@@ -644,7 +644,11 @@
       "id": "cookies-cream",
       "name": "Cookies & Cream",
       "tagline": "Milkshake energy, smoothie chill",
-      "flavorTags": ["cookies", "cream", "dessert"],
+      "flavorTags": [
+        "cookies",
+        "cream",
+        "dessert"
+      ],
       "image": "/donuts/assets/products/cookies-cream-smoothie.png",
       "visual": {
         "kind": "smoothie",
@@ -673,7 +677,11 @@
       "id": "pb-banana",
       "name": "PB Banana Cocoa",
       "tagline": "Peanut butter hug in a cup",
-      "flavorTags": ["peanut butter", "banana", "chocolate"],
+      "flavorTags": [
+        "peanut butter",
+        "banana",
+        "chocolate"
+      ],
       "image": "/donuts/assets/products/pb-banana-smoothie.png",
       "visual": {
         "kind": "smoothie",

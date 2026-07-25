@@ -20,11 +20,11 @@
   <script src="/shared/dark-mode.js" defer></script>
 </head>
 <body class="gz-page">
-  <div class="gz-sugar" id="gzSugar" aria-hidden="true"></div>
   <modern-navbar></modern-navbar>
 
   <main class="gz-main">
     <section class="gz-hero container" id="gzHero">
+      <div class="gz-sugar" id="gzSugar" aria-hidden="true"></div>
       <div class="gz-hero-layout">
         <div class="gz-hero-inner">
           <h1 class="gz-brand">Glazed</h1>
@@ -51,21 +51,23 @@
     <div class="container">
       <aside class="gz-guide" id="gzGuide" aria-label="Bakery guide Pip">
         <div class="gz-guide-card">
-          <img
-            class="gz-guide-portrait"
-            id="gzGuidePortrait"
-            src="/donuts/assets/pip-baker-portrait.png"
-            width="76"
-            height="76"
-            alt="Pip — bakery guide"
-          />
+          <button type="button" class="gz-guide-portrait-btn" id="gzGuideExpand" aria-label="Pip — expand dock">
+            <img
+              class="gz-guide-portrait"
+              id="gzGuidePortrait"
+              src="/donuts/assets/pip-baker-portrait.png"
+              width="76"
+              height="76"
+              alt="Pip — bakery guide"
+            />
+          </button>
           <div class="gz-guide-meta">
             <h2 id="gzGuideName">Pip</h2>
             <p id="gzGuideTitle">Head baker &amp; glaze gossip</p>
-            <p class="gz-guide-status">HeyGen avatar ready · tap Hear welcome</p>
+            <p class="gz-guide-status" id="gzGuideStatus">HeyGen avatar ready · tap Hear welcome</p>
           </div>
           <div class="gz-guide-actions">
-            <button type="button" class="gz-btn gz-btn-primary gz-btn-sm" id="gzMeetPip">
+            <button type="button" class="gz-btn gz-btn-primary gz-btn-sm" id="gzMeetPip" title="Play Pip’s HeyGen welcome clip">
               <i class="bi bi-play-fill"></i> Hear welcome
             </button>
             <button type="button" class="gz-btn gz-btn-frost gz-btn-sm" id="gzAskPip">
@@ -74,8 +76,14 @@
             <button type="button" class="gz-btn gz-btn-ghost gz-btn-sm" id="gzStopPip">
               <i class="bi bi-stop-fill"></i> Stop
             </button>
+            <button type="button" class="gz-btn gz-btn-ghost gz-btn-sm" id="gzGuideCollapse" title="Collapse Pip dock" aria-label="Collapse Pip dock">
+              <i class="bi bi-chevron-up"></i>
+            </button>
           </div>
         </div>
+        <p class="gz-pip-path-hint">
+          <strong>Hear welcome</strong> = HeyGen clip · <strong>Play reel</strong> = HyperFrame page tour · <strong>Ask Pip</strong> = chat
+        </p>
         <div class="gz-story-panel" id="gzStoryPanel" aria-label="Pip highlight reel">
           <div class="gz-story-panel-row">
             <button type="button" class="gz-btn gz-btn-frost gz-btn-sm" id="gzStoryPlay" aria-pressed="false">
@@ -89,7 +97,12 @@
               Narration
             </label>
           </div>
-          <p class="gz-story-panel-hint">HyperFrame tour with Pip — baker’s dozen, smoothies, and Savy on Harbor.</p>
+          <div class="gz-story-status" id="gzStoryStatus" hidden aria-live="polite">
+            <span class="gz-story-status-text" id="gzStoryStatusText">Playing…</span>
+            <div class="gz-story-dots" id="gzStoryDots" aria-hidden="true"></div>
+          </div>
+          <p class="gz-story-panel-hint" id="gzStoryHint">HyperFrame tour with Pip — baker’s dozen, smoothies, and Savy on Harbor.</p>
+          <p class="gz-story-error" id="gzStoryError" hidden></p>
         </div>
       </aside>
 
@@ -121,9 +134,14 @@
             <h3 id="gzShopName">Savy Donuts &amp; Smoothies</h3>
             <p id="gzShopAddress" class="gz-shop-address"></p>
             <p id="gzShopNote" class="gz-shop-note"></p>
-            <a id="gzShopDirections" class="gz-btn gz-btn-primary gz-btn-sm" href="#" target="_blank" rel="noopener" hidden>
-              <i class="bi bi-geo-alt-fill"></i> Directions
-            </a>
+            <div class="gz-shop-actions">
+              <a id="gzShopPhone" class="gz-btn gz-btn-ghost gz-btn-sm" href="tel:+16572320098" hidden>
+                <i class="bi bi-telephone-fill"></i> <span id="gzShopPhoneLabel">+1 657-232-0098</span>
+              </a>
+              <a id="gzShopDirections" class="gz-btn gz-btn-primary gz-btn-sm" href="#" target="_blank" rel="noopener" hidden>
+                <i class="bi bi-geo-alt-fill"></i> Directions
+              </a>
+            </div>
             <p id="gzShopMapStatus" class="gz-shop-map-status">Loading map…</p>
           </div>
           <div class="gz-shop-map-wrap">
@@ -155,7 +173,19 @@
         <p class="gz-story-kicker" id="gzStoryKicker"></p>
         <h3 class="gz-story-title" id="gzStoryTitle"></h3>
         <p class="gz-story-body" id="gzStoryCopy"></p>
+        <p class="gz-story-progress" id="gzStoryProgress"></p>
       </div>
+    </div>
+  </div>
+
+  <div class="gz-recipe-sheet" id="gzRecipeSheet" hidden role="dialog" aria-modal="true" aria-labelledby="gzRecipeSheetTitle">
+    <div class="gz-recipe-sheet-backdrop" id="gzRecipeSheetBackdrop"></div>
+    <div class="gz-recipe-sheet-panel">
+      <header class="gz-recipe-sheet-header">
+        <h2 id="gzRecipeSheetTitle">Recipe &amp; story</h2>
+        <button type="button" class="btn-close btn-close-white" id="gzRecipeSheetClose" aria-label="Close recipe"></button>
+      </header>
+      <div class="gz-recipe-sheet-body" id="gzRecipeSheetBody"></div>
     </div>
   </div>
 

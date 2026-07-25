@@ -15,9 +15,18 @@
       .replace(/"/g, '&quot;');
   }
 
-  /** Pip = young female Google Standard-F (reliable in prod; Neural2 often unavailable). */
-  const PIP_TTS_VOICE = 'en-US-Standard-F';
-  const PIP_TTS_OPTS = { preferFemale: true, gender: 'female', pitch: 2.2, speakingRate: 1.06 };
+  /**
+   * Pip = young / playful baker — NOT matron Standard-F.
+   * Neural2-H is brighter; server falls back to Wavenet-H then pitched Standard-F.
+   */
+  const PIP_TTS_VOICE = 'en-US-Neural2-H';
+  const PIP_TTS_OPTS = {
+    preferFemale: true,
+    gender: 'female',
+    youngFemale: true,
+    pitch: 6.5,
+    speakingRate: 1.12
+  };
 
   function speak(text) {
     if (!text) return;
@@ -30,17 +39,19 @@
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(text);
-      u.rate = 1.06;
-      u.pitch = 1.15;
+      u.rate = 1.12;
+      u.pitch = 1.85; // browser max~2 — keep Pip young, not matron
       const voices = window.speechSynthesis.getVoices();
-      const female =
-        voices.find((v) =>
-          /samantha|karen|jenny|aria|zira|susan|victoria|moira|fiona|siri|female/i.test(
-            `${v.name} ${v.voiceURI || ''}`
-          )
-        ) ||
-        voices.find((v) => /en(-|_)?us/i.test(v.lang) && !/male|david|daniel|alex|mark|george/i.test(v.name));
-      if (female) u.voice = female;
+      const label = (v) => `${v.name || ''} ${v.voiceURI || ''}`;
+      const young =
+        voices.find((v) => /jenny|aria|samantha|nova|karen|google.*female/i.test(label(v))) ||
+        voices.find(
+          (v) =>
+            /en(-|_)?us/i.test(v.lang) &&
+            /female/i.test(label(v)) &&
+            !/susan|victoria|zira|hazel|mature|grandma/i.test(label(v))
+        );
+      if (young) u.voice = young;
       window.speechSynthesis.speak(u);
     }
   }
@@ -173,15 +184,31 @@
     return buildDonutSvg(item.visual, item.id);
   }
 
-  function recipeHtml(recipe) {
+  function recipeHtml(recipe, { lightbox = false } = {}) {
     if (!recipe) return '';
     const ingredients = (recipe.ingredients || []).map((item) => `<li>${esc(item)}</li>`).join('');
     const steps = (recipe.steps || []).map((item) => `<li>${esc(item)}</li>`).join('');
-    return `
+    const meta = `
       <div class="gz-meta-row">
         <span><i class="bi bi-egg-fried"></i> ${esc(recipe.yield || '')}</span>
         <span><i class="bi bi-clock"></i> ${esc(recipe.time || '')}</span>
-      </div>
+      </div>`;
+    if (lightbox) {
+      return `
+        ${meta}
+        <div class="gz-recipe-sheet-cols">
+          <div class="gz-back-block">
+            <h4>Ingredients</h4>
+            <ul>${ingredients}</ul>
+          </div>
+          <div class="gz-back-block">
+            <h4>Steps</h4>
+            <ol class="gz-recipe-steps">${steps}</ol>
+          </div>
+        </div>`;
+    }
+    return `
+      ${meta}
       <div class="gz-back-block">
         <h4>Recipe</h4>
         <ul>${ingredients}</ul>
@@ -192,12 +219,35 @@
       </div>`;
   }
 
+  const PAIRINGS = {
+    'classic-glazed': 'mango-sunrise',
+    'boston-cream': 'cookies-cream',
+    'raspberry-jelly': 'berry-blast',
+    'old-fashioned': 'strawberry-banana',
+    'maple-walnut': 'pb-banana',
+    'french-cruller': 'mango-sunrise',
+    'chocolate-frosted': 'cookies-cream',
+    'strawberry-sprinkle': 'strawberry-banana',
+    'lemon-poppy': 'tropical-green',
+    'apple-fritter': 'pb-banana',
+    'cinnamon-sugar': 'mango-sunrise',
+    'matcha-white-chocolate': 'tropical-green',
+    'blueberry-cake': 'berry-blast',
+    'mango-sunrise': 'classic-glazed',
+    'berry-blast': 'raspberry-jelly',
+    'tropical-green': 'lemon-poppy',
+    'strawberry-banana': 'strawberry-sprinkle',
+    'cookies-cream': 'boston-cream',
+    'pb-banana': 'maple-walnut'
+  };
+
   function cardHtml(item, kind) {
     const tags = (item.flavorTags || [])
       .slice(0, 2)
       .map((t) => `<span class="gz-tag">${esc(t)}</span>`)
       .join('');
     const kicker = kind === 'smoothie' ? 'Smoothie' : 'Donut';
+    const pairLabel = kind === 'smoothie' ? 'Pair with a donut' : 'Pair with a smoothie';
     return `
       <article class="gz-card" data-id="${esc(item.id)}" data-kind="${esc(kind)}" tabindex="0" role="button" aria-pressed="false" aria-label="${esc(item.name)} — flip for recipe and history">
         <div class="gz-card-inner">
@@ -221,10 +271,18 @@
                 <p>${esc(item.history || '')}</p>
               </div>
             </div>
-            <p class="gz-scroll-cue" hidden><i class="bi bi-chevron-down"></i> Scroll</p>
+            <button type="button" class="gz-scroll-cue gz-recipe-open" data-recipe="${esc(item.id)}" hidden>
+              <i class="bi bi-arrows-fullscreen"></i> Full recipe
+            </button>
             <div class="gz-back-actions">
               <button type="button" class="gz-btn gz-btn-sm gz-btn-frost gz-hear" data-hear="${esc(item.id)}">
                 <i class="bi bi-soundwave"></i> Hear Pip
+              </button>
+              <button type="button" class="gz-btn gz-btn-sm gz-btn-ghost gz-recipe-open" data-recipe="${esc(item.id)}">
+                <i class="bi bi-book"></i> Open recipe
+              </button>
+              <button type="button" class="gz-btn gz-btn-sm gz-btn-ink gz-pair" data-pair="${esc(item.id)}">
+                <i class="bi bi-hearts"></i> ${pairLabel}
               </button>
               <button type="button" class="gz-btn gz-btn-sm gz-btn-ink gz-flip-back">
                 <i class="bi bi-arrow-counterclockwise"></i> Flip back
@@ -234,6 +292,61 @@
         </div>
       </article>`;
   }
+
+  function openRecipeSheet(item) {
+    const sheet = document.getElementById('gzRecipeSheet');
+    const title = document.getElementById('gzRecipeSheetTitle');
+    const body = document.getElementById('gzRecipeSheetBody');
+    if (!sheet || !body || !item) return;
+    if (title) title.textContent = item.name || 'Recipe & story';
+    body.innerHTML = `
+      <p class="gz-recipe-sheet-tagline">${esc(item.tagline || '')}</p>
+      ${recipeHtml(item.recipe, { lightbox: true })}
+      <div class="gz-back-block gz-recipe-sheet-history">
+        <h4>History</h4>
+        <p>${esc(item.history || '')}</p>
+      </div>`;
+    sheet.hidden = false;
+    document.body.classList.add('gz-recipe-open');
+    document.getElementById('gzRecipeSheetClose')?.focus?.();
+  }
+
+  function closeRecipeSheet() {
+    const sheet = document.getElementById('gzRecipeSheet');
+    if (sheet) sheet.hidden = true;
+    document.body.classList.remove('gz-recipe-open');
+  }
+
+  function askPipPairing(item) {
+    const catalog = window.GlazedCatalog || { byId: {} };
+    const pairId = PAIRINGS[item.id];
+    const pair = pairId ? catalog.byId[pairId] : null;
+    const pairName = pair?.name || (item.kind === 'smoothie' || catalog.byId[item.id]?.kind === 'smoothie' ? 'a classic glazed' : 'a mango smoothie');
+    const msg = `What pairs well with ${item.name}? I’d love something like ${pairName} — any tips?`;
+    if (typeof window.GlazedAskPip === 'function') {
+      window.GlazedAskPip(msg);
+    } else if (window.aiChatWidget?.sendMessage) {
+      window.aiChatWidget.open?.();
+      window.aiChatWidget.sendMessage(msg);
+    }
+  }
+
+  function collapsePipDock() {
+    document.getElementById('gzGuide')?.classList.add('is-compact');
+    try {
+      sessionStorage.setItem('glazedPipDockCompact', '1');
+    } catch (_) {}
+  }
+
+  function expandPipDock() {
+    document.getElementById('gzGuide')?.classList.remove('is-compact');
+    try {
+      sessionStorage.removeItem('glazedPipDockCompact');
+    } catch (_) {}
+  }
+
+  window.GlazedCollapsePipDock = collapsePipDock;
+  window.GlazedExpandPipDock = expandPipDock;
 
   function updateCardScrollCue(card) {
     const scroll = card?.querySelector('.gz-back-scroll');
@@ -250,24 +363,25 @@
   function wireSugar() {
     const root = document.getElementById('gzSugar');
     if (!root || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    for (let i = 0; i < 28; i += 1) {
+    // Light sugar season — hero only (clipped), grids stay still
+    for (let i = 0; i < 12; i += 1) {
       const span = document.createElement('span');
       span.style.left = `${Math.random() * 100}%`;
-      span.style.animationDuration = `${8 + Math.random() * 14}s`;
-      span.style.animationDelay = `${Math.random() * 10}s`;
-      span.style.width = `${2 + Math.random() * 4}px`;
+      span.style.animationDuration = `${10 + Math.random() * 12}s`;
+      span.style.animationDelay = `${Math.random() * 8}s`;
+      span.style.width = `${2 + Math.random() * 3}px`;
       span.style.height = span.style.width;
       root.appendChild(span);
     }
-    for (let i = 0; i < 40; i += 1) {
+    for (let i = 0; i < 16; i += 1) {
       const rod = document.createElement('span');
       rod.className = 'gz-sugar-sprinkle';
       rod.style.left = `${Math.random() * 100}%`;
       rod.style.background = SPRINKLE_COLORS[i % SPRINKLE_COLORS.length];
-      rod.style.animationDuration = `${7 + Math.random() * 12}s`;
-      rod.style.animationDelay = `${Math.random() * 9}s`;
-      rod.style.setProperty('--spin', `${(Math.random() * 360 - 180).toFixed(0)}deg`);
-      rod.style.setProperty('--drift-x', `${(Math.random() * 80 - 40).toFixed(0)}px`);
+      rod.style.animationDuration = `${9 + Math.random() * 10}s`;
+      rod.style.animationDelay = `${Math.random() * 7}s`;
+      rod.style.setProperty('--spin', `${(Math.random() * 280 - 140).toFixed(0)}deg`);
+      rod.style.setProperty('--drift-x', `${(Math.random() * 48 - 24).toFixed(0)}px`);
       root.appendChild(rod);
     }
   }
@@ -376,7 +490,7 @@
     const nameEl = document.getElementById('gzGuideName');
     const titleEl = document.getElementById('gzGuideTitle');
     const portrait = document.getElementById('gzGuidePortrait');
-    const statusEl = document.querySelector('.gz-guide-status');
+    const statusEl = document.getElementById('gzGuideStatus') || document.querySelector('.gz-guide-status');
     if (nameEl) nameEl.textContent = brand.guideName || 'Pip';
     if (titleEl) titleEl.textContent = brand.guideTitle || 'Head baker';
     if (portrait && brand.guidePortrait) {
@@ -384,17 +498,43 @@
       portrait.alt = `${brand.guideName || 'Pip'} — bakery guide`;
     }
 
+    try {
+      if (sessionStorage.getItem('glazedPipDockCompact') === '1') collapsePipDock();
+    } catch (_) {}
+
+    document.getElementById('gzGuideCollapse')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      collapsePipDock();
+    });
+    document.getElementById('gzGuideExpand')?.addEventListener('click', () => {
+      if (document.getElementById('gzGuide')?.classList.contains('is-compact')) {
+        expandPipDock();
+      }
+    });
+
     async function playWelcome() {
       setSpeaking(true);
+      if (statusEl) statusEl.textContent = 'Playing HeyGen welcome…';
       const played = window.GlazedHeygen ? await window.GlazedHeygen.playIntro() : false;
       if (!played) {
+        if (statusEl) statusEl.textContent = 'HeyGen clip unavailable — using Pip’s voice instead.';
         speak(brand.welcomeScript || '');
-        setTimeout(() => setSpeaking(false), Math.min(14000, (brand.welcomeScript || '').length * 55));
+        setTimeout(() => {
+          setSpeaking(false);
+          if (statusEl) statusEl.textContent = 'Tap Hear welcome for the clip, or Play reel for the tour.';
+        }, Math.min(14000, (brand.welcomeScript || '').length * 55));
         return;
       }
       const video = document.getElementById('gzHeygenDemoVideo');
       if (video) {
-        video.addEventListener('ended', () => setSpeaking(false), { once: true });
+        video.addEventListener(
+          'ended',
+          () => {
+            setSpeaking(false);
+            if (statusEl) statusEl.textContent = 'Welcome done · try Play reel for the page tour.';
+          },
+          { once: true }
+        );
         video.addEventListener('pause', () => {
           if (video.ended || video.paused) setSpeaking(false);
         });
@@ -408,6 +548,13 @@
       stopSpeak();
       window.GlazedHeygen?.stopIntro();
       setSpeaking(false);
+      if (statusEl) statusEl.textContent = 'Stopped · Hear welcome = clip · Play reel = tour.';
+    });
+
+    document.getElementById('gzRecipeSheetClose')?.addEventListener('click', closeRecipeSheet);
+    document.getElementById('gzRecipeSheetBackdrop')?.addEventListener('click', closeRecipeSheet);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeRecipeSheet();
     });
 
     fetch('/data/donuts-heygen-demo.json', { cache: 'no-store' })
@@ -415,10 +562,12 @@
       .then((demo) => {
         if (!statusEl) return;
         if (demo?.heygenVideoLocalShort || demo?.heygenVideoUrlShort) {
-          statusEl.textContent = 'HeyGen avatar ready · tap Hear welcome';
+          statusEl.textContent = 'HeyGen ready · Hear welcome = clip · Play reel = tour';
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        if (statusEl) statusEl.textContent = 'Clip may be offline · Play reel still works.';
+      });
   }
 
   function setCardFlipped(card, flipped) {
@@ -426,7 +575,16 @@
     card.classList.toggle('is-flipped', flipped);
     card.setAttribute('aria-pressed', flipped ? 'true' : 'false');
     if (flipped) {
-      window.requestAnimationFrame(() => updateCardScrollCue(card));
+      window.requestAnimationFrame(() => {
+        updateCardScrollCue(card);
+        // Long recipes → open readable lightbox after flip (card stays a teaser)
+        const face = card.querySelector('.gz-face--back');
+        const id = card.getAttribute('data-id');
+        const catalog = window.GlazedCatalog?.byId || {};
+        if (face?.classList.contains('has-scroll') && id && catalog[id]) {
+          window.setTimeout(() => openRecipeSheet(catalog[id]), 280);
+        }
+      });
     }
   }
 
@@ -449,6 +607,23 @@
         return;
       }
 
+      const recipeBtn = e.target.closest('.gz-recipe-open');
+      if (recipeBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        openRecipeSheet(byId[recipeBtn.getAttribute('data-recipe')]);
+        return;
+      }
+
+      const pairBtn = e.target.closest('.gz-pair');
+      if (pairBtn) {
+        e.preventDefault();
+        e.stopPropagation();
+        const item = byId[pairBtn.getAttribute('data-pair')];
+        if (item) askPipPairing(item);
+        return;
+      }
+
       const flipBack = e.target.closest('.gz-flip-back');
       if (flipBack) {
         e.preventDefault();
@@ -467,7 +642,7 @@
 
     grid.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' && e.key !== ' ') return;
-      if (e.target.closest('.gz-hear, .gz-flip-back')) return;
+      if (e.target.closest('.gz-hear, .gz-flip-back, .gz-recipe-open, .gz-pair')) return;
       const card = e.target.closest('.gz-card');
       if (!card || e.target !== card) return;
       e.preventDefault();
@@ -513,24 +688,34 @@
 
       if (loading) loading.hidden = true;
 
+      const byId = {};
+      donuts.forEach((d) => {
+        byId[d.id] = { ...d, kind: 'donut' };
+      });
+      smoothies.forEach((s) => {
+        byId[s.id] = { ...s, kind: 'smoothie' };
+      });
+      window.GlazedCatalog = { donuts, smoothies, byId, shop: data.shop || null };
+
       if (grid) {
         grid.innerHTML = donuts.length
           ? donuts.map((d) => cardHtml(d, 'donut')).join('')
-          : '<p class="gz-empty">No donuts in the case yet.</p>';
+          : '<p class="gz-empty">The case is empty right now — refresh in a moment.</p>';
         bindCards(donuts, 'gzGrid');
       }
 
       if (smoothieGrid) {
         smoothieGrid.innerHTML = smoothies.length
           ? smoothies.map((s) => cardHtml(s, 'smoothie')).join('')
-          : '<p class="gz-empty">Smoothie board coming soon.</p>';
+          : '<p class="gz-empty">Smoothie board is warming up — try again shortly.</p>';
         bindCards(smoothies, 'gzSmoothieGrid');
       }
     } catch (err) {
       console.error('Glazed gallery failed to load', err);
       if (loading) {
         loading.hidden = false;
-        loading.textContent = 'Could not load the case. Refresh and try again.';
+        loading.textContent =
+          'Couldn’t load the baker’s dozen (network hiccup). Refresh the page — Pip’s still here.';
       }
     }
   }

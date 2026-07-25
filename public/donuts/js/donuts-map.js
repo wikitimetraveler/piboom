@@ -25,6 +25,15 @@
       linkEl.href = shop.mapsUrl;
       linkEl.hidden = false;
     }
+    const phoneEl = document.getElementById('gzShopPhone');
+    const phoneLabel = document.getElementById('gzShopPhoneLabel');
+    const phone = String(shop.phone || '').trim();
+    if (phoneEl && phone) {
+      const digits = phone.replace(/[^\d+]/g, '');
+      phoneEl.href = `tel:${digits}`;
+      if (phoneLabel) phoneLabel.textContent = phone;
+      phoneEl.hidden = false;
+    }
     if (signEl && shop.signImage) {
       signEl.src = shop.signImage;
       signEl.alt = `${shop.name || 'Savy'} sign`;
@@ -34,7 +43,10 @@
     const lat = Number(shop.lat);
     const lng = Number(shop.lng);
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-      if (status) status.textContent = 'Map coordinates missing.';
+      if (status) {
+        status.hidden = false;
+        status.textContent = 'Map pin unavailable — use phone or Directions below.';
+      }
       return;
     }
 
@@ -45,9 +57,10 @@
 
     if (!ok || !window.google?.maps) {
       if (status) {
+        status.hidden = false;
         status.textContent =
           window.__laneGoogleMapsUnavailableReason ||
-          'Google Maps unavailable — use Directions instead.';
+          'Map couldn’t load here — tap Directions or call the shop.';
       }
       return;
     }

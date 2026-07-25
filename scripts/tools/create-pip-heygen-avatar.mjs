@@ -53,24 +53,50 @@ async function pickWarmFemaleEnglishVoice() {
       const name = String(v.name || v.voice_name || '').toLowerCase();
       const gender = String(v.gender || v.sex || '').toLowerCase();
       const lang = String(v.language || v.locale || '').toLowerCase();
+      const isFemale =
+        gender.includes('female') ||
+        gender === 'woman' ||
+        gender === 'f' ||
+        /\bfemale\b/.test(name);
+      const isMale =
+        gender.includes('male') && !isFemale
+          ? true
+          : /\b(male|man)\b/.test(name) && !isFemale;
       let score = 0;
-      if (gender.includes('female') || gender === 'woman' || gender === 'f') score += 6;
-      if (lang.includes('english') || lang.startsWith('en')) score += 5;
-      if (/italian|spanish|french|german|japanese|chinese|korean|portuguese|hindi|arabic/.test(`${name} ${lang}`)) {
-        score -= 10;
+      if (!isFemale || isMale) {
+        return {
+          voiceId: v.voice_id || v.id,
+          voiceName: v.name || v.voice_name || v.voice_id || v.id,
+          score: -100
+        };
       }
-      if (/warm|friendly|cheerful|upbeat|playful|soft|sweet|natural|conversational/.test(name)) score += 2;
+      score += 12; // required: female only
+      if (lang.includes('english') || lang.startsWith('en') || /en[-_]?us|american/.test(`${name} ${lang}`)) {
+        score += 8;
+      } else {
+        score -= 20;
+      }
+      if (/italian|spanish|french|german|japanese|chinese|korean|portuguese|hindi|arabic/.test(`${name} ${lang}`)) {
+        score -= 25;
+      }
+      // Prefer youthful / bright baker energy (Pip)
+      if (/young|youth|teen|girl|bright|perky|bubbly|playful|cute|sweet|cheerful|upbeat/.test(name)) {
+        score += 6;
+      }
+      if (/warm|friendly|soft|natural|conversational|radiant|sunny/.test(name)) score += 2;
+      // Avoid deep / mature narrator vibes
+      if (/mature|deep|serious|news|narrator|elder|grandma|grandmother|wise/.test(name)) score -= 4;
       return {
         voiceId: v.voice_id || v.id,
         voiceName: v.name || v.voice_name || v.voice_id || v.id,
         score
       };
     })
-    .filter((v) => v.voiceId)
+    .filter((v) => v.voiceId && v.score > 0)
     .sort((a, b) => b.score - a.score);
 
   const best = scored[0];
-  if (!best) throw new Error('No HeyGen voices available');
+  if (!best) throw new Error('No young female English HeyGen voices available');
   return best;
 }
 

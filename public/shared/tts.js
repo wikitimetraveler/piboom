@@ -81,11 +81,8 @@
 
   async function speakWithGoogle(text, voice = 'en-US-Standard-D', options = {}) {
     try {
-      // Mobile: prefer browser TTS - audio.play() often blocked without user gesture
-      if (isMobile()) {
-        return speakWithBrowser(text, options);
-      }
-
+      // Always try Google first for Pip / young-female — mobile browser voices sound matron (Zira/Susan).
+      // Hear Pip / reel / chat are user gestures, so audio.play() usually works; browser is fallback only.
       if (currentAudio) {
         currentAudio.pause();
         currentAudio = null;
@@ -97,8 +94,11 @@
         body: JSON.stringify({
           text,
           voice,
-          pitch: options.pitch || 0,
-          speakingRate: options.speakingRate || 1.0
+          pitch: Number.isFinite(Number(options.pitch)) ? Number(options.pitch) : 0,
+          speakingRate: options.speakingRate || 1.0,
+          gender: options.gender || (options.preferFemale || options.youngFemale ? 'female' : undefined),
+          preferFemale: options.preferFemale === true || options.youngFemale === true,
+          youngFemale: options.youngFemale === true
         })
       });
 
@@ -181,15 +181,15 @@
       utterance.volume = typeof options.volume === 'number' ? options.volume : 0.8;
       const voices = window.speechSynthesis.getVoices();
       const preferFemale = options.preferFemale === true || options.gender === 'female';
-      const picked = preferFemale
-        ? voices.find((v) =>
-            /female|samantha|karen|zira|susan|victoria|moira|fiona|siri|google us english female|microsoft zira/i.test(
-              `${v.name} ${v.voiceURI || ''}`
-            )
-          ) ||
-          voices.find((v) => /en(-|_)?us/i.test(v.lang) && !/male|david|daniel|alex|mark|george/i.test(v.name))
-        : voices.find((v) => /male|daniel|david|alex/i.test(v.name));
+      const picked = preferFemale ? pickFemaleBrowserVoice(voices) : voices.find((v) => /male|daniel|david|alex/i.test(v.name));
       if (picked) utterance.voice = picked;
+      // Young Pip only: push browser pitch near max (2) — avoid matron Zira/Susan
+      if (options.youngFemale) {
+        utterance.pitch = mobile ? 1.8 : Math.min(2, Math.max(1.6, 1 + (Number(options.pitch) || 6) / 12));
+        utterance.rate = mobile ? 1.05 : Math.min(1.25, Number(options.speakingRate) || 1.12);
+      } else if (preferFemale && typeof options.pitch === 'number') {
+        utterance.pitch = mobile ? 1.1 : Math.min(2, Math.max(0.8, 1 + options.pitch / 10));
+      }
       // Don't set voice if empty (iOS) - use default
       window.speechSynthesis.speak(utterance);
       return true;
@@ -197,6 +197,30 @@
       console.error('Browser speech error:', error);
       return false;
     }
+  }
+
+  function pickFemaleBrowserVoice(voices) {
+    const list = Array.isArray(voices) ? voices : [];
+    const label = (v) => `${v.name || ''} ${v.voiceURI || ''}`;
+    const matronHit = (v) =>
+      /susan|victoria|zira|hazel|moira|fiona|grandma|grandmother|mature|elder|catherine|martha/i.test(label(v));
+    const youngHit = (v) =>
+      /jenny|aria|samantha|nova|karen|allison|emily|ava|google us english female|microsoft jenny|microsoft aria/i.test(
+        label(v)
+      );
+    const femaleHit = (v) => /female|samantha|karen|jenny|aria|sara|natasha|siri/i.test(label(v));
+    const maleHit = (v) =>
+      /\b(male|david|daniel|alex|mark|george|fred|tom|bruce|aaron|guy|james|john|ryan|matthew)\b/i.test(label(v));
+    // Prefer young/playful — never lead with Zira/Susan (matron)
+    return (
+      list.find((v) => /en(-|_)?us/i.test(v.lang) && youngHit(v) && !matronHit(v)) ||
+      list.find((v) => /^en/i.test(v.lang) && youngHit(v) && !matronHit(v)) ||
+      list.find((v) => /en(-|_)?us/i.test(v.lang) && femaleHit(v) && !matronHit(v)) ||
+      list.find((v) => /^en/i.test(v.lang) && femaleHit(v) && !matronHit(v)) ||
+      list.find((v) => /en(-|_)?us/i.test(v.lang) && !maleHit(v) && !matronHit(v)) ||
+      list.find((v) => /^en/i.test(v.lang) && !maleHit(v)) ||
+      null
+    );
   }
 
   const NARRATION_CHUNK_MAX = 3200;
@@ -250,14 +274,15 @@
         const voices = window.speechSynthesis.getVoices();
         const preferFemale = options.preferFemale === true || options.gender === 'female';
         const picked = preferFemale
-          ? voices.find((v) =>
-              /female|samantha|karen|zira|susan|victoria|moira|fiona|siri|google us english female|microsoft zira/i.test(
-                `${v.name} ${v.voiceURI || ''}`
-              )
-            ) ||
-            voices.find((v) => /en(-|_)?us/i.test(v.lang) && !/male|david|daniel|alex|mark|george/i.test(v.name))
+          ? pickFemaleBrowserVoice(voices)
           : voices.find((v) => /male|daniel|david|alex/i.test(v.name));
         if (picked) utterance.voice = picked;
+        if (options.youngFemale) {
+          utterance.pitch = mobile ? 1.8 : Math.min(2, Math.max(1.6, 1 + (Number(options.pitch) || 6) / 12));
+          utterance.rate = mobile ? 1.05 : Math.min(1.25, Number(options.speakingRate) || 1.12);
+        } else if (preferFemale && typeof options.pitch === 'number') {
+          utterance.pitch = mobile ? 1.1 : Math.min(2, Math.max(0.8, 1 + options.pitch / 10));
+        }
         utterance.onend = () => resolve();
         utterance.onerror = () => resolve();
         window.speechSynthesis.speak(utterance);
@@ -279,13 +304,14 @@
         body: JSON.stringify({
           text,
           voice,
-          pitch: options.pitch || 0,
-          speakingRate: options.speakingRate != null ? options.speakingRate : 1.0
+          pitch: Number.isFinite(Number(options.pitch)) ? Number(options.pitch) : 0,
+          speakingRate: options.speakingRate != null ? options.speakingRate : 1.0,
+          gender: options.gender || (options.preferFemale ? 'female' : undefined)
         })
       });
       const data = await response.json();
       if (!data.success || !data.audio) {
-        await speakBrowserChunkAwaitEnd(text, options);
+        await speakBrowserChunkAwaitEnd(text, { ...options, preferFemale: true, gender: options.gender || 'female' });
         return;
       }
       const audioBlob = base64ToBlob(data.audio, 'audio/mp3');
@@ -329,16 +355,19 @@
    */
   async function speakNarrationAwaitEnd(text, options = {}) {
     const isCancelled = typeof options.isCancelled === 'function' ? options.isCancelled : () => false;
-    const preferFemale = options.preferFemale === true || options.gender === 'female';
-    const voice = options.voice || (preferFemale ? 'en-US-Standard-F' : 'en-US-Standard-D');
+    const youngFemale = options.youngFemale === true;
+    const preferFemale = youngFemale || options.preferFemale === true || options.gender === 'female';
+    const voice =
+      options.voice || (youngFemale ? 'en-US-Neural2-H' : preferFemale ? 'en-US-Standard-F' : 'en-US-Standard-D');
     const vol = typeof options.volume === 'number' ? options.volume : 0.85;
     const rate = getNarrationSpeakingRate(options);
     const baseOpts = {
       speakingRate: rate,
       volume: vol,
-      pitch: options.pitch,
+      pitch: options.pitch != null ? options.pitch : youngFemale ? 6.5 : undefined,
       voice,
       preferFemale,
+      youngFemale,
       gender: options.gender || (preferFemale ? 'female' : undefined),
       isCancelled
     };

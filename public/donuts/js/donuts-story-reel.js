@@ -8,9 +8,15 @@
   const REEL_URLS = ['/data/donuts-story-reel.json', '/donuts/data/donuts-story-reel.json'];
   const STORAGE_NA = 'glazedStoryNarrate';
   const GAP_MS = 320;
-  /** Standard-F is widely available on GCP; Neural2 often missing in prod. */
-  const DEFAULT_VOICE = 'en-US-Standard-F';
-  const DEFAULT_OPTS = { pitch: 2.2, speakingRate: 1.06, preferFemale: true, gender: 'female' };
+  /** Young playful Pip — Neural2-H (not matron Standard-F); same portrait as Hear welcome. */
+  const DEFAULT_VOICE = 'en-US-Neural2-H';
+  const DEFAULT_OPTS = {
+    pitch: 6.5,
+    speakingRate: 1.12,
+    preferFemale: true,
+    gender: 'female',
+    youngFemale: true
+  };
   const TTS_TIMEOUT_MS = 9000;
 
   /** Embedded fallback so Play works even if /data JSON 404s in prod */
@@ -154,32 +160,41 @@
   function speakText(text) {
     const clean = String(text || '').replace(/\s+/g, ' ').trim();
     if (!clean) return Promise.resolve();
-    const voice = state.config?.voice || DEFAULT_VOICE;
+    // Always young playful Pip — never matron Standard-F / male narrator defaults.
+    const voice = DEFAULT_VOICE;
     const opts = {
-      pitch: state.config?.pitch ?? DEFAULT_OPTS.pitch,
-      speakingRate: state.config?.speakingRate ?? DEFAULT_OPTS.speakingRate,
+      voice: DEFAULT_VOICE,
+      pitch: DEFAULT_OPTS.pitch,
+      speakingRate: DEFAULT_OPTS.speakingRate,
       preferFemale: true,
+      youngFemale: true,
       gender: 'female',
+      volume: 0.9,
       isCancelled: () => !state.running || state.paused
     };
 
     const speakPromise = (async () => {
       try {
         if (typeof window.speakNarrationAwaitEnd === 'function') {
-          await window.speakNarrationAwaitEnd(clean, { ...opts, voice });
-          return;
-        }
-        if (typeof window.gzSpeakPip === 'function') {
-          window.gzSpeakPip(clean);
-          await sleep(Math.min(8000, 800 + clean.length * 45));
+          await window.speakNarrationAwaitEnd(clean, opts);
           return;
         }
         if (typeof window.speakWithGoogle === 'function') {
           await window.speakWithGoogle(clean, voice, opts);
           await sleep(Math.min(8000, 800 + clean.length * 45));
+          return;
+        }
+        if (typeof window.gzSpeakPip === 'function') {
+          window.gzSpeakPip(clean);
+          await sleep(Math.min(8000, 800 + clean.length * 45));
         }
       } catch (err) {
         console.warn('Glazed reel narration failed', err);
+        const errEl = document.getElementById('gzStoryError');
+        if (errEl) {
+          errEl.hidden = false;
+          errEl.textContent = 'Narration hiccup — reel keeps going (try unmute / tap the page once).';
+        }
       }
     })();
 
@@ -269,6 +284,30 @@
     });
   }
 
+  function renderProgress(index) {
+    const total = state.scenes.length;
+    const n = index + 1;
+    const status = document.getElementById('gzStoryStatus');
+    const statusText = document.getElementById('gzStoryStatusText');
+    const dots = document.getElementById('gzStoryDots');
+    const progress = document.getElementById('gzStoryProgress');
+    if (status) status.hidden = false;
+    if (statusText) statusText.textContent = `Playing ${n}/${total}…`;
+    if (progress) progress.textContent = `${n} / ${total}`;
+    if (dots) {
+      dots.innerHTML = state.scenes
+        .map((_, i) => `<span class="gz-story-dot${i === index ? ' is-active' : i < index ? ' is-done' : ''}"></span>`)
+        .join('');
+    }
+  }
+
+  function clearProgress() {
+    const status = document.getElementById('gzStoryStatus');
+    const progress = document.getElementById('gzStoryProgress');
+    if (status) status.hidden = true;
+    if (progress) progress.textContent = '';
+  }
+
   function setUiRunning(running) {
     document.body.classList.toggle('gz-story-running', running);
     const play = document.getElementById('gzStoryPlay');
@@ -280,9 +319,11 @@
         : '<i class="bi bi-film"></i> Play highlight reel';
     }
     if (stop) stop.hidden = !running;
+    if (!running) clearProgress();
   }
 
-  function stopReel() {
+  function stopReel(opts) {
+    const finished = opts && opts.finished;
     state.running = false;
     state.paused = false;
     state.playbackToken += 1;
@@ -290,12 +331,18 @@
     clearSpotlight();
     setOverlay(null);
     setUiRunning(false);
+    if (finished && typeof window.GlazedCollapsePipDock === 'function') {
+      window.GlazedCollapsePipDock();
+    }
   }
 
-  async function playScene(scene, token) {
+  async function playScene(scene, token, index) {
     if (!scene || !state.running || token !== state.playbackToken) return;
+    renderProgress(index);
     applySpotlight(scene);
     setOverlay(scene);
+    const progress = document.getElementById('gzStoryProgress');
+    if (progress) progress.textContent = `${index + 1} / ${state.scenes.length}`;
     runAction(scene.action);
     document.getElementById('gzGuide')?.classList.toggle('is-speaking', narrationOn());
 
@@ -319,8 +366,17 @@
   }
 
   async function runReel(fromIndex = 0) {
+    const errEl = document.getElementById('gzStoryError');
+    if (errEl) {
+      errEl.hidden = true;
+      errEl.textContent = '';
+    }
     if (!state.scenes.length) {
       console.warn('Glazed story reel: no scenes loaded');
+      if (errEl) {
+        errEl.hidden = false;
+        errEl.textContent = 'Reel couldn’t load scenes. Refresh once — local fallback should kick in.';
+      }
       return;
     }
     state.running = true;
@@ -329,18 +385,19 @@
     setUiRunning(true);
     if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
     if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
+    typeof window.GlazedExpandPipDock === 'function' && window.GlazedExpandPipDock();
 
     for (let i = fromIndex; i < state.scenes.length; i += 1) {
       if (!state.running || token !== state.playbackToken) break;
       await waitWhilePaused(token);
       if (!state.running || token !== state.playbackToken) break;
       state.index = i;
-      await playScene(state.scenes[i], token);
+      await playScene(state.scenes[i], token, i);
       if (!state.running || token !== state.playbackToken) break;
       await sleep(GAP_MS);
     }
 
-    if (token === state.playbackToken) stopReel();
+    if (token === state.playbackToken) stopReel({ finished: true });
   }
 
   function togglePlay() {
@@ -399,6 +456,11 @@
     }
     state.config = { ...FALLBACK_CONFIG };
     state.scenes = FALLBACK_CONFIG.scenes.slice();
+    const errEl = document.getElementById('gzStoryError');
+    if (errEl) {
+      errEl.hidden = false;
+      errEl.textContent = 'Using offline reel scenes (catalog JSON slow or missing). Tour still plays.';
+    }
   }
 
   function bindUi() {

@@ -411,7 +411,7 @@ export function speakText(req, res) {
 // NEW: Google Cloud TTS endpoint - returns audio for frontend playback
 export async function synthesizeSpeech(req, res) {
   try {
-    const { text, voice, pitch, speakingRate } = req.body;
+    const { text, voice, pitch, speakingRate, gender, preferFemale, youngFemale } = req.body;
     
     if (!text) {
       return res.status(400).json({ 
@@ -424,7 +424,7 @@ export async function synthesizeSpeech(req, res) {
     const audioBase64 = await voiceService.speakWithGoogle(
       text,
       voice || 'en-US-Standard-D',
-      { pitch, speakingRate }
+      { pitch, speakingRate, gender, preferFemale, youngFemale }
     );
     
     if (audioBase64) {

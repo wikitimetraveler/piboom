@@ -49,31 +49,41 @@ body.gz-page {
   display: block;
 }
 
-/* —— Sugar dust + falling sprinkles —— */
+/* —— Sugar season: light motion, hero only (grids stay still) —— */
+.gz-hero {
+  position: relative;
+  overflow: hidden;
+}
+
 .gz-sugar {
   pointer-events: none;
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 0;
   overflow: hidden;
 }
 
+.gz-hero-layout {
+  position: relative;
+  z-index: 1;
+}
+
 .gz-sugar span {
   position: absolute;
-  width: 4px;
-  height: 4px;
+  width: 3px;
+  height: 3px;
   border-radius: 50%;
-  background: rgba(255, 244, 232, 0.45);
+  background: rgba(255, 244, 232, 0.4);
   animation: gz-drift linear infinite;
   opacity: 0;
 }
 
 .gz-sugar span.gz-sugar-sprinkle {
-  width: 9px;
-  height: 3px;
+  width: 8px;
+  height: 2.5px;
   border-radius: 999px;
-  top: -4%;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+  top: -6%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
   animation-name: gz-sprinkle-fall;
 }
 
@@ -83,24 +93,24 @@ body.gz-page {
     opacity: 0;
   }
   12% {
-    opacity: 0.7;
+    opacity: 0.55;
   }
   100% {
-    transform: translateY(100vh) scale(1);
+    transform: translateY(105%) scale(1);
     opacity: 0;
   }
 }
 
 @keyframes gz-sprinkle-fall {
   0% {
-    transform: translate3d(0, -8vh, 0) rotate(0deg);
+    transform: translate3d(0, -10%, 0) rotate(0deg);
     opacity: 0;
   }
-  8% {
-    opacity: 0.95;
+  10% {
+    opacity: 0.85;
   }
   100% {
-    transform: translate3d(var(--drift-x, 20px), 110vh, 0) rotate(var(--spin, 180deg));
+    transform: translate3d(var(--drift-x, 16px), 110%, 0) rotate(var(--spin, 160deg));
     opacity: 0;
   }
 }
@@ -585,6 +595,306 @@ body.gz-page {
   animation: gz-pulse-ring 0.9s ease-in-out infinite;
 }
 
+.gz-guide-portrait-btn {
+  display: block;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.gz-guide-portrait-btn:focus-visible {
+  outline: 2px solid var(--gz-frost);
+  outline-offset: 4px;
+}
+
+.gz-pip-path-hint {
+  margin: 0.55rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: rgba(255, 244, 232, 0.62);
+}
+
+.gz-pip-path-hint strong {
+  color: var(--gz-glaze);
+  font-weight: 800;
+}
+
+/* Compact Pip dock — portrait + icon actions after reel/chat */
+.gz-guide.is-compact .gz-guide-card {
+  grid-template-columns: auto auto;
+  gap: 0.65rem;
+  padding: 0.55rem 0.7rem;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.gz-guide.is-compact .gz-guide-meta,
+.gz-guide.is-compact .gz-pip-path-hint,
+.gz-guide.is-compact .gz-story-panel {
+  display: none;
+}
+
+.gz-guide.is-compact .gz-guide-portrait {
+  width: 56px;
+  height: 56px;
+  animation: none;
+}
+
+.gz-guide.is-compact .gz-guide-actions {
+  gap: 0.35rem;
+}
+
+.gz-guide.is-compact .gz-guide-actions .gz-btn {
+  padding: 0.4rem 0.55rem;
+  font-size: 0;
+  gap: 0;
+}
+
+.gz-guide.is-compact .gz-guide-actions .gz-btn i {
+  font-size: 1rem;
+}
+
+.gz-guide.is-compact #gzGuideCollapse {
+  display: none;
+}
+
+.gz-story-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem 0.85rem;
+  margin-top: 0.65rem;
+}
+
+.gz-story-status-text {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--gz-glaze);
+  letter-spacing: 0.02em;
+}
+
+.gz-story-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.gz-story-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 244, 232, 0.22);
+  box-shadow: inset 0 0 0 1px rgba(245, 199, 106, 0.25);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.gz-story-dot.is-done {
+  background: rgba(245, 199, 106, 0.55);
+}
+
+.gz-story-dot.is-active {
+  background: var(--gz-frost);
+  transform: scale(1.25);
+  box-shadow: 0 0 0 3px rgba(255, 122, 154, 0.28);
+}
+
+.gz-story-error {
+  margin: 0.5rem 0 0;
+  font-size: 0.8rem;
+  color: #ffb4c4;
+}
+
+.gz-story-progress {
+  margin: 0.4rem 0 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(245, 199, 106, 0.85);
+}
+
+.gz-shop-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+
+.gz-empty {
+  margin: 0;
+  padding: 1.25rem 1rem;
+  border-radius: 14px;
+  background: rgba(26, 16, 12, 0.45);
+  border: 1px dashed rgba(245, 199, 106, 0.35);
+  color: var(--gz-muted);
+}
+
+.gz-back-actions {
+  flex-wrap: wrap;
+}
+
+.gz-face--back .gz-btn-ghost {
+  background: rgba(74, 44, 26, 0.08);
+  color: var(--gz-espresso);
+  border: 1px solid rgba(74, 44, 26, 0.18);
+}
+
+.gz-face--back .gz-btn-ghost:hover {
+  background: rgba(74, 44, 26, 0.14);
+  color: var(--gz-espresso);
+}
+
+/* Recipe lightbox — readable after flip (not a cramped bottom sheet) */
+.gz-recipe-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 1400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
+    max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+}
+
+.gz-recipe-sheet[hidden] {
+  display: none !important;
+}
+
+.gz-recipe-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(12, 8, 6, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.gz-recipe-sheet-panel {
+  position: relative;
+  z-index: 1;
+  width: min(720px, 100%);
+  max-height: min(88vh, 820px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 22px;
+  background: linear-gradient(165deg, #fff8ef 0%, #fff1dc 55%, #f6e2c4 100%);
+  color: var(--gz-ink);
+  box-shadow: 0 28px 64px rgba(0, 0, 0, 0.45);
+  animation: gz-sheet-in 0.28s ease-out;
+  overflow: hidden;
+}
+
+@keyframes gz-sheet-in {
+  from {
+    transform: translateY(16px) scale(0.98);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.gz-recipe-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem 1.4rem;
+  border-bottom: 1px solid rgba(74, 44, 26, 0.12);
+  background: linear-gradient(135deg, #4a2c1a, #2c1810);
+  color: var(--gz-cream);
+}
+
+.gz-recipe-sheet-header h2 {
+  font-family: var(--gz-font-display);
+  font-size: clamp(1.35rem, 2.6vw, 1.7rem);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.gz-recipe-sheet-body {
+  overflow-y: auto;
+  padding: 1.4rem 1.5rem 1.75rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.gz-recipe-sheet-tagline {
+  margin: 0 0 1.15rem;
+  font-size: 1.05rem;
+  line-height: 1.45;
+  color: rgba(42, 24, 16, 0.78);
+}
+
+.gz-recipe-sheet-body .gz-meta-row {
+  gap: 0.75rem 1.1rem;
+  margin-bottom: 1.15rem;
+  font-size: 0.9rem;
+}
+
+.gz-recipe-sheet-cols {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem 1.75rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .gz-recipe-sheet-cols {
+    grid-template-columns: 1fr 1.15fr;
+  }
+}
+
+.gz-recipe-sheet-body .gz-back-block {
+  margin-bottom: 0;
+}
+
+.gz-recipe-sheet-body .gz-back-block h4 {
+  font-size: 0.82rem;
+  margin-bottom: 0.55rem;
+  color: var(--gz-frost-deep);
+}
+
+.gz-recipe-sheet-body .gz-back-block p,
+.gz-recipe-sheet-body .gz-back-block li {
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.gz-recipe-sheet-body .gz-back-block li + li {
+  margin-top: 0.35rem;
+}
+
+.gz-recipe-sheet-history {
+  margin-top: 0.35rem;
+  padding-top: 1.15rem;
+  border-top: 1px dashed rgba(74, 44, 26, 0.2);
+}
+
+body.gz-recipe-open {
+  overflow: hidden;
+}
+
+@media (max-width: 575.98px) {
+  .gz-recipe-sheet {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .gz-recipe-sheet-panel {
+    width: 100%;
+    max-height: min(92vh, 900px);
+    border-radius: 20px 20px 0 0;
+  }
+
+  .gz-recipe-sheet-body {
+    padding: 1.2rem 1.15rem 1.5rem;
+  }
+}
+
 /* —— Section —— */
 .gz-section {
   padding: 0.5rem 0 4rem;
@@ -691,9 +1001,11 @@ body.gz-page {
   inset: 18% 22% auto;
   height: 55%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(245, 199, 106, 0.2), transparent 70%);
+  background: radial-gradient(circle, rgba(245, 199, 106, 0.18), transparent 70%);
   pointer-events: none;
-  animation: gz-glow 3.2s ease-in-out infinite;
+  /* Grids stay still — no pulse on case cards */
+  animation: none;
+  opacity: 0.7;
 }
 
 @keyframes gz-glow {
@@ -948,12 +1260,18 @@ body.gz-page {
   inset: -6%;
 }
 
+/* Card product sparkles stay static; hero keeps motion via .gz-hero .gz-sparkle-overlay */
 .gz-sparkle-overlay span {
   position: absolute;
   width: 8px;
   height: 8px;
   background: #ffd98a;
   clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  animation: none;
+  opacity: 0.35;
+}
+
+.gz-hero .gz-sparkle-overlay span {
   animation: gz-twinkle 2.4s ease-in-out infinite;
   opacity: 0;
 }
@@ -974,9 +1292,15 @@ body.gz-page {
 }
 
 .gz-sparkle {
-  animation: gz-twinkle 2.6s ease-in-out infinite;
+  /* SVG sparkles on case cards — still */
+  animation: none;
+  opacity: 0.85;
   transform-box: fill-box;
   transform-origin: center;
+}
+
+.gz-hero .gz-sparkle {
+  animation: gz-twinkle 2.6s ease-in-out infinite;
 }
 
 .gz-shop-layout {

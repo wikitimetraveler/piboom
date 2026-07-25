@@ -210,23 +210,43 @@ export class VoiceService {
   async speakWithGoogle(text, voice = 'en-US-Standard-D', options = {}) {
     if (!this.ttsClient) return false;
 
-    const pitch = Number.isFinite(Number(options.pitch)) ? Number(options.pitch) : 0;
+    const basePitch = Number.isFinite(Number(options.pitch)) ? Number(options.pitch) : 0;
     const speakingRate = Number.isFinite(Number(options.speakingRate))
       ? Number(options.speakingRate)
       : 1.0;
-    // If a Neural/Chirp voice fails in prod, fall back to Standard female/male.
-    const voiceChain = [voice];
-    if (/Neural2|Wavenet|Chirp|Studio|Journey/i.test(String(voice || ''))) {
-      if (/-[FGHC]$/i.test(voice) || /female/i.test(String(options.gender || ''))) {
-        voiceChain.push('en-US-Standard-F');
-      } else {
-        voiceChain.push('en-US-Standard-D');
-      }
+    const youngFemale = options.youngFemale === true;
+    const female =
+      youngFemale ||
+      options.preferFemale === true ||
+      String(options.gender || '').toLowerCase() === 'female' ||
+      /Neural2-[FGHCE]|Wavenet-[FGH]|Standard-F/i.test(String(voice || ''));
+
+    // Pip youngFemale: bright Neural2-H → Wavenet-H → pitched Standard-F (plain Standard-F sounds matron).
+    const voiceChain = [];
+    const pushUnique = (name) => {
+      if (name && !voiceChain.includes(name)) voiceChain.push(name);
+    };
+    pushUnique(voice);
+    if (youngFemale) {
+      pushUnique('en-US-Neural2-H');
+      pushUnique('en-US-Wavenet-H');
+      pushUnique('en-US-Neural2-F');
+      pushUnique('en-US-Standard-F');
+    } else if (/Neural2|Wavenet|Chirp|Studio|Journey/i.test(String(voice || ''))) {
+      if (female) pushUnique('en-US-Standard-F');
+      else pushUnique('en-US-Standard-D');
     }
 
     for (const voiceName of voiceChain) {
       try {
         const languageCode = String(voiceName || '').split('-').slice(0, 2).join('-') || 'en-US';
+        // Standard-F reads mature — bump pitch harder so Pip stays playful
+        let pitch = basePitch;
+        if (youngFemale && /Standard-F$/i.test(voiceName)) {
+          pitch = Math.min(20, Math.max(basePitch, 8.5));
+        } else if (youngFemale && /Neural2-H|Wavenet-H/i.test(voiceName)) {
+          pitch = Math.min(20, Math.max(basePitch, 5.5));
+        }
         const request = {
           input: { text: text },
           voice: {
@@ -236,7 +256,7 @@ export class VoiceService {
           audioConfig: {
             audioEncoding: 'MP3',
             pitch,
-            speakingRate
+            speakingRate: youngFemale ? Math.max(speakingRate, 1.1) : speakingRate
           }
         };
 

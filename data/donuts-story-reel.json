@@ -2,8 +2,9 @@
   "id": "glazed-pip-highlight-reel",
   "title": "Glazed with Pip",
   "portrait": "/donuts/assets/pip-baker-portrait.png",
-  "voice": "en-US-Standard-F",
-  "pitch": 2.2,
+  "voice": "en-US-Neural2-H",
+  "pitch": 6.5,
+  "speakingRate": 1.12,
   "speakingRate": 1.06,
   "scenes": [
     {

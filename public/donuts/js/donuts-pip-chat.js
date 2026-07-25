@@ -5,9 +5,15 @@
  */
 import AIChatWidget from '/shared/ai-chat-widget.js';
 
-/** Young female Standard-F — reliable in prod; pitch up for youthful baker Pip */
-const PIP_TTS_VOICE = 'en-US-Standard-F';
-const PIP_TTS_OPTS = { preferFemale: true, gender: 'female', pitch: 2.2, speakingRate: 1.06 };
+/** Young playful Pip — Neural2-H (not matron Standard-F); server falls back if needed */
+const PIP_TTS_VOICE = 'en-US-Neural2-H';
+const PIP_TTS_OPTS = {
+  preferFemale: true,
+  gender: 'female',
+  youngFemale: true,
+  pitch: 6.5,
+  speakingRate: 1.12
+};
 
 function forSpeech(text) {
   return String(text || '')
@@ -113,14 +119,31 @@ function initPipChat() {
   `;
   document.head.appendChild(style);
 
-  document.getElementById('gzAskPip')?.addEventListener('click', openPip);
-  document.getElementById('gzAskPipMap')?.addEventListener('click', openPip);
+  document.getElementById('gzAskPip')?.addEventListener('click', () => openPip());
+  document.getElementById('gzAskPipMap')?.addEventListener('click', () => openPip());
+
+  window.GlazedAskPip = (message) => openPip(message);
 }
 
-function openPip() {
+function openPip(prefillMessage) {
   if (!window.aiChatWidget) return;
+  if (typeof window.GlazedExpandPipDock === 'function') window.GlazedExpandPipDock();
   if (typeof window.aiChatWidget.open === 'function') window.aiChatWidget.open();
   else if (typeof window.aiChatWidget.toggle === 'function') window.aiChatWidget.toggle();
+
+  const msg = String(prefillMessage || '').trim();
+  if (msg && typeof window.aiChatWidget.sendMessage === 'function') {
+    window.setTimeout(() => {
+      window.aiChatWidget.sendMessage(msg);
+      if (typeof window.GlazedCollapsePipDock === 'function') {
+        window.setTimeout(() => window.GlazedCollapsePipDock(), 400);
+      }
+    }, 180);
+    return;
+  }
+  if (typeof window.GlazedCollapsePipDock === 'function') {
+    window.setTimeout(() => window.GlazedCollapsePipDock(), 600);
+  }
 }
 
 if (document.readyState === 'loading') {
