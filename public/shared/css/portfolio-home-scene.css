@@ -138,11 +138,76 @@
   background: rgba(17, 24, 39, 0.82);
 }
 
+/* Public Glazed shortcut — above ice flower gate so guests can open without login */
+.home-glazed-donut {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1.25rem, env(safe-area-inset-bottom));
+  z-index: 12050;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  text-decoration: none;
+  color: inherit;
+  pointer-events: auto;
+}
+
+.home-glazed-donut img {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 16px rgba(42, 24, 16, 0.35));
+  transition: transform 0.25s ease;
+  animation: homeGlazedBob 3.2s ease-in-out infinite;
+}
+
+.home-glazed-donut__label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #4a2c1a;
+  background: rgba(255, 244, 232, 0.92);
+  border: 1px solid rgba(245, 199, 106, 0.55);
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.home-glazed-donut:hover img,
+.home-glazed-donut:focus-visible img {
+  transform: scale(1.08) rotate(-8deg);
+}
+
+.home-glazed-donut:focus-visible {
+  outline: 2px solid #e85a7a;
+  outline-offset: 6px;
+  border-radius: 16px;
+}
+
+.portfolio-page--home.portfolio-dark .home-glazed-donut__label {
+  color: #fff4e8;
+  background: rgba(42, 24, 16, 0.92);
+  border-color: rgba(245, 199, 106, 0.4);
+}
+
+@keyframes homeGlazedBob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(5deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .portfolio-page--home::before,
   .portfolio-page--home::after,
   .portfolio-page--home .portfolio-hero,
-  .portfolio-page--home .portfolio-section {
+  .portfolio-page--home .portfolio-section,
+  .home-glazed-donut img {
     animation: none !important;
   }
 }

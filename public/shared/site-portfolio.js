@@ -414,6 +414,21 @@
       stack: ['calculationEngine', 'Bootstrap', 'Worksheets'],
     },
     {
+      id: 'glazed',
+      label: 'Glazed',
+      tagline: 'Baker’s dozen flip cards, Pip guide, Savy on Harbor',
+      path: '/donuts/',
+      icon: 'bi-hearts',
+      category: 'other',
+      featured: true,
+      featuredOrder: 6,
+      authRequired: false,
+      problem: 'A playful public bakery gallery with recipes, history, and an AI baker guide.',
+      consultingBlurb:
+        'Bootstrap + vanilla Glazed page — flip cards, HyperFrame highlight reel, HeyGen Pip intro, Google Maps shop pin, and TTS chat. Fully public — no login.',
+      stack: ['Bootstrap', 'HeyGen', 'Google Maps', 'Google TTS'],
+    },
+    {
       id: 'heygen-hub',
       label: 'HeyGen Hub',
       tagline: 'Avatar clips and HyperFrames narrated reels',
