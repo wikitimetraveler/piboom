@@ -483,7 +483,68 @@
     const orb = document.getElementById('gzHeroOrb');
     if (!el) return;
 
-    const src = '/donuts/assets/products/classic-glazed-cutout.png';
+    // Product rotation — always start with classic glazed, then cycle through others
+    let rotationIndex = 0;
+    let productRotation = [];
+
+    function buildRotation() {
+      const catalog = window.GlazedCatalog;
+      if (!catalog) return;
+      
+      // Always start with classic glazed
+      const glazed = catalog.byId['classic-glazed'];
+      productRotation = [glazed];
+      
+      // Add one smoothie
+      if (catalog.smoothies?.length) {
+        const randomSmoothie = catalog.smoothies[Math.floor(Math.random() * catalog.smoothies.length)];
+        productRotation.push({ ...randomSmoothie, kind: 'smoothie' });
+      }
+      
+      // Add one submarine
+      if (catalog.submarines?.length) {
+        const randomSub = catalog.submarines[Math.floor(Math.random() * catalog.submarines.length)];
+        productRotation.push({ ...randomSub, kind: 'submarine' });
+      }
+      
+      // Add another random donut (not glazed)
+      const otherDonuts = catalog.donuts?.filter(d => d.id !== 'classic-glazed') || [];
+      if (otherDonuts.length) {
+        const randomDonut = otherDonuts[Math.floor(Math.random() * otherDonuts.length)];
+        productRotation.push({ ...randomDonut, kind: 'donut' });
+      }
+    }
+
+    function getCurrentProduct() {
+      if (!productRotation.length) {
+        return {
+          image: '/donuts/assets/products/classic-glazed-cutout.png',
+          name: 'Classic Glazed',
+          kind: 'donut'
+        };
+      }
+      return productRotation[rotationIndex % productRotation.length];
+    }
+
+    function updateHeroImage() {
+      const product = getCurrentProduct();
+      const src = product.image || '/donuts/assets/products/classic-glazed-cutout.png';
+      const whole = el.querySelector('.gz-hero-whole');
+      const kindLabel = product.kind === 'smoothie' ? 'smoothie' : product.kind === 'submarine' ? 'submarine' : 'donut';
+      
+      if (whole) {
+        whole.src = src;
+        whole.alt = product.name || 'Product';
+      }
+      
+      el.setAttribute('aria-label', `${product.name || 'Product'} — click to explode`);
+      
+      el.querySelectorAll('.gz-hero-piece').forEach((piece) => {
+        piece.style.backgroundImage = `url("${src}")`;
+      });
+    }
+
+    const initialSrc = '/donuts/assets/products/classic-glazed-cutout.png';
     const pieces = Array.from({ length: 9 }, () => '<span class="gz-hero-piece"></span>').join('');
     const crumbs = Array.from({ length: 18 }, (_, i) => {
       const angle = (i / 18) * Math.PI * 2;
@@ -499,7 +560,7 @@
     el.setAttribute('aria-label', 'Glazed donut — click to explode');
     el.innerHTML = `
       <div class="gz-hero-stage">
-        <img class="gz-hero-whole" src="${src}" alt="Classic glazed donut" width="220" height="220" draggable="false"/>
+        <img class="gz-hero-whole" src="${initialSrc}" alt="Classic glazed donut" width="220" height="220" draggable="false"/>
         <div class="gz-hero-pieces" aria-hidden="true">${pieces}</div>
         ${crumbs}
         <div class="gz-sparkle-overlay" aria-hidden="true">
@@ -508,8 +569,12 @@
       </div>`;
 
     el.querySelectorAll('.gz-hero-piece').forEach((piece) => {
-      piece.style.backgroundImage = `url("${src}")`;
+      piece.style.backgroundImage = `url("${initialSrc}")`;
     });
+
+    // Build rotation once catalog is ready
+    window.addEventListener('glazed-catalog-ready', buildRotation);
+    buildRotation(); // Try immediately in case already loaded
 
     let exploding = false;
     function explode() {
@@ -526,6 +591,10 @@
         el.classList.remove('is-exploding');
         orb?.classList.remove('is-shockwave');
         exploding = false;
+        
+        // Cycle to next product after explosion
+        rotationIndex++;
+        updateHeroImage();
       }, 1350);
     }
 
@@ -769,6 +838,9 @@
         byId[sub.id] = { ...sub, kind: 'submarine' };
       });
       window.GlazedCatalog = { donuts, smoothies, submarines, byId, shop: data.shop || null };
+      
+      // Notify hero donut rotation is ready
+      window.dispatchEvent(new CustomEvent('glazed-catalog-ready'));
 
       if (grid) {
         grid.innerHTML = donuts.length
