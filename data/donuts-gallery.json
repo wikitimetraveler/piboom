@@ -460,6 +460,48 @@
       },
       "history": "Matcha moved from tea ceremony into pastry cases worldwide in the 2010s — paired with white chocolate it balances bitter green notes with creamy sweetness.",
       "avatarScript": "Matcha White Chocolate is the modern looker — jade glaze with a sweet white drizzle."
+    },
+    {
+      "id": "blueberry-cake",
+      "name": "Blueberry Cake",
+      "tagline": "The baker’s lucky extra",
+      "flavorTags": [
+        "cake",
+        "blueberry",
+        "bakery"
+      ],
+      "visual": {
+        "dough": "#c4a07a",
+        "icing": "#6b5b95",
+        "icingShine": "#a89bc8",
+        "sprinkle": "#3d2a6d",
+        "sparkle": true
+      },
+      "recipe": {
+        "yield": "A baker’s dozen",
+        "time": "About 45 minutes",
+        "ingredients": [
+          "2 cups all-purpose flour",
+          "¾ cup sugar",
+          "2 tsp baking powder",
+          "½ tsp salt",
+          "½ tsp nutmeg",
+          "¾ cup buttermilk",
+          "2 large eggs",
+          "3 tbsp melted butter",
+          "1 cup fresh or frozen blueberries",
+          "Glaze: 1½ cups powdered sugar, 2–3 tbsp blueberry puree or milk, splash of lemon"
+        ],
+        "steps": [
+          "Whisk dry ingredients; fold in buttermilk, eggs, and butter.",
+          "Gently fold blueberries — don’t crush them.",
+          "Pipe or spoon into a donut pan (or fry cake rings at 365°F).",
+          "Bake at 375°F about 12 minutes, or fry until deep golden.",
+          "Cool slightly, then dip in blueberry glaze."
+        ]
+      },
+      "history": "A baker’s dozen means the lucky extra — once a goodwill cushion so customers never got shorted by weight. Blueberry cake donuts carry that counter-culture spirit: dense, fruity, and the one that rounds out the box.",
+      "avatarScript": "Blueberry Cake is the baker’s dozen lucky extra — purple-kissed cake crumb."
     }
   ],
   "smoothies": [

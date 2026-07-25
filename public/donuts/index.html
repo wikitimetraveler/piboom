@@ -24,18 +24,21 @@
   <modern-navbar></modern-navbar>
 
   <main class="gz-main">
-    <section class="gz-hero container">
+    <section class="gz-hero container" id="gzHero">
       <div class="gz-hero-layout">
         <div class="gz-hero-inner">
           <h1 class="gz-brand">Glazed</h1>
           <p class="gz-hero-line" id="gzHeroLine">Flip a treat. Steal a recipe. Meet Savy Donuts and Smoothies on Harbor.</p>
           <div class="gz-hero-cta">
             <a class="gz-btn gz-btn-primary" href="#gzCase">
-              <i class="bi bi-arrow-down-circle"></i> Donuts
+              <i class="bi bi-arrow-down-circle"></i> Baker's Dozen
             </a>
             <a class="gz-btn gz-btn-ghost" href="#gzSmoothies">
               <i class="bi bi-cup-straw"></i> Smoothies
             </a>
+            <button type="button" class="gz-btn gz-btn-ghost" id="gzStoryPlayHero">
+              <i class="bi bi-film"></i> Play reel
+            </button>
           </div>
         </div>
         <div class="gz-hero-orb" aria-hidden="false">
@@ -72,12 +75,27 @@
             </button>
           </div>
         </div>
+        <div class="gz-story-panel" id="gzStoryPanel" aria-label="Pip highlight reel">
+          <div class="gz-story-panel-row">
+            <button type="button" class="gz-btn gz-btn-frost gz-btn-sm" id="gzStoryPlay" aria-pressed="false">
+              <i class="bi bi-film"></i> Play highlight reel
+            </button>
+            <button type="button" class="gz-btn gz-btn-ghost gz-btn-sm" id="gzStoryStop" hidden>
+              <i class="bi bi-stop-fill"></i> Stop reel
+            </button>
+            <label class="gz-story-narrate">
+              <input type="checkbox" id="gzStoryNarrate" checked/>
+              Narration
+            </label>
+          </div>
+          <p class="gz-story-panel-hint">HyperFrame tour with Pip — baker’s dozen, smoothies, and Savy on Harbor.</p>
+        </div>
       </aside>
 
       <section class="gz-section" id="gzCase">
         <div class="gz-section-head">
-          <h2>Today’s case</h2>
-          <p>Twelve donuts — flip for recipe and history. Ask Pip in chat or tap Hear Pip on a card.</p>
+          <h2>Baker’s Dozen</h2>
+          <p>A baker’s dozen — flip for recipe and history. Ask Pip in chat or tap Hear Pip on a card.</p>
         </div>
         <p class="gz-loading" id="gzLoading">Warming the fryer…</p>
         <div class="gz-grid" id="gzGrid"></div>
@@ -123,11 +141,29 @@
     </div>
   </main>
 
+  <div
+    class="gz-story-overlay"
+    id="gzStoryOverlay"
+    hidden
+    aria-hidden="true"
+    aria-live="polite"
+  >
+    <div class="gz-story-chip">
+      <img id="gzStoryChipImg" src="/donuts/assets/pip-baker-portrait.png" width="56" height="56" alt=""/>
+      <div class="gz-story-chip-copy">
+        <p class="gz-story-kicker" id="gzStoryKicker"></p>
+        <h3 class="gz-story-title" id="gzStoryTitle"></h3>
+        <p class="gz-story-body" id="gzStoryCopy"></p>
+      </div>
+    </div>
+  </div>
+
   <script src="/shared/tts.js"></script>
   <script src="/family/js/lane-family-google-maps.js"></script>
   <script src="/donuts/js/donuts-heygen-popup.js"></script>
   <script src="/donuts/js/donuts-map.js"></script>
   <script src="/donuts/js/donuts-gallery.js"></script>
+  <script src="/donuts/js/donuts-story-reel.js"></script>
   <script type="module" src="/donuts/js/donuts-pip-chat.js"></script>
 </body>
 </html>

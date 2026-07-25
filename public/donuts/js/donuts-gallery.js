@@ -15,9 +15,9 @@
       .replace(/"/g, '&quot;');
   }
 
-  /** Pip = feminine Google TTS (fast). HeyGen Starfish kept for intro video only. */
-  const PIP_TTS_VOICE = 'en-US-Standard-F';
-  const PIP_TTS_OPTS = { preferFemale: true, gender: 'female', pitch: 0.05, speakingRate: 1.02 };
+  /** Pip = young female Google Neural2 (matches baker avatar). HeyGen intro video keeps Radiant Riley. */
+  const PIP_TTS_VOICE = 'en-US-Neural2-H';
+  const PIP_TTS_OPTS = { preferFemale: true, gender: 'female', pitch: 1.6, speakingRate: 1.06 };
 
   function speak(text) {
     if (!text) return;
@@ -30,12 +30,14 @@
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(text);
-      u.rate = 1.02;
-      u.pitch = 1.05;
+      u.rate = 1.06;
+      u.pitch = 1.15;
       const voices = window.speechSynthesis.getVoices();
       const female =
         voices.find((v) =>
-          /female|samantha|karen|zira|susan|victoria|moira|fiona|siri/i.test(`${v.name} ${v.voiceURI || ''}`)
+          /samantha|karen|jenny|aria|zira|susan|victoria|moira|fiona|siri|female/i.test(
+            `${v.name} ${v.voiceURI || ''}`
+          )
         ) ||
         voices.find((v) => /en(-|_)?us/i.test(v.lang) && !/male|david|daniel|alex|mark|george/i.test(v.name));
       if (female) u.voice = female;

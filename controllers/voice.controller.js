@@ -420,10 +420,11 @@ export async function synthesizeSpeech(req, res) {
       });
     }
     
-    // Use Google Cloud TTS
+    // Use Google Cloud TTS (pitch / speakingRate optional — used by Glazed Pip, etc.)
     const audioBase64 = await voiceService.speakWithGoogle(
-      text, 
-      voice || 'en-US-Standard-D'
+      text,
+      voice || 'en-US-Standard-D',
+      { pitch, speakingRate }
     );
     
     if (audioBase64) {

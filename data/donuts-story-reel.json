@@ -1,0 +1,73 @@
+{
+  "id": "glazed-pip-highlight-reel",
+  "title": "Glazed with Pip",
+  "portrait": "/donuts/assets/pip-baker-portrait.png",
+  "voice": "en-US-Neural2-H",
+  "pitch": 1.6,
+  "speakingRate": 1.06,
+  "scenes": [
+    {
+      "id": "open",
+      "kicker": "HyperFrame",
+      "title": "Meet Glazed",
+      "copy": "I’m Pip — flip a treat, steal a recipe, and find Savy on Harbor.",
+      "narration": "Hey! I’m Pip. Welcome to Glazed — a playful tour of Savy Donuts and Smoothies on Harbor.",
+      "anchor": "gzHero",
+      "spotlight": ".gz-hero-orb",
+      "action": "explodeHero",
+      "durationMs": 5200
+    },
+    {
+      "id": "pip",
+      "kicker": "Your guide",
+      "title": "Pip at the counter",
+      "copy": "Hear my HeyGen welcome anytime — or keep touring with me.",
+      "narration": "That’s me in the dock. Tap Hear welcome for my HeyGen intro, or stick with the reel.",
+      "anchor": "gzGuide",
+      "spotlight": "#gzGuide",
+      "durationMs": 4800
+    },
+    {
+      "id": "dozen",
+      "kicker": "Baker’s dozen",
+      "title": "Today’s case",
+      "copy": "Flip any donut for recipe and story. Here’s a peek at the back.",
+      "narration": "Here’s the baker’s dozen. Flip a card for the recipe and a little history.",
+      "anchor": "gzCase",
+      "spotlight": "#gzGrid .gz-card",
+      "action": "flipFirstDonut",
+      "durationMs": 6200
+    },
+    {
+      "id": "smoothies",
+      "kicker": "Cold cups",
+      "title": "Smoothie board",
+      "copy": "Pair a donut with something icy from the Savy counter energy.",
+      "narration": "And the smoothie board — cold cups ready to pair with a warm glaze.",
+      "anchor": "gzSmoothies",
+      "spotlight": "#gzSmoothieGrid .gz-card",
+      "action": "unflipCards",
+      "durationMs": 5000
+    },
+    {
+      "id": "shop",
+      "kicker": "Harbor",
+      "title": "Find Savy",
+      "copy": "Real counter on South Harbor near Kent — pin it and go.",
+      "narration": "Find Savy on South Harbor near Kent. I’m a fan tribute — go taste the real thing.",
+      "anchor": "gzShop",
+      "spotlight": "#gzShopMap",
+      "durationMs": 5200
+    },
+    {
+      "id": "ask",
+      "kicker": "Chat",
+      "title": "Ask Pip",
+      "copy": "Questions about pairings or the case? I’m in the dock and the chat bubble.",
+      "narration": "Ask me anything about the case, smoothies, or finding Savy. See you at the counter!",
+      "anchor": "gzGuide",
+      "spotlight": "#gzAskPip",
+      "durationMs": 4800
+    }
+  ]
+}

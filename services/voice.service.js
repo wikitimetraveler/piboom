@@ -207,20 +207,26 @@ export class VoiceService {
   }
 
   // Speak using Google Cloud Text-to-Speech (NEW - high quality!)
-  async speakWithGoogle(text, voice = 'en-US-Standard-D') {
+  async speakWithGoogle(text, voice = 'en-US-Standard-D', options = {}) {
     if (!this.ttsClient) return false;
     
     try {
+      const pitch = Number.isFinite(Number(options.pitch)) ? Number(options.pitch) : 0;
+      const speakingRate = Number.isFinite(Number(options.speakingRate))
+        ? Number(options.speakingRate)
+        : 1.0;
+      const languageCode = String(voice || '').split('-').slice(0, 2).join('-') || 'en-US';
+
       const request = {
         input: { text: text },
         voice: { 
-          languageCode: 'en-US',
+          languageCode,
           name: voice // Different voices available
         },
         audioConfig: { 
           audioEncoding: 'MP3',
-          pitch: 0,
-          speakingRate: 1.0
+          pitch,
+          speakingRate
         },
       };
 
