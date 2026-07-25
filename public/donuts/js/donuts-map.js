@@ -238,14 +238,12 @@
       </div>`);
       info.open({ map, anchor: marker });
       map.panTo(target);
-      // Zoom only when the map marker itself is clicked — not list rows
-      if (zoom) {
-        const current = Number(map.getZoom()) || 2;
-        const maxZoom = 12;
-        if (current < maxZoom) {
-          // Gentle +1 zoom for each marker click
-          map.setZoom(current + 1);
-        }
+      // Always add slight zoom to help with stacked/clustered markers
+      const current = Number(map.getZoom()) || 2;
+      const maxZoom = 12;
+      if (current < maxZoom) {
+        // Gentle +1 zoom for each click (marker or list row)
+        map.setZoom(current + 1);
       }
       list?.querySelectorAll('.gz-origin-link').forEach((btn) => {
         btn.classList.toggle('is-active', btn.getAttribute('data-id') === id);
