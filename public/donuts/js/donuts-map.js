@@ -240,10 +240,12 @@
       map.panTo(target);
       // Zoom only when the map marker itself is clicked — not list rows
       if (zoom) {
-        const detailZoom = 10;
         const current = Number(map.getZoom()) || 2;
-        if (current < detailZoom) map.setZoom(detailZoom);
-        else if (current < detailZoom + 2) map.setZoom(Math.min(14, current + 2));
+        const maxZoom = 12;
+        if (current < maxZoom) {
+          // Gentle +1 zoom for each marker click
+          map.setZoom(current + 1);
+        }
       }
       list?.querySelectorAll('.gz-origin-link').forEach((btn) => {
         btn.classList.toggle('is-active', btn.getAttribute('data-id') === id);
