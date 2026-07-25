@@ -245,10 +245,12 @@
     face.classList.toggle('has-scroll', overflows);
   }
 
+  const SPRINKLE_COLORS = ['#ff7a9a', '#fff4e8', '#5c3a2a', '#f5c76a', '#7ec8e3', '#e85a7a', '#ffd98a', '#c4f0c2'];
+
   function wireSugar() {
     const root = document.getElementById('gzSugar');
     if (!root || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    for (let i = 0; i < 36; i += 1) {
+    for (let i = 0; i < 28; i += 1) {
       const span = document.createElement('span');
       span.style.left = `${Math.random() * 100}%`;
       span.style.animationDuration = `${8 + Math.random() * 14}s`;
@@ -257,20 +259,72 @@
       span.style.height = span.style.width;
       root.appendChild(span);
     }
+    for (let i = 0; i < 40; i += 1) {
+      const rod = document.createElement('span');
+      rod.className = 'gz-sugar-sprinkle';
+      rod.style.left = `${Math.random() * 100}%`;
+      rod.style.background = SPRINKLE_COLORS[i % SPRINKLE_COLORS.length];
+      rod.style.animationDuration = `${7 + Math.random() * 12}s`;
+      rod.style.animationDelay = `${Math.random() * 9}s`;
+      rod.style.setProperty('--spin', `${(Math.random() * 360 - 180).toFixed(0)}deg`);
+      rod.style.setProperty('--drift-x', `${(Math.random() * 80 - 40).toFixed(0)}px`);
+      root.appendChild(rod);
+    }
+  }
+
+  function wireOrbSprinkles() {
+    const root = document.getElementById('gzOrbSprinkles');
+    if (!root || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    root.innerHTML = '';
+    for (let i = 0; i < 22; i += 1) {
+      const s = document.createElement('span');
+      s.className = 'gz-orb-sprinkle';
+      const angle = (i / 22) * Math.PI * 2 + Math.random() * 0.4;
+      const radius = 38 + Math.random() * 48;
+      s.style.setProperty('--sx', `${(50 + Math.cos(angle) * radius).toFixed(1)}%`);
+      s.style.setProperty('--sy', `${(50 + Math.sin(angle) * radius).toFixed(1)}%`);
+      s.style.setProperty('--rot', `${(Math.random() * 360).toFixed(0)}deg`);
+      s.style.background = SPRINKLE_COLORS[i % SPRINKLE_COLORS.length];
+      s.style.animationDelay = `${(Math.random() * 3).toFixed(2)}s`;
+      s.style.animationDuration = `${2.8 + Math.random() * 2.4}s`;
+      root.appendChild(s);
+    }
+  }
+
+  function burstSprinkles(host) {
+    if (!host || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const layer = document.createElement('div');
+    layer.className = 'gz-burst-sprinkles';
+    layer.setAttribute('aria-hidden', 'true');
+    const count = 28;
+    for (let i = 0; i < count; i += 1) {
+      const s = document.createElement('span');
+      const angle = (i / count) * Math.PI * 2 + (Math.random() * 0.35);
+      const dist = 90 + Math.random() * 110;
+      s.style.setProperty('--bx', `${Math.round(Math.cos(angle) * dist)}px`);
+      s.style.setProperty('--by', `${Math.round(Math.sin(angle) * dist)}px`);
+      s.style.setProperty('--brot', `${(Math.random() * 520 - 260).toFixed(0)}deg`);
+      s.style.background = SPRINKLE_COLORS[i % SPRINKLE_COLORS.length];
+      s.style.animationDelay = `${(i * 0.012).toFixed(2)}s`;
+      layer.appendChild(s);
+    }
+    host.appendChild(layer);
+    window.setTimeout(() => layer.remove(), 1200);
   }
 
   function renderHeroDonut() {
     const el = document.getElementById('gzHeroDonut');
+    const orb = document.getElementById('gzHeroOrb');
     if (!el) return;
 
-    const src = '/donuts/assets/products/classic-glazed.png';
+    const src = '/donuts/assets/products/classic-glazed-cutout.png';
     const pieces = Array.from({ length: 9 }, () => '<span class="gz-hero-piece"></span>').join('');
-    const crumbs = Array.from({ length: 14 }, (_, i) => {
-      const angle = (i / 14) * Math.PI * 2;
-      const dist = 70 + (i % 5) * 22;
+    const crumbs = Array.from({ length: 18 }, (_, i) => {
+      const angle = (i / 18) * Math.PI * 2;
+      const dist = 85 + (i % 6) * 28;
       const cx = Math.round(Math.cos(angle) * dist);
       const cy = Math.round(Math.sin(angle) * dist);
-      const delay = (i * 0.04).toFixed(2);
+      const delay = (i * 0.03).toFixed(2);
       return `<span class="gz-hero-crumb" style="--cx:${cx}px;--cy:${cy}px;left:50%;top:50%;animation-delay:${delay}s"></span>`;
     }).join('');
 
@@ -283,7 +337,7 @@
         <div class="gz-hero-pieces" aria-hidden="true">${pieces}</div>
         ${crumbs}
         <div class="gz-sparkle-overlay" aria-hidden="true">
-          <span></span><span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
         </div>
       </div>`;
 
@@ -295,11 +349,18 @@
     function explode() {
       if (exploding) return;
       exploding = true;
-      el.classList.add('is-exploding');
+      el.classList.add('is-winding');
+      orb?.classList.add('is-shockwave');
+      window.setTimeout(() => {
+        el.classList.remove('is-winding');
+        el.classList.add('is-exploding');
+        burstSprinkles(el.querySelector('.gz-hero-stage') || el);
+      }, 160);
       window.setTimeout(() => {
         el.classList.remove('is-exploding');
+        orb?.classList.remove('is-shockwave');
         exploding = false;
-      }, 1050);
+      }, 1350);
     }
 
     el.addEventListener('click', explode);
@@ -427,6 +488,7 @@
 
   async function init() {
     wireSugar();
+    wireOrbSprinkles();
     renderHeroDonut();
 
     const grid = document.getElementById('gzGrid');
