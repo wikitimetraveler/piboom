@@ -926,6 +926,7 @@ body.gz-recipe-open {
 
 .gz-card {
   perspective: 1200px;
+  -webkit-perspective: 1200px;
   border: none;
   background: transparent;
   padding: 0;
@@ -933,6 +934,9 @@ body.gz-recipe-open {
   cursor: pointer;
   width: 100%;
   display: block;
+  /* Contain flaky iOS 3D / filter stacking so the donut can't float over the back */
+  isolation: isolate;
+  overflow: visible;
 }
 
 .gz-card:focus-visible {
@@ -946,6 +950,7 @@ body.gz-recipe-open {
   width: 100%;
   min-height: 380px;
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
   transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1), min-height 0.35s ease;
 }
 
@@ -962,6 +967,9 @@ body.gz-recipe-open {
   border-radius: var(--gz-radius);
   overflow: hidden;
   box-shadow: var(--gz-shadow);
+  /* Promote each face; helps Safari hide the reverse side */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 .gz-face--front {
@@ -969,16 +977,44 @@ body.gz-recipe-open {
   border: 1px solid rgba(255, 244, 232, 0.12);
   display: flex;
   flex-direction: column;
+  z-index: 2;
 }
 
 .gz-face--back {
   background: linear-gradient(165deg, #fff8f0 0%, #ffe8d6 100%);
   color: var(--gz-ink);
-  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg) translateZ(0);
+  transform: rotateY(180deg) translateZ(0);
   border: 1px solid rgba(74, 44, 26, 0.12);
   display: flex;
   flex-direction: column;
   padding: 1rem 1.05rem 0.9rem;
+  z-index: 1;
+}
+
+/* Hard hide front when flipped — iOS often ignores backface-visibility on filtered images/SVGs */
+.gz-card.is-flipped .gz-face--front {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.gz-card.is-flipped .gz-face--back {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 3;
+}
+
+.gz-card.is-flipped .gz-donut-svg,
+.gz-card.is-flipped .gz-product-photo,
+.gz-card.is-flipped .gz-product-photo img,
+.gz-card.is-flipped .gz-sparkle-overlay {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  filter: none !important;
+  pointer-events: none !important;
 }
 
 .gz-card:hover .gz-face--front {
@@ -1025,12 +1061,66 @@ body.gz-recipe-open {
   height: auto;
   position: relative;
   z-index: 1;
-  filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.4));
+  /* drop-shadow filter punches through flip on iOS — use shadow on stage instead */
+  filter: none;
   transition: transform 0.35s ease;
+}
+
+.gz-donut-stage .gz-donut-svg,
+.gz-donut-stage .gz-product-photo {
+  box-shadow: 0 12px 18px rgba(0, 0, 0, 0.35);
+  border-radius: 50%;
 }
 
 .gz-card:hover:not(.is-flipped) .gz-donut-svg {
   transform: scale(1.06) rotate(4deg);
+}
+
+/* Touch / narrow: skip flaky 3D rotate — swap faces so recipe is always readable */
+@media (max-width: 767.98px), (hover: none) and (pointer: coarse) {
+  .gz-card {
+    perspective: none;
+    -webkit-perspective: none;
+  }
+
+  .gz-card-inner {
+    transform-style: flat;
+    -webkit-transform-style: flat;
+    transition: min-height 0.3s ease;
+  }
+
+  .gz-card.is-flipped .gz-card-inner {
+    transform: none;
+  }
+
+  .gz-face--front,
+  .gz-face--back {
+    -webkit-transform: none !important;
+    transform: none !important;
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
+  }
+
+  .gz-face--back {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .gz-card.is-flipped .gz-face--front {
+    display: none;
+  }
+
+  .gz-card.is-flipped .gz-face--back {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 3;
+    position: relative;
+    inset: auto;
+    min-height: min(560px, 78vh);
+  }
 }
 
 .gz-front-body {
