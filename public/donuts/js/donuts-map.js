@@ -224,12 +224,11 @@
     const info = new google.maps.InfoWindow();
     const byId = {};
 
-    function focusPin(id) {
+    function focusPin(id, { zoom = false } = {}) {
       const entry = byId[id];
       if (!entry) return;
       const { marker, pin } = entry;
       const target = { lat: pin.lat, lng: pin.lng };
-      const detailZoom = 10;
       info.setContent(`<div style="color:#1a100c;max-width:260px">
         <strong>${escapeHtml(pin.name)}</strong><br/>
         <span style="font-size:12px">${escapeHtml(pin.origin.place || '')}${
@@ -238,15 +237,13 @@
         <p style="font-size:12px;margin:6px 0 0">${escapeHtml(pin.origin.note || pin.history || '')}</p>
       </div>`);
       info.open({ map, anchor: marker });
-      // Zoom into the place (marker click + list row)
-      if (typeof map.panTo === 'function' && typeof map.setZoom === 'function') {
-        map.panTo(target);
+      map.panTo(target);
+      // Zoom only when the map marker itself is clicked — not list rows
+      if (zoom) {
+        const detailZoom = 10;
         const current = Number(map.getZoom()) || 2;
-        if (current < detailZoom) {
-          map.setZoom(detailZoom);
-        } else if (current < detailZoom + 2) {
-          map.setZoom(Math.min(14, current + 2));
-        }
+        if (current < detailZoom) map.setZoom(detailZoom);
+        else if (current < detailZoom + 2) map.setZoom(Math.min(14, current + 2));
       }
       list?.querySelectorAll('.gz-origin-link').forEach((btn) => {
         btn.classList.toggle('is-active', btn.getAttribute('data-id') === id);
@@ -262,7 +259,7 @@
         size: ORIGIN_MARKER_SIZE
       });
       byId[p.id] = { marker, pin: p };
-      marker.addListener('click', () => focusPin(p.id));
+      marker.addListener('click', () => focusPin(p.id, { zoom: true }));
     });
 
     if (list) {
@@ -287,7 +284,7 @@
         const btn = e.target.closest('.gz-origin-link');
         if (!btn || btn.disabled) return;
         e.preventDefault();
-        focusPin(btn.getAttribute('data-id'));
+        focusPin(btn.getAttribute('data-id'), { zoom: false });
       };
     }
 
