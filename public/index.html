@@ -3,8 +3,11 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>David Lane — Creative Projects & Discovery Tools</title>
-<meta name="description" content="Music pilgrimage, nature discovery, family history, donut artistry, and AI video. Creative projects by David Lane."/>
+<title>David Lane — Explore · Discover · Create</title>
+<meta name="description" content="Explore, discover, and create — music pilgrimage, nature discovery, family history, Glazed donuts, and HeyGen AI video by David Lane."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
 <link rel="stylesheet" href="/shared/design-tokens.css"/>
 <link rel="stylesheet" href="/shared/css/fun-home.css"/>
@@ -16,7 +19,7 @@
 <header class="fun-header">
   <a class="fun-logo" href="/">
     <span class="fun-logo__text">David Lane</span>
-    <span class="fun-logo__sparkle" id="secretSparkle" title="✨">✨</span>
+    <span class="fun-logo__sparkle" id="secretSparkle" title="✨" aria-hidden="true">✨</span>
   </a>
   <div class="fun-header__actions">
     <a href="/work.html" class="fun-secret-link" id="secretMortgageLink" style="display: none;">
@@ -31,39 +34,38 @@
 </header>
 
 <main class="fun-main">
-  
-  <section class="fun-hero">
+
+  <section class="fun-hero" aria-labelledby="funHeroTitle">
     <canvas id="heroCanvas" class="fun-hero__canvas" aria-hidden="true"></canvas>
     <div class="fun-hero__shader" id="shaderBg" aria-hidden="true"></div>
-    
-    <div class="fun-hero__sparkles" aria-hidden="true">
-      <span class="sparkle sparkle-1">✦</span>
-      <span class="sparkle sparkle-2">✧</span>
-      <span class="sparkle sparkle-3">★</span>
-      <span class="sparkle sparkle-4">✦</span>
-      <span class="sparkle sparkle-5">✧</span>
-      <span class="sparkle sparkle-6">★</span>
-    </div>
-    
+
     <div class="fun-hero__content">
-      <h1 class="fun-hero__title">
-        <span class="fun-hero__title-line">Discover.</span>
-        <span class="fun-hero__title-line">Explore.</span>
-        <span class="fun-hero__title-line">Create.</span>
+      <p class="fun-hero__kicker">Creative projects</p>
+      <h1 class="fun-hero__title" id="funHeroTitle">
+        <span class="fun-hero__title-line">Explore</span>
+        <span class="fun-hero__title-line">Discover</span>
+        <span class="fun-hero__title-line">Create</span>
       </h1>
-      
+
       <p class="fun-hero__lead">
-        Music pilgrimage, nature discoveries, family heritage, donut artistry, and AI video.
+        Music pilgrimage, nature finds, Lane heritage, Glazed on Harbor, and HeyGen video —
+        tools built with curiosity and craft.
       </p>
-      
-      <div class="fun-hero__scroll" aria-hidden="true">
-        <i class="bi bi-chevron-down"></i>
+
+      <div class="fun-hero__cta">
+        <a class="fun-btn fun-btn--primary" href="#projects">
+          Enter projects
+          <i class="bi bi-arrow-down"></i>
+        </a>
+        <a class="fun-btn fun-btn--ghost" href="/donuts/">
+          Visit Glazed
+        </a>
       </div>
     </div>
   </section>
 
-  <section class="fun-projects">
-    
+  <section class="fun-projects" id="projects">
+
     <article class="fun-card fun-card--music" data-project="music">
       <div class="fun-card__icon">
         <i class="bi bi-music-note-beamed"></i>
@@ -145,7 +147,7 @@
       </div>
       <h2 class="fun-card__title">Glazed</h2>
       <p class="fun-card__desc">
-        Artisan donuts, story reel, PIP assistant, map, and the pursuit of the perfect glaze.
+        Artisan donuts, story reel, Pip assistant, map, and the pursuit of the perfect glaze.
       </p>
       <div class="fun-card__links">
         <a href="/donuts/" class="fun-card__link">
@@ -156,8 +158,8 @@
           <span>Story Reel</span>
           <i class="bi bi-film"></i>
         </a>
-        <a href="/donuts/map.html" class="fun-card__link">
-          <span>Shop Map</span>
+        <a href="/donuts/#gzShop" class="fun-card__link">
+          <span>Find Savy</span>
           <i class="bi bi-geo-alt"></i>
         </a>
       </div>
@@ -193,14 +195,14 @@
 
   <section class="fun-about">
     <div class="fun-about__content">
-      <h2 class="fun-about__title">Creative exploration meets technical craft</h2>
+      <h2 class="fun-about__title">Explore · Discover · Create</h2>
       <p class="fun-about__text">
-        These projects blend history, discovery, and technology. From tracing Grateful Dead tours 
-        to identifying fish with AI, from preserving family heritage to celebrating donut artistry — 
-        each tool is built with curiosity and care.
+        Creative exploration meets technical craft — history, discovery, and technology in one place.
+        From Grateful Dead tours to AI fish ID, Lane heritage to Glazed on Harbor, each tool is built
+        with curiosity and care.
       </p>
       <p class="fun-about__text">
-        <strong>Stack:</strong> Node.js, PostgreSQL, OpenAI Vision, Google Maps, Bootstrap, vanilla JS, 
+        <strong>Stack:</strong> Node.js, PostgreSQL, OpenAI Vision, Google Maps, Bootstrap, vanilla JS,
         LangChain assistants, and a love for data that tells stories.
       </p>
     </div>
@@ -210,7 +212,7 @@
 
 <footer class="fun-footer">
   <div class="fun-footer__main">
-    <p>David Lane · Creative Projects · <span id="funYear"></span></p>
+    <p>David Lane · Explore · Discover · Create · <span id="funYear"></span></p>
     <p class="fun-footer__links">
       <a href="/stack.html">Tech stack</a>
       <span>·</span>

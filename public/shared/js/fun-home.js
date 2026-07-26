@@ -69,16 +69,15 @@
     });
   }
 
-  // Smooth scroll for hero scroll indicator
+  // Smooth scroll for hero CTA / legacy scroll indicator
   function initSmoothScroll() {
-    const scrollIndicator = document.querySelector('.fun-hero__scroll');
-    if (!scrollIndicator) return;
-
-    scrollIndicator.addEventListener('click', () => {
-      const projectsSection = document.querySelector('.fun-projects');
-      if (projectsSection) {
+    document.querySelectorAll('a[href="#projects"], .fun-hero__scroll').forEach((el) => {
+      el.addEventListener('click', (e) => {
+        const projectsSection = document.getElementById('projects') || document.querySelector('.fun-projects');
+        if (!projectsSection) return;
+        e.preventDefault();
         projectsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      });
     });
   }
 
@@ -272,231 +271,169 @@
     console.log('✨ Extra sparkles activated! ✨');
   }
 
-  // Three.js Hero Scene
+  // Three.js Hero Scene — one intentional orb (Explore / Discover / Create)
   function initHeroScene() {
     if (typeof THREE === 'undefined' || prefersReducedMotion) return;
+    if (window.matchMedia('(max-width: 767.98px)').matches) return;
 
     const canvas = document.getElementById('heroCanvas');
     if (!canvas) return;
 
     const container = canvas.parentElement;
-    const width = container.clientWidth;
-    const height = container.clientHeight;
+    let width = container.clientWidth;
+    let height = container.clientHeight;
 
-    // Setup renderer
     const renderer = new THREE.WebGLRenderer({
       canvas: canvas,
       alpha: true,
-      antialias: true
+      antialias: true,
+      powerPreference: 'high-performance'
     });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(width, height);
 
-    // Setup scene and camera
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(35, width / height, 0.1, 100);
-    camera.position.set(0, 0, 8);
+    const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
+    camera.position.set(0, 0.15, 5.2);
 
-    // Create geometric group
     const group = new THREE.Group();
+    group.position.set(1.35, 0.1, 0);
     scene.add(group);
 
-    // Materials for different theme
-    function getMaterial() {
-      const theme = document.body.getAttribute('data-theme');
-      if (theme === 'dark') {
-        return new THREE.MeshPhongMaterial({
-          color: 0x8b5cf6,
-          emissive: 0x4c1d95,
-          emissiveIntensity: 0.3,
-          shininess: 100,
-          transparent: true,
-          opacity: 0.85
-        });
-      } else {
-        return new THREE.MeshPhongMaterial({
-          color: 0x10b981,
-          emissive: 0x065f46,
-          emissiveIntensity: 0.2,
-          shininess: 80,
-          transparent: true,
-          opacity: 0.9
-        });
-      }
+    function getMaterials() {
+      const dark = document.body.getAttribute('data-theme') === 'dark';
+      const core = new THREE.MeshPhysicalMaterial({
+        color: dark ? 0x4a90a4 : 0x5aa3b5,
+        emissive: dark ? 0x1a3a44 : 0x2a6070,
+        emissiveIntensity: dark ? 0.35 : 0.22,
+        metalness: 0.15,
+        roughness: 0.35,
+        transparent: true,
+        opacity: 0.92,
+        clearcoat: 0.6,
+        clearcoatRoughness: 0.35
+      });
+      const ring = new THREE.MeshBasicMaterial({
+        color: dark ? 0xc9a227 : 0xb8922e,
+        transparent: true,
+        opacity: 0.55,
+        side: THREE.DoubleSide
+      });
+      return { core, ring };
     }
 
-    // Create main geometry - torus knot
-    const geometry1 = new THREE.TorusKnotGeometry(1, 0.3, 100, 16);
-    const mesh1 = new THREE.Mesh(geometry1, getMaterial());
-    mesh1.position.set(-1.5, 0.5, 0);
-    group.add(mesh1);
+        const RAINBOW_PALETTE = [0x8b5cf6, 0x10b981, 0x06b6d4, 0xf59e0b, 0xec4899];
+    let mats = getMaterials();
+    const orbGeom = new THREE.IcosahedronGeometry(1.05, 1);
+    const orb = new THREE.Mesh(orbGeom, mats.core);
+    group.add(orb);
 
-    // Create secondary geometry - octahedron
-    const geometry2 = new THREE.OctahedronGeometry(0.8, 0);
-    const mesh2 = new THREE.Mesh(geometry2, getMaterial());
-    mesh2.position.set(1.5, -0.5, -1);
-    group.add(mesh2);
+    const ringGeom = new THREE.TorusGeometry(1.55, 0.028, 12, 64);
+    const ring = new THREE.Mesh(ringGeom, mats.ring);
+    ring.rotation.x = Math.PI / 2.4;
+    group.add(ring);
 
-    // Create tertiary geometry - dodecahedron
-    const geometry3 = new THREE.DodecahedronGeometry(0.6, 0);
-    const mesh3 = new THREE.Mesh(geometry3, getMaterial());
-    mesh3.position.set(0, -1.5, 1);
-    group.add(mesh3);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+    const key = new THREE.DirectionalLight(0xe8f4f8, 1.05);
+    key.position.set(3, 4, 5);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0x4a90a4, 0.45);
+    fill.position.set(-4, 1, -2);
+    scene.add(fill);
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-    scene.add(ambientLight);
-
-    const directionalLight1 = new THREE.DirectionalLight(0x8b5cf6, 1);
-    directionalLight1.position.set(5, 5, 5);
-    scene.add(directionalLight1);
-
-    const directionalLight2 = new THREE.DirectionalLight(0x10b981, 0.6);
-    directionalLight2.position.set(-5, 3, -5);
-    scene.add(directionalLight2);
-
-    const pointLight = new THREE.PointLight(0x06b6d4, 1, 10);
-    pointLight.position.set(0, 2, 3);
-    scene.add(pointLight);
-
-    // Animation state
     let animationFrameId = null;
     let isPageVisible = true;
+    let inView = true;
     const clock = new THREE.Clock();
 
-    // Handle page visibility
     document.addEventListener('visibilitychange', () => {
       isPageVisible = !document.hidden;
     });
 
-    // Entrance animation with GSAP
+    if (typeof IntersectionObserver === 'function') {
+      const io = new IntersectionObserver(
+        (entries) => {
+          inView = entries.some((en) => en.isIntersecting);
+        },
+        { threshold: 0.05 }
+      );
+      io.observe(container);
+    }
+
     if (typeof gsap !== 'undefined') {
-      gsap.from(group.position, {
-        y: 3,
-        duration: 1.5,
-        ease: 'power3.out',
-        delay: 0.3
-      });
-
-      gsap.from(group.rotation, {
-        x: -Math.PI / 2,
-        duration: 1.2,
-        ease: 'power2.out',
-        delay: 0.3
-      });
-
       gsap.from(group.scale, {
-        x: 0.5,
-        y: 0.5,
-        z: 0.5,
-        duration: 1.2,
-        ease: 'back.out(1.5)',
-        delay: 0.5
+        x: 0.72, y: 0.72, z: 0.72,
+        duration: 1.35, ease: 'power3.out', delay: 0.2
+      });
+      gsap.from(group.rotation, {
+        y: -0.55, duration: 1.4, ease: 'power2.out', delay: 0.15
       });
     }
 
-    // Animation loop
     function animate() {
-      if (!isPageVisible) {
-        animationFrameId = requestAnimationFrame(animate);
-        return;
-      }
-
-      const delta = clock.getDelta();
+      animationFrameId = requestAnimationFrame(animate);
+      if (!isPageVisible || !inView) return;
       const elapsed = clock.getElapsedTime();
+      orb.rotation.y = elapsed * 0.22;
+      orb.rotation.x = Math.sin(elapsed * 0.35) * 0.12;
+      ring.rotation.z = elapsed * 0.18;
+      group.position.y = 0.1 + Math.sin(elapsed * 0.7) * 0.12;
 
-      // Rotate geometries
-      mesh1.rotation.x += delta * 0.3;
-      mesh1.rotation.y += delta * 0.2;
-      
-      mesh2.rotation.x += delta * 0.4;
-      mesh2.rotation.z += delta * 0.3;
-      
-      mesh3.rotation.y += delta * 0.5;
-      mesh3.rotation.z += delta * 0.2;
-
-      // Gentle group rotation
-      group.rotation.y = Math.sin(elapsed * 0.2) * 0.1;
-      group.rotation.x = Math.cos(elapsed * 0.15) * 0.05;
-
-      // Floating animation
-      mesh1.position.y = 0.5 + Math.sin(elapsed * 0.8) * 0.2;
-      mesh2.position.y = -0.5 + Math.cos(elapsed * 0.6) * 0.15;
-      mesh3.position.y = -1.5 + Math.sin(elapsed * 0.7) * 0.1;
+      // Soft rainbow cycle on orb + ring (matches title gradient)
+      const t = (elapsed * 0.18) % RAINBOW_PALETTE.length;
+      const i0 = Math.floor(t);
+      const i1 = (i0 + 1) % RAINBOW_PALETTE.length;
+      const mix = t - i0;
+      const c = new THREE.Color(RAINBOW_PALETTE[i0]).lerp(new THREE.Color(RAINBOW_PALETTE[i1]), mix);
+      orb.material.color.copy(c);
+      orb.material.emissive.copy(c).multiplyScalar(0.35);
+      ring.material.color.copy(c);
 
       renderer.render(scene, camera);
-      animationFrameId = requestAnimationFrame(animate);
     }
-
     animate();
 
-    // Handle window resize
     let resizeTimeout;
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
-        const newWidth = container.clientWidth;
-        const newHeight = container.clientHeight;
-        camera.aspect = newWidth / newHeight;
+        if (window.matchMedia('(max-width: 767.98px)').matches) {
+          cancelAnimationFrame(animationFrameId);
+          renderer.dispose();
+          canvas.style.display = 'none';
+          return;
+        }
+        canvas.style.display = '';
+        width = container.clientWidth;
+        height = container.clientHeight;
+        camera.aspect = width / height;
         camera.updateProjectionMatrix();
-        renderer.setSize(newWidth, newHeight);
+        renderer.setSize(width, height);
       }, 100);
     });
 
-    // Handle theme change
     const themeToggle = document.getElementById('funThemeToggle');
     if (themeToggle) {
       themeToggle.addEventListener('click', () => {
         setTimeout(() => {
-          const newMaterial = getMaterial();
-          mesh1.material.dispose();
-          mesh2.material.dispose();
-          mesh3.material.dispose();
-          mesh1.material = newMaterial;
-          mesh2.material = newMaterial.clone();
-          mesh3.material = newMaterial.clone();
+          mats.core.dispose();
+          mats.ring.dispose();
+          mats = getMaterials();
+          orb.material = mats.core;
+          ring.material = mats.ring;
         }, 50);
       });
     }
 
-    // Cleanup on page unload
-    window.addEventListener('beforeunload', () => {
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-      }
-      geometry1.dispose();
-      geometry2.dispose();
-      geometry3.dispose();
-      mesh1.material.dispose();
-      mesh2.material.dispose();
-      mesh3.material.dispose();
+    window.addEventListener('pagehide', () => {
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      orbGeom.dispose();
+      ringGeom.dispose();
+      orb.material.dispose();
+      ring.material.dispose();
       renderer.dispose();
     });
-
-    // Mouse interaction - subtle parallax
-    let mouseX = 0;
-    let mouseY = 0;
-    let targetX = 0;
-    let targetY = 0;
-
-    document.addEventListener('mousemove', (e) => {
-      mouseX = (e.clientX / window.innerWidth) * 2 - 1;
-      mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
-    });
-
-    function updateMouseParallax() {
-      targetX += (mouseX * 0.5 - targetX) * 0.05;
-      targetY += (mouseY * 0.3 - targetY) * 0.05;
-      
-      group.rotation.y += (targetX - group.rotation.y) * 0.05;
-      group.rotation.x += (targetY - group.rotation.x) * 0.05;
-
-      requestAnimationFrame(updateMouseParallax);
-    }
-
-    updateMouseParallax();
   }
-
   // Enhanced card interactions with GSAP
   function initEnhancedCardEffects() {
     if (typeof gsap === 'undefined' || prefersReducedMotion) return;

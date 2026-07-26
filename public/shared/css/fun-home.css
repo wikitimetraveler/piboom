@@ -10,49 +10,120 @@
 }
 
 :root {
-  /* Zen mode (light) colors */
-  --fun-bg: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
-  --fun-text: #1a202c;
-  --fun-text-soft: #4a5568;
-  --fun-surface: rgba(255, 255, 255, 0.95);
-  --fun-border: rgba(74, 144, 164, 0.15);
+  /* Zen creative home */
+  --fun-bg-base: #e8eef3;
+  --fun-text: #152028;
+  --fun-text-soft: #4a5d6a;
+  --fun-surface: rgba(255, 255, 255, 0.92);
+  --fun-border: rgba(74, 144, 164, 0.18);
   --fun-accent: #4a90a4;
   --fun-accent-hover: #3d7a8a;
-  --fun-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-  --fun-shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.12);
-  
-  /* Project colors */
+  --fun-ink: #1a2a33;
+  --fun-shadow: 0 10px 40px rgba(21, 32, 40, 0.08);
+  --fun-shadow-hover: 0 20px 60px rgba(21, 32, 40, 0.12);
+  --fun-font-display: "Fraunces", "Palatino Linotype", Georgia, serif;
+  --fun-font-body: "Outfit", "Segoe UI", sans-serif;
+
+  /* Project accents — also drive hero rainbow */
   --fun-music: #8b5cf6;
   --fun-nature: #10b981;
   --fun-family: #f59e0b;
   --fun-glazed: #ec4899;
   --fun-heygen: #06b6d4;
-  
-  /* Sparkles */
-  --fun-sparkle: #fbbf24;
+
+  --fun-sparkle: #c9a227;
 }
 
 body.fun-home {
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  background: var(--fun-bg);
+  font-family: var(--fun-font-body);
+  /* Transparent so animated ::before gradient is the visible atmosphere */
+  background: transparent;
   color: var(--fun-text);
   line-height: 1.6;
-  transition: background 0.5s ease, color 0.3s ease;
+  transition: color 0.3s ease, background 0.35s ease;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+/* Animated atmosphere gradient — project palette drift */
+body.fun-home::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 55% 45% at 18% 22%, rgba(74, 144, 164, 0.42), transparent 58%),
+    radial-gradient(ellipse 50% 40% at 82% 18%, rgba(245, 199, 106, 0.32), transparent 55%),
+    radial-gradient(ellipse 45% 50% at 70% 78%, rgba(236, 72, 153, 0.2), transparent 58%),
+    radial-gradient(ellipse 40% 45% at 22% 82%, rgba(16, 185, 129, 0.22), transparent 55%),
+    radial-gradient(ellipse 35% 35% at 50% 48%, rgba(6, 182, 212, 0.16), transparent 60%),
+    linear-gradient(145deg, #f4f7fa 0%, #e8eef3 42%, #eef2f6 100%);
+  background-size: 180% 180%;
+  background-position: 0% 40%;
+  animation: funBgDrift 16s ease-in-out infinite;
+}
+
+body.fun-home[data-theme="dark"]::before {
+  background:
+    radial-gradient(ellipse 55% 45% at 18% 22%, rgba(74, 144, 164, 0.38), transparent 58%),
+    radial-gradient(ellipse 50% 40% at 82% 18%, rgba(245, 199, 106, 0.18), transparent 55%),
+    radial-gradient(ellipse 45% 50% at 70% 78%, rgba(236, 72, 153, 0.16), transparent 58%),
+    radial-gradient(ellipse 40% 45% at 22% 82%, rgba(16, 185, 129, 0.18), transparent 55%),
+    radial-gradient(ellipse 35% 35% at 50% 48%, rgba(6, 182, 212, 0.14), transparent 60%),
+    linear-gradient(145deg, #0b1218 0%, #152028 48%, #0f1720 100%);
+  background-size: 180% 180%;
+  animation: funBgDrift 18s ease-in-out infinite;
+}
+
+@keyframes funBgDrift {
+  0%, 100% {
+    background-position:
+      12% 18%,
+      88% 12%,
+      72% 82%,
+      18% 86%,
+      48% 46%,
+      0% 0%;
+  }
+  33% {
+    background-position:
+      28% 42%,
+      68% 28%,
+      58% 62%,
+      36% 68%,
+      62% 54%,
+      0% 0%;
+  }
+  66% {
+    background-position:
+      8% 58%,
+      92% 48%,
+      82% 38%,
+      12% 32%,
+      42% 72%,
+      0% 0%;
+  }
+}
+
+.fun-main,
+.fun-footer {
+  position: relative;
+  z-index: 1;
 }
 
 /* Dark mode */
 body.fun-home[data-theme="dark"] {
-  --fun-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-  --fun-text: #f1f5f9;
-  --fun-text-soft: #cbd5e1;
-  --fun-surface: rgba(30, 41, 59, 0.95);
-  --fun-border: rgba(148, 163, 184, 0.2);
-  --fun-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-  --fun-shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.6);
-  --fun-sparkle: #fde047;
+  --fun-bg-base: #0b1218;
+  --fun-text: #eef4f7;
+  --fun-text-soft: #a8b8c4;
+  --fun-surface: rgba(21, 32, 40, 0.92);
+  --fun-border: rgba(148, 163, 184, 0.22);
+  --fun-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+  --fun-shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.55);
+  --fun-sparkle: #e8c96a;
 }
 
 /* Header */
@@ -76,8 +147,10 @@ body.fun-home[data-theme="dark"] {
   gap: 0.5rem;
   text-decoration: none;
   color: var(--fun-text);
+  font-family: var(--fun-font-display);
   font-weight: 700;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
   transition: transform 0.3s ease;
 }
 
@@ -85,9 +158,40 @@ body.fun-home[data-theme="dark"] {
   transform: scale(1.05);
 }
 
+/* Shared animated rainbow for name + titles */
+.fun-rainbow-text,
+.fun-logo__text,
+.fun-hero__title,
+.fun-card__title,
+.fun-about__title {
+  background: linear-gradient(
+    125deg,
+    var(--fun-music) 0%,
+    var(--fun-nature) 22%,
+    var(--fun-heygen) 44%,
+    var(--fun-family) 66%,
+    var(--fun-glazed) 88%,
+    var(--fun-music) 100%
+  );
+  background-size: 240% 240%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: funRainbowShift 9s ease infinite;
+}
+
+.fun-logo__text {
+  font-family: var(--fun-font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  filter: drop-shadow(0 2px 10px rgba(139, 92, 246, 0.2));
+}
+
 .fun-logo__sparkle {
   font-size: 1.5rem;
-  animation: sparkleRotate 3s ease-in-out infinite;
+  animation: sparkleRotate 3s ease-in-out infinite, funSparkleHue 6s linear infinite;
+  filter: drop-shadow(0 0 6px rgba(236, 72, 153, 0.45));
 }
 
 @keyframes sparkleRotate {
@@ -167,13 +271,13 @@ body.fun-home[data-theme="dark"] {
   50% { transform: scale(1.3) rotate(180deg); }
 }
 
-/* Hero */
+/* Hero — Explore · Discover · Create */
 .fun-hero {
   position: relative;
   text-align: center;
-  padding: 8rem 2rem 6rem;
+  padding: 5.5rem 1.5rem 4.5rem;
   overflow: hidden;
-  min-height: 80vh;
+  min-height: min(88vh, 820px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -186,13 +290,11 @@ body.fun-home[data-theme="dark"] {
   height: 100%;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.8;
-  mix-blend-mode: screen;
+  opacity: 0.55;
 }
 
 body[data-theme="dark"] .fun-hero__canvas {
-  opacity: 0.6;
-  mix-blend-mode: lighten;
+  opacity: 0.45;
 }
 
 .fun-hero__shader {
@@ -200,92 +302,101 @@ body[data-theme="dark"] .fun-hero__canvas {
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  opacity: 0.3;
-  background: radial-gradient(
-    circle at 30% 40%,
-    rgba(139, 92, 246, 0.15),
-    rgba(16, 185, 129, 0.1),
-    transparent 60%
-  );
+  opacity: 1;
+  background:
+    radial-gradient(ellipse 70% 55% at 70% 40%, rgba(74, 144, 164, 0.16), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 20% 70%, rgba(201, 162, 39, 0.08), transparent 55%),
+    linear-gradient(180deg, transparent 40%, rgba(21, 32, 40, 0.04) 100%);
 }
 
 body[data-theme="dark"] .fun-hero__shader {
-  opacity: 0.5;
-  background: radial-gradient(
-    circle at 30% 40%,
-    rgba(139, 92, 246, 0.25),
-    rgba(16, 185, 129, 0.15),
-    rgba(6, 182, 212, 0.1),
-    transparent 70%
-  );
+  background:
+    radial-gradient(ellipse 70% 55% at 70% 40%, rgba(74, 144, 164, 0.22), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 20% 70%, rgba(232, 201, 106, 0.06), transparent 55%),
+    linear-gradient(180deg, transparent 35%, rgba(0, 0, 0, 0.35) 100%);
 }
 
 .fun-hero__content {
   position: relative;
   z-index: 10;
-  max-width: 900px;
+  max-width: 42rem;
   margin: 0 auto;
+}
+
+.fun-hero__kicker {
+  font-family: var(--fun-font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fun-accent);
+  margin: 0 0 1rem;
+  animation: fadeInUp 0.7s ease-out both;
 }
 
 .fun-hero__sparkles {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  z-index: 2;
 }
 
 .sparkle {
   position: absolute;
   color: var(--fun-sparkle);
-  font-size: 2rem;
+  font-size: 1.25rem;
   opacity: 0;
-  animation: sparkleFloat 6s ease-in-out infinite;
+  animation: sparkleFloat 7s ease-in-out infinite;
 }
-
-.sparkle-1 { left: 10%; top: 20%; animation-delay: 0s; }
-.sparkle-2 { right: 15%; top: 30%; animation-delay: 1s; font-size: 1.5rem; }
-.sparkle-3 { left: 20%; bottom: 30%; animation-delay: 2s; font-size: 2.5rem; }
-.sparkle-4 { right: 25%; bottom: 40%; animation-delay: 3s; }
-.sparkle-5 { left: 30%; top: 50%; animation-delay: 4s; font-size: 1.75rem; }
-.sparkle-6 { right: 30%; top: 60%; animation-delay: 5s; }
 
 @keyframes sparkleFloat {
   0%, 100% { opacity: 0; transform: translateY(0) scale(1); }
-  50% { opacity: 0.8; transform: translateY(-20px) scale(1.2); }
+  50% { opacity: 0.55; transform: translateY(-14px) scale(1.08); }
 }
 
 .fun-hero__title {
-  font-size: clamp(3.5rem, 10vw, 7rem);
-  font-weight: 900;
-  line-height: 1.05;
-  margin-bottom: 2rem;
-  background: linear-gradient(135deg, var(--fun-music), var(--fun-nature), var(--fun-heygen), var(--fun-family), var(--fun-glazed));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: gradientShift 8s ease infinite;
-  background-size: 200% 200%;
-  text-shadow: 0 0 80px rgba(139, 92, 246, 0.3);
-  filter: drop-shadow(0 10px 40px rgba(0, 0, 0, 0.2));
+  font-family: var(--fun-font-display);
+  font-size: clamp(3.25rem, 11vw, 6.25rem);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.35rem;
+  filter: drop-shadow(0 8px 28px rgba(21, 32, 40, 0.18));
 }
 
-@keyframes gradientShift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+body[data-theme="dark"] .fun-hero__title {
+  filter: drop-shadow(0 10px 36px rgba(0, 0, 0, 0.45));
+}
+
+@keyframes funRainbowShift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes funSparkleHue {
+  0% { filter: hue-rotate(0deg) drop-shadow(0 0 6px rgba(236, 72, 153, 0.45)); }
+  50% { filter: hue-rotate(180deg) drop-shadow(0 0 8px rgba(16, 185, 129, 0.5)); }
+  100% { filter: hue-rotate(360deg) drop-shadow(0 0 6px rgba(139, 92, 246, 0.45)); }
 }
 
 .fun-hero__title-line {
   display: block;
-  animation: fadeInUp 0.8s ease-out backwards;
+  animation: fadeInUp 0.85s ease-out backwards;
 }
 
-.fun-hero__title-line:nth-child(1) { animation-delay: 0.2s; }
-.fun-hero__title-line:nth-child(2) { animation-delay: 0.4s; }
-.fun-hero__title-line:nth-child(3) { animation-delay: 0.6s; }
+.fun-hero__title-line:nth-child(1) { animation-delay: 0.12s; }
+.fun-hero__title-line:nth-child(2) { animation-delay: 0.28s; }
+.fun-hero__title-line:nth-child(3) { animation-delay: 0.44s; }
 
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(28px);
   }
   to {
     opacity: 1;
@@ -294,23 +405,62 @@ body[data-theme="dark"] .fun-hero__shader {
 }
 
 .fun-hero__lead {
-  font-size: clamp(1.125rem, 2vw, 1.5rem);
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  font-weight: 450;
   color: var(--fun-text-soft);
-  max-width: 600px;
-  margin: 0 auto 3rem;
-  animation: fadeInUp 0.8s ease-out 0.8s backwards;
+  max-width: 34ch;
+  margin: 0 auto 1.75rem;
+  line-height: 1.5;
+  animation: fadeInUp 0.8s ease-out 0.55s backwards;
+}
+
+.fun-hero__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  animation: fadeInUp 0.8s ease-out 0.7s backwards;
+}
+
+.fun-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.75rem 1.35rem;
+  border-radius: 999px;
+  font-family: var(--fun-font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fun-btn--primary {
+  background: var(--fun-accent);
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(74, 144, 164, 0.35);
+}
+
+.fun-btn--primary:hover {
+  background: var(--fun-accent-hover);
+  transform: translateY(-2px);
+  color: #fff;
+}
+
+.fun-btn--ghost {
+  background: transparent;
+  color: var(--fun-text);
+  border: 1px solid var(--fun-border);
+}
+
+.fun-btn--ghost:hover {
+  border-color: var(--fun-accent);
+  color: var(--fun-accent);
+  transform: translateY(-2px);
 }
 
 .fun-hero__scroll {
-  display: inline-flex;
-  color: var(--fun-accent);
-  font-size: 2rem;
-  animation: bounce 2s ease-in-out infinite;
-}
-
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(10px); }
+  display: none;
 }
 
 /* Projects Grid */
@@ -355,11 +505,17 @@ body[data-theme="dark"] .fun-card {
 .fun-card:nth-child(5) { animation-delay: 0.5s; }
 
 .fun-card:hover {
-  transform: translateY(-16px) translateZ(20px) rotateX(2deg);
-  box-shadow: 
+  transform: translateY(-12px);
+  box-shadow:
     0 30px 90px rgba(0, 0, 0, 0.15),
     0 10px 30px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .fun-card:hover {
+    transform: translateY(-14px) translateZ(12px);
+  }
 }
 
 body[data-theme="dark"] .fun-card:hover {
@@ -472,10 +628,10 @@ body[data-theme="dark"] .fun-card:hover {
 }
 
 .fun-card__title {
+  font-family: var(--fun-font-display);
   font-size: 2rem;
-  font-weight: 800;
+  font-weight: 700;
   margin-bottom: 1rem;
-  color: var(--fun-text);
   letter-spacing: -0.02em;
 }
 
@@ -588,12 +744,12 @@ body[data-theme="dark"] .fun-card:hover {
 }
 
 .fun-about__title {
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin-bottom: 2rem;
-  color: var(--fun-text);
+  font-family: var(--fun-font-display);
+  font-size: clamp(1.85rem, 4vw, 2.75rem);
+  font-weight: 700;
+  margin-bottom: 1.5rem;
   letter-spacing: -0.02em;
-  line-height: 1.2;
+  line-height: 1.15;
 }
 
 .fun-about__text {
@@ -692,15 +848,32 @@ body[data-theme="dark"] .fun-card:hover {
 @media (prefers-reduced-motion: reduce) {
   .fun-hero__canvas,
   .fun-hero__shader,
-  .sparkle {
+  .sparkle,
+  .fun-hero__title-line,
+  .fun-hero__kicker,
+  .fun-hero__lead,
+  .fun-hero__cta,
+  .fun-logo__text,
+  .fun-logo__sparkle,
+  .fun-card__title,
+  .fun-about__title,
+  .fun-rainbow-text {
     animation: none !important;
-    opacity: 0.3;
   }
-  
-  .fun-hero__title {
-    animation: none;
+
+  body.fun-home::before {
+    animation: none !important;
+    background-position: 20% 30%, 80% 20%, 70% 75%, 25% 80%, 50% 50%, 0% 0%;
   }
-  
+
+  .fun-hero__title,
+  .fun-logo__text,
+  .fun-card__title,
+  .fun-about__title {
+    animation: none !important;
+    background-position: 40% 50%;
+  }
+
   .fun-card {
     animation: none;
   }
