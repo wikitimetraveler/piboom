@@ -229,6 +229,186 @@ const darkModeStyles = `
     border-color: var(--site-primary-hover);
   }
 
+  /* —— Glazed Light Mode (fluffy, airy, bright) —— */
+  body.gz-page:not(.dark-mode) {
+    --gz-cocoa: #fff9f4;
+    --gz-espresso: #fff4eb;
+    --gz-bark: #f5e8dc;
+    --gz-frost: #ff7a9a;
+    --gz-frost-deep: #e85a7a;
+    --gz-glaze: #f5c76a;
+    --gz-glaze-hot: #ffd98a;
+    --gz-cream: #2c1810;
+    --gz-milk: #f5e8dc;
+    --gz-ink: #2c1810;
+    --gz-muted: rgba(44, 24, 16, 0.65);
+    
+    background:
+      radial-gradient(ellipse 85% 50% at 15% -5%, rgba(255, 210, 220, 0.35), transparent 50%),
+      radial-gradient(ellipse 75% 45% at 88% 10%, rgba(255, 225, 160, 0.3), transparent 48%),
+      radial-gradient(ellipse 90% 55% at 50% 100%, rgba(255, 200, 150, 0.2), transparent 55%),
+      linear-gradient(180deg, #fffbf7 0%, #fff4eb 40%, #ffe8d6 100%) !important;
+    background-attachment: fixed !important;
+    color: var(--gz-ink) !important;
+  }
+
+  body.gz-page:not(.dark-mode) .gz-hero::before {
+    background:
+      radial-gradient(circle at 72% 42%, rgba(255, 200, 120, 0.15), transparent 38%),
+      linear-gradient(180deg, transparent 25%, rgba(255, 245, 235, 0.65) 100%);
+  }
+
+  body.gz-page:not(.dark-mode) .gz-brand {
+    background: linear-gradient(135deg, #2c1810 5%, #c47a2c 40%, #ff7a9a 85%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0 4px 12px rgba(255, 122, 154, 0.25));
+  }
+
+  body.gz-page:not(.dark-mode) .gz-hero-line {
+    color: rgba(44, 24, 16, 0.75);
+  }
+
+  body.gz-page:not(.dark-mode) .gz-btn-primary {
+    background: linear-gradient(135deg, #ff7a9a, #e85a7a);
+    color: white;
+    border-color: transparent;
+  }
+
+  body.gz-page:not(.dark-mode) .gz-btn-primary:hover {
+    background: linear-gradient(135deg, #e85a7a, #d04a6a);
+    box-shadow: 0 6px 20px rgba(255, 122, 154, 0.35);
+  }
+
+  body.gz-page:not(.dark-mode) .gz-btn-ghost {
+    background: rgba(255, 255, 255, 0.75);
+    color: #2c1810;
+    border-color: rgba(44, 24, 16, 0.15);
+    backdrop-filter: blur(8px);
+  }
+
+  body.gz-page:not(.dark-mode) .gz-btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: #ff7a9a;
+    color: #ff7a9a;
+  }
+
+  body.gz-page:not(.dark-mode) .gz-btn-frost {
+    background: linear-gradient(135deg, #ffd98a, #f5c76a);
+    color: #2c1810;
+    border-color: transparent;
+  }
+
+  body.gz-page:not(.dark-mode) .gz-btn-frost:hover {
+    background: linear-gradient(135deg, #f5c76a, #e8a54b);
+    box-shadow: 0 6px 20px rgba(245, 199, 106, 0.35);
+  }
+
+  body.gz-page:not(.dark-mode) .gz-guide {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(44, 24, 16, 0.12);
+    color: #2c1810;
+    backdrop-filter: blur(12px);
+  }
+
+  body.gz-page:not(.dark-mode) .gz-guide-card {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 16px rgba(44, 24, 16, 0.08);
+  }
+
+  body.gz-page:not(.dark-mode) .gz-section {
+    color: #2c1810;
+  }
+
+  body.gz-page:not(.dark-mode) .gz-card {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(44, 24, 16, 0.1);
+    color: #2c1810;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 24px rgba(44, 24, 16, 0.08);
+  }
+
+  body.gz-page:not(.dark-mode) .gz-card:hover {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 12px 32px rgba(255, 122, 154, 0.15);
+  }
+
+  body.gz-page:not(.dark-mode) .gz-card-kicker {
+    color: #ff7a9a;
+  }
+
+  body.gz-page:not(.dark-mode) .gz-tagline {
+    color: rgba(44, 24, 16, 0.65);
+  }
+
+  body.gz-page:not(.dark-mode) .gz-tag {
+    background: rgba(255, 122, 154, 0.15);
+    color: #c4423a;
+  }
+
+  body.gz-page:not(.dark-mode) .gz-face--back {
+    background: rgba(255, 252, 248, 0.98);
+  }
+
+  body.gz-page:not(.dark-mode) .gz-back-kicker {
+    color: #ff7a9a;
+  }
+
+  body.gz-page:not(.dark-mode) .gz-back-title {
+    color: #2c1810;
+  }
+
+  body.gz-page:not(.dark-mode) .gz-fresh-drop-countdown {
+    background: linear-gradient(135deg, rgba(255, 122, 154, 0.25), rgba(245, 199, 106, 0.2));
+    border-color: rgba(245, 199, 106, 0.4);
+    box-shadow: 
+      0 8px 24px rgba(44, 24, 16, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  body.gz-page:not(.dark-mode) .gz-countdown-label {
+    color: #c47a2c;
+    text-shadow: 0 1px 3px rgba(255, 255, 255, 0.5);
+  }
+
+  body.gz-page:not(.dark-mode) .gz-countdown-value {
+    color: #2c1810;
+    text-shadow: 
+      0 2px 4px rgba(255, 255, 255, 0.8),
+      0 0 15px rgba(245, 199, 106, 0.3);
+  }
+
+  body.gz-page:not(.dark-mode) .gz-countdown-unit-label {
+    color: rgba(44, 24, 16, 0.6);
+  }
+
+  body.gz-page:not(.dark-mode) .gz-countdown-separator {
+    color: #ff7a9a;
+    text-shadow: 0 0 10px rgba(255, 122, 154, 0.4);
+  }
+
+  body.gz-page:not(.dark-mode) .gz-countdown-message {
+    color: rgba(44, 24, 16, 0.65);
+  }
+
+  body.gz-page:not(.dark-mode) .gz-footer-note {
+    color: rgba(44, 24, 16, 0.7);
+  }
+
+  body.gz-page:not(.dark-mode) .gz-recipe-sheet-panel {
+    background: rgba(255, 252, 248, 0.98);
+    color: #2c1810;
+  }
+
+  body.gz-page:not(.dark-mode) .gz-shop-section {
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  body.gz-page:not(.dark-mode) .gz-loading {
+    color: rgba(44, 24, 16, 0.7);
+  }
+
   .dark-mode-toggle {
     position: fixed;
     bottom: 100px;
@@ -249,6 +429,17 @@ const darkModeStyles = `
     font-size: 1.3rem;
   }
 
+  body.gz-page .dark-mode-toggle {
+    background: linear-gradient(135deg, #ff7a9a, #e85a7a);
+    box-shadow: 0 4px 15px rgba(255, 122, 154, 0.45);
+  }
+
+  body.gz-page.dark-mode .dark-mode-toggle {
+    background: linear-gradient(135deg, #ffd98a, #f5c76a);
+    box-shadow: 0 4px 15px rgba(245, 199, 106, 0.45);
+    color: #2c1810;
+  }
+
   .dark-mode-toggle:hover {
     transform: scale(1.05);
     box-shadow: 0 6px 22px rgba(var(--site-primary-rgb, 74, 144, 164), 0.55);
@@ -267,8 +458,16 @@ function initDarkMode() {
     document.head.appendChild(styleEl);
   }
 
-  const isDark = localStorage.getItem(DARK_MODE_KEY) === 'true';
-  if (isDark) {
+  const isGlazedPage = document.body.classList.contains('gz-page');
+  const storedPref = localStorage.getItem(DARK_MODE_KEY);
+  
+  // Glazed page defaults to dark mode (current design)
+  // Other pages respect saved preference or stay light
+  const shouldBeDark = isGlazedPage 
+    ? (storedPref === null ? true : storedPref === 'true')
+    : storedPref === 'true';
+  
+  if (shouldBeDark) {
     document.body.classList.add('dark-mode');
   }
 
