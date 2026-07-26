@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sparkle Fall Demo - DevConnect Labs</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 800px;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 1s ease-out;
+        }
+
+        p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease-out 0.2s backwards;
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-top: 2rem;
+            animation: fadeInUp 1s ease-out 0.4s backwards;
+        }
+
+        .control-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        button {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 0.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .value-display {
+            display: inline-block;
+            min-width: 50px;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .instructions {
+            margin-top: 3rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+        .instructions h2 {
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .instructions code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .instructions pre {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            text-align: left;
+        }
+    </style>
+</head>
+<body data-sparkle-fall>
+    <div class="container">
+        <h1>✨ Sparkle Fall Effect ✨</h1>
+        <p>Beautiful animated sparkles falling across your page</p>
+
+        <div class="controls">
+            <h2>Customize Your Sparkles</h2>
+            
+            <div class="control-group">
+                <label>
+                    Particle Count: <span class="value-display" id="countValue">60</span>
+                </label>
+                <input type="range" id="particleCount" min="10" max="200" value="60">
+            </div>
+
+            <div class="control-group">
+                <label>
+                    Fall Speed: <span class="value-display" id="speedValue">1.5</span>
+                </label>
+                <input type="range" id="speed" min="0.5" max="5" step="0.1" value="1.5">
+            </div>
+
+            <div class="control-group">
+                <label>
+                    Sparkle Size: <span class="value-display" id="sizeValue">4</span>
+                </label>
+                <input type="range" id="size" min="2" max="10" step="0.5" value="4">
+            </div>
+
+            <div class="control-group">
+                <label>
+                    Twinkle Speed: <span class="value-display" id="twinkleValue">0.05</span>
+                </label>
+                <input type="range" id="twinkle" min="0.01" max="0.2" step="0.01" value="0.05">
+            </div>
+
+            <button id="resetBtn">Reset to Defaults</button>
+            <button id="toggleBtn">Pause</button>
+        </div>
+
+        <div class="instructions">
+            <h2>How to Add to Any Page</h2>
+            <p><strong>Method 1: Automatic (easiest)</strong></p>
+            <p>Add the script and the <code>data-sparkle-fall</code> attribute to your body tag:</p>
+            <pre><code>&lt;body data-sparkle-fall&gt;
+    &lt;!-- your content --&gt;
+    &lt;script src="/shared/sparkle-fall.js"&gt;&lt;/script&gt;
+&lt;/body&gt;</code></pre>
+
+            <p><strong>Method 2: Custom JavaScript</strong></p>
+            <p>Create an instance with custom options:</p>
+            <pre><code>&lt;script src="/shared/sparkle-fall.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+    const sparkles = new SparkleFall({
+        particleCount: 80,
+        colors: ['#FFD700', '#FFF', '#FFE4B5'],
+        minSpeed: 1,
+        maxSpeed: 3,
+        minSize: 2,
+        maxSize: 6
+    });
+&lt;/script&gt;</code></pre>
+        </div>
+    </div>
+
+    <script src="/shared/sparkle-fall.js"></script>
+    <script>
+        // Get the sparkle instance (created automatically by data-sparkle-fall)
+        let currentSparkle = window.sparkleInstance;
+
+        // Controls
+        const particleCountSlider = document.getElementById('particleCount');
+        const speedSlider = document.getElementById('speed');
+        const sizeSlider = document.getElementById('size');
+        const twinkleSlider = document.getElementById('twinkle');
+        
+        const countValue = document.getElementById('countValue');
+        const speedValue = document.getElementById('speedValue');
+        const sizeValue = document.getElementById('sizeValue');
+        const twinkleValue = document.getElementById('twinkleValue');
+
+        const resetBtn = document.getElementById('resetBtn');
+        const toggleBtn = document.getElementById('toggleBtn');
+
+        let isPaused = false;
+
+        // Update value displays
+        particleCountSlider.addEventListener('input', (e) => {
+            countValue.textContent = e.target.value;
+            recreateSparkles();
+        });
+
+        speedSlider.addEventListener('input', (e) => {
+            speedValue.textContent = e.target.value;
+            recreateSparkles();
+        });
+
+        sizeSlider.addEventListener('input', (e) => {
+            sizeValue.textContent = e.target.value;
+            recreateSparkles();
+        });
+
+        twinkleSlider.addEventListener('input', (e) => {
+            twinkleValue.textContent = e.target.value;
+            recreateSparkles();
+        });
+
+        function recreateSparkles() {
+            if (currentSparkle) {
+                currentSparkle.dispose();
+            }
+
+            currentSparkle = new SparkleFall({
+                particleCount: parseInt(particleCountSlider.value),
+                minSpeed: parseFloat(speedSlider.value) * 0.5,
+                maxSpeed: parseFloat(speedSlider.value) * 1.5,
+                minSize: parseFloat(sizeSlider.value) * 0.5,
+                maxSize: parseFloat(sizeSlider.value) * 1.5,
+                twinkleSpeed: parseFloat(twinkleSlider.value)
+            });
+
+            if (isPaused) {
+                currentSparkle.pause();
+            }
+        }
+
+        resetBtn.addEventListener('click', () => {
+            particleCountSlider.value = 60;
+            speedSlider.value = 1.5;
+            sizeSlider.value = 4;
+            twinkleSlider.value = 0.05;
+            
+            countValue.textContent = '60';
+            speedValue.textContent = '1.5';
+            sizeValue.textContent = '4';
+            twinkleValue.textContent = '0.05';
+            
+            recreateSparkles();
+            isPaused = false;
+            toggleBtn.textContent = 'Pause';
+        });
+
+        toggleBtn.addEventListener('click', () => {
+            if (isPaused) {
+                currentSparkle.animate();
+                toggleBtn.textContent = 'Pause';
+                isPaused = false;
+            } else {
+                currentSparkle.pause();
+                toggleBtn.textContent = 'Resume';
+                isPaused = true;
+            }
+        });
+
+        // Store reference globally for demo purposes
+        window.sparkleInstance = currentSparkle;
+    </script>
+</body>
+</html>

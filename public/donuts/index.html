@@ -76,11 +76,8 @@
           <div class="gz-orb-sprinkles" id="gzOrbSprinkles" aria-hidden="true"></div>
           <button type="button" class="gz-hero-donut" id="gzHeroDonut" aria-label="Glazed donut — click to explode"></button>
         </div>
-      </div>
-    </section>
-
-    <div class="container">
-      <aside class="gz-guide" id="gzGuide" aria-label="Bakery guide Pip">
+        
+        <aside class="gz-guide gz-guide--hero" id="gzGuide" aria-label="Bakery guide Pip">
         <div class="gz-guide-card">
           <button type="button" class="gz-guide-portrait-btn" id="gzGuideExpand" aria-label="Pip — expand dock">
             <img
@@ -136,7 +133,10 @@
           <p class="gz-story-error" id="gzStoryError" hidden></p>
         </div>
       </aside>
+      </div>
+    </section>
 
+    <div class="container">
       <section class="gz-section" id="gzCase">
         <div class="gz-section-head">
           <h2>Baker’s Dozen</h2>
@@ -370,6 +370,28 @@
       // Update every second
       setInterval(updateCountdown, 1000);
     })();
+    
+    // Hero Meet Pip button
+    document.addEventListener('DOMContentLoaded', function() {
+      const playPipBtn = document.getElementById('gzPlayPipHero');
+      const meetPipBtn = document.getElementById('gzMeetPip');
+      
+      if (playPipBtn) {
+        playPipBtn.addEventListener('click', async function() {
+          if (window.GlazedHeygen && typeof window.GlazedHeygen.playIntro === 'function') {
+            await window.GlazedHeygen.playIntro();
+          }
+        });
+      }
+      
+      if (meetPipBtn) {
+        meetPipBtn.addEventListener('click', async function() {
+          if (window.GlazedHeygen && typeof window.GlazedHeygen.playIntro === 'function') {
+            await window.GlazedHeygen.playIntro();
+          }
+        });
+      }
+    });
   </script>
 </body>
 </html>

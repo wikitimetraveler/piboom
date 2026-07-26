@@ -743,6 +743,24 @@ body.gz-page {
   z-index: 3;
 }
 
+.gz-guide--hero {
+  position: absolute;
+  bottom: -3.5rem;
+  right: 4rem;
+  margin: 0;
+  max-width: 290px;
+  z-index: 10;
+}
+
+@media (max-width: 991.98px) {
+  .gz-guide--hero {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    margin: 2rem 0;
+  }
+}
+
 .gz-guide-card {
   display: grid;
   grid-template-columns: auto 1fr auto;

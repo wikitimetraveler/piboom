@@ -148,6 +148,7 @@
 
   const STACK_CHIPS = [
     { label: 'Node.js / Express', icon: 'bi-server' },
+    { label: 'Python / FastAPI', icon: 'bi-code-slash' },
     { label: 'PostgreSQL', icon: 'bi-database' },
     { label: 'LangChain + OpenAI', icon: 'bi-robot' },
     { label: 'OpenAI Vision', icon: 'bi-eye' },
@@ -166,6 +167,7 @@
       title: 'Platform',
       items: [
         { label: 'Node.js + Express', detail: 'API routes, services layer, static hosting', icon: 'bi-server' },
+        { label: 'Python/FastAPI', detail: 'PostGIS spatial queries, disaster PostgreSQL feed, Encompass RAG (keyword + vector search), text processing, data analytics', icon: 'bi-code-slash' },
         { label: 'PostgreSQL', detail: 'Lane graph, disasters, Encompass config, chat memory', icon: 'bi-database' },
         { label: 'Jest CI', detail: 'Unit tests across finance, genealogy, ingest pipelines', icon: 'bi-check2-circle' },
       ],
@@ -175,7 +177,7 @@
       items: [
         { label: 'LangChain + OpenAI', detail: 'Encompass Assistant, loan pipeline AI, Screen Test', icon: 'bi-robot' },
         { label: 'OpenAI Vision (GPT-4o)', detail: 'Automator field-image parsing, Screen Test, multimodal discovery', icon: 'bi-eye' },
-        { label: 'ICE knowledge RAG', detail: 'Indexed Developer Connect docs and repos', icon: 'bi-journal-code' },
+        { label: 'ICE knowledge RAG', detail: 'Python pgvector semantic search + Encompass docs', icon: 'bi-journal-code' },
         { label: 'HeyGen', detail: 'Avatar video, QR guide popups, demo explainers', icon: 'bi-camera-reels' },
         { label: 'HyperFrames', detail: 'Guided story reels and narrative overlays', icon: 'bi-film' },
       ],
@@ -280,7 +282,7 @@
       featuredOrder: 2,
       problem: 'Surface multi-source hazard intelligence with county-scoped views and pipeline risk context.',
       consultingBlurb: 'Postgres-backed ingest, Leaflet county gate, AG Grid, PostGIS nearby search, and live API pull workflows.',
-      stack: ['PostGIS', 'FEMA / NOAA APIs', 'AG Grid', 'Google Maps'],
+      stack: ['Python/FastAPI', 'PostGIS', 'FEMA / NOAA APIs', 'AG Grid', 'Google Maps'],
       caseStudy: {
         role: 'Full-stack — ingest services, PostGIS schema, map UX, and pipeline risk views.',
         outcome:
@@ -349,7 +351,7 @@
       authRequired: true,
       problem: 'Answer Encompass integration questions with indexed ICE docs and live context.',
       consultingBlurb: 'LangChain + OpenAI assistant with ICE knowledge RAG and persistent memory.',
-      stack: ['LangChain', 'OpenAI', 'ICE knowledge RAG'],
+      stack: ['LangChain', 'OpenAI', 'Python/FastAPI RAG', 'ICE knowledge'],
     },
     {
       id: 'automator',
@@ -373,7 +375,7 @@
       authRequired: true,
       problem: 'Review Encompass screen manifests with AI-assisted validation.',
       consultingBlurb: 'Reviewer AI controller with structured manifest feedback for ICE admins.',
-      stack: ['OpenAI', 'Encompass manifests', 'Screen Test'],
+      stack: ['OpenAI', 'Python text processing', 'Encompass manifests'],
     },
     {
       id: 'gse-analyzer',
@@ -448,7 +450,7 @@
       category: 'disasters',
       problem: 'Multi-hop graph model complementing spatial disaster search.',
       consultingBlurb: 'graph_nodes / graph_edges prototype seeded from Postgres spatial data.',
-      stack: ['PostgreSQL', 'Graph model', 'PostGIS seed'],
+      stack: ['PostgreSQL', 'Python/FastAPI', 'Graph model', 'PostGIS seed'],
     },
     {
       id: 'music',
