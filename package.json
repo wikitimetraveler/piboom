@@ -13,6 +13,7 @@
     "build:heygen-knowledge": "node scripts/build-heygen-knowledge.js",
     "scrape:encompass-docs": "node scripts/scrape-encompass-docs.js",
     "refresh:encompass-knowledge": "npm run scrape:encompass-docs && npm run build:ice-knowledge",
+    "convert:conditions-cdo": "node scripts/tools/convert-conditions-cdo.mjs",
     "embed:graph-nodes": "node scripts/build-graph-node-embeddings.mjs",
     "refresh:heygen-knowledge": "node scripts/build-heygen-knowledge.js",
     "test:finance": "node scripts/run-finance-unit-tests.js --file test/fixtures/finance/BSA_TASK_579580.xlsx",

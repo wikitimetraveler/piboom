@@ -50,6 +50,10 @@ jspm_packages/
 # dotenv environment variables file
 .env
 
+# Scratch files from API probes and one-off conversions; may contain
+# session cookies, loan data, or other tenant-specific payloads
+.tmp*
+
 # IDE files
 .vscode/
 .idea/
