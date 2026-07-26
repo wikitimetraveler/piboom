@@ -78,7 +78,7 @@
       if (!text || !window.speechSynthesis) return;
       window.speechSynthesis.cancel();
       const utter = new SpeechSynthesisUtterance(text);
-      utter.rate = 0.95;
+      utter.rate = 0.8;
       window.speechSynthesis.speak(utter);
     });
   }

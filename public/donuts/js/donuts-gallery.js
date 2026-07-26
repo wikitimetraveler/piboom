@@ -25,7 +25,7 @@
     gender: 'female',
     youngFemale: true,
     pitch: 6.5,
-    speakingRate: 1.12
+    speakingRate: 0.95
   };
 
   function speak(text) {
@@ -39,7 +39,7 @@
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.rate = 1.12;
+    u.rate = 0.95;
     u.pitch = 1.15;
     const voices = window.speechSynthesis.getVoices();
     const label = (v) => `${v.name || ''} ${v.voiceURI || ''}`;
@@ -332,15 +332,9 @@
               <h3 class="gz-back-title">${esc(item.name)}</h3>
               ${bodyBits}
             </div>
-            <button type="button" class="gz-scroll-cue gz-recipe-open" data-recipe="${esc(item.id)}" hidden>
-              <i class="bi bi-arrows-fullscreen"></i> ${openLabel}
-            </button>
             <div class="gz-back-actions">
               <button type="button" class="gz-btn gz-btn-sm gz-btn-frost gz-hear" data-hear="${esc(item.id)}">
                 <i class="bi bi-soundwave"></i> Hear Pip
-              </button>
-              <button type="button" class="gz-btn gz-btn-sm gz-btn-ghost gz-recipe-open" data-recipe="${esc(item.id)}">
-                <i class="bi ${openIcon}"></i> ${openLabel}
               </button>
               <button type="button" class="gz-btn gz-btn-sm gz-btn-ink gz-pair" data-pair="${esc(item.id)}">
                 <i class="bi bi-hearts"></i> ${pairLabel}
@@ -727,13 +721,7 @@
     if (flipped) {
       window.requestAnimationFrame(() => {
         updateCardScrollCue(card);
-        // Long story → open readable lightbox after flip (card stays a teaser)
-        const face = card.querySelector('.gz-face--back');
-        const id = card.getAttribute('data-id');
-        const catalog = window.GlazedCatalog?.byId || {};
-        if (face?.classList.contains('has-scroll') && id && catalog[id]) {
-          window.setTimeout(() => openStorySheet(catalog[id]), 280);
-        }
+        // Auto-open popup disabled - user can manually click "Open full story" button if needed
       });
     }
   }
@@ -772,7 +760,11 @@
       if (recipeBtn) {
         e.preventDefault();
         e.stopPropagation();
-        openStorySheet(byId[recipeBtn.getAttribute('data-recipe')]);
+        const itemId = recipeBtn.getAttribute('data-recipe');
+        const item = byId[itemId];
+        if (item) {
+          openStorySheet(item);
+        }
         return;
       }
 

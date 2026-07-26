@@ -1293,7 +1293,7 @@ body.gz-recipe-open {
   min-height: 380px;
   transform-style: preserve-3d;
   -webkit-transform-style: preserve-3d;
-  transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1), min-height 0.35s ease;
+  transition: transform 0.5s ease-out, min-height 0.5s ease-out;
 }
 
 .gz-card.is-flipped .gz-card-inner {
@@ -1320,6 +1320,10 @@ body.gz-recipe-open {
   display: flex;
   flex-direction: column;
   z-index: 2;
+  color: #fff4e8 !important;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.1s ease-out, visibility 0s linear 0s;
 }
 
 .gz-face--back {
@@ -1332,6 +1336,9 @@ body.gz-recipe-open {
   flex-direction: column;
   padding: 1rem 1.05rem 0.9rem;
   z-index: 1;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0s linear, visibility 0s linear;
 }
 
 /* Hard hide front when flipped — iOS often ignores backface-visibility on filtered images/SVGs */
@@ -1340,6 +1347,7 @@ body.gz-recipe-open {
   opacity: 0;
   pointer-events: none;
   z-index: 0;
+  transition: opacity 0.2s ease-out;
 }
 
 .gz-card.is-flipped .gz-face--back {
@@ -1347,6 +1355,7 @@ body.gz-recipe-open {
   opacity: 1;
   pointer-events: auto;
   z-index: 3;
+  transition: visibility 0s linear 0.35s, opacity 0.15s ease-in 0.35s;
 }
 
 .gz-card.is-flipped .gz-donut-svg,
@@ -1473,13 +1482,13 @@ body.gz-recipe-open {
   font-family: var(--gz-font-display);
   font-size: 1.35rem;
   margin: 0 0 0.2rem;
-  color: var(--gz-cream);
+  color: #fff4e8 !important;
 }
 
 .gz-front-body .gz-tagline {
   margin: 0 0 0.65rem;
   font-size: 0.88rem;
-  color: var(--gz-muted);
+  color: rgba(255, 244, 232, 0.85) !important;
 }
 
 .gz-tags {
@@ -1497,13 +1506,13 @@ body.gz-recipe-open {
   padding: 0.2rem 0.5rem;
   border-radius: 999px;
   background: rgba(255, 122, 154, 0.18);
-  color: var(--gz-frost);
+  color: #ff7a9a !important;
   border: 1px solid rgba(255, 122, 154, 0.3);
 }
 
 .gz-flip-hint {
   font-size: 0.78rem;
-  color: var(--gz-glaze);
+  color: #f5c76a !important;
   margin: 0;
   display: flex;
   align-items: center;
@@ -1656,7 +1665,7 @@ body.gz-recipe-open {
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--gz-glaze);
+  color: #f5c76a !important;
   margin: 0 0 0.15rem;
 }
 
@@ -1763,10 +1772,12 @@ body.gz-recipe-open {
 }
 
 .gz-shop-sign {
-  width: min(100%, 280px);
+  width: min(100%, 400px);
   border-radius: 12px;
   border: 1px solid rgba(255, 244, 232, 0.2);
   background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
 }
 
 .gz-shop-address {

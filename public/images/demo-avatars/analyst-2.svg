@@ -1,6 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Analyst Two">
-  <rect width="128" height="128" fill="#e9ecef"/>
-  <circle cx="64" cy="48" r="22" fill="#6c757d"/>
-  <path d="M24 112c8-28 32-40 40-40s32 12 40 40" fill="#6c757d"/>
-  <text x="64" y="118" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#495057">A2</text>
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5a6a85;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#475669;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" fill="url(#bg2)"/>
+  <circle cx="64" cy="52" r="24" fill="#ffffff" opacity="0.9"/>
+  <path d="M20 115c10-30 34-42 44-42s34 12 44 42" fill="#ffffff" opacity="0.9"/>
+  <circle cx="64" cy="52" r="20" fill="#5a6a85" opacity="0.3"/>
+  <text x="64" y="68" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="32" font-weight="700" fill="#3d4a5e">2</text>
 </svg>

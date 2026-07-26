@@ -41,13 +41,21 @@
     const title = opts.title || '';
     const color = opts.color || ORIGIN_PIN_COLOR;
     const label = opts.label || '';
+    const emoji = opts.emoji;
 
     if (gam?.createMapMarker) {
+      let content;
+      if (emoji) {
+        content = document.createElement('div');
+        content.innerHTML = `<div style="font-size:${opts.size || 32}px;line-height:1;text-shadow:0 2px 4px rgba(0,0,0,0.3);filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2));">${emoji}</div>`;
+      } else {
+        content = gam.createPinContent({ color, label, size: opts.size || 32 });
+      }
       return gam.createMapMarker({
         map: opts.map,
         position,
         title,
-        content: gam.createPinContent({ color, label, size: opts.size || 32 }),
+        content,
         zIndex: opts.zIndex,
       });
     }
@@ -263,9 +271,8 @@
         position: { lat: p.lat, lng: p.lng },
         map,
         title: `${p.name} — ${p.origin.place || ''}`,
-        color: ORIGIN_PIN_COLOR,
-        label: String(index + 1),
-        size: 32,
+        emoji: '🍩',
+        size: 28,
         zIndex: 100 + index,
       });
       byId[p.id] = { marker, pin: p };
