@@ -21,10 +21,10 @@
 </head>
 <body class="gz-page">
   <modern-navbar></modern-navbar>
+  <div class="gz-sugar gz-sugar--page" id="gzSugar" aria-hidden="true"></div>
 
   <main class="gz-main">
     <section class="gz-hero container" id="gzHero">
-      <div class="gz-sugar" id="gzSugar" aria-hidden="true"></div>
       <div class="gz-hero-layout">
         <div class="gz-hero-inner">
           <h1 class="gz-brand">Glazed</h1>
@@ -283,12 +283,21 @@
     </div>
   </div>
 
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
+    }
+  }
+  </script>
   <script src="/shared/tts.js"></script>
   <script src="/shared/discovery-camera.js"></script>
   <script src="/family/js/lane-family-google-maps.js"></script>
   <script src="/shared/google-advanced-markers.js"></script>
   <script src="/donuts/js/donuts-heygen-popup.js"></script>
   <script src="/donuts/js/donuts-map.js"></script>
+  <script type="module" src="/donuts/js/donut-explosion-3d.js"></script>
+  <script src="/donuts/js/orb-particles-canvas.js"></script>
   <script src="/donuts/js/donuts-gallery.js"></script>
   <script src="/donuts/js/donuts-discovery.js"></script>
   <script src="/donuts/js/donuts-story-reel.js"></script>

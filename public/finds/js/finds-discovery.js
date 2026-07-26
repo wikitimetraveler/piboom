@@ -160,6 +160,7 @@
     const el = $('cameraStatus');
     if (!el) return;
     el.textContent = msg || '';
+    el.hidden = !msg;
     el.className = 'small mb-2 ' + (kind === 'error' ? 'text-danger' : 'text-muted');
   }
 
@@ -294,24 +295,40 @@
 
     $('btnCameraStart')?.addEventListener('click', async function () {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setCameraStatus('Live camera not supported here. Use “Camera / take photo” instead.', 'error');
+        const msg =
+          typeof getDiscoveryCameraUnavailableMessage === 'function'
+            ? getDiscoveryCameraUnavailableMessage('tap Camera / take photo instead.')
+            : 'Camera unavailable — tap Camera / take photo instead.';
+        setCameraStatus(msg, 'error');
         return;
       }
       try {
         stopCamera();
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-        });
+        setCameraStatus('');
+        const stream =
+          typeof getDiscoveryCameraVideoStream === 'function'
+            ? await getDiscoveryCameraVideoStream()
+            : await navigator.mediaDevices.getUserMedia({
+                video: {
+                  facingMode: { ideal: 'environment' },
+                  width: { ideal: 1920 },
+                  height: { ideal: 1080 },
+                },
+              });
         cameraStream = stream;
         const video = $('findCameraPreview');
         video.srcObject = stream;
         video.style.display = 'block';
         $('btnCameraCapture').disabled = false;
         $('btnCameraStop').disabled = false;
-        setCameraStatus('Camera on. Tap Capture frame when ready.');
+        setCameraStatus('');
       } catch (e) {
         console.warn(e);
-        setCameraStatus('Camera blocked or unavailable.', 'error');
+        const msg =
+          typeof getDiscoveryCameraUnavailableMessage === 'function'
+            ? getDiscoveryCameraUnavailableMessage('tap Camera / take photo instead.')
+            : 'Camera unavailable — tap Camera / take photo instead.';
+        setCameraStatus(msg, 'error');
       }
     });
 
@@ -328,12 +345,12 @@
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
       await addImageFromDataUrl(dataUrl);
-      setCameraStatus('Frame added to photos.');
+      setCameraStatus('');
     });
 
     $('btnCameraStop')?.addEventListener('click', function () {
       stopCamera();
-      setCameraStatus('Camera stopped.');
+      setCameraStatus('');
     });
 
     $('btnAnalyze')?.addEventListener('click', async () => {

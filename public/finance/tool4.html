@@ -1361,9 +1361,13 @@
                 video.style.display = 'block';
                 document.getElementById('captureCameraBtn').disabled = false;
                 document.getElementById('stopCameraBtn').disabled = false;
-                setImageStatus('Camera ready. Capture to use image for extraction.', 'info');
+                setImageStatus('', 'info');
             } catch (error) {
-                setImageStatus(`Camera error: ${error.message}`, 'danger');
+                const msg =
+                    typeof getDiscoveryCameraUnavailableMessage === 'function'
+                        ? getDiscoveryCameraUnavailableMessage('tap Upload instead.')
+                        : 'Camera unavailable — tap Upload instead.';
+                setImageStatus(msg, 'danger');
             }
         }
 
@@ -1388,7 +1392,7 @@
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             setAutomatorImage(canvas.toDataURL('image/jpeg', 0.9));
-            setImageStatus('Camera image captured. Click Extract Fields.', 'success');
+            setImageStatus('', 'info');
         }
 
         async function extractFieldsFromImage() {

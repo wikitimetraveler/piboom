@@ -3,7 +3,10 @@
  */
 /**
  * Canonical getUserMedia video constraints for discovery tools (same site = same permission).
- * Use on album, nature, finds, fish, bike pages so the browser reuses one camera grant.
+ * Use on album, nature, finds, fish, bike, donuts pages so the browser reuses one camera grant.
+ *
+ * Mobile UX: stay silent on start/success — video/preview is self-evident.
+ * Only surface errors; prefer getDiscoveryCameraUnavailableMessage().
  */
 (function (global) {
   'use strict';
@@ -16,7 +19,18 @@
     },
   });
 
+  /** Default copy when live camera fails — pages may pass a local upload CTA. */
+  var DEFAULT_UNAVAILABLE =
+    'Camera unavailable — tap Upload photo instead.';
+
   global.DISCOVERY_CAMERA_VIDEO_CONSTRAINTS = VIDEO_CONSTRAINTS;
+
+  function getDiscoveryCameraUnavailableMessage(uploadHint) {
+    if (uploadHint && String(uploadHint).trim()) {
+      return 'Camera unavailable — ' + String(uploadHint).trim();
+    }
+    return DEFAULT_UNAVAILABLE;
+  }
 
   async function getDiscoveryCameraVideoStream() {
     if (!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== 'function') {
@@ -42,5 +56,6 @@
     return navigator.mediaDevices.getUserMedia(VIDEO_CONSTRAINTS);
   }
 
+  global.getDiscoveryCameraUnavailableMessage = getDiscoveryCameraUnavailableMessage;
   global.getDiscoveryCameraVideoStream = getDiscoveryCameraVideoStream;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -12,6 +12,7 @@
   <script src="/shared/modern-navbar.js"></script>
   <script src="/shared/demo-users.js"></script>
   <script src="/shared/user-selector.js"></script>
+  <script src="/shared/discovery-camera.js"></script>
   <script src="/shared/user-passwords.js"></script>
   <!-- EXIF.js for reading photo location data -->
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
@@ -410,7 +411,6 @@
           <button class="btn btn-lg btn-success" onclick="startCamera()" id="startCameraBtn">
             <i class="bi-camera-video"></i> Start Camera
           </button>
-          <p class="small text-muted mt-2 mb-0"><i class="bi-info-circle"></i> Allow camera permissions when prompted.</p>
           <button class="btn btn-lg btn-danger" onclick="stopCamera()" id="stopCameraBtn" style="display: none;">
             <i class="bi-camera-video-off"></i> Stop Camera
           </button>
@@ -878,19 +878,24 @@ function closeGalleryBatchModal() {
 
 async function startCamera() {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    showToast('error', 'Camera', 'Camera access is not supported in this browser or device.', 8000);
+    const msg =
+      typeof getDiscoveryCameraUnavailableMessage === 'function'
+        ? getDiscoveryCameraUnavailableMessage('tap Upload Photo instead.')
+        : 'Camera unavailable — tap Upload Photo instead.';
+    showToast('error', 'Camera', msg, 6000);
     return;
   }
   try {
-    showToast('info', 'Camera', 'Requesting camera access…');
-    const constraints = {
-      video: {
-        facingMode: 'environment',
-        width: { ideal: 1920 },
-        height: { ideal: 1080 }
-      }
-    };
-    cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+    cameraStream =
+      typeof getDiscoveryCameraVideoStream === 'function'
+        ? await getDiscoveryCameraVideoStream()
+        : await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: 'environment',
+              width: { ideal: 1920 },
+              height: { ideal: 1080 }
+            }
+          });
     cameraVideo = document.getElementById('cameraVideo');
     cameraVideo.srcObject = cameraStream;
     document.getElementById('cameraPreview').style.display = 'block';
@@ -908,11 +913,11 @@ async function startCamera() {
     };
   } catch (e) {
     console.error(e);
-    let msg = 'Could not access camera. ';
-    if (e.name === 'NotAllowedError') msg += 'Please allow camera permissions when prompted.';
-    else if (e.name === 'NotFoundError') msg += 'No camera found on this device.';
-    else msg += 'Make sure your camera is connected and not in use by another app.';
-    showToast('error', 'Camera Error', msg, 8000);
+    const msg =
+      typeof getDiscoveryCameraUnavailableMessage === 'function'
+        ? getDiscoveryCameraUnavailableMessage('tap Upload Photo instead.')
+        : 'Camera unavailable — tap Upload Photo instead.';
+    showToast('error', 'Camera', msg, 6000);
   }
 }
 

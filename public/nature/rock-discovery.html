@@ -312,6 +312,7 @@
   </div>
 
   <script src="/shared/tts.js"></script>
+  <script src="/shared/discovery-camera.js"></script>
   <script>
     let map;
     let specimens = [];
@@ -835,17 +836,24 @@
     async function startCamera() {
       try {
         stopCamera();
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
-        });
+        const stream =
+          typeof getDiscoveryCameraVideoStream === 'function'
+            ? await getDiscoveryCameraVideoStream()
+            : await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
+              });
         cameraStream = stream;
         const video = document.getElementById('cameraPreview');
         video.srcObject = stream;
         video.style.display = 'block';
-        setPhotoStatus('Camera on. Capture when ready.', 'info');
+        setPhotoStatus('', 'info');
       } catch (err) {
         console.error(err);
-        setPhotoStatus('Camera blocked or unavailable.', 'error');
+        const msg =
+          typeof getDiscoveryCameraUnavailableMessage === 'function'
+            ? getDiscoveryCameraUnavailableMessage('tap Upload photo instead.')
+            : 'Camera unavailable — tap Upload photo instead.';
+        setPhotoStatus(msg, 'error');
       }
     }
 
@@ -864,7 +872,7 @@
       const img = document.getElementById('photoPreview');
       img.src = uploadedImageData;
       img.style.display = 'block';
-      setPhotoStatus('Captured.', 'info');
+      setPhotoStatus('', 'info');
     }
 
     function stopCamera() {

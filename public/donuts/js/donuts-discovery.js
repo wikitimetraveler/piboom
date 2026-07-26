@@ -20,6 +20,10 @@
     el.dataset.kind = kind || 'info';
   }
 
+  function clearStatus() {
+    setStatus('', 'info');
+  }
+
   function stopCamera() {
     if (stream) {
       stream.getTracks().forEach((t) => t.stop());
@@ -30,7 +34,7 @@
   }
 
   async function startCamera() {
-    setStatus('Asking for camera…', 'info');
+    clearStatus();
     try {
       stopCamera();
       const getStream =
@@ -47,15 +51,10 @@
       await video.play();
       $('gzDiscoverLive')?.removeAttribute('hidden');
       $('gzDiscoverPreview')?.setAttribute('hidden', '');
-      setStatus('Camera live — frame a donut, then Capture.', 'info');
+      clearStatus();
     } catch (err) {
       console.warn('Donut camera failed', err);
-      setStatus(
-        err?.name === 'NotAllowedError'
-          ? 'Camera blocked — use Upload photo instead.'
-          : 'Camera unavailable here — upload a photo instead.',
-        'error'
-      );
+      setStatus('Camera unavailable — tap Upload photo instead.', 'error');
     }
   }
 
@@ -77,7 +76,7 @@
       img.hidden = false;
     }
     $('gzDiscoverPreview')?.removeAttribute('hidden');
-    setStatus('Got it — tap Identify donut.', 'info');
+    clearStatus();
   }
 
   function onFile(file) {
@@ -94,7 +93,7 @@
         img.hidden = false;
       }
       $('gzDiscoverPreview')?.removeAttribute('hidden');
-      setStatus('Photo loaded — tap Identify donut.', 'info');
+      clearStatus();
     };
     reader.readAsDataURL(file);
   }
@@ -105,7 +104,7 @@
       setStatus('Capture or upload a donut photo first.', 'error');
       return;
     }
-    setStatus('Pip is squinting at your donut…', 'info');
+    clearStatus();
     if (out) {
       out.hidden = false;
       out.textContent = 'Identifying…';
@@ -121,7 +120,7 @@
         throw new Error(data.error || data.message || `HTTP ${res.status}`);
       }
       if (out) out.innerHTML = formatMd(data.result || '');
-      setStatus('Identified — history nibble only.', 'info');
+      clearStatus();
       if (typeof window.gzSpeakPip === 'function') {
         const plain = String(data.result || '')
           .replace(/[*_`#]/g, ' ')
@@ -158,7 +157,7 @@
     $('gzDiscoverStart')?.addEventListener('click', startCamera);
     $('gzDiscoverStop')?.addEventListener('click', () => {
       stopCamera();
-      setStatus('Camera stopped.', 'info');
+      clearStatus();
     });
     $('gzDiscoverCapture')?.addEventListener('click', captureFrame);
     $('gzDiscoverIdentify')?.addEventListener('click', identify);

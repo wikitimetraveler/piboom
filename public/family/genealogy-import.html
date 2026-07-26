@@ -136,16 +136,22 @@
     async function startCamera() {
       if (cameraStream) return;
       try {
-        cameraStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'environment' },
-          audio: false
-        });
+        cameraStream =
+          typeof getDiscoveryCameraVideoStream === 'function'
+            ? await getDiscoveryCameraVideoStream()
+            : await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment' },
+                audio: false
+              });
         cameraPreview.srcObject = cameraStream;
         captureBtn.disabled = false;
         stopCameraBtn.disabled = false;
         startCameraBtn.disabled = true;
       } catch (error) {
-        apiResponse.textContent = `Camera error: ${error.message}`;
+        apiResponse.textContent =
+          typeof getDiscoveryCameraUnavailableMessage === 'function'
+            ? getDiscoveryCameraUnavailableMessage('use Add Selected Photos instead.')
+            : 'Camera unavailable — use Add Selected Photos instead.';
       }
     }
 
@@ -226,6 +232,7 @@
     window.addEventListener('beforeunload', stopCamera);
   </script>
   <script src="/shared/tts.js"></script>
+  <script src="/shared/discovery-camera.js"></script>
   <script src="/family/js/lane-tts.js"></script>
 </body>
 </html>

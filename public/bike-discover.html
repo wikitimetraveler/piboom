@@ -196,15 +196,24 @@
     async function startCamera() {
       try {
         stopCamera();
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 2560 }, height: { ideal: 1440 } } });
+        const stream =
+          typeof getDiscoveryCameraVideoStream === 'function'
+            ? await getDiscoveryCameraVideoStream()
+            : await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment', width: { ideal: 2560 }, height: { ideal: 1440 } }
+              });
         cameraStream = stream;
         const video = document.getElementById('cameraPreview');
         video.srcObject = stream;
         video.style.display = 'block';
-        setPhotoStatus('Camera ready. Capture to use this frame.');
+        setPhotoStatus('');
       } catch (err) {
         console.error(err);
-        setPhotoStatus('Unable to start camera.', 'error');
+        const msg =
+          typeof getDiscoveryCameraUnavailableMessage === 'function'
+            ? getDiscoveryCameraUnavailableMessage('upload a photo instead.')
+            : 'Camera unavailable — upload a photo instead.';
+        setPhotoStatus(msg, 'error');
       }
     }
 
@@ -220,7 +229,7 @@
       const img = document.getElementById('photoPreview');
       img.src = uploadedImageData;
       img.style.display = 'block';
-      setPhotoStatus('Captured. Run Identify to extract hints.');
+      setPhotoStatus('');
     }
 
     function stopCamera() {
@@ -484,6 +493,7 @@
     });
   </script>
   <script src="/shared/tts.js"></script>
+  <script src="/shared/discovery-camera.js"></script>
 </body>
 </html>
 

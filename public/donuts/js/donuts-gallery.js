@@ -197,10 +197,6 @@
   }
 
   function productArt(item) {
-    const kind = item.visual?.kind || item.kind;
-    if (kind === 'submarine') {
-      return buildSubmarineSvg(item.visual, item.id);
-    }
     if (item.image) {
       return `
         <div class="gz-product-photo">
@@ -209,6 +205,10 @@
             <span></span><span></span><span></span><span></span><span></span><span></span>
           </div>
         </div>`;
+    }
+    const kind = item.visual?.kind || item.kind;
+    if (kind === 'submarine') {
+      return buildSubmarineSvg(item.visual, item.id);
     }
     return buildDonutSvg(item.visual, item.id);
   }
@@ -438,30 +438,71 @@
   function wireSugar() {
     const root = document.getElementById('gzSugar');
     if (!root || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    // Light sugar season — hero only (clipped), grids stay still
-    for (let i = 0; i < 12; i += 1) {
+    root.innerHTML = '';
+
+    const isMobile = window.matchMedia('(max-width: 767.98px)').matches;
+    const dustCount = isMobile ? 22 : 36;
+    const rodCount = isMobile ? 40 : 64;
+    const chipCount = isMobile ? 14 : 24;
+    const starCount = isMobile ? 10 : 18;
+
+    // Soft sugar dust
+    for (let i = 0; i < dustCount; i += 1) {
       const span = document.createElement('span');
       span.style.left = `${Math.random() * 100}%`;
-      span.style.animationDuration = `${10 + Math.random() * 12}s`;
-      span.style.animationDelay = `${Math.random() * 8}s`;
-      span.style.width = `${2 + Math.random() * 3}px`;
+      span.style.animationDuration = `${10 + Math.random() * 16}s`;
+      span.style.animationDelay = `${Math.random() * 12}s`;
+      span.style.width = `${2 + Math.random() * 3.5}px`;
       span.style.height = span.style.width;
+      span.style.setProperty('--drift-x', `${(Math.random() * 80 - 40).toFixed(0)}px`);
       root.appendChild(span);
     }
-    for (let i = 0; i < 16; i += 1) {
+
+    // Classic rod sprinkles
+    for (let i = 0; i < rodCount; i += 1) {
       const rod = document.createElement('span');
       rod.className = 'gz-sugar-sprinkle';
       rod.style.left = `${Math.random() * 100}%`;
       rod.style.background = SPRINKLE_COLORS[i % SPRINKLE_COLORS.length];
-      rod.style.animationDuration = `${9 + Math.random() * 10}s`;
-      rod.style.animationDelay = `${Math.random() * 7}s`;
-      rod.style.setProperty('--spin', `${(Math.random() * 280 - 140).toFixed(0)}deg`);
-      rod.style.setProperty('--drift-x', `${(Math.random() * 48 - 24).toFixed(0)}px`);
+      rod.style.animationDuration = `${8 + Math.random() * 14}s`;
+      rod.style.animationDelay = `${Math.random() * 10}s`;
+      rod.style.width = `${7 + Math.random() * 6}px`;
+      rod.style.height = `${2.2 + Math.random() * 1.8}px`;
+      rod.style.setProperty('--spin', `${(Math.random() * 420 - 210).toFixed(0)}deg`);
+      rod.style.setProperty('--drift-x', `${(Math.random() * 90 - 45).toFixed(0)}px`);
       root.appendChild(rod);
+    }
+
+    // Square glaze chips
+    for (let i = 0; i < chipCount; i += 1) {
+      const chip = document.createElement('span');
+      chip.className = 'gz-sugar-chip';
+      chip.style.left = `${Math.random() * 100}%`;
+      chip.style.background = SPRINKLE_COLORS[(i + 3) % SPRINKLE_COLORS.length];
+      chip.style.animationDuration = `${9 + Math.random() * 13}s`;
+      chip.style.animationDelay = `${Math.random() * 9}s`;
+      chip.style.setProperty('--spin', `${(Math.random() * 520 - 260).toFixed(0)}deg`);
+      chip.style.setProperty('--drift-x', `${(Math.random() * 100 - 50).toFixed(0)}px`);
+      root.appendChild(chip);
+    }
+
+    // Tiny star sparkles
+    for (let i = 0; i < starCount; i += 1) {
+      const star = document.createElement('span');
+      star.className = 'gz-sugar-star';
+      star.style.left = `${Math.random() * 100}%`;
+      star.style.background = SPRINKLE_COLORS[(i + 5) % SPRINKLE_COLORS.length];
+      star.style.animationDuration = `${11 + Math.random() * 12}s`;
+      star.style.animationDelay = `${Math.random() * 11}s`;
+      star.style.setProperty('--spin', `${(Math.random() * 360).toFixed(0)}deg`);
+      star.style.setProperty('--drift-x', `${(Math.random() * 110 - 55).toFixed(0)}px`);
+      root.appendChild(star);
     }
   }
 
   function wireOrbSprinkles() {
+    // Canvas orb particles (orb-particles-canvas.js) replace CSS sprinkles when available
+    if (window.GlazedOrbParticles || document.querySelector('.gz-orb-particle-canvas')) return;
     const root = document.getElementById('gzOrbSprinkles');
     if (!root || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     root.innerHTML = '';
@@ -480,15 +521,15 @@
     }
   }
 
-  function burstSprinkles(host) {
+  function burstSprinkles(host, count = 28) {
     if (!host || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const layer = document.createElement('div');
     layer.className = 'gz-burst-sprinkles';
     layer.setAttribute('aria-hidden', 'true');
-    const count = 28;
-    for (let i = 0; i < count; i += 1) {
+    const n = count;
+    for (let i = 0; i < n; i += 1) {
       const s = document.createElement('span');
-      const angle = (i / count) * Math.PI * 2 + (Math.random() * 0.35);
+      const angle = (i / n) * Math.PI * 2 + Math.random() * 0.35;
       const dist = 90 + Math.random() * 110;
       s.style.setProperty('--bx', `${Math.round(Math.cos(angle) * dist)}px`);
       s.style.setProperty('--by', `${Math.round(Math.sin(angle) * dist)}px`);
@@ -499,6 +540,12 @@
     }
     host.appendChild(layer);
     window.setTimeout(() => layer.remove(), 1200);
+  }
+
+  function cardFlipSparkle(card) {
+    if (!card || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const stage = card.querySelector('.gz-donut-stage') || card;
+    burstSprinkles(stage, 8);
   }
 
   function renderHeroDonut() {
@@ -553,7 +600,6 @@
       const product = getCurrentProduct();
       const src = product.image || '/donuts/assets/products/classic-glazed-cutout.png';
       const whole = el.querySelector('.gz-hero-whole');
-      const kindLabel = product.kind === 'smoothie' ? 'smoothie' : product.kind === 'submarine' ? 'submarine' : 'donut';
       
       if (whole) {
         whole.src = src;
@@ -600,25 +646,66 @@
     buildRotation(); // Try immediately in case already loaded
 
     let exploding = false;
-    function explode() {
-      if (exploding) return;
-      exploding = true;
+    let explodeToken = 0;
+
+    function finishExplode(token) {
+      if (token !== explodeToken) return;
+      el.classList.remove('is-exploding', 'is-exploding-3d', 'is-winding');
+      orb?.classList.remove('is-shockwave');
+      exploding = false;
+      rotationIndex++;
+      updateHeroImage();
+    }
+
+    function explodeCssFallback(stage, token) {
       el.classList.add('is-winding');
       orb?.classList.add('is-shockwave');
       window.setTimeout(() => {
+        if (token !== explodeToken) return;
         el.classList.remove('is-winding');
         el.classList.add('is-exploding');
-        burstSprinkles(el.querySelector('.gz-hero-stage') || el);
+        burstSprinkles(stage || el);
       }, 160);
-      window.setTimeout(() => {
-        el.classList.remove('is-exploding');
-        orb?.classList.remove('is-shockwave');
-        exploding = false;
-        
-        // Cycle to next product after explosion
-        rotationIndex++;
-        updateHeroImage();
-      }, 1350);
+      window.setTimeout(() => finishExplode(token), 1350);
+    }
+
+    async function explode() {
+      if (exploding) return;
+      exploding = true;
+      const token = ++explodeToken;
+      const stage = el.querySelector('.gz-hero-stage') || el;
+      const product = getCurrentProduct();
+      const src = product.image || '/donuts/assets/products/classic-glazed-cutout.png';
+      const Explosion = window.DonutExplosion3D;
+      const use3d =
+        Explosion &&
+        typeof Explosion.isSupported === 'function' &&
+        Explosion.isSupported();
+
+      if (use3d) {
+        el.classList.add('is-winding');
+        orb?.classList.add('is-shockwave');
+        window.setTimeout(async () => {
+          if (token !== explodeToken) return;
+          el.classList.remove('is-winding');
+          el.classList.add('is-exploding-3d');
+          const fx = new Explosion(stage, src);
+          const ok = await fx.explode();
+          if (!ok) {
+            el.classList.remove('is-exploding-3d');
+            // Invalidate the 3D finish timer; CSS path owns the lifecycle
+            const fallbackToken = ++explodeToken;
+            exploding = true;
+            explodeCssFallback(stage, fallbackToken);
+            return;
+          }
+          burstSprinkles(stage, 36);
+        }, 140);
+        window.setTimeout(() => finishExplode(token), 1550);
+        return;
+      }
+
+      explodeCssFallback(stage, token);
     }
 
     el.addEventListener('click', explode);
@@ -716,9 +803,11 @@
 
   function setCardFlipped(card, flipped) {
     if (!card) return;
+    const wasFlipped = card.classList.contains('is-flipped');
     card.classList.toggle('is-flipped', flipped);
     card.setAttribute('aria-pressed', flipped ? 'true' : 'false');
     if (flipped) {
+      if (!wasFlipped) cardFlipSparkle(card);
       window.requestAnimationFrame(() => {
         updateCardScrollCue(card);
         // Auto-open popup disabled - user can manually click "Open full story" button if needed

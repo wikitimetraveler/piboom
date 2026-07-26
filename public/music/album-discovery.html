@@ -1190,21 +1190,16 @@
                 <i class="bi-camera-video-off"></i> Stop Camera
               </button>
             </div>
-            <div id="cameraStatus" class="camera-status camera-status--info">
-              <i class="bi-camera-video"></i>
-              <span>Camera not initialized. Click “Start Camera” to capture an album cover.</span>
-            </div>
+            <div id="cameraStatus" class="camera-status camera-status--info" style="display: none;" aria-live="polite"></div>
             <div class="camera-instructions">
               <strong>Tips for clearer identification:</strong>
               <ul>
-                <li>Allow camera permissions when prompted.</li>
                 <li>Fill the green square with the album art and avoid glare.</li>
                 <li>Use steady hands or rest the album on a flat surface.</li>
               </ul>
             </div>
-            <div id="cameraLoadingIndicator" class="camera-loading" style="display:none;">
+            <div id="cameraLoadingIndicator" class="camera-loading" style="display:none;" aria-hidden="true">
               <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
-              <span>Connecting to your camera…</span>
             </div>
             
             <!-- Camera Preview -->
@@ -1496,6 +1491,12 @@ const CAMERA_STATUS_ICONS = {
 function updateCameraStatus(message, type = 'info') {
   const statusEl = document.getElementById('cameraStatus');
   if (!statusEl) return;
+  if (!message) {
+    statusEl.style.display = 'none';
+    statusEl.innerHTML = '';
+    return;
+  }
+  statusEl.style.display = '';
   statusEl.className = `camera-status camera-status--${type}`;
   const icon = CAMERA_STATUS_ICONS[type] || CAMERA_STATUS_ICONS.info;
   statusEl.innerHTML = `<i class="bi ${icon}"></i><span>${message}</span>`;
@@ -1693,12 +1694,16 @@ function initCameraSupportStatus() {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     cameraSupported = false;
     if (startBtn) startBtn.disabled = true;
-    updateCameraStatus('Camera access is not supported in this browser or device.', 'error');
+    const msg =
+      typeof getDiscoveryCameraUnavailableMessage === 'function'
+        ? getDiscoveryCameraUnavailableMessage('tap Upload Photo instead.')
+        : 'Camera unavailable — tap Upload Photo instead.';
+    updateCameraStatus(msg, 'error');
     return;
   }
   cameraSupported = true;
   if (startBtn) startBtn.disabled = false;
-  updateCameraStatus('Camera ready. Click “Start Camera” to begin scanning an album cover.', 'info');
+  updateCameraStatus('', 'info');
 }
 
 function handleVisibilityChange() {
@@ -2523,16 +2528,19 @@ async function addSelectedMultiAlbumsToCollection() {
 // Start camera for live capture
 async function startCamera() {
   if (cameraStream) {
-    updateCameraStatus('Camera is already running.', 'info');
     return;
   }
   if (!cameraSupported) {
-    updateCameraStatus('Camera access is not supported in this browser.', 'error');
+    const msg =
+      typeof getDiscoveryCameraUnavailableMessage === 'function'
+        ? getDiscoveryCameraUnavailableMessage('tap Upload Photo instead.')
+        : 'Camera unavailable — tap Upload Photo instead.';
+    updateCameraStatus(msg, 'error');
     return;
   }
   try {
     setCameraLoading(true);
-    updateCameraStatus('Requesting camera access…', 'info');
+    updateCameraStatus('', 'info');
     cameraStream = typeof getDiscoveryCameraVideoStream === 'function'
       ? await getDiscoveryCameraVideoStream()
       : await navigator.mediaDevices.getUserMedia({
@@ -2547,7 +2555,7 @@ async function startCamera() {
     document.getElementById('cameraPreview').style.display = 'block';
     document.getElementById('startCameraBtn').style.display = 'none';
     document.getElementById('stopCameraBtn').style.display = 'inline-block';
-    updateCameraStatus('Camera connected. Center the album in the green square.', 'success');
+    updateCameraStatus('', 'info');
     setCameraLoading(false);
 
     cameraVideo.onloadedmetadata = function() {
@@ -2565,15 +2573,11 @@ async function startCamera() {
   } catch (error) {
     console.error('Error accessing camera:', error);
     setCameraLoading(false);
-    let errorMessage = 'Could not access camera. ';
-    if (error.name === 'NotAllowedError') {
-      errorMessage += 'Please allow camera permissions.';
-    } else if (error.name === 'NotFoundError') {
-      errorMessage += 'No camera found on this device.';
-    } else {
-      errorMessage += 'Make sure your camera is connected and not in use.';
-    }
-    updateCameraStatus(errorMessage, 'error');
+    const msg =
+      typeof getDiscoveryCameraUnavailableMessage === 'function'
+        ? getDiscoveryCameraUnavailableMessage('tap Upload Photo instead.')
+        : 'Camera unavailable — tap Upload Photo instead.';
+    updateCameraStatus(msg, 'error');
   }
 }
 
@@ -2596,12 +2600,9 @@ function stopCamera(options = {}) {
   setCameraLoading(false);
   resetPhotoLocation();
   
+  // Silent stop — no toast spam on mobile (tab hide / user stop)
   if (!silent) {
-    const message = reason === 'hidden'
-      ? 'Camera paused because the tab is inactive.'
-      : 'Camera stopped.';
-    const type = reason === 'hidden' ? 'info' : 'warning';
-    updateCameraStatus(message, type);
+    updateCameraStatus('', 'info');
   }
   
   uploadedImageData = null;
@@ -2648,7 +2649,7 @@ function captureFromCamera() {
   
   // Play a camera shutter sound effect (optional)
   playShutterSound();
-  updateCameraStatus('Photo captured. Tap “Identify Album” to analyze.', 'success');
+  updateCameraStatus('', 'info');
 }
 
 // Retake photo (go back to camera preview)
@@ -2658,7 +2659,7 @@ function retakePhoto() {
   document.getElementById('capturedImg').src = '';
   document.getElementById('capturedPreview').style.display = 'none';
   document.getElementById('cameraPreview').style.display = 'block';
-  updateCameraStatus('Ready for another capture. Align the album and press the shutter.', 'info');
+  updateCameraStatus('', 'info');
 }
 
 // Play camera shutter sound (simple audio feedback)
