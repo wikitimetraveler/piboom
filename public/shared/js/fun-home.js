@@ -18,13 +18,16 @@
 
     function applyTheme(theme) {
       body.setAttribute('data-theme', theme);
-      
+
+      // Button shows the destination theme (what a click will switch to)
       if (theme === 'dark') {
-        icon.className = 'bi bi-moon-stars-fill';
-        label.textContent = 'Dark';
-      } else {
         icon.className = 'bi bi-sun-fill';
         label.textContent = 'Zen';
+        btn.setAttribute('aria-label', 'Switch to zen theme');
+      } else {
+        icon.className = 'bi bi-moon-stars-fill';
+        label.textContent = 'Dark';
+        btn.setAttribute('aria-label', 'Switch to dark theme');
       }
 
       try {
@@ -548,11 +551,11 @@
           const icon = btn.querySelector('i');
           const label = btn.querySelector('span');
           if (theme === 'dark') {
-            icon.className = 'bi bi-moon-stars-fill';
-            label.textContent = 'Dark';
-          } else {
             icon.className = 'bi bi-sun-fill';
             label.textContent = 'Zen';
+          } else {
+            icon.className = 'bi bi-moon-stars-fill';
+            label.textContent = 'Dark';
           }
         }
         try {
