@@ -36,24 +36,24 @@
       window.speakWithGoogle(text, PIP_TTS_VOICE, PIP_TTS_OPTS);
       return;
     }
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.rate = 1.12;
-      u.pitch = 1.85; // browser max~2 — keep Pip young, not matron
-      const voices = window.speechSynthesis.getVoices();
-      const label = (v) => `${v.name || ''} ${v.voiceURI || ''}`;
-      const young =
-        voices.find((v) => /jenny|aria|samantha|nova|karen|google.*female/i.test(label(v))) ||
-        voices.find(
-          (v) =>
-            /en(-|_)?us/i.test(v.lang) &&
-            /female/i.test(label(v)) &&
-            !/susan|victoria|zira|hazel|mature|grandma/i.test(label(v))
-        );
-      if (young) u.voice = young;
-      window.speechSynthesis.speak(u);
-    }
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 1.12;
+    u.pitch = 1.15;
+    const voices = window.speechSynthesis.getVoices();
+    const label = (v) => `${v.name || ''} ${v.voiceURI || ''}`;
+    const young =
+      voices.find((v) => /jenny|aria|samantha|nova|karen|google.*female/i.test(label(v))) ||
+      voices.find(
+        (v) =>
+          /en(-|_)?us/i.test(v.lang) &&
+          /female/i.test(label(v)) &&
+          !/susan|victoria|zira|hazel|mature|grandma/i.test(label(v))
+      );
+    if (young) u.voice = young;
+    window.speechSynthesis.speak(u);
+  }
   }
 
   function stopSpeak() {
@@ -171,7 +171,36 @@
       </svg>`;
   }
 
+  function buildSubmarineSvg(visual, idSuffix) {
+    const v = visual || {};
+    const bread = v.bread || '#e8c89a';
+    const filling = v.filling || '#c4423a';
+    const uid = idSuffix || `s${Math.random().toString(36).slice(2, 8)}`;
+    return `
+      <svg class="gz-donut-svg gz-sub-svg" viewBox="0 0 100 100" aria-hidden="true">
+        <defs>
+          <linearGradient id="gzSubBread-${uid}" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#fff6e8"/>
+            <stop offset="55%" stop-color="${esc(bread)}"/>
+            <stop offset="100%" stop-color="#c9a06a"/>
+          </linearGradient>
+        </defs>
+        <ellipse cx="50" cy="72" rx="38" ry="8" fill="rgba(0,0,0,0.16)"/>
+        <path d="M14 58c2-18 18-30 36-30s34 12 36 30c0 8-10 14-36 14S14 66 14 58z" fill="url(#gzSubBread-${uid})"/>
+        <path d="M18 52c4-10 14-16 32-16s28 6 32 16" fill="none" stroke="#b88955" stroke-width="1.2" opacity="0.55"/>
+        <rect x="22" y="48" width="56" height="10" rx="4" fill="${esc(filling)}" opacity="0.92"/>
+        <rect x="26" y="50" width="18" height="3" rx="1.5" fill="#f4e4c8" opacity="0.85"/>
+        <rect x="48" y="51" width="14" height="2.5" rx="1" fill="#6fbf73" opacity="0.9"/>
+        <rect x="64" y="50" width="10" height="3" rx="1" fill="#f0c14a" opacity="0.9"/>
+        ${sparkleSvg(uid)}
+      </svg>`;
+  }
+
   function productArt(item) {
+    const kind = item.visual?.kind || item.kind;
+    if (kind === 'submarine') {
+      return buildSubmarineSvg(item.visual, item.id);
+    }
     if (item.image) {
       return `
         <div class="gz-product-photo">

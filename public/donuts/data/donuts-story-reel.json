@@ -32,7 +32,7 @@
       "id": "dozen",
       "kicker": "Baker’s dozen",
       "title": "Today’s case",
-      "copy": "Flip any donut for history and where it began — no recipes on these cards.",
+      "copy": "Flip any donut for history and where it began.",
       "narration": "Here’s the baker’s dozen. Flip a card for the history and where that style began.",
       "anchor": "gzCase",
       "spotlight": "#gzGrid .gz-card",

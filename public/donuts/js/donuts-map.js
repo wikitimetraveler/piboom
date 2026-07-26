@@ -1,71 +1,77 @@
 /**
- * Savy shop map + invention origins map — donut markers
+ * Savy shop map + invention origins map — generic place pins
  * Development work by David Lane
  */
 (function () {
   'use strict';
 
-  const FALLBACK_DONUT_ICON = '/donuts/assets/products/classic-glazed-cutout.png';
-  /** Map markers — doubled after the shrink pass (readable type icons) */
-  const ORIGIN_MARKER_SIZE = 32;
-  const SHOP_MARKER_SIZE = 36;
+  const SHOP_PIN_COLOR = '#c45c26';
+  const ORIGIN_PIN_COLOR = '#4a90a4';
   const LIST_THUMB_SIZE = 28;
 
   function absoluteUrl(path) {
-    const p = path || FALLBACK_DONUT_ICON;
+    if (!path) return '';
     try {
-      return new URL(p, window.location.origin).href;
+      return new URL(path, window.location.origin).href;
     } catch (_) {
-      return p;
+      return path;
     }
   }
 
-  function productIconPath(item) {
-    if (item?.image) return item.image;
-    if (item?.id === 'classic-glazed') return FALLBACK_DONUT_ICON;
-    return FALLBACK_DONUT_ICON;
-  }
-
-  function donutIcon(imagePath, size) {
-    const s = size || ORIGIN_MARKER_SIZE;
-    const g = window.google?.maps;
-    if (!g?.Size || !g?.Point) return undefined;
-    return {
-      url: absoluteUrl(imagePath || FALLBACK_DONUT_ICON),
-      scaledSize: new g.Size(s, s),
-      anchor: new g.Point(Math.round(s / 2), Math.round(s / 2))
-    };
-  }
-
   async function loadMaps() {
-    if (window.google?.maps) return true;
+    if (window.google?.maps) {
+      if (window.googleAdvancedMarkers?.ensureMarkerLibrary) {
+        await window.googleAdvancedMarkers.ensureMarkerLibrary();
+      }
+      return true;
+    }
     if (typeof window.laneFamilyLoadGoogleMaps === 'function') {
-      return window.laneFamilyLoadGoogleMaps();
+      const ok = await window.laneFamilyLoadGoogleMaps();
+      if (ok && window.googleAdvancedMarkers?.ensureMarkerLibrary) {
+        await window.googleAdvancedMarkers.ensureMarkerLibrary();
+      }
+      return ok;
     }
     return false;
   }
 
-  function placeDonutMarker(opts) {
-    const g = window.google.maps;
-    const icon = donutIcon(opts.imagePath, opts.size || ORIGIN_MARKER_SIZE);
-    try {
-      return new g.Marker({
-        position: opts.position,
+  function placeGenericPin(opts) {
+    const gam = window.googleAdvancedMarkers;
+    const position = opts.position;
+    const title = opts.title || '';
+    const color = opts.color || ORIGIN_PIN_COLOR;
+    const label = opts.label || '';
+
+    if (gam?.createMapMarker) {
+      return gam.createMapMarker({
         map: opts.map,
-        title: opts.title || '',
-        icon,
-        animation: opts.animation,
-        optimized: false
-      });
-    } catch (err) {
-      console.warn('Donut marker icon failed — using default pin', err);
-      return new g.Marker({
-        position: opts.position,
-        map: opts.map,
-        title: opts.title || '',
-        animation: opts.animation
+        position,
+        title,
+        content: gam.createPinContent({ color, label, size: opts.size || 32 }),
+        zIndex: opts.zIndex,
       });
     }
+
+    return new google.maps.Marker({
+      position,
+      map: opts.map,
+      title,
+      animation: opts.animation,
+    });
+  }
+
+  function mapOptions(center, zoom, mapTypeId) {
+    const gam = window.googleAdvancedMarkers;
+    const opts = {
+      center,
+      zoom,
+      mapTypeId: mapTypeId || google.maps.MapTypeId.ROADMAP,
+      streetViewControl: false,
+      fullscreenControl: true,
+      mapTypeControl: true,
+    };
+    if (gam?.DEFAULT_MAP_ID) opts.mapId = gam.DEFAULT_MAP_ID;
+    return opts;
   }
 
   async function initMap(shop) {
@@ -125,31 +131,34 @@
     }
 
     if (status) status.hidden = true;
-    const map = new google.maps.Map(el, {
-      center: { lat, lng },
-      zoom: 16,
-      mapTypeId: google.maps.MapTypeId.HYBRID,
-      disableDefaultUI: false,
-      streetViewControl: false,
-      fullscreenControl: true
-    });
+    const map = new google.maps.Map(
+      el,
+      mapOptions({ lat, lng }, 16, google.maps.MapTypeId.HYBRID)
+    );
 
-    const marker = placeDonutMarker({
+    const marker = placeGenericPin({
       position: { lat, lng },
       map,
       title: shop.name || 'Savy Donuts & Smoothies',
-      imagePath: FALLBACK_DONUT_ICON,
-      size: SHOP_MARKER_SIZE,
-      animation: google.maps.Animation.DROP
+      color: SHOP_PIN_COLOR,
+      label: 'S',
+      size: 36,
+      animation: google.maps.Animation?.DROP,
     });
 
     const info = new google.maps.InfoWindow({
       content: `<div style="color:#1a100c;max-width:220px">
         <strong>${escapeHtml(shop.name || 'Savy')}</strong><br/>
         <span style="font-size:12px">${escapeHtml(shop.address || '')}</span>
-      </div>`
+      </div>`,
     });
-    marker.addListener('click', () => info.open({ map, anchor: marker }));
+    marker.addListener('click', () => {
+      if (window.googleAdvancedMarkers?.openMapInfoWindow) {
+        window.googleAdvancedMarkers.openMapInfoWindow(info, map, marker);
+      } else {
+        info.open({ map, anchor: marker });
+      }
+    });
   }
 
   async function initOriginsMap(donuts) {
@@ -179,7 +188,6 @@
 
     const ok = await loadMaps();
     if (!ok || !window.google?.maps) {
-      // Still render clickable rows (list-only mode)
       if (list) {
         list.innerHTML = pins
           .map(
@@ -207,13 +215,10 @@
     const bounds = new google.maps.LatLngBounds();
     pins.forEach((p) => bounds.extend({ lat: p.lat, lng: p.lng }));
 
-    const map = new google.maps.Map(el, {
-      center: bounds.getCenter(),
-      zoom: 2,
-      mapTypeId: google.maps.MapTypeId.TERRAIN,
-      streetViewControl: false,
-      fullscreenControl: true
-    });
+    const map = new google.maps.Map(
+      el,
+      mapOptions(bounds.getCenter(), 2, google.maps.MapTypeId.TERRAIN)
+    );
 
     try {
       map.fitBounds(bounds, 56);
@@ -224,7 +229,15 @@
     const info = new google.maps.InfoWindow();
     const byId = {};
 
-    function focusPin(id, { zoom = false } = {}) {
+    function openInfo(marker) {
+      if (window.googleAdvancedMarkers?.openMapInfoWindow) {
+        window.googleAdvancedMarkers.openMapInfoWindow(info, map, marker);
+      } else {
+        info.open({ map, anchor: marker });
+      }
+    }
+
+    function focusPin(id) {
       const entry = byId[id];
       if (!entry) return;
       const { marker, pin } = entry;
@@ -236,39 +249,35 @@
       }</span>
         <p style="font-size:12px;margin:6px 0 0">${escapeHtml(pin.origin.note || pin.history || '')}</p>
       </div>`);
-      info.open({ map, anchor: marker });
+      openInfo(marker);
       map.panTo(target);
-      // Always add slight zoom to help with stacked/clustered markers
       const current = Number(map.getZoom()) || 2;
-      const maxZoom = 12;
-      if (current < maxZoom) {
-        // Gentle +1 zoom for each click (marker or list row)
-        map.setZoom(current + 1);
-      }
+      if (current < 12) map.setZoom(current + 1);
       list?.querySelectorAll('.gz-origin-link').forEach((btn) => {
         btn.classList.toggle('is-active', btn.getAttribute('data-id') === id);
       });
     }
 
-    pins.forEach((p) => {
-      const marker = placeDonutMarker({
+    pins.forEach((p, index) => {
+      const marker = placeGenericPin({
         position: { lat: p.lat, lng: p.lng },
         map,
         title: `${p.name} — ${p.origin.place || ''}`,
-        imagePath: productIconPath(p),
-        size: ORIGIN_MARKER_SIZE
+        color: ORIGIN_PIN_COLOR,
+        label: String(index + 1),
+        size: 32,
+        zIndex: 100 + index,
       });
       byId[p.id] = { marker, pin: p };
-      marker.addListener('click', () => focusPin(p.id, { zoom: true }));
+      marker.addListener('click', () => focusPin(p.id));
     });
 
     if (list) {
       list.innerHTML = pins
-        .map((p) => {
-          const thumb = productIconPath(p);
+        .map((p, index) => {
           return `<li>
             <button type="button" class="gz-origin-link" data-id="${escapeHtml(p.id)}" aria-label="Show ${escapeHtml(p.name)} on map">
-              <img class="gz-origin-thumb" src="${escapeHtml(thumb)}" alt="" width="${LIST_THUMB_SIZE}" height="${LIST_THUMB_SIZE}"/>
+              <span class="gz-origin-pin-badge" aria-hidden="true">${index + 1}</span>
               <span class="gz-origin-copy">
                 <strong>${escapeHtml(p.name)}</strong>
                 <span>${escapeHtml(p.origin.place || '')}${
@@ -284,17 +293,16 @@
         const btn = e.target.closest('.gz-origin-link');
         if (!btn || btn.disabled) return;
         e.preventDefault();
-        focusPin(btn.getAttribute('data-id'), { zoom: false });
+        focusPin(btn.getAttribute('data-id'));
       };
     }
 
     window.GlazedOriginsMap = {
       map,
       byId,
-      focusPin
+      focusPin,
     };
 
-    // Reset button — zoom back out to show all pins
     const resetBtn = document.getElementById('gzOriginsMapReset');
     if (resetBtn) {
       resetBtn.hidden = false;

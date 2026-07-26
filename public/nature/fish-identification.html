@@ -21,6 +21,61 @@
     .badge-assistant { background: #0d6efd; }
     #fishMap { width: 100%; height: 420px; border-radius: 12px; border: 1px solid #e5eef5; }
     .pac-container { z-index: 20000; }
+    
+    .countdown-container {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,255,255,0.15);
+      padding: 12px 20px;
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+      margin-top: 12px;
+    }
+    .countdown-label {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      font-weight: 500;
+    }
+    .countdown-clock {
+      display: flex;
+      gap: 8px;
+    }
+    .countdown-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 50px;
+    }
+    .countdown-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .countdown-unit-label {
+      font-size: 0.65rem;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+    .countdown-separator {
+      font-size: 1.5rem;
+      font-weight: 700;
+      opacity: 0.6;
+      animation: blink 1s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    @keyframes blink {
+      0%, 49%, 100% { opacity: 0.6; }
+      50%, 99% { opacity: 0.2; }
+    }
   </style>
 </head>
 <body>
