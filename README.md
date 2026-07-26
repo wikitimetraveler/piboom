@@ -86,6 +86,8 @@ ARCGIS_API_KEY=your_arcgis_api_key
 > ℹ️ Keep two separate Google API keys: one locked to browser referrers (`GOOGLE_BROWSER_API_KEY`) so the public pages like `music-research.html` can load Maps, and one server-side key (`GOOGLE_SERVER_API_KEY`) for backend calls to YouTube Data API, Places, etc. The code still falls back to `GOOGLE_API_KEY` if you only have a single key, but splitting them prevents referer restrictions from blocking server requests.
 
 ### 3. Start the System
+
+**Node.js Backend:**
 ```bash
 # For Development
 npm run dev
@@ -94,7 +96,30 @@ npm run dev
 npm run pi
 ```
 
+**Python Service (Optional but recommended for disaster/RAG features):**
+```bash
+# Navigate to python-service folder
+cd python-service
+
+# Create virtual environment (first time only)
+python -m venv venv
+
+# Activate virtual environment
+source venv/bin/activate  # macOS/Linux
+# or
+venv\Scripts\activate     # Windows
+
+# Install dependencies (first time only)
+pip install -r requirements.txt
+
+# Start the service
+python main.py
+```
+
+The Python service will start on `http://localhost:8000`. Visit `http://localhost:8000/docs` for interactive API documentation.
+
 ### 4. Access Web Interfaces
+**Node.js Web App (port 3000):**
 - **Music Research**: `http://localhost:3000/music/music-research.html`
 - **Mortgage Pipeline**: `http://localhost:3000/finance/pipeline-risk-dashboard.html`
 - **Disaster Dashboard**: `http://localhost:3000/finance/disasters-unified.html`
@@ -103,10 +128,16 @@ npm run pi
 - **Unit Tests**: `http://localhost:3000/finance/unit-tests.html`
 - **Main Hub**: `http://localhost:3000/`
 
+**Python Service API (port 8000):**
+- **API Docs (Swagger)**: `http://localhost:8000/docs`
+- **API Docs (ReDoc)**: `http://localhost:8000/redoc`
+- **Health Check**: `http://localhost:8000/health`
+
 ## Documentation
 
 - **AI Agents** (system self-knowledge): [`AGENTS.md`](AGENTS.md) — read this first for Encompass & AI context
 - All guides now live under `docs/` to keep the repo root clean
+- **Python Service**: [`docs/PYTHON_SERVICE_ARCHITECTURE.md`](docs/PYTHON_SERVICE_ARCHITECTURE.md) — How the FastAPI microservice works
 - **Encompass**: [`docs/ENCOMPASS.md`](docs/ENCOMPASS.md), [`docs/ICE_KNOWLEDGE_SOURCES.md`](docs/ICE_KNOWLEDGE_SOURCES.md)
 - **AI**: [`docs/AI_SYSTEM.md`](docs/AI_SYSTEM.md), [`docs/LANGCHAIN_MEMORY.md`](docs/LANGCHAIN_MEMORY.md)
 - Setup: [`docs/SETUP.md`](docs/SETUP.md), [`docs/DATABASE_SETUP.md`](docs/DATABASE_SETUP.md)
@@ -123,11 +154,46 @@ npm run pi
 
 ## 🛠️ Tech Stack
 
+### System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   DevConnect Labs Architecture                   │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                   │
+│  ┌─────────────────────┐         ┌─────────────────────────┐    │
+│  │  Node.js/Express    │  HTTP   │  Python/FastAPI         │    │
+│  │    (Port 3000)      │◄───────►│    (Port 8000)          │    │
+│  ├─────────────────────┤         ├─────────────────────────┤    │
+│  │ • Web UI serving    │         │ • Disaster PostGIS data │    │
+│  │ • API routes        │         │ • Encompass RAG/vector  │    │
+│  │ • Encompass Hub     │         │ • Text processing       │    │
+│  │ • LangChain/AI      │         │ • Data analytics        │    │
+│  │ • Real-time (Socket)│         │ • ML models (sklearn)   │    │
+│  └──────────┬──────────┘         └───────────┬─────────────┘    │
+│             │                                │                   │
+│             └────────────┬───────────────────┘                   │
+│                          ▼                                       │
+│              ┌────────────────────────┐                          │
+│              │  PostgreSQL Database   │                          │
+│              │  (PostGIS + pgvector)  │                          │
+│              └────────────────────────┘                          │
+│                                                                   │
+└───────────────────────────────────────────────────────────────────┘
+```
+
 ### Backend
-- **Node.js** - Runtime environment
+- **Node.js** - Runtime environment (port 3000)
 - **Express.js** - Web server framework
+- **Python/FastAPI** - Microservice for data processing and analytics (port 8000)
+  - **Disaster data retrieval** with PostGIS spatial queries
+  - **Encompass RAG** with pgvector semantic search
+  - **Text processing** (keyword extraction, field ID parsing, readability)
+  - **Data analytics** with pandas/numpy/scikit-learn
 - **ICE Encompass Developer Connect** - OAuth-secured access to loan pipeline/loan objects via the Encompass Hub service and ScreenBindings class
-- **PostgreSQL** - Relational database for loans, disasters, and AI memory
+- **PostgreSQL** - Relational database for loans, disasters, and AI memory (shared by Node.js and Python)
+  - **PostGIS** extension for spatial queries
+  - **pgvector** extension for semantic search
 - **Socket.IO** - Real-time communication for voice commands
 - **LangChain** - AI conversation framework with memory
 - **OpenAI GPT** - AI assistant models

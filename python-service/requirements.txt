@@ -1,0 +1,29 @@
+# Python Service Dependencies
+# DevConnect Labs - Python task worker
+
+# Web framework
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+
+# Database
+psycopg2-binary==2.9.10
+asyncpg==0.30.0
+
+# Environment variables
+python-dotenv==1.0.1
+
+# HTTP client
+httpx==0.28.1
+requests==2.32.3
+
+# Data processing
+pandas==2.2.3
+numpy==2.2.1
+geopy==2.4.1
+scikit-learn==1.6.1
+
+# Async utilities
+aiofiles==24.1.0
+
+# Logging
+structlog==24.4.0

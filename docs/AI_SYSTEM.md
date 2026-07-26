@@ -11,6 +11,27 @@ Overview of DevConnect Labs's AI integration for assistants, memory, and retriev
 | OpenAI GPT-4 / GPT-4o-mini | Model for assistants |
 | ice-knowledge.service | Encompass/ICE knowledge retrieval (`data/knowledge/ice-sources.json`) |
 | encompass-docs.service | Official Developer Connect docs retrieval (`data/encompass-docs.json`) |
+| Python/FastAPI Service | PostGIS disaster queries, pgvector RAG operations, text processing, data analytics |
+
+### Service Architecture
+
+```
+Node.js (Port 3000)              Python/FastAPI (Port 8000)
+├─ LangChain orchestration       ├─ PostGIS spatial queries
+├─ OpenAI API calls              ├─ pgvector semantic search
+├─ ICE knowledge retrieval       ├─ Text processing (field IDs, keywords)
+├─ Encompass docs search         ├─ Data analytics (pandas/numpy)
+└─ Web UI serving                └─ Encompass RAG operations
+         │                                  │
+         └──────────┬───────────────────────┘
+                    ▼
+            PostgreSQL Database
+            ├─ langchain_memory (conversations, messages)
+            ├─ ice_knowledge_chunks (pgvector embeddings)
+            ├─ encompass_docs_chunks (pgvector embeddings)
+            ├─ heygen_knowledge_chunks (pgvector embeddings)
+            └─ disasters (PostGIS spatial data)
+```
 
 ## Assistants
 
