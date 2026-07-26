@@ -64,12 +64,26 @@ function clearNwsGridFilter(uncheckToggle) {
 }
 
 function disastersGridExternalFilterPresent() {
-  return nwsGridFilterActive && !!nwsGridFilterContext;
+  return (nwsGridFilterActive && !!nwsGridFilterContext) || timeRangeFilterHours !== null;
 }
 
 function disastersGridExternalFilterPass(node) {
-  if (!disastersGridExternalFilterPresent()) return true;
-  return DisasterWeatherAlertFilters.rowPassesSelectionGridFilter(node.data, nwsGridFilterContext);
+  // Check NWS filter
+  if (nwsGridFilterActive && !!nwsGridFilterContext) {
+    if (!DisasterWeatherAlertFilters.rowPassesSelectionGridFilter(node.data, nwsGridFilterContext)) {
+      return false;
+    }
+  }
+  
+  // Check time range filter
+  if (timeRangeFilterHours !== null) {
+    const row = node.data?.disasterObj;
+    if (!row || !row.start_time) return false;
+    const hoursAgo = (Date.now() - new Date(row.start_time).getTime()) / (1000 * 60 * 60);
+    if (hoursAgo > timeRangeFilterHours) return false;
+  }
+  
+  return true;
 }
 
 function htmlCellRenderer(html) {

@@ -26,6 +26,7 @@
       let lastNearbyWeatherAlerts = [];
       let nwsGridFilterActive = false;
       let nwsGridFilterContext = null;
+      let timeRangeFilterHours = null;
       let aiChatWidget = null;
       let aiInsightsCard = null;
       let voiceRecognition = null;
@@ -857,6 +858,33 @@
           } else {
             clearNwsGridFilter(false);
           }
+        });
+        
+        // Time range filter event listeners
+        document.querySelectorAll('input[name="duTimeRange"]').forEach((radio) => {
+          radio.addEventListener('change', (e) => {
+            const value = e.target.value;
+            if (value === 'all') {
+              timeRangeFilterHours = null;
+            } else {
+              const hours = {
+                '24h': 24,
+                '48h': 48,
+                '72h': 72,
+                '7d': 168,
+                '30d': 720
+              };
+              timeRangeFilterHours = hours[value] || null;
+            }
+            refreshNwsGridExternalFilter();
+            
+            if (timeRangeFilterHours) {
+              const label = value === '7d' ? 'week' : value === '30d' ? '30 days' : value.replace('h', ' hours').replace('d', ' days');
+              setDashboardStatus(`Filtered to events from the last ${label}`, 'info');
+            } else {
+              setDashboardStatus('Showing all events (90-day window)', 'info');
+            }
+          });
         });
         initDuSectionCards();
         initHotspotFilterBadge();

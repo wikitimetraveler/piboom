@@ -344,7 +344,7 @@
             <span class="source-chip-count" data-source-count="nhc">0</span>
             <span class="source-chip-db-total" data-source-db="nhc" hidden></span>
           </button>
-          <button type="button" class="source-chip freshness-off" data-source="floodzones" onclick="toggleUnifiedSourceChip(this, 'floodzones')">
+          <button type="button" class="source-chip source-chip-active freshness-ok" data-source="floodzones" onclick="toggleUnifiedSourceChip(this, 'floodzones')">
             <span class="freshness-dot" aria-hidden="true"></span>
             <i class="bi bi-droplet"></i> Flood zones
             <span class="source-chip-count" data-source-count="floodzones">0</span>
@@ -466,6 +466,29 @@
                 <i class="bi bi-info-circle me-1"></i>
                 Source chips and multiselects <strong>auto-reload</strong> the grid when changed. Refine state, county, source, and event type here.
               </p>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Time range quick filters</label>
+                <div class="btn-group btn-group-sm du-time-range-pills" role="group" aria-label="Time range filters">
+                  <input type="radio" class="btn-check" name="duTimeRange" id="duTimeAll" value="all" autocomplete="off" checked>
+                  <label class="btn btn-outline-secondary" for="duTimeAll">All (90d)</label>
+                  
+                  <input type="radio" class="btn-check" name="duTimeRange" id="duTime24h" value="24h" autocomplete="off">
+                  <label class="btn btn-outline-secondary" for="duTime24h">Last 24h</label>
+                  
+                  <input type="radio" class="btn-check" name="duTimeRange" id="duTime48h" value="48h" autocomplete="off">
+                  <label class="btn btn-outline-secondary" for="duTime48h">Last 48h</label>
+                  
+                  <input type="radio" class="btn-check" name="duTimeRange" id="duTime72h" value="72h" autocomplete="off">
+                  <label class="btn btn-outline-secondary" for="duTime72h">Last 3d</label>
+                  
+                  <input type="radio" class="btn-check" name="duTimeRange" id="duTime7d" value="7d" autocomplete="off">
+                  <label class="btn btn-outline-secondary" for="duTime7d">Last week</label>
+                  
+                  <input type="radio" class="btn-check" name="duTimeRange" id="duTime30d" value="30d" autocomplete="off">
+                  <label class="btn btn-outline-secondary" for="duTime30d">Last 30d</label>
+                </div>
+                <p class="small text-muted mt-1 mb-0">Filter disasters by recency — highlights recent events with higher risk weighting</p>
+              </div>
               <div class="row g-3 align-items-start">
                 <div class="col-md-3 col-sm-6">
                   <label class="form-label" for="stateInput">State</label>
@@ -483,7 +506,7 @@
                     <option value="usgs" selected>USGS</option>
                     <option value="nws" selected>NOAA/NWS</option>
                     <option value="nhc" selected>NHC</option>
-                    <option value="floodzones">Flood Zones (NFHL)</option>
+                    <option value="floodzones" selected>Flood Zones (NFHL)</option>
                   </select>
                 </div>
                 <div class="col-md-3 col-sm-6">

@@ -7,10 +7,29 @@ Disaster data feeds, loan pipeline risk analysis, and the Disaster Risk AI assis
 | Area | Purpose |
 |------|---------|
 | **Disasters Service** | Multi-source disaster data (FEMA, NASA FIRMS, USGS, NWS, NHC) |
+| **Python/FastAPI Service** | PostGIS spatial queries, disaster data retrieval, analytics (port 8000) |
 | **Loan Pipeline + Risk** | Pipeline loans, geocoding, FEMA overlap, flood zones, risk summaries |
 | **Disaster Risk AI** | AI assistant for disaster impact on real estate |
 | **Pipeline Risk Dashboard** | `public/finance/pipeline-risk-dashboard.html` – map, tables, AI widgets |
 | **Unified Disasters** | `public/finance/disasters-unified.html` – multi-source disasters AG Grid, voice commands, disaster **processor** expert AI (`sessionId: unified-disaster-processor`) |
+
+### Service Architecture
+
+The disaster system spans both Node.js and Python services:
+
+**Node.js (Port 3000):**
+- Disaster data ingestion and storage
+- Web UI serving
+- LangChain AI orchestration
+- Real-time Socket.IO events
+
+**Python/FastAPI (Port 8000):**
+- PostGIS spatial queries (radius search, distance calculations)
+- Disaster data retrieval with async database operations
+- Spatial analytics and aggregation
+- Data export and processing
+
+Both services share the same PostgreSQL database with PostGIS extension.
 
 ## Data Sources (disasters.service.js)
 

@@ -2130,3 +2130,28 @@ body.du-pull-sheet-open .du-bottom-dock {
     background-size: 100% 100%;
   }
 }
+
+/* Time range filter pills */
+.du-time-range-pills {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.du-time-range-pills .btn {
+  font-size: 0.875rem;
+  padding: 0.375rem 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.du-time-range-pills .btn-check:checked + .btn {
+  background-color: var(--zen-primary, #4a90a4);
+  border-color: var(--zen-primary, #4a90a4);
+  color: white;
+}
+
+.du-time-range-pills .btn-check:focus + .btn,
+.du-time-range-pills .btn:hover {
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--zen-primary, #4a90a4) 25%, transparent);
+}
+
