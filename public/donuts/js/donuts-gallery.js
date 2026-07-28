@@ -648,6 +648,34 @@
     let exploding = false;
     let explodeToken = 0;
 
+    // With no clicks the hero would sit on the classic glazed forever, so it
+    // advances itself through the rotation while the visitor is idle.
+    const AUTO_CYCLE_MS = 7000;
+    let autoCycleTimer = 0;
+    let heroInView = true;
+    let hovered = false;
+
+    function canAutoCycle() {
+      return (
+        heroInView
+        && !hovered
+        && !exploding
+        && !document.hidden
+        // The story reel clicks the hero itself; two drivers would collide.
+        && !window.GlazedStoryReel?.isRunning?.()
+        && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      );
+    }
+
+    function scheduleAutoCycle() {
+      window.clearTimeout(autoCycleTimer);
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      autoCycleTimer = window.setTimeout(() => {
+        if (canAutoCycle()) explode();
+        else scheduleAutoCycle();
+      }, AUTO_CYCLE_MS);
+    }
+
     function finishExplode(token) {
       if (token !== explodeToken) return;
       el.classList.remove('is-exploding', 'is-exploding-3d', 'is-winding');
@@ -655,6 +683,7 @@
       exploding = false;
       rotationIndex++;
       updateHeroImage();
+      scheduleAutoCycle();
     }
 
     function explodeCssFallback(stage, token) {
@@ -708,13 +737,53 @@
       explodeCssFallback(stage, token);
     }
 
-    el.addEventListener('click', explode);
+    el.addEventListener('click', () => {
+      window.clearTimeout(autoCycleTimer);
+      explode();
+    });
     el.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
+        window.clearTimeout(autoCycleTimer);
         explode();
       }
     });
+
+    // Don't detonate the hero out from under someone who is reaching for it.
+    el.addEventListener('pointerenter', () => {
+      hovered = true;
+      window.clearTimeout(autoCycleTimer);
+    });
+    el.addEventListener('pointerleave', () => {
+      hovered = false;
+      scheduleAutoCycle();
+    });
+    el.addEventListener('focus', () => {
+      hovered = true;
+      window.clearTimeout(autoCycleTimer);
+    });
+    el.addEventListener('blur', () => {
+      hovered = false;
+      scheduleAutoCycle();
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) window.clearTimeout(autoCycleTimer);
+      else scheduleAutoCycle();
+    });
+
+    if (typeof IntersectionObserver === 'function') {
+      new IntersectionObserver(
+        (entries) => {
+          heroInView = entries.some((entry) => entry.isIntersecting);
+          if (heroInView) scheduleAutoCycle();
+          else window.clearTimeout(autoCycleTimer);
+        },
+        { threshold: 0.25 },
+      ).observe(el);
+    }
+
+    scheduleAutoCycle();
   }
 
   function bindGuide(brand) {

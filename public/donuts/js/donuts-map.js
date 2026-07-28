@@ -117,6 +117,8 @@
       signEl.hidden = false;
     }
 
+    wireShopSignSwap(shop);
+
     const lat = Number(shop.lat);
     const lng = Number(shop.lng);
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
@@ -143,6 +145,22 @@
       el,
       mapOptions({ lat, lng }, 16, google.maps.MapTypeId.HYBRID)
     );
+
+    // Hero layout can settle after init — force a paint + recenter.
+    const refreshShopMap = () => {
+      try {
+        google.maps.event.trigger(map, 'resize');
+        map.setCenter({ lat, lng });
+        map.setZoom(16);
+      } catch (_) {
+        /* ignore */
+      }
+    };
+    window.requestAnimationFrame(() => {
+      refreshShopMap();
+      window.setTimeout(refreshShopMap, 120);
+      window.setTimeout(refreshShopMap, 400);
+    });
 
     const marker = placeGenericPin({
       position: { lat, lng },
@@ -325,6 +343,62 @@
         });
       };
     }
+  }
+
+  function wireShopSignSwap(shop) {
+    const stage = document.getElementById('gzShopSignStage');
+    const primary = document.getElementById('gzShopSign');
+    if (!stage || !primary) return;
+
+    const slides = collectShopSignSlides(shop);
+    const slide = slides[0] || {
+      src: '/donuts/assets/savy-logo-sign.png',
+      alt: 'Savy Donuts & Smoothie logo sign',
+    };
+
+    if (stage._gzSignTimer) {
+      window.clearInterval(stage._gzSignTimer);
+      stage._gzSignTimer = 0;
+    }
+
+    stage.hidden = false;
+    primary.hidden = false;
+    primary.src = slide.src;
+    primary.alt = slide.alt;
+    primary.classList.add('is-active');
+    primary.classList.remove('is-leaving', 'is-photo');
+
+    const alt = document.getElementById('gzShopSignAlt');
+    if (alt) {
+      alt.hidden = true;
+      alt.removeAttribute('src');
+    }
+  }
+
+  function collectShopSignSlides(shop) {
+    const slides = [];
+    const seen = new Set();
+    const push = (src, alt) => {
+      const url = String(src || '').trim();
+      if (!url || seen.has(url)) return;
+      // Logo only — no storefront swap
+      if (/storefront|savvy-sign/i.test(url)) return;
+      seen.add(url);
+      slides.push({
+        src: url,
+        alt: alt || `${shop?.name || 'Savy'} logo`,
+      });
+    };
+
+    if (Array.isArray(shop?.signImages)) {
+      shop.signImages.forEach((item) => {
+        if (typeof item === 'string') push(item);
+        else if (item && item.src) push(item.src, item.alt);
+      });
+    }
+    push(shop?.signImage, `${shop?.name || 'Savy'} logo`);
+    push('/donuts/assets/savy-logo-sign.png', 'Savy Donuts & Smoothie logo sign');
+    return slides;
   }
 
   function escapeHtml(value) {

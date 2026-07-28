@@ -29,110 +29,133 @@
         <div class="gz-hero-inner">
           <h1 class="gz-brand">Glazed</h1>
           <p class="gz-hero-line" id="gzHeroLine">Flip a treat. Hear the history. Meet Savy Donuts and Smoothies on Harbor.</p>
-          
+
           <div class="gz-fresh-drop-countdown" id="gzFreshDropCountdown">
-            <div class="gz-countdown-label">🔥 Fresh Drop In</div>
+            <div class="gz-countdown-label">Fresh Drop In</div>
             <div class="gz-countdown-clock">
               <div class="gz-countdown-unit">
                 <div class="gz-countdown-value" id="gzCountHours">00</div>
-                <div class="gz-countdown-unit-label">Hours</div>
+                <div class="gz-countdown-unit-label">Hrs</div>
               </div>
               <div class="gz-countdown-separator">:</div>
               <div class="gz-countdown-unit">
                 <div class="gz-countdown-value" id="gzCountMinutes">00</div>
-                <div class="gz-countdown-unit-label">Minutes</div>
+                <div class="gz-countdown-unit-label">Min</div>
               </div>
               <div class="gz-countdown-separator">:</div>
               <div class="gz-countdown-unit">
                 <div class="gz-countdown-value" id="gzCountSeconds">00</div>
-                <div class="gz-countdown-unit-label">Seconds</div>
+                <div class="gz-countdown-unit-label">Sec</div>
               </div>
             </div>
-            <div class="gz-countdown-message" id="gzCountdownMessage">Fresh glazed drops at 6:00 AM daily</div>
+            <div class="gz-countdown-message" id="gzCountdownMessage">Drops at 6:00 AM daily</div>
           </div>
-          
+
           <div class="gz-hero-cta">
             <a class="gz-btn gz-btn-primary" href="#gzCase">
               <i class="bi bi-arrow-down-circle"></i> Baker's Dozen
             </a>
-            <a class="gz-btn gz-btn-ghost" href="#gzSmoothies">
-              <i class="bi bi-cup-straw"></i> Smoothies
+            <a class="gz-btn gz-btn-frost" href="#gzShop">
+              <i class="bi bi-geo-alt-fill"></i> Find Savy
             </a>
-            <a class="gz-btn gz-btn-ghost" href="#gzSubmarines">
-              <i class="bi bi-basket2"></i> Submarines
-            </a>
-            <a class="gz-btn gz-btn-ghost" href="#gzOrigins">
-              <i class="bi bi-globe2"></i> Invention map
-            </a>
-            <a class="gz-btn gz-btn-ghost" href="#gzDiscover">
-              <i class="bi bi-camera"></i> Donut cam
-            </a>
-            <button type="button" class="gz-btn gz-btn-ghost" id="gzStoryPlayHero">
+            <button type="button" class="gz-btn gz-btn-ghost gz-btn-sm" id="gzStoryPlayHero">
               <i class="bi bi-film"></i> Play reel
             </button>
           </div>
         </div>
+
         <div class="gz-hero-orb" id="gzHeroOrb" aria-hidden="false">
           <div class="gz-orb-sprinkles" id="gzOrbSprinkles" aria-hidden="true"></div>
           <button type="button" class="gz-hero-donut" id="gzHeroDonut" aria-label="Glazed donut — click to explode"></button>
         </div>
-        
+
+        <div class="gz-hero-shop" id="gzShop" aria-label="Find Savy Donuts and Smoothies">
+          <div class="gz-shop-layout gz-shop-layout--hero">
+            <div class="gz-shop-copy">
+              <div class="gz-shop-sign-stage" id="gzShopSignStage">
+                <img
+                  id="gzShopSign"
+                  class="gz-shop-sign is-active"
+                  src="/donuts/assets/savy-logo-sign.png"
+                  alt="Savy Donuts &amp; Smoothie logo sign"
+                />
+              </div>
+              <h3 id="gzShopName">Savy Donuts &amp; Smoothies</h3>
+              <p id="gzShopAddress" class="gz-shop-address"></p>
+              <p id="gzShopNote" class="gz-shop-note"></p>
+              <div class="gz-shop-actions">
+                <a id="gzShopPhone" class="gz-btn gz-btn-ghost gz-btn-sm" href="tel:+16572320098" hidden>
+                  <i class="bi bi-telephone-fill"></i> <span id="gzShopPhoneLabel">+1 657-232-0098</span>
+                </a>
+                <a id="gzShopDirections" class="gz-btn gz-btn-primary gz-btn-sm" href="#" target="_blank" rel="noopener" hidden>
+                  <i class="bi bi-geo-alt-fill"></i> Directions
+                </a>
+              </div>
+              <p id="gzShopMapStatus" class="gz-shop-map-status">Loading map…</p>
+              <p class="gz-map-pip-note gz-map-pip-note--hero">
+                Questions?
+                <button type="button" class="gz-text-link" id="gzAskPipMap">Ask Pip</button>
+              </p>
+            </div>
+            <div class="gz-shop-map-wrap">
+              <div id="gzShopMap" class="gz-shop-map" role="img" aria-label="Map of Savy Donuts and Smoothies"></div>
+            </div>
+          </div>
+        </div>
+
         <aside class="gz-guide gz-guide--hero" id="gzGuide" aria-label="Bakery guide Pip">
-        <div class="gz-guide-card">
-          <button type="button" class="gz-guide-portrait-btn" id="gzGuideExpand" aria-label="Pip — expand dock">
-            <img
-              class="gz-guide-portrait"
-              id="gzGuidePortrait"
-              src="/donuts/assets/pip-baker-portrait.png"
-              width="76"
-              height="76"
-              alt="Pip — bakery guide"
-            />
-          </button>
-          <div class="gz-guide-meta">
-            <h2 id="gzGuideName">Pip</h2>
-            <p id="gzGuideTitle">Head baker &amp; glaze gossip</p>
-            <p class="gz-guide-status" id="gzGuideStatus">HeyGen avatar ready · tap Hear welcome</p>
+          <div class="gz-guide-card">
+            <button type="button" class="gz-guide-portrait-btn" id="gzGuideExpand" aria-label="Pip — expand dock">
+              <img
+                class="gz-guide-portrait"
+                id="gzGuidePortrait"
+                src="/donuts/assets/pip-baker-portrait.png"
+                width="56"
+                height="56"
+                alt="Pip — bakery guide"
+              />
+            </button>
+            <div class="gz-guide-meta">
+              <h2 id="gzGuideName">Pip</h2>
+              <p id="gzGuideTitle">Head baker</p>
+              <p class="gz-guide-status" id="gzGuideStatus">Tap Hear welcome</p>
+            </div>
+            <div class="gz-guide-actions">
+              <button type="button" class="gz-btn gz-btn-primary gz-btn-sm" id="gzMeetPip" title="Play Pip’s HeyGen welcome clip">
+                <i class="bi bi-play-fill"></i> Hear welcome
+              </button>
+              <button type="button" class="gz-btn gz-btn-frost gz-btn-sm" id="gzAskPip">
+                <i class="bi bi-chat-dots-fill"></i> Ask Pip
+              </button>
+              <button type="button" class="gz-btn gz-btn-ghost gz-btn-sm" id="gzStopPip">
+                <i class="bi bi-stop-fill"></i> Stop
+              </button>
+              <button type="button" class="gz-btn gz-btn-ghost gz-btn-sm" id="gzGuideCollapse" title="Collapse Pip dock" aria-label="Collapse Pip dock">
+                <i class="bi bi-chevron-up"></i>
+              </button>
+            </div>
           </div>
-          <div class="gz-guide-actions">
-            <button type="button" class="gz-btn gz-btn-primary gz-btn-sm" id="gzMeetPip" title="Play Pip’s HeyGen welcome clip">
-              <i class="bi bi-play-fill"></i> Hear welcome
-            </button>
-            <button type="button" class="gz-btn gz-btn-frost gz-btn-sm" id="gzAskPip">
-              <i class="bi bi-chat-dots-fill"></i> Ask Pip
-            </button>
-            <button type="button" class="gz-btn gz-btn-ghost gz-btn-sm" id="gzStopPip">
-              <i class="bi bi-stop-fill"></i> Stop
-            </button>
-            <button type="button" class="gz-btn gz-btn-ghost gz-btn-sm" id="gzGuideCollapse" title="Collapse Pip dock" aria-label="Collapse Pip dock">
-              <i class="bi bi-chevron-up"></i>
-            </button>
+          <div class="gz-story-panel" id="gzStoryPanel" aria-label="Pip highlight reel">
+            <div class="gz-story-panel-row">
+              <button type="button" class="gz-btn gz-btn-frost gz-btn-sm" id="gzStoryPlay" aria-pressed="false">
+                <i class="bi bi-film"></i> Play highlight reel
+              </button>
+              <button type="button" class="gz-btn gz-btn-ghost gz-btn-sm" id="gzStoryStop" hidden>
+                <i class="bi bi-stop-fill"></i> Stop reel
+              </button>
+              <label class="gz-story-narrate">
+                <input type="checkbox" id="gzStoryNarrate" checked/>
+                Narration
+              </label>
+            </div>
+            <div class="gz-story-status" id="gzStoryStatus" hidden aria-live="polite">
+              <span class="gz-story-status-text" id="gzStoryStatusText">Playing…</span>
+              <div class="gz-story-dots" id="gzStoryDots" aria-hidden="true"></div>
+            </div>
+            <p class="gz-story-panel-hint" id="gzStoryHint">HyperFrame tour with Pip — baker’s dozen, smoothies, and Savy on Harbor.</p>
+            <p class="gz-story-error" id="gzStoryError" hidden></p>
           </div>
-        </div>
-        <p class="gz-pip-path-hint">
-          <strong>Hear welcome</strong> = HeyGen clip · <strong>Play reel</strong> = HyperFrame page tour · <strong>Ask Pip</strong> = chat
-        </p>
-        <div class="gz-story-panel" id="gzStoryPanel" aria-label="Pip highlight reel">
-          <div class="gz-story-panel-row">
-            <button type="button" class="gz-btn gz-btn-frost gz-btn-sm" id="gzStoryPlay" aria-pressed="false">
-              <i class="bi bi-film"></i> Play highlight reel
-            </button>
-            <button type="button" class="gz-btn gz-btn-ghost gz-btn-sm" id="gzStoryStop" hidden>
-              <i class="bi bi-stop-fill"></i> Stop reel
-            </button>
-            <label class="gz-story-narrate">
-              <input type="checkbox" id="gzStoryNarrate" checked/>
-              Narration
-            </label>
-          </div>
-          <div class="gz-story-status" id="gzStoryStatus" hidden aria-live="polite">
-            <span class="gz-story-status-text" id="gzStoryStatusText">Playing…</span>
-            <div class="gz-story-dots" id="gzStoryDots" aria-hidden="true"></div>
-          </div>
-          <p class="gz-story-panel-hint" id="gzStoryHint">HyperFrame tour with Pip — baker’s dozen, smoothies, and Savy on Harbor.</p>
-          <p class="gz-story-error" id="gzStoryError" hidden></p>
-        </div>
-      </aside>
+        </aside>
       </div>
     </section>
 
@@ -215,43 +238,6 @@
           <p>Hot and cold subs from the Savy deli — flip for sandwich stories and build notes.</p>
         </div>
         <div class="gz-grid" id="gzSubmarineGrid"></div>
-      </section>
-
-      <section class="gz-section gz-shop-section" id="gzShop">
-        <div class="gz-section-head">
-          <h2>Find Savy</h2>
-          <p>
-            Real counter on South Harbor near Kent — the Anaheim / Santa Ana corridor stop for
-            fresh glazed rings, blended smoothies, and deli subs. Walk up, say hi, and grab what’s
-            warm from the case.
-          </p>
-        </div>
-        <div class="gz-shop-layout">
-          <div class="gz-shop-copy">
-            <img id="gzShopSign" class="gz-shop-sign" src="/donuts/assets/savys-storefront.png" alt="Savy Donuts &amp; Smoothies storefront" hidden/>
-            <h3 id="gzShopName">Savy Donuts &amp; Smoothies</h3>
-            <p id="gzShopAddress" class="gz-shop-address"></p>
-            <p id="gzShopNote" class="gz-shop-note"></p>
-            <div class="gz-shop-actions">
-              <a id="gzShopPhone" class="gz-btn gz-btn-ghost gz-btn-sm" href="tel:+16572320098" hidden>
-                <i class="bi bi-telephone-fill"></i> <span id="gzShopPhoneLabel">+1 657-232-0098</span>
-              </a>
-              <a id="gzShopDirections" class="gz-btn gz-btn-primary gz-btn-sm" href="#" target="_blank" rel="noopener" hidden>
-                <i class="bi bi-geo-alt-fill"></i> Directions
-              </a>
-            </div>
-            <p id="gzShopMapStatus" class="gz-shop-map-status">Loading map…</p>
-          </div>
-          <div class="gz-shop-map-wrap">
-            <div id="gzShopMap" class="gz-shop-map" role="img" aria-label="Map of Savy Donuts and Smoothies"></div>
-          </div>
-        </div>
-
-        <p class="gz-map-pip-note">
-          Questions about the shop or pairings?
-          <button type="button" class="gz-text-link" id="gzAskPipMap">Ask Pip</button>
-          from the dock above or the chat bubble.
-        </p>
       </section>
 
       <p class="gz-footer-note">Glazed · Savy Donuts &amp; Smoothies™ on Harbor · Pip by HeyGen · Development by Cursor AI · <span id="gzFooterYear">© 2026</span></p>

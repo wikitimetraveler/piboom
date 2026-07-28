@@ -9,7 +9,13 @@
   },
   "shop": {
     "name": "Savy Donuts & Smoothies",
-    "signImage": "/donuts/assets/savys-storefront.png",
+    "signImage": "/donuts/assets/savy-logo-sign.png",
+    "signImages": [
+      {
+        "src": "/donuts/assets/savy-logo-sign.png",
+        "alt": "Savy Donuts & Smoothie logo sign"
+      }
+    ],
     "address": "940 S Harbor Blvd, Santa Ana, CA 92704",
     "crossStreets": "South Harbor near Kent — Anaheim / Santa Ana corridor",
     "cityNote": "South Anaheim Harbor corridor (Santa Ana address)",
