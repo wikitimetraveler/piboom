@@ -1,14 +1,14 @@
 {
   "brand": {
     "name": "Glazed",
-    "tagline": "Flip a treat. Hear the history. Meet Savy Donuts and Smoothies on Harbor.",
+    "tagline": "Flip a treat. Hear the history. Meet Savy Donuts and Smoothie on Harbor.",
     "guideName": "Pip",
     "guideTitle": "Head baker & glaze gossip",
     "guidePortrait": "/donuts/assets/pip-baker-portrait.png",
-    "welcomeScript": "Hey! I'm Pip — welcome to Glazed, celebrating Savy Donuts and Smoothies on Harbor. Flip any donut for its story and where it came from. Smoothies still share blend notes. Ask me in chat too — I'm your baker guide."
+    "welcomeScript": "Hey! I'm Pip — welcome to Glazed, celebrating Savy Donuts and Smoothie on Harbor. Flip any donut for its story and where it came from. Smoothies still share blend notes. Ask me in chat too — I'm your baker guide."
   },
   "shop": {
-    "name": "Savy Donuts & Smoothies",
+    "name": "Savy Donuts & Smoothie",
     "signImage": "/donuts/assets/savy-logo-sign.png",
     "signImages": [
       {

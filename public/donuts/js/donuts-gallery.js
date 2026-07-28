@@ -994,7 +994,7 @@
       const submarines = Array.isArray(data.submarines) ? data.submarines : [];
 
       document.getElementById('gzHeroLine').textContent =
-        brand.tagline || 'Flip a treat. Hear the history. Meet Savy Donuts and Smoothies on Harbor.';
+        brand.tagline || 'Flip a treat. Hear the history. Meet Savy Donuts and Smoothie on Harbor.';
       bindGuide(brand);
 
       if (data.shop && window.GlazedShopMap?.initMap) {

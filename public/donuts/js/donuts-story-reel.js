@@ -31,7 +31,7 @@
         kicker: 'HyperFrame',
         title: 'Meet Glazed',
         copy: 'I’m Pip — flip a treat, hear the history, and find Savy on Harbor.',
-        narration: 'Hey! I’m Pip. Welcome to Glazed — a playful tour of Savy Donuts and Smoothies on Harbor.',
+        narration: 'Hey! I’m Pip. Welcome to Glazed — a playful tour of Savy Donuts and Smoothie on Harbor.',
         anchor: 'gzHero',
         spotlight: '.gz-hero-orb',
         action: 'explodeHero',

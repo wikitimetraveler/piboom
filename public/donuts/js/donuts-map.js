@@ -93,7 +93,7 @@
     const linkEl = document.getElementById('gzShopDirections');
     const signEl = document.getElementById('gzShopSign');
 
-    if (nameEl) nameEl.textContent = shop.name || 'Savy Donuts & Smoothies';
+    if (nameEl) nameEl.textContent = shop.name || 'Savy Donuts & Smoothie';
     if (addrEl) {
       addrEl.textContent = [shop.address, shop.crossStreets].filter(Boolean).join(' · ');
     }
@@ -165,7 +165,7 @@
     const marker = placeGenericPin({
       position: { lat, lng },
       map,
-      title: shop.name || 'Savy Donuts & Smoothies',
+      title: shop.name || 'Savy Donuts & Smoothie',
       color: SHOP_PIN_COLOR,
       label: 'S',
       size: 36,
