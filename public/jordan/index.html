@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Jordan — Layers of the Kingdom | History, Food &amp; Music</title>
+  <meta name="description" content="A bilingual guided tour of Jordan: nine thousand years of history on the map, the story behind mansaf and jameed, the rababa and the dabke line — narrated in English or Arabic."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/jordan/css/jordan.css"/>
+  <script src="/shared/menu-config.js"></script>
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/demo-users.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <script src="/shared/dark-mode.js" defer></script>
+</head>
+<body class="jd-page">
+  <modern-navbar></modern-navbar>
+
+  <main class="jd-main">
+    <section class="jd-hero" id="jdHero">
+      <div class="jd-hero-atmos" id="jdHeroAtmos" aria-hidden="true">
+        <div class="jd-hero-sky"></div>
+        <div class="jd-hero-heat"></div>
+        <svg class="jd-hero-silhouettes" viewBox="0 0 1200 280" preserveAspectRatio="xMidYMax meet" focusable="false">
+          <path class="jd-hero-arch" d="M180 280 V120 Q180 40 260 40 Q340 40 340 120 V280 Z"/>
+          <path class="jd-hero-arch jd-hero-arch--far" d="M820 280 V150 Q820 70 900 70 Q980 70 980 150 V280 Z"/>
+          <path class="jd-hero-dune" d="M0 220 C160 180 280 200 420 170 C560 140 700 190 860 160 C980 140 1100 180 1200 155 L1200 280 L0 280 Z"/>
+        </svg>
+        <div class="jd-hero-sand"></div>
+        <div class="jd-hero-motes" id="jdHeroMotes"></div>
+      </div>
+      <div class="container">
+        <div class="jd-hero-layout">
+          <div class="jd-hero-inner" id="jdHeroInner">
+            <p class="jd-kicker" data-i18n="heroKicker">The Hashemite Kingdom of Jordan</p>
+            <h1 class="jd-hero-title" data-i18n="heroTitle">Jordan</h1>
+            <p class="jd-hero-line" data-i18n="heroLine">A crossroads kingdom between desert and sea — Nabataean stone, Roman colonnades, Bedouin fires, and a table that never stops filling.</p>
+
+            <div class="jd-hero-cta">
+              <button type="button" class="jd-btn jd-btn-primary" id="jdStoryPlayHero">
+                <i class="bi bi-film"></i> <span data-i18n="playReel">Play highlight reel</span>
+              </button>
+              <a class="jd-btn jd-btn-ghost" href="#jdMap">
+                <i class="bi bi-geo-alt-fill"></i> <span data-i18n="exploreMap">Explore the atlas</span>
+              </a>
+              <button type="button" class="jd-btn jd-btn-lang" id="jdLangToggle" aria-label="Switch language">
+                <i class="bi bi-translate"></i> <span id="jdLangToggleLabel">عربي</span>
+              </button>
+            </div>
+
+            <dl class="jd-facts" id="jdFacts">
+              <div><dt>7250 BCE</dt><dd data-i18n-fact="ain">Ain Ghazal statues</dd></div>
+              <div><dt>106 CE</dt><dd data-i18n-fact="rome">Rome annexes Nabataea</dd></div>
+              <div><dt>1946</dt><dd data-i18n-fact="ind">Independence</dd></div>
+              <div><dt>−430 m</dt><dd data-i18n-fact="dead">Dead Sea, lowest on Earth</dd></div>
+            </dl>
+          </div>
+
+          <aside class="jd-guide" id="jdGuide" aria-label="Jordan guide Rami">
+            <div class="jd-guide-card">
+              <img class="jd-guide-portrait" id="jdGuidePortrait" src="/jordan/assets/rami-guide-portrait-256.png" width="72" height="72" alt="Rami — Jordan history guide"/>
+              <div class="jd-guide-meta">
+                <h2 id="jdGuideName">Rami</h2>
+                <p id="jdGuideTitle">Jordan history guide</p>
+                <p class="jd-guide-status" id="jdGuideStatus">Ahlan wa sahlan.</p>
+              </div>
+            </div>
+
+            <div class="jd-guide-actions">
+              <button type="button" class="jd-btn jd-btn-primary jd-btn-sm" id="jdMeetGuide">
+                <i class="bi bi-play-fill"></i> <span data-i18n="hearWelcome">Hear welcome</span>
+              </button>
+              <button type="button" class="jd-btn jd-btn-sand jd-btn-sm" id="jdAskGuide">
+                <i class="bi bi-chat-dots-fill"></i> <span data-i18n="askGuide">Ask Rami</span>
+              </button>
+              <button type="button" class="jd-btn jd-btn-ghost jd-btn-sm" id="jdStopAudio">
+                <i class="bi bi-stop-fill"></i> <span data-i18n="stop">Stop</span>
+              </button>
+            </div>
+
+            <div class="jd-story-panel" id="jdStoryPanel">
+              <div class="jd-story-row">
+                <button type="button" class="jd-btn jd-btn-sand jd-btn-sm" id="jdStoryPlay" aria-pressed="false">
+                  <i class="bi bi-film"></i> <span data-i18n="playReel">Play highlight reel</span>
+                </button>
+                <button type="button" class="jd-btn jd-btn-ghost jd-btn-sm" id="jdStoryStop" hidden>
+                  <i class="bi bi-stop-fill"></i> <span data-i18n="stopReel">Stop reel</span>
+                </button>
+                <label class="jd-story-narrate">
+                  <input type="checkbox" id="jdStoryNarrate" checked/>
+                  <span data-i18n="narration">Narration</span>
+                </label>
+              </div>
+              <div class="jd-story-status" id="jdStoryStatus" hidden aria-live="polite">
+                <span id="jdStoryStatusText"></span>
+                <div class="jd-story-dots" id="jdStoryDots" aria-hidden="true"></div>
+              </div>
+              <p class="jd-story-error" id="jdStoryError" hidden></p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <div class="container">
+      <section class="jd-section" id="jdTimeline">
+        <div class="jd-section-head">
+          <h2 data-i18n="timelineHeading">Layers of Jordan</h2>
+          <p data-i18n="timelineLead">Ten turns of the road, from Neolithic plaster faces to a modern kingdom. Select an era to hear it and pin it on the map.</p>
+        </div>
+        <ol class="jd-era-list" id="jdEraList">
+          <li class="jd-loading" data-i18n="loading">Loading Jordan…</li>
+        </ol>
+      </section>
+
+      <section class="jd-section" id="jdMap">
+        <div class="jd-section-head">
+          <h2 data-i18n="mapHeading">Atlas of Jordan</h2>
+          <p data-i18n="mapLead">Every site below is a real place you can stand in. Tap a pin or a name to hear its story.</p>
+        </div>
+        <div class="jd-map-filters" id="jdMapFilters" role="group" aria-label="Filter map pins">
+          <button type="button" class="jd-chip is-active" data-filter="all" data-i18n="mapAll">All</button>
+          <button type="button" class="jd-chip" data-filter="history" data-i18n="mapHistory">History</button>
+          <button type="button" class="jd-chip" data-filter="food" data-i18n="mapFood">Food</button>
+          <button type="button" class="jd-chip" data-filter="music" data-i18n="mapMusic">Music</button>
+        </div>
+        <div class="jd-map-layout">
+          <ul class="jd-site-list" id="jdSiteList"></ul>
+          <div class="jd-map-wrap">
+            <div id="jdMapCanvas" class="jd-map-canvas" role="img" aria-label="Map of historic sites in Jordan"></div>
+            <p class="jd-map-status" id="jdMapStatus" data-i18n="mapLoading">Loading the atlas…</p>
+            <button type="button" class="jd-btn jd-btn-ghost jd-btn-sm jd-map-reset" id="jdMapReset" hidden>
+              <i class="bi bi-arrow-clockwise"></i> <span data-i18n="mapReset">Show all pins</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="jd-section" id="jdFood">
+        <div class="jd-section-head">
+          <h2 data-i18n="foodHeading">The Jordanian table</h2>
+          <p data-i18n="foodLead">Food here is a hospitality contract. Flip a plate for where it came from and what it means.</p>
+        </div>
+        <div class="jd-grid" id="jdFoodGrid"></div>
+      </section>
+
+      <section class="jd-section" id="jdMusic">
+        <div class="jd-section-head">
+          <h2 data-i18n="musicHeading">Sound of Jordan</h2>
+          <p data-i18n="musicLead">One string, two reeds, a line of dancers, and a stadium in Jerash. Flip a card for the history.</p>
+        </div>
+        <div class="jd-grid" id="jdMusicGrid"></div>
+      </section>
+
+      <section class="jd-section" id="jdPhrases">
+        <div class="jd-section-head">
+          <h2 data-i18n="phraseHeading">Speak Jordanian</h2>
+          <p data-i18n="phraseLead">Everyday Jordanian Arabic, spoken aloud. Press any phrase to hear it in Arabic.</p>
+        </div>
+        <ul class="jd-phrase-list" id="jdPhraseList"></ul>
+      </section>
+
+      <p class="jd-footer-note">
+        Jordan — Layers of the Kingdom · Guide narration by Google TTS &amp; HeyGen ·
+        Development by David E Lane · <span id="jdFooterYear">2026</span>
+      </p>
+    </div>
+  </main>
+
+  <div class="jd-story-overlay" id="jdStoryOverlay" hidden aria-hidden="true" aria-live="polite">
+    <div class="jd-story-chip">
+      <img id="jdStoryChipImg" src="/jordan/assets/rami-guide-portrait-256.png" width="56" height="56" alt=""/>
+      <div class="jd-story-chip-copy">
+        <p class="jd-story-kicker" id="jdStoryKicker"></p>
+        <h3 class="jd-story-title" id="jdStoryTitle"></h3>
+        <p class="jd-story-body" id="jdStoryCopy"></p>
+        <p class="jd-story-progress" id="jdStoryProgress"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="jd-sheet" id="jdSheet" hidden role="dialog" aria-modal="true" aria-labelledby="jdSheetTitle">
+    <div class="jd-sheet-backdrop" id="jdSheetBackdrop"></div>
+    <div class="jd-sheet-panel">
+      <header class="jd-sheet-header">
+        <h2 id="jdSheetTitle"></h2>
+        <button type="button" class="btn-close btn-close-white" id="jdSheetClose" aria-label="Close"></button>
+      </header>
+      <div class="jd-sheet-body" id="jdSheetBody"></div>
+      <footer class="jd-sheet-footer">
+        <button type="button" class="jd-btn jd-btn-sand jd-btn-sm" id="jdSheetListen">
+          <i class="bi bi-volume-up-fill"></i> <span data-i18n="listen">Listen</span>
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <script src="/shared/tts.js"></script>
+  <script src="/family/js/lane-family-google-maps.js"></script>
+  <script src="/shared/google-advanced-markers.js"></script>
+  <script src="/jordan/js/jordan-i18n.js"></script>
+  <script src="/jordan/js/jordan-content.js"></script>
+  <script src="/jordan/js/jordan-desert-atmos.js"></script>
+  <script src="/jordan/js/jordan-map.js"></script>
+  <script src="/jordan/js/jordan-heygen.js"></script>
+  <script src="/jordan/js/jordan-story-reel.js"></script>
+  <script type="module" src="/jordan/js/jordan-guide-chat.js"></script>
+</body>
+</html>

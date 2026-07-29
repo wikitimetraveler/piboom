@@ -416,7 +416,7 @@
   function expandPipDock() {
     document.getElementById('gzGuide')?.classList.remove('is-compact');
     try {
-      sessionStorage.removeItem('glazedPipDockCompact');
+      sessionStorage.setItem('glazedPipDockCompact', '0');
     } catch (_) {}
   }
 
@@ -799,8 +799,11 @@
     }
 
     try {
-      if (sessionStorage.getItem('glazedPipDockCompact') === '1') collapsePipDock();
-    } catch (_) {}
+      // Default compact unless user explicitly expanded this session
+      if (sessionStorage.getItem('glazedPipDockCompact') !== '0') collapsePipDock();
+    } catch (_) {
+      collapsePipDock();
+    }
 
     document.getElementById('gzGuideCollapse')?.addEventListener('click', (e) => {
       e.stopPropagation();

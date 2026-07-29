@@ -79,12 +79,23 @@ async function listAll(path, { maxPages = 1 } = {}) {
 }
 
 /** Avatar looks (outfit/pose IDs used as avatar_id in POST /v3/videos). */
-export async function listAvatars() {
-  return listAll('/v3/avatars/looks?limit=50', { maxPages: 1 });
+export async function listAvatars({ maxPages = 1 } = {}) {
+  return listAll('/v3/avatars/looks?limit=50', { maxPages });
 }
 
-export async function listVoices() {
-  return listAll('/v3/voices?limit=100', { maxPages: 2 });
+/**
+ * Voices for avatar videos and Starfish speech.
+ * @param {object} [opts]
+ * @param {number} [opts.maxPages=2] - Raise to reach non-English voices, which sit deep in the catalog.
+ * @param {string} [opts.language] - Case-insensitive match against the voice `language` field (e.g. 'Arabic').
+ */
+export async function listVoices({ maxPages = 2, language } = {}) {
+  const voices = await listAll('/v3/voices?limit=100', { maxPages });
+  if (!language) return voices;
+  const wanted = String(language).trim().toLowerCase();
+  return voices.filter((v) =>
+    `${v.language || ''} ${v.locale || ''}`.toLowerCase().includes(wanted)
+  );
 }
 
 /**
@@ -93,9 +104,10 @@ export async function listVoices() {
  * @param {string} opts.text
  * @param {string} opts.voiceId
  * @param {number} [opts.speed]
+ * @param {string} [opts.language='en'] - Two-letter code; must match the script language (e.g. 'ar').
  * @returns {Promise<{ audio_url: string, duration?: number }>}
  */
-export async function generateSpeech({ text, voiceId, speed = 1 }) {
+export async function generateSpeech({ text, voiceId, speed = 1, language = 'en' }) {
   if (!text || !String(text).trim()) throw new Error('text is required');
   if (!voiceId) throw new Error('voiceId is required');
   const data = await heygenRequest('/v3/voices/speech', {
@@ -105,7 +117,7 @@ export async function generateSpeech({ text, voiceId, speed = 1 }) {
       voice_id: voiceId,
       input_type: 'text',
       speed: Math.min(2, Math.max(0.5, Number(speed) || 1)),
-      language: 'en'
+      language: String(language || 'en').slice(0, 2).toLowerCase()
     }
   });
   if (!data?.audio_url) throw new Error('HeyGen speech did not return audio_url');

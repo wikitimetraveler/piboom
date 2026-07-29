@@ -1,0 +1,1390 @@
+{
+  "id": "jordan-atlas",
+  "brand": {
+    "name": {
+      "en": "Jordan — Layers of the Kingdom",
+      "ar": "الأردن — طبقات المملكة"
+    },
+    "tagline": {
+      "en": "Nine thousand years of history, told through its roads, its tables, and its songs.",
+      "ar": "تسعة آلاف سنة من التاريخ، تُروى عبر دروبها وموائدها وأغانيها."
+    }
+  },
+  "guide": {
+    "name": {
+      "en": "Rami",
+      "ar": "رامي"
+    },
+    "title": {
+      "en": "Jordan history guide",
+      "ar": "دليل تاريخ الأردن"
+    },
+    "portrait": "/jordan/assets/rami-guide-portrait-256.png",
+    "greeting": {
+      "en": "Ahlan wa sahlan. I am Rami. Walk with me from Ain Ghazal to Amman.",
+      "ar": "أهلاً وسهلاً. أنا رامي. امشِ معي من عين غزال إلى عمّان."
+    }
+  },
+  "ui": {
+    "en": {
+      "dir": "ltr",
+      "langLabel": "English",
+      "switchTo": "عربي",
+      "heroKicker": "The Hashemite Kingdom of Jordan",
+      "heroTitle": "Jordan",
+      "heroLine": "A crossroads kingdom between desert and sea — Nabataean stone, Roman colonnades, Bedouin fires, and a table that never stops filling.",
+      "playReel": "Play highlight reel",
+      "pauseReel": "Pause reel",
+      "resumeReel": "Resume reel",
+      "stopReel": "Stop reel",
+      "narration": "Narration",
+      "hearWelcome": "Hear welcome",
+      "askGuide": "Ask Rami",
+      "stop": "Stop",
+      "listen": "Listen",
+      "exploreMap": "Explore the atlas",
+      "timelineHeading": "Layers of Jordan",
+      "timelineLead": "Ten turns of the road, from Neolithic plaster faces to a modern kingdom. Select an era to hear it and pin it on the map.",
+      "mapHeading": "Atlas of Jordan",
+      "mapLead": "Every site below is a real place you can stand in. Tap a pin or a name to hear its story.",
+      "mapAll": "All",
+      "mapHistory": "History",
+      "mapFood": "Food",
+      "mapMusic": "Music",
+      "mapReset": "Show all pins",
+      "mapLoading": "Loading the atlas…",
+      "foodHeading": "The Jordanian table",
+      "foodLead": "Food here is a hospitality contract. Flip a plate for where it came from and what it means.",
+      "musicHeading": "Sound of Jordan",
+      "musicLead": "One string, two reeds, a line of dancers, and a stadium in Jerash. Flip a card for the history.",
+      "phraseHeading": "Speak Jordanian",
+      "phraseLead": "Everyday Jordanian Arabic, spoken aloud. Press any phrase to hear it in Arabic.",
+      "flipHint": "Flip for the history",
+      "back": "Back",
+      "loading": "Loading Jordan…",
+      "readMore": "Read the full story",
+      "close": "Close",
+      "unesco": "UNESCO World Heritage",
+      "context": "Context",
+      "evidence": "On the ground"
+    },
+    "ar": {
+      "dir": "rtl",
+      "langLabel": "العربية",
+      "switchTo": "English",
+      "heroKicker": "المملكة الأردنية الهاشمية",
+      "heroTitle": "الأردن",
+      "heroLine": "مملكة على مفترق الطرق بين الصحراء والبحر — حجرٌ نبطي، وأعمدةٌ رومانية، ونار بدوية، ومائدة لا تتوقف عن الامتلاء.",
+      "playReel": "شغّل الجولة المصوّرة",
+      "pauseReel": "إيقاف مؤقت",
+      "resumeReel": "متابعة الجولة",
+      "stopReel": "إنهاء الجولة",
+      "narration": "السرد الصوتي",
+      "hearWelcome": "اسمع الترحيب",
+      "askGuide": "اسأل رامي",
+      "stop": "إيقاف",
+      "listen": "استمع",
+      "exploreMap": "استكشف الأطلس",
+      "timelineHeading": "طبقات الأردن",
+      "timelineLead": "عشر محطات على الطريق، من وجوه الجصّ في العصر الحجري إلى مملكة حديثة. اختر حقبة لتسمعها وتراها على الخريطة.",
+      "mapHeading": "أطلس الأردن",
+      "mapLead": "كل موقع هنا مكان حقيقي يمكنك الوقوف فيه. اضغط على دبوس أو اسم لتسمع حكايته.",
+      "mapAll": "الكل",
+      "mapHistory": "تاريخ",
+      "mapFood": "طعام",
+      "mapMusic": "موسيقى",
+      "mapReset": "أظهر كل الدبابيس",
+      "mapLoading": "جارٍ تحميل الأطلس…",
+      "foodHeading": "المائدة الأردنية",
+      "foodLead": "الطعام هنا عقد ضيافة. اقلب الطبق لتعرف من أين جاء وماذا يعني.",
+      "musicHeading": "صوت الأردن",
+      "musicLead": "وترٌ واحد، وقصبتان، وصفُّ دبكة، ومسرحٌ في جرش. اقلب البطاقة لتقرأ التاريخ.",
+      "phraseHeading": "احكِ أردني",
+      "phraseLead": "عربية أردنية يومية، منطوقة بصوت عالٍ. اضغط أي عبارة لتسمعها.",
+      "flipHint": "اقلب البطاقة للتاريخ",
+      "back": "رجوع",
+      "loading": "جارٍ تحميل الأردن…",
+      "readMore": "اقرأ الحكاية كاملة",
+      "close": "إغلاق",
+      "unesco": "موقع تراث عالمي — اليونسكو",
+      "context": "السياق",
+      "evidence": "على الأرض"
+    }
+  },
+  "eras": [
+    {
+      "id": "ain-ghazal",
+      "siteId": "ain-ghazal",
+      "years": {
+        "en": "c. 7250 BCE",
+        "ar": "نحو ٧٢٥٠ ق.م"
+      },
+      "title": {
+        "en": "Plaster faces at Ain Ghazal",
+        "ar": "وجوه الجصّ في عين غزال"
+      },
+      "copy": {
+        "en": "On the edge of modern Amman, Neolithic villagers built one of the largest settlements of their world — and made lime-plaster statues with wide bitumen eyes, among the oldest large-scale human figures ever found.",
+        "ar": "على أطراف عمّان الحديثة، بنى سكان العصر الحجري الحديث واحدة من أكبر قرى عالمهم، وصنعوا تماثيل من الجصّ بعيون واسعة من القار، وهي من أقدم التماثيل البشرية الكبيرة المكتشفة."
+      },
+      "narration": {
+        "en": "We begin at Ain Ghazal, on the edge of Amman, where farmers nine thousand years ago shaped human faces out of lime plaster.",
+        "ar": "نبدأ من عين غزال على أطراف عمّان، حيث شكّل المزارعون قبل تسعة آلاف عام وجوهاً بشرية من الجصّ."
+      }
+    },
+    {
+      "id": "nabataeans",
+      "siteId": "petra",
+      "years": {
+        "en": "4th c. BCE – 106 CE",
+        "ar": "القرن الرابع ق.م — ١٠٦ م"
+      },
+      "title": {
+        "en": "The Nabataeans carve Petra",
+        "ar": "الأنباط ينحتون البتراء"
+      },
+      "copy": {
+        "en": "Nabataean caravan traders turned a hidden sandstone basin into a capital, controlling the incense road from Arabia. Their real genius was water: dams, channels and cisterns that let a city live in a desert.",
+        "ar": "حوّل تجار القوافل الأنباط حوضاً رملياً مخفياً إلى عاصمة، وسيطروا على طريق البخور القادم من الجزيرة. وكانت عبقريتهم الحقيقية في الماء: سدود وقنوات وصهاريج جعلت مدينة تعيش في الصحراء."
+      },
+      "narration": {
+        "en": "Then come the Nabataeans, carving Petra out of rose sandstone and taming desert water well enough to build a capital.",
+        "ar": "ثم يأتي الأنباط، ينحتون البتراء في الحجر الوردي، ويروّضون ماء الصحراء بما يكفي لبناء عاصمة."
+      }
+    },
+    {
+      "id": "rome",
+      "siteId": "jerash",
+      "years": {
+        "en": "106 – 324 CE",
+        "ar": "١٠٦ — ٣٢٤ م"
+      },
+      "title": {
+        "en": "Rome annexes Arabia",
+        "ar": "روما تضمّ العربية"
+      },
+      "copy": {
+        "en": "Trajan absorbed the Nabataean kingdom into Provincia Arabia in 106 CE. Decapolis cities like Gerasa (Jerash) and Gadara (Umm Qais) grew colonnaded streets, theatres and an oval plaza still standing today.",
+        "ar": "ضمّ الإمبراطور تراجان مملكة الأنباط إلى ولاية العربية عام ١٠٦م. ونمت مدن الديكابوليس مثل جرش وأم قيس بشوارع الأعمدة والمسارح والساحة البيضوية التي ما زالت قائمة."
+      },
+      "narration": {
+        "en": "Rome annexes the Nabataean kingdom in one hundred six, and Decapolis cities like Jerash bloom into colonnaded stone.",
+        "ar": "تضمّ روما مملكة الأنباط عام مئة وستة، فتزدهر مدن الديكابوليس مثل جرش بشوارع الأعمدة."
+      }
+    },
+    {
+      "id": "byzantine",
+      "siteId": "madaba",
+      "years": {
+        "en": "4th – 7th c. CE",
+        "ar": "القرن الرابع — السابع م"
+      },
+      "title": {
+        "en": "Byzantine mosaics and pilgrims",
+        "ar": "الفسيفساء البيزنطية والحجّاج"
+      },
+      "copy": {
+        "en": "Churches spread across the plateau, and mosaicists in Madaba laid the oldest surviving map of the Holy Land into a church floor. Pilgrims walked to Mount Nebo and to the Jordan River crossing.",
+        "ar": "انتشرت الكنائس على الهضبة، ووضع فسيفسائيو مادبا أقدم خريطة باقية للأرض المقدسة في أرضية كنيسة. ومشى الحجّاج إلى جبل نيبو وإلى مَعبر نهر الأردن."
+      },
+      "narration": {
+        "en": "In the Byzantine centuries, mosaic workers in Madaba set the oldest surviving map of the Holy Land into a church floor.",
+        "ar": "في القرون البيزنطية، وضع صُنّاع الفسيفساء في مادبا أقدم خريطة باقية للأرض المقدسة في أرضية كنيسة."
+      }
+    },
+    {
+      "id": "umayyad",
+      "siteId": "qusayr-amra",
+      "years": {
+        "en": "636 – 750 CE",
+        "ar": "٦٣٦ — ٧٥٠ م"
+      },
+      "title": {
+        "en": "Yarmouk and the desert palaces",
+        "ar": "اليرموك والقصور الصحراوية"
+      },
+      "copy": {
+        "en": "The Battle of Yarmouk in 636 turned the Levant toward Arab Muslim rule. Umayyad princes then built badiya retreats east of Amman — Qusayr Amra's bathhouse frescoes still show hunters, musicians and a painted night sky.",
+        "ar": "حوّلت معركة اليرموك عام ٦٣٦ بلاد الشام إلى الحكم العربي الإسلامي. ثم بنى أمراء بني أميّة قصور البادية شرق عمّان — وما زالت جداريات قصير عمرة تُظهر الصيّادين والموسيقيين وسماءً مرسومة."
+      },
+      "narration": {
+        "en": "After Yarmouk in six thirty six, Umayyad princes built desert retreats east of Amman, painted with hunters, musicians and a night sky.",
+        "ar": "بعد اليرموك عام ستمئة وستة وثلاثين، بنى أمراء بني أميّة قصور البادية شرق عمّان، مزيّنة بالصيادين والموسيقيين وسماء الليل."
+      }
+    },
+    {
+      "id": "crusader",
+      "siteId": "karak",
+      "years": {
+        "en": "1115 – 1263 CE",
+        "ar": "١١١٥ — ١٢٦٣ م"
+      },
+      "title": {
+        "en": "Castles of Karak and Ajloun",
+        "ar": "قلعتا الكرك وعجلون"
+      },
+      "copy": {
+        "en": "Crusaders raised Karak above the King's Highway; Saladin's side answered with Ajloun Castle in 1184–85, guarding the iron hills and the signal-fire chain. Karak finally fell to Saladin's forces in 1188.",
+        "ar": "رفع الصليبيون قلعة الكرك فوق طريق الملوك، وردّ معسكر صلاح الدين ببناء قلعة عجلون سنة ١١٨٤–١١٨٥ لحماية جبال الحديد وسلسلة نيران الإشارة. وسقطت الكرك أخيراً بيد قوات صلاح الدين عام ١١٨٨."
+      },
+      "narration": {
+        "en": "Crusader Karak and Ayyubid Ajloun faced each other across the King's Highway until Saladin's forces took Karak in eleven eighty eight.",
+        "ar": "تواجهت الكرك الصليبية وعجلون الأيوبية على طريق الملوك، حتى أخذت قوات صلاح الدين الكرك عام ١١٨٨."
+      }
+    },
+    {
+      "id": "ottoman",
+      "siteId": "hejaz-railway",
+      "years": {
+        "en": "1516 – 1918",
+        "ar": "١٥١٦ — ١٩١٨"
+      },
+      "title": {
+        "en": "Ottoman rule and the Hejaz Railway",
+        "ar": "الحكم العثماني وسكة حديد الحجاز"
+      },
+      "copy": {
+        "en": "For four centuries this was Ottoman frontier country of villages and tribes. Between 1900 and 1908 the Hejaz Railway pushed south from Damascus toward Medina, and pilgrim caravan stops became station towns.",
+        "ar": "كانت هذه لأربعة قرون أرض تخوم عثمانية من قرى وعشائر. وبين ١٩٠٠ و١٩٠٨ امتدّت سكة حديد الحجاز جنوباً من دمشق نحو المدينة، فتحوّلت محطات قوافل الحجّ إلى بلدات محطات."
+      },
+      "narration": {
+        "en": "Under the Ottomans, the Hejaz Railway pushed south from Damascus after nineteen hundred, and pilgrim stops became station towns.",
+        "ar": "في العهد العثماني، امتدت سكة حديد الحجاز جنوباً من دمشق بعد عام ألف وتسعمئة، فصارت محطات الحجّ بلدات."
+      }
+    },
+    {
+      "id": "revolt",
+      "siteId": "aqaba",
+      "years": {
+        "en": "1916 – 1918",
+        "ar": "١٩١٦ — ١٩١٨"
+      },
+      "title": {
+        "en": "The Great Arab Revolt",
+        "ar": "الثورة العربية الكبرى"
+      },
+      "copy": {
+        "en": "Sharif Hussein of Mecca declared the revolt in 1916. Faisal's columns and raiding parties struck the railway across Jordan, and in July 1917 the Arab forces took Aqaba from the landward desert side.",
+        "ar": "أعلن الشريف حسين في مكة الثورة عام ١٩١٦. وضربت طوابير فيصل وفصائل الإغارة سكة الحديد عبر الأردن، وفي تموز ١٩١٧ أخذت القوات العربية العقبة من جهة الصحراء البرية."
+      },
+      "narration": {
+        "en": "In the Great Arab Revolt, raiders cut the Hejaz railway, and in July nineteen seventeen Arab forces took Aqaba from the desert side.",
+        "ar": "في الثورة العربية الكبرى قطع المغيرون سكة الحجاز، وفي تموز ١٩١٧ أخذت القوات العربية العقبة من جهة الصحراء."
+      }
+    },
+    {
+      "id": "emirate",
+      "siteId": "amman-citadel",
+      "years": {
+        "en": "1921 – 1946",
+        "ar": "١٩٢١ — ١٩٤٦"
+      },
+      "title": {
+        "en": "Emirate of Transjordan",
+        "ar": "إمارة شرق الأردن"
+      },
+      "copy": {
+        "en": "Abdullah I bin al-Hussein established the Emirate of Transjordan in 1921 with Amman as its seat — then a small town of seven hills around a Roman theatre and a Circassian quarter.",
+        "ar": "أسّس عبد الله الأول بن الحسين إمارة شرق الأردن عام ١٩٢١ وجعل عمّان مقرّها — وكانت حينها بلدة صغيرة من سبعة جبال حول مسرح روماني وحيّ شركسي."
+      },
+      "narration": {
+        "en": "In nineteen twenty one, Abdullah the First made Amman the seat of the Emirate of Transjordan — then a small town of seven hills.",
+        "ar": "في عام ١٩٢١ جعل عبد الله الأول عمّان مقرّ إمارة شرق الأردن — وكانت بلدة صغيرة من سبعة جبال."
+      }
+    },
+    {
+      "id": "kingdom",
+      "siteId": "amman-citadel",
+      "years": {
+        "en": "25 May 1946 → today",
+        "ar": "٢٥ أيار ١٩٤٦ — اليوم"
+      },
+      "title": {
+        "en": "An independent kingdom",
+        "ar": "مملكة مستقلة"
+      },
+      "copy": {
+        "en": "Independence came on 25 May 1946, still marked every year. Amman grew from tens of thousands to millions, and Jordan became a country defined as much by who it shelters as by what it builds.",
+        "ar": "جاء الاستقلال في ٢٥ أيار ١٩٤٦، ويُحتفل به كل عام. ونمت عمّان من عشرات الآلاف إلى الملايين، وصار الأردن بلداً يُعرَّف بمن يؤويه بقدر ما يُعرَّف بما يبنيه."
+      },
+      "narration": {
+        "en": "Independence arrives on the twenty fifth of May, nineteen forty six, and Amman grows from a town of hills into a capital of millions.",
+        "ar": "يأتي الاستقلال في الخامس والعشرين من أيار عام ١٩٤٦، وتكبر عمّان من بلدة جبال إلى عاصمة بالملايين."
+      }
+    }
+  ],
+  "sites": [
+    {
+      "id": "petra",
+      "category": "history",
+      "emoji": "🏛️",
+      "lat": 30.3285,
+      "lng": 35.4444,
+      "unesco": true,
+      "name": {
+        "en": "Petra",
+        "ar": "البتراء"
+      },
+      "place": {
+        "en": "Ma'an Governorate",
+        "ar": "محافظة معان"
+      },
+      "blurb": {
+        "en": "Nabataean capital carved into rose sandstone, reached through the Siq. Inscribed by UNESCO in 1985.",
+        "ar": "عاصمة الأنباط المنحوتة في الحجر الرملي الوردي، يُوصل إليها عبر السيق. أُدرجت على قائمة اليونسكو عام ١٩٨٥."
+      }
+    },
+    {
+      "id": "jerash",
+      "category": "history",
+      "emoji": "🏛️",
+      "lat": 32.2808,
+      "lng": 35.8912,
+      "name": {
+        "en": "Jerash (Gerasa)",
+        "ar": "جرش"
+      },
+      "place": {
+        "en": "Jerash Governorate",
+        "ar": "محافظة جرش"
+      },
+      "blurb": {
+        "en": "Decapolis city with an oval plaza, colonnaded cardo and Hadrian's Arch, built for the emperor's visit around 129 CE.",
+        "ar": "مدينة من الديكابوليس بساحة بيضوية وشارع أعمدة وقوس هادريان، بُني لزيارة الإمبراطور نحو عام ١٢٩م."
+      }
+    },
+    {
+      "id": "amman-citadel",
+      "category": "history",
+      "emoji": "🏛️",
+      "lat": 31.9548,
+      "lng": 35.9345,
+      "name": {
+        "en": "Amman Citadel",
+        "ar": "جبل القلعة — عمّان"
+      },
+      "place": {
+        "en": "Jabal al-Qal'a, Amman",
+        "ar": "جبل القلعة، عمّان"
+      },
+      "blurb": {
+        "en": "Rabbath Ammon, later Philadelphia. The hill stacks a Temple of Hercules, a Byzantine church and an Umayyad palace above the Roman theatre.",
+        "ar": "ربّة عمّون، ثم فيلادلفيا. يجمع الجبل معبد هرقل وكنيسة بيزنطية وقصراً أموياً فوق المسرح الروماني."
+      }
+    },
+    {
+      "id": "ain-ghazal",
+      "category": "history",
+      "emoji": "🗿",
+      "lat": 32.0089,
+      "lng": 35.9683,
+      "name": {
+        "en": "Ain Ghazal",
+        "ar": "عين غزال"
+      },
+      "place": {
+        "en": "North-east Amman",
+        "ar": "شمال شرق عمّان"
+      },
+      "blurb": {
+        "en": "Neolithic settlement whose lime-plaster statues, made around 7000 BCE, are among the oldest large human figures known.",
+        "ar": "مستوطنة من العصر الحجري الحديث، تماثيلها الجصّية المصنوعة نحو ٧٠٠٠ ق.م من أقدم التماثيل البشرية الكبيرة المعروفة."
+      }
+    },
+    {
+      "id": "madaba",
+      "category": "history",
+      "emoji": "🗺️",
+      "lat": 31.716,
+      "lng": 35.7938,
+      "name": {
+        "en": "Madaba",
+        "ar": "مادبا"
+      },
+      "place": {
+        "en": "Madaba Governorate",
+        "ar": "محافظة مادبا"
+      },
+      "blurb": {
+        "en": "The 6th-century mosaic map in St George's Church is the oldest surviving cartographic depiction of the Holy Land.",
+        "ar": "خريطة الفسيفساء من القرن السادس في كنيسة القديس جاورجيوس هي أقدم تصوير خرائطي باقٍ للأرض المقدسة."
+      }
+    },
+    {
+      "id": "qusayr-amra",
+      "category": "history",
+      "emoji": "🎨",
+      "lat": 31.8022,
+      "lng": 36.5867,
+      "unesco": true,
+      "name": {
+        "en": "Qusayr Amra",
+        "ar": "قصير عمرة"
+      },
+      "place": {
+        "en": "Eastern badia",
+        "ar": "البادية الشرقية"
+      },
+      "blurb": {
+        "en": "Umayyad bath-house with rare early Islamic figurative frescoes, including a domed ceiling painted as the night sky.",
+        "ar": "حمّام أموي بجداريات تصويرية نادرة من صدر الإسلام، منها قبة مرسومة كسماء الليل."
+      }
+    },
+    {
+      "id": "karak",
+      "category": "history",
+      "emoji": "🏰",
+      "lat": 31.181,
+      "lng": 35.7017,
+      "name": {
+        "en": "Karak Castle",
+        "ar": "قلعة الكرك"
+      },
+      "place": {
+        "en": "Al-Karak",
+        "ar": "الكرك"
+      },
+      "blurb": {
+        "en": "Crusader stronghold on the King's Highway, begun in the 1140s and taken by Saladin's forces in 1188.",
+        "ar": "حصن صليبي على طريق الملوك، بدأ بناؤه في أربعينيات القرن الثاني عشر، وأخذته قوات صلاح الدين عام ١١٨٨."
+      }
+    },
+    {
+      "id": "ajloun",
+      "category": "history",
+      "emoji": "🏰",
+      "lat": 32.3245,
+      "lng": 35.7274,
+      "name": {
+        "en": "Ajloun Castle",
+        "ar": "قلعة عجلون"
+      },
+      "place": {
+        "en": "Ajloun",
+        "ar": "عجلون"
+      },
+      "blurb": {
+        "en": "Qal'at ar-Rabad, raised 1184–85 by Izz al-Din Usama, a commander of Saladin, to watch the iron hills and the Jordan Valley.",
+        "ar": "قلعة الربض، بناها عز الدين أسامة أحد قادة صلاح الدين سنة ١١٨٤–١١٨٥ لمراقبة جبال الحديد وغور الأردن."
+      }
+    },
+    {
+      "id": "wadi-rum",
+      "category": "history",
+      "emoji": "🏜️",
+      "lat": 29.5765,
+      "lng": 35.42,
+      "unesco": true,
+      "name": {
+        "en": "Wadi Rum",
+        "ar": "وادي رم"
+      },
+      "place": {
+        "en": "Aqaba Governorate",
+        "ar": "محافظة العقبة"
+      },
+      "blurb": {
+        "en": "A UNESCO mixed site since 2011: sandstone valleys carrying thousands of petroglyphs and Thamudic and Nabataean inscriptions.",
+        "ar": "موقع مختلط على قائمة اليونسكو منذ ٢٠١١: أودية رملية تحمل آلاف النقوش الصخرية والكتابات الثمودية والنبطية."
+      }
+    },
+    {
+      "id": "dead-sea",
+      "category": "history",
+      "emoji": "🌊",
+      "lat": 31.559,
+      "lng": 35.4732,
+      "name": {
+        "en": "The Dead Sea",
+        "ar": "البحر الميت"
+      },
+      "place": {
+        "en": "Jordan Rift Valley",
+        "ar": "الأخدود الأردني"
+      },
+      "blurb": {
+        "en": "The lowest land surface on Earth, roughly 430 metres below sea level, and a salt trade resource since antiquity.",
+        "ar": "أخفض بقعة يابسة على وجه الأرض، نحو ٤٣٠ متراً تحت سطح البحر، ومصدر لتجارة الملح منذ القدم."
+      }
+    },
+    {
+      "id": "aqaba",
+      "category": "history",
+      "emoji": "⚓",
+      "lat": 29.5321,
+      "lng": 35.0063,
+      "name": {
+        "en": "Aqaba",
+        "ar": "العقبة"
+      },
+      "place": {
+        "en": "Red Sea coast",
+        "ar": "ساحل البحر الأحمر"
+      },
+      "blurb": {
+        "en": "Jordan's only seaport, the early Islamic town of Ayla, and the prize taken by Arab Revolt forces in July 1917.",
+        "ar": "ميناء الأردن الوحيد، ومدينة أيلة الإسلامية المبكرة، والغنيمة التي أخذتها قوات الثورة العربية في تموز ١٩١٧."
+      }
+    },
+    {
+      "id": "hejaz-railway",
+      "category": "history",
+      "emoji": "🚂",
+      "lat": 31.9394,
+      "lng": 35.9349,
+      "name": {
+        "en": "Hejaz Railway, Amman",
+        "ar": "سكة حديد الحجاز، عمّان"
+      },
+      "place": {
+        "en": "Mahatta, Amman",
+        "ar": "المحطة، عمّان"
+      },
+      "blurb": {
+        "en": "Ottoman pilgrim line built 1900–1908 from Damascus toward Medina; its Amman station still keeps steam stock.",
+        "ar": "خط الحجّ العثماني الذي بُني بين ١٩٠٠ و١٩٠٨ من دمشق نحو المدينة، وما زالت محطته في عمّان تحتفظ بقاطرات بخارية."
+      }
+    },
+    {
+      "id": "umm-qais",
+      "category": "music",
+      "emoji": "🎭",
+      "lat": 32.6553,
+      "lng": 35.6807,
+      "name": {
+        "en": "Umm Qais (Gadara)",
+        "ar": "أم قيس (جدارا)"
+      },
+      "place": {
+        "en": "Irbid Governorate",
+        "ar": "محافظة إربد"
+      },
+      "blurb": {
+        "en": "Decapolis town of poets and philosophers — Meleager and Menippus came from Gadara — with two Roman theatres in black basalt.",
+        "ar": "مدينة من الديكابوليس للشعراء والفلاسفة — منها ميلياغروس ومينيبوس — وفيها مسرحان رومانيان من البازلت الأسود."
+      }
+    },
+    {
+      "id": "jerash-festival",
+      "category": "music",
+      "emoji": "🎶",
+      "lat": 32.283,
+      "lng": 35.8918,
+      "name": {
+        "en": "Jerash Festival stage",
+        "ar": "مسرح مهرجان جرش"
+      },
+      "place": {
+        "en": "South Theatre, Jerash",
+        "ar": "المسرح الجنوبي، جرش"
+      },
+      "blurb": {
+        "en": "Since 1981 the Jerash Festival for Culture and Arts has filled the Roman theatres with Arab orchestras, dabke troupes and poets.",
+        "ar": "منذ ١٩٨١ يملأ مهرجان جرش للثقافة والفنون المسارح الرومانية بالفرق العربية وفرق الدبكة والشعراء."
+      }
+    },
+    {
+      "id": "salt",
+      "category": "music",
+      "emoji": "🪕",
+      "lat": 32.0392,
+      "lng": 35.7272,
+      "unesco": true,
+      "name": {
+        "en": "As-Salt",
+        "ar": "السلط"
+      },
+      "place": {
+        "en": "Balqa Governorate",
+        "ar": "محافظة البلقاء"
+      },
+      "blurb": {
+        "en": "Inscribed by UNESCO in 2021 for its yellow limestone townhouses and its living traditions of hospitality and communal song.",
+        "ar": "أُدرجت على قائمة اليونسكو عام ٢٠٢١ لبيوتها من الحجر الأصفر ولتقاليدها الحيّة في الضيافة والغناء الجماعي."
+      }
+    },
+    {
+      "id": "karak-jameed",
+      "category": "food",
+      "emoji": "🍲",
+      "lat": 31.1854,
+      "lng": 35.7047,
+      "name": {
+        "en": "Karak — home of jameed",
+        "ar": "الكرك — موطن الجميد"
+      },
+      "place": {
+        "en": "Al-Karak",
+        "ar": "الكرك"
+      },
+      "blurb": {
+        "en": "Jameed, the hard dried sheep-yogurt that makes mansaf taste like mansaf, is most associated with Karak's dairying villages.",
+        "ar": "الجميد، لبن الغنم المجفّف القاسي الذي يمنح المنسف طعمه، يرتبط أكثر ما يرتبط بقرى الكرك ومراعيها."
+      }
+    },
+    {
+      "id": "nablus-knafeh",
+      "category": "food",
+      "emoji": "🧀",
+      "lat": 31.9038,
+      "lng": 35.9106,
+      "name": {
+        "en": "Knafeh counters, downtown Amman",
+        "ar": "محلات الكنافة، وسط عمّان"
+      },
+      "place": {
+        "en": "Al-Balad, Amman",
+        "ar": "البلد، عمّان"
+      },
+      "blurb": {
+        "en": "Knafeh nabulsiyeh travelled from Nablus and became downtown Amman's default dessert, cut in trays all evening.",
+        "ar": "انتقلت الكنافة النابلسية من نابلس وصارت حلوى وسط البلد في عمّان، تُقطع في الصواني طوال المساء."
+      }
+    },
+    {
+      "id": "rum-zarb",
+      "category": "food",
+      "emoji": "🔥",
+      "lat": 29.585,
+      "lng": 35.42,
+      "name": {
+        "en": "Zarb pits, Wadi Rum",
+        "ar": "حفر الزرب، وادي رم"
+      },
+      "place": {
+        "en": "Wadi Rum",
+        "ar": "وادي رم"
+      },
+      "blurb": {
+        "en": "Bedouin zarb: meat and vegetables lowered into a sand oven, sealed, and dug out hours later at the camp fire.",
+        "ar": "الزرب البدوي: لحم وخضار يُنزلان في فرن رملي ويُغلق، ثم يُخرجان بعد ساعات عند نار المخيّم."
+      }
+    }
+  ],
+  "foods": [
+    {
+      "id": "mansaf",
+      "emoji": "🍛",
+      "siteId": "karak-jameed",
+      "name": {
+        "en": "Mansaf",
+        "ar": "المنسف"
+      },
+      "tagline": {
+        "en": "The national dish, and a contract of hospitality",
+        "ar": "الطبق الوطني، وعقد ضيافة"
+      },
+      "history": {
+        "en": "Lamb simmered in jameed — reconstituted dried sheep yogurt — poured over rice and thin shrak bread. It is Bedouin in origin and communal by design: guests stand around one tray and eat with the right hand, and the host serves the best cuts to the guest. It marks weddings, funerals, reconciliations and holidays, and in 2022 mansaf was inscribed on the UNESCO list of intangible cultural heritage.",
+        "ar": "لحم ضأن يُطهى في الجميد — لبن الغنم المجفّف المُذاب — ويُسكب فوق الأرز وخبز الشراك الرقيق. أصله بدوي وجماعيّ بطبيعته: يقف الضيوف حول صينية واحدة ويأكلون باليد اليمنى، ويقدّم المضيف أفضل القطع للضيف. يحضر في الأعراس والعزاء والصلح والأعياد، وفي عام ٢٠٢٢ أُدرج المنسف على قائمة اليونسكو للتراث الثقافي غير المادي."
+      },
+      "tags": {
+        "en": [
+          "lamb",
+          "jameed",
+          "shrak bread"
+        ],
+        "ar": [
+          "لحم ضأن",
+          "جميد",
+          "خبز شراك"
+        ]
+      },
+      "image": "/jordan/assets/food/mansaf.png"
+    },
+    {
+      "id": "jameed",
+      "emoji": "🥛",
+      "siteId": "karak-jameed",
+      "name": {
+        "en": "Jameed",
+        "ar": "الجميد"
+      },
+      "tagline": {
+        "en": "Yogurt engineered to survive the desert",
+        "ar": "لبنٌ صُنع ليعيش في الصحراء"
+      },
+      "history": {
+        "en": "Sheep or goat milk is soured, strained, salted and shaped into stones that dry hard in the sun. Before refrigeration this was how a herding family banked a season of milk. Karak's jameed is the benchmark; cooks soak and whisk it back into the tangy white sauce that defines mansaf.",
+        "ar": "يُخمَّر حليب الغنم أو الماعز ويُصفّى ويُملّح ويُشكَّل كرات تجفّ في الشمس حتى تقسو. قبل التبريد كانت هذه طريقة العائلة الراعية في ادّخار موسم الحليب. وجميد الكرك هو المعيار؛ ينقعه الطهاة ويخفقونه فيعود صلصة بيضاء حامضة هي روح المنسف."
+      },
+      "tags": {
+        "en": [
+          "preservation",
+          "pastoral",
+          "Karak"
+        ],
+        "ar": [
+          "حفظ الطعام",
+          "رعوي",
+          "الكرك"
+        ]
+      },
+      "image": "/jordan/assets/food/jameed.png"
+    },
+    {
+      "id": "maqluba",
+      "emoji": "🍆",
+      "siteId": "amman-citadel",
+      "name": {
+        "en": "Maqluba",
+        "ar": "المقلوبة"
+      },
+      "tagline": {
+        "en": "\"Upside down\" — and flipped at the table",
+        "ar": "«مقلوبة» — وتُقلب على المائدة"
+      },
+      "history": {
+        "en": "Rice, meat and fried aubergine or cauliflower are layered in one pot, then the whole pot is inverted onto a tray so the layers stand like a cake. A dish called maqlūba appears in 13th-century Arabic cookery writing, and it stayed a Levantine household centrepiece because the drama of the flip is half the point.",
+        "ar": "يُرصف الأرز واللحم والباذنجان أو القرنبيط المقلي طبقات في قدر واحد، ثم يُقلب القدر كله على صينية فتقف الطبقات كالكعكة. ورد طبق باسم «المقلوبة» في كتب الطبخ العربية في القرن الثالث عشر، وبقي طبقاً شاميّاً بيتيّاً لأن مشهد القلب نصف المتعة."
+      },
+      "tags": {
+        "en": [
+          "one pot",
+          "aubergine",
+          "Levantine"
+        ],
+        "ar": [
+          "قدر واحد",
+          "باذنجان",
+          "شامي"
+        ]
+      },
+      "image": "/jordan/assets/food/maqluba.png"
+    },
+    {
+      "id": "zarb",
+      "emoji": "🔥",
+      "siteId": "rum-zarb",
+      "name": {
+        "en": "Zarb",
+        "ar": "الزرب"
+      },
+      "tagline": {
+        "en": "An oven dug into the desert floor",
+        "ar": "فرنٌ يُحفر في أرض الصحراء"
+      },
+      "history": {
+        "en": "A pit is lined with coals, a rack of marinated lamb, chicken and vegetables is lowered in, then the whole thing is covered with a metal lid, a blanket and sand. Two or three hours later the Bedouin host lifts a smoking tower of meat out of the ground. It is the theatre of Wadi Rum camp hospitality.",
+        "ar": "تُحفر حفرة وتُفرش بالجمر، ثم يُنزل فيها رفٌّ من لحم الضأن والدجاج والخضار المتبّلة، ويُغطّى الكل بغطاء معدني وبطانية ورمل. وبعد ساعتين أو ثلاث يرفع المضيف البدوي برجاً من اللحم يتصاعد منه الدخان. إنه مسرح الضيافة في مخيمات وادي رم."
+      },
+      "tags": {
+        "en": [
+          "Bedouin",
+          "underground oven",
+          "Wadi Rum"
+        ],
+        "ar": [
+          "بدوي",
+          "فرن أرضي",
+          "وادي رم"
+        ]
+      },
+      "image": "/jordan/assets/food/zarb.png"
+    },
+    {
+      "id": "knafeh",
+      "emoji": "🧀",
+      "siteId": "nablus-knafeh",
+      "name": {
+        "en": "Knafeh nabulsiyeh",
+        "ar": "الكنافة النابلسية"
+      },
+      "tagline": {
+        "en": "Hot cheese, orange crust, sugar syrup",
+        "ar": "جبنة ساخنة وقشرة برتقالية وقطر"
+      },
+      "history": {
+        "en": "Soft white cheese under semolina or shredded pastry, baked in a wide copper tray, soaked in syrup and cut in front of you. It is named for Nablus, and Palestinian families carried it across the river; today downtown Amman counters sell it by the kilo from mid-afternoon until the tray is gone.",
+        "ar": "جبنة بيضاء طرية تحت السميد أو الشعيرية، تُخبز في صينية نحاسية واسعة، وتُسقى بالقطر وتُقطع أمامك. تُنسب إلى نابلس، وحملتها العائلات الفلسطينية عبر النهر؛ واليوم تبيعها محلات وسط عمّان بالكيلو من العصر حتى تفرغ الصينية."
+      },
+      "tags": {
+        "en": [
+          "dessert",
+          "Nablus",
+          "syrup"
+        ],
+        "ar": [
+          "حلويات",
+          "نابلس",
+          "قطر"
+        ]
+      },
+      "image": "/jordan/assets/food/knafeh.png"
+    },
+    {
+      "id": "hummus",
+      "emoji": "🥣",
+      "siteId": "amman-citadel",
+      "name": {
+        "en": "Hummus bi tahina",
+        "ar": "حمّص بالطحينة"
+      },
+      "tagline": {
+        "en": "Breakfast, not a side dish",
+        "ar": "فطور، لا طبق جانبي"
+      },
+      "history": {
+        "en": "Chickpeas, tahina, lemon and garlic, served warm with a pool of olive oil and eaten with bread for breakfast. Chickpea-and-tahina dishes appear in 13th-century Arabic cookbooks from the eastern Mediterranean, and the modern Levantine bowl became a morning ritual in Amman's old downtown houses.",
+        "ar": "حمّص وطحينة وليمون وثوم، يُقدَّم دافئاً مع بركة من زيت الزيتون ويُؤكل بالخبز على الفطور. تظهر أطباق الحمّص والطحينة في كتب الطبخ العربية في القرن الثالث عشر شرق المتوسط، وصار الصحن الشامي الحديث طقساً صباحياً في بيوت وسط عمّان القديمة."
+      },
+      "tags": {
+        "en": [
+          "breakfast",
+          "chickpeas",
+          "tahina"
+        ],
+        "ar": [
+          "فطور",
+          "حمّص",
+          "طحينة"
+        ]
+      },
+      "image": "/jordan/assets/food/hummus.png"
+    },
+    {
+      "id": "falafel",
+      "emoji": "🧆",
+      "siteId": "amman-citadel",
+      "name": {
+        "en": "Falafel",
+        "ar": "الفلافل"
+      },
+      "tagline": {
+        "en": "The five-in-the-morning fryer",
+        "ar": "مقلاة الخامسة صباحاً"
+      },
+      "history": {
+        "en": "Soaked chickpeas ground with parsley, coriander and cumin, pressed into discs and fried dark. The Levantine chickpea version is the one Jordan eats, wrapped in shrak with pickles and tahina. Old Amman falafel houses open before dawn and are judged entirely on crust.",
+        "ar": "حمّص منقوع يُطحن مع البقدونس والكزبرة والكمّون، يُضغط أقراصاً ويُقلى حتى الاسمرار. النسخة الشامية بالحمّص هي التي يأكلها الأردن، ملفوفة بالشراك مع المخلّل والطحينة. تفتح محلات الفلافل القديمة في عمّان قبل الفجر، ويُحكم عليها بالقشرة وحدها."
+      },
+      "tags": {
+        "en": [
+          "street food",
+          "chickpeas",
+          "dawn"
+        ],
+        "ar": [
+          "أكل شارع",
+          "حمّص",
+          "فجر"
+        ]
+      },
+      "image": "/jordan/assets/food/falafel.png"
+    },
+    {
+      "id": "galayet-bandora",
+      "emoji": "🍅",
+      "siteId": "salt",
+      "name": {
+        "en": "Galayet bandora",
+        "ar": "قلاية بندورة"
+      },
+      "tagline": {
+        "en": "Tomatoes, olive oil, and nothing to hide behind",
+        "ar": "بندورة وزيت زيتون ولا شيء تختبئ خلفه"
+      },
+      "history": {
+        "en": "Tomatoes collapsed in olive oil with garlic and chilli, sometimes with lamb, scooped straight from the skillet with bread. It is the summer-harvest dish of the hill villages around As-Salt and the Jordan Valley, and the clearest test of a household's olive oil.",
+        "ar": "بندورة تذوب في زيت الزيتون مع الثوم والفلفل، وأحياناً مع اللحم، تُغرف من المقلاة رأساً بالخبز. إنه طبق موسم الصيف في قرى الجبال حول السلط والغور، وأصدق اختبار لزيت زيتون البيت."
+      },
+      "tags": {
+        "en": [
+          "harvest",
+          "olive oil",
+          "skillet"
+        ],
+        "ar": [
+          "موسم",
+          "زيت زيتون",
+          "مقلاة"
+        ]
+      },
+      "image": "/jordan/assets/food/galayet-bandora.png"
+    },
+    {
+      "id": "sayadieh",
+      "emoji": "🐟",
+      "siteId": "aqaba",
+      "name": {
+        "en": "Sayadieh",
+        "ar": "الصيادية"
+      },
+      "tagline": {
+        "en": "The fisherman's rice, from the Red Sea end",
+        "ar": "أرز الصيّاد من طرف البحر الأحمر"
+      },
+      "history": {
+        "en": "Fish fried, then rice cooked in its stock with deeply caramelised onions and cumin until it goes brown. It belongs to the Arab coast rather than the plateau, and in Jordan it means Aqaba — the one port town, where the Red Sea catch lands.",
+        "ar": "سمك يُقلى، ثم أرز يُطبخ بمرقه مع بصل مكرمل بعمق وكمّون حتى يسمرّ. ينتمي إلى الساحل العربي لا إلى الهضبة، وفي الأردن يعني العقبة — مدينة الميناء الوحيدة حيث يرسو صيد البحر الأحمر."
+      },
+      "tags": {
+        "en": [
+          "Aqaba",
+          "fish",
+          "caramelised onion"
+        ],
+        "ar": [
+          "العقبة",
+          "سمك",
+          "بصل مكرمل"
+        ]
+      },
+      "image": "/jordan/assets/food/sayadieh.png"
+    },
+    {
+      "id": "qahwa-sada",
+      "emoji": "☕",
+      "siteId": "rum-zarb",
+      "name": {
+        "en": "Qahwa sada",
+        "ar": "القهوة السادة"
+      },
+      "tagline": {
+        "en": "Bitter, cardamom-green, and never more than three",
+        "ar": "مُرّة، خضراء بالهيل، ولا تتجاوز الثلاث"
+      },
+      "history": {
+        "en": "Unsweetened Arabic coffee, heavy with cardamom, poured from a brass dallah into a small handleless finjan. The guest takes one, two, or at most three, then shakes the cup side to side to say enough. Serving it is the opening move of Bedouin hospitality, and UNESCO lists Arabic coffee as intangible heritage.",
+        "ar": "قهوة عربية بلا سكر، ثقيلة بالهيل، تُسكب من دلّة نحاسية في فنجان صغير بلا مقبض. يأخذ الضيف واحداً أو اثنين أو ثلاثة على الأكثر، ثم يهزّ الفنجان يميناً وشمالاً ليقول: يكفي. تقديمها أول خطوة في الضيافة البدوية، واليونسكو تدرج القهوة العربية ضمن التراث غير المادي."
+      },
+      "tags": {
+        "en": [
+          "hospitality",
+          "cardamom",
+          "dallah"
+        ],
+        "ar": [
+          "ضيافة",
+          "هيل",
+          "دلّة"
+        ]
+      },
+      "image": "/jordan/assets/food/qahwa-sada.png"
+    },
+    {
+      "id": "shrak",
+      "emoji": "🫓",
+      "siteId": "salt",
+      "name": {
+        "en": "Shrak bread",
+        "ar": "خبز الشراك"
+      },
+      "tagline": {
+        "en": "Paper-thin, off a domed iron saj",
+        "ar": "رقيق كالورق، من صاج حديدي مقبّب"
+      },
+      "history": {
+        "en": "Dough is spun between the hands until it is almost translucent, then laid for seconds on a convex iron saj over fire. It lines the mansaf tray and soaks the jameed sauce, and it is the bread form that suits a life on the move — no oven required, just a metal dome and flame.",
+        "ar": "تُدار العجينة بين اليدين حتى تكاد تشفّ، ثم تُلقى ثوانيَ على صاج حديدي محدَّب فوق النار. تُفرش تحت المنسف وتشرب مرق الجميد، وهي شكل الخبز الذي يناسب حياة الترحال — بلا فرن، يكفي قبّة معدن ولهب."
+      },
+      "tags": {
+        "en": [
+          "saj",
+          "flatbread",
+          "mansaf"
+        ],
+        "ar": [
+          "صاج",
+          "خبز رقيق",
+          "منسف"
+        ]
+      },
+      "image": "/jordan/assets/food/shrak.png"
+    },
+    {
+      "id": "qatayef",
+      "emoji": "🥮",
+      "siteId": "amman-citadel",
+      "name": {
+        "en": "Qatayef",
+        "ar": "القطايف"
+      },
+      "tagline": {
+        "en": "The pancake that only exists in Ramadan",
+        "ar": "الفطيرة التي لا توجد إلا في رمضان"
+      },
+      "history": {
+        "en": "Small yeasted pancakes cooked on one side only, stuffed with walnuts or sweet cheese, folded shut and fried or baked, then drowned in syrup. Qatayef is attested in medieval Arab kitchens and remains strictly seasonal: batter stalls appear on Amman pavements the week Ramadan begins and vanish with Eid.",
+        "ar": "فطائر خميرة صغيرة تُطهى على وجه واحد، تُحشى بالجوز أو الجبنة الحلوة، تُطبق وتُقلى أو تُخبز، ثم تُغرق بالقطر. ذُكرت القطايف في المطابخ العربية الوسيطة، وبقيت موسمية بصرامة: تظهر بسطات العجين على أرصفة عمّان في أسبوع بدء رمضان وتختفي مع العيد."
+      },
+      "tags": {
+        "en": [
+          "Ramadan",
+          "walnut",
+          "syrup"
+        ],
+        "ar": [
+          "رمضان",
+          "جوز",
+          "قطر"
+        ]
+      },
+      "image": "/jordan/assets/food/qatayef.png"
+    }
+  ],
+  "music": [
+    {
+      "id": "rababa",
+      "emoji": "🎻",
+      "siteId": "rum-zarb",
+      "name": {
+        "en": "The rababa",
+        "ar": "الربابة"
+      },
+      "tagline": {
+        "en": "One horsehair string, one whole tradition",
+        "ar": "وترٌ واحد من شعر الخيل، وتقليد كامل"
+      },
+      "history": {
+        "en": "A single-string spike fiddle with a skin-covered box, bowed slowly to shadow a poet's voice. In the Bedouin tent the rababa does not accompany a song so much as hold a floor for it — the shaer recites nabati verse about lineage, loss and the road, and the string answers between the lines.",
+        "ar": "كمانٌ ذو وتر واحد بصندوق مغطّى بالجلد، يُعزف بقوس بطيء ليظلّل صوت الشاعر. في بيت الشَّعر لا ترافق الربابة الأغنية بقدر ما تفتح لها مجلساً — يلقي الشاعر النبطي أبياته عن النسب والفقد والطريق، ويردّ الوتر بين السطور."
+      },
+      "tags": {
+        "en": [
+          "Bedouin",
+          "nabati poetry",
+          "spike fiddle"
+        ],
+        "ar": [
+          "بدوي",
+          "شعر نبطي",
+          "ربابة"
+        ]
+      }
+    },
+    {
+      "id": "mijwiz",
+      "emoji": "🪈",
+      "siteId": "salt",
+      "name": {
+        "en": "Mijwiz and yarghoul",
+        "ar": "المجوز واليرغول"
+      },
+      "tagline": {
+        "en": "Two reeds, and a breath that never stops",
+        "ar": "قصبتان ونفَسٌ لا ينقطع"
+      },
+      "history": {
+        "en": "The mijwiz is a double-pipe reed instrument; the yarghoul adds a long drone pipe beside the melody. Both are played with circular breathing, so the sound never breaks — which is exactly what a dabke line needs. In the northern villages these instruments, with the tableh, are the whole wedding band.",
+        "ar": "المجوز آلة من قصبتين بريشتين، واليرغول يضيف أنبوباً طويلاً للدرون بجانب اللحن. تُعزفان بالتنفّس الدائري فلا ينقطع الصوت — وهذا بالضبط ما يحتاجه صفّ الدبكة. في قرى الشمال تشكّل هاتان الآلتان مع الطبلة فرقة العرس كاملة."
+      },
+      "tags": {
+        "en": [
+          "reed pipes",
+          "circular breathing",
+          "weddings"
+        ],
+        "ar": [
+          "مزامير",
+          "تنفّس دائري",
+          "أعراس"
+        ]
+      }
+    },
+    {
+      "id": "dabke",
+      "emoji": "💃",
+      "siteId": "salt",
+      "name": {
+        "en": "Dabke",
+        "ar": "الدبكة"
+      },
+      "tagline": {
+        "en": "A line, a stamp, and a leader who improvises",
+        "ar": "صفٌّ، ودقّة قدم، ولويح يرتجل"
+      },
+      "history": {
+        "en": "Dancers link shoulders in a line, stamping in unison while the lawweeh at the head breaks off to improvise. The most repeated origin story ties the stamp to villagers packing a mud roof together before the rains; whatever its source, in Jordan dabke is the physical form of a wedding, and every region defends its own step.",
+        "ar": "يتشابك الراقصون بالأكتاف في صفّ، يدقّون الأرض معاً بينما ينفصل اللويّح في المقدمة ليرتجل. وأشهر رواية للأصل تربط الدقّ بأهل القرية يرصّون سطح الطين معاً قبل المطر؛ ومهما كان المصدر، فالدبكة في الأردن هي الشكل الجسدي للعرس، وكل منطقة تدافع عن خطوتها."
+      },
+      "tags": {
+        "en": [
+          "line dance",
+          "wedding",
+          "regional styles"
+        ],
+        "ar": [
+          "رقص صفّي",
+          "عرس",
+          "أساليب محلية"
+        ]
+      }
+    },
+    {
+      "id": "sahjeh",
+      "emoji": "👏",
+      "siteId": "salt",
+      "name": {
+        "en": "Sahjeh and zaghareed",
+        "ar": "السحجة والزغاريد"
+      },
+      "tagline": {
+        "en": "Clapped chant on one side, ululation on the other",
+        "ar": "هزيجٌ بالتصفيق هنا، وزغرودة هناك"
+      },
+      "history": {
+        "en": "Sahjeh is a row of men clapping and chanting in call-and-response, swaying as a single body while a soloist teases the groom. Facing them, women send up zaghareed — the ululation that opens and closes every ceremony. Neither needs an instrument, which is why both survived every era on this page.",
+        "ar": "السحجة صفٌّ من الرجال يصفّقون ويهزجون بالردّ والجواب، يتمايلون كجسد واحد بينما يداعب المنشد العريس. وفي مقابلهم ترفع النساء الزغاريد — الزغرودة التي تفتح كل مناسبة وتختمها. ولا تحتاج أيّ منهما آلة، ولهذا نجت الاثنتان عبر كل حقبة في هذه الصفحة."
+      },
+      "tags": {
+        "en": [
+          "a cappella",
+          "call and response",
+          "ceremony"
+        ],
+        "ar": [
+          "بلا آلات",
+          "ردّ وجواب",
+          "مناسبات"
+        ]
+      }
+    },
+    {
+      "id": "hjeini",
+      "emoji": "🐪",
+      "siteId": "wadi-rum",
+      "name": {
+        "en": "Hjeini — the camel-road song",
+        "ar": "الهجيني — أغنية طريق الإبل"
+      },
+      "tagline": {
+        "en": "Sung at the pace of a walking camel",
+        "ar": "يُغنّى على خطو الناقة"
+      },
+      "history": {
+        "en": "Hjeini takes its name and its lope from the hjin, the riding camel. The metre matches the animal's gait, so a traveller could sing for hours across Wadi Rum and the eastern badia without losing the line. It is the clearest case of Jordanian music being shaped by distance itself.",
+        "ar": "يأخذ الهجيني اسمه وإيقاعه من الهجين، ناقة الركوب. يوافق الوزنُ خطوَ الحيوان، فيغنّي المسافر ساعات عبر وادي رم والبادية الشرقية دون أن يفقد الإيقاع. وهو أوضح مثال على أن المسافة نفسها هي التي شكّلت موسيقى الأردن."
+      },
+      "tags": {
+        "en": [
+          "badia",
+          "travel song",
+          "metre"
+        ],
+        "ar": [
+          "بادية",
+          "أغنية سفر",
+          "وزن"
+        ]
+      }
+    },
+    {
+      "id": "bagpipes",
+      "emoji": "🎺",
+      "siteId": "amman-citadel",
+      "name": {
+        "en": "The army bagpipes",
+        "ar": "مزمار الجيش القِرَبي"
+      },
+      "tagline": {
+        "en": "A Scottish import that became fully Jordanian",
+        "ar": "وافدٌ اسكتلندي صار أردنياً بالكامل"
+      },
+      "history": {
+        "en": "Bagpipes entered Jordan through the Arab Legion's British-influenced military bands in the first half of the twentieth century. They never left. Today pipe bands in Jordanian dress play at state ceremonies, graduations and weddings, and the instrument reads to most Jordanians as local, not foreign.",
+        "ar": "دخل مزمار القِرَب إلى الأردن عبر فرق الجيش العربي الموسيقية المتأثرة بالبريطانيين في النصف الأول من القرن العشرين. ولم يغادر. واليوم تعزف فرق المزمار بالزيّ الأردني في المناسبات الرسمية وحفلات التخرّج والأعراس، ويسمعه معظم الأردنيين محليّاً لا غريباً."
+      },
+      "tags": {
+        "en": [
+          "Arab Legion",
+          "military band",
+          "ceremony"
+        ],
+        "ar": [
+          "الجيش العربي",
+          "موسيقى عسكرية",
+          "مراسم"
+        ]
+      }
+    },
+    {
+      "id": "anthem",
+      "emoji": "🇯🇴",
+      "siteId": "amman-citadel",
+      "name": {
+        "en": "As-Salam al-Malaki",
+        "ar": "السلام الملكي الأردني"
+      },
+      "tagline": {
+        "en": "A national anthem adopted at independence",
+        "ar": "نشيدٌ وطني اعتُمد مع الاستقلال"
+      },
+      "history": {
+        "en": "The Royal Anthem of Jordan was adopted in 1946, the year of independence, with words by Abdel Munim al-Rifai and music by Abdel Qader al-Taneer. It exists in a short form heard daily and a long form for state occasions — a small example of how quickly the new kingdom built its symbols.",
+        "ar": "اعتُمد السلام الملكي الأردني عام ١٩٤٦، عام الاستقلال، بكلمات عبد المنعم الرفاعي وألحان عبد القادر التنير. وله صيغة قصيرة تُسمع يومياً وأخرى طويلة للمناسبات الرسمية — مثالٌ صغير على سرعة بناء المملكة الجديدة لرموزها."
+      },
+      "tags": {
+        "en": [
+          "1946",
+          "state symbol",
+          "independence"
+        ],
+        "ar": [
+          "١٩٤٦",
+          "رمز وطني",
+          "استقلال"
+        ]
+      }
+    },
+    {
+      "id": "jerash-festival-music",
+      "emoji": "🎪",
+      "siteId": "jerash-festival",
+      "name": {
+        "en": "The Jerash Festival",
+        "ar": "مهرجان جرش"
+      },
+      "tagline": {
+        "en": "Roman stone as a summer concert hall",
+        "ar": "حجرٌ روماني كقاعة حفلات صيفية"
+      },
+      "history": {
+        "en": "Launched in 1981 under royal patronage, the Jerash Festival for Culture and Arts turned second-century theatres into the region's summer stage. Folk troupes, Arab orchestras, poets and later pop and rock acts all played the same stone seating — it is where Jordanian folk revival met a mass audience.",
+        "ar": "انطلق مهرجان جرش للثقافة والفنون عام ١٩٨١ برعاية ملكية، فحوّل مسارح القرن الثاني إلى منصة الصيف في المنطقة. عزفت الفرق الشعبية والأوركسترات العربية والشعراء ثم فرق البوب والروك على المدرّجات الحجرية نفسها — وهنا التقى إحياء التراث الأردني بجمهور واسع."
+      },
+      "tags": {
+        "en": [
+          "since 1981",
+          "folk revival",
+          "South Theatre"
+        ],
+        "ar": [
+          "منذ ١٩٨١",
+          "إحياء التراث",
+          "المسرح الجنوبي"
+        ]
+      }
+    },
+    {
+      "id": "bedouin-pop",
+      "emoji": "🎤",
+      "siteId": "amman-citadel",
+      "name": {
+        "en": "Bedouin pop",
+        "ar": "الأغنية البدوية الحديثة"
+      },
+      "tagline": {
+        "en": "The rababa plugged into a keyboard",
+        "ar": "الربابة موصولة بأورغ"
+      },
+      "history": {
+        "en": "From the 1990s, singers such as Omar Al-Abdallat carried Bedouin melody and patriotic lyric into studio pop, and Diana Karazon's 2003 pan-Arab talent-show win made a Jordanian voice mainstream across the region. The result is a radio sound that keeps the old modes but adds drums, synths and a chorus everyone can sing.",
+        "ar": "منذ التسعينيات حمل مغنّون مثل عمر العبداللات اللحن البدوي والكلمة الوطنية إلى بوب الاستوديو، وجعل فوز ديانا كرزون في مسابقة عربية عام ٢٠٠٣ صوتاً أردنياً حاضراً في المنطقة كلها. والنتيجة صوتٌ إذاعي يحافظ على المقامات القديمة ويضيف الإيقاع والسينثِسايزر ولازمة يغنّيها الجميع."
+      },
+      "tags": {
+        "en": [
+          "Omar Al-Abdallat",
+          "Diana Karazon",
+          "radio"
+        ],
+        "ar": [
+          "عمر العبداللات",
+          "ديانا كرزون",
+          "إذاعة"
+        ]
+      }
+    },
+    {
+      "id": "amman-indie",
+      "emoji": "🎸",
+      "siteId": "amman-citadel",
+      "name": {
+        "en": "The Amman indie scene",
+        "ar": "مشهد عمّان المستقل"
+      },
+      "tagline": {
+        "en": "Arabic rock out of Jabal Amman basements",
+        "ar": "روك عربي من أقبية جبل عمّان"
+      },
+      "history": {
+        "en": "In the 2000s and 2010s bands like Jadal, Autostrad and El Morabba3 built an Arabic-language rock and alternative scene in Amman's cafés and small venues, writing about the city itself. Amman became one of the regional hubs for independent Arabic music, feeding festivals well beyond Jordan.",
+        "ar": "في العقدين الأول والثاني من الألفية بنت فرق مثل جدل وأوتوستراد والمربّع مشهداً للروك والبديل بالعربية في مقاهي عمّان وصالاتها الصغيرة، وكتبت عن المدينة نفسها. وصارت عمّان أحد مراكز الموسيقى العربية المستقلة في المنطقة، تغذّي مهرجانات أبعد من الأردن بكثير."
+      },
+      "tags": {
+        "en": [
+          "Jadal",
+          "Autostrad",
+          "El Morabba3"
+        ],
+        "ar": [
+          "جدل",
+          "أوتوستراد",
+          "المربّع"
+        ]
+      }
+    }
+  ],
+  "phrases": [
+    {
+      "ar": "أهلاً وسهلاً",
+      "translit": "ahlan wa sahlan",
+      "en": "Welcome — the standard greeting to a guest"
+    },
+    {
+      "ar": "مرحبا، كيفك؟",
+      "translit": "marhaba, keefak?",
+      "en": "Hello, how are you? (to a man; keefek to a woman)"
+    },
+    {
+      "ar": "تمام، الحمد لله",
+      "translit": "tamam, al-hamdu lillah",
+      "en": "All good, thank God"
+    },
+    {
+      "ar": "تفضّل",
+      "translit": "tfaddal",
+      "en": "Please, go ahead / help yourself"
+    },
+    {
+      "ar": "يعطيك العافية",
+      "translit": "ya'teek al-'afyeh",
+      "en": "May God give you strength — said to anyone working"
+    },
+    {
+      "ar": "صحتين",
+      "translit": "sahtein",
+      "en": "To your health — said before or after eating"
+    },
+    {
+      "ar": "على راسي",
+      "translit": "'ala rasi",
+      "en": "\"On my head\" — my pleasure, consider it done"
+    },
+    {
+      "ar": "قدّيش؟",
+      "translit": "addaysh?",
+      "en": "How much?"
+    },
+    {
+      "ar": "وين الطريق للبتراء؟",
+      "translit": "wein it-tareeq lal-Batra?",
+      "en": "Which way to Petra?"
+    },
+    {
+      "ar": "بدّي فنجان قهوة سادة",
+      "translit": "baddi finjan qahwa sada",
+      "en": "I'd like a cup of unsweetened coffee"
+    },
+    {
+      "ar": "المنسف زاكي كتير",
+      "translit": "il-mansaf zaki kteer",
+      "en": "The mansaf is delicious"
+    },
+    {
+      "ar": "يلّا، منروح",
+      "translit": "yalla, mnrooh",
+      "en": "Come on, let's go"
+    },
+    {
+      "ar": "إن شاء الله",
+      "translit": "inshallah",
+      "en": "God willing — yes, maybe, or eventually"
+    },
+    {
+      "ar": "شكراً كتير",
+      "translit": "shukran kteer",
+      "en": "Thank you very much"
+    }
+  ]
+}

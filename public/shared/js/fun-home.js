@@ -274,10 +274,9 @@
     console.log('✨ Extra sparkles activated! ✨');
   }
 
-  // Three.js Hero Scene — one intentional orb (Explore / Discover / Create)
+  // Three.js Hero Scene — intentional full-bleed orb (dominant visual plane)
   function initHeroScene() {
     if (typeof THREE === 'undefined' || prefersReducedMotion) return;
-    if (window.matchMedia('(max-width: 767.98px)').matches) return;
 
     const canvas = document.getElementById('heroCanvas');
     if (!canvas) return;
@@ -285,6 +284,7 @@
     const container = canvas.parentElement;
     let width = container.clientWidth;
     let height = container.clientHeight;
+    const isNarrow = window.matchMedia('(max-width: 991.98px)').matches;
 
     const renderer = new THREE.WebGLRenderer({
       canvas: canvas,
@@ -292,15 +292,17 @@
       antialias: true,
       powerPreference: 'high-performance'
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isNarrow ? 1.5 : 2));
     renderer.setSize(width, height);
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
-    camera.position.set(0, 0.15, 5.2);
+    const camera = new THREE.PerspectiveCamera(isNarrow ? 42 : 36, width / height, 0.1, 100);
+    camera.position.set(0, 0.05, isNarrow ? 5.6 : 4.6);
 
     const group = new THREE.Group();
-    group.position.set(1.35, 0.1, 0);
+    // Desktop: dominate the right half. Narrow: sit behind/above copy.
+    group.position.set(isNarrow ? 0.15 : 1.55, isNarrow ? 0.55 : 0.05, 0);
+    group.scale.setScalar(isNarrow ? 1.15 : 1.55);
     scene.add(group);
 
     function getMaterials() {
@@ -308,39 +310,53 @@
       const core = new THREE.MeshPhysicalMaterial({
         color: dark ? 0x4a90a4 : 0x5aa3b5,
         emissive: dark ? 0x1a3a44 : 0x2a6070,
-        emissiveIntensity: dark ? 0.35 : 0.22,
-        metalness: 0.15,
-        roughness: 0.35,
+        emissiveIntensity: dark ? 0.4 : 0.28,
+        metalness: 0.18,
+        roughness: 0.32,
         transparent: true,
-        opacity: 0.92,
-        clearcoat: 0.6,
-        clearcoatRoughness: 0.35
+        opacity: 0.95,
+        clearcoat: 0.7,
+        clearcoatRoughness: 0.3
       });
       const ring = new THREE.MeshBasicMaterial({
         color: dark ? 0xc9a227 : 0xb8922e,
         transparent: true,
-        opacity: 0.55,
+        opacity: 0.62,
         side: THREE.DoubleSide
       });
       return { core, ring };
     }
 
-        const RAINBOW_PALETTE = [0x8b5cf6, 0x10b981, 0x06b6d4, 0xf59e0b, 0xec4899];
+    const ORB_PALETTE = [0x3d7a8a, 0x10b981, 0x2a9bb0, 0xc9852a, 0xe85a7a];
     let mats = getMaterials();
-    const orbGeom = new THREE.IcosahedronGeometry(1.05, 1);
+    const detail = isNarrow ? 0 : 1;
+    const orbGeom = new THREE.IcosahedronGeometry(1.15, detail);
     const orb = new THREE.Mesh(orbGeom, mats.core);
     group.add(orb);
 
-    const ringGeom = new THREE.TorusGeometry(1.55, 0.028, 12, 64);
+    const ringGeom = new THREE.TorusGeometry(1.72, 0.032, 10, isNarrow ? 48 : 72);
     const ring = new THREE.Mesh(ringGeom, mats.ring);
-    ring.rotation.x = Math.PI / 2.4;
+    ring.rotation.x = Math.PI / 2.35;
     group.add(ring);
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
-    const key = new THREE.DirectionalLight(0xe8f4f8, 1.05);
+    const ring2 = new THREE.Mesh(
+      new THREE.TorusGeometry(2.05, 0.018, 8, isNarrow ? 40 : 64),
+      new THREE.MeshBasicMaterial({
+        color: 0x4a90a4,
+        transparent: true,
+        opacity: 0.28,
+        side: THREE.DoubleSide
+      })
+    );
+    ring2.rotation.x = Math.PI / 2.8;
+    ring2.rotation.y = 0.35;
+    group.add(ring2);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const key = new THREE.DirectionalLight(0xe8f4f8, 1.15);
     key.position.set(3, 4, 5);
     scene.add(key);
-    const fill = new THREE.DirectionalLight(0x4a90a4, 0.45);
+    const fill = new THREE.DirectionalLight(0x4a90a4, 0.5);
     fill.position.set(-4, 1, -2);
     scene.add(fill);
 
@@ -365,11 +381,18 @@
 
     if (typeof gsap !== 'undefined') {
       gsap.from(group.scale, {
-        x: 0.72, y: 0.72, z: 0.72,
-        duration: 1.35, ease: 'power3.out', delay: 0.2
+        x: isNarrow ? 0.85 : 1.1,
+        y: isNarrow ? 0.85 : 1.1,
+        z: isNarrow ? 0.85 : 1.1,
+        duration: 1.45,
+        ease: 'power3.out',
+        delay: 0.15
       });
       gsap.from(group.rotation, {
-        y: -0.55, duration: 1.4, ease: 'power2.out', delay: 0.15
+        y: -0.65,
+        duration: 1.5,
+        ease: 'power2.out',
+        delay: 0.1
       });
     }
 
@@ -377,20 +400,21 @@
       animationFrameId = requestAnimationFrame(animate);
       if (!isPageVisible || !inView) return;
       const elapsed = clock.getElapsedTime();
-      orb.rotation.y = elapsed * 0.22;
-      orb.rotation.x = Math.sin(elapsed * 0.35) * 0.12;
-      ring.rotation.z = elapsed * 0.18;
-      group.position.y = 0.1 + Math.sin(elapsed * 0.7) * 0.12;
+      orb.rotation.y = elapsed * 0.2;
+      orb.rotation.x = Math.sin(elapsed * 0.32) * 0.14;
+      ring.rotation.z = elapsed * 0.16;
+      ring2.rotation.z = -elapsed * 0.11;
+      group.position.y =
+        (isNarrow ? 0.55 : 0.05) + Math.sin(elapsed * 0.65) * 0.1;
 
-      // Soft rainbow cycle on orb + ring (matches title gradient)
-      const t = (elapsed * 0.18) % RAINBOW_PALETTE.length;
+      const t = (elapsed * 0.15) % ORB_PALETTE.length;
       const i0 = Math.floor(t);
-      const i1 = (i0 + 1) % RAINBOW_PALETTE.length;
+      const i1 = (i0 + 1) % ORB_PALETTE.length;
       const mix = t - i0;
-      const c = new THREE.Color(RAINBOW_PALETTE[i0]).lerp(new THREE.Color(RAINBOW_PALETTE[i1]), mix);
-      orb.material.color.copy(c);
-      orb.material.emissive.copy(c).multiplyScalar(0.35);
-      ring.material.color.copy(c);
+      const c0 = new THREE.Color(ORB_PALETTE[i0]);
+      const c1 = new THREE.Color(ORB_PALETTE[i1]);
+      mats.core.color.copy(c0).lerp(c1, mix);
+      mats.ring.color.copy(c1).lerp(c0, mix * 0.5);
 
       renderer.render(scene, camera);
     }
@@ -400,17 +424,11 @@
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
-        if (window.matchMedia('(max-width: 767.98px)').matches) {
-          cancelAnimationFrame(animationFrameId);
-          renderer.dispose();
-          canvas.style.display = 'none';
-          return;
-        }
-        canvas.style.display = '';
         width = container.clientWidth;
         height = container.clientHeight;
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, width < 992 ? 1.5 : 2));
         renderer.setSize(width, height);
       }, 100);
     });
@@ -432,6 +450,8 @@
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
       orbGeom.dispose();
       ringGeom.dispose();
+      ring2.geometry.dispose();
+      if (ring2.material) ring2.material.dispose();
       orb.material.dispose();
       ring.material.dispose();
       renderer.dispose();

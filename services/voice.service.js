@@ -227,14 +227,23 @@ export class VoiceService {
       if (name && !voiceChain.includes(name)) voiceChain.push(name);
     };
     pushUnique(voice);
-    if (youngFemale) {
+    // Non-English requests (e.g. ar-XA for the Jordan guide) must never fall back to an
+    // English voice — it would read foreign-script text as gibberish.
+    const requestedLanguage = String(voice || '').split('-').slice(0, 2).join('-') || 'en-US';
+    const isEnglishRequest = /^en-/i.test(requestedLanguage);
+    const isPremiumVoice = /Neural2|Wavenet|Chirp|Studio|Journey/i.test(String(voice || ''));
+
+    if (youngFemale && isEnglishRequest) {
       pushUnique('en-US-Neural2-H');
       pushUnique('en-US-Wavenet-H');
       pushUnique('en-US-Neural2-F');
       pushUnique('en-US-Standard-F');
-    } else if (/Neural2|Wavenet|Chirp|Studio|Journey/i.test(String(voice || ''))) {
+    } else if (isPremiumVoice && isEnglishRequest) {
       if (female) pushUnique('en-US-Standard-F');
       else pushUnique('en-US-Standard-D');
+    } else if (isPremiumVoice) {
+      // Same language, plainer tier — e.g. ar-XA-Wavenet-B → ar-XA-Standard-B.
+      pushUnique(String(voice).replace(/(Neural2|Wavenet|Chirp|Studio|Journey)/i, 'Standard'));
     }
 
     for (const voiceName of voiceChain) {

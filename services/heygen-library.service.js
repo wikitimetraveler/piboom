@@ -14,6 +14,7 @@ const MUSIC_DEMO_PATH = path.join(ROOT, 'data/music-heygen-demo.json');
 const CALC_ENGINE_DEMO_PATH = path.join(ROOT, 'data/calc-engine-heygen-demo.json');
 const UNIT_TESTS_DEMO_PATH = path.join(ROOT, 'data/unit-tests-heygen-demo.json');
 const SVEN_UX_DEMO_PATH = path.join(ROOT, 'data/sven-ux-heygen-demo.json');
+const JORDAN_DEMO_PATH = path.join(ROOT, 'data/jordan-heygen-demo.json');
 const HYPERFRAMES_LIBRARY_PATH = path.join(ROOT, 'data/hyperframes-library.json');
 
 function pickUrl(...candidates) {
@@ -156,6 +157,36 @@ function musicDemoEntry(demo) {
   ];
 }
 
+/** Jordan ships one clip per page language, so each language is its own library entry. */
+function jordanDemoEntries(demo) {
+  if (!demo) return [];
+  const langs = [
+    { code: 'en', label: 'English' },
+    { code: 'ar', label: 'Arabic' }
+  ];
+  return langs.flatMap(({ code, label }) => {
+    const url = pickUrl(demo.heygenVideoLocalShort?.[code], demo.heygenVideoUrlShort?.[code]);
+    const videoId = demo.heygenVideoIdShort?.[code] || null;
+    if (!url && !videoId) return [];
+    return [
+      entryBase({
+        id: `jordan-rami-intro-${code}`,
+        videoId,
+        title: `${demo.title?.en || 'Jordan — Meet Rami'} (${label})`,
+        domain: 'jordan',
+        variant: 'demo',
+        videoUrl: url,
+        portraitUrl: demo.avatar?.portrait || null,
+        sourcePage: demo.qrLandingPath || '/jordan/?demo=heygen',
+        studioPage: demo.ctaHref || '/jordan/',
+        script: demo.heygenScriptShort?.[code] || null,
+        tags: ['jordan', 'demo', 'popup', 'bilingual', code],
+        generatedAt: demo.generatedAt?.[code] || null
+      })
+    ];
+  });
+}
+
 function financeBoothEntry(demo, { id, tags }) {
   if (!demo) return [];
   const url = pickUrl(demo.heygenVideoLocalShort, demo.heygenVideoUrlShort);
@@ -249,14 +280,24 @@ async function saveRegistry(registry) {
 
 /** Merge HeyGen avatar videos, HyperFrames reels, and API registry (registry wins on duplicate id). */
 export async function getHeygenVideoLibrary({ domain, kind } = {}) {
-  const [laneCatalog, disasterDemo, musicDemo, calcDemo, unitDemo, svenDemo, hyperframesCatalog, registry] =
-    await Promise.all([
+  const [
+    laneCatalog,
+    disasterDemo,
+    musicDemo,
+    calcDemo,
+    unitDemo,
+    svenDemo,
+    jordanDemo,
+    hyperframesCatalog,
+    registry
+  ] = await Promise.all([
     readJsonSafe(LANE_LINES_PATH),
     readJsonSafe(DISASTER_DEMO_PATH),
     readJsonSafe(MUSIC_DEMO_PATH),
     readJsonSafe(CALC_ENGINE_DEMO_PATH),
     readJsonSafe(UNIT_TESTS_DEMO_PATH),
     readJsonSafe(SVEN_UX_DEMO_PATH),
+    readJsonSafe(JORDAN_DEMO_PATH),
     readJsonSafe(HYPERFRAMES_LIBRARY_PATH),
     loadRegistry()
   ]);
@@ -266,6 +307,7 @@ export async function getHeygenVideoLibrary({ domain, kind } = {}) {
   for (const item of disasterDemoEntry(disasterDemo)) byId.set(item.id, item);
   for (const item of musicDemoEntry(musicDemo)) byId.set(item.id, item);
   for (const item of financeDemoEntries(calcDemo, unitDemo, svenDemo)) byId.set(item.id, item);
+  for (const item of jordanDemoEntries(jordanDemo)) byId.set(item.id, item);
   for (const item of registry.videos || []) {
     if (item?.id) byId.set(item.id, { ...byId.get(item.id), ...item, kind: item.kind || 'heygen' });
   }

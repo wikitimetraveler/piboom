@@ -41,7 +41,9 @@ export async function getHeygenAvatars(req, res) {
 
 export async function getHeygenVoices(req, res) {
   try {
-    res.json({ success: true, voices: await listVoices() });
+    const language = String(req.query?.language || '').trim() || undefined;
+    const maxPages = Math.min(12, Math.max(1, Number(req.query?.maxPages) || 2));
+    res.json({ success: true, voices: await listVoices({ language, maxPages }) });
   } catch (e) {
     handleHeygenError(res, e, 'Failed to list voices');
   }
@@ -50,14 +52,14 @@ export async function getHeygenVoices(req, res) {
 /** Starfish TTS — reuse avatar voice_id for audio-only Pip / booth lines */
 export async function postHeygenSpeech(req, res) {
   try {
-    const { text, voiceId, speed } = req.body || {};
+    const { text, voiceId, speed, language } = req.body || {};
     if (!text || !String(text).trim()) {
       return res.status(400).json({ success: false, error: 'text is required' });
     }
     if (!voiceId) {
       return res.status(400).json({ success: false, error: 'voiceId is required' });
     }
-    const data = await generateSpeech({ text, voiceId, speed });
+    const data = await generateSpeech({ text, voiceId, speed, language });
     res.json({
       success: true,
       audioUrl: data.audio_url,

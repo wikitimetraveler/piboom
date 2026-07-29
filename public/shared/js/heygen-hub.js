@@ -27,6 +27,7 @@
       disasters: 'Disasters',
       finance: 'Finance',
       nature: 'Nature',
+      jordan: 'Jordan',
       platform: 'Platform'
     };
     return map[domain] || domain || 'Other';

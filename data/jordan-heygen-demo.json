@@ -1,0 +1,66 @@
+{
+  "id": "jordan-rami-intro",
+  "title": {
+    "en": "Jordan — Meet Rami",
+    "ar": "الأردن — تعرّف على رامي"
+  },
+  "ctaLabel": {
+    "en": "Start the tour",
+    "ar": "ابدأ الجولة"
+  },
+  "ctaHref": "/jordan/?reel=1",
+  "qrLandingPath": "/jordan/?demo=heygen",
+  "brand": {
+    "attribution": {
+      "en": "Avatar narration powered by HeyGen",
+      "ar": "سرد الأفاتار بتقنية HeyGen"
+    },
+    "developmentBy": "David E Lane"
+  },
+  "heygenScriptShort": {
+    "en": "Ahlan wa sahlan — I'm Rami, your guide to Jordan. In a few minutes we'll go from the plaster faces of Ain Ghazal to Petra's water channels, then to a tray of mansaf and a dabke line that never really ends. Press play on the highlight reel, or just ask me a question.",
+    "ar": "أهلاً وسهلاً — أنا رامي، دليلك إلى الأردن. في دقائق ننتقل من وجوه الجصّ في عين غزال إلى قنوات الماء في البتراء، ثم إلى صينية منسف وصفّ دبكة لا ينتهي. شغّل الجولة المصوّرة، أو اسألني مباشرة."
+  },
+  "heygenVoiceLanguage": {
+    "en": "English",
+    "ar": "Arabic"
+  },
+  "heygenMotionPrompt": "calm nod, warm local guide speaking to camera",
+  "heygenExpressiveness": "low",
+  "heygenAvatarId": "125eef25a4cc42e6a4109bd014d00123",
+  "heygenAvatarGroupId": "2cf7659eb12044d789601ae6ee97336f",
+  "heygenVoiceId": {
+    "en": "02d5366a90af4c7a87157808ff352e33",
+    "ar": "a0bd2e5d41a74643be47ac75ca9171a2"
+  },
+  "heygenVoiceName": {
+    "en": "Rami",
+    "ar": "Rami Idris"
+  },
+  "heygenVideoIdShort": {
+    "en": "5f4f92281fe64317b37a5256e25ac8c3",
+    "ar": "711b3a2030ad4ed88bc12509be1495ab"
+  },
+  "heygenVideoUrlShort": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVideoLocalShort": {
+    "en": "/jordan/assets/video/jordan-rami-intro.mp4",
+    "ar": "/jordan/assets/video/jordan-rami-intro-ar.mp4"
+  },
+  "generatedAt": {
+    "en": "2026-07-29T02:11:23.159Z",
+    "ar": "2026-07-29T02:12:45.686Z"
+  },
+  "avatar": {
+    "name": "Rami",
+    "file": "AVATAR-RAMI.md",
+    "portrait": "/jordan/assets/rami-guide-portrait-256.png",
+    "source": "/jordan/assets/rami-guide-portrait.png",
+    "status": "heygen-ready-with-video",
+    "lookId": "125eef25a4cc42e6a4109bd014d00123",
+    "groupId": "2cf7659eb12044d789601ae6ee97336f"
+  },
+  "generateHint": "npm run generate:jordan-heygen-demo -- --lang both --direct --cache-local"
+}

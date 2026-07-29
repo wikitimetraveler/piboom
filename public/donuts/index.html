@@ -30,37 +30,21 @@
           <h1 class="gz-brand">Glazed</h1>
           <p class="gz-hero-line" id="gzHeroLine">Flip a treat. Hear the history. Meet Savy Donuts and Smoothie on Harbor.</p>
 
-          <div class="gz-fresh-drop-countdown" id="gzFreshDropCountdown">
-            <div class="gz-countdown-label">Fresh Drop In</div>
+          <div class="gz-fresh-drop-countdown" id="gzFreshDropCountdown" aria-live="polite">
+            <div class="gz-countdown-label">Fresh drop</div>
             <div class="gz-countdown-clock">
-              <div class="gz-countdown-unit">
-                <div class="gz-countdown-value" id="gzCountHours">00</div>
-                <div class="gz-countdown-unit-label">Hrs</div>
-              </div>
-              <div class="gz-countdown-separator">:</div>
-              <div class="gz-countdown-unit">
-                <div class="gz-countdown-value" id="gzCountMinutes">00</div>
-                <div class="gz-countdown-unit-label">Min</div>
-              </div>
-              <div class="gz-countdown-separator">:</div>
-              <div class="gz-countdown-unit">
-                <div class="gz-countdown-value" id="gzCountSeconds">00</div>
-                <div class="gz-countdown-unit-label">Sec</div>
-              </div>
+              <span class="gz-countdown-value" id="gzCountHours">00</span><span class="gz-countdown-separator">:</span><span class="gz-countdown-value" id="gzCountMinutes">00</span><span class="gz-countdown-separator">:</span><span class="gz-countdown-value" id="gzCountSeconds">00</span>
             </div>
-            <div class="gz-countdown-message" id="gzCountdownMessage">Drops at 6:00 AM daily</div>
+            <div class="gz-countdown-message" id="gzCountdownMessage">6:00 AM daily</div>
           </div>
 
           <div class="gz-hero-cta">
             <a class="gz-btn gz-btn-primary" href="#gzCase">
               <i class="bi bi-arrow-down-circle"></i> Baker's Dozen
             </a>
-            <a class="gz-btn gz-btn-frost" href="#gzShop">
-              <i class="bi bi-geo-alt-fill"></i> Find Savy
+            <a class="gz-btn gz-btn-ghost" id="gzShopDirectionsHero" href="#gzShop">
+              <i class="bi bi-geo-alt-fill"></i> Directions
             </a>
-            <button type="button" class="gz-btn gz-btn-ghost gz-btn-sm" id="gzStoryPlayHero">
-              <i class="bi bi-film"></i> Play reel
-            </button>
           </div>
         </div>
 
@@ -92,18 +76,14 @@
                 </a>
               </div>
               <p id="gzShopMapStatus" class="gz-shop-map-status">Loading map…</p>
-              <p class="gz-map-pip-note gz-map-pip-note--hero">
-                Questions?
-                <button type="button" class="gz-text-link" id="gzAskPipMap">Ask Pip</button>
-              </p>
             </div>
             <div class="gz-shop-map-wrap">
-              <div id="gzShopMap" class="gz-shop-map" role="img" aria-label="Map of Savy Donuts and Smoothie"></div>
+              <div id="gzShopMap" class="gz-shop-map" aria-label="Map of Savy Donuts and Smoothie"></div>
             </div>
           </div>
         </div>
 
-        <aside class="gz-guide gz-guide--hero" id="gzGuide" aria-label="Bakery guide Pip">
+        <aside class="gz-guide gz-guide--hero is-compact" id="gzGuide" aria-label="Bakery guide Pip">
           <div class="gz-guide-card">
             <button type="button" class="gz-guide-portrait-btn" id="gzGuideExpand" aria-label="Pip — expand dock">
               <img
@@ -118,17 +98,17 @@
             <div class="gz-guide-meta">
               <h2 id="gzGuideName">Pip</h2>
               <p id="gzGuideTitle">Head baker</p>
-              <p class="gz-guide-status" id="gzGuideStatus">Tap Hear welcome</p>
+              <p class="gz-guide-status" id="gzGuideStatus">Tap to expand</p>
             </div>
             <div class="gz-guide-actions">
-              <button type="button" class="gz-btn gz-btn-primary gz-btn-sm" id="gzMeetPip" title="Play Pip’s HeyGen welcome clip">
-                <i class="bi bi-play-fill"></i> Hear welcome
+              <button type="button" class="gz-btn gz-btn-primary gz-btn-sm" id="gzMeetPip" title="Play Pip’s HeyGen welcome clip" aria-label="Hear welcome">
+                <i class="bi bi-play-fill"></i> <span class="gz-guide-action-label">Hear welcome</span>
               </button>
-              <button type="button" class="gz-btn gz-btn-frost gz-btn-sm" id="gzAskPip">
-                <i class="bi bi-chat-dots-fill"></i> Ask Pip
+              <button type="button" class="gz-btn gz-btn-frost gz-btn-sm" id="gzAskPip" aria-label="Ask Pip">
+                <i class="bi bi-chat-dots-fill"></i> <span class="gz-guide-action-label">Ask Pip</span>
               </button>
-              <button type="button" class="gz-btn gz-btn-ghost gz-btn-sm" id="gzStopPip">
-                <i class="bi bi-stop-fill"></i> Stop
+              <button type="button" class="gz-btn gz-btn-ghost gz-btn-sm" id="gzStopPip" aria-label="Stop">
+                <i class="bi bi-stop-fill"></i> <span class="gz-guide-action-label">Stop</span>
               </button>
               <button type="button" class="gz-btn gz-btn-ghost gz-btn-sm" id="gzGuideCollapse" title="Collapse Pip dock" aria-label="Collapse Pip dock">
                 <i class="bi bi-chevron-up"></i>
@@ -325,7 +305,7 @@
           document.getElementById('gzCountHours').textContent = '00';
           document.getElementById('gzCountMinutes').textContent = '00';
           document.getElementById('gzCountSeconds').textContent = '00';
-          document.getElementById('gzCountdownMessage').textContent = '🔥 Fresh donuts dropping NOW! 🔥';
+          document.getElementById('gzCountdownMessage').textContent = 'Fresh donuts dropping now';
           return;
         }
         
@@ -347,7 +327,7 @@
         });
         const dropDay = nextDrop.toDateString() === now.toDateString() ? 'today' : 'tomorrow';
         document.getElementById('gzCountdownMessage').textContent = 
-          `Fresh glazed drops at ${dropTime} ${dropDay}`;
+          `${dropTime} ${dropDay}`;
       }
       
       // Initialize countdown
@@ -357,25 +337,31 @@
       setInterval(updateCountdown, 1000);
     })();
     
-    // Hero Meet Pip button
+    // Hero Meet Pip button + Directions link mirrors shop maps URL when ready
     document.addEventListener('DOMContentLoaded', function() {
-      const playPipBtn = document.getElementById('gzPlayPipHero');
       const meetPipBtn = document.getElementById('gzMeetPip');
-      
-      if (playPipBtn) {
-        playPipBtn.addEventListener('click', async function() {
-          if (window.GlazedHeygen && typeof window.GlazedHeygen.playIntro === 'function') {
-            await window.GlazedHeygen.playIntro();
-          }
-        });
-      }
-      
+      const heroDirs = document.getElementById('gzShopDirectionsHero');
+      const shopDirs = document.getElementById('gzShopDirections');
+
       if (meetPipBtn) {
         meetPipBtn.addEventListener('click', async function() {
           if (window.GlazedHeygen && typeof window.GlazedHeygen.playIntro === 'function') {
             await window.GlazedHeygen.playIntro();
           }
         });
+      }
+
+      if (heroDirs && shopDirs) {
+        const syncDirs = () => {
+          if (shopDirs.href && shopDirs.href !== '#' && !shopDirs.hidden) {
+            heroDirs.href = shopDirs.href;
+            heroDirs.target = '_blank';
+            heroDirs.rel = 'noopener';
+          }
+        };
+        syncDirs();
+        const mo = new MutationObserver(syncDirs);
+        mo.observe(shopDirs, { attributes: true, attributeFilter: ['href', 'hidden'] });
       }
     });
   </script>

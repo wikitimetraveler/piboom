@@ -183,6 +183,7 @@
       const preferFemale = options.preferFemale === true || options.gender === 'female';
       const picked = preferFemale ? pickFemaleBrowserVoice(voices) : voices.find((v) => /male|daniel|david|alex/i.test(v.name));
       if (picked) utterance.voice = picked;
+      applyBrowserLanguage(utterance, voices, options.lang);
       // Young Pip only: push browser pitch near max (2) — avoid matron Zira/Susan
       if (options.youngFemale) {
         utterance.pitch = mobile ? 1.8 : Math.min(2, Math.max(1.6, 1 + (Number(options.pitch) || 6) / 12));
@@ -197,6 +198,20 @@
       console.error('Browser speech error:', error);
       return false;
     }
+  }
+
+  /**
+   * Force a non-English utterance onto a matching system voice.
+   * Without this the default (usually English) voice reads foreign script as noise.
+   */
+  function applyBrowserLanguage(utterance, voices, langCode) {
+    const code = String(langCode || '').trim();
+    if (!code) return;
+    utterance.lang = code;
+    const prefix = code.slice(0, 2).toLowerCase();
+    if (prefix === 'en') return;
+    const match = (voices || []).find((v) => String(v.lang || '').toLowerCase().startsWith(prefix));
+    if (match) utterance.voice = match;
   }
 
   function pickFemaleBrowserVoice(voices) {
@@ -277,6 +292,7 @@
           ? pickFemaleBrowserVoice(voices)
           : voices.find((v) => /male|daniel|david|alex/i.test(v.name));
         if (picked) utterance.voice = picked;
+        applyBrowserLanguage(utterance, voices, options.lang);
         if (options.youngFemale) {
           utterance.pitch = mobile ? 1.8 : Math.min(2, Math.max(1.6, 1 + (Number(options.pitch) || 6) / 12));
           utterance.rate = mobile ? 1.05 : Math.min(1.25, Number(options.speakingRate) || 1.12);
@@ -366,6 +382,7 @@
       volume: vol,
       pitch: options.pitch != null ? options.pitch : youngFemale ? 6.5 : undefined,
       voice,
+      lang: options.lang,
       preferFemale,
       youngFemale,
       gender: options.gender || (preferFemale ? 'female' : undefined),

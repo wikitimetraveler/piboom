@@ -3,17 +3,21 @@
  */
 import { jest } from '@jest/globals';
 
+// Fixtures must stay inside the crawler's maxAgeHours window, so timestamps are relative to now.
+const hoursAgoIso = (hours) => new Date(Date.now() - hours * 3600 * 1000).toISOString();
+const hoursAgoGdelt = (hours) => hoursAgoIso(hours).replace(/[-:T]/g, '').slice(0, 14);
+
 const SAMPLE_ATOM = `<?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
   <entry>
     <title>Flood Warning for Example County</title>
     <link href="https://www.weather.gov/example"/>
-    <updated>2026-06-19T10:00:00Z</updated>
+    <updated>${hoursAgoIso(2)}</updated>
     <summary>River flooding expected overnight.</summary>
   </entry>
   <entry>
     <title>Local sports roundup</title>
-    <updated>2026-06-19T09:00:00Z</updated>
+    <updated>${hoursAgoIso(3)}</updated>
     <summary>High school baseball finals.</summary>
   </entry>
 </feed>`;
@@ -43,7 +47,7 @@ describe('disaster-web-crawler.service', () => {
           ok: true,
           headers: { get: () => 'application/atom+xml' },
           url,
-          text: async () => `<?xml version="1.0"?><feed xmlns="http://www.w3.org/2005/Atom"><entry><title>M 3.1 - Nevada</title><updated>2026-06-19T08:00:00Z</updated><link href="https://earthquake.usgs.gov/earthquakes/eventpage/nv001"/></entry></feed>`,
+          text: async () => `<?xml version="1.0"?><feed xmlns="http://www.w3.org/2005/Atom"><entry><title>M 3.1 - Nevada</title><updated>${hoursAgoIso(4)}</updated><link href="https://earthquake.usgs.gov/earthquakes/eventpage/nv001"/></entry></feed>`,
         };
       }
       if (String(url).includes('significant_month.atom')) {
@@ -78,7 +82,7 @@ describe('disaster-web-crawler.service', () => {
                 {
                   title: 'Flooding forces evacuations in Mississippi county',
                   url: 'https://example.com/flood-story',
-                  seendate: '20260619060000',
+                  seendate: hoursAgoGdelt(6),
                   domain: 'example.com',
                   sourcecountry: 'United States',
                   language: 'English',
