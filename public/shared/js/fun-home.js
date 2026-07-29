@@ -535,7 +535,7 @@
     });
   }
 
-  // QR tiles — absolute URLs so a phone scan opens each site directly
+  // Little QRs next to featured chips — absolute URLs for phone scan
   function absoluteSiteUrl(path) {
     try {
       return new URL(path, window.location.origin).href;
@@ -561,8 +561,8 @@
     }
   }
 
-  function initSiteQrCodes() {
-    const tiles = document.querySelectorAll('.fun-scan__tile[data-scan-path]');
+  function initFeaturedQrCodes() {
+    const tiles = document.querySelectorAll('.fun-featured-qr[data-scan-path]');
     if (!tiles.length) return;
 
     const paint = () => {
@@ -572,11 +572,10 @@
         if (!path || !mount) return;
         const url = absoluteSiteUrl(path);
         tile.setAttribute('href', url);
-        tile.setAttribute('title', 'Open ' + url);
-        const ok = mountQr(mount, url, 112);
+        const ok = mountQr(mount, url, 44);
         if (!ok) {
           mount.innerHTML =
-            '<span class="fun-scan__qr-fallback"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></span>';
+            '<span class="fun-featured-qr__fallback"><i class="bi bi-qr-code" aria-hidden="true"></i></span>';
         }
       });
     };
@@ -586,7 +585,6 @@
       return;
     }
 
-    // CDN may still be loading (defer-friendly)
     let tries = 0;
     const timer = setInterval(() => {
       tries += 1;
@@ -608,7 +606,7 @@
     initCardOpen();
     initEasterEgg();
     initSecretMortgageLink();
-    initSiteQrCodes();
+    initFeaturedQrCodes();
     
     // Wait for libraries to load
     if (typeof THREE !== 'undefined') {
