@@ -43,10 +43,7 @@
             <p class="jd-hero-line" data-i18n="heroLine">A crossroads kingdom between desert and sea — Nabataean stone, Roman colonnades, Bedouin fires, and a table that never stops filling.</p>
 
             <div class="jd-hero-cta">
-              <button type="button" class="jd-btn jd-btn-primary" id="jdStoryPlayHero">
-                <i class="bi bi-film"></i> <span data-i18n="playReel">Play highlight reel</span>
-              </button>
-              <a class="jd-btn jd-btn-ghost" href="#jdMap">
+              <a class="jd-btn jd-btn-primary" href="#jdMap">
                 <i class="bi bi-geo-alt-fill"></i> <span data-i18n="exploreMap">Explore the atlas</span>
               </a>
               <button type="button" class="jd-btn jd-btn-lang" id="jdLangToggle" aria-label="Switch language">
@@ -73,8 +70,8 @@
             </div>
 
             <div class="jd-guide-actions">
-              <button type="button" class="jd-btn jd-btn-primary jd-btn-sm" id="jdMeetGuide">
-                <i class="bi bi-play-fill"></i> <span data-i18n="hearWelcome">Hear welcome</span>
+              <button type="button" class="jd-btn jd-btn-primary jd-btn-sm" id="jdStoryPlay" aria-pressed="false">
+                <i class="bi bi-film"></i> <span data-i18n="startTour">Start tour</span>
               </button>
               <button type="button" class="jd-btn jd-btn-sand jd-btn-sm" id="jdAskGuide">
                 <i class="bi bi-chat-dots-fill"></i> <span data-i18n="askGuide">Ask Rami</span>
@@ -86,12 +83,6 @@
 
             <div class="jd-story-panel" id="jdStoryPanel">
               <div class="jd-story-row">
-                <button type="button" class="jd-btn jd-btn-sand jd-btn-sm" id="jdStoryPlay" aria-pressed="false">
-                  <i class="bi bi-film"></i> <span data-i18n="playReel">Play highlight reel</span>
-                </button>
-                <button type="button" class="jd-btn jd-btn-ghost jd-btn-sm" id="jdStoryStop" hidden>
-                  <i class="bi bi-stop-fill"></i> <span data-i18n="stopReel">Stop reel</span>
-                </button>
                 <label class="jd-story-narrate">
                   <input type="checkbox" id="jdStoryNarrate" checked/>
                   <span data-i18n="narration">Narration</span>

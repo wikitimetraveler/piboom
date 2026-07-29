@@ -6,7 +6,7 @@
 (function () {
   'use strict';
 
-  const MOTE_COUNT = 16;
+  const MOTE_COUNT = 7;
 
   function prefersReducedMotion() {
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;

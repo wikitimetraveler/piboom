@@ -109,7 +109,7 @@
     { href: '/local/local-spots.html', icon: 'bi-geo-alt-fill', label: 'Local Spots' },
     { href: '/finds/index.html', icon: 'bi-search-heart', label: 'Finds' },
     { divider: true },
-    { href: '/', icon: 'bi-house', label: 'Hub (All Tools)' },
+    { href: '/', icon: 'bi-house', label: 'Home' },
   ];
 
   /** Worksheets hub tool grid (calculators + disasters only) */

@@ -116,4 +116,53 @@ describe('shared tts helper', () => {
 
     expect(global.fetch).toHaveBeenCalled();
   });
+
+  test('speakNarrationAwaitEnd keeps male browser voice when Google synth fails', async () => {
+    global.navigator = { userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120', maxTouchPoints: 0 };
+    const male = { name: 'Microsoft David', lang: 'en-US', voiceURI: 'david' };
+    const female = { name: 'Microsoft Zira', lang: 'en-US', voiceURI: 'zira' };
+    global.speechSynthesis.getVoices = jest.fn(() => [female, male]);
+    global.speechSynthesis.speak = jest.fn((utterance) => {
+      queueMicrotask(() => utterance.onend && utterance.onend());
+    });
+    global.fetch = jest.fn().mockResolvedValue({
+      json: async () => ({ success: false })
+    });
+
+    await import('../../public/shared/tts.js');
+
+    await window.speakNarrationAwaitEnd('Ahlan from Rami.', {
+      voice: 'en-US-Neural2-D',
+      lang: 'en-US',
+      gender: 'male',
+      preferFemale: false
+    });
+
+    expect(global.speechSynthesis.speak).toHaveBeenCalled();
+    const uttered = global.speechSynthesis.speak.mock.calls[0][0];
+    expect(uttered.voice).toBe(male);
+  });
+
+  test('Arabic narration prefers a male browser voice over the first ar-* voice', async () => {
+    global.navigator = { userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)', maxTouchPoints: 5 };
+    const femaleAr = { name: 'Microsoft Hoda', lang: 'ar-SA', voiceURI: 'hoda' };
+    const maleAr = { name: 'Microsoft Naayf', lang: 'ar-SA', voiceURI: 'naayf' };
+    global.speechSynthesis.getVoices = jest.fn(() => [femaleAr, maleAr]);
+    global.speechSynthesis.speak = jest.fn((utterance) => {
+      queueMicrotask(() => utterance.onend && utterance.onend());
+    });
+
+    await import('../../public/shared/tts.js');
+
+    await window.speakNarrationAwaitEnd('أهلاً وسهلاً', {
+      voice: 'ar-XA-Wavenet-B',
+      lang: 'ar-XA',
+      gender: 'male',
+      preferFemale: false
+    });
+
+    expect(global.speechSynthesis.speak).toHaveBeenCalled();
+    const uttered = global.speechSynthesis.speak.mock.calls[0][0];
+    expect(uttered.voice).toBe(maleAr);
+  });
 });

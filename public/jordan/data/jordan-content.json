@@ -66,7 +66,8 @@
       "close": "Close",
       "unesco": "UNESCO World Heritage",
       "context": "Context",
-      "evidence": "On the ground"
+      "evidence": "On the ground",
+      "startTour": "Start tour"
     },
     "ar": {
       "dir": "rtl",
@@ -108,7 +109,8 @@
       "close": "إغلاق",
       "unesco": "موقع تراث عالمي — اليونسكو",
       "context": "السياق",
-      "evidence": "على الأرض"
+      "evidence": "على الأرض",
+      "startTour": "ابدأ الجولة"
     }
   },
   "eras": [
@@ -1051,7 +1053,8 @@
           "شعر نبطي",
           "ربابة"
         ]
-      }
+      },
+      "image": "/jordan/assets/music/rababa.png"
     },
     {
       "id": "mijwiz",
@@ -1080,7 +1083,8 @@
           "تنفّس دائري",
           "أعراس"
         ]
-      }
+      },
+      "image": "/jordan/assets/music/mijwiz.png"
     },
     {
       "id": "dabke",
@@ -1109,7 +1113,8 @@
           "عرس",
           "أساليب محلية"
         ]
-      }
+      },
+      "image": "/jordan/assets/music/dabke.png"
     },
     {
       "id": "sahjeh",
@@ -1138,7 +1143,8 @@
           "ردّ وجواب",
           "مناسبات"
         ]
-      }
+      },
+      "image": "/jordan/assets/music/sahjeh.png"
     },
     {
       "id": "hjeini",
@@ -1167,7 +1173,8 @@
           "أغنية سفر",
           "وزن"
         ]
-      }
+      },
+      "image": "/jordan/assets/music/hjeini.png"
     },
     {
       "id": "bagpipes",
@@ -1196,7 +1203,8 @@
           "موسيقى عسكرية",
           "مراسم"
         ]
-      }
+      },
+      "image": "/jordan/assets/music/bagpipes.png"
     },
     {
       "id": "anthem",
@@ -1225,7 +1233,8 @@
           "رمز وطني",
           "استقلال"
         ]
-      }
+      },
+      "image": "/jordan/assets/music/anthem.png"
     },
     {
       "id": "jerash-festival-music",
@@ -1254,7 +1263,8 @@
           "إحياء التراث",
           "المسرح الجنوبي"
         ]
-      }
+      },
+      "image": "/jordan/assets/music/jerash-festival-music.png"
     },
     {
       "id": "bedouin-pop",
@@ -1283,7 +1293,8 @@
           "ديانا كرزون",
           "إذاعة"
         ]
-      }
+      },
+      "image": "/jordan/assets/music/bedouin-pop.png"
     },
     {
       "id": "amman-indie",
@@ -1312,7 +1323,8 @@
           "أوتوستراد",
           "المربّع"
         ]
-      }
+      },
+      "image": "/jordan/assets/music/amman-indie.png"
     }
   ],
   "phrases": [

@@ -141,24 +141,38 @@
     });
   }
 
-  // Keyboard navigation enhancement
-  function initKeyboardNav() {
+  // Click / keyboard: same as the primary Enter / open button
+  function initCardOpen() {
     const cards = document.querySelectorAll('.fun-card');
-    
-    cards.forEach(card => {
-      const links = card.querySelectorAll('.fun-card__link');
-      
-      // Make card focusable
-      if (links.length > 0) {
-        card.setAttribute('tabindex', '0');
-        
-        card.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            links[0].click();
-          }
-        });
-      }
+
+    cards.forEach((card) => {
+      const primary = card.querySelector('.fun-card__link--primary');
+      if (!primary) return;
+
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('role', 'link');
+      card.setAttribute(
+        'aria-label',
+        primary.textContent.replace(/\s+/g, ' ').trim()
+      );
+      card.classList.add('fun-card--clickable');
+
+      const openLikeButton = () => {
+        primary.click();
+      };
+
+      card.addEventListener('click', (e) => {
+        // Leave Enter button, More, and nested links alone
+        if (e.target.closest('a, button, summary, details')) return;
+        openLikeButton();
+      });
+
+      card.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        if (e.target !== card) return;
+        e.preventDefault();
+        openLikeButton();
+      });
     });
   }
 
@@ -521,6 +535,68 @@
     });
   }
 
+  // QR tiles — absolute URLs so a phone scan opens each site directly
+  function absoluteSiteUrl(path) {
+    try {
+      return new URL(path, window.location.origin).href;
+    } catch (_) {
+      return path;
+    }
+  }
+
+  function mountQr(el, url, size) {
+    if (!el || !url || typeof window.QRCode !== 'function') return false;
+    el.innerHTML = '';
+    try {
+      // eslint-disable-next-line no-new
+      new window.QRCode(el, {
+        text: url,
+        width: size,
+        height: size,
+        correctLevel: window.QRCode.CorrectLevel ? window.QRCode.CorrectLevel.M : undefined,
+      });
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function initSiteQrCodes() {
+    const tiles = document.querySelectorAll('.fun-scan__tile[data-scan-path]');
+    if (!tiles.length) return;
+
+    const paint = () => {
+      tiles.forEach((tile) => {
+        const path = tile.getAttribute('data-scan-path');
+        const mount = tile.querySelector('[data-fun-qr]');
+        if (!path || !mount) return;
+        const url = absoluteSiteUrl(path);
+        tile.setAttribute('href', url);
+        tile.setAttribute('title', 'Open ' + url);
+        const ok = mountQr(mount, url, 112);
+        if (!ok) {
+          mount.innerHTML =
+            '<span class="fun-scan__qr-fallback"><i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></span>';
+        }
+      });
+    };
+
+    if (typeof window.QRCode === 'function') {
+      paint();
+      return;
+    }
+
+    // CDN may still be loading (defer-friendly)
+    let tries = 0;
+    const timer = setInterval(() => {
+      tries += 1;
+      if (typeof window.QRCode === 'function' || tries > 40) {
+        clearInterval(timer);
+        paint();
+      }
+    }, 50);
+  }
+
   // Initialize everything
   function init() {
     initThemeToggle();
@@ -529,9 +605,10 @@
     updateYear();
     initParallaxSparkles();
     initScrollAnimations();
-    initKeyboardNav();
+    initCardOpen();
     initEasterEgg();
     initSecretMortgageLink();
+    initSiteQrCodes();
     
     // Wait for libraries to load
     if (typeof THREE !== 'undefined') {

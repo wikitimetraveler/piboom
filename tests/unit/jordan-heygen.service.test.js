@@ -67,6 +67,17 @@ describe('jordan-heygen.service', () => {
     expect(pickRamiVoice([], 'en')).toBeNull();
   });
 
+  test('pickRamiVoice never selects a female voice', () => {
+    const voices = [
+      { voice_id: 'en-f', name: 'Warm Rami', gender: 'female', language: 'English' },
+      { voice_id: 'en-m', name: 'Marcus', gender: 'male', language: 'English' }
+    ];
+    expect(pickRamiVoice(voices, 'en').voiceId).toBe('en-m');
+    expect(
+      pickRamiVoice([{ voice_id: 'ar-f', name: 'GHIZLANE', gender: 'female', language: 'Arabic' }], 'ar')
+    ).toBeNull();
+  });
+
   test('demo catalog carries per-language slots the page reads', async () => {
     const demo = JSON.parse(await readFile(DEMO_PATH, 'utf8'));
     for (const lang of RAMI_LANGS) {

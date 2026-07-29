@@ -181,9 +181,11 @@
       utterance.volume = typeof options.volume === 'number' ? options.volume : 0.8;
       const voices = window.speechSynthesis.getVoices();
       const preferFemale = options.preferFemale === true || options.gender === 'female';
-      const picked = preferFemale ? pickFemaleBrowserVoice(voices) : voices.find((v) => /male|daniel|david|alex/i.test(v.name));
+      const picked = preferFemale
+        ? pickFemaleBrowserVoice(voices, options.lang)
+        : pickMaleBrowserVoice(voices, options.lang);
       if (picked) utterance.voice = picked;
-      applyBrowserLanguage(utterance, voices, options.lang);
+      applyBrowserLanguage(utterance, voices, options);
       // Young Pip only: push browser pitch near max (2) — avoid matron Zira/Susan
       if (options.youngFemale) {
         utterance.pitch = mobile ? 1.8 : Math.min(2, Math.max(1.6, 1 + (Number(options.pitch) || 6) / 12));
@@ -200,40 +202,87 @@
     }
   }
 
+  function voiceLabel(v) {
+    return `${v?.name || ''} ${v?.voiceURI || ''}`;
+  }
+
+  function isFemaleBrowserVoice(v) {
+    return /female|samantha|karen|jenny|aria|sara|natasha|siri|zira|susan|victoria|hazel|moira|fiona|hoda|salma|laila|ghizlane/i.test(
+      voiceLabel(v)
+    );
+  }
+
+  function isMaleBrowserVoice(v) {
+    return /\b(male|david|daniel|alex|mark|george|fred|tom|bruce|aaron|guy|james|john|ryan|matthew|sam|rami|maged|naeem|khaled|naayf)\b/i.test(
+      voiceLabel(v)
+    );
+  }
+
   /**
    * Force a non-English utterance onto a matching system voice.
    * Without this the default (usually English) voice reads foreign script as noise.
+   * Prefer male/female to match the requested gender — first ar-* voice is often female.
    */
-  function applyBrowserLanguage(utterance, voices, langCode) {
-    const code = String(langCode || '').trim();
+  function applyBrowserLanguage(utterance, voices, options = {}) {
+    const code = typeof options === 'string' ? options : String(options.lang || '').trim();
     if (!code) return;
     utterance.lang = code;
     const prefix = code.slice(0, 2).toLowerCase();
     if (prefix === 'en') return;
-    const match = (voices || []).find((v) => String(v.lang || '').toLowerCase().startsWith(prefix));
+    const preferFemale =
+      typeof options === 'object' &&
+      (options.preferFemale === true || String(options.gender || '').toLowerCase() === 'female');
+    const candidates = (voices || []).filter((v) => String(v.lang || '').toLowerCase().startsWith(prefix));
+    if (!candidates.length) return;
+    const match = preferFemale
+      ? candidates.find((v) => isFemaleBrowserVoice(v) && !isMaleBrowserVoice(v)) ||
+        candidates.find((v) => !isMaleBrowserVoice(v)) ||
+        candidates[0]
+      : candidates.find((v) => isMaleBrowserVoice(v) && !isFemaleBrowserVoice(v)) ||
+        candidates.find((v) => !isFemaleBrowserVoice(v)) ||
+        candidates[0];
     if (match) utterance.voice = match;
   }
 
-  function pickFemaleBrowserVoice(voices) {
+  function pickFemaleBrowserVoice(voices, langCode) {
     const list = Array.isArray(voices) ? voices : [];
-    const label = (v) => `${v.name || ''} ${v.voiceURI || ''}`;
     const matronHit = (v) =>
-      /susan|victoria|zira|hazel|moira|fiona|grandma|grandmother|mature|elder|catherine|martha/i.test(label(v));
+      /susan|victoria|zira|hazel|moira|fiona|grandma|grandmother|mature|elder|catherine|martha/i.test(voiceLabel(v));
     const youngHit = (v) =>
       /jenny|aria|samantha|nova|karen|allison|emily|ava|google us english female|microsoft jenny|microsoft aria/i.test(
-        label(v)
+        voiceLabel(v)
       );
-    const femaleHit = (v) => /female|samantha|karen|jenny|aria|sara|natasha|siri/i.test(label(v));
-    const maleHit = (v) =>
-      /\b(male|david|daniel|alex|mark|george|fred|tom|bruce|aaron|guy|james|john|ryan|matthew)\b/i.test(label(v));
+    const femaleHit = (v) => isFemaleBrowserVoice(v);
+    const maleHit = (v) => isMaleBrowserVoice(v);
+    const prefix = String(langCode || 'en').slice(0, 2).toLowerCase();
+    const langOk = (v) => String(v.lang || '').toLowerCase().startsWith(prefix);
     // Prefer young/playful — never lead with Zira/Susan (matron)
     return (
+      list.find((v) => langOk(v) && youngHit(v) && !matronHit(v)) ||
       list.find((v) => /en(-|_)?us/i.test(v.lang) && youngHit(v) && !matronHit(v)) ||
       list.find((v) => /^en/i.test(v.lang) && youngHit(v) && !matronHit(v)) ||
+      list.find((v) => langOk(v) && femaleHit(v) && !matronHit(v)) ||
       list.find((v) => /en(-|_)?us/i.test(v.lang) && femaleHit(v) && !matronHit(v)) ||
       list.find((v) => /^en/i.test(v.lang) && femaleHit(v) && !matronHit(v)) ||
+      list.find((v) => langOk(v) && !maleHit(v) && !matronHit(v)) ||
       list.find((v) => /en(-|_)?us/i.test(v.lang) && !maleHit(v) && !matronHit(v)) ||
       list.find((v) => /^en/i.test(v.lang) && !maleHit(v)) ||
+      null
+    );
+  }
+
+  /** Male guide voices (Rami, etc.) — prefer explicit male labels, then avoid known female names. */
+  function pickMaleBrowserVoice(voices, langCode) {
+    const list = Array.isArray(voices) ? voices : [];
+    const prefix = String(langCode || 'en').slice(0, 2).toLowerCase();
+    const langOk = (v) => String(v.lang || '').toLowerCase().startsWith(prefix);
+    return (
+      list.find((v) => langOk(v) && isMaleBrowserVoice(v) && !isFemaleBrowserVoice(v)) ||
+      list.find((v) => /en(-|_)?us/i.test(v.lang) && isMaleBrowserVoice(v) && !isFemaleBrowserVoice(v)) ||
+      list.find((v) => /^en/i.test(v.lang) && isMaleBrowserVoice(v) && !isFemaleBrowserVoice(v)) ||
+      list.find((v) => langOk(v) && !isFemaleBrowserVoice(v)) ||
+      list.find((v) => /en(-|_)?us/i.test(v.lang) && !isFemaleBrowserVoice(v)) ||
+      list.find((v) => isMaleBrowserVoice(v) && !isFemaleBrowserVoice(v)) ||
       null
     );
   }
@@ -289,10 +338,10 @@
         const voices = window.speechSynthesis.getVoices();
         const preferFemale = options.preferFemale === true || options.gender === 'female';
         const picked = preferFemale
-          ? pickFemaleBrowserVoice(voices)
-          : voices.find((v) => /male|daniel|david|alex/i.test(v.name));
+          ? pickFemaleBrowserVoice(voices, options.lang)
+          : pickMaleBrowserVoice(voices, options.lang);
         if (picked) utterance.voice = picked;
-        applyBrowserLanguage(utterance, voices, options.lang);
+        applyBrowserLanguage(utterance, voices, options);
         if (options.youngFemale) {
           utterance.pitch = mobile ? 1.8 : Math.min(2, Math.max(1.6, 1 + (Number(options.pitch) || 6) / 12));
           utterance.rate = mobile ? 1.05 : Math.min(1.25, Number(options.speakingRate) || 1.12);
@@ -327,7 +376,8 @@
       });
       const data = await response.json();
       if (!data.success || !data.audio) {
-        await speakBrowserChunkAwaitEnd(text, { ...options, preferFemale: true, gender: options.gender || 'female' });
+        // Keep requested gender — never force female (that broke male guides like Rami).
+        await speakBrowserChunkAwaitEnd(text, options);
         return;
       }
       const audioBlob = base64ToBlob(data.audio, 'audio/mp3');
@@ -373,6 +423,7 @@
     const isCancelled = typeof options.isCancelled === 'function' ? options.isCancelled : () => false;
     const youngFemale = options.youngFemale === true;
     const preferFemale = youngFemale || options.preferFemale === true || options.gender === 'female';
+    const preferMale = options.gender === 'male' || (!preferFemale && options.preferMale === true);
     const voice =
       options.voice || (youngFemale ? 'en-US-Neural2-H' : preferFemale ? 'en-US-Standard-F' : 'en-US-Standard-D');
     const vol = typeof options.volume === 'number' ? options.volume : 0.85;
@@ -385,7 +436,7 @@
       lang: options.lang,
       preferFemale,
       youngFemale,
-      gender: options.gender || (preferFemale ? 'female' : undefined),
+      gender: options.gender || (preferFemale ? 'female' : preferMale ? 'male' : undefined),
       isCancelled
     };
 

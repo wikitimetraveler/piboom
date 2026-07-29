@@ -110,7 +110,9 @@ export function pickRamiVoice(voices, lang = 'en') {
       if (!language.includes(wantedLanguage)) return null;
 
       let score = 10;
-      if (gender.includes('male') && !gender.includes('female')) score += 8;
+      // Rami is always a male guide — never select a female HeyGen voice.
+      if (gender.includes('female') && !gender.includes('male')) return null;
+      if (gender.includes('male')) score += 8;
       // HeyGen's Arabic catalog includes a voice named Rami — the guide's own name wins.
       if (/\brami\b/i.test(name)) score += 6;
       if (/warm|calm|natural|friendly|conversational|storyteller|narrator|documentary/i.test(name)) {

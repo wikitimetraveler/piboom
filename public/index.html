@@ -7,7 +7,7 @@
 <meta name="description" content="Explore, discover, and create — music pilgrimage, nature discovery, family history, Glazed donuts, a bilingual Jordan atlas, and HeyGen AI video by David Lane."/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
 <link rel="stylesheet" href="/shared/design-tokens.css"/>
 <link rel="stylesheet" href="/shared/css/fun-home.css"/>
@@ -55,11 +55,52 @@
 
       <div class="fun-hero__cta">
         <a class="fun-btn fun-btn--primary" href="#projects">
-          Enter projects
-          <i class="bi bi-arrow-down"></i>
+          Projects
+          <i class="bi bi-arrow-down" aria-hidden="true"></i>
         </a>
-        <a class="fun-btn fun-btn--ghost" href="/donuts/">
-          Visit Glazed
+        <a class="fun-featured-glazed" href="/donuts/" aria-label="Featured — Glazed donuts">
+          <span class="fun-featured-glazed__shine" aria-hidden="true"></span>
+          <span class="fun-featured-glazed__drip" aria-hidden="true"></span>
+          <img
+            class="fun-featured-glazed__donut"
+            src="/donuts/assets/products/classic-glazed-cutout.png"
+            width="48"
+            height="48"
+            alt=""
+            decoding="async"
+          />
+          <span class="fun-featured-glazed__copy">
+            <span class="fun-featured-glazed__eyebrow">Featured</span>
+            <span class="fun-featured-glazed__name">Glazed</span>
+          </span>
+          <i class="bi bi-arrow-right fun-featured-glazed__arrow" aria-hidden="true"></i>
+        </a>
+        <a class="fun-featured-jordan" href="/jordan/" aria-label="Featured — Jordan bilingual atlas">
+          <span class="fun-featured-jordan__heat" aria-hidden="true"></span>
+          <span class="fun-featured-jordan__sand" aria-hidden="true"></span>
+          <span class="fun-featured-jordan__mark" aria-hidden="true">
+            <svg viewBox="0 0 40 40" width="40" height="40" focusable="false">
+              <defs>
+                <radialGradient id="jdStarGlow" cx="50%" cy="45%" r="55%">
+                  <stop offset="0%" stop-color="#ffe8a8"/>
+                  <stop offset="55%" stop-color="#d4a24c"/>
+                  <stop offset="100%" stop-color="#8c2214"/>
+                </radialGradient>
+              </defs>
+              <circle cx="20" cy="20" r="18" fill="url(#jdStarGlow)" opacity="0.9"/>
+              <!-- Seven-pointed star — Jordan flag motif -->
+              <polygon
+                fill="#f6efe2"
+                points="20,6.5 22.3,15.1 30.6,11.6 25.3,18.8 33.2,23 24.2,23.4 25.9,32.2 20,25.4 14.1,32.2 15.8,23.4 6.8,23 14.7,18.8 9.4,11.6 17.7,15.1"
+              />
+            </svg>
+          </span>
+          <span class="fun-featured-jordan__copy">
+            <span class="fun-featured-jordan__eyebrow">Featured · EN / ع</span>
+            <span class="fun-featured-jordan__name">Jordan</span>
+            <span class="fun-featured-jordan__ar" lang="ar" dir="rtl">الأردن</span>
+          </span>
+          <i class="bi bi-arrow-right fun-featured-jordan__arrow" aria-hidden="true"></i>
         </a>
       </div>
     </div>
@@ -237,6 +278,58 @@
 
   </section>
 
+  <section class="fun-scan" id="scan" aria-labelledby="funScanTitle">
+    <div class="fun-scan__intro">
+      <p class="fun-scan__kicker"><i class="bi bi-qr-code" aria-hidden="true"></i> Scan · open on phone</p>
+      <h2 class="fun-scan__title" id="funScanTitle">Direct to each site</h2>
+      <p class="fun-scan__lead">Point your camera at a code — it jumps straight to that project.</p>
+    </div>
+    <div class="fun-scan__grid" id="funScanGrid">
+      <a class="fun-scan__tile" href="/music/music-research.html" data-scan-path="/music/music-research.html">
+        <span class="fun-scan__qr" data-fun-qr aria-hidden="true"></span>
+        <span class="fun-scan__meta">
+          <span class="fun-scan__name">Music</span>
+          <span class="fun-scan__hint">Open site</span>
+        </span>
+      </a>
+      <a class="fun-scan__tile" href="/nature/nature-hub.html" data-scan-path="/nature/nature-hub.html">
+        <span class="fun-scan__qr" data-fun-qr aria-hidden="true"></span>
+        <span class="fun-scan__meta">
+          <span class="fun-scan__name">Nature</span>
+          <span class="fun-scan__hint">Open site</span>
+        </span>
+      </a>
+      <a class="fun-scan__tile" href="/family/lane-family.html" data-scan-path="/family/lane-family.html">
+        <span class="fun-scan__qr" data-fun-qr aria-hidden="true"></span>
+        <span class="fun-scan__meta">
+          <span class="fun-scan__name">Family</span>
+          <span class="fun-scan__hint">Open site</span>
+        </span>
+      </a>
+      <a class="fun-scan__tile fun-scan__tile--glazed" href="/donuts/" data-scan-path="/donuts/">
+        <span class="fun-scan__qr" data-fun-qr aria-hidden="true"></span>
+        <span class="fun-scan__meta">
+          <span class="fun-scan__name">Glazed</span>
+          <span class="fun-scan__hint">Open site</span>
+        </span>
+      </a>
+      <a class="fun-scan__tile fun-scan__tile--jordan" href="/jordan/" data-scan-path="/jordan/">
+        <span class="fun-scan__qr" data-fun-qr aria-hidden="true"></span>
+        <span class="fun-scan__meta">
+          <span class="fun-scan__name">Jordan</span>
+          <span class="fun-scan__hint">Open site</span>
+        </span>
+      </a>
+      <a class="fun-scan__tile" href="/heygen-hub.html" data-scan-path="/heygen-hub.html">
+        <span class="fun-scan__qr" data-fun-qr aria-hidden="true"></span>
+        <span class="fun-scan__meta">
+          <span class="fun-scan__name">HeyGen</span>
+          <span class="fun-scan__hint">Open site</span>
+        </span>
+      </a>
+    </div>
+  </section>
+
   <section class="fun-about" aria-label="About">
     <p class="fun-about__line">
       Built to turn curiosity into tools you can walk through —
@@ -257,6 +350,7 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
 <script src="/shared/js/fun-home.js"></script>
 </body>
 </html>

@@ -202,14 +202,12 @@
   function setUiRunning(running) {
     document.body.classList.toggle('jd-story-running', running);
     const play = document.getElementById('jdStoryPlay');
-    const stop = document.getElementById('jdStoryStop');
     if (play) {
       play.setAttribute('aria-pressed', running ? 'true' : 'false');
       play.innerHTML = running
         ? `<i class="bi bi-pause-fill"></i> ${t('pauseReel')}`
-        : `<i class="bi bi-film"></i> ${t('playReel')}`;
+        : `<i class="bi bi-film"></i> ${t('startTour') || t('playReel')}`;
     }
-    if (stop) stop.hidden = !running;
     if (!running) {
       const status = document.getElementById('jdStoryStatus');
       const progress = document.getElementById('jdStoryProgress');
@@ -219,10 +217,8 @@
   }
 
   function setPlayEnabled(enabled) {
-    ['jdStoryPlay', 'jdStoryPlayHero'].forEach((id) => {
-      const btn = document.getElementById(id);
-      if (btn) btn.disabled = !enabled;
-    });
+    const btn = document.getElementById('jdStoryPlay');
+    if (btn) btn.disabled = !enabled;
   }
 
   function stopReel() {
@@ -328,11 +324,9 @@
 
   function bindUi() {
     document.getElementById('jdStoryPlay')?.addEventListener('click', togglePlay);
-    document.getElementById('jdStoryPlayHero')?.addEventListener('click', () => {
-      if (!state.running) scrollToEl(document.getElementById('jdGuide'));
-      togglePlay();
+    document.getElementById('jdStopAudio')?.addEventListener('click', () => {
+      if (state.running) stopReel();
     });
-    document.getElementById('jdStoryStop')?.addEventListener('click', () => stopReel());
     document.getElementById('jdStoryNarrate')?.addEventListener('change', persistNarratePref);
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && state.running) stopReel();

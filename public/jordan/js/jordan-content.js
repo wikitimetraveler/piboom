@@ -77,17 +77,17 @@
         </div>`
       : `<span class="jd-card-emoji" aria-hidden="true">${esc(item.emoji || '')}</span>`;
 
-    return `<div class="jd-card" role="button" tabindex="0" data-kind="${esc(kind)}" data-id="${esc(item.id)}"
-        aria-pressed="false" aria-label="${esc(pick(item.name))}">
+    return `<article class="jd-card" data-kind="${esc(kind)}" data-id="${esc(item.id)}">
       <div class="jd-card-inner">
-        <div class="jd-card-face jd-card-front">
+        <button type="button" class="jd-card-face jd-card-front jd-card-flip" aria-expanded="false"
+          aria-label="${esc(pick(item.name))} — ${esc(t('flipHint'))}">
           ${art}
           <h3 class="jd-card-name">${esc(pick(item.name))}</h3>
           <p class="jd-card-tagline">${esc(pick(item.tagline))}</p>
           <div class="jd-card-tags">${tagHtml}</div>
           <p class="jd-card-hint">${esc(t('flipHint'))}</p>
-        </div>
-        <div class="jd-card-face jd-card-back">
+        </button>
+        <div class="jd-card-face jd-card-back" data-card-back-flip>
           <h3 class="jd-card-name">${esc(pick(item.name))}</h3>
           <p class="jd-card-history">${esc(pick(item.history))}</p>
           <div class="jd-card-actions">
@@ -101,10 +101,13 @@
                   </button>`
                 : ''
             }
+            <button type="button" class="jd-btn jd-btn-ghost jd-btn-sm jd-card-flip" aria-label="${esc(t('back') || 'Back')}">
+              <i class="bi bi-arrow-counterclockwise"></i> ${esc(t('back') || 'Back')}
+            </button>
           </div>
         </div>
       </div>
-    </div>`;
+    </article>`;
   }
 
   function renderCards() {
@@ -251,13 +254,19 @@
 
   function toggleCard(card) {
     const flipped = card.classList.toggle('is-flipped');
-    card.setAttribute('aria-pressed', flipped ? 'true' : 'false');
+    card.querySelectorAll('.jd-card-flip').forEach((btn) => {
+      if (btn.classList.contains('jd-card-front')) {
+        btn.setAttribute('aria-expanded', flipped ? 'true' : 'false');
+      }
+    });
   }
 
   function unflipAll() {
     document.querySelectorAll('.jd-card.is-flipped').forEach((card) => {
       card.classList.remove('is-flipped');
-      card.setAttribute('aria-pressed', 'false');
+      card.querySelectorAll('.jd-card-front.jd-card-flip').forEach((btn) => {
+        btn.setAttribute('aria-expanded', 'false');
+      });
     });
   }
 
@@ -305,6 +314,23 @@
         return;
       }
 
+      const cardFlip = event.target.closest('.jd-card-flip');
+      if (cardFlip) {
+        event.preventDefault();
+        event.stopPropagation();
+        toggleCard(cardFlip.closest('.jd-card'));
+        return;
+      }
+
+      // Click anywhere on the back (outside action buttons) flips — same as front
+      const cardBack = event.target.closest('[data-card-back-flip]');
+      if (cardBack && !event.target.closest('button, a')) {
+        event.preventDefault();
+        event.stopPropagation();
+        toggleCard(cardBack.closest('.jd-card'));
+        return;
+      }
+
       const phrase = event.target.closest('[data-phrase-index]');
       if (phrase) {
         speakPhrase(Number(phrase.getAttribute('data-phrase-index')));
@@ -316,19 +342,10 @@
         openEra(eraTitle.closest('.jd-era')?.getAttribute('data-era-id'));
         return;
       }
-
-      const card = event.target.closest('.jd-card');
-      if (card) toggleCard(card);
     });
 
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') closeSheet();
-      if (event.key !== 'Enter' && event.key !== ' ') return;
-      const card = event.target.closest?.('.jd-card');
-      if (card && event.target === card) {
-        event.preventDefault();
-        toggleCard(card);
-      }
     });
 
     document.getElementById('jdSheetClose')?.addEventListener('click', closeSheet);
@@ -336,11 +353,6 @@
     document.getElementById('jdSheetListen')?.addEventListener('click', () => {
       i18n()?.unlockAudio();
       i18n()?.speakAsGuide(state.sheet.speech);
-    });
-    document.getElementById('jdMeetGuide')?.addEventListener('click', () => {
-      i18n()?.unlockAudio();
-      if (window.JordanHeygen?.playIntro) window.JordanHeygen.playIntro();
-      else i18n()?.speakAsGuide(pick(state.data?.guide?.greeting));
     });
 
     const year = document.getElementById('jdFooterYear');

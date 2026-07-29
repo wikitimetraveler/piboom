@@ -431,6 +431,21 @@
       stack: ['Bootstrap', 'HeyGen', 'Google Maps', 'Google TTS'],
     },
     {
+      id: 'jordan',
+      label: 'Jordan',
+      tagline: 'Bilingual atlas — Petra to mansaf, Rami guide in EN/AR',
+      path: '/jordan/',
+      icon: 'bi-globe-central-south-asia',
+      category: 'other',
+      featured: true,
+      featuredOrder: 7,
+      authRequired: false,
+      problem: 'Explore Jordan’s history, food, and music in English or Arabic with a local AI guide.',
+      consultingBlurb:
+        'Public bilingual atlas — EN/AR toggle, story reel, map layers, and Rami HeyGen clips. Fully public — no login.',
+      stack: ['Bootstrap', 'HeyGen', 'Google Maps', 'Google TTS', 'i18n'],
+    },
+    {
       id: 'heygen-hub',
       label: 'HeyGen Hub',
       tagline: 'Avatar clips and HyperFrames narrated reels',

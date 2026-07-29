@@ -178,7 +178,7 @@ class ModernNavbar extends HTMLElement {
   }
 
   render() {
-    const brand = this.getAttribute('brand') || 'DevConnect Labs';
+    const brand = this.getAttribute('brand') || 'Home';
     const compact = this.hasAttribute('compact');
     const demoMode = this.isDemoMode();
     const cfg = window.MENU_CONFIG || {};
@@ -473,7 +473,7 @@ class ModernNavbar extends HTMLElement {
       <nav class="modern-navbar">
         <div class="container">
           <a class="navbar-brand-modern" href="/">
-            <i class="bi-music-note-beamed"></i>
+            <i class="bi-house-door"></i>
             ${brand}
           </a>
           

@@ -85,7 +85,9 @@
 
   function renderFilters() {
     document.querySelectorAll('#jdMapFilters .jd-chip').forEach((chip) => {
-      chip.classList.toggle('is-active', chip.getAttribute('data-filter') === state.filter);
+      const active = chip.getAttribute('data-filter') === state.filter;
+      chip.classList.toggle('is-active', active);
+      chip.setAttribute('aria-pressed', active ? 'true' : 'false');
     });
   }
 
@@ -121,10 +123,10 @@
   function openInfo(site) {
     const entry = state.markers[site.id];
     if (!entry || !state.info) return;
-    state.info.setContent(`<div style="color:#2a201a;max-width:260px;font-family:system-ui,sans-serif">
-      <strong style="font-size:14px">${esc(pick(site.name))}</strong><br/>
-      <span style="font-size:12px;color:#6b5b4a">${esc(pick(site.place))}</span>
-      <p style="font-size:12px;margin:6px 0 0;line-height:1.5">${esc(pick(site.blurb))}</p>
+    state.info.setContent(`<div style="color:#1c1510;max-width:280px;font-family:system-ui,sans-serif">
+      <strong style="font-size:16px;line-height:1.3">${esc(pick(site.name))}</strong><br/>
+      <span style="font-size:13px;color:#4a3c2e;font-weight:600">${esc(pick(site.place))}</span>
+      <p style="font-size:13px;margin:8px 0 0;line-height:1.55;color:#2a201a">${esc(pick(site.blurb))}</p>
     </div>`);
     if (window.googleAdvancedMarkers?.openMapInfoWindow) {
       window.googleAdvancedMarkers.openMapInfoWindow(state.info, state.map, entry.marker);
@@ -149,6 +151,9 @@
     if (options.speak !== false) {
       i18n()?.speakAsGuide(`${pick(site.name)}. ${pick(site.blurb)}`);
     }
+
+    const activeBtn = document.querySelector(`#jdSiteList [data-site-id="${siteId}"]`);
+    activeBtn?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 
     if (!state.map) return;
     openInfo(site);

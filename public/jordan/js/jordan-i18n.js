@@ -9,10 +9,10 @@
   const STORAGE_KEY = 'jordanLang';
   const LANGS = ['en', 'ar'];
 
-  /** Guide voice per language. Arabic falls back to browser ar-* voices on mobile. */
+  /** Guide voice per language — always male (Rami). Arabic falls back to browser ar-* males on mobile. */
   const VOICES = {
-    en: { voice: 'en-US-Neural2-D', lang: 'en-US', speakingRate: 0.98, pitch: -1 },
-    ar: { voice: 'ar-XA-Wavenet-B', lang: 'ar-XA', speakingRate: 0.95, pitch: -1 }
+    en: { voice: 'en-US-Neural2-D', lang: 'en-US', speakingRate: 0.98, pitch: -1, gender: 'male' },
+    ar: { voice: 'ar-XA-Wavenet-B', lang: 'ar-XA', speakingRate: 0.95, pitch: -1, gender: 'male' }
   };
 
   const state = {
@@ -162,6 +162,8 @@
       speakingRate: options.speakingRate ?? profile.speakingRate,
       pitch: options.pitch ?? profile.pitch,
       volume: options.volume ?? 0.9,
+      gender: options.gender || profile.gender || 'male',
+      preferFemale: false,
       isCancelled: options.isCancelled
     };
 

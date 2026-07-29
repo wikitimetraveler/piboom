@@ -57,7 +57,13 @@ Impact graph seeding adds **`NEAR`** edges (`disaster_event → loan`) from a sp
 
 ### FIRMS clustering
 
-FIRMS NRT detections are clustered with **union-find single-linkage** (`clusterFirmsDetectionsByDistance`): membership is order-independent; elongated fronts can chain beyond diameter \(2r\). Centroids are computed per component for logging. Quality gates (confidence / thermal / cluster-or-strong-solo) remain precision-oriented.
+FIRMS NRT detections are clustered with **union-find single-linkage** (`clusterFirmsDetectionsByDistance`): membership is order-independent; elongated fronts can chain beyond diameter \(2r\). Quality gates (confidence / thermal / cluster-or-strong-solo) remain precision-oriented.
+
+**Upsert shape:** `aggregateFirmsClusterEvents` writes **one `disasters` row per qualifying cluster** (centroid + max FRP/brightness), not one row per VIIRS pixel. Stable `source_id` looks like `firms-cluster:YYYY-MM-DD:lat:lng`. Coordinates use `hasFiniteCoords` (allows `0°`; never falsy `lat && lng`).
+
+### USGS magnitude floor
+
+`ingestUsgsQuakes` keeps quakes with `mag >= USGS_MIN_MAG` (default **2.5**). Optional `USGS_MIN_SIG`: also keep when USGS significance ≥ that value even if mag is below the floor. This drops microquake “rumbling” from the daily event list.
 
 | Component | Path |
 |-----------|------|
@@ -128,6 +134,9 @@ FIRMS NRT detections are clustered with **union-find single-linkage** (`clusterF
 ## Environment Variables
 
 - `NASA_API_KEY` – NASA FIRMS fire data
+- `FIRMS_MIN_CONFIDENCE` / `FIRMS_MIN_BRIGHTNESS` / `FIRMS_MIN_FRP` / `FIRMS_CLUSTER_RADIUS_KM` – FIRMS quality gates (defaults: high / 330 / 4 / 5)
+- `USGS_MIN_MAG` – Minimum earthquake magnitude to ingest (default `2.5`)
+- `USGS_MIN_SIG` – Optional USGS significance floor; when set, keep quakes with `sig >=` this value even if mag is below `USGS_MIN_MAG`
 - `DATABASE_URL` – PostgreSQL (disasters table, `fire_cameras` hazard webcams)
 - `MAPBOX_ACCESS_TOKEN` – Geocoding (loan addresses, disaster county/state lookup, ALERTCalifornia camera county backfill)
 - `WEBCOOS_API_TOKEN` – NOAA WebCOOS assets API (required for WebCOOS webcam ingest)

@@ -319,6 +319,30 @@ function mapCountyToFips(countyName, stateAbbr) {
 }
 
 /**
+ * True when lat/lng are finite numbers (including 0° equator / prime meridian).
+ * Rejects null / undefined / '' / NaN / Infinity. Do not use falsy `lat && lng`.
+ * @param {*} lat
+ * @param {*} lng
+ * @returns {boolean}
+ */
+export function hasFiniteCoords(lat, lng) {
+  if (lat === null || lat === undefined || lat === '') return false;
+  if (lng === null || lng === undefined || lng === '') return false;
+  return Number.isFinite(Number(lat)) && Number.isFinite(Number(lng));
+}
+
+/**
+ * Keep a disaster row when FIPS is present or coordinates are finite (incl. 0°).
+ * @param {{ county_fips?: *, lat?: *, lng?: * }} rec
+ * @returns {boolean}
+ */
+export function shouldIncludeDisasterRecord(rec) {
+  if (!rec) return false;
+  if (rec.county_fips) return true;
+  return hasFiniteCoords(rec.lat, rec.lng);
+}
+
+/**
  * Calculate distance between two lat/lng points in kilometers (Haversine formula)
  * @param {number} lat1 - Latitude of first point
  * @param {number} lng1 - Longitude of first point
@@ -823,6 +847,7 @@ export function clusterFirmsDetectionsByDistance(fires, radiusKm) {
   }
 
   const clusterSizeByIndex = new Array(n).fill(1);
+  const rootByIndex = new Array(n).fill(0);
   const centroids = new Map();
   for (const [root, idxs] of members.entries()) {
     let latSum = 0;
@@ -831,6 +856,7 @@ export function clusterFirmsDetectionsByDistance(fires, radiusKm) {
       latSum += Number(fires[i].lat);
       lngSum += Number(fires[i].lng);
       clusterSizeByIndex[i] = idxs.length;
+      rootByIndex[i] = root;
     }
     centroids.set(root, {
       lat: latSum / idxs.length,
@@ -839,7 +865,93 @@ export function clusterFirmsDetectionsByDistance(fires, radiusKm) {
     });
   }
 
-  return { clusterSizeByIndex, centroids, componentCount: members.size };
+  return { clusterSizeByIndex, centroids, componentCount: members.size, rootByIndex };
+}
+
+/**
+ * Collapse FIRMS detections to one disaster event per union-find component
+ * that passes the likely-fire gate (clustered OR strong solo).
+ *
+ * @param {Array<{ lat: number, lng: number, detection: object, start: string, props: object }>} significantFires
+ * @param {{ clusterSizeByIndex: number[], centroids?: Map<number, { lat: number, lng: number, size: number }>, rootByIndex?: number[] }} clusterResult
+ * @param {ReturnType<typeof getFirmsQualityThresholds>} [thresholds]
+ * @returns {Array<object>} one aggregate fire event per qualifying component
+ */
+export function aggregateFirmsClusterEvents(
+  significantFires,
+  clusterResult = {},
+  thresholds = getFirmsQualityThresholds()
+) {
+  const fires = Array.isArray(significantFires) ? significantFires : [];
+  const clusterSizeByIndex = clusterResult.clusterSizeByIndex || [];
+  const rootByIndex = clusterResult.rootByIndex;
+  const centroids = clusterResult.centroids;
+  const confRank = FIRMS_CONFIDENCE_RANK;
+  const membersByRoot = new Map();
+
+  for (let i = 0; i < fires.length; i++) {
+    const fire = fires[i];
+    const clusterSize = clusterSizeByIndex[i] || 1;
+    if (!isLikelyActualFirmsFire(fire.detection, clusterSize, thresholds)) continue;
+    const root = rootByIndex?.[i] ?? i;
+    if (!membersByRoot.has(root)) membersByRoot.set(root, []);
+    membersByRoot.get(root).push(i);
+  }
+
+  const events = [];
+  for (const [root, idxs] of membersByRoot.entries()) {
+    const members = idxs.map((i) => fires[i]);
+    const c = centroids?.get?.(root);
+    let lat;
+    let lng;
+    if (c && hasFiniteCoords(c.lat, c.lng)) {
+      lat = Number(c.lat);
+      lng = Number(c.lng);
+    } else {
+      lat = members.reduce((s, m) => s + Number(m.lat), 0) / members.length;
+      lng = members.reduce((s, m) => s + Number(m.lng), 0) / members.length;
+    }
+
+    let maxBright = null;
+    let maxFrp = null;
+    let bestConf = 'low';
+    let earliest = members[0].start;
+    const memberIds = [];
+    for (const m of members) {
+      const { brightness, frp, confidence } = m.detection || {};
+      if (brightness != null && (maxBright == null || brightness > maxBright)) maxBright = brightness;
+      if (frp != null && (maxFrp == null || frp > maxFrp)) maxFrp = frp;
+      if ((confRank[confidence] ?? -1) > (confRank[bestConf] ?? -1)) bestConf = confidence;
+      if (m.start && (!earliest || m.start < earliest)) earliest = m.start;
+      memberIds.push(String(m.props?.id || `${m.lat},${m.lng},${m.start}`));
+    }
+
+    const day = String(earliest || new Date().toISOString()).slice(0, 10);
+    const sourceId = `firms-cluster:${day}:${Number(lat).toFixed(2)}:${Number(lng).toFixed(2)}`;
+
+    events.push({
+      lat,
+      lng,
+      detection: {
+        brightness: maxBright,
+        frp: maxFrp,
+        confidence: bestConf,
+        daynight: members[0].detection?.daynight || '',
+        type: members[0].detection?.type || '',
+      },
+      start: earliest,
+      props: {
+        ...(members[0].props || {}),
+        id: sourceId,
+        cluster_size: members.length,
+        member_ids: memberIds,
+      },
+      coords: [lng, lat],
+      memberCount: members.length,
+    });
+  }
+
+  return events;
 }
 
 /** NASA FIRMS (active fires) - VIIRS NRT GeoJSON **/
@@ -982,7 +1094,7 @@ export async function ingestFirmsNrt() {
     const lat = coords[1];
     const lng = coords[0];
 
-    if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+    if (!hasFiniteCoords(lat, lng)) continue;
 
     const detection = parseFirmsDetectionProps(props);
     if (!passesFirmsConfidenceGate(detection.confidence, thresholds)) {
@@ -1023,29 +1135,20 @@ export async function ingestFirmsNrt() {
   console.log(`   - ${significantFires.length} candidate fire detections remaining`);
 
   // Union-find single-linkage (order-independent membership). See clusterFirmsDetectionsByDistance.
-  const { clusterSizeByIndex, componentCount } = clusterFirmsDetectionsByDistance(
+  const clusterResult = clusterFirmsDetectionsByDistance(
     significantFires,
     thresholds.clusterRadiusKm
   );
+  const { componentCount } = clusterResult;
 
-  const finalFires = [];
-  let filteredByLikelyFire = 0;
+  // One disaster row per qualifying cluster (not per pixel hotspot).
+  const finalFires = aggregateFirmsClusterEvents(significantFires, clusterResult, thresholds);
+  const filteredByLikelyFire = Math.max(0, significantFires.length - finalFires.reduce((n, e) => n + (e.memberCount || 1), 0));
 
-  for (let i = 0; i < significantFires.length; i++) {
-    const fire = significantFires[i];
-    const clusterSize = clusterSizeByIndex[i] || 1;
-
-    if (isLikelyActualFirmsFire(fire.detection, clusterSize, thresholds)) {
-      finalFires.push(fire);
-    } else {
-      filteredByLikelyFire++;
-    }
-  }
-
-  console.log(`🔥 FIRMS: Likely-fire gate:`);
+  console.log(`🔥 FIRMS: Likely-fire gate + cluster aggregate:`);
   console.log(`   - ${componentCount} fire clusters identified (union-find / single-linkage)`);
-  console.log(`   - ${filteredByLikelyFire} filtered (unlikely isolated noise)`);
-  console.log(`   - ${finalFires.length} likely fires ready for ingestion`);
+  console.log(`   - ${filteredByLikelyFire} detections not in qualifying clusters (unlikely isolated noise)`);
+  console.log(`   - ${finalFires.length} cluster events ready for ingestion`);
   
   // Third pass: Geocode and prepare records
   // Limit: 500 with Mapbox (was 100 for Nominatim 1 req/sec). Override via FIRMS_GEOCODE_LIMIT env.
@@ -1058,12 +1161,12 @@ export async function ingestFirmsNrt() {
   await loadFipsReference();
   
   for (const fire of finalFires) {
-    const { lat, lng, detection, start, props } = fire;
+    const { lat, lng, detection, start, props, memberCount } = fire;
     const { brightness, confidence, frp } = detection;
     let county = null, state = null, fips = null;
     
     // Only geocode if we haven't exceeded the limit (prevents runaway costs)
-    if (Number.isFinite(lat) && Number.isFinite(lng) && geocodingCalls < MAX_GEOCODING_CALLS) {
+    if (hasFiniteCoords(lat, lng) && geocodingCalls < MAX_GEOCODING_CALLS) {
       try {
         const rev = await reverseGeocodeCountyState(lat, lng);
         county = rev.county; 
@@ -1084,6 +1187,7 @@ export async function ingestFirmsNrt() {
       console.log(`⚠️  FIRMS: Reached geocoding limit (${MAX_GEOCODING_CALLS}), skipping remaining geocoding calls`);
     }
     
+    const n = memberCount || 1;
     const rec = {
       source: 'firms',
       event_type: 'wildfire',
@@ -1092,14 +1196,16 @@ export async function ingestFirmsNrt() {
       state_abbr: state,
       start_time: start,
       end_time: null,
-      severity: `${confidence}${brightness != null ? ` (${brightness}K)` : ''}${frp != null ? ` FRP ${frp}MW` : ''}`.trim(),
-      title: `Wildfire${brightness != null ? ` (${brightness}K)` : frp != null ? ` (FRP ${frp}MW)` : ''}`.trim(),
+      severity: `${confidence}${brightness != null ? ` (${brightness}K)` : ''}${frp != null ? ` FRP ${frp}MW` : ''}${n > 1 ? ` · ${n} px` : ''}`.trim(),
+      title: n > 1
+        ? `Wildfire cluster (${n} detections${frp != null ? `, FRP ${frp}MW` : brightness != null ? `, ${brightness}K` : ''})`
+        : `Wildfire${brightness != null ? ` (${brightness}K)` : frp != null ? ` (FRP ${frp}MW)` : ''}`.trim(),
       lat, lng,
       source_id: String(props.id || `${lat},${lng},${start}`),
       raw: props
     };
     
-    if (rec.county_fips || (lat && lng)) {
+    if (shouldIncludeDisasterRecord(rec)) {
       batch.push(rec);
     } else {
       noFipsCount++;
@@ -1120,14 +1226,44 @@ export async function ingestFirmsNrt() {
     fetched: feats.length,
     prepared: batch.length,
     likelyFire: finalFires.length,
+    clusterEvents: finalFires.length,
     filtered: {
       confidence: filteredByConfidence,
       weakSignal: filteredBySignal,
       unlikelyFire: filteredByLikelyFire,
     },
   };
-  console.log(`🔥 FIRMS: Inserted ${summary.inserted}, skipped ${summary.skipped}, fetched ${summary.fetched}, likely ${summary.likelyFire}`);
+  console.log(`🔥 FIRMS: Inserted ${summary.inserted}, skipped ${summary.skipped}, fetched ${summary.fetched}, cluster events ${summary.clusterEvents}`);
   return summary;
+}
+
+/** USGS magnitude / significance floors for ingest (drops microquake rumbling). */
+export function getUsgsQualityThresholds() {
+  const magParsed = parseFloat(process.env.USGS_MIN_MAG ?? '2.5');
+  const sigRaw = process.env.USGS_MIN_SIG;
+  const sigParsed = sigRaw != null && String(sigRaw).trim() !== '' ? parseFloat(sigRaw) : null;
+  return {
+    minMag: Number.isFinite(magParsed) ? magParsed : 2.5,
+    // Optional: keep quakes with USGS significance >= minSig even if mag < minMag
+    minSig: Number.isFinite(sigParsed) ? sigParsed : null,
+  };
+}
+
+/**
+ * Keep earthquake if magnitude meets floor, or (when USGS_MIN_SIG set) significance does.
+ * @param {{ mag?: *, sig?: * }} props
+ * @param {{ minMag: number, minSig: number|null }} [thresholds]
+ * @returns {boolean}
+ */
+export function passesUsgsQuakeGate(props = {}, thresholds = getUsgsQualityThresholds()) {
+  const mag = props.mag != null && props.mag !== '' ? Number(props.mag) : null;
+  const sig = props.sig != null && props.sig !== '' ? Number(props.sig) : null;
+  const magOk = Number.isFinite(mag) && mag >= thresholds.minMag;
+  if (thresholds.minSig != null) {
+    const sigOk = Number.isFinite(sig) && sig >= thresholds.minSig;
+    return magOk || sigOk;
+  }
+  return magOk;
 }
 
 /** USGS Earthquakes GeoJSON (past day) **/
@@ -1145,13 +1281,19 @@ export async function ingestUsgsQuakes() {
     return { inserted: 0, skipped: 0 };
   }
   const feats = (geo && geo.features) ? geo.features : [];
-  console.log(`🌍 USGS: Fetched ${feats.length} earthquakes`);
+  const thresholds = getUsgsQualityThresholds();
+  console.log(`🌍 USGS: Fetched ${feats.length} earthquakes (minMag=${thresholds.minMag}${thresholds.minSig != null ? `, minSig=${thresholds.minSig}` : ''})`);
   const batch = [];
   const MAX_GEOCODING_CALLS = 50; // Limit for earthquakes (usually fewer)
   let geocodingCalls = 0;
+  let filteredByMag = 0;
   
   for (const f of feats) {
     const props = f.properties || {};
+    if (!passesUsgsQuakeGate(props, thresholds)) {
+      filteredByMag++;
+      continue;
+    }
     const coords = (f.geometry && f.geometry.coordinates) || [];
     const lng = coords[0];
     const lat = coords[1];
@@ -1159,7 +1301,7 @@ export async function ingestUsgsQuakes() {
     let county = null, state = null, fips = null;
     
     // Only geocode if under limit (prevents excessive API calls)
-    if (lat && lng && geocodingCalls < MAX_GEOCODING_CALLS) {
+    if (hasFiniteCoords(lat, lng) && geocodingCalls < MAX_GEOCODING_CALLS) {
       try {
         const rev = await reverseGeocodeCountyState(lat, lng);
         county = rev.county; state = rev.state;
@@ -1177,7 +1319,7 @@ export async function ingestUsgsQuakes() {
     await loadFipsReference();
     fips = mapCountyToFips(county, state);
     // Use '00000' when geocoding fails but we have coordinates (e.g. offshore quakes) so it appears on map
-    if (!fips && lat && lng) fips = '00000';
+    if (!fips && hasFiniteCoords(lat, lng)) fips = '00000';
     const rec = {
       source: 'usgs',
       event_type: 'earthquake',
@@ -1194,7 +1336,7 @@ export async function ingestUsgsQuakes() {
     };
     if (rec.county_fips) batch.push(rec);
   }
-  console.log(`🌍 USGS: Prepared ${batch.length} records for database insertion`);
+  console.log(`🌍 USGS: Filtered ${filteredByMag} below mag/sig floor; prepared ${batch.length} records for database insertion`);
   return upsertDisasters(batch);
 }
 
@@ -1247,7 +1389,7 @@ export async function ingestNwsCap(options = {}) {
       }
     }
     // Reverse geocode when we have lat/lng but need county/state
-    if ((!county || !state) && lat && lng && geocodingCalls < MAX_GEOCODING_CALLS) {
+    if ((!county || !state) && hasFiniteCoords(lat, lng) && geocodingCalls < MAX_GEOCODING_CALLS) {
       try {
         const rev = await reverseGeocodeCountyState(lat, lng);
         county = county || rev.county; state = state || rev.state;
@@ -1262,13 +1404,13 @@ export async function ingestNwsCap(options = {}) {
       }
     }
     // Forward geocode when we have county/state but no lat/lng (needed for map display)
-    if ((!lat || !lng) && county && state && geocodingCalls < MAX_GEOCODING_CALLS) {
+    if (!hasFiniteCoords(lat, lng) && county && state && geocodingCalls < MAX_GEOCODING_CALLS) {
       const cacheKey = `${county}|${state}`;
       let coords = coordCache.get(cacheKey);
       if (!coords) {
         try {
           const res = await geocodeCountyStateWithCache(county, state);
-          if (res?.latitude && res?.longitude) {
+          if (hasFiniteCoords(res?.latitude, res?.longitude)) {
             coords = { lat: res.latitude, lng: res.longitude };
             coordCache.set(cacheKey, coords);
             geocodingCalls++;
@@ -1277,7 +1419,7 @@ export async function ingestNwsCap(options = {}) {
           // Skip on error
         }
       }
-      if (coords?.lat && coords?.lng) {
+      if (hasFiniteCoords(coords?.lat, coords?.lng)) {
         lat = coords.lat;
         lng = coords.lng;
       }
@@ -1285,7 +1427,7 @@ export async function ingestNwsCap(options = {}) {
     await loadFipsReference();
     fips = mapCountyToFips(county, state);
     // Use '00000' when we have coordinates but no county (e.g. marine zones) so alert still appears on map
-    if (!fips && (lat || lng)) fips = '00000';
+    if (!fips && hasFiniteCoords(lat, lng)) fips = '00000';
     const start = props.effective || props.onset || props.sent || new Date().toISOString();
     const rec = {
       source,
@@ -1359,23 +1501,23 @@ export async function ingestFema() {
     const rec = resolveFemaDeclarationFields(item);
     if (!rec || !(rec.county_fips !== '00000' || (rec.county_name && rec.state_abbr))) continue;
 
-    if ((!rec.lat || !rec.lng) && rec.county_name && rec.state_abbr) {
+    if (!hasFiniteCoords(rec.lat, rec.lng) && rec.county_name && rec.state_abbr) {
       const cacheKey = `${rec.county_name}|${rec.state_abbr}`;
       let coords = coordCache.get(cacheKey);
       if (!coords) {
         try {
           coords = await geocodeCountyStateWithCache(rec.county_name, rec.state_abbr);
-          if (coords?.latitude && coords?.longitude) {
+          if (hasFiniteCoords(coords?.latitude, coords?.longitude)) {
             coordCache.set(cacheKey, { lat: coords.latitude, lng: coords.longitude });
           }
         } catch (e) {
           // Continue without coords
         }
       }
-      if (coords?.lat && coords?.lng) {
+      if (hasFiniteCoords(coords?.lat, coords?.lng)) {
         rec.lat = coords.lat;
         rec.lng = coords.lng;
-      } else if (coords?.latitude && coords?.longitude) {
+      } else if (hasFiniteCoords(coords?.latitude, coords?.longitude)) {
         rec.lat = coords.latitude;
         rec.lng = coords.longitude;
       }
@@ -1651,12 +1793,12 @@ export async function ingestCaFireCameras() {
         
         return camera;
       }).filter((cam, filterIdx) => {
-        // Only include cameras with valid coordinates
-        const hasCoords = cam.latitude && cam.longitude && 
-                          !isNaN(parseFloat(cam.latitude)) && 
-                          !isNaN(parseFloat(cam.longitude)) &&
-                          Math.abs(parseFloat(cam.latitude)) <= 90 &&
-                          Math.abs(parseFloat(cam.longitude)) <= 180;
+        // Only include cameras with valid coordinates (allow 0° — do not use falsy checks)
+        const lat = parseFloat(cam.latitude);
+        const lng = parseFloat(cam.longitude);
+        const hasCoords = hasFiniteCoords(lat, lng)
+          && Math.abs(lat) <= 90
+          && Math.abs(lng) <= 180;
         if (!hasCoords && filterIdx === 0) {
           console.log(`📹 First camera missing or invalid coordinates:`, cam);
         }

@@ -188,6 +188,9 @@ function initDuSectionCards() {
       syncDuWorkflowPillLocal(step);
       if (sectionId === 'collapseLoans') {
         setDuSectionPillActive('collapseLoans');
+        // AG Grid needs a layout pass after Bootstrap expand (was collapsed / 0-height)
+        setTimeout(refreshEncompassLoansGridLayout, 50);
+        setTimeout(refreshEncompassLoansGridLayout, 200);
       }
     });
     el.addEventListener('hidden.bs.collapse', () => {
@@ -698,6 +701,9 @@ function refreshEncompassLoansGridLayout() {
   if (!encompassLoansGridApi) return;
   if (typeof encompassLoansGridApi.sizeColumnsToFit === 'function') {
     encompassLoansGridApi.sizeColumnsToFit();
+  }
+  if (typeof encompassLoansGridApi.resetRowHeights === 'function') {
+    encompassLoansGridApi.resetRowHeights();
   }
   if (map && typeof google !== 'undefined' && google.maps?.event) {
     google.maps.event.trigger(map, 'resize');
