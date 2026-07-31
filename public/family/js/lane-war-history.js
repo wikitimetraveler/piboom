@@ -85,6 +85,33 @@ const CAMPAIGN_CONTEXT = {
     },
     { year: 1763, event: 'Treaty settlements reshape control and migration pressures.' }
   ],
+  'barbary-wars': [
+    {
+      year: 1801,
+      event:
+        'First Barbary War opens after Tripoli’s ultimatum; U.S. Mediterranean squadron deploys (Jefferson administration).'
+    },
+    {
+      year: 1801,
+      event:
+        'USS Enterprize (Sterett) defeats the corsair Tripoli (1 Aug.)—early U.S. Navy victory often cited in general histories.'
+    },
+    {
+      year: 1804,
+      event:
+        'Burning of the captured frigate Philadelphia in Tripoli harbor (Decatur / Intrepid)—standard First Barbary War highlight.'
+    },
+    {
+      year: 1805,
+      event:
+        'Derna expedition and peace with Tripoli close the First Barbary War in many textbook chronologies.'
+    },
+    {
+      year: 1815,
+      event:
+        'Second Barbary War (Algiers): Decatur’s squadron forces new treaties—brief follow-on conflict after the War of 1812.'
+    }
+  ],
   'war-of-1812': [
     { year: 1812, event: 'War declared between the United States and Britain.' },
     { year: 1813, event: 'Regional militia and regular units guard coasts and frontiers.' },
@@ -232,13 +259,18 @@ function confidenceClass(conf) {
 }
 
 function associationLabel(entry) {
-  return entry?.associationType === 'family-associated' ? 'Family-associated' : 'Service member';
+  if (entry?.associationType === 'family-associated') return 'Family-associated';
+  if (entry?.associationType === 'external-research') return 'External research (not in Vol. I)';
+  return 'Service member';
 }
 
 function participantCampaignNote(entry) {
-  const personId = Number(entry?.person?.id);
-  if (activeWarSlug === 'mexican-american-war' && personId === 1024) {
+  const personId = entry?.person?.id;
+  if (activeWarSlug === 'mexican-american-war' && Number(personId) === 1024) {
     return 'Mexican-American War veteran; Forty-niner; later associated with Lane\'s Crossing on the Mojave River (1859).';
+  }
+  if (activeWarSlug === 'barbary-wars' && String(personId) === 'ext-enoch-s-lane') {
+    return 'USMC 2nd Lt. in Barbary officer register (Enterprize / New York, Mediterranean). Not in Vol. I—research note only; Virginia Lane line possible, unproven.';
   }
   return '';
 }
@@ -310,12 +342,18 @@ function renderCampaignContextPanel() {
     )
     .join('');
 
+  const barbaryNote =
+    activeWarSlug === 'barbary-wars'
+      ? `<p class="small text-warning mt-2 mb-0"><strong>Vol. I note:</strong> No Barbary / Tripoli / Algiers service text was found in Lane Genealogies Vol. I or automatic <code>laneData</code> matching. The participant card below is from the official Barbary Wars officer register (external research).</p>`
+      : '';
+
   host.innerHTML = `
     <div class="war-context-card">
       <h4 class="h6 mb-2">${esc(campaign?.label || 'Campaign context')}</h4>
       <p class="small text-muted mb-2">Campaign range: ${esc((campaign?.years || []).join(' - ') || 'Unknown')}</p>
       <ul class="list-unstyled mb-0">${itemsHtml}</ul>
       <p class="small text-muted mt-2 mb-0">Use each participant evidence panel for Lane-specific proof and confidence.</p>
+      ${barbaryNote}
     </div>
   `;
 }
@@ -340,7 +378,7 @@ function renderParticipantsList() {
             <span class="confidence-badge ${confidenceClass(entry.confidence)}">${esc(entry.confidence)}</span>
           </div>
           <div id="${metaId}" class="small text-muted">${esc(p.birthYear || '?')} - ${esc(p.deathYear || '?')}</div>
-          <div class="small ${entry.associationType === 'family-associated' ? 'text-warning' : 'text-muted'}">${esc(association)}</div>
+          <div class="small ${entry.associationType === 'family-associated' || entry.associationType === 'external-research' ? 'text-warning' : 'text-muted'}">${esc(association)}</div>
           <div class="small">${esc(place)}</div>
           ${note ? `<div class="small text-info">${esc(note)}</div>` : ''}
         </button>
@@ -633,8 +671,10 @@ async function renderAllMapLayers() {
   if (!map || !mapReady) return;
 
   // Avoid visual implication that Lane evidence ties directly to context battles.
-  // Show battle/theater pins only when we do not have participant locations to map.
-  const showContextBattlePins = !hasAnyMappableParticipants();
+  // Show battle/theater pins when we lack participant locations, or for overseas theaters
+  // (Barbary) where Mediterranean geography is the campaign story.
+  const showContextBattlePins =
+    !hasAnyMappableParticipants() || activeWarSlug === 'barbary-wars';
   if (showContextBattlePins) {
     renderBattleMapMarkers();
   }

@@ -73,8 +73,20 @@
     el.hidden = false;
   }
 
+  function ensureGateFonts() {
+    if (document.getElementById('coffeeDreamsGateFonts')) return;
+    const link = document.createElement('link');
+    link.id = 'coffeeDreamsGateFonts';
+    link.rel = 'stylesheet';
+    link.href =
+      'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500&family=Sora:wght@300;400;500;600&display=swap';
+    document.head.appendChild(link);
+  }
+
   function createOverlay() {
     if (document.getElementById(OVERLAY_ID)) return;
+
+    ensureGateFonts();
 
     const overlay = document.createElement('div');
     overlay.id = OVERLAY_ID;
@@ -85,23 +97,61 @@
       position: fixed; inset: 0; z-index: 12000;
       display: flex; align-items: center; justify-content: center;
       padding: 1.5rem;
-      background: rgba(18, 10, 8, 0.92);
-      backdrop-filter: blur(8px);
+      background:
+        radial-gradient(ellipse 70% 50% at 50% 20%, rgba(196, 132, 74, 0.18), transparent 55%),
+        rgba(14, 8, 5, 0.94);
+      backdrop-filter: blur(10px);
+      font-family: "Sora", "Segoe UI", sans-serif;
     `;
 
     overlay.innerHTML = `
-      <div style="max-width: 420px; width: 100%; background: #2a1810; color: #f5e6d3; border-radius: 1rem; padding: 2rem; box-shadow: 0 24px 60px rgba(0,0,0,0.45); border: 1px solid rgba(255,200,150,0.15);">
-        <div style="font-size: 2rem; text-align: center; margin-bottom: 0.5rem;">☕</div>
-        <h2 id="coffeeDreamsAuthTitle" style="margin: 0 0 0.5rem; font-size: 1.35rem; text-align: center; font-weight: 600; letter-spacing: 0.04em;">Coffee Dreams</h2>
-        <p style="margin: 0 0 1.25rem; text-align: center; color: #c9b8a8; font-size: 0.95rem;">This gallery is private. Enter the page password to continue.</p>
+      <div style="
+        max-width: 400px; width: 100%;
+        background: linear-gradient(165deg, #2e1a12 0%, #1c110c 100%);
+        color: #f3e6d4;
+        border-radius: 0.25rem;
+        padding: 2.25rem 1.85rem 2rem;
+        box-shadow: 0 22px 48px rgba(0,0,0,0.5);
+        border: 1px solid rgba(243, 230, 212, 0.12);
+      ">
+        <p style="
+          margin: 0 0 0.65rem; text-align: center;
+          font-size: 0.68rem; font-weight: 500;
+          letter-spacing: 0.16em; text-transform: uppercase;
+          color: #c4844a;
+        ">Private gallery</p>
+        <h2 id="coffeeDreamsAuthTitle" style="
+          margin: 0 0 0.65rem; text-align: center;
+          font-family: Fraunces, Palatino, serif;
+          font-weight: 300; font-size: clamp(1.85rem, 6vw, 2.35rem);
+          letter-spacing: -0.02em; line-height: 1; color: #fff6ea;
+        ">Coffee <em style="font-style: italic; font-weight: 500; color: #c4844a;">Dreams</em></h2>
+        <p style="
+          margin: 0 0 1.5rem; text-align: center;
+          color: #b9a693; font-size: 0.92rem; font-weight: 300; line-height: 1.5;
+        ">Late-night café prints. Enter the page password to step inside.</p>
         <form id="coffeeDreamsAuthForm">
-          <label for="coffeeDreamsPassword" style="display: block; font-size: 0.8rem; margin-bottom: 0.35rem; color: #d4c4b0;">Password</label>
+          <label for="coffeeDreamsPassword" style="
+            display: block; font-size: 0.72rem; font-weight: 500;
+            margin-bottom: 0.4rem; color: #b9a693;
+            letter-spacing: 0.08em; text-transform: uppercase;
+          ">Password</label>
           <input type="password" id="coffeeDreamsPassword" autocomplete="current-password"
-            style="width: 100%; padding: 0.75rem 1rem; border-radius: 0.5rem; border: 1px solid rgba(255,200,150,0.25); background: rgba(0,0,0,0.25); color: #fff; margin-bottom: 0.75rem;"
+            style="
+              width: 100%; padding: 0.8rem 1rem; border-radius: 0.2rem;
+              border: 1px solid rgba(243, 230, 212, 0.18);
+              background: rgba(0, 0, 0, 0.35); color: #fff6ea;
+              font-family: inherit; font-size: 1rem; margin-bottom: 0.85rem;
+            "
             required />
-          <p id="coffeeDreamsAuthError" hidden style="color: #ffb4a2; font-size: 0.85rem; margin: 0 0 0.75rem;"></p>
+          <p id="coffeeDreamsAuthError" hidden style="color: #e8a090; font-size: 0.85rem; margin: 0 0 0.85rem;"></p>
           <button type="submit" id="coffeeDreamsAuthSubmit"
-            style="width: 100%; padding: 0.75rem; border: none; border-radius: 0.5rem; background: linear-gradient(135deg, #c87941, #8b4513); color: #fff; font-weight: 600; cursor: pointer;">
+            style="
+              width: 100%; padding: 0.85rem; border: none; border-radius: 0.2rem;
+              background: #c4844a; color: #1a100b;
+              font-family: inherit; font-weight: 600; font-size: 0.88rem;
+              letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
+            ">
             Unlock gallery
           </button>
         </form>

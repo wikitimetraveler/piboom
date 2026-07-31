@@ -1,0 +1,160 @@
+{
+  "updated": "2026-07-28",
+  "disclaimer": "Approximate traditional regions associated with landraces and botanical types. Educational geography only — not cultivation advice.",
+  "entries": [
+    {
+      "id": "hindu-kush",
+      "name": "Hindu Kush",
+      "type": "indica",
+      "origin": {
+        "place": "Hindu Kush range (Afghanistan / Pakistan)",
+        "lat": 35.5,
+        "lng": 71.0,
+        "note": "Mountain landraces often linked to short, broad-leaf plants adapted to high elevation and short seasons."
+      }
+    },
+    {
+      "id": "afghani",
+      "name": "Afghani",
+      "type": "indica",
+      "origin": {
+        "place": "Northern Afghanistan",
+        "lat": 36.7,
+        "lng": 67.1,
+        "note": "Classic Central Asian indica landrace region; historically associated with resin-rich mountain populations."
+      }
+    },
+    {
+      "id": "thai",
+      "name": "Thai",
+      "type": "sativa",
+      "origin": {
+        "place": "Thailand",
+        "lat": 15.0,
+        "lng": 101.0,
+        "note": "Southeast Asian sativa landraces known in trade history for tall, narrow-leaf tropical expressions."
+      }
+    },
+    {
+      "id": "durban",
+      "name": "Durban / South African",
+      "type": "sativa",
+      "origin": {
+        "place": "KwaZulu-Natal, South Africa",
+        "lat": -29.85,
+        "lng": 31.02,
+        "note": "Southern African landrace lineage; Durban became a widely known reference point for African sativa heritage."
+      }
+    },
+    {
+      "id": "colombian",
+      "name": "Colombian",
+      "type": "sativa",
+      "origin": {
+        "place": "Santa Marta / Colombia",
+        "lat": 11.24,
+        "lng": -74.2,
+        "note": "Andean and Caribbean Colombian landraces entered global awareness through mid-20th-century trade routes."
+      }
+    },
+    {
+      "id": "mexican",
+      "name": "Mexican",
+      "type": "sativa",
+      "origin": {
+        "place": "Sierra Madre / Mexico",
+        "lat": 19.4,
+        "lng": -99.1,
+        "note": "Mexican highland and coastal landraces contributed heavily to Western breeding in the 1960s–70s."
+      }
+    },
+    {
+      "id": "acapulco-gold",
+      "name": "Acapulco Gold",
+      "type": "sativa",
+      "origin": {
+        "place": "Acapulco region, Guerrero, Mexico",
+        "lat": 16.85,
+        "lng": -99.88,
+        "note": "Famous Mexican landrace name associated with the Pacific coast around Acapulco."
+      }
+    },
+    {
+      "id": "jamaican",
+      "name": "Jamaican",
+      "type": "sativa",
+      "origin": {
+        "place": "Jamaica",
+        "lat": 18.1,
+        "lng": -77.3,
+        "note": "Caribbean sativa heritage shaped by island growing traditions and later international exchange."
+      }
+    },
+    {
+      "id": "panama",
+      "name": "Panama / Central American",
+      "type": "sativa",
+      "origin": {
+        "place": "Panama",
+        "lat": 8.98,
+        "lng": -79.52,
+        "note": "Isthmus landraces sit in a corridor between Mexican and South American cannabis histories."
+      }
+    },
+    {
+      "id": "chinese-hemp",
+      "name": "Chinese hemp",
+      "type": "hemp",
+      "origin": {
+        "place": "Yellow River basin / China",
+        "lat": 34.75,
+        "lng": 113.65,
+        "note": "East Asia has deep archaeological and historical records of hemp for fiber, seed, and ritual use."
+      }
+    },
+    {
+      "id": "central-asian-sativa",
+      "name": "Central Asian wild / early cannabis",
+      "type": "sativa",
+      "origin": {
+        "place": "Central Asia (Tian Shan foothills)",
+        "lat": 43.2,
+        "lng": 76.9,
+        "note": "Many botanists place early cannabis diversification in Central Asia, with later spread along trade routes."
+      }
+    },
+    {
+      "id": "ruderalis",
+      "name": "Ruderalis belt",
+      "type": "ruderalis",
+      "origin": {
+        "place": "Southern Russia / Central-Eastern Europe",
+        "lat": 52.0,
+        "lng": 40.0,
+        "note": "C. ruderalis is associated with short-season northern latitudes and weedy roadside / steppe habitats."
+      }
+    },
+    {
+      "id": "indian-subcontinent",
+      "name": "Indian subcontinent",
+      "type": "hybrid-landrace",
+      "origin": {
+        "place": "Northern India / Himalayan foothills",
+        "lat": 30.3,
+        "lng": 78.0,
+        "note": "Long cultural history of cannabis on the subcontinent, spanning fiber, ritual, and regional landrace diversity."
+      }
+    },
+    {
+      "id": "malawi",
+      "name": "Malawi / East African",
+      "type": "sativa",
+      "origin": {
+        "place": "Malawi",
+        "lat": -13.25,
+        "lng": 34.3,
+        "note": "East African highland landraces, including Malawi lines, are part of African sativa geographic heritage."
+      }
+    }
+  ]
+}

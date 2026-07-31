@@ -43,6 +43,7 @@ import localSpotsRoutes from './local-spots.routes.js';
 import findsRoutes from './finds.routes.js';
 import appUserAuthRoutes from './app-user-auth.routes.js';
 import coffeeDreamsAuthRoutes from './coffee-dreams-auth.routes.js';
+import cannabisOriginsAuthRoutes from './cannabis-origins-auth.routes.js';
 import gseRoutes from './gse.routes.js';
 import financeRoutes from './finance.routes.js';
 import disasterImpactGraphRoutes from './disaster-impact-graph.routes.js';
@@ -95,6 +96,7 @@ export default function buildRoutes(io) {
   api.use('/finds', findsRoutes);
   api.use('/auth', appUserAuthRoutes);
   api.use('/auth', coffeeDreamsAuthRoutes);
+  api.use('/auth', cannabisOriginsAuthRoutes);
   api.use('/gse', gseRoutes);
   api.use('/finance', financeRoutes);
   api.use('/disaster-impact-graph', disasterImpactGraphRoutes);

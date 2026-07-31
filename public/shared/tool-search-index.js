@@ -99,6 +99,7 @@
     { name: 'Tree Collection', url: '/nature/tree-collection.html', category: 'Nature', keywords: 'trees forest' },
     { name: 'Critter Discovery', url: '/nature/critter-discovery.html', category: 'Nature', keywords: 'animal wildlife identify photo' },
     { name: 'Critter Collection', url: '/nature/critter-collection.html', category: 'Nature', keywords: 'critters wildlife collection' },
+    { name: 'Cannabis Origins', url: '/nature/cannabis-origins.html', category: 'Nature', keywords: 'cannabis landrace origins map password private marijuana hemp indica sativa user' },
     { name: 'Local Spots', url: '/local/local-spots.html', category: 'Local', keywords: 'thrift spots map' },
     { name: 'Finds', url: '/finds/index.html', category: 'Local', keywords: 'thrift flea vintage collection AI' },
     { name: 'Home', url: '/', category: 'Hub', keywords: 'hub index' },

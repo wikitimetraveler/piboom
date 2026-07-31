@@ -21,7 +21,7 @@
     },
     "portrait": "/jordan/assets/rami-guide-portrait-256.png",
     "greeting": {
-      "en": "Ahlan wa sahlan. I am Rami. Walk with me from Ain Ghazal to Amman.",
+      "en": "Ahlan wa sahlan. I am Rami — walk with me from Ain Ghazal to Amman.",
       "ar": "أهلاً وسهلاً. أنا رامي. امشِ معي من عين غزال إلى عمّان."
     }
   },
@@ -32,7 +32,7 @@
       "switchTo": "عربي",
       "heroKicker": "The Hashemite Kingdom of Jordan",
       "heroTitle": "Jordan",
-      "heroLine": "A crossroads kingdom between desert and sea — Nabataean stone, Roman colonnades, Bedouin fires, and a table that never stops filling.",
+      "heroLine": "A crossroads between desert and sea — Nabataean stone, Roman cities, Bedouin hospitality, and a living table of food and song.",
       "playReel": "Play highlight reel",
       "pauseReel": "Pause reel",
       "resumeReel": "Resume reel",
@@ -44,22 +44,27 @@
       "listen": "Listen",
       "exploreMap": "Explore the atlas",
       "timelineHeading": "Layers of Jordan",
-      "timelineLead": "Ten turns of the road, from Neolithic plaster faces to a modern kingdom. Select an era to hear it and pin it on the map.",
+      "timelineLead": "Ten eras from Neolithic Ain Ghazal to the modern kingdom. Select a layer to hear it and locate it on the map.",
       "mapHeading": "Atlas of Jordan",
-      "mapLead": "Every site below is a real place you can stand in. Tap a pin or a name to hear its story.",
+      "mapLead": "Each pin is a place you can visit. Select a site or name to hear its story.",
       "mapAll": "All",
       "mapHistory": "History",
       "mapFood": "Food",
       "mapMusic": "Music",
+      "mapHookah": "Argileh",
       "mapReset": "Show all pins",
       "mapLoading": "Loading the atlas…",
       "foodHeading": "The Jordanian table",
-      "foodLead": "Food here is a hospitality contract. Flip a plate for where it came from and what it means.",
+      "foodLead": "Food here is hospitality. Flip a plate for its origin and meaning.",
       "musicHeading": "Sound of Jordan",
-      "musicLead": "One string, two reeds, a line of dancers, and a stadium in Jerash. Flip a card for the history.",
+      "musicLead": "Rababa, mijwiz, dabke, and festival stages at Jerash. Flip a card for the history.",
+      "hookahHeading": "Argileh — the café smoke",
+      "hookahLead": "From antique brass nargileh to tonight’s Amman terrace — history, types, and flavors. Flip a card for the story — and the apple blend your neighbor already knows.",
       "phraseHeading": "Speak Jordanian",
-      "phraseLead": "Everyday Jordanian Arabic, spoken aloud. Press any phrase to hear it in Arabic.",
+      "phraseLead": "Everyday Jordanian Arabic, spoken aloud. Press any phrase to hear it.",
       "flipHint": "Flip for the history",
+      "playMusic": "Play music",
+      "stopMusic": "Stop music",
       "back": "Back",
       "loading": "Loading Jordan…",
       "readMore": "Read the full story",
@@ -67,7 +72,10 @@
       "unesco": "UNESCO World Heritage",
       "context": "Context",
       "evidence": "On the ground",
-      "startTour": "Start tour"
+      "startTour": "Start tour",
+      "mapLiving": "Living",
+      "livingHeading": "Living Jordan",
+      "livingLead": "Bedouin roots, neighbor communities, the eastern badia, and crafts that still have hands on them. Flip a card for the story."
     },
     "ar": {
       "dir": "rtl",
@@ -94,15 +102,20 @@
       "mapHistory": "تاريخ",
       "mapFood": "طعام",
       "mapMusic": "موسيقى",
+      "mapHookah": "أرجيلة",
       "mapReset": "أظهر كل الدبابيس",
       "mapLoading": "جارٍ تحميل الأطلس…",
       "foodHeading": "المائدة الأردنية",
       "foodLead": "الطعام هنا عقد ضيافة. اقلب الطبق لتعرف من أين جاء وماذا يعني.",
       "musicHeading": "صوت الأردن",
       "musicLead": "وترٌ واحد، وقصبتان، وصفُّ دبكة، ومسرحٌ في جرش. اقلب البطاقة لتقرأ التاريخ.",
+      "hookahHeading": "الأرجيلة — دخان المقهى",
+      "hookahLead": "من النارجيلة النحاسية القديمة إلى شرفة عمّان الليلة — تاريخ وأنواع ونكهات. اقلب البطاقة للحكاية — ونكهة التفاح التي يعرفها جارك جيداً.",
       "phraseHeading": "احكِ أردني",
       "phraseLead": "عربية أردنية يومية، منطوقة بصوت عالٍ. اضغط أي عبارة لتسمعها.",
       "flipHint": "اقلب البطاقة للتاريخ",
+      "playMusic": "شغّل الموسيقى",
+      "stopMusic": "أوقف الموسيقى",
       "back": "رجوع",
       "loading": "جارٍ تحميل الأردن…",
       "readMore": "اقرأ الحكاية كاملة",
@@ -110,7 +123,10 @@
       "unesco": "موقع تراث عالمي — اليونسكو",
       "context": "السياق",
       "evidence": "على الأرض",
-      "startTour": "ابدأ الجولة"
+      "startTour": "ابدأ الجولة",
+      "mapLiving": "حيّ",
+      "livingHeading": "الأردن الحيّ",
+      "livingLead": "جذور بدوية، ومجتمعات جارة، والبادية الشرقية، وحِرَف ما زالت بأيدٍ حية. اقلب البطاقة للحكاية."
     }
   },
   "eras": [
@@ -567,6 +583,25 @@
       }
     },
     {
+      "id": "amman-argileh",
+      "category": "hookah",
+      "emoji": "🍎",
+      "lat": 31.9497,
+      "lng": 35.9235,
+      "name": {
+        "en": "Amman café terraces",
+        "ar": "شرفات مقاهي عمّان"
+      },
+      "place": {
+        "en": "Jabal Amman / Rainbow Street",
+        "ar": "جبل عمّان / شارع الرينبو"
+      },
+      "blurb": {
+        "en": "Evening argileh culture — shared hoses, tea, and the classic apple (tufahtayn) blend on stone terraces above downtown.",
+        "ar": "ثقافة الأرجيلة المسائية — خراطيم مشتركة وشاي ونكهة التفاح الكلاسيكية (تفاحتين) على شرفات حجرية فوق وسط البلد."
+      }
+    },
+    {
       "id": "jerash-festival",
       "category": "music",
       "emoji": "🎶",
@@ -603,6 +638,63 @@
       "blurb": {
         "en": "Inscribed by UNESCO in 2021 for its yellow limestone townhouses and its living traditions of hospitality and communal song.",
         "ar": "أُدرجت على قائمة اليونسكو عام ٢٠٢١ لبيوتها من الحجر الأصفر ولتقاليدها الحيّة في الضيافة والغناء الجماعي."
+      }
+    },
+    {
+      "id": "azraq",
+      "category": "living",
+      "emoji": "🦩",
+      "lat": 31.834,
+      "lng": 36.8215,
+      "name": {
+        "en": "Azraq Wetland Reserve",
+        "ar": "محمية الأزرق المائية"
+      },
+      "place": {
+        "en": "Eastern badia, Zarqa Governorate",
+        "ar": "البادية الشرقية، محافظة الزرقاء"
+      },
+      "blurb": {
+        "en": "An oasis in the eastern desert — once a vast wetland on bird migration routes; today a reserve that tells Jordan's water story.",
+        "ar": "واحة في الصحراء الشرقية — كانت أرضاً رطبة واسعة على مسارات الطيور المهاجرة؛ واليوم محمية تروي قصة الماء في الأردن."
+      }
+    },
+    {
+      "id": "amman-neighborhoods",
+      "category": "living",
+      "emoji": "🏘️",
+      "lat": 31.955,
+      "lng": 35.93,
+      "name": {
+        "en": "Amman neighborhoods",
+        "ar": "أحياء عمّان"
+      },
+      "place": {
+        "en": "Jabal al-Weibdeh / downtown Amman",
+        "ar": "جبل اللويبدة / وسط عمّان"
+      },
+      "blurb": {
+        "en": "Where Circassian, Palestinian, Syrian, and East Bank stories share the same stair streets — markets, bakeries, and Friday family visits.",
+        "ar": "حيث تتشابك حكايات الشركس والفلسطينيين والسوريين وأبناء الضفة الشرقية في الشوارع السلّمية — أسواق ومخابز وزيارات جمعة."
+      }
+    },
+    {
+      "id": "bani-hamida",
+      "category": "living",
+      "emoji": "🧶",
+      "lat": 31.586,
+      "lng": 35.658,
+      "name": {
+        "en": "Bani Hamida weaving country",
+        "ar": "بلاد بني حميدة للنسيج"
+      },
+      "place": {
+        "en": "Mukawir hills, Madaba Governorate",
+        "ar": "تلال مكاور، محافظة مادبا"
+      },
+      "blurb": {
+        "en": "Hill villages east of the Dead Sea known for women's cooperative rug weaving — geometric reds and blacks from Bedouin pattern memory.",
+        "ar": "قرى تلال شرق البحر الميت تشتهر بنسيج السجاد في تعاونيات نسائية — أحمر وأسود هندسي من ذاكرة النقش البدوي."
       }
     },
     {
@@ -1327,6 +1419,128 @@
       "image": "/jordan/assets/music/amman-indie.png"
     }
   ],
+  "hookah": [
+    {
+      "id": "argileh-history",
+      "emoji": "🫖",
+      "siteId": "amman-argileh",
+      "name": {
+        "en": "Argileh on the terrace",
+        "ar": "أرجيلة على الشرفة"
+      },
+      "tagline": {
+        "en": "A Levant café ritual with Persian roots",
+        "ar": "طقس مقاهي شاميّ بجذور فارسية"
+      },
+      "history": {
+        "en": "The water pipe reached the Ottoman Levant centuries ago — often traced to Safavid Persia — and settled into Jordanian café life as argileh (also nargileh). In Amman and Irbid, evenings stretch on plastic chairs and stone terraces: tea, cards, football on the TV, and a slow hose passed among friends. It is social furniture more than a solo habit — conversation paced by coals and water.",
+        "ar": "وصلت الأرجيلة (أو النارجيلة) إلى بلاد الشام العثمانية قبل قرون — وغالباً ما تُنسب جذورها إلى فارس الصفوية — واستقرّت في مقاهي الأردن. في عمّان وإربد تطول الأمسيات على كراسي بلاستيكية وشرفات حجرية: شاي، ورق لعب، مباراة على الشاشة، وخرطوم بطيء يدور بين الأصحاب. هي أثاث اجتماعي أكثر مما هي عادة فردية — حديث يمشي على إيقاع الفحم والماء."
+      },
+      "tags": {
+        "en": [
+          "café culture",
+          "Ottoman Levant",
+          "Amman nights"
+        ],
+        "ar": [
+          "ثقافة المقاهي",
+          "بلاد الشام العثمانية",
+          "ليالي عمّان"
+        ]
+      },
+      "image": "/jordan/assets/hookah/argileh-history.png"
+    },
+    {
+      "id": "argileh-types",
+      "emoji": "🏺",
+      "siteId": "amman-argileh",
+      "name": {
+        "en": "Types of the pipe",
+        "ar": "أنواع الأرجيلة"
+      },
+      "tagline": {
+        "en": "Glass base, clay head, and the hose that travels",
+        "ar": "قاعدة زجاج، ورأس فخار، وخرطوم يدور"
+      },
+      "history": {
+        "en": "A classic café argileh has a water-filled glass or metal vase, a clay or ceramic head for the tobacco, foil or a screen, charcoal on top, and one or more hoses. Egyptian-style stems are tall and formal; shorter \"travel\" or personal pipes show up at home. In Jordan the café standard is still the shared stem — one bowl for the table, coals refreshed by the waiter, flavor chosen before the first pull.",
+        "ar": "أرجيلة المقهى الكلاسيكية: مزهرية زجاج أو معدن فيها ماء، ورأس فخاري أو خزفي للتبغ، ورق ألمنيوم أو شبكة، وفحم فوقها، وخرطوم أو أكثر. السيقان على الطراز المصري طويلة ورسمية؛ والأنابيب الأقصر تظهر في البيوت. وفي الأردن ما زال معيار المقهى هو الجذع المشترك — رأس واحد للطاولة، والفحم يجدّده النادل، والنكهة تُختار قبل أول سحبة."
+      },
+      "tags": {
+        "en": [
+          "glass vase",
+          "clay head",
+          "shared hose"
+        ],
+        "ar": [
+          "مزهرية زجاج",
+          "رأس فخار",
+          "خرطوم مشترك"
+        ]
+      },
+      "image": "/jordan/assets/hookah/argileh-types.png"
+    },
+    {
+      "id": "apple-blend",
+      "emoji": "🍎",
+      "siteId": "amman-argileh",
+      "name": {
+        "en": "Apple blend (tufahtayn)",
+        "ar": "نكهة التفاح (تفاحتين)"
+      },
+      "tagline": {
+        "en": "The default order — sweet, familiar, everywhere",
+        "ar": "الطلب الافتراضي — حلوة ومألوفة وفي كل مكان"
+      },
+      "history": {
+        "en": "Two-apple — tufahtayn — is the Levant café classic: a sweet green-apple molasses tobacco that smells like candy more than orchard. Ask for \"apple\" in Amman and most waiters already know the blend. (True story from this atlas: a neighbor's go-to is that same apple blend — the flavor that starts half the first-time tables.) Mint, grape, and mixed fruit chase it; apple still wins the first round.",
+        "ar": "«تفاحتين» هي كلاسيكية مقاهي الشام: تبغ معسّل بنكهة التفاح الأخضر يفوح كالحلوى أكثر مما يفوح كالبستان. اطلب «تفاح» في عمّان ومعظم النوادل يعرفون الخلطة. (حكاية من هذا الأطلس: جارٌ يطلب دائماً نكهة التفاح نفسها — النكهة التي تبدأ نصف الطاولات لأول مرة.) يأتي بعدها النعناع والعنب والفواكه المشكلة؛ لكن التفاح ما زال يفوز بالجولة الأولى."
+      },
+      "tags": {
+        "en": [
+          "tufahtayn",
+          "molasses tobacco",
+          "neighbor favorite"
+        ],
+        "ar": [
+          "تفاحتين",
+          "معسّل",
+          "مفضّلة الجار"
+        ]
+      },
+      "image": "/jordan/assets/hookah/apple-blend.png"
+    },
+    {
+      "id": "argileh-etiquette",
+      "emoji": "🤝",
+      "siteId": "amman-argileh",
+      "name": {
+        "en": "How the table shares it",
+        "ar": "كيف تتشاركها الطاولة"
+      },
+      "tagline": {
+        "en": "Pass the hose, mind the coals, linger",
+        "ar": "مرّر الخرطوم، راعِ الفحم، وأطل الجلسة"
+      },
+      "history": {
+        "en": "Argileh etiquette is soft hospitality: do not blow into the hose, keep the tip clean when you pass it, and let the waiter manage the coals. Sessions last hours; rushing is the only real mistake. Many cafés now offer disposable mouthpieces — useful, not mandatory among close friends. Pair it with tea or juice; the pipe is the clock of the evening, not a cigarette break.",
+        "ar": "أصول الأرجيلة ضيافة هادئة: لا تنفخ في الخرطوم، ونظّف الطرف وأنت تمرّره، ودع النادل يدبّر الفحم. الجلسات تطول ساعات؛ والاستعجال هو الخطأ الوحيد. كثير من المقاهي يقدّم اليوم قطع فم للاستخدام مرة واحدة — مفيدة، وغير إلزامية بين الأصدقاء المقربين. رافقها بالشاي أو العصير؛ الأرجيلة ساعة المساء، لا استراحة سيجارة."
+      },
+      "tags": {
+        "en": [
+          "sharing",
+          "coals",
+          "slow evening"
+        ],
+        "ar": [
+          "مشاركة",
+          "فحم",
+          "أمسية بطيئة"
+        ]
+      },
+      "image": "/jordan/assets/hookah/argileh-etiquette.png"
+    }
+  ],
   "phrases": [
     {
       "ar": "أهلاً وسهلاً",
@@ -1379,6 +1593,11 @@
       "en": "I'd like a cup of unsweetened coffee"
     },
     {
+      "ar": "بدّي أرجيلة تفاحتين",
+      "translit": "baddi argileh tufahtayn",
+      "en": "I'd like an apple-blend (two-apple) argileh"
+    },
+    {
       "ar": "المنسف زاكي كتير",
       "translit": "il-mansaf zaki kteer",
       "en": "The mansaf is delicious"
@@ -1397,6 +1616,258 @@
       "ar": "شكراً كتير",
       "translit": "shukran kteer",
       "en": "Thank you very much"
+    },
+    {
+      "ar": "تفضّل، القهوة جاهزة",
+      "translit": "tfaddal, il-qahwa jahzeh",
+      "en": "Please — the coffee is ready (diwan welcome)"
+    },
+    {
+      "ar": "أهلاً بالجار",
+      "translit": "ahlan bil-jar",
+      "en": "Welcome to the neighbor"
+    }
+  ],
+  "living": [
+    {
+      "id": "bedouin-diwan",
+      "emoji": "🏕️",
+      "siteId": "wadi-rum",
+      "name": {
+        "en": "Bedouin diwan",
+        "ar": "الديوان البدوي"
+      },
+      "tagline": {
+        "en": "Coffee first, then the floor for speech",
+        "ar": "القهوة أولاً، ثم المجلس للكلام"
+      },
+      "history": {
+        "en": "Bedouin social life is built around the diwan — a guest space where bitter qahwa opens every welcome, elders hold the floor, and disputes can still be cooled by mediation. Identity in Jordan is not only desert tourism; it is this code of hospitality, lineage talk, and shared silence under the tent or in a concrete majlis in town.",
+        "ar": "الحياة البدوية تُبنى حول الديوان — مجلس ضيافة تفتتحه القهوة المُرّة، ويتكلم فيه الكبار، وقد تُبرَّد فيه الخصومات بالصلح. هوية الأردن ليست سياحة صحراوية فقط؛ بل هذا العقد من الضيافة وحديث النسب والصمت المشترك تحت بيت الشَّعر أو في مجلس إسمنتي في المدينة."
+      },
+      "tags": {
+        "en": [
+          "hospitality",
+          "majlis",
+          "identity"
+        ],
+        "ar": [
+          "ضيافة",
+          "مجلس",
+          "هوية"
+        ]
+      },
+      "image": "/jordan/assets/living/bedouin-diwan.png"
+    },
+    {
+      "id": "nabati-voice",
+      "emoji": "📜",
+      "siteId": "wadi-rum",
+      "name": {
+        "en": "Nabati voice",
+        "ar": "الصوت النبطي"
+      },
+      "tagline": {
+        "en": "Poetry that keeps lineage on the tongue",
+        "ar": "شعرٌ يُبقي النسب على اللسان"
+      },
+      "history": {
+        "en": "Nabati poetry — vernacular verse of the Arabian desert — is how praise, satire, love, and genealogy travel without paper. In Jordan it still meets the rababa in tent evenings and phone voice notes. The point is not nostalgia; it is a living archive of names, routes, and pride spoken aloud.",
+        "ar": "الشعر النبطي — شعر عامية الصحراء العربية — هو طريق المديح والهجاء والغزل والنسب بلا ورق. في الأردن ما زال يلتقي الربابة في أمسيات الخيمة وفي رسائل الصوت على الهاتف. الهدف ليس الحنين؛ بل أرشيف حيّ للأسماء والدروب والكرامة يُنطق بصوت عالٍ."
+      },
+      "tags": {
+        "en": [
+          "nabati",
+          "oral archive",
+          "rababa"
+        ],
+        "ar": [
+          "نبطي",
+          "أرشيف شفهي",
+          "ربابة"
+        ]
+      },
+      "image": "/jordan/assets/living/nabati-voice.png"
+    },
+    {
+      "id": "palestinian-jordan",
+      "emoji": "🍞",
+      "siteId": "amman-neighborhoods",
+      "name": {
+        "en": "Palestinian Jordan",
+        "ar": "الأردن الفلسطيني"
+      },
+      "tagline": {
+        "en": "Half the table — bakeries, knafeh, and city stairs",
+        "ar": "نصف المائدة — مخابز وكنافة وسلالم المدينة"
+      },
+      "history": {
+        "en": "After 1948 and 1967, hundreds of thousands of Palestinians made Jordan home. Their bakeries, knafeh trays, dabke lines, and neighborhood institutions reshaped Amman and Zarqa. Jordanian identity today is inseparable from that shared household — East Bank and West Bank histories under one passport, one Friday lunch.",
+        "ar": "بعد ١٩٤٨ و١٩٦٧ صار مئات الآلاف من الفلسطينيين في الأردن بيتاً. مخابزهم وصواني الكنافة وصفوف الدبكة ومؤسسات الأحياء أعادت تشكيل عمّان والزرقاء. وهوية الأردن اليوم لا تُفصل عن هذا البيت المشترك — تواريخ الضفتين تحت جواز واحد وغداء جمعة واحد."
+      },
+      "tags": {
+        "en": [
+          "1948 / 1967",
+          "bakeries",
+          "shared identity"
+        ],
+        "ar": [
+          "١٩٤٨ / ١٩٦٧",
+          "مخابز",
+          "هوية مشتركة"
+        ]
+      },
+      "image": "/jordan/assets/living/palestinian-jordan.png"
+    },
+    {
+      "id": "syrian-neighbors",
+      "emoji": "🤝",
+      "siteId": "amman-neighborhoods",
+      "name": {
+        "en": "Syrian neighbors",
+        "ar": "الجيران السوريون"
+      },
+      "tagline": {
+        "en": "Sweets shops, workshops, and a decade of welcome",
+        "ar": "محال حلويات وورش وعقد من الاستضافة"
+      },
+      "history": {
+        "en": "Since 2011 Jordan has hosted a large Syrian community — in camps and, more often, in cities. Syrian sweets, shawarma counters, and skilled trades became part of everyday streets. The story is complicated (pressure on schools, water, rents) and also simple: neighbors sharing work and food across an open border of language.",
+        "ar": "منذ ٢٠١١ استضاف الأردن مجتمعاً سورياً كبيراً — في المخيمات وغالباً في المدن. حلويات الشام وشاورما العدادات والحِرَف الماهرة صارت جزءاً من الشارع اليومي. الحكاية معقّدة (ضغط على المدارس والماء والإيجار) وبسيطة أيضاً: جيران يتقاسمون العمل والطعام عبر حدود لغة مفتوحة."
+      },
+      "tags": {
+        "en": [
+          "since 2011",
+          "sweets",
+          "city life"
+        ],
+        "ar": [
+          "منذ ٢٠١١",
+          "حلويات",
+          "حياة المدينة"
+        ]
+      },
+      "image": "/jordan/assets/living/syrian-neighbors.png"
+    },
+    {
+      "id": "eastern-badia",
+      "emoji": "🌵",
+      "siteId": "azraq",
+      "name": {
+        "en": "Eastern badia",
+        "ar": "البادية الشرقية"
+      },
+      "tagline": {
+        "en": "Black basalt, open sky, and silence as geography",
+        "ar": "بازلت أسود وسماء مفتوحة وصمتٌ كجغرافيا"
+      },
+      "history": {
+        "en": "East of Amman the land flattens into harra — black basalt desert — and hamad gravel plains. This is not Wadi Rum's postcard sandstone. It is truck routes, seasonal grazing, military airspace, and nights so clear the Milky Way feels near. The badia's essence is scale: few towns, long horizons, and weather that writes the calendar.",
+        "ar": "شرق عمّان تنبسط الأرض حرّةً بازلتية سوداء وسهول حماد حصوية. ليست هذه رمال وادي رم البطاقية. هي طرق شاحنات ورعي موسمي ومجال جوي، وليالٍ صافية تقترب فيها المجرة. جوهر البادية مقياسها: بلدات قليلة وآفاق طويلة وطقس يكتب التقويم."
+      },
+      "tags": {
+        "en": [
+          "harra",
+          "horizon",
+          "beyond Rum"
+        ],
+        "ar": [
+          "حرّة",
+          "أفق",
+          "أبعد من رم"
+        ]
+      },
+      "image": "/jordan/assets/living/eastern-badia.png"
+    },
+    {
+      "id": "azraq-water",
+      "emoji": "🦩",
+      "siteId": "azraq",
+      "name": {
+        "en": "Azraq's water lesson",
+        "ar": "درس الماء في الأزرق"
+      },
+      "tagline": {
+        "en": "An oasis that shrank — and still teaches",
+        "ar": "واحة انكمشت — وما زالت تعلّم"
+      },
+      "history": {
+        "en": "Azraq once held permanent wetlands that drew millions of migratory birds. Over-pumping for Amman and farms dried most of it; the reserve today is a careful restoration and a national parable about water. In a country among the world's most water-scarce, Azraq is ecology and politics in one basin.",
+        "ar": "كان الأزرق أرضاً رطبة دائمة تجذب ملايين الطيور المهاجرة. الضخ الجائر لعمّان والمزارع جفّف معظمها؛ والمحمية اليوم ترميمٌ حذر ومثلٌ وطني عن الماء. في بلد من أشد بلدان العالم شحّاً بالمياه، الأزرق بيئة وسياسة في حوض واحد."
+      },
+      "tags": {
+        "en": [
+          "wetland",
+          "migration",
+          "water scarcity"
+        ],
+        "ar": [
+          "أراضٍ رطبة",
+          "هجرة",
+          "شحّ المياه"
+        ]
+      },
+      "image": "/jordan/assets/living/azraq-water.png"
+    },
+    {
+      "id": "mosaic-hands",
+      "emoji": "🧩",
+      "siteId": "madaba",
+      "name": {
+        "en": "Mosaic hands",
+        "ar": "أيادي الفسيفساء"
+      },
+      "tagline": {
+        "en": "Not only the map — a craft still taught",
+        "ar": "ليست الخريطة وحدها — حرفة ما زالت تُعلَّم"
+      },
+      "history": {
+        "en": "Madaba's fame is the 6th-century Holy Land map, but the deeper story is Byzantine and Umayyad floors across Jordan — and modern workshops where stone cubes are still cut and set. Craft schools and family ateliers keep tesserae work alive as livelihood, not only museum glass.",
+        "ar": "شهرة مادبا خريطة الأرض المقدسة من القرن السادس، لكن القصة الأعمق أرضيات بيزنطية وأموية عبر الأردن — وورش حديثة ما زالت تقطع فيها المكعبات وتُرصف. مدارس الحِرَف ومشاغل العائلات تُبقي عمل الفسيفساء رزقاً، لا زجاج متحف فقط."
+      },
+      "tags": {
+        "en": [
+          "Madaba",
+          "tesserae",
+          "livelihood"
+        ],
+        "ar": [
+          "مادبا",
+          "مكعبات",
+          "رزق"
+        ]
+      },
+      "image": "/jordan/assets/living/mosaic-hands.png"
+    },
+    {
+      "id": "rug-weaving",
+      "emoji": "🧶",
+      "siteId": "bani-hamida",
+      "name": {
+        "en": "Rug weaving",
+        "ar": "نسيج السجاد"
+      },
+      "tagline": {
+        "en": "Women's cooperatives keeping pattern memory",
+        "ar": "تعاونيات نسائية تحفظ ذاكرة النقش"
+      },
+      "history": {
+        "en": "In the Mukawir hills, Bani Hamida and neighboring communities built rug cooperatives where women weave geometric kilims from local wool. Patterns travel from tent aesthetics into export orders. The craft is economic agency and design history at once — red, black, and ivory repeating like a spoken poem.",
+        "ar": "في تلال مكاور بنت بني حميدة والجوار تعاونيات سجاد تنسج فيها النساء كِليماً هندسياً من صوف محلي. تنتقل الأنماط من جمالية الخيمة إلى طلبات التصدير. الحرفة وكالة اقتصادية وتاريخ تصميم معاً — أحمر وأسود وعاجي يتكرر كقصيدة منطوقة."
+      },
+      "tags": {
+        "en": [
+          "kilim",
+          "cooperatives",
+          "Mukawir"
+        ],
+        "ar": [
+          "كليم",
+          "تعاونيات",
+          "مكاور"
+        ]
+      },
+      "image": "/jordan/assets/living/rug-weaving.png"
     }
   ]
 }

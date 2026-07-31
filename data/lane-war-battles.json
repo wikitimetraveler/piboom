@@ -1,6 +1,6 @@
 {
-  "version": 4,
-  "generatedNote": "Summaries follow general historiography. “Further reading” favors Library of Congress guides, National Archives topic pages, NPS parks and portals, and similar institutional sources—not scraped Wikipedia. Optional Lane-book notes flag compilation wording only; verify with primary records before asserting presence at an engagement. This catalog does not alter laneData.json or server war-matching rules.",
+  "version": 5,
+  "generatedNote": "Summaries follow general historiography. “Further reading” favors Library of Congress guides, National Archives topic pages, NPS parks and portals, and similar institutional sources—not scraped Wikipedia. Optional Lane-book notes flag compilation wording only; verify with primary records before asserting presence at an engagement. This catalog does not alter laneData.json. Barbary pins are general Mediterranean theater context; Vol. I has no matching service text.",
   "battles": [
     {
       "id": "kp-great-swamp-1675",
@@ -495,6 +495,72 @@
         {
           "label": "Library of Congress — U.S. local history & genealogy portal",
           "url": "https://guides.loc.gov/us-history-local-history-genealogy"
+        }
+      ]
+    },
+    {
+      "id": "barbary-enterprize-tripoli-1801",
+      "warSlug": "barbary-wars",
+      "title": "Enterprize vs corsair Tripoli",
+      "approxWhen": "1 August 1801",
+      "lat": 35.9,
+      "lng": 14.5,
+      "summary": "USS Enterprize (Lt. Andrew Sterett) defeats the Tripolitan corsair Tripoli west of Malta—often cited as the first notable U.S. Navy victory of the First Barbary War. Pin approximates central Mediterranean waters for map orientation.",
+      "belligerents": ["U.S. Navy (Enterprize)", "Tripolitan corsair Tripoli"],
+      "keywords": ["enterprize", "enterprise", "tripoli corsair", "sterett"],
+      "laneBookNote": "No Vol. I text ties a Lane ancestor to this engagement. External research: USMC 2nd Lt. Enoch S. Lane served in Enterprize in the Mediterranean in 1801 (Barbary Wars officer register)—not proof he was aboard for this action.",
+      "externalLinks": [
+        {
+          "label": "Naval History and Heritage Command — Barbary Wars",
+          "url": "https://www.history.navy.mil/browse-by-topic/wars-conflicts-and-operations/barbary-wars.html"
+        },
+        {
+          "label": "NHHC — Register of Officer Personnel (Barbary Wars PDF)",
+          "url": "https://www.history.navy.mil/content/dam/nhhc/research/library/pdf/PERSONNEL%20AND%20SHIP%20DATA%201801-1807.pdf"
+        }
+      ]
+    },
+    {
+      "id": "barbary-philadelphia-burn-1804",
+      "warSlug": "barbary-wars",
+      "title": "Burning of the Philadelphia (Tripoli harbor)",
+      "approxWhen": "16 February 1804",
+      "lat": 32.902,
+      "lng": 13.186,
+      "summary": "Decatur’s Intrepid raid destroys the captured frigate Philadelphia in Tripoli harbor—standard First Barbary War highlight in U.S. naval histories.",
+      "belligerents": ["U.S. Navy volunteers (Intrepid)", "Tripolitan harbor defenses"],
+      "keywords": ["philadelphia", "intrepid", "decatur", "tripoli harbor"],
+      "laneBookNote": "Context only—no Vol. I Lane presence asserted. Enoch S. Lane (USMC register) died 16 July 1804 after Mediterranean and Norfolk duty; not linked here to the Intrepid raid.",
+      "externalLinks": [
+        {
+          "label": "Naval History and Heritage Command — Barbary Wars",
+          "url": "https://www.history.navy.mil/browse-by-topic/wars-conflicts-and-operations/barbary-wars.html"
+        },
+        {
+          "label": "USS Constitution Museum — First Barbary War",
+          "url": "https://ussconstitutionmuseum.org/major-events/first-barbary-war-1803-1805/"
+        }
+      ]
+    },
+    {
+      "id": "barbary-derna-1805",
+      "warSlug": "barbary-wars",
+      "title": "Battle of Derna",
+      "approxWhen": "April 1805",
+      "lat": 32.7667,
+      "lng": 22.6333,
+      "summary": "Eaton–O’Bannon land expedition captures Derna with Navy support—source of the Marines’ Hymn line “to the shores of Tripoli” in Marine Corps tradition.",
+      "belligerents": ["U.S. Marines, Navy, and allied force", "Tripolitan garrison"],
+      "keywords": ["derna", "derne", "o'bannon", "eaton"],
+      "laneBookNote": "After Enoch S. Lane’s death (July 1804). Included as campaign geography only.",
+      "externalLinks": [
+        {
+          "label": "Naval History and Heritage Command — Barbary Wars",
+          "url": "https://www.history.navy.mil/browse-by-topic/wars-conflicts-and-operations/barbary-wars.html"
+        },
+        {
+          "label": "National Archives — early Navy / Marine research",
+          "url": "https://www.archives.gov/research/military/navy-marine"
         }
       ]
     },

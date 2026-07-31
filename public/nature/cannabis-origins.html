@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="robots" content="noindex, nofollow"/>
+  <title>Cannabis Origins Map</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="/shared/design-tokens.css"/>
+  <script src="/shared/menu-config.js"></script>
+  <script src="/shared/demo-users.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <script src="/shared/user-login.js"></script>
+  <script src="/shared/user-passwords.js"></script>
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/cannabis-origins-guard.js"></script>
+  <style>
+    :root {
+      --co-forest: #1a2e1c;
+      --co-leaf: #3d7a4a;
+      --co-mist: #e8f0e4;
+      --co-sage: #a8c4a0;
+      --co-soil: #0f1a10;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse 70% 45% at 20% 0%, rgba(61, 122, 74, 0.28), transparent),
+        radial-gradient(ellipse 50% 40% at 90% 20%, rgba(180, 140, 60, 0.12), transparent),
+        linear-gradient(180deg, #122016 0%, var(--co-forest) 50%, var(--co-soil) 100%);
+      color: var(--co-mist);
+      font-family: "Segoe UI", system-ui, sans-serif;
+    }
+
+    .co-hero {
+      text-align: center;
+      padding: 2.5rem 1rem 1.5rem;
+    }
+
+    .co-hero h1 {
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.5rem;
+    }
+
+    .co-hero p {
+      color: var(--co-sage);
+      max-width: 36rem;
+      margin: 0 auto;
+      font-size: 0.95rem;
+    }
+
+    .co-note {
+      margin-top: 0.75rem;
+      font-size: 0.8rem;
+      color: rgba(168, 196, 160, 0.85);
+    }
+
+    .co-layout {
+      display: grid;
+      grid-template-columns: minmax(200px, 0.9fr) 1.4fr;
+      gap: 1.25rem;
+      align-items: stretch;
+      padding-bottom: 2.5rem;
+    }
+
+    @media (max-width: 767.98px) {
+      .co-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .co-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-height: 520px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .co-origin-link {
+      width: 100%;
+      text-align: left;
+      border: 1px solid rgba(120, 180, 100, 0.28);
+      background: rgba(10, 22, 12, 0.55);
+      color: var(--co-mist);
+      border-radius: 12px;
+      padding: 0.65rem 0.8rem;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.7rem;
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .co-origin-link:hover,
+    .co-origin-link.is-active {
+      border-color: rgba(120, 180, 100, 0.7);
+      background: rgba(61, 122, 74, 0.28);
+    }
+
+    .co-origin-pin-badge {
+      flex: 0 0 auto;
+      width: 1.6rem;
+      height: 1.6rem;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: var(--co-leaf);
+      color: #fff;
+    }
+
+    .co-origin-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      min-width: 0;
+    }
+
+    .co-origin-copy strong {
+      font-size: 0.95rem;
+    }
+
+    .co-origin-copy span {
+      font-size: 0.78rem;
+      color: var(--co-sage);
+    }
+
+    .co-type-tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      background: rgba(61, 122, 74, 0.35);
+      color: #c8e6c0;
+      margin-top: 0.15rem;
+      width: fit-content;
+    }
+
+    .co-map-wrap {
+      position: relative;
+      min-height: 420px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(120, 180, 100, 0.25);
+      background: rgba(0, 0, 0, 0.25);
+    }
+
+    .co-map {
+      width: 100%;
+      height: 480px;
+      min-height: 360px;
+    }
+
+    .co-map-status {
+      position: absolute;
+      left: 0.75rem;
+      bottom: 0.75rem;
+      margin: 0;
+      padding: 0.4rem 0.7rem;
+      border-radius: 8px;
+      background: rgba(10, 22, 12, 0.85);
+      color: var(--co-sage);
+      font-size: 0.85rem;
+      max-width: calc(100% - 8rem);
+      z-index: 2;
+    }
+
+    .co-map-reset {
+      position: absolute;
+      right: 0.75rem;
+      bottom: 0.75rem;
+      z-index: 2;
+      border: 1px solid rgba(120, 180, 100, 0.4);
+      background: rgba(10, 22, 12, 0.9);
+      color: var(--co-mist);
+      border-radius: 8px;
+      padding: 0.4rem 0.7rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .co-map-reset:hover {
+      border-color: rgba(120, 180, 100, 0.75);
+      background: rgba(61, 122, 74, 0.4);
+    }
+
+    #cannabisOriginsContent[hidden] {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <modern-navbar></modern-navbar>
+
+  <div id="cannabisOriginsContent" hidden aria-hidden="true">
+    <header class="co-hero">
+      <h1><i class="bi bi-globe2" aria-hidden="true"></i> Cannabis Origins</h1>
+      <p>
+        Educational map of traditional geographic regions associated with major cannabis types and landraces.
+        Approximate pins — botanical and historical geography only, not cultivation advice.
+      </p>
+      <p class="co-note">Tap a name or pin to focus the map.</p>
+    </header>
+
+    <div class="container">
+      <div class="co-layout">
+        <ul class="co-list" id="cannabisOriginsList"></ul>
+        <div class="co-map-wrap">
+          <div id="cannabisOriginsMap" class="co-map" role="img" aria-label="Map of cannabis landrace origin regions"></div>
+          <p id="cannabisOriginsMapStatus" class="co-map-status">Loading origins map…</p>
+          <button type="button" class="co-map-reset" id="cannabisOriginsMapReset" hidden>
+            <i class="bi bi-arrow-clockwise"></i> Show all pins
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/family/js/lane-family-google-maps.js"></script>
+  <script src="/shared/google-advanced-markers.js"></script>
+  <script src="/nature/js/cannabis-origins-map.js"></script>
+  <script>
+    (function () {
+      function bootMap() {
+        if (window.CannabisOriginsMap?.init) {
+          window.CannabisOriginsMap.init();
+        }
+      }
+
+      function bootWhenReady() {
+        if (window.CannabisOriginsGuard?.readUnlock?.()) {
+          // Defer so the guard can unhide #cannabisOriginsContent first.
+          window.requestAnimationFrame(() => window.setTimeout(bootMap, 0));
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bootWhenReady);
+      } else {
+        bootWhenReady();
+      }
+      window.addEventListener('cannabis-origins-unlocked', bootMap);
+    })();
+  </script>
+</body>
+</html>

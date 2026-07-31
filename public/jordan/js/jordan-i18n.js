@@ -134,8 +134,14 @@
   }
 
   function stop() {
-    if (typeof window.stopSpeech === 'function') window.stopSpeech();
-    else if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    if (typeof window.JordanContent?.stopListenSpeech === 'function') {
+      window.JordanContent.stopListenSpeech();
+    } else if (typeof window.stopSpeech === 'function') {
+      window.stopSpeech();
+    } else if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+    if (typeof window.JordanContent?.stopMusic === 'function') window.JordanContent.stopMusic();
     document.getElementById('jdGuide')?.classList.remove('is-speaking');
     document.querySelectorAll('.jd-phrase.is-speaking').forEach((el) => {
       el.classList.remove('is-speaking');

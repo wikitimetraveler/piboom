@@ -503,6 +503,22 @@ const CONFLICT_DEFINITIONS = [
     ]
   },
   {
+    slug: 'barbary-wars',
+    label: 'Barbary Wars',
+    years: [1801, 1815],
+    keywords: [
+      'barbary',
+      'barbary war',
+      'barbary wars',
+      'tripoli',
+      'algiers',
+      'algerine',
+      'mediterranean squadron',
+      'uss enterprize',
+      'enterprize in the mediterranean'
+    ]
+  },
+  {
     slug: 'war-of-1812',
     label: 'War of 1812',
     years: [1812, 1815],
@@ -544,6 +560,42 @@ const WAR_DEFINITIONS = CONFLICT_DEFINITIONS.reduce((acc, war) => {
   acc[war.slug] = war;
   return acc;
 }, {});
+
+/**
+ * Curated war participants not present in laneData / Vol. I matching.
+ * Keep provenance explicit: external naval/Marine registers vs Lane Genealogies.
+ */
+const EXTERNAL_WAR_PARTICIPANTS = [
+  {
+    warSlug: 'barbary-wars',
+    confidence: 'high',
+    associationType: 'external-research',
+    associatedPeople: [],
+    associationNotes: [
+      'Not found in Lane Genealogies Vol. I (1891) or laneData automatic matching.',
+      'Service documented in the Navy Department Register of Officer Personnel and Ships’ Data for the Barbary Wars (1801–1807).',
+      'Possible identity: Enoch Smith Lane of the Loudoun County, Virginia, Lanes (James Hardage Lane line)—a different branch from William Lane of Boston; not proven here.',
+      'Do not treat as a confirmed Vol. I ancestor without independent genealogy linking.'
+    ],
+    person: {
+      id: 'ext-enoch-s-lane',
+      name: 'Enoch S. Lane',
+      birthYear: '?',
+      deathYear: 1804,
+      born: 'Norfolk, Virginia',
+      text:
+        'U.S. Marine Corps 2nd lieutenant in the First Barbary War era (external register; not in Vol. I).'
+    },
+    evidence: [
+      'Enoch S. Lane — Second lieutenant, U.S.M.C., appointed 27 Feb. 1801 (Barbary Wars officer register).',
+      'Served in U.S.S. Enterprize in the Mediterranean, 1801.',
+      'Shore duty / furlough at Washington, D.C., 1802; U.S.S. New York in the Mediterranean, 1802–1803.',
+      'Navy Yard, Norfolk, Va., 1804; died 16 July 1804.',
+      'Vol. I / laneData: no Barbary, Tripoli, or Algiers service text located for any matched person.'
+    ],
+    places: ['Norfolk, Virginia', 'Mediterranean (USS Enterprize / New York)']
+  }
+];
 
 const DEFAULT_MUSEUM_CONTENT = {
   featuredStory: {
@@ -1446,6 +1498,24 @@ export function getLaneTradingCardById(cardId) {
   };
 }
 
+function getExternalWarParticipants(warSlug) {
+  const key = String(warSlug || '').toLowerCase();
+  const war = WAR_DEFINITIONS[key];
+  if (!war) return [];
+  return EXTERNAL_WAR_PARTICIPANTS.filter((entry) => entry.warSlug === key).map((entry) => ({
+    warSlug: war.slug,
+    warLabel: war.label,
+    warYears: war.years,
+    confidence: entry.confidence,
+    associationType: entry.associationType || 'external-research',
+    associatedPeople: entry.associatedPeople || [],
+    associationNotes: entry.associationNotes || [],
+    person: entry.person,
+    evidence: entry.evidence || [],
+    places: Array.isArray(entry.places) ? entry.places : []
+  }));
+}
+
 export function getWarParticipants(warSlug) {
   const key = String(warSlug || '').toLowerCase();
   const war = WAR_DEFINITIONS[key];
@@ -1455,7 +1525,7 @@ export function getWarParticipants(warSlug) {
     1024: 'mexican-american-war'
   };
 
-  return people
+  const fromTree = people
     .map((person) => {
       const curatedWarSlug = CURATED_WAR_SLUG_BY_PERSON_ID[Number(person?.id)];
       if (curatedWarSlug && curatedWarSlug !== key) return null;
@@ -1474,15 +1544,16 @@ export function getWarParticipants(warSlug) {
         places: extractParticipantPlaces(person)
       };
     })
-    .filter(Boolean)
-    .sort((a, b) => {
-      const order = { high: 0, medium: 1, low: 2 };
-      const c = order[a.confidence] - order[b.confidence];
-      if (c !== 0) return c;
-      const ay = parseInt(a.person.birthYear) || 9999;
-      const by = parseInt(b.person.birthYear) || 9999;
-      return ay - by;
-    });
+    .filter(Boolean);
+
+  return [...fromTree, ...getExternalWarParticipants(key)].sort((a, b) => {
+    const order = { high: 0, medium: 1, low: 2 };
+    const c = order[a.confidence] - order[b.confidence];
+    if (c !== 0) return c;
+    const ay = parseInt(a.person.birthYear, 10) || 9999;
+    const by = parseInt(b.person.birthYear, 10) || 9999;
+    return ay - by;
+  });
 }
 
 export function getWarCampaignsSummary() {
@@ -1576,6 +1647,7 @@ export const __test__ = {
   scoreWarMatch,
   plausibleAgeForWarInference,
   WAR_DEFINITIONS,
+  EXTERNAL_WAR_PARTICIPANTS,
   ocrFoldMilitaryHaystack,
   hasRevolutionaryEraAnchorInEvidence,
   hasKeyword

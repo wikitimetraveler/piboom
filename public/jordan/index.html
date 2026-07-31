@@ -40,7 +40,7 @@
           <div class="jd-hero-inner" id="jdHeroInner">
             <p class="jd-kicker" data-i18n="heroKicker">The Hashemite Kingdom of Jordan</p>
             <h1 class="jd-hero-title" data-i18n="heroTitle">Jordan</h1>
-            <p class="jd-hero-line" data-i18n="heroLine">A crossroads kingdom between desert and sea — Nabataean stone, Roman colonnades, Bedouin fires, and a table that never stops filling.</p>
+            <p class="jd-hero-line" data-i18n="heroLine">A crossroads between desert and sea — Nabataean stone, Roman cities, Bedouin hospitality, and a living table of food and song.</p>
 
             <div class="jd-hero-cta">
               <a class="jd-btn jd-btn-primary" href="#jdMap">
@@ -52,9 +52,9 @@
             </div>
 
             <dl class="jd-facts" id="jdFacts">
-              <div><dt>7250 BCE</dt><dd data-i18n-fact="ain">Ain Ghazal statues</dd></div>
+              <div><dt>7250 BCE</dt><dd data-i18n-fact="ain">Ain Ghazal plaster statues</dd></div>
               <div><dt>106 CE</dt><dd data-i18n-fact="rome">Rome annexes Nabataea</dd></div>
-              <div><dt>1946</dt><dd data-i18n-fact="ind">Independence</dd></div>
+              <div><dt>1946</dt><dd data-i18n-fact="ind">Independence, 1946</dd></div>
               <div><dt>−430 m</dt><dd data-i18n-fact="dead">Dead Sea, lowest on Earth</dd></div>
             </dl>
           </div>
@@ -103,7 +103,7 @@
       <section class="jd-section" id="jdTimeline">
         <div class="jd-section-head">
           <h2 data-i18n="timelineHeading">Layers of Jordan</h2>
-          <p data-i18n="timelineLead">Ten turns of the road, from Neolithic plaster faces to a modern kingdom. Select an era to hear it and pin it on the map.</p>
+          <p data-i18n="timelineLead">Ten eras from Neolithic Ain Ghazal to the modern kingdom. Select a layer to hear it and locate it on the map.</p>
         </div>
         <ol class="jd-era-list" id="jdEraList">
           <li class="jd-loading" data-i18n="loading">Loading Jordan…</li>
@@ -113,13 +113,15 @@
       <section class="jd-section" id="jdMap">
         <div class="jd-section-head">
           <h2 data-i18n="mapHeading">Atlas of Jordan</h2>
-          <p data-i18n="mapLead">Every site below is a real place you can stand in. Tap a pin or a name to hear its story.</p>
+          <p data-i18n="mapLead">Each pin is a place you can visit. Select a site or name to hear its story.</p>
         </div>
         <div class="jd-map-filters" id="jdMapFilters" role="group" aria-label="Filter map pins">
           <button type="button" class="jd-chip is-active" data-filter="all" data-i18n="mapAll">All</button>
           <button type="button" class="jd-chip" data-filter="history" data-i18n="mapHistory">History</button>
           <button type="button" class="jd-chip" data-filter="food" data-i18n="mapFood">Food</button>
           <button type="button" class="jd-chip" data-filter="music" data-i18n="mapMusic">Music</button>
+          <button type="button" class="jd-chip" data-filter="hookah" data-i18n="mapHookah">Argileh</button>
+          <button type="button" class="jd-chip" data-filter="living" data-i18n="mapLiving">Living</button>
         </div>
         <div class="jd-map-layout">
           <ul class="jd-site-list" id="jdSiteList"></ul>
@@ -147,6 +149,22 @@
           <p data-i18n="musicLead">One string, two reeds, a line of dancers, and a stadium in Jerash. Flip a card for the history.</p>
         </div>
         <div class="jd-grid" id="jdMusicGrid"></div>
+      </section>
+
+      <section class="jd-section" id="jdHookah">
+        <div class="jd-section-head">
+          <h2 data-i18n="hookahHeading">Argileh — the café smoke</h2>
+          <p data-i18n="hookahLead">From antique brass nargileh to tonight’s Amman terrace — history, types, and flavors. Flip a card for the story — and the apple blend your neighbor already knows.</p>
+        </div>
+        <div class="jd-grid" id="jdHookahGrid"></div>
+      </section>
+
+      <section class="jd-section" id="jdLiving">
+        <div class="jd-section-head">
+          <h2 data-i18n="livingHeading">Living Jordan</h2>
+          <p data-i18n="livingLead">Bedouin roots, neighbor communities, the eastern badia, and crafts that still have hands on them. Flip a card for the story.</p>
+        </div>
+        <div class="jd-grid" id="jdLivingGrid"></div>
       </section>
 
       <section class="jd-section" id="jdPhrases">
@@ -185,8 +203,9 @@
       </header>
       <div class="jd-sheet-body" id="jdSheetBody"></div>
       <footer class="jd-sheet-footer">
-        <button type="button" class="jd-btn jd-btn-sand jd-btn-sm" id="jdSheetListen">
-          <i class="bi bi-volume-up-fill"></i> <span data-i18n="listen">Listen</span>
+        <button type="button" class="jd-btn jd-btn-sand jd-btn-sm jd-listen-btn" id="jdSheetListen" aria-pressed="false">
+          <i class="bi bi-volume-up-fill" aria-hidden="true"></i>
+          <span class="jd-listen-label" data-i18n="listen">Listen</span>
         </button>
       </footer>
     </div>

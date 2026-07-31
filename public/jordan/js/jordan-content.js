@@ -1,5 +1,5 @@
 /**
- * Jordan page — loads bilingual content and renders eras, food, music and phrases.
+ * Jordan page — loads bilingual content and renders eras, food, music, hookah, living and phrases.
  * Development work by David Lane
  */
 (function () {
@@ -48,8 +48,10 @@
             </h3>
             <p class="jd-era-copy">${esc(pick(era.copy))}</p>
             <div class="jd-era-tools">
-              <button type="button" class="jd-btn jd-btn-sand jd-btn-sm" data-era-listen="${esc(era.id)}">
-                <i class="bi bi-volume-up-fill"></i> ${esc(t('listen'))}
+              <button type="button" class="jd-btn jd-btn-sand jd-btn-sm jd-listen-btn" data-era-listen="${esc(era.id)}"
+                aria-pressed="false">
+                <i class="bi bi-volume-up-fill" aria-hidden="true"></i>
+                <span class="jd-listen-label">${esc(t('listen'))}</span>
               </button>
               ${
                 era.siteId
@@ -76,8 +78,22 @@
           <img src="${esc(item.image)}" alt="" loading="lazy" width="220" height="220"/>
         </div>`
       : `<span class="jd-card-emoji" aria-hidden="true">${esc(item.emoji || '')}</span>`;
+    const audioSrc = kind === 'music' && item.audio?.src ? String(item.audio.src) : '';
+    const audioCredit = audioSrc ? pick(item.audio.credit) : '';
+    const playBtn = audioSrc
+      ? `<button type="button" class="jd-btn jd-btn-rose jd-btn-sm jd-card-play" data-card-play="${esc(item.id)}"
+            aria-pressed="false" aria-label="${esc(t('playMusic') || 'Play music')}">
+            <i class="bi bi-play-fill" aria-hidden="true"></i>
+            <span class="jd-card-play-label">${esc(t('playMusic') || 'Play music')}</span>
+          </button>`
+      : '';
+    const creditHtml = audioCredit
+      ? `<p class="jd-card-audio-credit" hidden data-card-audio-credit>${esc(audioCredit)}</p>`
+      : '';
 
-    return `<article class="jd-card" data-kind="${esc(kind)}" data-id="${esc(item.id)}">
+    return `<article class="jd-card" data-kind="${esc(kind)}" data-id="${esc(item.id)}"${
+      audioSrc ? ` data-audio-src="${esc(audioSrc)}"` : ''
+    }>
       <div class="jd-card-inner">
         <button type="button" class="jd-card-face jd-card-front jd-card-flip" aria-expanded="false"
           aria-label="${esc(pick(item.name))} — ${esc(t('flipHint'))}">
@@ -90,9 +106,13 @@
         <div class="jd-card-face jd-card-back" data-card-back-flip>
           <h3 class="jd-card-name">${esc(pick(item.name))}</h3>
           <p class="jd-card-history">${esc(pick(item.history))}</p>
+          ${creditHtml}
           <div class="jd-card-actions">
-            <button type="button" class="jd-btn jd-btn-sand jd-btn-sm" data-card-listen="${esc(item.id)}" data-card-kind="${esc(kind)}">
-              <i class="bi bi-volume-up-fill"></i> ${esc(t('listen'))}
+            ${playBtn}
+            <button type="button" class="jd-btn jd-btn-sand jd-btn-sm jd-listen-btn" data-card-listen="${esc(item.id)}" data-card-kind="${esc(kind)}"
+              aria-pressed="false">
+              <i class="bi bi-volume-up-fill" aria-hidden="true"></i>
+              <span class="jd-listen-label">${esc(t('listen'))}</span>
             </button>
             ${
               item.siteId
@@ -113,8 +133,18 @@
   function renderCards() {
     const foodGrid = document.getElementById('jdFoodGrid');
     const musicGrid = document.getElementById('jdMusicGrid');
+    const hookahGrid = document.getElementById('jdHookahGrid');
     if (foodGrid) foodGrid.innerHTML = state.data.foods.map((f) => cardMarkup(f, 'food')).join('');
     if (musicGrid) musicGrid.innerHTML = state.data.music.map((m) => cardMarkup(m, 'music')).join('');
+    if (hookahGrid) {
+      const items = Array.isArray(state.data.hookah) ? state.data.hookah : [];
+      hookahGrid.innerHTML = items.map((h) => cardMarkup(h, 'hookah')).join('');
+    }
+    const livingGrid = document.getElementById('jdLivingGrid');
+    if (livingGrid) {
+      const items = Array.isArray(state.data.living) ? state.data.living : [];
+      livingGrid.innerHTML = items.map((item) => cardMarkup(item, 'living')).join('');
+    }
   }
 
   function renderPhrases() {
@@ -152,9 +182,9 @@
   function renderFacts() {
     const map = {
       en: {
-        ain: 'Ain Ghazal statues',
+        ain: 'Ain Ghazal plaster statues',
         rome: 'Rome annexes Nabataea',
-        ind: 'Independence',
+        ind: 'Independence, 1946',
         dead: 'Dead Sea, lowest on Earth'
       },
       ar: {
@@ -173,12 +203,29 @@
 
   function renderAll() {
     if (!state.data) return;
+    const keepPlayingId = musicPlayingId;
+    const keepTime = musicAudio && !musicAudio.paused ? musicAudio.currentTime : 0;
     renderGuide();
     renderFacts();
     renderEras();
     renderCards();
     renderPhrases();
     i18n()?.applyStaticStrings();
+    // Language toggle re-renders cards — keep the sample playing and refresh button labels.
+    if (keepPlayingId && musicAudio && !musicAudio.paused) {
+      musicPlayingId = keepPlayingId;
+      try {
+        if (Math.abs((musicAudio.currentTime || 0) - keepTime) > 0.5) {
+          musicAudio.currentTime = keepTime;
+        }
+      } catch (_) {
+        /* ignore */
+      }
+      syncMusicPlayButtons();
+    } else if (keepPlayingId && (!musicAudio || musicAudio.paused)) {
+      stopMusic();
+    }
+    if (listenSpeakingKey) syncListenButtons();
     document.dispatchEvent(new CustomEvent('jordan:rendered'));
   }
 
@@ -222,34 +269,197 @@
 
   /* --------------------------------------------------------------- actions */
 
+  let musicAudio = null;
+  let musicPlayingId = null;
+  let listenSpeakingKey = null;
+  let listenGeneration = 0;
+
   function findItem(kind, id) {
-    const source = kind === 'music' ? state.data?.music : state.data?.foods;
+    const sources = {
+      music: state.data?.music,
+      food: state.data?.foods,
+      hookah: state.data?.hookah,
+      living: state.data?.living
+    };
+    const source = sources[kind] || state.data?.foods;
     return (source || []).find((item) => item.id === id) || null;
+  }
+
+  function applyListenButtonState(btn, active) {
+    const listenLabel = t('listen') || 'Listen';
+    const stopLabel = t('stop') || 'Stop';
+    const label = active ? stopLabel : listenLabel;
+    btn.classList.toggle('is-listening', active);
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    btn.setAttribute('aria-label', label);
+    const icon = btn.querySelector('i');
+    if (icon) {
+      icon.className = active ? 'bi bi-stop-fill' : 'bi bi-volume-up-fill';
+    }
+    const text = btn.querySelector('.jd-listen-label');
+    if (text) text.textContent = label;
+    else if (!btn.querySelector('img')) {
+      // Phrase / compact buttons keep their own copy; only flip aria + icon class above.
+    }
+  }
+
+  function syncListenButtons() {
+    document.querySelectorAll('[data-card-listen]').forEach((btn) => {
+      const key = `card:${btn.getAttribute('data-card-kind')}:${btn.getAttribute('data-card-listen')}`;
+      applyListenButtonState(btn, listenSpeakingKey === key);
+    });
+    document.querySelectorAll('[data-era-listen]').forEach((btn) => {
+      const key = `era:${btn.getAttribute('data-era-listen')}`;
+      applyListenButtonState(btn, listenSpeakingKey === key);
+    });
+    const sheetBtn = document.getElementById('jdSheetListen');
+    if (sheetBtn) applyListenButtonState(sheetBtn, listenSpeakingKey === 'sheet');
+    document.querySelectorAll('[data-phrase-index]').forEach((btn) => {
+      const key = `phrase:${btn.getAttribute('data-phrase-index')}`;
+      const active = listenSpeakingKey === key;
+      btn.classList.toggle('is-speaking', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+  }
+
+  function clearListenUi() {
+    listenSpeakingKey = null;
+    syncListenButtons();
+  }
+
+  /** Stop guide/phrase speech and reset Listen → Stop toggles (does not touch music samples). */
+  function stopListenSpeech() {
+    listenGeneration += 1;
+    clearListenUi();
+    if (typeof window.stopSpeech === 'function') window.stopSpeech();
+    else if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    document.getElementById('jdGuide')?.classList.remove('is-speaking');
+  }
+
+  /**
+   * Toggle guide narration for a Listen control.
+   * Second click on the same key stops; another key switches over.
+   * @param {string} key
+   * @param {() => Promise<void>|void} speakFn
+   */
+  async function toggleGuideSpeech(key, speakFn) {
+    if (!key || typeof speakFn !== 'function') return;
+    if (listenSpeakingKey === key) {
+      stopListenSpeech();
+      return;
+    }
+
+    stopMusic();
+    stopListenSpeech();
+    const gen = ++listenGeneration;
+    listenSpeakingKey = key;
+    syncListenButtons();
+    i18n()?.unlockAudio();
+    try {
+      await speakFn();
+    } finally {
+      if (gen === listenGeneration) clearListenUi();
+    }
+  }
+
+  function syncMusicPlayButtons() {
+    document.querySelectorAll('[data-card-play]').forEach((btn) => {
+      const id = btn.getAttribute('data-card-play');
+      const playing = musicPlayingId === id;
+      const label = playing ? t('stopMusic') || 'Stop music' : t('playMusic') || 'Play music';
+      btn.classList.toggle('is-playing', playing);
+      btn.setAttribute('aria-pressed', playing ? 'true' : 'false');
+      btn.setAttribute('aria-label', label);
+      const icon = btn.querySelector('i');
+      if (icon) icon.className = playing ? 'bi bi-stop-fill' : 'bi bi-play-fill';
+      const text = btn.querySelector('.jd-card-play-label');
+      if (text) text.textContent = label;
+      const card = btn.closest('.jd-card');
+      card?.classList.toggle('is-playing-music', playing);
+      const credit = card?.querySelector('[data-card-audio-credit]');
+      if (credit) credit.hidden = !playing;
+    });
+  }
+
+  function stopMusic() {
+    if (musicAudio) {
+      try {
+        musicAudio.pause();
+        musicAudio.currentTime = 0;
+      } catch (_) {
+        /* ignore */
+      }
+      musicAudio = null;
+    }
+    musicPlayingId = null;
+    syncMusicPlayButtons();
+  }
+
+  function playMusic(id) {
+    const item = findItem('music', id);
+    const src = item?.audio?.src;
+    if (!src) return;
+
+    if (musicPlayingId === id) {
+      stopMusic();
+      return;
+    }
+
+    stopMusic();
+    stopListenSpeech();
+    i18n()?.unlockAudio();
+
+    const audio = new Audio(src);
+    audio.volume = 0.9;
+    musicAudio = audio;
+    musicPlayingId = id;
+    syncMusicPlayButtons();
+
+    const clearIfCurrent = () => {
+      if (musicAudio === audio) {
+        musicAudio = null;
+        musicPlayingId = null;
+        syncMusicPlayButtons();
+      }
+    };
+    audio.addEventListener('ended', clearIfCurrent);
+    audio.addEventListener('error', () => {
+      console.warn('Jordan music sample failed to load', src);
+      clearIfCurrent();
+    });
+
+    audio.play().catch((err) => {
+      console.warn('Jordan music play blocked', err);
+      clearIfCurrent();
+    });
   }
 
   function speakItem(kind, id) {
     const item = findItem(kind, id);
     if (!item) return;
-    i18n()?.unlockAudio();
-    i18n()?.speakAsGuide(`${pick(item.name)}. ${pick(item.history)}`);
+    return toggleGuideSpeech(`card:${kind}:${id}`, () =>
+      i18n()?.speakAsGuide(`${pick(item.name)}. ${pick(item.history)}`)
+    );
   }
 
   function speakEra(eraId) {
     const era = state.data?.eras.find((e) => e.id === eraId);
     if (!era) return;
-    i18n()?.unlockAudio();
-    i18n()?.speakAsGuide(pick(era.narration) || pick(era.copy));
+    return toggleGuideSpeech(`era:${eraId}`, () =>
+      i18n()?.speakAsGuide(pick(era.narration) || pick(era.copy))
+    );
   }
 
   function speakPhrase(index) {
     const phrase = state.data?.phrases?.[index];
     if (!phrase) return;
-    i18n()?.unlockAudio();
-    const button = document.querySelector(`[data-phrase-index="${index}"]`);
-    button?.classList.add('is-speaking');
-    i18n()
-      .speak(phrase.ar, { lang: 'ar' })
-      .finally(() => button?.classList.remove('is-speaking'));
+    return toggleGuideSpeech(`phrase:${index}`, () => i18n()?.speak(phrase.ar, { lang: 'ar' }));
+  }
+
+  function speakSheet() {
+    const speech = state.sheet.speech;
+    if (!speech) return;
+    return toggleGuideSpeech('sheet', () => i18n()?.speakAsGuide(speech));
   }
 
   function toggleCard(card) {
@@ -259,9 +469,13 @@
         btn.setAttribute('aria-expanded', flipped ? 'true' : 'false');
       }
     });
+    if (!flipped && musicPlayingId && card.getAttribute('data-id') === musicPlayingId) {
+      stopMusic();
+    }
   }
 
   function unflipAll() {
+    stopMusic();
     document.querySelectorAll('.jd-card.is-flipped').forEach((card) => {
       card.classList.remove('is-flipped');
       card.querySelectorAll('.jd-card-front.jd-card-flip').forEach((btn) => {
@@ -304,6 +518,14 @@
       if (cardListen) {
         event.stopPropagation();
         speakItem(cardListen.getAttribute('data-card-kind'), cardListen.getAttribute('data-card-listen'));
+        return;
+      }
+
+      const cardPlay = event.target.closest('[data-card-play]');
+      if (cardPlay) {
+        event.preventDefault();
+        event.stopPropagation();
+        playMusic(cardPlay.getAttribute('data-card-play'));
         return;
       }
 
@@ -351,8 +573,7 @@
     document.getElementById('jdSheetClose')?.addEventListener('click', closeSheet);
     document.getElementById('jdSheetBackdrop')?.addEventListener('click', closeSheet);
     document.getElementById('jdSheetListen')?.addEventListener('click', () => {
-      i18n()?.unlockAudio();
-      i18n()?.speakAsGuide(state.sheet.speech);
+      speakSheet();
     });
 
     const year = document.getElementById('jdFooterYear');
@@ -392,6 +613,11 @@
     unflipAll,
     speakPhrase,
     speakFirstPhrase: () => speakPhrase(0),
+    playMusic,
+    stopMusic,
+    toggleGuideSpeech,
+    clearListenUi,
+    stopListenSpeech,
     focusSite
   };
 

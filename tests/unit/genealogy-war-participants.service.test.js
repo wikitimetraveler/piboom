@@ -87,6 +87,22 @@ describe('genealogy war participant matching', () => {
     expect(Array.isArray(getWarParticipants('revolutionary-war'))).toBe(true);
   });
 
+  test('Barbary Wars includes external research note for Enoch S. Lane (not in Vol. I)', () => {
+    expect(__test__.WAR_DEFINITIONS['barbary-wars']).toBeTruthy();
+    const participants = getWarParticipants('barbary-wars');
+    expect(participants.length).toBeGreaterThanOrEqual(1);
+    const enoch = participants.find((p) => String(p.person?.id) === 'ext-enoch-s-lane');
+    expect(enoch).toBeTruthy();
+    expect(enoch.associationType).toBe('external-research');
+    expect(enoch.confidence).toBe('high');
+    expect(enoch.evidence.join(' ')).toMatch(/Enterprize/i);
+    expect(enoch.associationNotes.join(' ')).toMatch(/Not found in Lane Genealogies Vol\. I/i);
+    const summary = getWarCampaignsSummary();
+    expect(summary.campaigns.some((c) => c.slug === 'barbary-wars' && c.participantCount >= 1)).toBe(
+      true
+    );
+  });
+
   test('deep scan report returns conflict + suspicious sections', () => {
     const report = getMilitaryDeepScanReport();
     expect(report).toBeTruthy();

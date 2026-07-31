@@ -1,5 +1,5 @@
 /**
- * Rami — Jordan history, food and music expert assistant
+ * Rami — Jordan history, food, music and argileh expert assistant
  * Development work by David Lane
  */
 import { readFile } from 'node:fs/promises';
@@ -55,6 +55,16 @@ function factSheet(content) {
 
   lines.push('', '### Music');
   for (const entry of content.music || []) {
+    lines.push(`- ${entry.name?.en}: ${entry.tagline?.en}. ${entry.history?.en}`);
+  }
+
+  lines.push('', '### Argileh (hookah)');
+  for (const entry of content.hookah || []) {
+    lines.push(`- ${entry.name?.en}: ${entry.tagline?.en}. ${entry.history?.en}`);
+  }
+
+  lines.push('', '### Living Jordan (people, badia, crafts)');
+  for (const entry of content.living || []) {
     lines.push(`- ${entry.name?.en}: ${entry.tagline?.en}. ${entry.history?.en}`);
   }
 
@@ -195,6 +205,8 @@ export async function getJordanSummary() {
     siteCount: (content.sites || []).length,
     foodCount: (content.foods || []).length,
     musicCount: (content.music || []).length,
+    hookahCount: (content.hookah || []).length,
+    livingCount: (content.living || []).length,
     phraseCount: (content.phrases || []).length
   };
 }

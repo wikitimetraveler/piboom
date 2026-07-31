@@ -27,15 +27,19 @@
   }
 
   function setPaused(root, paused) {
-    root.style.animationPlayState = paused ? 'paused' : 'running';
+    const state = paused ? 'paused' : 'running';
+    root.style.animationPlayState = state;
     root.querySelectorAll('.jd-hero-mote').forEach((el) => {
-      el.style.animationPlayState = paused ? 'paused' : 'running';
+      el.style.animationPlayState = state;
     });
     const atmos = document.getElementById('jdHeroAtmos');
-    if (!atmos) return;
-    atmos.querySelectorAll('.jd-hero-sky, .jd-hero-heat, .jd-hero-sand, .jd-hero-arch, .jd-hero-dune').forEach((el) => {
-      el.style.animationPlayState = paused ? 'paused' : 'running';
-    });
+    if (atmos) {
+      atmos.querySelectorAll('.jd-hero-sky, .jd-hero-heat, .jd-hero-sand, .jd-hero-arch, .jd-hero-dune').forEach((el) => {
+        el.style.animationPlayState = state;
+      });
+    }
+    const portrait = document.querySelector('#jdGuide:not(.is-speaking) .jd-guide-portrait');
+    if (portrait) portrait.style.animationPlayState = state;
   }
 
   function init() {

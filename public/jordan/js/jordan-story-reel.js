@@ -167,6 +167,12 @@
       case 'flipFirstMusic':
         content.flipFirst?.('jdMusicGrid');
         break;
+      case 'flipFirstHookah':
+        content.flipFirst?.('jdHookahGrid');
+        break;
+      case 'flipFirstLiving':
+        content.flipFirst?.('jdLivingGrid');
+        break;
       case 'unflipCards':
         content.unflipAll?.();
         break;

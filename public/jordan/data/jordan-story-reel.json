@@ -13,8 +13,8 @@
       "kicker": { "en": "HyperFrame", "ar": "إطار" },
       "title": { "en": "Ahlan wa sahlan", "ar": "أهلاً وسهلاً" },
       "copy": {
-        "en": "I'm Rami. Nine thousand years in about four minutes — history, food, and song.",
-        "ar": "أنا رامي. تسعة آلاف سنة في أربع دقائق تقريباً — تاريخ وطعام وغناء."
+        "en": "I'm Rami. Nine thousand years in about four minutes — history, food, song, and café argileh.",
+        "ar": "أنا رامي. تسعة آلاف سنة في أربع دقائق تقريباً — تاريخ وطعام وغناء وأرجيلة المقهى."
       },
       "narration": {
         "en": "Ahlan wa sahlan. I'm Rami, and this is Jordan — nine thousand years of history, told through its roads, its tables, and its songs.",
@@ -121,6 +121,40 @@
       "narration": {
         "en": "Then the sound. A one-string rababa holding the floor for a nabati poet. A double-reed mijwiz driving a dabke line, played with circular breathing so it never stops. And since nineteen eighty one, all of it amplified inside second-century Roman theatres at the Jerash Festival.",
         "ar": "ثم الصوت. ربابةٌ بوترٍ واحد تفتح المجلس لشاعرٍ نبطي. ومجوزٌ بقصبتين يقود صفّ الدبكة، يُعزف بالتنفّس الدائري فلا ينقطع. ومنذ عام ١٩٨١ يتردّد كل ذلك في مسارح رومانية من القرن الثاني في مهرجان جرش."
+      }
+    },
+    {
+      "id": "hookah",
+      "anchor": "jdHookah",
+      "spotlight": "#jdHookahGrid .jd-card",
+      "action": "flipFirstHookah",
+      "durationMs": 7000,
+      "kicker": { "en": "Argileh", "ar": "أرجيلة" },
+      "title": { "en": "Apple on the terrace", "ar": "تفاح على الشرفة" },
+      "copy": {
+        "en": "Café argileh — history, shared hoses, and the classic two-apple blend.",
+        "ar": "أرجيلة المقهى — تاريخ، وخراطيم مشتركة، ونكهة التفاحتين الكلاسيكية."
+      },
+      "narration": {
+        "en": "After the music, the café. Argileh arrived centuries ago and stayed on Amman terraces — glass vase, clay head, coals on foil. The default flavor is two-apple, tufahtayn — sweet, familiar, and yes, the blend a neighbor still orders first.",
+        "ar": "بعد الموسيقى، المقهى. جاءت الأرجيلة قبل قرون وبقيت على شرفات عمّان — مزهرية زجاج ورأس فخار وفحم على الورق. والنكهة الافتراضية تفاحتين — حلوة ومألوفة، ونعم، الخلطة التي ما زال جار يطلبها أولاً."
+      }
+    },
+    {
+      "id": "living",
+      "anchor": "jdLiving",
+      "spotlight": "#jdLivingGrid .jd-card",
+      "action": "flipFirstLiving",
+      "durationMs": 7600,
+      "kicker": { "en": "Living", "ar": "حيّ" },
+      "title": { "en": "People, badia, hands", "ar": "ناس وبادية وأيادٍ" },
+      "copy": {
+        "en": "Bedouin diwan, neighbor communities, eastern desert, mosaics and rugs.",
+        "ar": "ديوان بدوي، ومجتمعات جارة، وصحراء شرقية، وفسيفساء وسجاد."
+      },
+      "narration": {
+        "en": "Then the living country. A Bedouin diwan where coffee opens the floor. Palestinian bakeries and Syrian sweets on Amman stairs. The eastern badia beyond postcard Rum — and Azraq's water lesson. Madaba mosaic hands and Bani Hamida looms still earning a living.",
+        "ar": "ثم البلد الحيّ. ديوان بدوي تفتتحه القهوة. مخابز فلسطينية وحلويات سورية على سلالم عمّان. البادية الشرقية أبعد من رم البطاقية — ودرس الماء في الأزرق. أيادي فسيفساء مادبا وأنوال بني حميدة ما زالت ترزق."
       }
     },
     {

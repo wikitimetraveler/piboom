@@ -8,16 +8,16 @@ const i18n = () => window.JordanI18N;
 
 const WELCOME = {
   en: `<img src="/jordan/assets/rami-guide-portrait-256.png" alt="" style="width:64px;height:64px;border-radius:50%;margin-bottom:8px;border:2px solid #d4a24c"/>
-    <p>Ahlan wa sahlan — I'm <strong>Rami</strong>. Ask me about Jordan's history, its food, or its music.</p>
-    <small class="text-muted">Try: "How did the Nabataeans store water?" or "Why is mansaf eaten from one tray?"</small>`,
+    <p>Ahlan wa sahlan — I'm <strong>Rami</strong>. Ask me about history, food, music, argileh, Bedouin life, or Amman's neighborhoods.</p>
+    <small class="text-muted">Try: "What is the eastern badia?" or "Why is mansaf eaten from one tray?"</small>`,
   ar: `<img src="/jordan/assets/rami-guide-portrait-256.png" alt="" style="width:64px;height:64px;border-radius:50%;margin-bottom:8px;border:2px solid #d4a24c"/>
-    <p>أهلاً وسهلاً — أنا <strong>رامي</strong>. اسألني عن تاريخ الأردن أو طعامه أو موسيقاه.</p>
-    <small class="text-muted">جرّب: «كيف خزّن الأنباط الماء؟» أو «لماذا يُؤكل المنسف من صينية واحدة؟»</small>`
+    <p>أهلاً وسهلاً — أنا <strong>رامي</strong>. اسألني عن التاريخ أو الطعام أو الموسيقى أو الأرجيلة أو الحياة البدوية أو أحياء عمّان.</p>
+    <small class="text-muted">جرّب: «ما البادية الشرقية؟» أو «لماذا يُؤكل المنسف من صينية واحدة؟»</small>`
 };
 
 const PLACEHOLDER = {
-  en: 'Ask about Petra, mansaf, the rababa…',
-  ar: 'اسأل عن البتراء أو المنسف أو الربابة…'
+  en: 'Ask about Petra, Azraq, mansaf, Bedouin diwan…',
+  ar: 'اسأل عن البتراء أو الأزرق أو المنسف أو الديوان…'
 };
 
 function forSpeech(text) {
