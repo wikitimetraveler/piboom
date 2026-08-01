@@ -491,14 +491,24 @@
    * @param {string} key
    * @param {() => Promise<void>|void} speakFn
    */
-  async function toggleGuideSpeech(key, speakFn) {
+  /**
+   * @param {string} key
+   * @param {() => Promise<void>|void} speakFn
+   * @param {{ force?: boolean }} [options] force=true bypasses the page Narration toggle
+   */
+  async function toggleGuideSpeech(key, speakFn, options = {}) {
     if (!key || typeof speakFn !== 'function') return;
     if (listenSpeakingKey === key) {
       stopListenSpeech();
       return;
     }
-    // Master Narration checkbox (default on) — atlas, eras, cards, phrases.
-    if (i18n() && typeof i18n().narrationEnabled === 'function' && !i18n().narrationEnabled()) {
+    // Master Narration checkbox — skip for explicit practice audio (e.g. phrases).
+    if (
+      !options.force &&
+      i18n() &&
+      typeof i18n().narrationEnabled === 'function' &&
+      !i18n().narrationEnabled()
+    ) {
       return;
     }
 
@@ -611,7 +621,12 @@
   function speakPhrase(index) {
     const phrase = state.data?.phrases?.[index];
     if (!phrase) return;
-    return toggleGuideSpeech(`phrase:${index}`, () => i18n()?.speak(phrase.ar, { lang: 'ar' }));
+    // Speak Jordanian is practice audio — always on, ignore the page Narration toggle.
+    return toggleGuideSpeech(
+      `phrase:${index}`,
+      () => i18n()?.speak(phrase.ar, { lang: 'ar', force: true }),
+      { force: true }
+    );
   }
 
   function speakSheet() {

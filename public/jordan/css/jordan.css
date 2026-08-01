@@ -629,8 +629,7 @@ html.jd-narration-off .jd-narrate--global {
   background: rgba(255, 253, 248, 0.55);
 }
 
-html.jd-narration-off .jd-listen-btn,
-html.jd-narration-off .jd-phrase {
+html.jd-narration-off .jd-listen-btn {
   opacity: 0.55;
 }
 
