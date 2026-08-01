@@ -1,0 +1,145 @@
+{
+  "id": "shenango-valley-atlas",
+  "brand": {
+    "name": { "en": "Shenango Valley" },
+    "tagline": { "en": "Home park, Amish neighbors, and the valley table — mapped from Buhl Park." }
+  },
+  "guide": {
+    "name": { "en": "David" },
+    "title": { "en": "Shenango Valley guide" },
+    "portrait": "/family/assets/david-lane-time-traveler-scene.png",
+    "greeting": { "en": "Welcome home. I'm David — walk with me from Buhl Park to the Amish roads and the valley's favorite tables." }
+  },
+  "ui": {
+    "en": {
+      "dir": "ltr",
+      "heroKicker": "Mercer & Lawrence Counties · Western Pennsylvania",
+      "heroTitle": "Shenango Valley",
+      "heroLine": "Buhl Park at the center — Amish countryside nearby, and the local plates that taste like home.",
+      "exploreMap": "Explore the atlas",
+      "askGuide": "Ask David",
+      "meetGuide": "Meet David",
+      "stop": "Stop",
+      "listen": "Listen",
+      "timelineHeading": "Layers of the valley",
+      "timelineLead": "Three short chapters. Select one to open the story and find it on the map.",
+      "mapHeading": "Atlas of Shenango Valley",
+      "mapLead": "Each pin is a place you can visit. Select a site to hear its story.",
+      "mapAll": "All",
+      "mapPark": "Park",
+      "mapAmish": "Amish",
+      "mapFood": "Food",
+      "mapReset": "Show all pins",
+      "mapLoading": "Loading the atlas…",
+      "foodHeading": "The valley table",
+      "foodLead": "Featured for now — Quaker Steak & Lube and Luigi's Pizza. Flip a card for the story.",
+      "livingHeading": "Living neighbors",
+      "livingLead": "The New Wilmington Amish countryside — drive respectfully, no photos of people without permission.",
+      "flipHint": "Flip for the story",
+      "back": "Back",
+      "loading": "Loading Shenango Valley…",
+      "close": "Close",
+      "context": "Context",
+      "mapShow": "Show on map"
+    }
+  },
+  "eras": [
+    {
+      "id": "home-park",
+      "siteId": "buhl-park",
+      "years": { "en": "1915 → today" },
+      "title": { "en": "Buhl Park — the living green" },
+      "copy": { "en": "In the heart of the Shenango Valley, Buhl Park's 270 acres hold trails, Lake Julia, free nine-hole golf, and the gatherings that stitch Hermitage and Sharon together." },
+      "narration": { "en": "Start at Buhl Park — the valley's shared front yard since nineteen fifteen." }
+    },
+    {
+      "id": "valley-table",
+      "siteId": "quaker-steak-lube",
+      "years": { "en": "1955 → 1974" },
+      "title": { "en": "Tables that taste like home" },
+      "copy": { "en": "Luigi's has been serving pie in Hermitage since 1955. Quaker Steak & Lube opened the original motor-themed wing house in Sharon in 1974 — both still define the valley table." },
+      "narration": { "en": "Two tables for now — Luigi's pizza and the original Quaker Steak and Lube." }
+    },
+    {
+      "id": "amish-neighbors",
+      "siteId": "new-wilmington-amish",
+      "years": { "en": "1847 → today" },
+      "title": { "en": "Amish countryside nearby" },
+      "copy": { "en": "Around New Wilmington, Old Order Amish farms stretch across Lawrence and Mercer counties — brown-topped buggies, quiet roads, and markets that ask for courtesy over spectacle." },
+      "narration": { "en": "Just south-east of Buhl Park, New Wilmington anchors the local Amish countryside — not Lancaster." }
+    }
+  ],
+  "sites": [
+    {
+      "id": "buhl-park",
+      "category": "park",
+      "emoji": "🌳",
+      "lat": 41.245889,
+      "lng": -80.477848,
+      "name": { "en": "Buhl Park" },
+      "place": { "en": "715 Hazen Rd, Hermitage, PA" },
+      "blurb": { "en": "270-acre heart of the Shenango Valley — trails, Lake Julia, recreation, and free nine-hole golf since 1915." }
+    },
+    {
+      "id": "new-wilmington-amish",
+      "category": "amish",
+      "emoji": "🌾",
+      "lat": 41.12083,
+      "lng": -80.33278,
+      "name": { "en": "New Wilmington Amish countryside" },
+      "place": { "en": "New Wilmington / Volant, PA" },
+      "blurb": { "en": "Western Pennsylvania's Old Order Amish settlement — farms around New Wilmington and Volant, roughly ten miles from Buhl Park." }
+    },
+    {
+      "id": "quaker-steak-lube",
+      "category": "food",
+      "emoji": "🍗",
+      "lat": 41.231344,
+      "lng": -80.507806,
+      "name": { "en": "Quaker Steak & Lube — The Original" },
+      "place": { "en": "101 Chestnut St, Sharon, PA" },
+      "blurb": { "en": "The original Quaker Steak & Lube opened in 1974 in a former service station — motor-themed wings and a Sharon landmark." }
+    },
+    {
+      "id": "luigis-pizza",
+      "category": "food",
+      "emoji": "🍕",
+      "lat": 41.2332,
+      "lng": -80.4475,
+      "name": { "en": "Luigi's Pizza" },
+      "place": { "en": "2918 E State St, Hermitage, PA" },
+      "blurb": { "en": "Shenango Valley pizza institution since 1955 — often voted Best of the Best by local readers." }
+    }
+  ],
+  "foods": [
+    {
+      "id": "qsl-card",
+      "siteId": "quaker-steak-lube",
+      "emoji": "🍗",
+      "name": { "en": "Quaker Steak & Lube" },
+      "tagline": { "en": "The original — Sharon, 1974" },
+      "history": { "en": "Born in a vacant auto service station on Chestnut Street, the Sharon Lube invented the motor-garage dining vibe and put Shenango Valley wings on the national map. Bike Night, sauces by the dozen, and the original address still matter." },
+      "tags": { "en": ["Sharon", "Wings", "Original"] }
+    },
+    {
+      "id": "luigis-card",
+      "siteId": "luigis-pizza",
+      "emoji": "🍕",
+      "name": { "en": "Luigi's Pizza" },
+      "tagline": { "en": "Hermitage pie since 1955" },
+      "history": { "en": "A neighborhood pizzeria on East State Street that has fed the valley for generations. Classic pies, local loyalty, and the kind of counter where everyone already knows your order." },
+      "tags": { "en": ["Hermitage", "Pizza", "Since 1955"] }
+    }
+  ],
+  "living": [
+    {
+      "id": "amish-etiquette",
+      "siteId": "new-wilmington-amish",
+      "emoji": "🌾",
+      "name": { "en": "Drive with courtesy" },
+      "tagline": { "en": "Neighbors, not a theme park" },
+      "history": { "en": "Share the road with buggies, keep cameras pointed at barns and fields — never at people without clear permission — and buy from roadside stands when they are open. The countryside around New Wilmington is a living community." },
+      "tags": { "en": ["Etiquette", "New Wilmington"] }
+    }
+  ]
+}

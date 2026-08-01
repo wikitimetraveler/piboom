@@ -7,6 +7,7 @@
   'use strict';
 
   const STORAGE_KEY = 'jordanLang';
+  const NARRATE_KEY = 'jordanStoryNarrate';
   const LANGS = ['en', 'ar'];
 
   /** Guide voice per language — always male (Rami). Arabic falls back to browser ar-* males on mobile. */
@@ -20,6 +21,43 @@
     ui: { en: {}, ar: {} },
     listeners: []
   };
+
+  function narrateEl() {
+    return document.getElementById('jdNarrate') || document.getElementById('jdStoryNarrate');
+  }
+
+  /** Atlas, cards, phrases, guide replies, and the story reel — default ON. */
+  function narrationEnabled() {
+    const el = narrateEl();
+    return !el || el.checked;
+  }
+
+  function applyNarrationUi() {
+    document.documentElement.classList.toggle('jd-narration-off', !narrationEnabled());
+  }
+
+  function loadNarratePref() {
+    const el = narrateEl();
+    if (!el) return;
+    try {
+      el.checked = localStorage.getItem(NARRATE_KEY) !== '0';
+    } catch (_) {
+      el.checked = true;
+    }
+    applyNarrationUi();
+  }
+
+  function persistNarratePref() {
+    const el = narrateEl();
+    if (!el) return;
+    try {
+      localStorage.setItem(NARRATE_KEY, el.checked ? '1' : '0');
+    } catch (_) {
+      /* ignore */
+    }
+    applyNarrationUi();
+    if (!el.checked) stop();
+  }
 
   function readInitialLang() {
     try {
@@ -159,6 +197,7 @@
    * @param {{lang?: string, isCancelled?: () => boolean, volume?: number}} [options]
    */
   async function speak(text, options = {}) {
+    if (!narrationEnabled() && options.force !== true) return;
     const clean = String(text || '').replace(/\s+/g, ' ').trim();
     if (!clean) return;
     const profile = voiceProfile(options.lang);
@@ -203,12 +242,14 @@
       toggle();
     });
     document.getElementById('jdStopAudio')?.addEventListener('click', stop);
+    narrateEl()?.addEventListener('change', persistNarratePref);
   }
 
   function init() {
     state.lang = readInitialLang();
     applyDocumentDirection();
     updateToggleLabel();
+    loadNarratePref();
     bindToggle();
   }
 
@@ -227,6 +268,7 @@
     speakAsGuide,
     stop,
     unlockAudio,
+    narrationEnabled,
     LANGS
   };
 

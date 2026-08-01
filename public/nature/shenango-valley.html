@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Shenango Valley — Local Atlas | Nature</title>
+  <meta name="description" content="Shenango Valley local atlas: Buhl Park, New Wilmington Amish countryside, Quaker Steak &amp; Lube, and Luigi's Pizza — guided by David with HeyGen and AI chat."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/nature/css/shenango-valley.css"/>
+  <script src="/shared/menu-config.js"></script>
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/demo-users.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <script src="/shared/dark-mode.js" defer></script>
+</head>
+<body class="sv-page">
+  <modern-navbar></modern-navbar>
+
+  <main class="sv-main">
+    <section class="sv-hero" id="svHero">
+      <div class="sv-hero-atmos" aria-hidden="true">
+        <div class="sv-hero-mist"></div>
+        <svg class="sv-hero-ridge" viewBox="0 0 1200 220" preserveAspectRatio="xMidYMax meet" focusable="false">
+          <path d="M0 160 C180 110 320 140 480 100 C640 60 780 120 960 90 C1080 70 1160 100 1200 85 L1200 220 L0 220 Z"/>
+        </svg>
+      </div>
+      <div class="container">
+        <div class="sv-hero-layout">
+          <div class="sv-hero-inner">
+            <p class="sv-kicker" id="svHeroKicker">Mercer &amp; Lawrence Counties · Western Pennsylvania</p>
+            <h1 class="sv-hero-title" id="svHeroTitle">Shenango Valley</h1>
+            <p class="sv-hero-line" id="svHeroLine">Buhl Park at the center — Amish countryside nearby, and the local plates that taste like home.</p>
+            <div class="sv-hero-cta">
+              <a class="sv-btn sv-btn-primary" href="#svMap">
+                <i class="bi bi-geo-alt-fill"></i> <span id="svExploreLabel">Explore the atlas</span>
+              </a>
+              <a class="sv-btn sv-btn-ghost" href="/nature/nature-hub.html">
+                <i class="bi bi-tree"></i> Nature hub
+              </a>
+            </div>
+          </div>
+
+          <aside class="sv-guide" id="svGuide" aria-label="Shenango Valley guide David">
+            <div class="sv-guide-card">
+              <img class="sv-guide-portrait" id="svGuidePortrait" src="/family/assets/david-lane-time-traveler-scene.png" width="72" height="72" alt="David — Shenango Valley guide"/>
+              <div class="sv-guide-meta">
+                <h2 id="svGuideName">David</h2>
+                <p id="svGuideTitle">Shenango Valley guide</p>
+                <p class="sv-guide-status" id="svGuideStatus">Welcome home.</p>
+              </div>
+            </div>
+            <div class="sv-guide-actions">
+              <button type="button" class="sv-btn sv-btn-primary sv-btn-sm" id="svMeetGuide">
+                <i class="bi bi-camera-reels"></i> <span id="svMeetLabel">Meet David</span>
+              </button>
+              <button type="button" class="sv-btn sv-btn-sand sv-btn-sm" id="svAskGuide">
+                <i class="bi bi-chat-dots-fill"></i> <span id="svAskLabel">Ask David</span>
+              </button>
+              <button type="button" class="sv-btn sv-btn-ghost sv-btn-sm" id="svStopAudio">
+                <i class="bi bi-stop-fill"></i> <span>Stop</span>
+              </button>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <div class="container">
+      <section class="sv-section" id="svTimeline">
+        <div class="sv-section-head">
+          <h2 id="svTimelineHeading">Layers of the valley</h2>
+          <p id="svTimelineLead">Three short chapters. Select one to open the story and find it on the map.</p>
+        </div>
+        <ol class="sv-era-list" id="svEraList">
+          <li class="sv-loading">Loading Shenango Valley…</li>
+        </ol>
+      </section>
+
+      <section class="sv-section" id="svMap">
+        <div class="sv-section-head">
+          <h2 id="svMapHeading">Atlas of Shenango Valley</h2>
+          <p id="svMapLead">Each pin is a place you can visit. Select a site to hear its story.</p>
+        </div>
+        <div class="sv-map-filters" id="svMapFilters" role="group" aria-label="Filter map pins">
+          <button type="button" class="sv-chip is-active" data-filter="all">All</button>
+          <button type="button" class="sv-chip" data-filter="park">Park</button>
+          <button type="button" class="sv-chip" data-filter="amish">Amish</button>
+          <button type="button" class="sv-chip" data-filter="food">Food</button>
+        </div>
+        <div class="sv-map-layout">
+          <ul class="sv-site-list" id="svSiteList"></ul>
+          <div class="sv-map-wrap">
+            <div id="svMapCanvas" class="sv-map-canvas" role="img" aria-label="Map of Shenango Valley places"></div>
+            <p class="sv-map-status" id="svMapStatus">Loading the atlas…</p>
+            <button type="button" class="sv-btn sv-btn-ghost sv-btn-sm sv-map-reset" id="svMapReset" hidden>
+              <i class="bi bi-arrow-clockwise"></i> Show all pins
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="sv-section" id="svFood">
+        <div class="sv-section-head">
+          <h2 id="svFoodHeading">The valley table</h2>
+          <p id="svFoodLead">Featured for now — Quaker Steak &amp; Lube and Luigi's Pizza. Flip a card for the story.</p>
+        </div>
+        <div class="sv-grid" id="svFoodGrid"></div>
+      </section>
+
+      <section class="sv-section" id="svLiving">
+        <div class="sv-section-head">
+          <h2 id="svLivingHeading">Living neighbors</h2>
+          <p id="svLivingLead">The New Wilmington Amish countryside — drive respectfully, no photos of people without permission.</p>
+        </div>
+        <div class="sv-grid" id="svLivingGrid"></div>
+      </section>
+
+      <p class="sv-footer-note">
+        Shenango Valley Local Atlas · Guide narration by HeyGen &amp; TTS ·
+        Development by David E Lane · <span id="svFooterYear">2026</span>
+      </p>
+    </div>
+  </main>
+
+  <div class="sv-sheet" id="svSheet" hidden role="dialog" aria-modal="true" aria-labelledby="svSheetTitle">
+    <div class="sv-sheet-backdrop" id="svSheetBackdrop"></div>
+    <div class="sv-sheet-panel">
+      <header class="sv-sheet-header">
+        <h2 id="svSheetTitle"></h2>
+        <button type="button" class="btn-close btn-close-white" id="svSheetClose" aria-label="Close"></button>
+      </header>
+      <div class="sv-sheet-body" id="svSheetBody"></div>
+      <footer class="sv-sheet-footer">
+        <button type="button" class="sv-btn sv-btn-sand sv-btn-sm" id="svSheetListen">
+          <i class="bi bi-volume-up-fill"></i> <span>Listen</span>
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <script src="/shared/tts.js"></script>
+  <script src="/shared/speech-recognition.js"></script>
+  <script src="/family/js/lane-family-google-maps.js"></script>
+  <script src="/shared/google-advanced-markers.js"></script>
+  <script src="/nature/js/shenango-content.js"></script>
+  <script src="/nature/js/shenango-map.js"></script>
+  <script src="/nature/js/shenango-heygen.js"></script>
+  <script type="module" src="/nature/js/shenango-guide-chat.js"></script>
+</body>
+</html>

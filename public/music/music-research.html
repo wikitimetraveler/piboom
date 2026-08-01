@@ -1037,6 +1037,7 @@
   </div>
 </footer>
 
+<script src="/shared/speech-recognition.js"></script>
 <script src="/shared/voice-widget.js"></script>
 <script src="/shared/map-icons.js"></script>
 <script src="/shared/scripts.js"></script>
@@ -1880,22 +1881,25 @@ function detectPlatform() {
 // Initialize Web Speech Recognition (for desktop mode) - working code from player
 function initWebSpeechRecognition() {
   console.log('🎤 Initializing Web Speech Recognition...');
-  
-  // Check if browser supports speech recognition
-  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+
+  const supported =
+    typeof window.DcSpeechRecognition?.isSpeechRecognitionSupported === 'function'
+      ? window.DcSpeechRecognition.isSpeechRecognitionSupported()
+      : Boolean(window.SpeechRecognition || window.webkitSpeechRecognition);
+
+  if (!supported) {
     console.warn('❌ Speech recognition not supported in this browser');
     showVoiceNotification('Speech recognition not supported in this browser');
     return false;
   }
-  
-  // Skip voice recognition on Pi - just use server TTS
-  if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    console.log('Voice recognition disabled on Pi. Server TTS is working!');
-    showVoiceNotification('Voice recognition disabled on Pi. Server TTS is working!', 'info');
+
+  // Pi uses backend STT — do not disable Web Speech just because hostname isn't localhost
+  // (LAN IPs / Render / production still have SpeechRecognition in Chrome/Edge).
+  if (isPiMode && useBackendVoice) {
+    console.log('Voice recognition using backend on Pi; Web Speech skipped.');
     return false;
   }
-  
-  // Create speech recognition instance
+
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SpeechRecognition();
   
@@ -2081,7 +2085,11 @@ async function initVoiceSystem() {
       console.log('🎤 Initializing frontend voice recognition...');
       
       // Check if Web Speech API is available
-      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      const supported =
+        typeof window.DcSpeechRecognition?.isSpeechRecognitionSupported === 'function'
+          ? window.DcSpeechRecognition.isSpeechRecognitionSupported()
+          : Boolean(window.SpeechRecognition || window.webkitSpeechRecognition);
+      if (!supported) {
         throw new Error('Web Speech API not supported in this browser');
       }
       

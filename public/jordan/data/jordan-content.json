@@ -38,6 +38,7 @@
       "resumeReel": "Resume reel",
       "stopReel": "Stop reel",
       "narration": "Narration",
+      "narrationScope": "Entire page — atlas, tour, and cards",
       "hearWelcome": "Hear welcome",
       "askGuide": "Ask Rami",
       "stop": "Stop",
@@ -45,6 +46,7 @@
       "exploreMap": "Explore the atlas",
       "timelineHeading": "Layers of Jordan",
       "timelineLead": "Ten eras from Neolithic Ain Ghazal to the modern kingdom. Select a layer to hear it and locate it on the map.",
+      "timelineSelectHint": "Select an era on the timeline",
       "mapHeading": "Atlas of Jordan",
       "mapLead": "Each pin is a place you can visit. Select a site or name to hear its story.",
       "mapAll": "All",
@@ -89,6 +91,7 @@
       "resumeReel": "متابعة الجولة",
       "stopReel": "إنهاء الجولة",
       "narration": "السرد الصوتي",
+      "narrationScope": "لكل الصفحة — الأطلس والجولة والبطاقات",
       "hearWelcome": "اسمع الترحيب",
       "askGuide": "اسأل رامي",
       "stop": "إيقاف",
@@ -96,6 +99,7 @@
       "exploreMap": "استكشف الأطلس",
       "timelineHeading": "طبقات الأردن",
       "timelineLead": "عشر محطات على الطريق، من وجوه الجصّ في العصر الحجري إلى مملكة حديثة. اختر حقبة لتسمعها وتراها على الخريطة.",
+      "timelineSelectHint": "اختر حقبة على الخط الزمني",
       "mapHeading": "أطلس الأردن",
       "mapLead": "كل موقع هنا مكان حقيقي يمكنك الوقوف فيه. اضغط على دبوس أو اسم لتسمع حكايته.",
       "mapAll": "الكل",
@@ -148,6 +152,11 @@
       "narration": {
         "en": "We begin at Ain Ghazal, on the edge of Amman, where farmers nine thousand years ago shaped human faces out of lime plaster.",
         "ar": "نبدأ من عين غزال على أطراف عمّان، حيث شكّل المزارعون قبل تسعة آلاف عام وجوهاً بشرية من الجصّ."
+      },
+      "image": "/jordan/assets/eras/era-ain-ghazal.png",
+      "history": {
+        "en": "Ain Ghazal, on the northeastern edge of modern Amman, was one of the largest Pre-Pottery Neolithic B settlements known in the Levant. Excavations from the 1980s onward uncovered plastered floors, domestic architecture, and caches of lime-plaster statues dating to roughly 7250–6500 BCE. The large standing figures and smaller busts — painted, sometimes with bitumen eyes and modeled features — are among the earliest monumental human images. They speak less of kings than of community ritual: a village society investing enormous labor in faces that outlived their makers. Burials beneath house floors and the careful deposition of statues suggest a world where ancestors and place were tightly bound. Today the site’s name anchors Amman to a deeper chronology than Rome or the Citadel alone can tell.",
+        "ar": "كانت عين غزال على الطرف الشمالي الشرقي لعمّان الحديثة من أكبر مستوطنات العصر الحجري الحديث قبل الفخاري في بلاد الشام. كشفت التنقيبات منذ الثمانينيات عن أرضيات جصّية وعمارة منزلية ومخابئ لتماثيل من الجصّ تعود تقريباً إلى ٧٢٥٠–٦٥٠٠ ق.م. والتماثيل الكبيرة والتماثيل النصفية الأصغر — الملوّنة وأحياناً بعيون من القار — من أقدم الصور البشرية الضخمة. وهي لا تتحدث عن ملوك بقدر ما تتحدث عن طقس جماعي: مجتمع قروي يستثمر جهداً هائلاً في وجوه تبقى بعد صانعيها. وتشير الدفنات تحت أرضيات البيوت وإيداع التماثيل بعناية إلى عالم يرتبط فيه الأسلاف والمكان ارتباطاً وثيقاً."
       }
     },
     {
@@ -168,6 +177,11 @@
       "narration": {
         "en": "Then come the Nabataeans, carving Petra out of rose sandstone and taming desert water well enough to build a capital.",
         "ar": "ثم يأتي الأنباط، ينحتون البتراء في الحجر الوردي، ويروّضون ماء الصحراء بما يكفي لبناء عاصمة."
+      },
+      "image": "/jordan/assets/eras/era-nabataeans.png",
+      "history": {
+        "en": "From roughly the fourth century BCE the Nabataeans rose as caravan specialists controlling stretches of the incense and spice routes linking southern Arabia to the Mediterranean. Their capital at Petra — Raqmu in their own tongue — was not merely a rock-cut façade: it was a hydraulic city. Dams in the Siq, channels cut into sandstone, and cisterns stored flash floods so a population could thrive in a basin that looks impossible from the desert approaches. Tombs, temples, and the Treasury (Al-Khazneh) display Hellenistic taste adapted to local stone. Nabataean Aramaic inscriptions and coinage mark a kingdom that negotiated with Seleucids, Ptolemies, and later Rome until annexation in 106 CE. Water engineering remains their clearest signature — still readable in the wadis if you know where to look.",
+        "ar": "منذ القرن الرابع ق.م تقريباً برز الأنباط كخبراء قوافل يسيطرون على مقاطع من طرق البخور والتوابل بين جنوب الجزيرة والبحر المتوسط. وعاصمتهم البتراء — رقمو بلغتهم — لم تكن واجهة منحوتة فحسب، بل مدينة مائية. سدود في السيق وقنوات في الحجر الرملي وصهاريج خزنَت السيول حتى يعيش السكان في حوض يبدو مستحيلاً من مداخل الصحراء. وتُظهر المقابر والمعابد والخزنة ذوقاً هلنستياً مكيّفاً على حجر محلي. والنقوش النبطية والعملات تعلن مملكة تفاوضت مع السلوقيين والبطالمة ثم مع روما حتى الضم عام ١٠٦م. وهندسة الماء ما زالت أوضح بصماتهم."
       }
     },
     {
@@ -188,6 +202,11 @@
       "narration": {
         "en": "Rome annexes the Nabataean kingdom in one hundred six, and Decapolis cities like Jerash bloom into colonnaded stone.",
         "ar": "تضمّ روما مملكة الأنباط عام مئة وستة، فتزدهر مدن الديكابوليس مثل جرش بشوارع الأعمدة."
+      },
+      "image": "/jordan/assets/eras/era-rome.png",
+      "history": {
+        "en": "In 106 CE Emperor Trajan absorbed the Nabataean kingdom into Provincia Arabia, with Bostra (Busra) as a key administrative center and the Via Nova Traiana stitching the plateau from Syria toward Aqaba. Decapolis cities already linked to Hellenistic and Roman networks — Gerasa (Jerash), Gadara (Umm Qais), Philadelphia (Amman) — expanded with colonnaded streets, theatres, nymphaea, and temples. Jerash’s oval plaza and Hippodrome still stage that urban grammar in stone. Roman rule layered Latin and Greek civic life onto older roads rather than erasing local cults overnight. Milestone fragments and legionary presence along the desert fringe show a frontier of logistics as much as glory. The landscape at Jerash is a Roman city plan that later centuries never fully erased.",
+        "ar": "في عام ١٠٦م ضمّ الإمبراطور تراجان مملكة الأنباط إلى ولاية العربية، مع بصرى مركزاً إدارياً مهماً وطريق تراجان الجديد يربط الهضبة من سوريا نحو العقبة. ومدن الديكابوليس — جرش وأم قيس وفيلادلفيا (عمّان) — توسّعت بشوارع الأعمدة والمسارح والنوافير والمعابد. وما زالت ساحة جرش البيضوية والهيبودروم تعرضان هذه القواعد الحضرية بالحجر. وركّب الحكم الروماني حياة مدنية لاتينية ويونانية فوق طرق أقدم دون محو العبادات المحلية دفعة واحدة."
       }
     },
     {
@@ -208,6 +227,11 @@
       "narration": {
         "en": "In the Byzantine centuries, mosaic workers in Madaba set the oldest surviving map of the Holy Land into a church floor.",
         "ar": "في القرون البيزنطية، وضع صُنّاع الفسيفساء في مادبا أقدم خريطة باقية للأرض المقدسة في أرضية كنيسة."
+      },
+      "image": "/jordan/assets/eras/era-byzantine.png",
+      "history": {
+        "en": "From the fourth century CE Christianity reshaped the plateau’s sacred map. Basilicas rose in Madaba, Nebo, Petra’s Urn Tomb conversion, and countless village sites. Madaba’s Church of Saint George preserves the sixth-century mosaic map of the Holy Land — the oldest surviving cartographic floor of Jerusalem and the Jordan Valley, a pilgrim’s theology drawn in stone cubes. Mount Nebo became a memorial of Moses looking toward Canaan; baptismal traditions clung to the Jordan River. Byzantine Jordan weathered earthquakes, Persian wars, and shifting trade in the century before Islam. The mosaics remain — vine scrolls, cities labeled in Greek, a visual archive of how late antique Christians imagined the land between desert and sea.",
+        "ar": "منذ القرن الرابع الميلادي أعادت المسيحية رسم الخريطة المقدسة للهضبة. قامت البازيليكات في مادبا ونيبو وفي تحويل قبر الجرة بالبتراء وفي قرى كثيرة. وتحفظ كنيسة القديس جورج في مادبا خريطة فسيفساء من القرن السادس للأرض المقدسة — أقدم أرضية خرائطية باقية للقدس وغور الأردن. وصار جبل نيبو ذكرى موسى ينظر نحو كنعان. ولم يكن الأردن البيزنطي هامشاً هادئاً: زلازل وحروب فارسية وتحوّلات تجارة سبقت الإسلام. لكن الفسيفساء بقيت أرشيفاً بصرياً."
       }
     },
     {
@@ -228,6 +252,11 @@
       "narration": {
         "en": "After Yarmouk in six thirty six, Umayyad princes built desert retreats east of Amman, painted with hunters, musicians and a night sky.",
         "ar": "بعد اليرموك عام ستمئة وستة وثلاثين، بنى أمراء بني أميّة قصور البادية شرق عمّان، مزيّنة بالصيادين والموسيقيين وسماء الليل."
+      },
+      "image": "/jordan/assets/eras/era-umayyad.png",
+      "history": {
+        "en": "The Battle of Yarmouk in 636 CE opened the Levant to the early Islamic caliphate. Under the Umayyads (661–750), the Syrian desert fringe east of Amman became a landscape of qusur — seasonal retreats combining bath, audience hall, and agricultural estates. Qusayr Amra’s frescoes (UNESCO) are extraordinary: hunting scenes, musicians, a zodiac dome, and human figures rarely so freely painted in early Islamic art. Qasr al-Hallabat, Qasr Kharana, and related sites show a court culture moving between Damascus and the steppe. The Umayyad century welded Arab-Muslim political authority to older Roman roads and water points. After the Abbasids shifted east to Iraq after 750, many Jordanian desert palaces fell quiet — which is why their painted rooms feel suspended in time.",
+        "ar": "فتحت معركة اليرموك عام ٦٣٦م بلاد الشام على الخلافة الإسلامية المبكرة. وفي العهد الأموي (٦٦١–٧٥٠) صارت حافة البادية شرق عمّان مشهد قصور موسمية تجمع الحمّام وقاعة الاستقبال والضياع. وجداريات قصير عمرة (اليونسكو) استثنائية: صيد وموسيقى وقبة أبراج ووجوه بشرية. وقصور الحلاّبات والخرّانة تُظهر ثقافة بلاط بين دمشق والبادية. وبعد انتقال العباسيين شرقاً بعد ٧٥٠ سكنت كثير من هذه القصور — ولذلك تبدو غرفها المرسومة معلّقة في الزمن."
       }
     },
     {
@@ -248,6 +277,11 @@
       "narration": {
         "en": "Crusader Karak and Ayyubid Ajloun faced each other across the King's Highway until Saladin's forces took Karak in eleven eighty eight.",
         "ar": "تواجهت الكرك الصليبية وعجلون الأيوبية على طريق الملوك، حتى أخذت قوات صلاح الدين الكرك عام ١١٨٨."
+      },
+      "image": "/jordan/assets/eras/era-crusader.png",
+      "history": {
+        "en": "In the twelfth century the King’s Highway and the approaches to the Dead Sea became a chessboard of castles. Crusader Kerak (Karak), begun in the 1140s and later associated with Raynald of Châtillon, dominated the plateau route and provoked Ayyubid response. Ajloun Castle (Qalʿat al-Rabad), founded by one of Saladin’s generals in 1184–85, watched the north and the iron mines of the Ajloun hills as part of a signal-fire network. Karak fell to Saladin’s forces in 1188 after a hard siege. These fortresses taxed caravans, stored grain, and projected power over tribes and pilgrims. Walking their basements today is walking a frontier argument in stone.",
+        "ar": "في القرن الثاني عشر صارت طريق الملوك ومداخل البحر الميت رقعة قلاع. وسيطر الكرك الصليبي — الذي بدأ في الأربعينيات من ذلك القرن ثم ارتبط برينو دي شاتيون — على طريق الهضبة. وبُنيت قلعة عجلون سنة ١١٨٤–١١٨٥ لتراقب الشمال ومناجم الحديد ضمن شبكة نيران إشارة. وسقط الكرك بيد قوات صلاح الدين عام ١١٨٨. ولم تكن هذه القلاع صوراً سياحية: كانت تجبي القوافل وتخزن الغلال وتفرض السلطة على العشائر والحجّاج."
       }
     },
     {
@@ -268,6 +302,11 @@
       "narration": {
         "en": "Under the Ottomans, the Hejaz Railway pushed south from Damascus after nineteen hundred, and pilgrim stops became station towns.",
         "ar": "في العهد العثماني، امتدت سكة حديد الحجاز جنوباً من دمشق بعد عام ألف وتسعمئة، فصارت محطات الحجّ بلدات."
+      },
+      "image": "/jordan/assets/eras/era-ottoman.png",
+      "history": {
+        "en": "From 1516 until the First World War most of what is now Jordan lay within Ottoman districts tied to Damascus and the later vilayet system. For centuries the plateau was a mosaic of village agriculture, Bedouin seasonal routes, and pilgrimage logistics toward the Hijaz. The Hejaz Railway (1900–1908), pushed south from Damascus under Sultan Abdülhamid II, was both a pious project toward Medina and a strategic line. Stations at Amman, Qatraneh, Maʿan and beyond turned caravan pauses into rail towns; Ottoman forts and locomotives still rust in the desert. Ottoman rule was uneven — stronger near towns, negotiated with tribes — but it fixed borders, taxes, and telegraph in ways the twentieth-century state would inherit.",
+        "ar": "من ١٥١٦ حتى الحرب العالمية الأولى وقع معظم أرض الأردن اليوم ضمن الإدارة العثمانية المرتبطة بدمشق ثم بنظام الولايات. ولقرون كانت الهضبة فسيفساء زراعة قروية ومسارات بدوية ولوجستيات حج نحو الحجاز. وسكة حديد الحجاز (١٩٠٠–١٩٠٨) جنوباً من دمشق كانت مشروعاً دينياً نحو المدينة وخطاً استراتيجياً. فحوّلت محطات عمّان والقطرانة ومعان توقفات القوافل إلى بلدات سكة. وكان الحكم متفاوتاً لكنه ثبّت حدوداً وضرائب وبرقاً ورثتها الدولة لاحقاً."
       }
     },
     {
@@ -288,6 +327,11 @@
       "narration": {
         "en": "In the Great Arab Revolt, raiders cut the Hejaz railway, and in July nineteen seventeen Arab forces took Aqaba from the desert side.",
         "ar": "في الثورة العربية الكبرى قطع المغيرون سكة الحجاز، وفي تموز ١٩١٧ أخذت القوات العربية العقبة من جهة الصحراء."
+      },
+      "image": "/jordan/assets/eras/era-revolt.png",
+      "history": {
+        "en": "In June 1916 Sharif Hussein bin Ali of Mecca proclaimed the Arab Revolt against Ottoman rule. His sons — notably Faisal and Abdullah — led northern campaigns in coordination with British wartime strategy and its contested promises. Across Transjordan, raiding parties repeatedly cut the Hejaz Railway: bridges blown, rails lifted, stations seized. The July 1917 capture of Aqaba from the landward side opened a Red Sea supply door and entered popular memory through Faisal’s northern Arab forces and T. E. Lawrence’s account. Postwar politics were tangled by Sykes–Picot and the Mandate system, yet the military geography is still readable: desert approaches, rail cuts, and Aqaba as the hinge between Arabia and the Levant.",
+        "ar": "في حزيران ١٩١٦ أعلن الشريف حسين بن علي في مكة الثورة العربية على الحكم العثماني. وقاد أبناؤه — خصوصاً فيصل وعبد الله — حملات شمالية بتنسيق مع بريطانيا ووعودها المتنازع عليها. وعبر شرق الأردن قطعت فصائل الإغارة سكة الحجاز مراراً. وفتح الاستيلاء على العقبة في تموز ١٩١٧ من جهة البر باب تموين على البحر الأحمر. وسياسة ما بعد الحرب تشابكت مع سايكس بيكو والانتداب، غير أن جغرافيا الثورة ما زالت مقروءة في الصحراء والقطوع والعقبة."
       }
     },
     {
@@ -308,6 +352,11 @@
       "narration": {
         "en": "In nineteen twenty one, Abdullah the First made Amman the seat of the Emirate of Transjordan — then a small town of seven hills.",
         "ar": "في عام ١٩٢١ جعل عبد الله الأول عمّان مقرّ إمارة شرق الأردن — وكانت بلدة صغيرة من سبعة جبال."
+      },
+      "image": "/jordan/assets/eras/era-emirate.png",
+      "history": {
+        "en": "In 1921 Abdullah bin al-Hussein arrived in Amman under arrangements that produced the Emirate of Transjordan within the British Mandate framework. Amman was then a modest town: a Roman theatre in the wadi, Circassian quarters from late Ottoman resettlement, and a handful of hills that would later define the capital’s districts. The Emirate built ministries, the early Arab Legion, and a political identity distinct from Syria and Palestine even while bound to London. Treaties in the 1920s gradually widened autonomy. Roads, schools, and the slow absorption of tribal and village elites into a central court laid the chassis of a state. From the Citadel looking south, you see the bowl where that small capital decided to grow.",
+        "ar": "في عام ١٩٢١ وصل عبد الله بن الحسين إلى عمّان في ترتيبات أنتجت إمارة شرق الأردن ضمن الانتداب البريطاني. وكانت عمّان بلدة متواضعة: مسرح روماني وأحياء شركسية وتلال قليلة. وبنت الإمارة وزارات والنواة الأولى للجيش العربي وهوية سياسية متميزة عن سوريا وفلسطين رغم الارتباط بلندن. ووسّعت معاهدات العشرينيات الحكم الذاتي تدريجياً، وشكّلت الطرق والمدارس وهيكل الدولة الناشئة."
       }
     },
     {
@@ -328,6 +377,11 @@
       "narration": {
         "en": "Independence arrives on the twenty fifth of May, nineteen forty six, and Amman grows from a town of hills into a capital of millions.",
         "ar": "يأتي الاستقلال في الخامس والعشرين من أيار عام ١٩٤٦، وتكبر عمّان من بلدة جبال إلى عاصمة بالملايين."
+      },
+      "image": "/jordan/assets/eras/era-kingdom.png",
+      "history": {
+        "en": "On 25 May 1946 the Hashemite Kingdom declared independence; the name Jordan solidified as its international identity. The date remains Independence Day. Across the following decades Amman expanded from tens of thousands to a metropolitan region of millions, absorbing successive waves of refugees and migrants while remaining the political center. The reigns of Abdullah I, Talal, Hussein, and Abdullah II mark constitutional and regional chapters — wars, treaties, economic opening, and diplomacy often described as bridge-building. On the ground the capital stays layered: Roman theatre, Citadel fragments, Ottoman and Mandate streets, modern towers on the western ridges. Independence is the frame that lets those layers share one map.",
+        "ar": "في ٢٥ أيار ١٩٤٦ أُعلن استقلال المملكة الأردنية الهاشمية، وما زال اليوم عيد الاستقلال. وعبر العقود توسّعت عمّان من عشرات الآلاف إلى منطقة حضرية بالملايين، مستوعبة موجات لجوء وهجرة. وعهد عبد الله الأول وطلال والحسين وعبد الله الثاني فصول دستورية وإقليمية واسعة. وما يبقى على الأرض عاصمة طبقات: مسرح روماني وبقايا القلعة وشوارع عثمانية وانتدابية وأبراج حديثة. فالاستقلال إطار يجعل هذه الطبقات تتشارك خريطة واحدة."
       }
     }
   ],

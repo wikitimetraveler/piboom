@@ -1,0 +1,31 @@
+{
+  "id": "shenango-david-intro",
+  "title": "Shenango Valley — Meet David",
+  "ctaLabel": "Explore the atlas",
+  "ctaHref": "/nature/shenango-valley.html#svMap",
+  "qrLandingPath": "/nature/shenango-valley.html?demo=heygen",
+  "brand": {
+    "attribution": "Avatar narration powered by HeyGen",
+    "developmentBy": "David E Lane"
+  },
+  "heygenScriptShort": "Welcome to Shenango Valley. I'm David — your local guide. We'll start at Buhl Park in Hermitage, swing past the New Wilmington Amish countryside, then hit two valley tables: Quaker Steak and Lube in Sharon, and Luigi's Pizza. Ask me anything, or open the atlas and pick a pin.",
+  "heygenVoiceLanguage": "English",
+  "heygenMotionPrompt": "calm nod, warm local guide speaking to camera",
+  "heygenExpressiveness": "low",
+  "heygenAvatarId": "50b2818bcadf4493b81aa22001b41613",
+  "heygenVoiceId": "d2f4f24783d04e22ab49ee8fdc3715e0",
+  "heygenVoiceName": "David",
+  "heygenVideoIdShort": null,
+  "heygenVideoUrlShort": null,
+  "heygenVideoLocalShort": "/nature/assets/video/shenango-david-intro.mp4",
+  "generatedAt": null,
+  "avatar": {
+    "name": "David",
+    "label": "My avatar",
+    "portrait": "/family/assets/david-lane-time-traveler-scene.png",
+    "status": "heygen-ready-awaiting-render",
+    "lookId": "50b2818bcadf4493b81aa22001b41613",
+    "note": "Same look + voice as Newport Pier Nature guide (data/newport-pier-fish.json)."
+  },
+  "generateHint": "Use HeyGen Hub or POST /api/heygen/videos with heygenAvatarId + heygenVoiceId from this file, then cache MP4 to heygenVideoLocalShort."
+}

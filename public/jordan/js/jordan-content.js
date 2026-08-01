@@ -54,6 +54,25 @@
     return Math.max(0, Math.min(1, (year - CAL_MIN) / (CAL_MAX - CAL_MIN))) * 100;
   }
 
+  const CAL_MARKERS = [
+    { year: -7000, label: '7000 BCE' },
+    { year: -3000, label: '3000 BCE' },
+    { year: -1000, label: '1000 BCE' },
+    { year: 1, label: 'CE' },
+    { year: 1000, label: '1000' },
+    { year: 1900, label: '1900' },
+    { year: 2026, label: 'Now' }
+  ];
+
+  function renderCalendarScale() {
+    const host = document.getElementById('jdCalendarScale');
+    if (!host) return;
+    host.innerHTML = CAL_MARKERS.map(
+      (m) =>
+        `<span class="jd-calendar__mark" style="inset-inline-start:${yearToPct(m.year).toFixed(2)}%">${esc(m.label)}</span>`
+    ).join('');
+  }
+
   function renderCalendarTicks() {
     const host = document.getElementById('jdCalendarTicks');
     if (!host || !state.data?.eras) return;
@@ -65,51 +84,113 @@
         const active = state.activeEra === era.id ? ' is-active' : '';
         return `<button type="button" class="jd-calendar__tick${active}" data-era-tick="${esc(era.id)}"
           style="inset-inline-start:${pct.toFixed(2)}%" title="${esc(pick(era.title))} · ${esc(pick(era.years))}"
-          aria-label="${esc(pick(era.title))}"></button>`;
+          aria-label="${esc(pick(era.title))} · ${esc(pick(era.years))}">
+          <span class="jd-calendar__tick-date">${esc(pick(era.years))}</span>
+        </button>`;
       })
       .join('');
+    renderCalendarScale();
+    syncSelectedEraBox(state.activeEra);
+  }
+
+  function syncSelectedEraBox(eraId) {
+    const card = document.getElementById('jdTimelineSelectedCard');
+    const empty = document.getElementById('jdTimelineSelectedEmpty');
+    const media = document.getElementById('jdTimelineSelectedMedia');
+    const dateEl = document.getElementById('jdTimelineSelectedDate');
+    const titleEl = document.getElementById('jdTimelineSelectedTitle');
+    const fill = document.getElementById('jdCalendarFill');
+    const headRange = document.getElementById('jdCalendarHeadRange');
+    const root = document.getElementById('jdTimelineSelected');
+    const era = eraId ? state.data?.eras?.find((e) => e.id === eraId) : null;
+
+    if (!era) {
+      if (card) card.hidden = true;
+      if (empty) empty.hidden = false;
+      if (root) root.classList.remove('has-selection');
+      if (fill) fill.style.width = '0%';
+      if (media) media.innerHTML = '';
+      if (headRange) headRange.textContent = '7500 BCE → today';
+      return;
+    }
+
+    const years = pick(era.years);
+    const year = ERA_YEAR_CE[era.id];
+    if (card) card.hidden = false;
+    if (empty) empty.hidden = true;
+    if (root) root.classList.add('has-selection');
+    if (media) {
+      media.innerHTML = era.image
+        ? `<img class="jd-timeline-selected__img" src="${esc(era.image)}" alt="" width="200" height="200" decoding="async"/>`
+        : '';
+    }
+    if (dateEl) dateEl.textContent = years;
+    if (titleEl) titleEl.textContent = pick(era.title);
+    if (fill && year != null) fill.style.width = `${yearToPct(year).toFixed(2)}%`;
+    if (headRange) headRange.textContent = years;
   }
 
   function syncCalendarActive(eraId) {
     document.querySelectorAll('.jd-calendar__tick').forEach((el) => {
-      el.classList.toggle('is-active', el.getAttribute('data-era-tick') === eraId);
+      el.classList.toggle('is-active', !!eraId && el.getAttribute('data-era-tick') === eraId);
     });
+    syncSelectedEraBox(eraId);
   }
 
   function renderEras() {
     const list = document.getElementById('jdEraList');
     if (!list || !state.data) return;
+    const flipHint = t('flipHint') || 'Flip for the history';
+    const backHint = t('back') || 'Back';
 
     list.innerHTML = state.data.eras
       .map((era, index) => {
-        const active = state.activeEra === era.id ? ' is-active' : '';
+        const flipped = state.activeEra === era.id ? ' is-active is-flipped' : '';
         const years = pick(era.years);
-        return `<li class="jd-era${active}" data-era-id="${esc(era.id)}" style="--jd-era-i:${index}">
+        const history = pick(era.history) || pick(era.copy);
+        const art = era.image
+          ? `<img class="jd-era-cal__img" src="${esc(era.image)}" alt="" loading="lazy" width="160" height="160" decoding="async"/>`
+          : `<span class="jd-era-cal__tick"></span>`;
+        const mapBtn = era.siteId
+          ? `<button type="button" class="jd-btn jd-btn-ghost jd-btn-sm" data-era-map="${esc(era.siteId)}">
+              <i class="bi bi-geo-alt"></i> ${esc(t('mapHeading'))}
+            </button>`
+          : '';
+        return `<li class="jd-era${flipped}" data-era-id="${esc(era.id)}" style="--jd-era-i:${index}">
           <span class="jd-era-node" aria-hidden="true"></span>
           <article class="jd-era-card">
-            <div class="jd-era-cal" aria-hidden="true">
-              <span class="jd-era-cal__tick"></span>
-              <span class="jd-era-cal__band">${esc(years)}</span>
-            </div>
-            <div class="jd-era-body">
-              <span class="jd-era-years">${esc(years)}</span>
-              <h3 class="jd-era-title">
-                <button type="button" class="jd-era-open">${esc(pick(era.title))}</button>
-              </h3>
-              <p class="jd-era-copy">${esc(pick(era.copy))}</p>
-              <div class="jd-era-tools">
-                <button type="button" class="jd-btn jd-btn-sand jd-btn-sm jd-listen-btn" data-era-listen="${esc(era.id)}"
-                  aria-pressed="false">
-                  <i class="bi bi-volume-up-fill" aria-hidden="true"></i>
-                  <span class="jd-listen-label">${esc(t('listen'))}</span>
-                </button>
-                ${
-                  era.siteId
-                    ? `<button type="button" class="jd-btn jd-btn-ghost jd-btn-sm" data-era-map="${esc(era.siteId)}">
-                        <i class="bi bi-geo-alt"></i> ${esc(t('mapHeading'))}
-                      </button>`
-                    : ''
-                }
+            <div class="jd-era-card-inner">
+              <button type="button" class="jd-era-face jd-era-front jd-era-flip"
+                aria-expanded="${flipped ? 'true' : 'false'}"
+                aria-label="${esc(pick(era.title))} — ${esc(flipHint)}">
+                <div class="jd-era-cal${era.image ? ' has-image' : ''}" aria-hidden="true">
+                  ${art}
+                  <span class="jd-era-cal__band">${esc(years)}</span>
+                </div>
+                <div class="jd-era-body">
+                  <span class="jd-era-years">${esc(years)}</span>
+                  <h3 class="jd-era-title">${esc(pick(era.title))}</h3>
+                  <p class="jd-era-copy">${esc(pick(era.copy))}</p>
+                  <p class="jd-era-hint">${esc(flipHint)}</p>
+                </div>
+              </button>
+              <div class="jd-era-face jd-era-back" data-era-back-flip>
+                <p class="jd-era-back__label">${esc(t('evidence') || 'On the ground')} · ${esc(years)}</p>
+                <h3 class="jd-era-back__title">${esc(pick(era.title))}</h3>
+                <div class="jd-era-back__scroll">
+                  <p class="jd-era-history">${esc(history)}</p>
+                </div>
+                <div class="jd-era-tools">
+                  <button type="button" class="jd-btn jd-btn-sand jd-btn-sm jd-listen-btn" data-era-listen="${esc(era.id)}"
+                    aria-pressed="false">
+                    <i class="bi bi-volume-up-fill" aria-hidden="true"></i>
+                    <span class="jd-listen-label">${esc(t('listen'))}</span>
+                  </button>
+                  ${mapBtn}
+                  <button type="button" class="jd-btn jd-btn-ghost jd-btn-sm jd-era-flip-back">
+                    <i class="bi bi-arrow-repeat"></i> ${esc(backHint)}
+                  </button>
+                </div>
               </div>
             </div>
           </article>
@@ -305,23 +386,34 @@
     i18n()?.stop();
   }
 
+  function setEraFlipped(eraId, flip) {
+    document.querySelectorAll('.jd-era').forEach((el) => {
+      const id = el.getAttribute('data-era-id');
+      const on = flip && id === eraId;
+      el.classList.toggle('is-active', on);
+      el.classList.toggle('is-flipped', on);
+      const front = el.querySelector('.jd-era-flip');
+      if (front) front.setAttribute('aria-expanded', on ? 'true' : 'false');
+    });
+    syncCalendarActive(flip ? eraId : null);
+  }
+
+  /** Flip era card in-place — no sheet/popup. Toggle if already open. */
   function openEra(eraId) {
     const era = state.data?.eras.find((e) => e.id === eraId);
     if (!era) return;
+    // Flipping eras always cuts narration so speech is easy to silence.
+    stopListenSpeech();
     window.JordanSections?.expand('jdTimeline');
-    state.activeEra = eraId;
-    document.querySelectorAll('.jd-era').forEach((el) => {
-      el.classList.toggle('is-active', el.getAttribute('data-era-id') === eraId);
-    });
-    syncCalendarActive(eraId);
-    const eraEl = document.querySelector(`.jd-era[data-era-id="${eraId}"]`);
-    eraEl?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    openSheet({
-      title: pick(era.title),
-      label: `${t('context')} · ${pick(era.years)}`,
-      body: pick(era.copy),
-      speech: pick(era.narration) || pick(era.copy)
-    });
+    const togglingOff = state.activeEra === eraId;
+    state.activeEra = togglingOff ? null : eraId;
+    setEraFlipped(eraId, !togglingOff);
+    if (!togglingOff) {
+      closeSheet();
+      const eraEl = document.querySelector(`.jd-era[data-era-id="${eraId}"]`);
+      eraEl?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      eraEl?.querySelector('[data-era-listen]')?.focus({ preventScroll: true });
+    }
   }
 
   /* --------------------------------------------------------------- actions */
@@ -403,6 +495,10 @@
     if (!key || typeof speakFn !== 'function') return;
     if (listenSpeakingKey === key) {
       stopListenSpeech();
+      return;
+    }
+    // Master Narration checkbox (default on) — atlas, eras, cards, phrases.
+    if (i18n() && typeof i18n().narrationEnabled === 'function' && !i18n().narrationEnabled()) {
       return;
     }
 
@@ -502,6 +598,11 @@
   function speakEra(eraId) {
     const era = state.data?.eras.find((e) => e.id === eraId);
     if (!era) return;
+    // Keep history on the flipped card — never open the sheet for eras.
+    if (state.activeEra !== eraId) {
+      state.activeEra = eraId;
+      setEraFlipped(eraId, true);
+    }
     return toggleGuideSpeech(`era:${eraId}`, () =>
       i18n()?.speakAsGuide(pick(era.narration) || pick(era.copy))
     );
@@ -520,6 +621,9 @@
   }
 
   function toggleCard(card) {
+    if (!card) return;
+    // Any flip (open or close) stops guide speech — Listen again if you want more.
+    stopListenSpeech();
     const flipped = card.classList.toggle('is-flipped');
     card.querySelectorAll('.jd-card-flip').forEach((btn) => {
       if (btn.classList.contains('jd-card-front')) {
@@ -532,6 +636,7 @@
   }
 
   function unflipAll() {
+    stopListenSpeech();
     stopMusic();
     document.querySelectorAll('.jd-card.is-flipped').forEach((card) => {
       card.classList.remove('is-flipped');
@@ -626,15 +731,32 @@
         return;
       }
 
-      const eraTitle = event.target.closest('.jd-era-title');
-      if (eraTitle) {
-        openEra(eraTitle.closest('.jd-era')?.getAttribute('data-era-id'));
+      const eraFlipBack = event.target.closest('.jd-era-flip-back');
+      if (eraFlipBack) {
+        event.stopPropagation();
+        openEra(eraFlipBack.closest('.jd-era')?.getAttribute('data-era-id'));
         return;
+      }
+
+      const eraFlip = event.target.closest('.jd-era-flip');
+      if (eraFlip) {
+        event.preventDefault();
+        openEra(eraFlip.closest('.jd-era')?.getAttribute('data-era-id'));
+        return;
+      }
+
+      const eraBack = event.target.closest('[data-era-back-flip]');
+      if (eraBack && !event.target.closest('button, a')) {
+        event.preventDefault();
+        openEra(eraBack.closest('.jd-era')?.getAttribute('data-era-id'));
       }
     });
 
     document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') closeSheet();
+      if (event.key !== 'Escape') return;
+      closeSheet();
+      stopListenSpeech();
+      stopMusic();
     });
 
     document.getElementById('jdSheetClose')?.addEventListener('click', closeSheet);

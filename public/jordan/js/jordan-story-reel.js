@@ -6,7 +6,6 @@
   'use strict';
 
   const REEL_URL = '/jordan/data/jordan-story-reel.json';
-  const NARRATE_KEY = 'jordanStoryNarrate';
   const GAP_MS = 320;
   const TTS_TIMEOUT_MS = 20000;
 
@@ -50,28 +49,9 @@
   /* ------------------------------------------------------------ narration */
 
   function narrationOn() {
-    const el = document.getElementById('jdStoryNarrate');
+    if (typeof i18n()?.narrationEnabled === 'function') return i18n().narrationEnabled();
+    const el = document.getElementById('jdNarrate') || document.getElementById('jdStoryNarrate');
     return !el || el.checked;
-  }
-
-  function loadNarratePref() {
-    const el = document.getElementById('jdStoryNarrate');
-    if (!el) return;
-    try {
-      el.checked = localStorage.getItem(NARRATE_KEY) !== '0';
-    } catch (_) {
-      el.checked = true;
-    }
-  }
-
-  function persistNarratePref() {
-    const el = document.getElementById('jdStoryNarrate');
-    if (!el) return;
-    try {
-      localStorage.setItem(NARRATE_KEY, el.checked ? '1' : '0');
-    } catch (_) {
-      /* ignore */
-    }
   }
 
   function speakScene(scene, token) {
@@ -335,7 +315,6 @@
     document.getElementById('jdStopAudio')?.addEventListener('click', () => {
       if (state.running) stopReel();
     });
-    document.getElementById('jdStoryNarrate')?.addEventListener('change', persistNarratePref);
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && state.running) stopReel();
     });
@@ -347,7 +326,6 @@
 
   async function init() {
     state.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    loadNarratePref();
     setPlayEnabled(false);
     bindUi();
     await loadConfig();

@@ -63,16 +63,16 @@ class VoiceWidget {
   }
 
   init() {
-    // Check if browser supports speech recognition
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    const supported =
+      typeof window.DcSpeechRecognition?.isSpeechRecognitionSupported === 'function'
+        ? window.DcSpeechRecognition.isSpeechRecognitionSupported()
+        : Boolean(window.SpeechRecognition || window.webkitSpeechRecognition);
+    if (!supported) {
       console.warn('Voice recognition not supported in this browser');
       return;
     }
-    
-    // Create the floating button
-    this.createButton();
 
-    // Initialize speech recognition
+    this.createButton();
     this.initSpeechRecognition();
   }
 
@@ -160,46 +160,76 @@ class VoiceWidget {
   }
 
   initSpeechRecognition() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    this.recognition = new SpeechRecognition();
-    this.recognition.continuous = false;
-    this.recognition.interimResults = false;
-    this.recognition.lang = 'en-US';
+    if (window.DcSpeechRecognition?.createSpeechBridge) {
+      const bridge = window.DcSpeechRecognition.createSpeechBridge({
+        lang: 'en-US',
+        continuous: false,
+        interimResults: false,
+        onStart: () => {
+          this.isListening = true;
+          this.button.style.animation = 'voicePulse 1.5s ease-in-out infinite';
+          this.tooltip.textContent = '🎤 Listening...';
+          this.tooltip.style.display = 'block';
+        },
+        onResult: (transcript) => {
+          this.tooltip.textContent = `"${transcript}"`;
+          this.options.onCommand(transcript);
+        },
+        onError: () => {
+          this.tooltip.textContent = 'Voice error - try again';
+          setTimeout(() => {
+            this.tooltip.style.display = 'none';
+          }, 2000);
+        },
+        onEnd: () => {
+          this.isListening = false;
+          this.button.style.animation = '';
+          setTimeout(() => {
+            this.tooltip.style.display = 'none';
+          }, 3000);
+        }
+      });
+      this._bridge = bridge;
+      this.recognition = bridge?.recognition || null;
+    } else {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      this.recognition = new SpeechRecognition();
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+      this.recognition.lang = 'en-US';
 
-    this.recognition.onstart = () => {
-      this.isListening = true;
-      this.button.style.animation = 'voicePulse 1.5s ease-in-out infinite';
-      this.tooltip.textContent = '🎤 Listening...';
-      this.tooltip.style.display = 'block';
-      console.log('🎤 Voice recognition started');
-    };
+      this.recognition.onstart = () => {
+        this.isListening = true;
+        this.button.style.animation = 'voicePulse 1.5s ease-in-out infinite';
+        this.tooltip.textContent = '🎤 Listening...';
+        this.tooltip.style.display = 'block';
+        console.log('🎤 Voice recognition started');
+      };
 
-    this.recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      console.log('📝 Heard:', transcript);
-      this.tooltip.textContent = `"${transcript}"`;
-      
-      // Call the command handler
-      this.options.onCommand(transcript);
-    };
+      this.recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        console.log('📝 Heard:', transcript);
+        this.tooltip.textContent = `"${transcript}"`;
+        this.options.onCommand(transcript);
+      };
 
-    this.recognition.onerror = (event) => {
-      console.error('Voice recognition error:', event.error);
-      this.tooltip.textContent = 'Voice error - try again';
-      setTimeout(() => {
-        this.tooltip.style.display = 'none';
-      }, 2000);
-    };
+      this.recognition.onerror = (event) => {
+        console.error('Voice recognition error:', event.error);
+        this.tooltip.textContent = 'Voice error - try again';
+        setTimeout(() => {
+          this.tooltip.style.display = 'none';
+        }, 2000);
+      };
 
-    this.recognition.onend = () => {
-      this.isListening = false;
-      this.button.style.animation = '';
-      setTimeout(() => {
-        this.tooltip.style.display = 'none';
-      }, 3000);
-    };
+      this.recognition.onend = () => {
+        this.isListening = false;
+        this.button.style.animation = '';
+        setTimeout(() => {
+          this.tooltip.style.display = 'none';
+        }, 3000);
+      };
+    }
 
-    // Add animation keyframes
     if (!document.getElementById('voiceWidgetStyles')) {
       const style = document.createElement('style');
       style.id = 'voiceWidgetStyles';
@@ -220,10 +250,16 @@ class VoiceWidget {
   }
 
   toggleListening() {
-    if (!this.recognition) return;
     if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
     if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
 
+    if (this._bridge) {
+      if (this.isListening) this._bridge.stop();
+      else this._bridge.start();
+      return;
+    }
+
+    if (!this.recognition) return;
     if (this.isListening) {
       this.recognition.stop();
     } else {

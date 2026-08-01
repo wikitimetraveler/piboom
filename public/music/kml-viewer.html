@@ -1191,7 +1191,11 @@
     }
 
     function startVoiceRecognition() {
-      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      const supported =
+        typeof window.DcSpeechRecognition?.isSpeechRecognitionSupported === 'function'
+          ? window.DcSpeechRecognition.isSpeechRecognitionSupported()
+          : Boolean(window.SpeechRecognition || window.webkitSpeechRecognition);
+      if (!supported) {
         showToast('Voice recognition is not supported. Please use Chrome or Edge.', 'warning');
         return;
       }
@@ -1466,6 +1470,7 @@
     });
   </script>
   <script src="/shared/tts.js"></script>
+  <script src="/shared/speech-recognition.js"></script>
 
   <!-- Attribution Footer -->
   <footer style="background: rgba(255, 255, 255, 0.95); padding: 2rem 0; margin-top: 4rem; border-top: 2px solid rgba(135, 206, 250, 0.3); backdrop-filter: blur(10px);">

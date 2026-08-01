@@ -1,31 +1,31 @@
 /**
- * Jordan atlas map — Google Maps pins for historic, food, music, argileh and living sites.
+ * Shenango Valley atlas map — Google Maps pins (park / amish / food).
  * Development work by David Lane
  */
 (function () {
   'use strict';
 
   const CATEGORY_COLOR = {
-    history: '#b5301f',
-    food: '#d4a24c',
-    music: '#6f7f52',
-    hookah: '#8b5a3c',
-    living: '#3d6b7a'
+    park: '#2f5d46',
+    amish: '#c48a3a',
+    food: '#b5301f'
   };
+
+  const DEFAULT_CENTER = { lat: 41.245889, lng: -80.477848 };
 
   const state = {
     sites: [],
     filter: 'all',
     map: null,
     info: null,
-    bounds: null,
     markers: {},
-    activeId: null
+    activeId: null,
+    center: DEFAULT_CENTER
   };
 
-  const i18n = () => window.JordanI18N;
-  const pick = (value) => (i18n() ? i18n().pick(value) : String(value?.en || value || ''));
-  const t = (key) => (i18n() ? i18n().t(key) : '');
+  function pick(value) {
+    return window.ShenangoContent?.pick(value) || String(value?.en || value || '');
+  }
 
   function esc(value) {
     return String(value == null ? '' : value)
@@ -36,7 +36,7 @@
   }
 
   function setStatus(message) {
-    const el = document.getElementById('jdMapStatus');
+    const el = document.getElementById('svMapStatus');
     if (!el) return;
     if (!message) {
       el.hidden = true;
@@ -64,20 +64,17 @@
     return state.sites.filter((site) => site.category === state.filter);
   }
 
-  /* ---------------------------------------------------------------- list */
-
   function renderList() {
-    const list = document.getElementById('jdSiteList');
+    const list = document.getElementById('svSiteList');
     if (!list) return;
     list.innerHTML = visibleSites()
       .map(
         (site) => `<li>
-          <button type="button" class="jd-site-btn${state.activeId === site.id ? ' is-active' : ''}" data-site-id="${esc(site.id)}">
-            <span class="jd-site-emoji" aria-hidden="true">${esc(site.emoji || '📍')}</span>
-            <span class="jd-site-copy">
+          <button type="button" class="sv-site-btn${state.activeId === site.id ? ' is-active' : ''}" data-site-id="${esc(site.id)}">
+            <span class="sv-site-emoji" aria-hidden="true">${esc(site.emoji || '📍')}</span>
+            <span class="sv-site-copy">
               <strong>${esc(pick(site.name))}</strong>
               <span>${esc(pick(site.place))}</span>
-              ${site.unesco ? `<span class="jd-site-unesco">${esc(t('unesco'))}</span>` : ''}
             </span>
           </button>
         </li>`
@@ -86,14 +83,12 @@
   }
 
   function renderFilters() {
-    document.querySelectorAll('#jdMapFilters .jd-chip').forEach((chip) => {
+    document.querySelectorAll('#svMapFilters .sv-chip').forEach((chip) => {
       const active = chip.getAttribute('data-filter') === state.filter;
       chip.classList.toggle('is-active', active);
       chip.setAttribute('aria-pressed', active ? 'true' : 'false');
     });
   }
-
-  /* ----------------------------------------------------------------- map */
 
   function makeMarker(site) {
     const gam = window.googleAdvancedMarkers;
@@ -102,8 +97,7 @@
 
     if (gam?.createMapMarker) {
       const content = document.createElement('div');
-      content.innerHTML =
-        `<div style="font-size:26px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.35))">${site.emoji || '📍'}</div>`;
+      content.innerHTML = `<div style="font-size:26px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.35))">${site.emoji || '📍'}</div>`;
       return gam.createMapMarker({ map: state.map, position, title, content });
     }
 
@@ -114,9 +108,9 @@
       icon: {
         path: google.maps.SymbolPath.CIRCLE,
         scale: 8,
-        fillColor: CATEGORY_COLOR[site.category] || '#b5301f',
+        fillColor: CATEGORY_COLOR[site.category] || '#2f5d46',
         fillOpacity: 1,
-        strokeColor: '#fffdf8',
+        strokeColor: '#fff',
         strokeWeight: 2
       }
     });
@@ -125,10 +119,10 @@
   function openInfo(site) {
     const entry = state.markers[site.id];
     if (!entry || !state.info) return;
-    state.info.setContent(`<div style="color:#1c1510;max-width:280px;font-family:system-ui,sans-serif">
+    state.info.setContent(`<div style="color:#1a2420;max-width:280px;font-family:system-ui,sans-serif">
       <strong style="font-size:16px;line-height:1.3">${esc(pick(site.name))}</strong><br/>
-      <span style="font-size:13px;color:#4a3c2e;font-weight:600">${esc(pick(site.place))}</span>
-      <p style="font-size:13px;margin:8px 0 0;line-height:1.55;color:#2a201a">${esc(pick(site.blurb))}</p>
+      <span style="font-size:13px;color:#3a4a52;font-weight:600">${esc(pick(site.place))}</span>
+      <p style="font-size:13px;margin:8px 0 0;line-height:1.55">${esc(pick(site.blurb))}</p>
     </div>`);
     if (window.googleAdvancedMarkers?.openMapInfoWindow) {
       window.googleAdvancedMarkers.openMapInfoWindow(state.info, state.map, entry.marker);
@@ -151,23 +145,20 @@
     renderList();
 
     if (options.speak !== false) {
-      const line = `${pick(site.name)}. ${pick(site.blurb)}`;
-      if (typeof window.JordanContent?.toggleGuideSpeech === 'function') {
-        window.JordanContent.toggleGuideSpeech(`site:${siteId}`, () => i18n()?.speakAsGuide(line));
-      } else {
-        i18n()?.speakAsGuide(line);
-      }
+      window.ShenangoContent?.speak?.(`${pick(site.name)}. ${pick(site.blurb)}`);
     }
 
-    const activeBtn = document.querySelector(`#jdSiteList [data-site-id="${siteId}"]`);
-    activeBtn?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    document.querySelector(`#svSiteList [data-site-id="${siteId}"]`)?.scrollIntoView({
+      block: 'nearest',
+      behavior: 'smooth'
+    });
 
     if (!state.map) return;
     openInfo(site);
     state.map.panTo({ lat: site.lat, lng: site.lng });
-    const zoom = Number(state.map.getZoom()) || 7;
-    if (zoom < 11) state.map.setZoom(11);
-    document.getElementById('jdMapReset')?.removeAttribute('hidden');
+    const zoom = Number(state.map.getZoom()) || 11;
+    if (zoom < 12) state.map.setZoom(13);
+    document.getElementById('svMapReset')?.removeAttribute('hidden');
   }
 
   function applyFilter() {
@@ -185,9 +176,18 @@
   function resetView() {
     if (!state.map) return;
     state.info?.close();
-    const bounds = new google.maps.LatLngBounds();
     const shown = visibleSites();
-    if (!shown.length) return;
+    if (!shown.length) {
+      state.map.setCenter(state.center);
+      state.map.setZoom(11);
+      return;
+    }
+    if (shown.length === 1) {
+      state.map.setCenter({ lat: shown[0].lat, lng: shown[0].lng });
+      state.map.setZoom(14);
+      return;
+    }
+    const bounds = new google.maps.LatLngBounds();
     shown.forEach((site) => bounds.extend({ lat: site.lat, lng: site.lng }));
     try {
       state.map.fitBounds(bounds, 60);
@@ -197,14 +197,14 @@
   }
 
   async function initMap() {
-    const el = document.getElementById('jdMapCanvas');
+    const el = document.getElementById('svMapCanvas');
     if (!el || !state.sites.length) return;
 
     const ok = await loadMaps();
     if (!ok || !window.google?.maps) {
       setStatus(
         window.__laneGoogleMapsUnavailableReason ||
-          'The map could not load here — the site list below still works.'
+          'The map could not load here — the site list still works.'
       );
       return;
     }
@@ -212,8 +212,8 @@
     setStatus('');
     const gam = window.googleAdvancedMarkers;
     const mapOptions = {
-      center: { lat: 31.24, lng: 36.51 },
-      zoom: 7,
+      center: state.center,
+      zoom: 11,
       mapTypeId: google.maps.MapTypeId.TERRAIN,
       streetViewControl: false,
       fullscreenControl: true,
@@ -227,12 +227,12 @@
     state.sites.forEach((site) => {
       const marker = makeMarker(site);
       state.markers[site.id] = { marker, site };
-      marker.addListener('click', () => focusSite(site.id));
+      marker.addListener('click', () => focusSite(site.id, { speak: false }));
     });
 
     resetView();
 
-    const reset = document.getElementById('jdMapReset');
+    const reset = document.getElementById('svMapReset');
     if (reset) {
       reset.hidden = false;
       reset.onclick = () => {
@@ -243,67 +243,39 @@
     }
   }
 
-  /* -------------------------------------------------------------- binding */
-
   function bind() {
-    document.getElementById('jdMapFilters')?.addEventListener('click', (event) => {
-      const chip = event.target.closest('.jd-chip');
+    document.getElementById('svMapFilters')?.addEventListener('click', (event) => {
+      const chip = event.target.closest('.sv-chip');
       if (!chip) return;
       state.filter = chip.getAttribute('data-filter') || 'all';
       renderFilters();
       applyFilter();
     });
 
-    document.getElementById('jdSiteList')?.addEventListener('click', (event) => {
+    document.getElementById('svSiteList')?.addEventListener('click', (event) => {
       const btn = event.target.closest('[data-site-id]');
       if (!btn) return;
-      i18n()?.unlockAudio();
       focusSite(btn.getAttribute('data-site-id'));
     });
-
-    i18n()?.onChange(() => {
-      renderList();
-      setStatus(state.map ? '' : t('mapLoading'));
-      if (state.activeId) {
-        const site = state.sites.find((s) => s.id === state.activeId);
-        if (site) openInfo(site);
-      }
-    });
   }
 
-  function refreshMapSize() {
-    if (!state.map || !window.google?.maps?.event) return;
-    try {
-      google.maps.event.trigger(state.map, 'resize');
-      if (state.activeId) {
-        const site = state.sites.find((s) => s.id === state.activeId);
-        if (site) state.map.panTo({ lat: site.lat, lng: site.lng });
-      } else {
-        resetView();
-      }
-    } catch (_) {
-      /* ignore */
-    }
-  }
+  let bound = false;
 
-  document.addEventListener('jordan:content-ready', (event) => {
+  document.addEventListener('shenango:content-ready', (event) => {
     state.sites = event.detail?.sites || [];
+    state.center = event.detail?.center || DEFAULT_CENTER;
     renderFilters();
     renderList();
-    bind();
+    if (!bound) {
+      bind();
+      bound = true;
+    }
     initMap();
   });
 
-  document.addEventListener('jd:section-expanded', (event) => {
-    if (event.detail?.id === 'jdMap') {
-      requestAnimationFrame(() => setTimeout(refreshMapSize, 80));
-    }
-  });
-
-  window.JordanMap = {
+  window.ShenangoMap = {
     focusSite,
     resetView,
-    getSites: () => state.sites,
-    refreshMapSize
+    getSites: () => state.sites
   };
 })();

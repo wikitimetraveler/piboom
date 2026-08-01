@@ -1,0 +1,648 @@
+/**
+ * Shenango Valley — Nature local atlas
+ * Valley greens / river slate palette.
+ * Development work by David Lane
+ */
+
+.sv-page {
+  --sv-green: #2f5d46;
+  --sv-green-deep: #1e3d2e;
+  --sv-mist: #e8f0ea;
+  --sv-mist-soft: #f4f8f5;
+  --sv-line: #c5d4ca;
+  --sv-slate: #3a4a52;
+  --sv-amber: #c48a3a;
+  --sv-ink: #1a2420;
+  --sv-muted: #5a6b62;
+  --sv-panel: #1a2420;
+  --sv-panel-ink: #f4f8f5;
+
+  background: var(--sv-mist-soft);
+  color: var(--sv-ink);
+  font-family: 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+.sv-main {
+  padding-bottom: 3rem;
+}
+
+.sv-hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(2.5rem, 6vw, 4.5rem) 0 clamp(2rem, 4vw, 3rem);
+  background:
+    radial-gradient(ellipse at 15% 10%, rgba(47, 93, 70, 0.22), transparent 55%),
+    radial-gradient(ellipse at 85% 0%, rgba(196, 138, 58, 0.18), transparent 50%),
+    linear-gradient(165deg, #eef5f0 0%, #d5e4da 50%, #c2d4c8 100%);
+  border-bottom: 1px solid var(--sv-line);
+}
+
+.sv-hero-atmos {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.sv-hero-mist {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 70% 20%, rgba(255, 255, 255, 0.35), transparent 60%),
+    linear-gradient(180deg, transparent 40%, rgba(47, 93, 70, 0.08) 100%);
+  animation: sv-mist-breathe 16s ease-in-out infinite;
+}
+
+.sv-hero-ridge {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  width: 100%;
+  height: min(38%, 220px);
+  opacity: 0.18;
+  color: var(--sv-green-deep);
+  fill: currentColor;
+  animation: sv-ridge-drift 22s ease-in-out infinite;
+}
+
+@keyframes sv-mist-breathe {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+@keyframes sv-ridge-drift {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-1.5%); }
+}
+
+.sv-hero-layout {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 1.5rem;
+  align-items: end;
+}
+
+@media (min-width: 900px) {
+  .sv-hero-layout {
+    grid-template-columns: 1fr minmax(240px, 300px);
+    gap: 2rem;
+  }
+}
+
+.sv-kicker {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sv-green);
+  margin-bottom: 0.5rem;
+}
+
+.sv-hero-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 700;
+  font-size: clamp(2.6rem, 7vw, 4.2rem);
+  line-height: 1.05;
+  color: var(--sv-green-deep);
+  margin: 0 0 0.75rem;
+}
+
+.sv-hero-line {
+  font-size: 1.1rem;
+  max-width: 36rem;
+  color: var(--sv-slate);
+  margin-bottom: 1.25rem;
+}
+
+.sv-hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.sv-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  padding: 0.55rem 1rem;
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-decoration: none;
+  cursor: pointer;
+  background: transparent;
+  color: inherit;
+}
+
+.sv-btn-primary {
+  background: var(--sv-green);
+  color: #fff;
+}
+
+.sv-btn-primary:hover {
+  background: var(--sv-green-deep);
+  color: #fff;
+}
+
+.sv-btn-sand {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: var(--sv-line);
+  color: var(--sv-green-deep);
+}
+
+.sv-btn-ghost {
+  border-color: var(--sv-line);
+  color: var(--sv-slate);
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.sv-btn-sm {
+  padding: 0.35rem 0.7rem;
+  font-size: 0.82rem;
+}
+
+.sv-guide-card {
+  display: flex;
+  gap: 0.85rem;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid var(--sv-line);
+  border-radius: 1rem;
+  padding: 0.85rem 1rem;
+  backdrop-filter: blur(6px);
+}
+
+.sv-guide-portrait {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--sv-amber);
+}
+
+.sv-guide-meta h2 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.25rem;
+  margin: 0;
+  color: var(--sv-green-deep);
+}
+
+.sv-guide-meta p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--sv-muted);
+}
+
+.sv-guide-status {
+  margin-top: 0.35rem !important;
+  color: var(--sv-ink) !important;
+  font-size: 0.88rem !important;
+}
+
+.sv-guide-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+}
+
+.sv-section {
+  padding: 2.5rem 0 0.5rem;
+}
+
+.sv-section-head {
+  margin-bottom: 1.25rem;
+}
+
+.sv-section-head h2 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(1.6rem, 3vw, 2rem);
+  color: var(--sv-green-deep);
+  margin: 0 0 0.35rem;
+}
+
+.sv-section-head p {
+  color: var(--sv-muted);
+  max-width: 40rem;
+  margin: 0;
+}
+
+.sv-era-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.85rem;
+}
+
+@media (min-width: 768px) {
+  .sv-era-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.sv-era {
+  background: #fff;
+  border: 1px solid var(--sv-line);
+  border-radius: 0.85rem;
+  padding: 1rem 1.1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.sv-era.is-active {
+  border-color: var(--sv-green);
+  box-shadow: 0 0 0 1px var(--sv-green);
+}
+
+.sv-era-years {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sv-amber);
+  margin-bottom: 0.35rem;
+}
+
+.sv-era-title {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.15rem;
+  margin: 0 0 0.4rem;
+}
+
+.sv-era-open {
+  background: none;
+  border: 0;
+  padding: 0;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.sv-era-copy {
+  font-size: 0.92rem;
+  color: var(--sv-muted);
+  margin: 0 0 0.75rem;
+}
+
+.sv-era-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.sv-map-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 1rem;
+}
+
+.sv-chip {
+  border: 1px solid var(--sv-line);
+  background: #fff;
+  color: var(--sv-slate);
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sv-chip.is-active {
+  background: var(--sv-green);
+  border-color: var(--sv-green);
+  color: #fff;
+}
+
+.sv-map-layout {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 900px) {
+  .sv-map-layout {
+    grid-template-columns: minmax(220px, 280px) 1fr;
+    align-items: stretch;
+  }
+}
+
+.sv-site-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  max-height: 420px;
+  overflow: auto;
+}
+
+.sv-site-btn {
+  width: 100%;
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  text-align: left;
+  border: 1px solid var(--sv-line);
+  background: #fff;
+  border-radius: 0.65rem;
+  padding: 0.65rem 0.75rem;
+  cursor: pointer;
+}
+
+.sv-site-btn.is-active,
+.sv-site-btn:hover {
+  border-color: var(--sv-green);
+  background: var(--sv-mist);
+}
+
+.sv-site-emoji {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.sv-site-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.sv-site-copy strong {
+  font-size: 0.95rem;
+  color: var(--sv-ink);
+}
+
+.sv-site-copy span {
+  font-size: 0.8rem;
+  color: var(--sv-muted);
+}
+
+.sv-map-wrap {
+  position: relative;
+  min-height: 360px;
+  border-radius: 0.85rem;
+  overflow: hidden;
+  border: 1px solid var(--sv-line);
+  background: #d8e4dc;
+}
+
+.sv-map-canvas {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+}
+
+.sv-map-status {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 0.75rem;
+  margin: 0;
+  padding: 0.4rem 0.65rem;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--sv-slate);
+}
+
+.sv-map-reset {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 2;
+}
+
+.sv-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.sv-card {
+  perspective: 900px;
+  min-height: 260px;
+}
+
+.sv-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 260px;
+  transition: transform 0.55s;
+  transform-style: preserve-3d;
+}
+
+.sv-card.is-flipped .sv-card-inner {
+  transform: rotateY(180deg);
+}
+
+.sv-card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 0.85rem;
+  border: 1px solid var(--sv-line);
+  padding: 1.1rem;
+  background: #fff;
+}
+
+.sv-card-back {
+  transform: rotateY(180deg);
+  background: var(--sv-panel);
+  color: var(--sv-panel-ink);
+  border-color: var(--sv-green-deep);
+  display: flex;
+  flex-direction: column;
+}
+
+.sv-card-front {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+}
+
+.sv-card-emoji {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.sv-card-name {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.2rem;
+  margin: 0 0 0.35rem;
+}
+
+.sv-card-tagline {
+  color: var(--sv-muted);
+  font-size: 0.9rem;
+  margin: 0 0 0.65rem;
+}
+
+.sv-card-back .sv-card-tagline,
+.sv-card-back .sv-card-name {
+  color: var(--sv-panel-ink);
+}
+
+.sv-card-history {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  flex: 1;
+  margin: 0 0 0.75rem;
+}
+
+.sv-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.sv-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--sv-mist);
+  color: var(--sv-green);
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+}
+
+.sv-card-hint {
+  font-size: 0.78rem;
+  color: var(--sv-muted);
+  margin: 0;
+}
+
+.sv-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.sv-footer-note {
+  margin-top: 2.5rem;
+  font-size: 0.8rem;
+  color: var(--sv-muted);
+}
+
+.sv-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 1080;
+}
+
+.sv-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 25, 20, 0.55);
+}
+
+.sv-sheet-panel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(520px, calc(100% - 2rem));
+  max-height: min(80vh, 640px);
+  overflow: auto;
+  background: var(--sv-panel);
+  color: var(--sv-panel-ink);
+  border-radius: 1rem;
+  padding: 1.25rem 1.35rem;
+}
+
+.sv-sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.sv-sheet-header h2 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 1.35rem;
+  margin: 0;
+}
+
+.sv-sheet-label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--sv-amber);
+  margin-bottom: 0.5rem;
+}
+
+.sv-sheet-footer {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.sv-heygen-video {
+  width: 100%;
+  border-radius: 0.65rem;
+  background: #000;
+}
+
+.sv-heygen-script {
+  text-align: center;
+  padding: 0.5rem 0 1rem;
+}
+
+.sv-heygen-script img {
+  border-radius: 50%;
+  border: 2px solid var(--sv-amber);
+  margin-bottom: 0.75rem;
+  object-fit: cover;
+}
+
+.sv-heygen-credit {
+  font-size: 0.75rem;
+  color: rgba(244, 248, 245, 0.7);
+  margin: 0;
+}
+
+html[data-theme='dark'] .sv-page,
+body.dark-mode .sv-page {
+  --sv-mist: #1e2a24;
+  --sv-mist-soft: #15201b;
+  --sv-line: #2f4038;
+  --sv-ink: #e8f0ea;
+  --sv-muted: #9aada2;
+  background: var(--sv-mist-soft);
+  color: var(--sv-ink);
+}
+
+html[data-theme='dark'] .sv-era,
+html[data-theme='dark'] .sv-site-btn,
+html[data-theme='dark'] .sv-card-face:not(.sv-card-back),
+html[data-theme='dark'] .sv-chip,
+html[data-theme='dark'] .sv-guide-card,
+body.dark-mode .sv-era,
+body.dark-mode .sv-site-btn,
+body.dark-mode .sv-card-face:not(.sv-card-back),
+body.dark-mode .sv-chip,
+body.dark-mode .sv-guide-card {
+  background: #1c2923;
+  border-color: var(--sv-line);
+  color: var(--sv-ink);
+}
+
+html[data-theme='dark'] .sv-hero,
+body.dark-mode .sv-hero {
+  background:
+    radial-gradient(ellipse at 15% 10%, rgba(47, 93, 70, 0.35), transparent 55%),
+    linear-gradient(165deg, #15201b 0%, #1e2a24 100%);
+}

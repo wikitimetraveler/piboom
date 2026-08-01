@@ -96,6 +96,7 @@
     { href: '/heygen-hub.html', icon: 'bi-collection-play', label: 'HeyGen & HyperFrames', title: 'All HeyGen avatar videos and HyperFrames reels (public)' },
     { href: '/donuts/', icon: 'bi-hearts', label: 'Glazed', title: 'Glazed — public donut gallery with Pip (no login)' },
     { href: '/jordan/', icon: 'bi-globe-central-south-asia', label: 'Jordan', title: 'Jordan — bilingual history, food, music, argileh and living culture atlas with Rami (no login)' },
+    { href: '/nature/shenango-valley.html', icon: 'bi-geo-alt', label: 'Shenango Valley', title: 'Shenango Valley local atlas — Buhl Park, Amish country, Quaker Steak & Lube, Luigi\'s (David HeyGen + AI)' },
     { href: '/gse-analyzer.html', icon: 'bi-graph-up-arrow', label: 'GSE scenario analyzer' },
     { href: '/bike-store-home.html', icon: 'bi-bicycle', label: 'Bike Store' },
     { href: '/ai/voice-dj.html', icon: 'bi-mic', label: 'Wolfman Dave' },
@@ -164,7 +165,7 @@
     { href: '/nature/rock-discovery.html', icon: 'bi-gem', label: 'Rocky The Rock Star', title: 'Rubies, gems & meteorites — Rocky The Rock Star' },
     { href: '/nature/rock-collection.html', icon: 'bi-circle', label: 'Rock Collection', title: 'Your rock specimens' },
     { href: '/nature/share-collection.html', icon: 'bi-share', label: 'Share Collection', title: 'Share your collection' },
-    { href: '/nature/cannabis-origins.html', icon: 'bi-globe2', label: 'Cannabis Origins', title: 'Private landrace origins map (user password)' },
+    { href: '/nature/shenango-valley.html', icon: 'bi-geo-alt', label: 'Shenango Valley', title: 'Local atlas — Buhl Park center, Amish country, Quaker Steak & Lube, Luigi\'s Pizza' },
   ];
 
   /** Bike hub tool grid */

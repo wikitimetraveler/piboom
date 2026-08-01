@@ -18,21 +18,93 @@
   <script src="/shared/demo-users.js"></script>
   <script src="/shared/user-selector.js"></script>
   <script src="/shared/dark-mode.js" defer></script>
+  <script src="/jordan/js/jordan-splash.js" defer></script>
 </head>
-<body class="jd-page">
+<body class="jd-page jd-splash-open">
+  <div
+    id="jdSplash"
+    class="jd-splash is-ready"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="jdSplashTitle"
+    aria-hidden="false"
+  >
+    <button type="button" class="jd-splash__skip" id="jdSplashSkip">Skip</button>
+    <div class="jd-splash__veil" aria-hidden="true"></div>
+    <div class="jd-splash__grain" aria-hidden="true"></div>
+    <div class="jd-splash__stage">
+      <div class="jd-splash__flag-wrap" aria-hidden="true">
+        <svg class="jd-splash__flag" viewBox="0 0 1200 600" focusable="false" role="img" aria-label="Flag of Jordan">
+          <defs>
+            <linearGradient id="jdFlagSheen" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.22"/>
+              <stop offset="45%" stop-color="#ffffff" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#ffffff" stop-opacity="0.08"/>
+            </linearGradient>
+            <filter id="jdFlagSoft" x="-5%" y="-5%" width="110%" height="110%">
+              <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000" flood-opacity="0.45"/>
+            </filter>
+          </defs>
+          <g filter="url(#jdFlagSoft)">
+            <rect class="jd-splash__stripe jd-splash__stripe--black" width="1200" height="200" fill="#000000"/>
+            <rect class="jd-splash__stripe jd-splash__stripe--white" y="200" width="1200" height="200" fill="#ffffff"/>
+            <rect class="jd-splash__stripe jd-splash__stripe--green" y="400" width="1200" height="200" fill="#007a3d"/>
+            <polygon class="jd-splash__triangle" points="0,0 520,300 0,600" fill="#ce1126"/>
+            <g class="jd-splash__star" transform="translate(175 300)">
+              <polygon
+                fill="#ffffff"
+                points="0,-52 8.7,-18 40.7,-32.4 19.5,-4.5 50.7,11.6 15.6,12.5 22.6,46.9 0,20 -22.6,46.9 -15.6,12.5 -50.7,11.6 -19.5,-4.5 -40.7,-32.4 -8.7,-18"
+              />
+            </g>
+          </g>
+          <rect width="1200" height="600" fill="url(#jdFlagSheen)" pointer-events="none"/>
+        </svg>
+      </div>
+      <p class="jd-splash__kicker" lang="ar">المملكة الأردنية الهاشمية</p>
+      <h1 class="jd-splash__title" id="jdSplashTitle">Jordan</h1>
+      <p class="jd-splash__line">Layers of the Kingdom</p>
+      <div class="jd-splash__rule" aria-hidden="true"></div>
+      <p class="jd-splash__enter" id="jdSplashEnterHint">Enter the atlas</p>
+    </div>
+  </div>
+
   <modern-navbar></modern-navbar>
 
   <main class="jd-main">
     <section class="jd-hero" id="jdHero">
-      <div class="jd-hero-atmos" id="jdHeroAtmos" aria-hidden="true">
+      <div class="jd-hero-atmos jd-hero-atmos--storm" id="jdHeroAtmos" aria-hidden="true">
         <div class="jd-hero-sky"></div>
         <div class="jd-hero-heat"></div>
         <svg class="jd-hero-silhouettes" viewBox="0 0 1200 280" preserveAspectRatio="xMidYMax meet" focusable="false">
+          <g class="jd-hero-city jd-hero-city--far" fill="currentColor">
+            <rect x="40" y="168" width="36" height="112"/>
+            <rect x="82" y="148" width="28" height="132"/>
+            <rect x="118" y="178" width="44" height="102"/>
+            <rect x="170" y="138" width="22" height="142"/>
+            <rect x="198" y="158" width="50" height="122"/>
+            <rect x="256" y="172" width="34" height="108"/>
+            <rect x="400" y="160" width="40" height="120"/>
+            <rect x="448" y="140" width="26" height="140"/>
+            <rect x="482" y="170" width="48" height="110"/>
+            <rect x="538" y="150" width="30" height="130"/>
+            <rect x="620" y="165" width="42" height="115"/>
+            <rect x="670" y="145" width="24" height="135"/>
+            <rect x="700" y="175" width="38" height="105"/>
+            <rect x="1040" y="155" width="32" height="125"/>
+            <rect x="1080" y="168" width="46" height="112"/>
+            <rect x="1134" y="148" width="28" height="132"/>
+          </g>
           <path class="jd-hero-arch" d="M180 280 V120 Q180 40 260 40 Q340 40 340 120 V280 Z"/>
+          <path class="jd-hero-arch jd-hero-arch--mid" d="M300 280 V155 Q300 95 355 95 Q410 95 410 155 V280 Z"/>
           <path class="jd-hero-arch jd-hero-arch--far" d="M820 280 V150 Q820 70 900 70 Q980 70 980 150 V280 Z"/>
+          <path class="jd-hero-arch jd-hero-arch--far" d="M940 280 V175 Q940 120 990 120 Q1040 120 1040 175 V280 Z"/>
           <path class="jd-hero-dune" d="M0 220 C160 180 280 200 420 170 C560 140 700 190 860 160 C980 140 1100 180 1200 155 L1200 280 L0 280 Z"/>
         </svg>
         <div class="jd-hero-sand"></div>
+        <div class="jd-hero-storm-veil jd-hero-storm-veil--a"></div>
+        <div class="jd-hero-storm-veil jd-hero-storm-veil--b"></div>
+        <div class="jd-hero-storm-veil jd-hero-storm-veil--c"></div>
+        <canvas class="jd-hero-storm" id="jdSandstorm" width="1200" height="400"></canvas>
         <div class="jd-hero-motes" id="jdHeroMotes"></div>
       </div>
       <div class="container">
@@ -69,6 +141,14 @@
               </div>
             </div>
 
+            <label class="jd-narrate jd-narrate--global" for="jdNarrate">
+              <input type="checkbox" id="jdNarrate" checked/>
+              <span class="jd-narrate__copy">
+                <span class="jd-narrate__title" data-i18n="narration">Narration</span>
+                <span class="jd-narrate__scope" data-i18n="narrationScope">Entire page — atlas, tour, and cards</span>
+              </span>
+            </label>
+
             <div class="jd-guide-actions">
               <button type="button" class="jd-btn jd-btn-primary jd-btn-sm" id="jdStoryPlay" aria-pressed="false">
                 <i class="bi bi-film"></i> <span data-i18n="startTour">Start tour</span>
@@ -82,12 +162,6 @@
             </div>
 
             <div class="jd-story-panel" id="jdStoryPanel">
-              <div class="jd-story-row">
-                <label class="jd-story-narrate">
-                  <input type="checkbox" id="jdStoryNarrate" checked/>
-                  <span data-i18n="narration">Narration</span>
-                </label>
-              </div>
               <div class="jd-story-status" id="jdStoryStatus" hidden aria-live="polite">
                 <span id="jdStoryStatusText"></span>
                 <div class="jd-story-dots" id="jdStoryDots" aria-hidden="true"></div>
@@ -144,18 +218,30 @@
         </div>
         <div class="jd-section-panel" id="jdTimelinePanel" role="region" aria-labelledby="jdTimelineToggle">
           <div class="jd-timeline-stage">
-            <div class="jd-timeline-3d" id="jdTimeline3d" aria-hidden="true"></div>
-            <div class="jd-calendar" aria-hidden="true">
+            <aside class="jd-timeline-selected" id="jdTimelineSelected" aria-live="polite">
+              <div class="jd-timeline-selected__empty" id="jdTimelineSelectedEmpty">
+                <div class="jd-timeline-3d" id="jdTimeline3d" aria-hidden="true"></div>
+                <p class="jd-timeline-selected__prompt" data-i18n="timelineSelectHint">Select an era on the timeline</p>
+              </div>
+              <div class="jd-timeline-selected__card" id="jdTimelineSelectedCard" hidden>
+                <div class="jd-timeline-selected__media" id="jdTimelineSelectedMedia"></div>
+                <p class="jd-timeline-selected__date" id="jdTimelineSelectedDate"></p>
+                <h3 class="jd-timeline-selected__title" id="jdTimelineSelectedTitle"></h3>
+              </div>
+            </aside>
+            <div class="jd-calendar" aria-label="Chronological scale">
+              <div class="jd-calendar__head">
+                <span class="jd-calendar__head-label">Chronology</span>
+                <span class="jd-calendar__head-range" id="jdCalendarHeadRange">7500 BCE → today</span>
+              </div>
               <div class="jd-calendar__track">
                 <div class="jd-calendar__rail"></div>
+                <div class="jd-calendar__fill" id="jdCalendarFill"></div>
+                <div class="jd-calendar__centuries" id="jdCalendarCenturies" aria-hidden="true"></div>
                 <div class="jd-calendar__ticks" id="jdCalendarTicks"></div>
                 <div class="jd-calendar__now" id="jdCalendarNow" title="Present"></div>
               </div>
-              <div class="jd-calendar__scale">
-                <span>BCE</span>
-                <span>CE</span>
-                <span>Now</span>
-              </div>
+              <div class="jd-calendar__scale" id="jdCalendarScale"></div>
             </div>
           </div>
           <ol class="jd-era-list" id="jdEraList">

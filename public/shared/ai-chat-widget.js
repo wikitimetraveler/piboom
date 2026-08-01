@@ -427,18 +427,124 @@ class AIChatWidget {
         this.context = { ...this.context, ...newContext };
     }
 
-    toggleVoice() {
-        // Voice integration will be added in voice-controls step
-        if (window.voiceRecognition) {
-            if (window.voiceRecognition.isListening) {
-                window.voiceRecognition.stop();
-            } else {
-                window.voiceRecognition.start((transcript) => {
-                    this.sendMessage(transcript);
-                });
+    resolveVoiceLang() {
+        try {
+            const ctx = typeof this.getContext === 'function' ? this.getContext() : this.context;
+            const lang = String(ctx?.lang || ctx?.language || 'en').toLowerCase();
+            if (lang.startsWith('ar')) return 'ar-SA';
+            if (lang.startsWith('es')) return 'es-ES';
+            if (lang.startsWith('fr')) return 'fr-FR';
+            return 'en-US';
+        } catch (_) {
+            return 'en-US';
+        }
+    }
+
+    /**
+     * Shared mic for every AIChatWidget page (Jordan, Glazed, Shenango, disasters chat, etc.).
+     * Uses /shared/speech-recognition.js when present; falls back to Web Speech API directly.
+     */
+    ensureVoiceRecognition() {
+        if (this._chatVoice) {
+            this._chatVoice.setLang?.(this.resolveVoiceLang());
+            return this._chatVoice;
+        }
+
+        const setListeningUi = (on) => {
+            document.getElementById('aiChatVoiceBtn')?.classList.toggle('listening', on);
+        };
+
+        if (window.DcSpeechRecognition?.createSpeechBridge) {
+            this._chatVoice = window.DcSpeechRecognition.createSpeechBridge({
+                lang: this.resolveVoiceLang(),
+                continuous: false,
+                interimResults: false,
+                onStart: () => setListeningUi(true),
+                onEnd: () => setListeningUi(false),
+                onError: () => setListeningUi(false)
+            });
+            return this._chatVoice;
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) return null;
+
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = this.resolveVoiceLang();
+
+        let listening = false;
+        let onResult = null;
+        const widget = this;
+
+        recognition.onstart = () => {
+            listening = true;
+            setListeningUi(true);
+        };
+        recognition.onend = () => {
+            listening = false;
+            setListeningUi(false);
+        };
+        recognition.onerror = () => {
+            listening = false;
+            setListeningUi(false);
+        };
+        recognition.onresult = (event) => {
+            const transcript = event.results?.[0]?.[0]?.transcript?.trim();
+            if (transcript && typeof onResult === 'function') onResult(transcript);
+        };
+
+        this._chatVoice = {
+            get isListening() {
+                return listening;
+            },
+            setLang(lang) {
+                if (lang) recognition.lang = lang;
+            },
+            start(callback) {
+                onResult = callback;
+                recognition.lang = widget.resolveVoiceLang();
+                try {
+                    recognition.start();
+                } catch (_) {
+                    /* already started */
+                }
+            },
+            stop() {
+                try {
+                    recognition.stop();
+                } catch (_) {
+                    /* ignore */
+                }
             }
-        } else {
-            alert('Voice recognition not available. Please type your message.');
+        };
+
+        return this._chatVoice;
+    }
+
+    isVoiceListening(voice) {
+        if (!voice) return false;
+        if (typeof voice.isListening === 'function') return Boolean(voice.isListening());
+        return Boolean(voice.isListening);
+    }
+
+    toggleVoice() {
+        const voice = this.ensureVoiceRecognition();
+        if (!voice) {
+            const input = document.getElementById('aiChatInput');
+            if (input) {
+                input.placeholder = 'Voice not supported here — type your message';
+                input.focus();
+            }
+            return;
+        }
+        if (this.isVoiceListening(voice)) voice.stop();
+        else {
+            voice.start((transcript) => {
+                const text = String(transcript || '').trim();
+                if (text) this.sendMessage(text);
+            });
         }
     }
 }
