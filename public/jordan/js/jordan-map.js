@@ -1,5 +1,5 @@
 /**
- * Jordan atlas map — Google Maps pins for historic, food, music, argileh and living sites.
+ * Jordan atlas map — Google Maps pins for historic, food, music, and living sites.
  * Development work by David Lane
  */
 (function () {
@@ -9,7 +9,6 @@
     history: '#b5301f',
     food: '#d4a24c',
     music: '#6f7f52',
-    hookah: '#8b5a3c',
     living: '#3d6b7a'
   };
 
