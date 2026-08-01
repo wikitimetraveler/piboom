@@ -22,8 +22,15 @@
     listeners: []
   };
 
+  function narrateEls() {
+    const list = Array.from(document.querySelectorAll('[data-jd-narrate]'));
+    const legacy = document.getElementById('jdStoryNarrate');
+    if (legacy && !list.includes(legacy)) list.push(legacy);
+    return list;
+  }
+
   function narrateEl() {
-    return document.getElementById('jdNarrate') || document.getElementById('jdStoryNarrate');
+    return document.getElementById('jdNarrate') || narrateEls()[0] || null;
   }
 
   /** Atlas, cards, phrases, guide replies, and the story reel — default ON. */
@@ -32,31 +39,38 @@
     return !el || el.checked;
   }
 
+  function syncNarrateChecks(checked) {
+    narrateEls().forEach((el) => {
+      el.checked = checked;
+    });
+  }
+
   function applyNarrationUi() {
     document.documentElement.classList.toggle('jd-narration-off', !narrationEnabled());
   }
 
   function loadNarratePref() {
-    const el = narrateEl();
-    if (!el) return;
+    let on = true;
     try {
-      el.checked = localStorage.getItem(NARRATE_KEY) !== '0';
+      on = localStorage.getItem(NARRATE_KEY) !== '0';
     } catch (_) {
-      el.checked = true;
+      on = true;
     }
+    syncNarrateChecks(on);
     applyNarrationUi();
   }
 
-  function persistNarratePref() {
-    const el = narrateEl();
-    if (!el) return;
+  function persistNarratePref(event) {
+    const source = event?.target;
+    const on = source && 'checked' in source ? !!source.checked : narrationEnabled();
+    syncNarrateChecks(on);
     try {
-      localStorage.setItem(NARRATE_KEY, el.checked ? '1' : '0');
+      localStorage.setItem(NARRATE_KEY, on ? '1' : '0');
     } catch (_) {
       /* ignore */
     }
     applyNarrationUi();
-    if (!el.checked) stop();
+    if (!on) stop();
   }
 
   function readInitialLang() {
@@ -242,7 +256,9 @@
       toggle();
     });
     document.getElementById('jdStopAudio')?.addEventListener('click', stop);
-    narrateEl()?.addEventListener('change', persistNarratePref);
+    narrateEls().forEach((el) => {
+      el.addEventListener('change', persistNarratePref);
+    });
   }
 
   function init() {

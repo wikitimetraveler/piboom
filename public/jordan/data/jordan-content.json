@@ -637,25 +637,6 @@
       }
     },
     {
-      "id": "amman-argileh",
-      "category": "hookah",
-      "emoji": "🍎",
-      "lat": 31.9497,
-      "lng": 35.9235,
-      "name": {
-        "en": "Amman café terraces",
-        "ar": "شرفات مقاهي عمّان"
-      },
-      "place": {
-        "en": "Jabal Amman / Rainbow Street",
-        "ar": "جبل عمّان / شارع الرينبو"
-      },
-      "blurb": {
-        "en": "Evening argileh culture — shared hoses, tea, and the classic apple (tufahtayn) blend on stone terraces above downtown.",
-        "ar": "ثقافة الأرجيلة المسائية — خراطيم مشتركة وشاي ونكهة التفاح الكلاسيكية (تفاحتين) على شرفات حجرية فوق وسط البلد."
-      }
-    },
-    {
       "id": "jerash-festival",
       "category": "music",
       "emoji": "🎶",
@@ -730,6 +711,25 @@
       "blurb": {
         "en": "Where Circassian, Palestinian, Syrian, and East Bank stories share the same stair streets — markets, bakeries, and Friday family visits.",
         "ar": "حيث تتشابك حكايات الشركس والفلسطينيين والسوريين وأبناء الضفة الشرقية في الشوارع السلّمية — أسواق ومخابز وزيارات جمعة."
+      }
+    },
+    {
+      "id": "amman-argileh",
+      "category": "living",
+      "emoji": "🍎",
+      "lat": 31.9497,
+      "lng": 35.9235,
+      "name": {
+        "en": "Amman café terraces",
+        "ar": "شرفات مقاهي عمّان"
+      },
+      "place": {
+        "en": "Jabal Amman / Rainbow Street",
+        "ar": "جبل عمّان / شارع الرينبو"
+      },
+      "blurb": {
+        "en": "Evening argileh culture — shared hoses, tea, and the classic apple (tufahtayn) blend on stone terraces above downtown.",
+        "ar": "ثقافة الأرجيلة المسائية — خراطيم مشتركة وشاي ونكهة التفاح الكلاسيكية (تفاحتين) على شرفات حجرية فوق وسط البلد."
       }
     },
     {

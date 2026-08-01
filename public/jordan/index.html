@@ -75,35 +75,38 @@
       <div class="jd-hero-atmos jd-hero-atmos--storm" id="jdHeroAtmos" aria-hidden="true">
         <div class="jd-hero-sky"></div>
         <div class="jd-hero-heat"></div>
-        <svg class="jd-hero-silhouettes" viewBox="0 0 1200 280" preserveAspectRatio="xMidYMax meet" focusable="false">
+        <svg class="jd-hero-silhouettes" viewBox="0 0 1200 100" preserveAspectRatio="xMidYMax meet" focusable="false">
           <g class="jd-hero-city jd-hero-city--far" fill="currentColor">
-            <rect x="40" y="168" width="36" height="112"/>
-            <rect x="82" y="148" width="28" height="132"/>
-            <rect x="118" y="178" width="44" height="102"/>
-            <rect x="170" y="138" width="22" height="142"/>
-            <rect x="198" y="158" width="50" height="122"/>
-            <rect x="256" y="172" width="34" height="108"/>
-            <rect x="400" y="160" width="40" height="120"/>
-            <rect x="448" y="140" width="26" height="140"/>
-            <rect x="482" y="170" width="48" height="110"/>
-            <rect x="538" y="150" width="30" height="130"/>
-            <rect x="620" y="165" width="42" height="115"/>
-            <rect x="670" y="145" width="24" height="135"/>
-            <rect x="700" y="175" width="38" height="105"/>
-            <rect x="1040" y="155" width="32" height="125"/>
-            <rect x="1080" y="168" width="46" height="112"/>
-            <rect x="1134" y="148" width="28" height="132"/>
+            <rect x="20" y="58" width="22" height="42"/>
+            <rect x="46" y="48" width="16" height="52"/>
+            <rect x="68" y="62" width="28" height="38"/>
+            <rect x="102" y="52" width="14" height="48"/>
+            <rect x="122" y="58" width="30" height="42"/>
+            <rect x="200" y="55" width="24" height="45"/>
+            <rect x="230" y="45" width="14" height="55"/>
+            <rect x="250" y="60" width="26" height="40"/>
+            <rect x="360" y="50" width="20" height="50"/>
+            <rect x="386" y="42" width="12" height="58"/>
+            <rect x="404" y="56" width="28" height="44"/>
+            <rect x="520" y="54" width="22" height="46"/>
+            <rect x="548" y="44" width="14" height="56"/>
+            <rect x="568" y="58" width="24" height="42"/>
+            <rect x="700" y="52" width="18" height="48"/>
+            <rect x="724" y="46" width="12" height="54"/>
+            <rect x="742" y="58" width="26" height="42"/>
+            <rect x="920" y="50" width="20" height="50"/>
+            <rect x="946" y="56" width="28" height="44"/>
+            <rect x="1100" y="48" width="16" height="52"/>
+            <rect x="1122" y="58" width="24" height="42"/>
+            <rect x="1152" y="44" width="14" height="56"/>
           </g>
-          <path class="jd-hero-arch" d="M180 280 V120 Q180 40 260 40 Q340 40 340 120 V280 Z"/>
-          <path class="jd-hero-arch jd-hero-arch--mid" d="M300 280 V155 Q300 95 355 95 Q410 95 410 155 V280 Z"/>
-          <path class="jd-hero-arch jd-hero-arch--far" d="M820 280 V150 Q820 70 900 70 Q980 70 980 150 V280 Z"/>
-          <path class="jd-hero-arch jd-hero-arch--far" d="M940 280 V175 Q940 120 990 120 Q1040 120 1040 175 V280 Z"/>
-          <path class="jd-hero-dune" d="M0 220 C160 180 280 200 420 170 C560 140 700 190 860 160 C980 140 1100 180 1200 155 L1200 280 L0 280 Z"/>
+          <path class="jd-hero-arch" d="M140 100 V55 Q140 28 168 28 Q196 28 196 55 V100 Z"/>
+          <path class="jd-hero-arch jd-hero-arch--mid" d="M280 100 V62 Q280 42 302 42 Q324 42 324 62 V100 Z"/>
+          <path class="jd-hero-arch jd-hero-arch--far" d="M780 100 V50 Q780 26 812 26 Q844 26 844 50 V100 Z"/>
+          <path class="jd-hero-arch jd-hero-arch--far" d="M860 100 V64 Q860 48 882 48 Q904 48 904 64 V100 Z"/>
+          <path class="jd-hero-dune" d="M0 78 C140 68 260 74 400 66 C540 58 680 72 820 64 C960 56 1100 70 1200 62 L1200 100 L0 100 Z"/>
         </svg>
         <div class="jd-hero-sand"></div>
-        <div class="jd-hero-storm-veil jd-hero-storm-veil--a"></div>
-        <div class="jd-hero-storm-veil jd-hero-storm-veil--b"></div>
-        <div class="jd-hero-storm-veil jd-hero-storm-veil--c"></div>
         <canvas class="jd-hero-storm" id="jdSandstorm" width="1200" height="400"></canvas>
         <div class="jd-hero-motes" id="jdHeroMotes"></div>
       </div>
@@ -142,7 +145,7 @@
             </div>
 
             <label class="jd-narrate jd-narrate--global" for="jdNarrate">
-              <input type="checkbox" id="jdNarrate" checked/>
+              <input type="checkbox" id="jdNarrate" data-jd-narrate checked/>
               <span class="jd-narrate__copy">
                 <span class="jd-narrate__title" data-i18n="narration">Narration</span>
                 <span class="jd-narrate__scope" data-i18n="narrationScope">Entire page — atlas, tour, and cards</span>
@@ -185,13 +188,19 @@
           </button>
         </div>
         <div class="jd-section-panel" id="jdMapPanel" role="region" aria-labelledby="jdMapToggle">
-          <div class="jd-map-filters" id="jdMapFilters" role="group" aria-label="Filter map pins">
-            <button type="button" class="jd-chip is-active" data-filter="all" data-i18n="mapAll">All</button>
-            <button type="button" class="jd-chip" data-filter="history" data-i18n="mapHistory">History</button>
-            <button type="button" class="jd-chip" data-filter="food" data-i18n="mapFood">Food</button>
-            <button type="button" class="jd-chip" data-filter="music" data-i18n="mapMusic">Music</button>
-            <button type="button" class="jd-chip" data-filter="hookah" data-i18n="mapHookah">Argileh</button>
-            <button type="button" class="jd-chip" data-filter="living" data-i18n="mapLiving">Living</button>
+          <div class="jd-map-toolbar">
+            <div class="jd-map-filters" id="jdMapFilters" role="group" aria-label="Filter map pins">
+              <button type="button" class="jd-chip is-active" data-filter="all" data-i18n="mapAll">All</button>
+              <button type="button" class="jd-chip" data-filter="history" data-i18n="mapHistory">History</button>
+              <button type="button" class="jd-chip" data-filter="food" data-i18n="mapFood">Food</button>
+              <button type="button" class="jd-chip" data-filter="music" data-i18n="mapMusic">Music</button>
+              <button type="button" class="jd-chip" data-filter="hookah" data-i18n="mapHookah">Argileh</button>
+              <button type="button" class="jd-chip" data-filter="living" data-i18n="mapLiving">Living</button>
+            </div>
+            <label class="jd-narrate jd-narrate--section" for="jdNarrateMap">
+              <input type="checkbox" id="jdNarrateMap" data-jd-narrate checked/>
+              <span data-i18n="narration">Narration</span>
+            </label>
           </div>
           <div class="jd-map-layout">
             <ul class="jd-site-list" id="jdSiteList"></ul>
@@ -206,9 +215,9 @@
         </div>
       </section>
 
-      <section class="jd-section is-open" id="jdTimeline" data-jd-collapse data-jd-default-open="1">
+      <section class="jd-section" id="jdTimeline" data-jd-collapse>
         <div class="jd-section-head">
-          <button type="button" class="jd-section-toggle" id="jdTimelineToggle" aria-expanded="true" aria-controls="jdTimelinePanel">
+          <button type="button" class="jd-section-toggle" id="jdTimelineToggle" aria-expanded="false" aria-controls="jdTimelinePanel">
             <span class="jd-section-toggle__copy">
               <span class="jd-section-title" data-i18n="timelineHeading">Layers of Jordan</span>
               <span class="jd-section-lead" data-i18n="timelineLead">Ten eras from Neolithic Ain Ghazal to the modern kingdom. Select a layer to hear it and locate it on the map.</span>
@@ -216,7 +225,7 @@
             <i class="bi bi-chevron-down jd-section-chevron" aria-hidden="true"></i>
           </button>
         </div>
-        <div class="jd-section-panel" id="jdTimelinePanel" role="region" aria-labelledby="jdTimelineToggle">
+        <div class="jd-section-panel" id="jdTimelinePanel" role="region" aria-labelledby="jdTimelineToggle" hidden>
           <div class="jd-timeline-stage">
             <aside class="jd-timeline-selected" id="jdTimelineSelected" aria-live="polite">
               <div class="jd-timeline-selected__empty" id="jdTimelineSelectedEmpty">
@@ -250,9 +259,9 @@
         </div>
       </section>
 
-      <section class="jd-section is-open" id="jdFood" data-jd-collapse data-jd-default-open="1">
+      <section class="jd-section" id="jdFood" data-jd-collapse>
         <div class="jd-section-head">
-          <button type="button" class="jd-section-toggle" id="jdFoodToggle" aria-expanded="true" aria-controls="jdFoodPanel">
+          <button type="button" class="jd-section-toggle" id="jdFoodToggle" aria-expanded="false" aria-controls="jdFoodPanel">
             <span class="jd-section-toggle__copy">
               <span class="jd-section-title" data-i18n="foodHeading">The Jordanian table</span>
               <span class="jd-section-lead" data-i18n="foodLead">Food here is a hospitality contract. Flip a plate for where it came from and what it means.</span>
@@ -260,14 +269,14 @@
             <i class="bi bi-chevron-down jd-section-chevron" aria-hidden="true"></i>
           </button>
         </div>
-        <div class="jd-section-panel" id="jdFoodPanel" role="region" aria-labelledby="jdFoodToggle">
+        <div class="jd-section-panel" id="jdFoodPanel" role="region" aria-labelledby="jdFoodToggle" hidden>
           <div class="jd-grid" id="jdFoodGrid"></div>
         </div>
       </section>
 
-      <section class="jd-section is-open" id="jdMusic" data-jd-collapse data-jd-default-open="1">
+      <section class="jd-section" id="jdMusic" data-jd-collapse>
         <div class="jd-section-head">
-          <button type="button" class="jd-section-toggle" id="jdMusicToggle" aria-expanded="true" aria-controls="jdMusicPanel">
+          <button type="button" class="jd-section-toggle" id="jdMusicToggle" aria-expanded="false" aria-controls="jdMusicPanel">
             <span class="jd-section-toggle__copy">
               <span class="jd-section-title" data-i18n="musicHeading">Sound of Jordan</span>
               <span class="jd-section-lead" data-i18n="musicLead">One string, two reeds, a line of dancers, and a stadium in Jerash. Flip a card for the history.</span>
@@ -275,14 +284,14 @@
             <i class="bi bi-chevron-down jd-section-chevron" aria-hidden="true"></i>
           </button>
         </div>
-        <div class="jd-section-panel" id="jdMusicPanel" role="region" aria-labelledby="jdMusicToggle">
+        <div class="jd-section-panel" id="jdMusicPanel" role="region" aria-labelledby="jdMusicToggle" hidden>
           <div class="jd-grid" id="jdMusicGrid"></div>
         </div>
       </section>
 
-      <section class="jd-section is-open" id="jdHookah" data-jd-collapse data-jd-default-open="1">
+      <section class="jd-section" id="jdHookah" data-jd-collapse>
         <div class="jd-section-head">
-          <button type="button" class="jd-section-toggle" id="jdHookahToggle" aria-expanded="true" aria-controls="jdHookahPanel">
+          <button type="button" class="jd-section-toggle" id="jdHookahToggle" aria-expanded="false" aria-controls="jdHookahPanel">
             <span class="jd-section-toggle__copy">
               <span class="jd-section-title" data-i18n="hookahHeading">Argileh — the café smoke</span>
               <span class="jd-section-lead" data-i18n="hookahLead">From antique brass nargileh to tonight’s Amman terrace — history, types, and flavors. Flip a card for the story — and the apple blend your neighbor already knows.</span>
@@ -290,14 +299,14 @@
             <i class="bi bi-chevron-down jd-section-chevron" aria-hidden="true"></i>
           </button>
         </div>
-        <div class="jd-section-panel" id="jdHookahPanel" role="region" aria-labelledby="jdHookahToggle">
+        <div class="jd-section-panel" id="jdHookahPanel" role="region" aria-labelledby="jdHookahToggle" hidden>
           <div class="jd-grid" id="jdHookahGrid"></div>
         </div>
       </section>
 
-      <section class="jd-section is-open" id="jdLiving" data-jd-collapse data-jd-default-open="1">
+      <section class="jd-section" id="jdLiving" data-jd-collapse>
         <div class="jd-section-head">
-          <button type="button" class="jd-section-toggle" id="jdLivingToggle" aria-expanded="true" aria-controls="jdLivingPanel">
+          <button type="button" class="jd-section-toggle" id="jdLivingToggle" aria-expanded="false" aria-controls="jdLivingPanel">
             <span class="jd-section-toggle__copy">
               <span class="jd-section-title" data-i18n="livingHeading">Living Jordan</span>
               <span class="jd-section-lead" data-i18n="livingLead">Bedouin roots, neighbor communities, the eastern badia, and crafts that still have hands on them. Flip a card for the story.</span>
@@ -305,14 +314,14 @@
             <i class="bi bi-chevron-down jd-section-chevron" aria-hidden="true"></i>
           </button>
         </div>
-        <div class="jd-section-panel" id="jdLivingPanel" role="region" aria-labelledby="jdLivingToggle">
+        <div class="jd-section-panel" id="jdLivingPanel" role="region" aria-labelledby="jdLivingToggle" hidden>
           <div class="jd-grid" id="jdLivingGrid"></div>
         </div>
       </section>
 
-      <section class="jd-section is-open" id="jdPhrases" data-jd-collapse data-jd-default-open="1">
+      <section class="jd-section" id="jdPhrases" data-jd-collapse>
         <div class="jd-section-head">
-          <button type="button" class="jd-section-toggle" id="jdPhrasesToggle" aria-expanded="true" aria-controls="jdPhrasesPanel">
+          <button type="button" class="jd-section-toggle" id="jdPhrasesToggle" aria-expanded="false" aria-controls="jdPhrasesPanel">
             <span class="jd-section-toggle__copy">
               <span class="jd-section-title" data-i18n="phraseHeading">Speak Jordanian</span>
               <span class="jd-section-lead" data-i18n="phraseLead">Everyday Jordanian Arabic, spoken aloud. Press any phrase to hear it in Arabic.</span>
@@ -320,7 +329,7 @@
             <i class="bi bi-chevron-down jd-section-chevron" aria-hidden="true"></i>
           </button>
         </div>
-        <div class="jd-section-panel" id="jdPhrasesPanel" role="region" aria-labelledby="jdPhrasesToggle">
+        <div class="jd-section-panel" id="jdPhrasesPanel" role="region" aria-labelledby="jdPhrasesToggle" hidden>
           <ul class="jd-phrase-list" id="jdPhraseList"></ul>
         </div>
       </section>
