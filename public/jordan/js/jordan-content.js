@@ -33,38 +33,91 @@
 
   /* ------------------------------------------------------------- rendering */
 
+  /** Approximate year CE for calendar tick placement (BCE negative). */
+  const ERA_YEAR_CE = {
+    'ain-ghazal': -7250,
+    nabataeans: -200,
+    rome: 106,
+    byzantine: 400,
+    umayyad: 700,
+    crusader: 1185,
+    ottoman: 1516,
+    revolt: 1916,
+    emirate: 1921,
+    kingdom: 1946
+  };
+
+  const CAL_MIN = -7500;
+  const CAL_MAX = 2026;
+
+  function yearToPct(year) {
+    return Math.max(0, Math.min(1, (year - CAL_MIN) / (CAL_MAX - CAL_MIN))) * 100;
+  }
+
+  function renderCalendarTicks() {
+    const host = document.getElementById('jdCalendarTicks');
+    if (!host || !state.data?.eras) return;
+    host.innerHTML = state.data.eras
+      .map((era) => {
+        const year = ERA_YEAR_CE[era.id];
+        if (year == null) return '';
+        const pct = yearToPct(year);
+        const active = state.activeEra === era.id ? ' is-active' : '';
+        return `<button type="button" class="jd-calendar__tick${active}" data-era-tick="${esc(era.id)}"
+          style="inset-inline-start:${pct.toFixed(2)}%" title="${esc(pick(era.title))} · ${esc(pick(era.years))}"
+          aria-label="${esc(pick(era.title))}"></button>`;
+      })
+      .join('');
+  }
+
+  function syncCalendarActive(eraId) {
+    document.querySelectorAll('.jd-calendar__tick').forEach((el) => {
+      el.classList.toggle('is-active', el.getAttribute('data-era-tick') === eraId);
+    });
+  }
+
   function renderEras() {
     const list = document.getElementById('jdEraList');
     if (!list || !state.data) return;
 
     list.innerHTML = state.data.eras
-      .map((era) => {
+      .map((era, index) => {
         const active = state.activeEra === era.id ? ' is-active' : '';
-        return `<li class="jd-era${active}" data-era-id="${esc(era.id)}">
-          <div class="jd-era-btn">
-            <span class="jd-era-years">${esc(pick(era.years))}</span>
-            <h3 class="jd-era-title">
-              <button type="button" class="jd-era-open">${esc(pick(era.title))}</button>
-            </h3>
-            <p class="jd-era-copy">${esc(pick(era.copy))}</p>
-            <div class="jd-era-tools">
-              <button type="button" class="jd-btn jd-btn-sand jd-btn-sm jd-listen-btn" data-era-listen="${esc(era.id)}"
-                aria-pressed="false">
-                <i class="bi bi-volume-up-fill" aria-hidden="true"></i>
-                <span class="jd-listen-label">${esc(t('listen'))}</span>
-              </button>
-              ${
-                era.siteId
-                  ? `<button type="button" class="jd-btn jd-btn-ghost jd-btn-sm" data-era-map="${esc(era.siteId)}">
-                      <i class="bi bi-geo-alt"></i> ${esc(t('mapHeading'))}
-                    </button>`
-                  : ''
-              }
+        const years = pick(era.years);
+        return `<li class="jd-era${active}" data-era-id="${esc(era.id)}" style="--jd-era-i:${index}">
+          <span class="jd-era-node" aria-hidden="true"></span>
+          <article class="jd-era-card">
+            <div class="jd-era-cal" aria-hidden="true">
+              <span class="jd-era-cal__tick"></span>
+              <span class="jd-era-cal__band">${esc(years)}</span>
             </div>
-          </div>
+            <div class="jd-era-body">
+              <span class="jd-era-years">${esc(years)}</span>
+              <h3 class="jd-era-title">
+                <button type="button" class="jd-era-open">${esc(pick(era.title))}</button>
+              </h3>
+              <p class="jd-era-copy">${esc(pick(era.copy))}</p>
+              <div class="jd-era-tools">
+                <button type="button" class="jd-btn jd-btn-sand jd-btn-sm jd-listen-btn" data-era-listen="${esc(era.id)}"
+                  aria-pressed="false">
+                  <i class="bi bi-volume-up-fill" aria-hidden="true"></i>
+                  <span class="jd-listen-label">${esc(t('listen'))}</span>
+                </button>
+                ${
+                  era.siteId
+                    ? `<button type="button" class="jd-btn jd-btn-ghost jd-btn-sm" data-era-map="${esc(era.siteId)}">
+                        <i class="bi bi-geo-alt"></i> ${esc(t('mapHeading'))}
+                      </button>`
+                    : ''
+                }
+              </div>
+            </div>
+          </article>
         </li>`;
       })
       .join('');
+
+    renderCalendarTicks();
   }
 
   function cardMarkup(item, kind) {
@@ -255,10 +308,14 @@
   function openEra(eraId) {
     const era = state.data?.eras.find((e) => e.id === eraId);
     if (!era) return;
+    window.JordanSections?.expand('jdTimeline');
     state.activeEra = eraId;
     document.querySelectorAll('.jd-era').forEach((el) => {
       el.classList.toggle('is-active', el.getAttribute('data-era-id') === eraId);
     });
+    syncCalendarActive(eraId);
+    const eraEl = document.querySelector(`.jd-era[data-era-id="${eraId}"]`);
+    eraEl?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     openSheet({
       title: pick(era.title),
       label: `${t('context')} · ${pick(era.years)}`,
@@ -485,12 +542,15 @@
   }
 
   function flipFirst(gridId) {
+    const grid = document.getElementById(gridId);
+    window.JordanSections?.expandFor(grid);
     const card = document.querySelector(`#${gridId} .jd-card`);
     if (card && !card.classList.contains('is-flipped')) toggleCard(card);
   }
 
   function focusSite(siteId) {
     if (window.JordanMap?.focusSite) {
+      window.JordanSections?.expand('jdMap');
       window.JordanMap.focusSite(siteId);
       document.getElementById('jdMap')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -511,6 +571,13 @@
       if (eraMap) {
         event.stopPropagation();
         focusSite(eraMap.getAttribute('data-era-map'));
+        return;
+      }
+
+      const eraTick = event.target.closest('[data-era-tick]');
+      if (eraTick) {
+        event.stopPropagation();
+        openEra(eraTick.getAttribute('data-era-tick'));
         return;
       }
 

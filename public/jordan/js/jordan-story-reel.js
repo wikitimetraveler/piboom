@@ -109,6 +109,7 @@
 
   function scrollToEl(el) {
     if (!el) return;
+    window.JordanSections?.expandFor(el);
     try {
       el.scrollIntoView({ behavior: state.reducedMotion ? 'auto' : 'smooth', block: 'center' });
     } catch (_) {
@@ -120,6 +121,7 @@
     clearSpotlight();
     const spot = resolveEl(scene.spotlight) || resolveEl(scene.anchor);
     if (spot) {
+      window.JordanSections?.expandFor(spot);
       spot.classList.add('jd-story-spotlight');
       scrollToEl(spot);
       return;

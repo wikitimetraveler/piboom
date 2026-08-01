@@ -271,6 +271,21 @@
     });
   }
 
+  function refreshMapSize() {
+    if (!state.map || !window.google?.maps?.event) return;
+    try {
+      google.maps.event.trigger(state.map, 'resize');
+      if (state.activeId) {
+        const site = state.sites.find((s) => s.id === state.activeId);
+        if (site) state.map.panTo({ lat: site.lat, lng: site.lng });
+      } else {
+        resetView();
+      }
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
   document.addEventListener('jordan:content-ready', (event) => {
     state.sites = event.detail?.sites || [];
     renderFilters();
@@ -279,9 +294,16 @@
     initMap();
   });
 
+  document.addEventListener('jd:section-expanded', (event) => {
+    if (event.detail?.id === 'jdMap') {
+      requestAnimationFrame(() => setTimeout(refreshMapSize, 80));
+    }
+  });
+
   window.JordanMap = {
     focusSite,
     resetView,
-    getSites: () => state.sites
+    getSites: () => state.sites,
+    refreshMapSize
   };
 })();

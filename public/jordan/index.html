@@ -99,80 +99,144 @@
       </div>
     </section>
 
-    <div class="container">
-      <section class="jd-section" id="jdTimeline">
+    <div class="container jd-sections">
+      <section class="jd-section is-open" id="jdMap" data-jd-collapse data-jd-default-open="1">
         <div class="jd-section-head">
-          <h2 data-i18n="timelineHeading">Layers of Jordan</h2>
-          <p data-i18n="timelineLead">Ten eras from Neolithic Ain Ghazal to the modern kingdom. Select a layer to hear it and locate it on the map.</p>
+          <button type="button" class="jd-section-toggle" id="jdMapToggle" aria-expanded="true" aria-controls="jdMapPanel">
+            <span class="jd-section-toggle__copy">
+              <span class="jd-section-title" data-i18n="mapHeading">Atlas of Jordan</span>
+              <span class="jd-section-lead" data-i18n="mapLead">Each pin is a place you can visit. Select a site or name to hear its story.</span>
+            </span>
+            <i class="bi bi-chevron-down jd-section-chevron" aria-hidden="true"></i>
+          </button>
         </div>
-        <ol class="jd-era-list" id="jdEraList">
-          <li class="jd-loading" data-i18n="loading">Loading Jordan…</li>
-        </ol>
-      </section>
-
-      <section class="jd-section" id="jdMap">
-        <div class="jd-section-head">
-          <h2 data-i18n="mapHeading">Atlas of Jordan</h2>
-          <p data-i18n="mapLead">Each pin is a place you can visit. Select a site or name to hear its story.</p>
-        </div>
-        <div class="jd-map-filters" id="jdMapFilters" role="group" aria-label="Filter map pins">
-          <button type="button" class="jd-chip is-active" data-filter="all" data-i18n="mapAll">All</button>
-          <button type="button" class="jd-chip" data-filter="history" data-i18n="mapHistory">History</button>
-          <button type="button" class="jd-chip" data-filter="food" data-i18n="mapFood">Food</button>
-          <button type="button" class="jd-chip" data-filter="music" data-i18n="mapMusic">Music</button>
-          <button type="button" class="jd-chip" data-filter="hookah" data-i18n="mapHookah">Argileh</button>
-          <button type="button" class="jd-chip" data-filter="living" data-i18n="mapLiving">Living</button>
-        </div>
-        <div class="jd-map-layout">
-          <ul class="jd-site-list" id="jdSiteList"></ul>
-          <div class="jd-map-wrap">
-            <div id="jdMapCanvas" class="jd-map-canvas" role="img" aria-label="Map of historic sites in Jordan"></div>
-            <p class="jd-map-status" id="jdMapStatus" data-i18n="mapLoading">Loading the atlas…</p>
-            <button type="button" class="jd-btn jd-btn-ghost jd-btn-sm jd-map-reset" id="jdMapReset" hidden>
-              <i class="bi bi-arrow-clockwise"></i> <span data-i18n="mapReset">Show all pins</span>
-            </button>
+        <div class="jd-section-panel" id="jdMapPanel" role="region" aria-labelledby="jdMapToggle">
+          <div class="jd-map-filters" id="jdMapFilters" role="group" aria-label="Filter map pins">
+            <button type="button" class="jd-chip is-active" data-filter="all" data-i18n="mapAll">All</button>
+            <button type="button" class="jd-chip" data-filter="history" data-i18n="mapHistory">History</button>
+            <button type="button" class="jd-chip" data-filter="food" data-i18n="mapFood">Food</button>
+            <button type="button" class="jd-chip" data-filter="music" data-i18n="mapMusic">Music</button>
+            <button type="button" class="jd-chip" data-filter="hookah" data-i18n="mapHookah">Argileh</button>
+            <button type="button" class="jd-chip" data-filter="living" data-i18n="mapLiving">Living</button>
+          </div>
+          <div class="jd-map-layout">
+            <ul class="jd-site-list" id="jdSiteList"></ul>
+            <div class="jd-map-wrap">
+              <div id="jdMapCanvas" class="jd-map-canvas" role="img" aria-label="Map of historic sites in Jordan"></div>
+              <p class="jd-map-status" id="jdMapStatus" data-i18n="mapLoading">Loading the atlas…</p>
+              <button type="button" class="jd-btn jd-btn-ghost jd-btn-sm jd-map-reset" id="jdMapReset" hidden>
+                <i class="bi bi-arrow-clockwise"></i> <span data-i18n="mapReset">Show all pins</span>
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="jd-section" id="jdFood">
+      <section class="jd-section is-open" id="jdTimeline" data-jd-collapse data-jd-default-open="1">
         <div class="jd-section-head">
-          <h2 data-i18n="foodHeading">The Jordanian table</h2>
-          <p data-i18n="foodLead">Food here is a hospitality contract. Flip a plate for where it came from and what it means.</p>
+          <button type="button" class="jd-section-toggle" id="jdTimelineToggle" aria-expanded="true" aria-controls="jdTimelinePanel">
+            <span class="jd-section-toggle__copy">
+              <span class="jd-section-title" data-i18n="timelineHeading">Layers of Jordan</span>
+              <span class="jd-section-lead" data-i18n="timelineLead">Ten eras from Neolithic Ain Ghazal to the modern kingdom. Select a layer to hear it and locate it on the map.</span>
+            </span>
+            <i class="bi bi-chevron-down jd-section-chevron" aria-hidden="true"></i>
+          </button>
         </div>
-        <div class="jd-grid" id="jdFoodGrid"></div>
+        <div class="jd-section-panel" id="jdTimelinePanel" role="region" aria-labelledby="jdTimelineToggle">
+          <div class="jd-timeline-stage">
+            <div class="jd-timeline-3d" id="jdTimeline3d" aria-hidden="true"></div>
+            <div class="jd-calendar" aria-hidden="true">
+              <div class="jd-calendar__track">
+                <div class="jd-calendar__rail"></div>
+                <div class="jd-calendar__ticks" id="jdCalendarTicks"></div>
+                <div class="jd-calendar__now" id="jdCalendarNow" title="Present"></div>
+              </div>
+              <div class="jd-calendar__scale">
+                <span>BCE</span>
+                <span>CE</span>
+                <span>Now</span>
+              </div>
+            </div>
+          </div>
+          <ol class="jd-era-list" id="jdEraList">
+            <li class="jd-loading" data-i18n="loading">Loading Jordan…</li>
+          </ol>
+        </div>
       </section>
 
-      <section class="jd-section" id="jdMusic">
+      <section class="jd-section is-open" id="jdFood" data-jd-collapse data-jd-default-open="1">
         <div class="jd-section-head">
-          <h2 data-i18n="musicHeading">Sound of Jordan</h2>
-          <p data-i18n="musicLead">One string, two reeds, a line of dancers, and a stadium in Jerash. Flip a card for the history.</p>
+          <button type="button" class="jd-section-toggle" id="jdFoodToggle" aria-expanded="true" aria-controls="jdFoodPanel">
+            <span class="jd-section-toggle__copy">
+              <span class="jd-section-title" data-i18n="foodHeading">The Jordanian table</span>
+              <span class="jd-section-lead" data-i18n="foodLead">Food here is a hospitality contract. Flip a plate for where it came from and what it means.</span>
+            </span>
+            <i class="bi bi-chevron-down jd-section-chevron" aria-hidden="true"></i>
+          </button>
         </div>
-        <div class="jd-grid" id="jdMusicGrid"></div>
+        <div class="jd-section-panel" id="jdFoodPanel" role="region" aria-labelledby="jdFoodToggle">
+          <div class="jd-grid" id="jdFoodGrid"></div>
+        </div>
       </section>
 
-      <section class="jd-section" id="jdHookah">
+      <section class="jd-section is-open" id="jdMusic" data-jd-collapse data-jd-default-open="1">
         <div class="jd-section-head">
-          <h2 data-i18n="hookahHeading">Argileh — the café smoke</h2>
-          <p data-i18n="hookahLead">From antique brass nargileh to tonight’s Amman terrace — history, types, and flavors. Flip a card for the story — and the apple blend your neighbor already knows.</p>
+          <button type="button" class="jd-section-toggle" id="jdMusicToggle" aria-expanded="true" aria-controls="jdMusicPanel">
+            <span class="jd-section-toggle__copy">
+              <span class="jd-section-title" data-i18n="musicHeading">Sound of Jordan</span>
+              <span class="jd-section-lead" data-i18n="musicLead">One string, two reeds, a line of dancers, and a stadium in Jerash. Flip a card for the history.</span>
+            </span>
+            <i class="bi bi-chevron-down jd-section-chevron" aria-hidden="true"></i>
+          </button>
         </div>
-        <div class="jd-grid" id="jdHookahGrid"></div>
+        <div class="jd-section-panel" id="jdMusicPanel" role="region" aria-labelledby="jdMusicToggle">
+          <div class="jd-grid" id="jdMusicGrid"></div>
+        </div>
       </section>
 
-      <section class="jd-section" id="jdLiving">
+      <section class="jd-section is-open" id="jdHookah" data-jd-collapse data-jd-default-open="1">
         <div class="jd-section-head">
-          <h2 data-i18n="livingHeading">Living Jordan</h2>
-          <p data-i18n="livingLead">Bedouin roots, neighbor communities, the eastern badia, and crafts that still have hands on them. Flip a card for the story.</p>
+          <button type="button" class="jd-section-toggle" id="jdHookahToggle" aria-expanded="true" aria-controls="jdHookahPanel">
+            <span class="jd-section-toggle__copy">
+              <span class="jd-section-title" data-i18n="hookahHeading">Argileh — the café smoke</span>
+              <span class="jd-section-lead" data-i18n="hookahLead">From antique brass nargileh to tonight’s Amman terrace — history, types, and flavors. Flip a card for the story — and the apple blend your neighbor already knows.</span>
+            </span>
+            <i class="bi bi-chevron-down jd-section-chevron" aria-hidden="true"></i>
+          </button>
         </div>
-        <div class="jd-grid" id="jdLivingGrid"></div>
+        <div class="jd-section-panel" id="jdHookahPanel" role="region" aria-labelledby="jdHookahToggle">
+          <div class="jd-grid" id="jdHookahGrid"></div>
+        </div>
       </section>
 
-      <section class="jd-section" id="jdPhrases">
+      <section class="jd-section is-open" id="jdLiving" data-jd-collapse data-jd-default-open="1">
         <div class="jd-section-head">
-          <h2 data-i18n="phraseHeading">Speak Jordanian</h2>
-          <p data-i18n="phraseLead">Everyday Jordanian Arabic, spoken aloud. Press any phrase to hear it in Arabic.</p>
+          <button type="button" class="jd-section-toggle" id="jdLivingToggle" aria-expanded="true" aria-controls="jdLivingPanel">
+            <span class="jd-section-toggle__copy">
+              <span class="jd-section-title" data-i18n="livingHeading">Living Jordan</span>
+              <span class="jd-section-lead" data-i18n="livingLead">Bedouin roots, neighbor communities, the eastern badia, and crafts that still have hands on them. Flip a card for the story.</span>
+            </span>
+            <i class="bi bi-chevron-down jd-section-chevron" aria-hidden="true"></i>
+          </button>
         </div>
-        <ul class="jd-phrase-list" id="jdPhraseList"></ul>
+        <div class="jd-section-panel" id="jdLivingPanel" role="region" aria-labelledby="jdLivingToggle">
+          <div class="jd-grid" id="jdLivingGrid"></div>
+        </div>
+      </section>
+
+      <section class="jd-section is-open" id="jdPhrases" data-jd-collapse data-jd-default-open="1">
+        <div class="jd-section-head">
+          <button type="button" class="jd-section-toggle" id="jdPhrasesToggle" aria-expanded="true" aria-controls="jdPhrasesPanel">
+            <span class="jd-section-toggle__copy">
+              <span class="jd-section-title" data-i18n="phraseHeading">Speak Jordanian</span>
+              <span class="jd-section-lead" data-i18n="phraseLead">Everyday Jordanian Arabic, spoken aloud. Press any phrase to hear it in Arabic.</span>
+            </span>
+            <i class="bi bi-chevron-down jd-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="jd-section-panel" id="jdPhrasesPanel" role="region" aria-labelledby="jdPhrasesToggle">
+          <ul class="jd-phrase-list" id="jdPhraseList"></ul>
+        </div>
       </section>
 
       <p class="jd-footer-note">
@@ -212,11 +276,15 @@
   </div>
 
   <script src="/shared/tts.js"></script>
+  <script src="/shared/speech-recognition.js"></script>
   <script src="/family/js/lane-family-google-maps.js"></script>
   <script src="/shared/google-advanced-markers.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r160/three.min.js"></script>
   <script src="/jordan/js/jordan-i18n.js"></script>
+  <script src="/jordan/js/jordan-sections.js"></script>
   <script src="/jordan/js/jordan-content.js"></script>
   <script src="/jordan/js/jordan-desert-atmos.js"></script>
+  <script src="/jordan/js/jordan-timeline-3d.js"></script>
   <script src="/jordan/js/jordan-map.js"></script>
   <script src="/jordan/js/jordan-heygen.js"></script>
   <script src="/jordan/js/jordan-story-reel.js"></script>
