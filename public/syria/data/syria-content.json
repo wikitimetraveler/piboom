@@ -1,0 +1,2108 @@
+{
+  "id": "syria-atlas",
+  "brand": {
+    "name": {
+      "en": "Syria — Layers of the Levant",
+      "ar": "سوريا — طبقات الشام"
+    },
+    "tagline": {
+      "en": "Eleven thousand years of villages, alphabets, caravans and cities",
+      "ar": "أحد عشر ألف عام من القرى والأبجديات والقوافل والمدن"
+    }
+  },
+  "guide": {
+    "name": {
+      "en": "Niqula",
+      "ar": "نقولا"
+    },
+    "title": {
+      "en": "Syria history guide",
+      "ar": "دليل التاريخ السوري"
+    },
+    "portrait": "/syria/assets/niqula-guide-portrait-256.png",
+    "greeting": {
+      "en": "Ahlan wa sahlan — sit, and we will start at the beginning.",
+      "ar": "أهلاً وسهلاً — تفضّل، ونبدأ من البداية."
+    }
+  },
+  "ui": {
+    "en": {
+      "dir": "ltr",
+      "langLabel": "English",
+      "switchTo": "عربي",
+      "heroKicker": "The Syrian Arab Republic",
+      "heroTitle": "Syria",
+      "heroLine": "Where the alphabet was cut into clay and the caravan roads met the sea — Ebla and Ugarit, Zenobia's Palmyra, the Umayyad capital, and a table and a maqam still kept by hand.",
+      "playReel": "Play HyperFrame tour",
+      "pauseReel": "Pause tour",
+      "resumeReel": "Resume tour",
+      "stopReel": "Stop tour",
+      "narration": "Narration",
+      "narrationScope": "Entire page — atlas, tour, and cards",
+      "hearWelcome": "Hear welcome",
+      "askGuide": "Ask Niqula",
+      "stop": "Stop",
+      "listen": "Listen",
+      "exploreMap": "Explore the atlas",
+      "timelineHeading": "Layers of Syria",
+      "timelineLead": "From the first Euphrates villages to the republic. Select a layer to hear it and find it on the map.",
+      "timelineSelectHint": "Select an era on the timeline",
+      "mapHeading": "Atlas of Syria",
+      "mapLead": "Coast, steppe, and the two great cities. Select a pin or a name to hear its story.",
+      "mapAll": "All",
+      "mapHistory": "History",
+      "mapFood": "Food",
+      "mapMusic": "Music",
+      "mapLiving": "Living",
+      "mapReset": "Show all pins",
+      "mapLoading": "Loading the atlas…",
+      "foodHeading": "The Syrian table",
+      "foodLead": "Aleppo counts its kibbeh in dozens of shapes and Damascus answers with mezze. Flip a plate for its origin and meaning.",
+      "musicHeading": "Sound of Syria",
+      "musicLead": "An oud from a Damascus workshop, the qudud of Aleppo, a dhikr circle, and a wedding dabke in the Jazira. Flip a card for the history.",
+      "hookahHeading": "Argileh — the café smoke",
+      "hookahLead": "The nargileh sits where the storyteller reads, in the courtyard cafés off the Straight Street. History, types, and the two tobaccos.",
+      "livingHeading": "Living Syria",
+      "livingLead": "Courtyard houses, Aramaic still spoken in Maaloula, the communities of the Jazira and the Jabal, and crafts that still have hands on them.",
+      "phraseHeading": "Speak Syrian",
+      "phraseLead": "Everyday Syrian Levantine Arabic, spoken aloud. Press any phrase to hear it.",
+      "flipHint": "Flip for the history",
+      "playMusic": "Play music",
+      "stopMusic": "Stop music",
+      "back": "Back",
+      "loading": "Loading Syria…",
+      "readMore": "Read the full story",
+      "close": "Close",
+      "unesco": "UNESCO World Heritage",
+      "context": "Context",
+      "evidence": "On the ground",
+      "startTour": "HyperFrame tour",
+      "meetGuide": "Meet Niqula"
+    },
+    "ar": {
+      "dir": "rtl",
+      "langLabel": "العربية",
+      "switchTo": "English",
+      "heroKicker": "الجمهورية العربية السورية",
+      "heroTitle": "سوريا",
+      "heroLine": "هنا حُفرت الأبجدية في الطين والتقت دروب القوافل بالبحر — إيبلا وأوغاريت، تدمر زنوبيا، عاصمة الأمويين، ومائدة ومقام ما زالا يُصنعان باليد.",
+      "playReel": "شغّل الجولة",
+      "pauseReel": "إيقاف مؤقت",
+      "resumeReel": "متابعة الجولة",
+      "stopReel": "إنهاء الجولة",
+      "narration": "السرد الصوتي",
+      "narrationScope": "الصفحة كاملة — الأطلس والجولة والبطاقات",
+      "hearWelcome": "استمع للترحيب",
+      "askGuide": "اسأل نقولا",
+      "stop": "إيقاف",
+      "listen": "استمع",
+      "exploreMap": "استكشف الأطلس",
+      "timelineHeading": "طبقات سوريا",
+      "timelineLead": "من أولى قرى الفرات إلى الجمهورية. اختر طبقة لتسمعها وتجدها على الخريطة.",
+      "timelineSelectHint": "اختر حقبة من الخط الزمني",
+      "mapHeading": "أطلس سوريا",
+      "mapLead": "ساحل وبادية والمدينتان الكبيرتان. اختر علامة أو اسماً لتسمع حكايته.",
+      "mapAll": "الكل",
+      "mapHistory": "تاريخ",
+      "mapFood": "طعام",
+      "mapMusic": "موسيقى",
+      "mapLiving": "حياة",
+      "mapReset": "أظهر كل العلامات",
+      "mapLoading": "جارٍ تحميل الأطلس…",
+      "foodHeading": "المائدة السورية",
+      "foodLead": "حلب تعدّ كبّتها بعشرات الأشكال، ودمشق تردّ بالمازة. اقلب الطبق لتعرف أصله ومعناه.",
+      "musicHeading": "صوت سوريا",
+      "musicLead": "عود من ورشة دمشقية، وقدود حلبية، وحلقة ذكر، ودبكة عرس في الجزيرة. اقلب البطاقة لتقرأ الحكاية.",
+      "hookahHeading": "الأرجيلة — دخان المقهى",
+      "hookahLead": "النارجيلة حيث يقرأ الحكواتي، في مقاهي الفناء قرب الشارع المستقيم. التاريخ والأنواع والتبغان.",
+      "livingHeading": "سوريا الحيّة",
+      "livingLead": "بيوت بفناء، وآرامية ما زالت تُنطق في معلولا، ومجتمعات الجزيرة والجبل، وحِرَف ما زالت الأيدي عليها.",
+      "phraseHeading": "احكِ سوري",
+      "phraseLead": "عربية شامية يومية، منطوقة بصوت عالٍ. اضغط أي عبارة لتسمعها.",
+      "flipHint": "اقلب البطاقة للحكاية",
+      "playMusic": "شغّل المقطع",
+      "stopMusic": "أوقف المقطع",
+      "back": "رجوع",
+      "loading": "جارٍ تحميل سوريا…",
+      "readMore": "اقرأ الحكاية كاملة",
+      "close": "إغلاق",
+      "unesco": "تراث عالمي — اليونسكو",
+      "context": "السياق",
+      "evidence": "على الأرض",
+      "startTour": "جولة مصوّرة",
+      "meetGuide": "تعرّف على نقولا"
+    }
+  },
+  "eras": [
+    {
+      "id": "euphrates-villages",
+      "siteId": "deir-ez-zor-euphrates",
+      "yearCE": -9000,
+      "years": {
+        "en": "c. 11th–8th millennia BCE",
+        "ar": "نحو الألف الحادي عشر–الثامن ق.م"
+      },
+      "title": {
+        "en": "The first villages",
+        "ar": "أولى القرى"
+      },
+      "copy": {
+        "en": "On the middle Euphrates, hunters became farmers — and two dams later flooded the evidence.",
+        "ar": "على الفرات الأوسط صار الصيّادون مزارعين — ثم غمر سدّان الأدلّة."
+      },
+      "narration": {
+        "en": "Before cities, before writing, there were villages on the middle Euphrates. At Mureybet, Jerf el-Ahmar and Abu Hureyra people ground wild grain, then planted it. Much of what we know comes from salvage digs before the Tabqa and Tishrin dams flooded the valley.",
+        "ar": "قبل المدن وقبل الكتابة، كانت هناك قرى على الفرات الأوسط. في مريبط وجرف الأحمر وأبو هريرة طحن الناس الحبّ البرّي ثم زرعوه. وكثير مما نعرفه جاء من حفريات إنقاذ قبل أن يغمر سدّا الطبقة وتشرين الوادي."
+      },
+      "history": {
+        "en": "On the middle Euphrates, Mureybet, Jerf el-Ahmar and Tell Abu Hureyra together record the shift from foraging to farming between roughly the 11th and 8th millennia BCE, including the change from round houses to rectangular ones. Much of what we know comes from salvage excavations ahead of two dams: Tabqa, which flooded Abu Hureyra in 1974 and Mureybet in 1976, and Tishrin, which flooded Jerf el-Ahmar in 1999.",
+        "ar": "على الفرات الأوسط تسجّل مريبط وجرف الأحمر وتل أبو هريرة معاً الانتقال من الالتقاط إلى الزراعة بين نحو الألف الحادي عشر والثامن قبل الميلاد، بما في ذلك التحوّل من البيوت الدائرية إلى المستطيلة. وكثير مما نعرفه جاء من حفريات إنقاذ قبل سدّين: الطبقة الذي غمر أبو هريرة عام ١٩٧٤ ومريبط عام ١٩٧٦، وتشرين الذي غمر جرف الأحمر عام ١٩٩٩."
+      },
+      "image": "/syria/assets/era/euphrates-villages.jpg",
+      "photoId": "euphrates-villages"
+    },
+    {
+      "id": "ebla",
+      "siteId": "ebla",
+      "yearCE": -2400,
+      "years": {
+        "en": "c. 2400 BCE",
+        "ar": "نحو ٢٤٠٠ ق.م"
+      },
+      "title": {
+        "en": "Ebla and its archive",
+        "ar": "إيبلا وأرشيفها"
+      },
+      "copy": {
+        "en": "Seventeen thousand clay tablets from a palace archive — including the oldest bilingual word lists.",
+        "ar": "سبعة عشر ألف رُقيم طين من أرشيف قصر — منها أقدم قوائم الكلمات ثنائية اللغة."
+      },
+      "narration": {
+        "en": "Ebla was a trading kingdom south of Aleppo. Italian excavators, working there since 1964, recovered some seventeen thousand tablets from Palace G in the mid-nineteen-seventies — accounts, treaties, and bilingual word lists nobody had read for four thousand years.",
+        "ar": "كانت إيبلا مملكة تجارية جنوب حلب. انتشل المنقّبون الإيطاليون، العاملون هناك منذ ١٩٦٤، نحو سبعة عشر ألف رُقيم من القصر ج في منتصف السبعينيات — حسابات ومعاهدات وقوائم كلمات ثنائية اللغة لم يقرأها أحد منذ أربعة آلاف عام."
+      },
+      "history": {
+        "en": "Tell Mardikh was identified as Ebla in 1968. Italian excavators, working at the site since 1964, recovered some 17,000 cuneiform tablets and fragments from Palace G in 1974–76, dating to about 2400 BCE. Among them are bilingual Sumerian–Eblaite word lists, often called the oldest known dictionaries. The site was looted and heavily damaged by military occupation during the recent war.",
+        "ar": "عُرِّف تل مرديخ بأنه إيبلا عام ١٩٦٨. ومنذ ١٩٦٤ انتشل المنقّبون الإيطاليون نحو سبعة عشر ألف رُقيم وكسرة مسمارية من أرشيف القصر ج بين ١٩٧٤ و١٩٧٦، تعود إلى نحو ٢٤٠٠ ق.م. ومنها قوائم كلمات سومرية–إيبلاوية ثنائية اللغة تُوصف غالباً بأنها أقدم القواميس المعروفة. تضرّر الموقع وتعرّض للنهب والاحتلال العسكري خلال الحرب الأخيرة."
+      },
+      "image": "/syria/assets/era/ebla.jpg",
+      "photoId": "ebla"
+    },
+    {
+      "id": "mari",
+      "siteId": "mari",
+      "yearCE": -1800,
+      "years": {
+        "en": "c. 1800 BCE",
+        "ar": "نحو ١٨٠٠ ق.م"
+      },
+      "title": {
+        "en": "Mari on the river",
+        "ar": "ماري على النهر"
+      },
+      "copy": {
+        "en": "A palace of three hundred rooms, and the mail of a Bronze Age world.",
+        "ar": "قصر من ثلاثمئة غرفة، وبريد عالمٍ من العصر البرونزي."
+      },
+      "narration": {
+        "en": "Mari controlled river traffic where the Euphrates enters Syria. The palace of Zimri-Lim held tens of thousands of letters — about tin, about marriages, about prophets — until Hammurabi of Babylon destroyed the city.",
+        "ar": "تحكّمت ماري بحركة النهر حيث يدخل الفرات سوريا. ضمّ قصر زمري ليم عشرات آلاف الرسائل — عن القصدير والزيجات والأنبياء — إلى أن دمّر حمورابي البابلي المدينة."
+      },
+      "history": {
+        "en": "Excavated from 1933, Mari (Tell Hariri) yielded some 25,000 cuneiform tablets, most of them from the great palace in its final phase under Zimri-Lim. The letters range across tin routes, tribal politics, irrigation disputes and prophecy. Hammurabi of Babylon destroyed the city around 1761 BCE.",
+        "ar": "منذ حفريات ١٩٣٣ أخرج تل حريري — ماري — نحو خمسة وعشرين ألف رُقيم مسماري، معظمها من القصر العظيم في مرحلته الأخيرة تحت زمري ليم. وتتنقّل الرسائل بين طرق القصدير وسياسة القبائل ونزاعات الري والنبوءة. دمّر حمورابي البابلي المدينة نحو ١٧٦١ ق.م."
+      },
+      "image": "/syria/assets/era/mari.jpg",
+      "photoId": "mari"
+    },
+    {
+      "id": "ugarit",
+      "siteId": "ugarit",
+      "yearCE": -1350,
+      "years": {
+        "en": "c. 1400–1190 BCE",
+        "ar": "نحو ١٤٠٠–١١٩٠ ق.م"
+      },
+      "title": {
+        "en": "Ugarit cuts the alphabet",
+        "ar": "أوغاريت تنحت الأبجدية"
+      },
+      "copy": {
+        "en": "Thirty wedge signs — and the oldest surviving proof that an alphabet had an order.",
+        "ar": "ثلاثون علامة مسمارية — وأقدم دليل باقٍ على أن للأبجدية ترتيباً."
+      },
+      "narration": {
+        "en": "At Ras Shamra on the coast, scribes wrote with a cuneiform alphabet of about thirty signs. Their school tablets are the oldest surviving abecedaries anywhere — the earliest direct evidence of the alphabet recited in a fixed order, close to the one you know.",
+        "ar": "في رأس شمرا على الساحل كتب الكتبة بأبجدية مسمارية من نحو ثلاثين علامة. وألواح مدارسهم أقدم أبجديات باقية في أي مكان — أقدم دليل مباشر على أبجدية تُتلى بترتيب ثابت، قريب مما تعرفه."
+      },
+      "history": {
+        "en": "Ugarit was a wealthy port trading with Cyprus, Egypt and the Hittites. Its scribes wrote a Semitic language in a thirty-sign cuneiform alphabet. Their school tablets are the oldest surviving abecedaries — the earliest direct evidence of alphabetic order, the ancestor of alef-bet-gimel. The tablets also carry the Baal Cycle, the fullest Canaanite mythology we have. The city fell around 1190 BCE in the wider collapse that ended the Late Bronze Age. Older alphabetic writing exists in Sinai; what is unique here is the order.",
+        "ar": "كانت أوغاريت مرفأً غنياً يتاجر مع قبرص ومصر والحثيين. كتب كتبتها لغة سامية بأبجدية مسمارية من ثلاثين علامة. وألواح المدرسة أقدم أبجديات باقية — أقدم دليل مباشر على ترتيب أبجدي، سلف ألف باء جيم. وتحمل الرُقُم أيضاً ملحمة بعل، أوفى ميثولوجيا كنعانية وصلتنا. سقطت المدينة نحو ١١٩٠ ق.م في الانهيار الواسع الذي أنهى العصر البرونزي المتأخر. وكتابة أبجدية أقدم موجودة في سيناء؛ وما ينفرد به هذا الموقع هو الترتيب."
+      },
+      "image": "/syria/assets/era/ugarit.jpg",
+      "photoId": "ugarit"
+    },
+    {
+      "id": "aram-damascus",
+      "siteId": "damascus-old-city",
+      "yearCE": -900,
+      "years": {
+        "en": "c. 1000–730 BCE",
+        "ar": "نحو ١٠٠٠–٧٣٠ ق.م"
+      },
+      "title": {
+        "en": "Aram-Damascus",
+        "ar": "آرام دمشق"
+      },
+      "copy": {
+        "en": "Aramaean kings in Damascus — and a language that outlived them by a thousand years.",
+        "ar": "ملوك آراميون في دمشق — ولغة عمّرت بعدهم ألف سنة."
+      },
+      "narration": {
+        "en": "Aramaean kingdoms held the interior, with Damascus the strongest of them. Assyria eventually swallowed them all, and then adopted their language: Aramaic became the everyday speech of the whole Near East.",
+        "ar": "أمسكت الممالك الآرامية بالداخل، وكانت دمشق أقواها. ابتلعتها آشور جميعاً في النهاية، ثم تبنّت لغتها: صارت الآرامية لسان الشرق الأدنى اليومي."
+      },
+      "history": {
+        "en": "Aram-Damascus was the most powerful of the Aramaean kingdoms, especially under Hazael, until Tiglath-Pileser III took the city in 732 BCE. Aramaic outlived it, becoming the everyday and administrative language of one Near Eastern empire after another. Its western dialect still survives in Maaloula and two neighbouring villages, and Syriac endures in church liturgy.",
+        "ar": "كانت آرام دمشق أقوى الممالك الآرامية، ولا سيّما في عهد حزائيل، إلى أن أخذ تغلث فلاسر الثالث المدينة عام ٧٣٢ ق.م. وعاشت الآرامية بعدها فصارت لغة الحياة والإدارة في إمبراطوريات الشرق الأدنى المتعاقبة. وما زال لهجتها الغربية حيّة في معلولا وقريتين مجاورتين، والسريانية باقية في الطقس الكنسي."
+      },
+      "image": "/syria/assets/era/aram-damascus.jpg",
+      "photoId": "aram-damascus"
+    },
+    {
+      "id": "greek-roman",
+      "siteId": "apamea",
+      "yearCE": 100,
+      "years": {
+        "en": "300 BCE – 300 CE",
+        "ar": "٣٠٠ ق.م – ٣٠٠ م"
+      },
+      "title": {
+        "en": "Greek city, Roman province",
+        "ar": "مدينة يونانية، ولاية رومانية"
+      },
+      "copy": {
+        "en": "Colonnaded streets from Apamea to Bosra, and emperors born in Homs.",
+        "ar": "شوارع معمّدة من أفاميا إلى بصرى، وأباطرة من حمص."
+      },
+      "narration": {
+        "en": "The Seleucids founded Greek cities here; Rome inherited them. Apamea's colonnade runs for nearly two kilometres, Bosra's theatre is cut from black basalt, and the imperial family of Emesa put its own emperors on the Roman throne.",
+        "ar": "أسّس السلوقيون مدناً يونانية هنا، ثم ورثتها روما. يمتدّ شارع أفاميا المعمّد نحو كيلومترين، ومسرح بصرى منحوت من البازلت الأسود، ووضعت أسرة حمص الإمبراطورية أباطرتها على عرش روما."
+      },
+      "history": {
+        "en": "Seleucus I founded four great cities in the region — Antioch, Seleucia in Pieria, Laodicea (Latakia) and Apamea — and Pompey annexed Syria for Rome in 64 BCE. Bosra, capital of the province of Arabia, still has its black basalt theatre, seating an estimated 15,000. Apamea's colonnaded street runs for nearly two kilometres. The Severan emperors were tied to Emesa, modern Homs, through Julia Domna. Of the four Seleucid foundations, Apamea and Latakia lie in modern Syria; Antioch and Seleucia are in Turkey.",
+        "ar": "أسّس سلوقس الأول أربع مدن كبرى في المنطقة — أنطاكية وسلوقية بييريا واللاذقية وأفاميا — وضمّ بومبيوس سوريا لروما عام ٦٤ ق.م. وتحتفظ بصرى، عاصمة الولاية العربية، بمسرحها البازلتي الذي يُقدَّر أن يتسع لنحو خمسة عشر ألفاً. ويمتدّ شارع أفاميا المعمّد نحو كيلومترين. وارتبط الأباطرة السيفيريون بحمص عبر جوليا دومنا. ومن المدن الأربع تقع أفاميا واللاذقية في سوريا الحديثة، بينما أنطاكية وسلوقية في تركيا."
+      },
+      "image": "/syria/assets/era/greek-roman.jpg",
+      "photoId": "greek-roman"
+    },
+    {
+      "id": "palmyra",
+      "siteId": "palmyra",
+      "yearCE": 260,
+      "years": {
+        "en": "1st–3rd century CE",
+        "ar": "القرن الأول–الثالث الميلادي"
+      },
+      "title": {
+        "en": "Palmyra and Zenobia",
+        "ar": "تدمر وزنوبيا"
+      },
+      "copy": {
+        "en": "A caravan city in the steppe that briefly ruled from Egypt to Anatolia.",
+        "ar": "مدينة قوافل في البادية حكمت لبرهة من مصر إلى الأناضول."
+      },
+      "narration": {
+        "en": "Palmyra grew rich escorting caravans between the Mediterranean and the Gulf. In the 270s its queen, Zenobia, broke with Rome and took Egypt and much of Anatolia. Aurelian defeated her and took the city in 272, then sacked it the next year after it revolted.",
+        "ar": "اغتنت تدمر من حراسة القوافل بين المتوسط والخليج. وفي سبعينيات القرن الثالث انفصلت ملكتها زنوبيا عن روما وأخذت مصر وقسماً كبيراً من الأناضول. هزمها أورليان وأخذ المدينة عام ٢٧٢، ثم نهبها في العام التالي بعد أن ثارت."
+      },
+      "history": {
+        "en": "Palmyra's bilingual Greek and Palmyrene Aramaic inscriptions, tower tombs and Temple of Bel describe a merchant aristocracy that policed the desert route and taxed it under a published tariff. Odaenathus served Rome; his widow Zenobia went further. Aurelian defeated her and took Palmyra in 272 CE, and sacked the city in 273 after it revolted. The site is a UNESCO World Heritage property; ISIS held the ruins twice in 2015–2017 and destroyed the Temple of Bel, the Temple of Baalshamin, the monumental arch and several tower tombs, and murdered the retired chief of antiquities, Khaled al-Asaad.",
+        "ar": "تصف نقوش تدمر ثنائية اللغة، اليونانية والآرامية التدمرية، وقبورها البرجية ومعبد بل، أرستقراطية تجارية ضبطت طريق الصحراء وفرضت عليه تعرفة معلنة. خدم أذينة روما، ثم ذهبت أرملته زنوبيا أبعد من ذلك. هزمها أورليان وأخذ تدمر عام ٢٧٢ م، ونهب المدينة عام ٢٧٣ بعد أن ثارت. الموقع مدرج على لائحة التراث العالمي؛ سيطر تنظيم داعش على الأطلال مرتين بين ٢٠١٥ و٢٠١٧ فدمّر معبد بل ومعبد بعلشمين وقوس النصر وعدداً من القبور البرجية، وقتل مدير الآثار المتقاعد خالد الأسعد."
+      },
+      "image": "/syria/assets/era/palmyra.jpg",
+      "photoId": "palmyra"
+    },
+    {
+      "id": "byzantine-dead-cities",
+      "siteId": "dead-cities",
+      "yearCE": 480,
+      "years": {
+        "en": "4th–6th century CE",
+        "ar": "القرن الرابع–السادس الميلادي"
+      },
+      "title": {
+        "en": "The limestone villages",
+        "ar": "قرى الكتلة الكلسية"
+      },
+      "copy": {
+        "en": "Hundreds of stone villages, an olive-oil boom, and a man on a pillar.",
+        "ar": "مئات القرى الحجرية، وازدهار زيت الزيتون، ورجل فوق عمود."
+      },
+      "narration": {
+        "en": "Between Aleppo and Idlib stand hundreds of Byzantine villages, roofless but standing. They were not destroyed but slowly abandoned. Nearby, Simeon spent some four decades on top of a pillar and drew pilgrims from Britain to Persia.",
+        "ar": "بين حلب وإدلب تقوم مئات القرى البيزنطية، بلا سقوف لكنها واقفة. لم تُدمَّر بل هُجرت ببطء. وقربها أمضى سمعان نحو أربعة عقود فوق عمود واجتذب الحجّاج من بريطانيا إلى فارس."
+      },
+      "history": {
+        "en": "More than 700 Roman and Byzantine settlements survive on the limestone massif between Aleppo and Idlib, living on olive oil and wine. They were not destroyed but slowly abandoned between the 8th and 10th centuries. Forty of them, in eight archaeological parks, were inscribed by UNESCO in 2011 as the Ancient Villages of Northern Syria. At Qal'at Sim'an, a great cruciform church was built around the pillar on which Simeon Stylites spent some four decades.",
+        "ar": "بقيت أكثر من سبعمئة مستوطنة رومانية وبيزنطية على الكتلة الكلسية بين حلب وإدلب، تعيش من زيت الزيتون والنبيذ. لم تُدمَّر بل هُجرت ببطء بين القرنين الثامن والعاشر. وأُدرجت أربعون منها في ثمانية منتزهات أثرية على لائحة اليونسكو عام ٢٠١١ باسم قرى شمال سوريا القديمة. وعند قلعة سمعان بُنيت كنيسة مصلّبة ضخمة حول العمود الذي أمضى عليه سمعان العمودي نحو أربعة عقود."
+      },
+      "image": "/syria/assets/era/byzantine-dead-cities.jpg",
+      "photoId": "byzantine-dead-cities"
+    },
+    {
+      "id": "umayyad",
+      "siteId": "umayyad-mosque",
+      "yearCE": 700,
+      "years": {
+        "en": "661–750 CE",
+        "ar": "٦٦١–٧٥٠ م"
+      },
+      "title": {
+        "en": "Damascus, imperial capital",
+        "ar": "دمشق، عاصمة الخلافة"
+      },
+      "copy": {
+        "en": "For ninety years the largest empire on earth was run from this city.",
+        "ar": "طوال تسعين عاماً أُديرت أكبر إمبراطورية في الأرض من هذه المدينة."
+      },
+      "narration": {
+        "en": "Mu'awiya made Damascus the Umayyad capital, and from here the caliphate reached Spain in one direction and the Indus in the other. Al-Walid's Great Mosque, with its golden mosaics of a river paradise, is the monument that remains.",
+        "ar": "جعل معاوية دمشق عاصمة الأمويين، ومنها بلغت الخلافة الأندلس في جهة والسند في أخرى. والجامع الكبير الذي بناه الوليد، بفسيفسائه الذهبية لجنّة الأنهار، هو الأثر الباقي."
+      },
+      "history": {
+        "en": "Mu'awiya made Damascus his capital in 661. On a site that had held an Aramaean temple of Hadad, then a temple of Jupiter, then the cathedral of St John the Baptist, al-Walid I raised the Umayyad Mosque, finished around 715. The Umayyads shifted administration into Arabic and, under 'Abd al-Malik in 696, struck the first purely Arabic coinage. When the Abbasids took power in 750 the centre of the caliphate moved to Iraq, and Damascus became a provincial city.",
+        "ar": "جعل معاوية دمشق عاصمته عام ٦٦١. وعلى موقع كان معبداً آرامياً لحداد، ثم معبداً لجوبيتر، ثم كاتدرائية القديس يوحنا المعمدان، أقام الوليد الأول الجامع الأموي الذي اكتمل نحو ٧١٥. ونقل الأمويون الإدارة إلى العربية، وضرب عبد الملك عام ٦٩٦ أول نقد عربي خالص. وحين استلم العباسيون السلطة عام ٧٥٠ انتقل مركز الخلافة إلى العراق، فعادت دمشق مدينة ولاية."
+      },
+      "image": "/syria/assets/era/umayyad.jpg",
+      "photoId": "umayyad"
+    },
+    {
+      "id": "crusades-ayyubid",
+      "siteId": "krak-des-chevaliers",
+      "yearCE": 1180,
+      "years": {
+        "en": "1098–1516",
+        "ar": "١٠٩٨–١٥١٦"
+      },
+      "title": {
+        "en": "Castles, Saladin, Mamluks",
+        "ar": "القلاع وصلاح الدين والمماليك"
+      },
+      "copy": {
+        "en": "Frankish castles on the ridge, Nur al-Din and Saladin in the cities below.",
+        "ar": "قلاع إفرنجية على الجبل، ونور الدين وصلاح الدين في المدن تحتها."
+      },
+      "narration": {
+        "en": "The Crusader states built Krak des Chevaliers on the pass to the sea. Nur al-Din united Aleppo and Damascus, Saladin inherited the project, and the Mamluks who followed made both cities workshops of stone, glass and steel.",
+        "ar": "بنت الإمارات الصليبية قلعة الحصن على الممرّ إلى البحر. ووحّد نور الدين حلب ودمشق، وورث صلاح الدين المشروع، ثم جعل المماليك من المدينتين ورشاً للحجر والزجاج والفولاذ."
+      },
+      "history": {
+        "en": "The Knights Hospitaller held Krak des Chevaliers from 1142 until Baybars took it in 1271. Nur al-Din and Saladin endowed hospitals, madrasas and citadel works, and Mamluk Damascus exported inlaid brass and enamelled glass so admired that the city's name attached itself to damask cloth and to damascened steel. In March 1401 Timur sacked the city and marched its craftsmen east to Samarkand.",
+        "ar": "احتلّ فرسان الإسبتارية قلعة الحصن منذ ١١٤٢ إلى أن أخذها بيبرس عام ١٢٧١. وأوقف نور الدين وصلاح الدين البيمارستانات والمدارس وأعمال القلاع، وصدّرت دمشق المملوكية النحاس المطعّم والزجاج المموّه إلى حدّ أن اسم المدينة التصق بقماش الدمقس وبفولاذ دمشق. وفي آذار ١٤٠١ نهب تيمورلنك المدينة وساق صنّاعها شرقاً إلى سمرقند."
+      },
+      "image": "/syria/assets/era/crusades-ayyubid.jpg",
+      "photoId": "crusades-ayyubid"
+    },
+    {
+      "id": "ottoman",
+      "siteId": "aleppo-souq",
+      "yearCE": 1650,
+      "years": {
+        "en": "1516–1918",
+        "ar": "١٥١٦–١٩١٨"
+      },
+      "title": {
+        "en": "Ottoman centuries",
+        "ar": "القرون العثمانية"
+      },
+      "copy": {
+        "en": "Aleppo trades with Venice and London; Damascus assembles the Hajj.",
+        "ar": "حلب تتاجر مع البندقية ولندن، ودمشق تجمع قافلة الحج."
+      },
+      "narration": {
+        "en": "For four centuries Aleppo was the empire's great commercial city, with khans for Venetian, French and English merchants. Damascus organised the annual pilgrimage caravan, and at the end of the period the Hejaz Railway replaced the camels.",
+        "ar": "طوال أربعة قرون كانت حلب مدينة الإمبراطورية التجارية الكبرى، بخاناتها لتجار البندقية وفرنسا وإنكلترا. ونظّمت دمشق قافلة الحج السنوية، وفي أواخر العهد حلّ الخط الحديدي الحجازي محلّ الجِمال."
+      },
+      "history": {
+        "en": "Selim I took Syria in 1516. Aleppo's covered souq, some thirteen kilometres of lanes, was ringed with great caravanserais — Khan al-Jumruk, Khan al-Wazir — where European consuls and merchants lodged their goods. Damascus was where the Hajj caravan assembled each year, and in 1908 the Hejaz Railway reached Medina.",
+        "ar": "أخذ سليم الأول سوريا عام ١٥١٦. وكان سوق حلب المسقوف، نحو ثلاثة عشر كيلومتراً من الأزقّة، محاطاً بخانات كبرى — خان الجمرك وخان الوزير — يودع فيها القناصل والتجّار الأوروبيون بضائعهم. وكانت دمشق نقطة تجمّع قافلة الحج كل عام، وفي ١٩٠٨ وصل الخط الحجازي إلى المدينة."
+      },
+      "image": "/syria/assets/era/ottoman.jpg",
+      "photoId": "ottoman"
+    },
+    {
+      "id": "mandate-independence",
+      "siteId": "suwayda-jabal",
+      "yearCE": 1946,
+      "years": {
+        "en": "1920–1946",
+        "ar": "١٩٢٠–١٩٤٦"
+      },
+      "title": {
+        "en": "Mandate and independence",
+        "ar": "الانتداب والاستقلال"
+      },
+      "copy": {
+        "en": "A French mandate, a general revolt, and the last soldier leaving in 1946.",
+        "ar": "انتداب فرنسي، وثورة عامة، وآخر جندي يغادر عام ١٩٤٦."
+      },
+      "narration": {
+        "en": "France governed Syria under a League of Nations mandate from 1920. The Great Syrian Revolt began in the Jabal in 1925 and spread to Damascus. Independence was recognised in 1946, and the seventeenth of April is still Evacuation Day.",
+        "ar": "حكمت فرنسا سوريا بانتداب من عصبة الأمم منذ ١٩٢٠. بدأت الثورة السورية الكبرى في الجبل عام ١٩٢٥ وامتدّت إلى دمشق. واعتُرف بالاستقلال عام ١٩٤٦، وما زال السابع عشر من نيسان عيد الجلاء."
+      },
+      "history": {
+        "en": "After the brief Arab Kingdom of Syria was defeated at Maysalun in 1920, France divided the territory into statelets and faced continuous resistance. The Great Syrian Revolt of 1925–27, led from Jabal al-Arab by Sultan al-Atrash, drew in Damascus and the Ghouta and was suppressed with the shelling of the capital. The last French troops left on 17 April 1946, the date Syria still marks as Evacuation Day.",
+        "ar": "بعد هزيمة المملكة السورية العربية القصيرة في ميسلون عام ١٩٢٠، قسّمت فرنسا البلاد إلى دويلات وواجهت مقاومة متصلة. اجتذبت الثورة السورية الكبرى ١٩٢٥–١٩٢٧، بقيادة سلطان الأطرش من جبل العرب، دمشق والغوطة، وقُمعت بقصف العاصمة. غادرت آخر القوات الفرنسية في ١٧ نيسان ١٩٤٦، وهو التاريخ الذي ما زالت سوريا تحييه عيداً للجلاء."
+      },
+      "image": "/syria/assets/era/mandate-independence.jpg",
+      "photoId": "mandate-independence"
+    },
+    {
+      "id": "republic",
+      "siteId": "damascus-old-city",
+      "yearCE": 2011,
+      "years": {
+        "en": "1946 — today",
+        "ar": "١٩٤٦ — اليوم"
+      },
+      "title": {
+        "en": "The republic, war, and after",
+        "ar": "الجمهورية والحرب وما بعدها"
+      },
+      "copy": {
+        "en": "Coups, one long presidency, a war that drove half the country from home, and a transition.",
+        "ar": "انقلابات، ورئاسة طويلة، وحرب أخرجت نصف البلاد من بيوتها، ثم مرحلة انتقالية."
+      },
+      "narration": {
+        "en": "The republic's first decades were unstable, followed by decades of Ba'ath and Assad rule. The war that began in 2011 killed hundreds of thousands and drove more than half the population from their homes. All six of Syria's World Heritage sites were placed on the List of World Heritage in Danger in 2013; Aleppo and Palmyra were the worst hit. The Assad government fell in December 2024, and a transitional constitutional framework followed.",
+        "ar": "كانت عقود الجمهورية الأولى مضطربة، ثم تلتها عقود من حكم البعث والأسد. وقتلت الحرب التي بدأت عام ٢٠١١ مئات الآلاف وأخرجت أكثر من نصف السكان من بيوتهم. ووُضعت مواقع التراث العالمي السورية الستة كلها على قائمة الخطر عام ٢٠١٣؛ وكانت حلب وتدمر الأشدّ تضرّراً. سقطت حكومة الأسد في كانون الأول ٢٠٢٤، وتلاها إطار دستوري انتقالي."
+      },
+      "history": {
+        "en": "Syria left its union with Egypt in 1961; the Ba'ath Party took power in 1963; Hafez al-Assad ruled from 1970 and his son Bashar from 2000. The war that began in 2011 killed hundreds of thousands and drove more than half the country's people from their homes. All six of Syria's UNESCO World Heritage sites were placed on the List of World Heritage in Danger in 2013 and remain there; Aleppo and Palmyra were the worst hit. The Assad government fell in December 2024. Since then Syria has been governed under a transitional constitutional framework, with a new permanent constitution and national elections still to come. This page describes rather than takes sides.",
+        "ar": "خرجت سوريا من الوحدة مع مصر عام ١٩٦١، واستلم حزب البعث السلطة عام ١٩٦٣؛ وحكم حافظ الأسد منذ ١٩٧٠ وخلفه ابنه بشار عام ٢٠٠٠. وقتلت الحرب التي بدأت عام ٢٠١١ مئات الآلاف وأخرجت أكثر من نصف أهل البلاد من بيوتهم. ووُضعت مواقع التراث العالمي السورية الستة على قائمة الخطر عام ٢٠١٣ وما زالت عليها؛ وكانت حلب وتدمر الأشدّ تضرّراً. سقطت حكومة الأسد في كانون الأول ٢٠٢٤. ومنذ ذلك الحين تُحكم سوريا في إطار دستوري انتقالي، ودستور دائم وانتخابات وطنية ما زالا أمامها. وهذه الصفحة تصف ولا تنحاز."
+      },
+      "image": "/syria/assets/era/republic.jpg",
+      "photoId": "republic"
+    }
+  ],
+  "sites": [
+    {
+      "id": "damascus-old-city",
+      "category": "history",
+      "emoji": "🕌",
+      "lat": 33.5111,
+      "lng": 36.3064,
+      "unesco": true,
+      "name": {
+        "en": "Old City of Damascus",
+        "ar": "دمشق القديمة"
+      },
+      "place": {
+        "en": "Damascus",
+        "ar": "دمشق"
+      },
+      "blurb": {
+        "en": "Walled city on a Roman grid, with the Straight Street still running east to west. One of the longest continuously inhabited cities in the world.",
+        "ar": "مدينة مسوّرة على تخطيط روماني، وما زال الشارع المستقيم يمتدّ من الشرق إلى الغرب. من أطول مدن العالم سكناً متّصلاً."
+      },
+      "image": "/syria/assets/site/damascus-old-city.jpg",
+      "photoId": "damascus-old-city"
+    },
+    {
+      "id": "umayyad-mosque",
+      "category": "history",
+      "emoji": "🕌",
+      "lat": 33.5117,
+      "lng": 36.3067,
+      "unesco": true,
+      "name": {
+        "en": "Umayyad Mosque",
+        "ar": "الجامع الأموي"
+      },
+      "place": {
+        "en": "Damascus",
+        "ar": "دمشق"
+      },
+      "blurb": {
+        "en": "Finished around 715 CE over a temple and a cathedral. Its courtyard mosaics show a paradise of rivers and houses in gold.",
+        "ar": "اكتمل نحو ٧١٥ م فوق معبد وكاتدرائية. تُظهر فسيفساء صحنه جنّة من أنهار وبيوت بالذهب."
+      },
+      "image": "/syria/assets/site/umayyad-mosque.jpg",
+      "photoId": "umayyad-mosque"
+    },
+    {
+      "id": "souq-al-hamidiyah",
+      "category": "food",
+      "emoji": "🍦",
+      "lat": 33.5119,
+      "lng": 36.304,
+      "name": {
+        "en": "Souq al-Hamidiyah",
+        "ar": "سوق الحميدية"
+      },
+      "place": {
+        "en": "Damascus",
+        "ar": "دمشق"
+      },
+      "blurb": {
+        "en": "Iron-roofed market pierced by bullet holes that let the light in. At the end, Bakdash has pounded stretchy ice cream since the late nineteenth century.",
+        "ar": "سوق بسقف حديدي مثقوب برصاص يدخل منه الضوء. وفي آخره يدقّ بكداش بوظته المطّاطة منذ أواخر القرن التاسع عشر."
+      },
+      "image": "/syria/assets/site/souq-al-hamidiyah.jpg",
+      "photoId": "souq-al-hamidiyah"
+    },
+    {
+      "id": "nawfara-cafe",
+      "category": "living",
+      "emoji": "☕",
+      "lat": 33.5122,
+      "lng": 36.3071,
+      "name": {
+        "en": "Al-Nawfara café",
+        "ar": "مقهى النوفرة"
+      },
+      "place": {
+        "en": "Damascus",
+        "ar": "دمشق"
+      },
+      "blurb": {
+        "en": "Behind the mosque, on the steps: tea, argileh, and the hakawati who reads the epic of Baybars aloud, chapter by chapter.",
+        "ar": "خلف الجامع على الدرج: شاي وأرجيلة، وحكواتي يقرأ سيرة الظاهر بيبرس بصوت عالٍ، فصلاً بعد فصل."
+      },
+      "image": "/syria/assets/site/nawfara-cafe.jpg",
+      "photoId": "nawfara-cafe"
+    },
+    {
+      "id": "maaloula",
+      "category": "living",
+      "emoji": "⛰️",
+      "lat": 33.8464,
+      "lng": 36.545,
+      "name": {
+        "en": "Maaloula",
+        "ar": "معلولا"
+      },
+      "place": {
+        "en": "Rif Dimashq",
+        "ar": "ريف دمشق"
+      },
+      "blurb": {
+        "en": "A village in a cleft of the Qalamoun where Western Neo-Aramaic is still spoken — a late descendant of the language of the region.",
+        "ar": "قرية في شقّ من القلمون ما زالت تُنطق فيها الآرامية الغربية الحديثة — سليلة متأخرة للغة المنطقة."
+      },
+      "image": "/syria/assets/site/maaloula.jpg",
+      "photoId": "maaloula"
+    },
+    {
+      "id": "aleppo-citadel",
+      "category": "history",
+      "emoji": "🏰",
+      "lat": 36.1996,
+      "lng": 37.162,
+      "unesco": true,
+      "name": {
+        "en": "Citadel of Aleppo",
+        "ar": "قلعة حلب"
+      },
+      "place": {
+        "en": "Aleppo",
+        "ar": "حلب"
+      },
+      "blurb": {
+        "en": "A fortified mound used since the third millennium BCE, given its Ayyubid gate and glacis under Saladin's son al-Zahir Ghazi.",
+        "ar": "تلّ محصّن مستعمل منذ الألف الثالث ق.م، ونال بوابته الأيوبية ومنحدره في عهد الظاهر غازي بن صلاح الدين."
+      },
+      "image": "/syria/assets/site/aleppo-citadel.jpg",
+      "photoId": "aleppo-citadel"
+    },
+    {
+      "id": "aleppo-souq",
+      "category": "food",
+      "emoji": "🧺",
+      "lat": 36.199,
+      "lng": 37.156,
+      "unesco": true,
+      "name": {
+        "en": "Souq al-Madina",
+        "ar": "سوق المدينة"
+      },
+      "place": {
+        "en": "Aleppo",
+        "ar": "حلب"
+      },
+      "blurb": {
+        "en": "Kilometres of vaulted lanes and Ottoman khans — soap, pepper, pistachio and cloth. Burned in 2012 and being rebuilt section by section.",
+        "ar": "كيلومترات من الأزقّة المقبّبة والخانات العثمانية — صابون وفلفل وفستق وقماش. احترق عام ٢٠١٢ ويُعاد بناؤه قسماً بعد قسم."
+      },
+      "image": "/syria/assets/site/aleppo-souq.jpg",
+      "photoId": "aleppo-souq"
+    },
+    {
+      "id": "aleppo-tarab",
+      "category": "music",
+      "emoji": "🎶",
+      "lat": 36.202,
+      "lng": 37.16,
+      "name": {
+        "en": "Aleppo, city of tarab",
+        "ar": "حلب مدينة الطرب"
+      },
+      "place": {
+        "en": "Aleppo",
+        "ar": "حلب"
+      },
+      "blurb": {
+        "en": "Home of the qudud halabiya and of listening rooms where an audience knows the maqam and answers the singer.",
+        "ar": "موطن القدود الحلبية وقاعات سماع يعرف جمهورها المقام ويردّ على المطرب."
+      },
+      "image": "/syria/assets/site/aleppo-tarab.jpg",
+      "photoId": "aleppo-tarab"
+    },
+    {
+      "id": "palmyra",
+      "category": "history",
+      "emoji": "🏛️",
+      "lat": 34.5527,
+      "lng": 38.2739,
+      "unesco": true,
+      "name": {
+        "en": "Palmyra",
+        "ar": "تدمر"
+      },
+      "place": {
+        "en": "Homs Governorate",
+        "ar": "محافظة حمص"
+      },
+      "blurb": {
+        "en": "Zenobia's caravan city in the steppe. Colonnade, theatre and tower tombs; the Temple of Bel was destroyed in 2015.",
+        "ar": "مدينة زنوبيا القوافلية في البادية. شارع معمّد ومسرح وقبور برجية؛ ودُمّر معبد بل عام ٢٠١٥."
+      },
+      "image": "/syria/assets/site/palmyra-site.jpg",
+      "photoId": "palmyra-site"
+    },
+    {
+      "id": "krak-des-chevaliers",
+      "category": "history",
+      "emoji": "🛡️",
+      "lat": 34.7569,
+      "lng": 36.2947,
+      "unesco": true,
+      "name": {
+        "en": "Krak des Chevaliers",
+        "ar": "قلعة الحصن"
+      },
+      "place": {
+        "en": "Homs Governorate",
+        "ar": "محافظة حمص"
+      },
+      "blurb": {
+        "en": "Hospitaller castle guarding the Homs Gap, with concentric walls and a vaulted Gothic hall. Taken by Baybars in 1271.",
+        "ar": "قلعة إسبتارية تحرس فتحة حمص، بأسوار متراكزة وقاعة قوطية مقبّبة. أخذها بيبرس عام ١٢٧١."
+      },
+      "image": "/syria/assets/site/krak-des-chevaliers.jpg",
+      "photoId": "krak-des-chevaliers"
+    },
+    {
+      "id": "bosra",
+      "category": "history",
+      "emoji": "🎭",
+      "lat": 32.5186,
+      "lng": 36.4817,
+      "unesco": true,
+      "name": {
+        "en": "Bosra",
+        "ar": "بصرى"
+      },
+      "place": {
+        "en": "Daraa Governorate",
+        "ar": "محافظة درعا"
+      },
+      "blurb": {
+        "en": "Capital of Roman Arabia, built in black basalt, with a theatre for fifteen thousand later wrapped inside a fortress.",
+        "ar": "عاصمة الولاية العربية الرومانية، مبنية بالبازلت الأسود، ومسرحها لخمسة عشر ألفاً لُفّ لاحقاً داخل قلعة."
+      },
+      "image": "/syria/assets/site/bosra.jpg",
+      "photoId": "bosra"
+    },
+    {
+      "id": "apamea",
+      "category": "history",
+      "emoji": "🏛️",
+      "lat": 35.4181,
+      "lng": 36.3969,
+      "name": {
+        "en": "Apamea",
+        "ar": "أفاميا"
+      },
+      "place": {
+        "en": "Hama Governorate",
+        "ar": "محافظة حماة"
+      },
+      "blurb": {
+        "en": "A Seleucid foundation whose colonnaded main street runs for almost two kilometres above the Ghab plain.",
+        "ar": "مدينة سلوقية يمتدّ شارعها المعمّد نحو كيلومترين فوق سهل الغاب."
+      },
+      "image": "/syria/assets/site/apamea.jpg",
+      "photoId": "apamea"
+    },
+    {
+      "id": "ugarit",
+      "category": "history",
+      "emoji": "🔤",
+      "lat": 35.6019,
+      "lng": 35.7822,
+      "name": {
+        "en": "Ugarit (Ras Shamra)",
+        "ar": "أوغاريت (رأس شمرا)"
+      },
+      "place": {
+        "en": "Latakia Governorate",
+        "ar": "محافظة اللاذقية"
+      },
+      "blurb": {
+        "en": "Bronze Age port where scribes reduced cuneiform to a thirty-sign alphabet and wrote down the Baal Cycle.",
+        "ar": "مرفأ من العصر البرونزي اختصر كتبته المسمارية إلى أبجدية من ثلاثين علامة ودوّنوا ملحمة بعل."
+      },
+      "image": "/syria/assets/site/ugarit-site.jpg",
+      "photoId": "ugarit-site"
+    },
+    {
+      "id": "ebla",
+      "category": "history",
+      "emoji": "📜",
+      "lat": 35.7986,
+      "lng": 36.7986,
+      "name": {
+        "en": "Ebla (Tell Mardikh)",
+        "ar": "إيبلا (تل مرديخ)"
+      },
+      "place": {
+        "en": "Idlib Governorate",
+        "ar": "محافظة إدلب"
+      },
+      "blurb": {
+        "en": "Third-millennium kingdom whose burned palace preserved seventeen thousand cuneiform tablets, including the oldest bilingual word lists.",
+        "ar": "مملكة من الألف الثالث حفظ قصرها المحترق سبعة عشر ألف رُقيم مسماري، منها أقدم قوائم الكلمات ثنائية اللغة."
+      },
+      "image": "/syria/assets/site/ebla-site.jpg",
+      "photoId": "ebla-site"
+    },
+    {
+      "id": "mari",
+      "category": "history",
+      "emoji": "🏺",
+      "lat": 34.5486,
+      "lng": 40.8897,
+      "name": {
+        "en": "Mari (Tell Hariri)",
+        "ar": "ماري (تل حريري)"
+      },
+      "place": {
+        "en": "Deir ez-Zor Governorate",
+        "ar": "محافظة دير الزور"
+      },
+      "blurb": {
+        "en": "Euphrates city whose royal palace held twenty-five thousand letters — the richest correspondence of the Bronze Age.",
+        "ar": "مدينة على الفرات ضمّ قصرها الملكي خمسة وعشرين ألف رسالة — أغنى مراسلات العصر البرونزي."
+      },
+      "image": "/syria/assets/site/mari-site.jpg",
+      "photoId": "mari-site"
+    },
+    {
+      "id": "dead-cities",
+      "category": "history",
+      "emoji": "🪨",
+      "lat": 35.5578,
+      "lng": 36.5628,
+      "unesco": true,
+      "name": {
+        "en": "Serjilla and the Dead Cities",
+        "ar": "سرجيلا والمدن المنسية"
+      },
+      "place": {
+        "en": "Idlib Governorate",
+        "ar": "محافظة إدلب"
+      },
+      "blurb": {
+        "en": "Byzantine olive-oil villages abandoned rather than destroyed — houses, baths and presses still standing without roofs.",
+        "ar": "قرى بيزنطية لزيت الزيتون هُجرت ولم تُدمَّر — بيوت وحمّامات ومعاصر ما زالت قائمة بلا سقوف."
+      },
+      "image": "/syria/assets/site/dead-cities.jpg",
+      "photoId": "dead-cities"
+    },
+    {
+      "id": "saint-simeon",
+      "category": "history",
+      "emoji": "⛪",
+      "lat": 36.3342,
+      "lng": 36.8442,
+      "unesco": true,
+      "name": {
+        "en": "Qal'at Sim'an",
+        "ar": "قلعة سمعان"
+      },
+      "place": {
+        "en": "Aleppo Governorate",
+        "ar": "محافظة حلب"
+      },
+      "blurb": {
+        "en": "A vast cruciform basilica built around the pillar where Simeon Stylites stood for thirty-seven years.",
+        "ar": "كنيسة مصلّبة ضخمة بُنيت حول العمود الذي وقف عليه سمعان العمودي سبعاً وثلاثين سنة."
+      },
+      "image": "/syria/assets/site/saint-simeon.jpg",
+      "photoId": "saint-simeon"
+    },
+    {
+      "id": "hama-norias",
+      "category": "music",
+      "emoji": "🎡",
+      "lat": 35.1318,
+      "lng": 36.7578,
+      "name": {
+        "en": "Norias of Hama",
+        "ar": "نواعير حماة"
+      },
+      "place": {
+        "en": "Hama",
+        "ar": "حماة"
+      },
+      "blurb": {
+        "en": "Wooden waterwheels up to twenty metres across, lifting the Orontes into aqueducts — and groaning as they turn.",
+        "ar": "دواليب خشبية يبلغ قطرها عشرين متراً، ترفع العاصي إلى القنوات — وتئنّ وهي تدور."
+      },
+      "image": "/syria/assets/site/hama-norias.jpg",
+      "photoId": "hama-norias"
+    },
+    {
+      "id": "damascus-oud",
+      "category": "music",
+      "emoji": "🪕",
+      "lat": 33.5095,
+      "lng": 36.305,
+      "name": {
+        "en": "Damascus oud workshops",
+        "ar": "ورش العود الدمشقية"
+      },
+      "place": {
+        "en": "Damascus",
+        "ar": "دمشق"
+      },
+      "blurb": {
+        "en": "The Nahat family and their successors made the instruments that set the standard for the Arab oud.",
+        "ar": "صنعت أسرة نحّات ومن بعدها الآلات التي وضعت معيار العود العربي."
+      },
+      "image": "/syria/assets/site/damascus-oud.jpg",
+      "photoId": "damascus-oud"
+    },
+    {
+      "id": "latakia-coast",
+      "category": "food",
+      "emoji": "🐟",
+      "lat": 35.5236,
+      "lng": 35.7917,
+      "name": {
+        "en": "The Latakia coast",
+        "ar": "ساحل اللاذقية"
+      },
+      "place": {
+        "en": "Latakia",
+        "ar": "اللاذقية"
+      },
+      "blurb": {
+        "en": "Citrus, olives and tobacco on the slopes; grilled fish, sayadieh rice and lemon on the shore.",
+        "ar": "حمضيات وزيتون وتبغ على السفوح؛ وسمك مشوي وصيادية وليمون على الشاطئ."
+      },
+      "image": "/syria/assets/site/latakia-coast.jpg",
+      "photoId": "latakia-coast"
+    },
+    {
+      "id": "suwayda-jabal",
+      "category": "living",
+      "emoji": "🧉",
+      "lat": 32.7089,
+      "lng": 36.5695,
+      "name": {
+        "en": "Jabal al-Arab",
+        "ar": "جبل العرب"
+      },
+      "place": {
+        "en": "As-Suwayda",
+        "ar": "السويداء"
+      },
+      "blurb": {
+        "en": "Basalt villages and vineyards, the heartland of the Druze community — and the place where mate is drunk all day.",
+        "ar": "قرى بازلتية وكروم، قلب المجتمع الدرزي — والمكان الذي يُشرب فيه المتّة طوال اليوم."
+      },
+      "image": "/syria/assets/site/suwayda-jabal.jpg",
+      "photoId": "suwayda-jabal"
+    },
+    {
+      "id": "deir-ez-zor-euphrates",
+      "category": "living",
+      "emoji": "🌾",
+      "lat": 35.3359,
+      "lng": 40.1408,
+      "name": {
+        "en": "The Euphrates at Deir ez-Zor",
+        "ar": "الفرات عند دير الزور"
+      },
+      "place": {
+        "en": "Deir ez-Zor",
+        "ar": "دير الزور"
+      },
+      "blurb": {
+        "en": "Irrigated fields, a famous suspension footbridge, and the river road that carried farming into the world.",
+        "ar": "حقول مروية، وجسر معلّق شهير، وطريق النهر الذي حمل الزراعة إلى العالم."
+      },
+      "image": "/syria/assets/site/deir-ez-zor-euphrates.jpg",
+      "photoId": "deir-ez-zor-euphrates"
+    },
+    {
+      "id": "qamishli-jazira",
+      "category": "living",
+      "emoji": "🌱",
+      "lat": 37.0521,
+      "lng": 41.2313,
+      "name": {
+        "en": "Qamishli and the Jazira",
+        "ar": "القامشلي والجزيرة"
+      },
+      "place": {
+        "en": "Al-Hasakah Governorate",
+        "ar": "محافظة الحسكة"
+      },
+      "blurb": {
+        "en": "Wheat plain in the northeast where Kurdish, Arabic, Syriac and Armenian are all everyday languages.",
+        "ar": "سهل قمح في الشمال الشرقي تُستعمل فيه الكردية والعربية والسريانية والأرمنية لغاتٍ يومية."
+      },
+      "image": "/syria/assets/site/qamishli-jazira.jpg",
+      "photoId": "qamishli-jazira"
+    }
+  ],
+  "foods": [
+    {
+      "id": "kibbeh",
+      "emoji": "🥟",
+      "siteId": "aleppo-souq",
+      "name": {
+        "en": "Kibbeh",
+        "ar": "الكبّة"
+      },
+      "tagline": {
+        "en": "Bulgur and lamb, in dozens of shapes",
+        "ar": "برغل ولحم، بعشرات الأشكال"
+      },
+      "history": {
+        "en": "Kibbeh is a whole family of dishes — fried torpedoes, tray-baked layers, kibbeh labaniyeh in yogurt, safarjaliyeh with quince, and raw kibbeh nayyeh. Aleppo cooks name dozens of varieties; the city was once called \"the city of 1001 kibbeh.\" Kibbeh is shared across Lebanon, Iraq and southern Turkey, where it is içli köfte.",
+        "ar": "الكبّة عائلة أطباق كاملة — أقراص مقليّة وطبقات في الصينية وكبّة لبنية وكبّة سفرجليّة ونيّئة. يعدّد طبّاخو حلب عشرات الأنواع؛ وقد لُقّبت المدينة يوماً بـ«مدينة الألف كبّة وواحدة». وهي مشتركة مع لبنان والعراق وجنوب تركيا حيث تُسمّى إشلي كفتة."
+      },
+      "tags": {
+        "en": [
+          "Aleppo",
+          "bulgur",
+          "lamb"
+        ],
+        "ar": [
+          "حلب",
+          "برغل",
+          "لحم"
+        ]
+      },
+      "image": "/syria/assets/food/kibbeh.jpg",
+      "photoId": "kibbeh"
+    },
+    {
+      "id": "muhammara",
+      "emoji": "🌶️",
+      "siteId": "aleppo-souq",
+      "name": {
+        "en": "Muhammara",
+        "ar": "المحمّرة"
+      },
+      "tagline": {
+        "en": "Red pepper, walnut, pomegranate molasses — seasoned with Aleppo chilli",
+        "ar": "فلفل أحمر وجوز ودبس رمان — متبّلة بفلفل حلب"
+      },
+      "history": {
+        "en": "Muhammara is an Aleppo mezze of red pepper, walnut, breadcrumbs, cumin and pomegranate molasses. Aleppo pepper — Halaby pepper — is a different, hotter chilli: ripened to burgundy, semi-dried, de-seeded, then coarsely ground and cured with salt and oil. It seasons the dip rather than forming its base. Since 2011 much of the world's \"Aleppo pepper\" has in fact been grown across the border in southern Turkey.",
+        "ar": "المحمّرة مازة حلبية من الفلفل الأحمر والجوز وفتات الخبز والكمون ودبس الرمان. أما فلفل حلب — الفلفل الحلبي — فصنف أحرّ مختلف: يُترَك حتى يحمرّ، ويُجفَّف جزئياً، ويُنزع بزره، ثم يُطحن خشناً ويُعالج بالملح والزيت. وهو يتبّل الغموس لا يشكّل أساسه. ومنذ ٢٠١١ يُزرع كثير مما يُباع عالمياً باسم فلفل حلب عبر الحدود في جنوب تركيا."
+      },
+      "tags": {
+        "en": [
+          "mezze",
+          "walnut",
+          "Aleppo"
+        ],
+        "ar": [
+          "مازة",
+          "جوز",
+          "حلب"
+        ]
+      },
+      "image": "/syria/assets/food/muhammara.jpg",
+      "photoId": "muhammara"
+    },
+    {
+      "id": "kebab-karaz",
+      "emoji": "🍒",
+      "siteId": "aleppo-souq",
+      "name": {
+        "en": "Kebab karaz",
+        "ar": "كباب الكرز"
+      },
+      "tagline": {
+        "en": "Lamb meatballs in sour cherry",
+        "ar": "كفتة لحم بالكرز الحامض"
+      },
+      "history": {
+        "en": "Small lamb meatballs cooked in a sauce of the local washneh sour cherry — harvested around June north of Aleppo — served on flatbread with pine nuts. Pomegranate molasses usually joins the cherries in the sauce. It is the clearest example of Aleppo's taste for meat with fruit, an inheritance shared with Ottoman and Persian cooking.",
+        "ar": "كرات صغيرة من لحم الغنم تُطبخ بصلصة الكرز الحامض المحلي — الوشنة — الذي يُحصد نحو حزيران شمال حلب، وتُقدَّم على خبز مرقوق مع الصنوبر. وغالباً يدخل دبس الرمان مع الكرز في الصلصة. وهو أوضح مثال على ولع حلب بجمع اللحم بالفاكهة، إرث مشترك مع المطبخين العثماني والفارسي."
+      },
+      "tags": {
+        "en": [
+          "seasonal",
+          "Aleppo",
+          "lamb"
+        ],
+        "ar": [
+          "موسمي",
+          "حلب",
+          "لحم"
+        ]
+      },
+      "image": "/syria/assets/food/kebab-karaz.jpg",
+      "photoId": "kebab-karaz"
+    },
+    {
+      "id": "yabraq",
+      "emoji": "🍃",
+      "siteId": "damascus-old-city",
+      "name": {
+        "en": "Yabraq and mahshi",
+        "ar": "اليبرق والمحشي"
+      },
+      "tagline": {
+        "en": "Vine leaves and squash, rolled by hand",
+        "ar": "ورق عنب وكوسا، ملفوف باليد"
+      },
+      "history": {
+        "en": "Yabraq: vine leaves stuffed with rice and lamb, packed seam-side down in tight layers over lamb bones, weighted with an upturned plate and simmered with lemon. Yalanji — from the Turkish for \"liar\" — is the meatless version, served cold under olive oil. Both are shared across the Levant.",
+        "ar": "اليبرق: ورق عنب محشو بالأرز واللحم، يُرصّ على وجهه المخيط في طبقات متراصّة فوق عظام الغنم، ويُثقَّل بصحن مقلوب ويُطبخ بالليمون. واليالنجي — من التركية بمعنى «الكذّاب» — نسخته بلا لحم، تُقدَّم باردة بزيت الزيتون. وكلاهما مشترك في بلاد الشام."
+      },
+      "tags": {
+        "en": [
+          "mezze",
+          "rice",
+          "family"
+        ],
+        "ar": [
+          "مازة",
+          "أرز",
+          "عائلة"
+        ]
+      },
+      "image": "/syria/assets/food/yabraq.jpg",
+      "photoId": "yabraq"
+    },
+    {
+      "id": "fattoush",
+      "emoji": "🥗",
+      "siteId": "damascus-old-city",
+      "name": {
+        "en": "Fattoush",
+        "ar": "الفتّوش"
+      },
+      "tagline": {
+        "en": "Yesterday's bread, today's salad",
+        "ar": "خبز الأمس، سلطة اليوم"
+      },
+      "history": {
+        "en": "Fattoush turns stale flatbread into a meal, sharpened with sumac and, traditionally, purslane. It belongs to the fattat family of bread dishes born of village thrift, and is a fixture of Ramadan iftar tables across the Levant.",
+        "ar": "يحوّل الفتّوش الخبز اليابس إلى وجبة، يحدّها السمّاق وتقليدياً البقلة. وينتمي إلى عائلة الفتّات، أطباق الخبز النابعة من اقتصاد القرية، وهو ثابت على موائد إفطار رمضان في بلاد الشام."
+      },
+      "tags": {
+        "en": [
+          "sumac",
+          "salad",
+          "Ramadan"
+        ],
+        "ar": [
+          "سمّاق",
+          "سلطة",
+          "رمضان"
+        ]
+      },
+      "image": "/syria/assets/food/fattoush.jpg",
+      "photoId": "fattoush"
+    },
+    {
+      "id": "makdous",
+      "emoji": "🍆",
+      "siteId": "aleppo-souq",
+      "name": {
+        "en": "Makdous",
+        "ar": "المكدوس"
+      },
+      "tagline": {
+        "en": "Autumn aubergines put up in oil",
+        "ar": "باذنجان الخريف محفوظ بالزيت"
+      },
+      "history": {
+        "en": "Makdous: baby aubergines blanched, pressed under salt, stuffed with walnut, garlic and red pepper, then buried in olive oil. Made through the autumn mouneh season across Syria and the wider Levant, and eaten at breakfast.",
+        "ar": "المكدوس: باذنجان صغير يُسلق بلطف ويُضغط بالملح ويُحشى بالجوز والثوم والفلفل الأحمر ثم يُغمر بزيت الزيتون. يُصنع في موسم المونة الخريفي في سوريا وبلاد الشام الأوسع، ويؤكل على الفطور."
+      },
+      "tags": {
+        "en": [
+          "mouneh",
+          "walnut",
+          "breakfast"
+        ],
+        "ar": [
+          "مونة",
+          "جوز",
+          "فطور"
+        ]
+      },
+      "image": "/syria/assets/food/makdous.jpg",
+      "photoId": "makdous"
+    },
+    {
+      "id": "shawarma",
+      "emoji": "🌯",
+      "siteId": "damascus-old-city",
+      "name": {
+        "en": "Shawarma",
+        "ar": "الشاورما"
+      },
+      "tagline": {
+        "en": "The vertical spit, shaved to order",
+        "ar": "السيخ العمودي يُقشَط عند الطلب"
+      },
+      "history": {
+        "en": "Shawarma descends from Ottoman döner kebab, whose vertical spit spread in the 19th century. The Levant made it its own — lamb and chicken, garlic sauce, pickles — and Arab migrants carried it as far as Mexico, where it became al pastor.",
+        "ar": "تنحدر الشاورما من دونر كباب العثماني الذي انتشر سيخه العمودي في القرن التاسع عشر. وجعلها الشام لنفسها — لحم غنم ودجاج وثوم ومخلّل — وحملها المهاجرون العرب حتى المكسيك حيث صارت أل باستور."
+      },
+      "tags": {
+        "en": [
+          "street food",
+          "lamb",
+          "garlic"
+        ],
+        "ar": [
+          "أكل شارع",
+          "لحم",
+          "ثوم"
+        ]
+      },
+      "image": "/syria/assets/food/shawarma.jpg",
+      "photoId": "shawarma"
+    },
+    {
+      "id": "mujaddara",
+      "emoji": "🍚",
+      "siteId": "damascus-old-city",
+      "name": {
+        "en": "Mujaddara",
+        "ar": "المجدّرة"
+      },
+      "tagline": {
+        "en": "Lentils, bulgur, and onions taken dark",
+        "ar": "عدس وبرغل وبصل محمّر حتى السواد"
+      },
+      "history": {
+        "en": "Mujaddara: lentils with rice — or bulgur — under heavily browned onions. A recipe appears in al-Baghdadi's Kitab al-Tabikh of 1226, where it was made with meat for celebrations; the meatless version, food of the poor, is the one that survived.",
+        "ar": "المجدّرة: عدس مع الأرز — أو البرغل — تحت بصل محمّر جداً. تظهر وصفة في كتاب الطبيخ للبغدادي عام ١٢٢٦، حيث كانت تُصنع باللحم في الأفراح؛ والنسخة بلا لحم، طعام الفقراء، هي التي بقيت."
+      },
+      "tags": {
+        "en": [
+          "lentils",
+          "everyday",
+          "vegan"
+        ],
+        "ar": [
+          "عدس",
+          "يومي",
+          "نباتي"
+        ]
+      },
+      "image": "/syria/assets/food/mujaddara.jpg",
+      "photoId": "mujaddara"
+    },
+    {
+      "id": "booza",
+      "emoji": "🍦",
+      "siteId": "souq-al-hamidiyah",
+      "name": {
+        "en": "Booza",
+        "ar": "البوظة"
+      },
+      "tagline": {
+        "en": "Stretchy ice cream — salep for the pull, mastic for the chew",
+        "ar": "بوظة مطّاطة — سحلب للمطّ ومستكة للمضغ"
+      },
+      "history": {
+        "en": "Booza, Damascene stretchy ice cream: salep — flour from orchid roots — gives the pull, mastic resin the chew and scent, and metre-long wooden mallets pound it in a chilled drum before it is rolled in pistachio. Bakdash, in Souq al-Hamidiyah, has been serving it since the late 1880s or 1890s.",
+        "ar": "البوظة الدمشقية المطّاطة: السحلب — دقيق من جذور السحلب — يعطي المطّ، والمستكة المضغ والرائحة، وتدقّها مداقّ خشبية بطول المتر في وعاء مثلّج قبل أن تُغلَّف بالفستق. ويقدّمها بكداش في سوق الحميدية منذ أواخر الثمانينيات أو التسعينيات من القرن التاسع عشر."
+      },
+      "tags": {
+        "en": [
+          "mastic",
+          "pistachio",
+          "Damascus"
+        ],
+        "ar": [
+          "مستكة",
+          "فستق",
+          "دمشق"
+        ]
+      },
+      "image": "/syria/assets/food/booza.jpg",
+      "photoId": "booza"
+    },
+    {
+      "id": "barazek",
+      "emoji": "🍪",
+      "siteId": "damascus-old-city",
+      "name": {
+        "en": "Barazek",
+        "ar": "البرازق"
+      },
+      "tagline": {
+        "en": "Sesame on one side, pistachio on the other",
+        "ar": "سمسم من وجه وفستق من وجه"
+      },
+      "history": {
+        "en": "Barazek: thin, crisp biscuits of flour and clarified butter, pistachio pressed into one face and honeyed sesame into the other. Associated with Damascus — the al-Midan quarter in particular — and sold across the Levant.",
+        "ar": "البرازق: بسكويت رقيق هشّ من الطحين والسمن، يُضغط الفستق في وجه والسمسم المعسّل في الآخر. مرتبط بدمشق — بحيّ الميدان خاصّة — ويُباع في بلاد الشام."
+      },
+      "tags": {
+        "en": [
+          "sweets",
+          "sesame",
+          "gift"
+        ],
+        "ar": [
+          "حلويات",
+          "سمسم",
+          "هدية"
+        ]
+      },
+      "image": "/syria/assets/food/barazek.jpg",
+      "photoId": "barazek"
+    },
+    {
+      "id": "freekeh",
+      "emoji": "🌾",
+      "siteId": "deir-ez-zor-euphrates",
+      "name": {
+        "en": "Freekeh",
+        "ar": "الفريكة"
+      },
+      "tagline": {
+        "en": "Green wheat, burned on purpose",
+        "ar": "قمح أخضر يُحرق عمداً"
+      },
+      "history": {
+        "en": "Freekeh: durum wheat cut while still green and milky, piled and set alight so only the straw and chaff burn, then rubbed to free the smoky grain. The name comes from the Arabic root for \"to rub.\"",
+        "ar": "الفريكة: قمح قاسي يُحصد وهو أخضر لبني، يُكدَّس ويُشعل بحيث يحترق القش والقشور فقط، ثم يُفرك ليتحرّر الحبّ المدخّن. والاسم من جذر عربي بمعنى «يفرك»."
+      },
+      "tags": {
+        "en": [
+          "wheat",
+          "smoky",
+          "harvest"
+        ],
+        "ar": [
+          "قمح",
+          "مدخّن",
+          "حصاد"
+        ]
+      },
+      "image": "/syria/assets/food/freekeh.jpg",
+      "photoId": "freekeh"
+    }
+  ],
+  "music": [
+    {
+      "id": "oud-nahat",
+      "emoji": "🪕",
+      "siteId": "damascus-oud",
+      "name": {
+        "en": "The Damascus oud",
+        "ar": "العود الدمشقي"
+      },
+      "tagline": {
+        "en": "The workshop that set the standard",
+        "ar": "الورشة التي وضعت المعيار"
+      },
+      "history": {
+        "en": "The Nahat family of Damascus built ouds from the 1870s into the 1980s. Their bracing became the structure most Arab oud makers still follow, and Abdo George Nahat (1872–1941) is called the Stradivari of the oud. Nahat instruments are still played, and still copied.",
+        "ar": "صنعت أسرة نحّات الدمشقية الأعواد من سبعينيات القرن التاسع عشر حتى الثمانينيات. وصار تضليعها البنية التي ما زال معظم صنّاع العود العرب يتبعونها، ويُلقَّب عبده جورج نحّات (١٨٧٢–١٩٤١) بستراديفاري العود. وما زالت آلات نحّات تُعزف وتُقلَّد."
+      },
+      "tags": {
+        "en": [
+          "luthier",
+          "Damascus",
+          "instrument"
+        ],
+        "ar": [
+          "صناعة",
+          "دمشق",
+          "آلة"
+        ]
+      },
+      "image": "/syria/assets/music/oud-nahat.jpg",
+      "photoId": "oud-nahat"
+    },
+    {
+      "id": "qudud-halabiya",
+      "emoji": "🎼",
+      "siteId": "aleppo-tarab",
+      "name": {
+        "en": "Qudud halabiya",
+        "ar": "القدود الحلبية"
+      },
+      "tagline": {
+        "en": "Old melodies given new words",
+        "ar": "ألحان قديمة بكلمات جديدة"
+      },
+      "history": {
+        "en": "Qudud halabiya are songs built on the measure of existing melodies — sacred tunes refitted with worldly words, and the reverse. Aleppo carried forward the Andalusian muwashshah as a poetic form, setting it to melodies composed largely in the 19th and 20th centuries, and its Sufi lodges taught the repertoire. UNESCO inscribed Al-Qudoud al-Halabiya, nominated by Syria, on the Representative List of the Intangible Cultural Heritage of Humanity in 2021.",
+        "ar": "القدود الحلبية أغاني تُبنى على قدّ ألحان قائمة — ألحان مقدّسة تُلبَس كلاماً دنيوياً والعكس. وحملت حلب الموشّح الأندلسي كشكل شعري، ووضعت عليه ألحاناً من القرنين التاسع عشر والعشرين غالباً، وعلّمت تكاياها الصوفية السجلّ. وأدرجت اليونسكو القدود الحلبية، بترشيح من سوريا، على القائمة التمثيلية للتراث الثقافي غير المادي عام ٢٠٢١."
+      },
+      "tags": {
+        "en": [
+          "Aleppo",
+          "muwashshah",
+          "tarab"
+        ],
+        "ar": [
+          "حلب",
+          "موشّح",
+          "طرب"
+        ]
+      },
+      "image": "/syria/assets/music/qudud-halabiya.jpg",
+      "photoId": "qudud-halabiya"
+    },
+    {
+      "id": "sabah-fakhri",
+      "emoji": "🎤",
+      "siteId": "aleppo-tarab",
+      "name": {
+        "en": "Sabah Fakhri",
+        "ar": "صباح فخري"
+      },
+      "tagline": {
+        "en": "The voice that carried the qudud out",
+        "ar": "الصوت الذي حمل القدود إلى الخارج"
+      },
+      "history": {
+        "en": "Sabah Fakhri (1933–2021) of Aleppo was the great interpreter of the qudud and muwashshahat. In Caracas in 1968 he is said to have sung for ten hours without pause — a feat widely reported as a Guinness world record. His medium was the wasla, a suite of pieces linked by a single maqam.",
+        "ar": "كان صباح فخري (١٩٣٣–٢٠٢١) الحلبي أعظم مؤدٍّ للقدود والموشّحات. ويُقال إنه غنّى في كاراكاس عام ١٩٦٨ عشر ساعات بلا انقطاع — إنجاز يُروى على نطاق واسع كرقم قياسي في غينيس. ووسيلته كانت الوصلة، سلسلة قطع يجمعها مقام واحد."
+      },
+      "tags": {
+        "en": [
+          "singer",
+          "wasla",
+          "maqam"
+        ],
+        "ar": [
+          "مطرب",
+          "وصلة",
+          "مقام"
+        ]
+      },
+      "image": "/syria/assets/music/sabah-fakhri.jpg",
+      "photoId": "sabah-fakhri"
+    },
+    {
+      "id": "atrash-asmahan",
+      "emoji": "🎻",
+      "siteId": "suwayda-jabal",
+      "name": {
+        "en": "Farid al-Atrash and Asmahan",
+        "ar": "فريد الأطرش وأسمهان"
+      },
+      "tagline": {
+        "en": "A brother and sister from the Jabal",
+        "ar": "أخ وأخت من الجبل"
+      },
+      "history": {
+        "en": "Farid al-Atrash (1910–1974) and his sister Asmahan (1912–1944) were born to the princely Druze al-Atrash family of Jabal al-Arab and taken to Egypt as children, fleeing French rule. She became Umm Kulthum's only serious rival before dying in a car accident at 31; he became the Arab world's leading oud virtuoso and a composer for the Egyptian cinema.",
+        "ar": "وُلد فريد الأطرش (١٩١٠–١٩٧٤) وأخته أسمهان (١٩١٢–١٩٤٤) في الأسرة الدرزية الأميرية في جبل العرب، وأخذهما أهلهما إلى مصر وهما طفلان فارّين من الحكم الفرنسي. وصارت هي المنافس الجادّ الوحيد لأم كلثوم قبل أن تموت في حادث سيارة وهي في الحادية والثلاثين؛ وصار هو أبرز عازفي العود في العالم العربي وملحّناً للسينما المصرية."
+      },
+      "tags": {
+        "en": [
+          "oud",
+          "cinema",
+          "Jabal"
+        ],
+        "ar": [
+          "عود",
+          "سينما",
+          "الجبل"
+        ]
+      },
+      "image": "/syria/assets/music/atrash-asmahan.jpg",
+      "photoId": "atrash-asmahan"
+    },
+    {
+      "id": "dhikr-sufi",
+      "emoji": "🕯️",
+      "siteId": "umayyad-mosque",
+      "name": {
+        "en": "Dhikr and the sama'",
+        "ar": "الذكر والسماع"
+      },
+      "tagline": {
+        "en": "Breath kept in time by a circle",
+        "ar": "نَفَس يضبطه الحلقة"
+      },
+      "history": {
+        "en": "In the Sufi lodges of Damascus and Aleppo the munshid sings over the circle of dhikr, backed by a choir. The Mawlawiyya added whirling. The same maqamat, and often the same muwashshah melodies, run between this sacred repertoire and the secular concert hall.",
+        "ar": "في تكايا دمشق وحلب يغنّي المنشد فوق حلقة الذكر بمساندة جوقة. وأضاف المولوية الدوران. والمقامات نفسها، وغالباً ألحان الموشّح نفسها، تجري بين هذا السجلّ المقدّس وقاعة الحفل الدنيوية."
+      },
+      "tags": {
+        "en": [
+          "Sufi",
+          "munshid",
+          "maqam"
+        ],
+        "ar": [
+          "صوفي",
+          "منشد",
+          "مقام"
+        ]
+      },
+      "image": "/syria/assets/music/dhikr-sufi.jpg",
+      "photoId": "dhikr-sufi"
+    },
+    {
+      "id": "dabke",
+      "emoji": "💃",
+      "siteId": "qamishli-jazira",
+      "name": {
+        "en": "Dabke",
+        "ar": "الدبكة"
+      },
+      "tagline": {
+        "en": "A line, a stamp, and a leader who decides",
+        "ar": "صفّ ودقّة قدم ولوّيح يقرّر"
+      },
+      "history": {
+        "en": "Dabke is a Levantine line dance — Syrian, Lebanese, Palestinian, Jordanian alike — led by the lawweeh, who breaks from the line twirling a handkerchief. The story people tell is that it began with villagers stamping a mud roof flat before the rains. The steps change from region to region.",
+        "ar": "الدبكة رقصة صفّ شامية — سورية ولبنانية وفلسطينية وأردنية على السواء — يقودها اللوّيح الذي يخرج من الصفّ وهو يدوّر منديلاً. والقصة التي يرويها الناس أنها بدأت بدقّ أهل القرية سطح الطين قبل المطر. والخطوات تختلف من منطقة إلى أخرى."
+      },
+      "tags": {
+        "en": [
+          "wedding",
+          "line dance",
+          "lawweeh"
+        ],
+        "ar": [
+          "عرس",
+          "صفّ",
+          "لوّيح"
+        ]
+      },
+      "image": "/syria/assets/music/dabke.jpg",
+      "photoId": "dabke"
+    },
+    {
+      "id": "rababa-badia",
+      "emoji": "🎵",
+      "siteId": "palmyra",
+      "name": {
+        "en": "Rababa and the badia",
+        "ar": "الربابة والبادية"
+      },
+      "tagline": {
+        "en": "One string, and a poem answered in kind",
+        "ar": "وتر واحد، وقصيدة تُردّ بمثلها"
+      },
+      "history": {
+        "en": "The rababa, a single-stringed bowed fiddle, carries the poet-singer of the badia. He improvises the unmetered ataba over it, and the company answers with the mijana refrain — a tradition shared across the Syrian, Jordanian and Iraqi steppe.",
+        "ar": "تحمل الربابة، الكمانة ذات الوتر الواحد، شاعر البادية المغنّي. يرتجل عليها العتابا بلا وزن، ويردّ الجمع بميجانا — تقليد مشترك في بادية سوريا والأردن والعراق."
+      },
+      "tags": {
+        "en": [
+          "Bedouin",
+          "ataba",
+          "poetry"
+        ],
+        "ar": [
+          "بدو",
+          "عتابا",
+          "شعر"
+        ]
+      },
+      "image": "/syria/assets/music/rababa-badia.jpg",
+      "photoId": "rababa-badia"
+    },
+    {
+      "id": "jazira-wedding",
+      "emoji": "🔊",
+      "siteId": "qamishli-jazira",
+      "name": {
+        "en": "Jazira wedding sound",
+        "ar": "صوت أعراس الجزيرة"
+      },
+      "tagline": {
+        "en": "Keyboard, saz, and a very loud PA",
+        "ar": "أورغ وساز ومكبّرات عالية جداً"
+      },
+      "history": {
+        "en": "Omar Souleyman was born in Ras al-Ayn in 1966 and raised in Tell Tamer, in the Jazira. From 1994 he sang at weddings across Hasakah; the performances were recorded, copied and sold from cassette kiosks — more than five hundred of them — until a Western label pressed a selection in 2007 and the circuit became a touring career.",
+        "ar": "وُلد عمر سليمان في رأس العين عام ١٩٦٦ وترعرع في تل تمر في الجزيرة. ومنذ ١٩٩٤ غنّى في أعراس الحسكة؛ وسُجّلت الحفلات ونُسخت وبِيعت من أكشاك الكاسيت — أكثر من خمسمئة — إلى أن أصدرت شركة غربية مختارات عام ٢٠٠٧ وصارت الدائرة مسيرة جولات."
+      },
+      "tags": {
+        "en": [
+          "cassette",
+          "dabke",
+          "northeast"
+        ],
+        "ar": [
+          "كاسيت",
+          "دبكة",
+          "الشمال الشرقي"
+        ]
+      },
+      "image": "/syria/assets/music/jazira-wedding.jpg",
+      "photoId": "jazira-wedding"
+    },
+    {
+      "id": "norias-sound",
+      "emoji": "🎡",
+      "siteId": "hama-norias",
+      "name": {
+        "en": "The groan of the norias",
+        "ar": "أنين النواعير"
+      },
+      "tagline": {
+        "en": "Seventeen wooden wheels — monuments that once groaned over the Orontes",
+        "ar": "سبع عشرة دولاباً خشبياً — آثار كانت تئنّ فوق العاصي"
+      },
+      "history": {
+        "en": "Seventeen wooden norias survive at Hama, the largest — al-Muhammadiya, built in 1361 — some 21 metres across. For centuries they lifted the Orontes into aqueducts that fed the mosques, baths and gardens of the city, groaning as they turned. There were more than fifty around 1900; the last fell out of use by 2009, and they are now kept as monuments.",
+        "ar": "بقيت سبع عشرة ناعورة خشبية في حماة، أكبرها — المحمدية المبنية عام ١٣٦١ — نحو واحد وعشرين متراً. وقروناً رفعت العاصي إلى قنوات تسقي المساجد والحمّامات والحدائق، وهي تئنّ. وكان عددها أكثر من خمسين نحو ١٩٠٠؛ وتوقّف آخرها عن العمل نحو ٢٠٠٩، وهي اليوم آثار محفوظة."
+      },
+      "tags": {
+        "en": [
+          "Hama",
+          "Orontes",
+          "field recording"
+        ],
+        "ar": [
+          "حماة",
+          "العاصي",
+          "تسجيل ميداني"
+        ]
+      },
+      "image": "/syria/assets/music/norias-sound.jpg",
+      "photoId": "norias-sound"
+    }
+  ],
+  "hookah": [
+    {
+      "id": "nargileh-history",
+      "emoji": "💨",
+      "siteId": "nawfara-cafe",
+      "name": {
+        "en": "How the nargileh arrived",
+        "ar": "كيف وصلت النارجيلة"
+      },
+      "tagline": {
+        "en": "A Persian word, an Ottoman café habit",
+        "ar": "كلمة فارسية وعادة مقهى عثمانية"
+      },
+      "history": {
+        "en": "The water pipe reached the Ottoman lands from Safavid Persia and India in the sixteenth and seventeenth centuries; the word nargileh comes from the Persian for coconut, the original water vessel. Damascus and Aleppo cafés adopted it as the fixture of long sitting, and brass workshops in both cities built the stems and trays. Argileh is the everyday Levantine name.",
+        "ar": "وصلت النارجيلة إلى البلاد العثمانية من فارس الصفوية والهند في القرنين السادس عشر والسابع عشر؛ والكلمة من الفارسية «نارگیل» أي جوز الهند، وعاء الماء الأول. تبنّتها مقاهي دمشق وحلب أثاثاً للجلسة الطويلة، وصنعت ورش النحاس في المدينتين السيقان والصواني. و«أرجيلة» هو الاسم الشامي اليومي."
+      },
+      "tags": {
+        "en": [
+          "café",
+          "brass",
+          "Ottoman"
+        ],
+        "ar": [
+          "مقهى",
+          "نحاس",
+          "عثماني"
+        ]
+      },
+      "image": "/syria/assets/hookah/nargileh-history.jpg",
+      "photoId": "nargileh-history"
+    },
+    {
+      "id": "tumbak-muassel",
+      "emoji": "🍎",
+      "siteId": "nawfara-cafe",
+      "name": {
+        "en": "Tumbak or mu'assel",
+        "ar": "التنباك أم المعسّل"
+      },
+      "tagline": {
+        "en": "The plain leaf and the sweet one",
+        "ar": "الورقة الصافية والحلوة"
+      },
+      "history": {
+        "en": "Two tobaccos share the same pipe. Ajami tumbak is unflavoured leaf, soaked and wrung out, packed in a cone and smoked strong — the older habit, still the choice of the men who have been coming for forty years. Mu'assel is molasses-cured and flavoured, apple with anise being the classic, and it is what most cafés serve now.",
+        "ar": "تبغان يتقاسمان الغليون نفسه. التنباك العجمي ورق بلا نكهة، يُنقع ويُعصر ويُكوَّم مخروطاً ويُدخَّن قوياً — العادة الأقدم، وما زال خيار من يرتادون المقهى منذ أربعين سنة. والمعسّل مُعالَج بالدبس ومنكّه، والتفاح باليانسون هو الكلاسيكي، وهو ما تقدّمه معظم المقاهي اليوم."
+      },
+      "tags": {
+        "en": [
+          "tumbak",
+          "two apples",
+          "coal"
+        ],
+        "ar": [
+          "تنباك",
+          "تفاحتين",
+          "فحم"
+        ]
+      },
+      "image": "/syria/assets/hookah/tumbak-muassel.jpg",
+      "photoId": "tumbak-muassel"
+    },
+    {
+      "id": "argileh-etiquette",
+      "emoji": "🤝",
+      "siteId": "nawfara-cafe",
+      "name": {
+        "en": "Table manners",
+        "ar": "آداب الجلسة"
+      },
+      "tagline": {
+        "en": "Pass the hose, never the coal",
+        "ar": "مرّر الخرطوم لا الفحمة"
+      },
+      "history": {
+        "en": "The hose is passed folded, mouthpiece toward the other person, and you do not light a cigarette from the argileh coal. One pipe is normally shared by two or three people and the tongs belong to whoever is closest to the tray. The waiter changing coals without being asked is a sign you are being looked after, not hurried.",
+        "ar": "يُمرَّر الخرطوم مطوياً والبزّاز نحو الآخر، ولا تُشعل سيجارة من فحمة الأرجيلة. تُتقاسم الأرجيلة عادة بين اثنين أو ثلاثة، والملقط لمن هو أقرب إلى الصينية. وتغيير النادل للفحم دون طلب علامة على أنك مخدوم، لا على أنه يستعجلك."
+      },
+      "tags": {
+        "en": [
+          "etiquette",
+          "sharing",
+          "coal"
+        ],
+        "ar": [
+          "آداب",
+          "مشاركة",
+          "فحم"
+        ]
+      },
+      "image": "/syria/assets/hookah/argileh-etiquette.jpg",
+      "photoId": "argileh-etiquette"
+    },
+    {
+      "id": "hakawati",
+      "emoji": "📖",
+      "siteId": "nawfara-cafe",
+      "name": {
+        "en": "The hakawati's hour",
+        "ar": "ساعة الحكواتي"
+      },
+      "tagline": {
+        "en": "A sword on the table, a cliffhanger at closing",
+        "ar": "سيف على الطاولة، وقطع عند الإغلاق"
+      },
+      "history": {
+        "en": "In the courtyard cafés a hakawati sits on a raised chair after sunset and reads the epic of Baybars or Antar in instalments, banging a sword for emphasis and stopping at the worst possible moment so the room returns tomorrow. Radio and then television nearly ended the trade; Al-Nawfara in Damascus kept it going, and the practice is being revived.",
+        "ar": "في مقاهي الفناء يجلس الحكواتي على كرسي مرتفع بعد المغرب ويقرأ سيرة الظاهر بيبرس أو عنترة على حلقات، يضرب بالسيف للتشديد ويتوقّف في أسوأ لحظة ممكنة كي تعود القاعة غداً. كاد الراديو ثم التلفزيون ينهيان المهنة؛ وحافظ عليها مقهى النوفرة في دمشق، وتشهد اليوم إحياءً."
+      },
+      "tags": {
+        "en": [
+          "storyteller",
+          "Baybars",
+          "evening"
+        ],
+        "ar": [
+          "حكواتي",
+          "بيبرس",
+          "مساء"
+        ]
+      },
+      "image": "/syria/assets/hookah/hakawati.jpg",
+      "photoId": "hakawati"
+    }
+  ],
+  "living": [
+    {
+      "id": "bayt-arabi",
+      "emoji": "⛲",
+      "siteId": "damascus-old-city",
+      "name": {
+        "en": "The courtyard house",
+        "ar": "البيت العربي"
+      },
+      "tagline": {
+        "en": "Blank wall outside, orange tree inside",
+        "ar": "جدار أصمّ في الخارج، وشجرة نارنج في الداخل"
+      },
+      "history": {
+        "en": "The Damascene bayt turns its back on the lane: a plain wall, a bent entrance, then a courtyard with a fountain, citrus trees and a liwan open on one side to catch the evening. Rooms are decorated with painted wood panelling called ajami. Many of these houses are now restaurants and small hotels, which is what has paid for their restoration.",
+        "ar": "يدير البيت الدمشقي ظهره للزقاق: جدار أصمّ، ومدخل منكسر، ثم فناء فيه بحرة وأشجار حمضيات وليوان مفتوح من جهة يلتقط المساء. وتُزيَّن الغرف بألواح خشبية مرسومة تُسمّى العجمي. وصار كثير من هذه البيوت مطاعم وفنادق صغيرة، وهو ما موّل ترميمها."
+      },
+      "tags": {
+        "en": [
+          "architecture",
+          "ajami",
+          "fountain"
+        ],
+        "ar": [
+          "عمارة",
+          "عجمي",
+          "بحرة"
+        ]
+      },
+      "image": "/syria/assets/living/bayt-arabi.jpg",
+      "photoId": "bayt-arabi"
+    },
+    {
+      "id": "maaloula-aramaic",
+      "emoji": "🗣️",
+      "siteId": "maaloula",
+      "name": {
+        "en": "Aramaic in Maaloula",
+        "ar": "الآرامية في معلولا"
+      },
+      "tagline": {
+        "en": "A language with a few thousand speakers left",
+        "ar": "لغة بقي لها بضعة آلاف متحدث"
+      },
+      "history": {
+        "en": "Maaloula and two neighbouring villages, Jubb'adin and Bakh'a, are the last places where Western Neo-Aramaic is spoken as a home language, by a few thousand people. It is a descendant of the Aramaic of the region, not the same as Syriac used liturgically. Displacement during the war scattered speakers, and teaching programmes are trying to hold the line.",
+        "ar": "معلولا وقريتان مجاورتان، جبعدين وبخعة، آخر أماكن تُنطق فيها الآرامية الغربية الحديثة لغةَ بيت، لدى بضعة آلاف من الناس. وهي سليلة آرامية المنطقة، لا السريانية المستعملة في الطقس الكنسي. شتّت التهجير خلال الحرب المتحدثين بها، وتحاول برامج تعليمية أن تصمد بها."
+      },
+      "tags": {
+        "en": [
+          "Aramaic",
+          "Qalamoun",
+          "endangered"
+        ],
+        "ar": [
+          "آرامية",
+          "القلمون",
+          "مهدّدة"
+        ]
+      },
+      "image": "/syria/assets/living/maaloula-aramaic.jpg",
+      "photoId": "maaloula-aramaic"
+    },
+    {
+      "id": "aleppo-armenians",
+      "emoji": "🕍",
+      "siteId": "aleppo-souq",
+      "name": {
+        "en": "Armenian Aleppo",
+        "ar": "حلب الأرمنية"
+      },
+      "tagline": {
+        "en": "A quarter built by survivors",
+        "ar": "حيّ بناه ناجون"
+      },
+      "history": {
+        "en": "Aleppo received large numbers of Armenian survivors of the 1915 genocide, who built the Midan quarter, churches, schools and a reputation in jewellery, photography, tailoring and music. The community shrank sharply during the recent war through emigration. Its imprint on the city's crafts and kitchens is permanent.",
+        "ar": "استقبلت حلب أعداداً كبيرة من الناجين الأرمن من إبادة ١٩١٥، فبنوا حيّ الميدان والكنائس والمدارس، وسمعةً في الصياغة والتصوير والخياطة والموسيقى. وتقلّص المجتمع بحدّة في الحرب الأخيرة بالهجرة. لكن أثره في حِرَف المدينة ومطابخها باقٍ."
+      },
+      "tags": {
+        "en": [
+          "Midan",
+          "crafts",
+          "diaspora"
+        ],
+        "ar": [
+          "الميدان",
+          "حِرَف",
+          "شتات"
+        ]
+      },
+      "image": "/syria/assets/living/aleppo-armenians.jpg",
+      "photoId": "aleppo-armenians"
+    },
+    {
+      "id": "jazira-communities",
+      "emoji": "🌾",
+      "siteId": "qamishli-jazira",
+      "name": {
+        "en": "The Jazira's languages",
+        "ar": "لغات الجزيرة"
+      },
+      "tagline": {
+        "en": "Kurdish, Arabic, Syriac, Armenian",
+        "ar": "كردية وعربية وسريانية وأرمنية"
+      },
+      "history": {
+        "en": "The northeastern plain is home to Kurdish, Arab, Syriac-Assyrian and Armenian communities, with Newroz fires in March and Syriac liturgy in churches whose language descends from Aramaic. It is also Syria's grain and oil region, which has made its administration contested for a century. Describing it honestly means naming all of its peoples.",
+        "ar": "السهل الشمالي الشرقي موطن لمجتمعات كردية وعربية وسريانية آشورية وأرمنية، بنيران نوروز في آذار وقدّاس سرياني في كنائس لغتها سليلة الآرامية. وهو أيضاً منطقة القمح والنفط في سوريا، ولهذا ظلّت إدارته متنازعاً عليها قرناً. ووصفه بأمانة يعني تسمية كل أهله."
+      },
+      "tags": {
+        "en": [
+          "Newroz",
+          "Syriac",
+          "wheat"
+        ],
+        "ar": [
+          "نوروز",
+          "سريانية",
+          "قمح"
+        ]
+      },
+      "image": "/syria/assets/living/jazira-communities.jpg",
+      "photoId": "jazira-communities"
+    },
+    {
+      "id": "druze-mate",
+      "emoji": "🧉",
+      "siteId": "suwayda-jabal",
+      "name": {
+        "en": "Mate in the Jabal",
+        "ar": "المتّة في الجبل"
+      },
+      "tagline": {
+        "en": "A South American habit that came home",
+        "ar": "عادة جنوب أمريكية عادت إلى البيت"
+      },
+      "history": {
+        "en": "Syrians who emigrated to Argentina and Brazil brought yerba mate back with them, and in Jabal al-Arab and the coastal mountains it became the drink of the whole day, passed around a circle through one metal straw and refilled from a thermos. Refusing your turn is odd; blowing into the straw is worse. Syria is one of the largest importers of yerba in the world.",
+        "ar": "حمل السوريون الذين هاجروا إلى الأرجنتين والبرازيل المتّة معهم في عودتهم، فصارت في جبل العرب وجبال الساحل شراب النهار كله، تدور في الحلقة بمصّاصة معدنية واحدة وتُملأ من ترمس. رفض دورك غريب، والنفخ في المصّاصة أسوأ. وسوريا من أكبر مستوردي المتّة في العالم."
+      },
+      "tags": {
+        "en": [
+          "mate",
+          "migration",
+          "Druze"
+        ],
+        "ar": [
+          "متّة",
+          "هجرة",
+          "دروز"
+        ]
+      },
+      "image": "/syria/assets/living/druze-mate.jpg",
+      "photoId": "druze-mate"
+    },
+    {
+      "id": "badia-bedouin",
+      "emoji": "🐪",
+      "siteId": "palmyra",
+      "name": {
+        "en": "The badia",
+        "ar": "البادية"
+      },
+      "tagline": {
+        "en": "Steppe grazing, and three days of guest right",
+        "ar": "رعي البادية، وثلاثة أيام حقّ ضيافة"
+      },
+      "history": {
+        "en": "More than half of Syria is steppe, grazed for millennia by tribes moving between winter pasture and summer wells. The old guest custom gives a stranger three days before anyone may ask his business. Drought, land reform, borders and war have pushed most families into settlement, but the tribal map still shapes local politics.",
+        "ar": "أكثر من نصف سوريا بادية، رعتها قبائل آلاف السنين متنقّلة بين مرعى الشتاء وآبار الصيف. والعرف القديم يمنح الغريب ثلاثة أيام قبل أن يسأله أحد عن حاجته. دفع الجفاف والإصلاح الزراعي والحدود والحرب معظم العائلات إلى الاستقرار، لكن الخريطة العشائرية ما زالت ترسم السياسة المحلية."
+      },
+      "tags": {
+        "en": [
+          "steppe",
+          "hospitality",
+          "tribes"
+        ],
+        "ar": [
+          "بادية",
+          "ضيافة",
+          "عشائر"
+        ]
+      },
+      "image": "/syria/assets/living/badia-bedouin.jpg",
+      "photoId": "badia-bedouin"
+    },
+    {
+      "id": "aleppo-soap",
+      "emoji": "🧼",
+      "siteId": "aleppo-souq",
+      "name": {
+        "en": "Aleppo laurel soap",
+        "ar": "صابون الغار الحلبي"
+      },
+      "tagline": {
+        "en": "Olive oil, laurel berry, nine months of air",
+        "ar": "زيت زيتون وحبّ غار وتسعة أشهر هواء"
+      },
+      "history": {
+        "en": "Olive oil is boiled with lye, laurel berry oil is added at the end, and the paste is poured onto the floor, cut into cubes, stamped and stacked in towers to cure for six to nine months. The green interior and brown crust are the proof of that curing. It is one of the oldest hard soaps still made the same way, and the workshops are slowly restarting.",
+        "ar": "يُغلى زيت الزيتون مع القطرونة، ويُضاف زيت حبّ الغار في النهاية، ثم تُسكب العجينة على الأرض وتُقطّع مكعبات وتُختم وتُرصّ أبراجاً لتنشف ستة إلى تسعة أشهر. والأخضر في الداخل والبنّي في القشرة دليل ذلك التنشيف. وهو من أقدم أنواع الصابون الصلب التي ما زالت تُصنع بالطريقة نفسها، والورش تعاود العمل ببطء."
+      },
+      "tags": {
+        "en": [
+          "ghar",
+          "workshop",
+          "curing"
+        ],
+        "ar": [
+          "غار",
+          "ورشة",
+          "تنشيف"
+        ]
+      },
+      "image": "/syria/assets/living/aleppo-soap.jpg",
+      "photoId": "aleppo-soap"
+    },
+    {
+      "id": "damascene-crafts",
+      "emoji": "🪡",
+      "siteId": "souq-al-hamidiyah",
+      "name": {
+        "en": "Damask, inlay and steel",
+        "ar": "الدمقس والتطعيم والفولاذ"
+      },
+      "tagline": {
+        "en": "Three crafts that took the city's name",
+        "ar": "ثلاث حِرَف حملت اسم المدينة"
+      },
+      "history": {
+        "en": "Damask cloth, damascened steel and mother-of-pearl inlay all carry the city's name into other languages. The looms wove figured silk with a reversible pattern; the steel was patterned crucible metal traded through the city; the inlayers still cut shell into rosewood for tables and chests. Aghabani embroidery, done on machine-guided chain stitch, is the surviving everyday version.",
+        "ar": "قماش الدمقس وفولاذ دمشق وتطعيم الصدف كلها حملت اسم المدينة إلى لغات أخرى. نسجت الأنوال حريراً مزخرفاً بنقش يُقرأ من الوجهين؛ والفولاذ معدن بوتقة منقوش كان يُتاجَر به عبر المدينة؛ وما زال المطعّمون يقصّون الصدف في خشب الورد للطاولات والصناديق. والعجمي والأغباني، المطرّز بغرزة سلسلة موجّهة بالآلة، هو النسخة اليومية الباقية."
+      },
+      "tags": {
+        "en": [
+          "damask",
+          "aghabani",
+          "inlay"
+        ],
+        "ar": [
+          "دمقس",
+          "أغباني",
+          "تطعيم"
+        ]
+      },
+      "image": "/syria/assets/living/damascene-crafts.jpg",
+      "photoId": "damascene-crafts"
+    },
+    {
+      "id": "hammam",
+      "emoji": "♨️",
+      "siteId": "damascus-old-city",
+      "name": {
+        "en": "The hammam",
+        "ar": "الحمّام"
+      },
+      "tagline": {
+        "en": "Cold room, warm room, hot room, tea",
+        "ar": "برّاني ووسطاني وجوّاني وشاي"
+      },
+      "history": {
+        "en": "A Damascene bath moves you through three rooms of rising heat under a domed ceiling pierced with glass eyes, ending back in the cold room with tea and a long sit. Hammam Nur al-Din, built in the twelfth century, is still working. The bath was a neighbourhood institution — weddings, negotiations and gossip all happened there.",
+        "ar": "ينقلك الحمّام الدمشقي عبر ثلاث غرف متصاعدة الحرارة تحت قبّة مثقوبة بعيون زجاجية، وينتهي بك في البرّاني مع شاي وجلسة طويلة. وما زال حمّام نور الدين، المبني في القرن الثاني عشر، يعمل. وكان الحمّام مؤسسة حيّ — فيه تُقام الأعراس وتُعقد المفاوضات ويدور الكلام."
+      },
+      "tags": {
+        "en": [
+          "Nur al-Din",
+          "dome",
+          "ritual"
+        ],
+        "ar": [
+          "نور الدين",
+          "قبّة",
+          "طقس"
+        ]
+      },
+      "image": "/syria/assets/living/hammam.jpg",
+      "photoId": "hammam"
+    },
+    {
+      "id": "displacement-return",
+      "emoji": "🏗️",
+      "siteId": "aleppo-citadel",
+      "name": {
+        "en": "Damage, return, repair",
+        "ar": "الضرر والعودة والترميم"
+      },
+      "tagline": {
+        "en": "Half a country moved; the stone is being put back",
+        "ar": "نصف بلد تنقّل، والحجر يُعاد إلى مكانه"
+      },
+      "history": {
+        "en": "The war displaced more than half of Syria's population at its peak and placed all six World Heritage sites on the List of World Heritage in Danger in 2013. Aleppo and Palmyra were the worst hit — the burning of Aleppo's souq, the collapse of its Umayyad Mosque minaret, and demolition at Palmyra. Since 2024 return movements have grown and restoration work has widened, funded unevenly and argued over: what to rebuild, how faithfully, and who decides. Craft workshops reopening is the part that most directly brings a quarter back to life.",
+        "ar": "هجّرت الحرب في ذروتها أكثر من نصف سكان سوريا، ووضعت مواقع التراث العالمي الستة على قائمة الخطر عام ٢٠١٣. وكانت حلب وتدمر الأشدّ تضرّراً — احتراق سوق حلب وانهيار مئذنة جامعها الأموي والتفجير في تدمر. ومنذ ٢٠٢٤ اتّسعت حركات العودة وتوسّع الترميم، بتمويل متفاوت ونقاش مفتوح: ماذا يُعاد بناؤه، وبأي أمانة، ومن يقرّر. وإعادة فتح ورش الحِرَف هي الجزء الذي يعيد الحيّ إلى الحياة فعلاً."
+      },
+      "tags": {
+        "en": [
+          "restoration",
+          "return",
+          "heritage"
+        ],
+        "ar": [
+          "ترميم",
+          "عودة",
+          "تراث"
+        ]
+      },
+      "image": "/syria/assets/living/displacement-return.jpg",
+      "photoId": "displacement-return"
+    }
+  ],
+  "phrases": [
+    {
+      "ar": "أهلين",
+      "translit": "ahlein",
+      "en": "Hi — the everyday Syrian answer to a greeting"
+    },
+    {
+      "ar": "كيفك؟",
+      "translit": "kifak? (to a man) / kifik? (to a woman)",
+      "en": "How are you?"
+    },
+    {
+      "ar": "شو أخبارك؟",
+      "translit": "shu akhbarak?",
+      "en": "What's your news? — how have you been?"
+    },
+    {
+      "ar": "تكرم عينك",
+      "translit": "tikram aynak",
+      "en": "May your eye be honoured — of course, gladly"
+    },
+    {
+      "ar": "على راسي",
+      "translit": "ala rasi",
+      "en": "On my head — consider it done"
+    },
+    {
+      "ar": "يعطيك العافية",
+      "translit": "ya'tik il-afye",
+      "en": "May God give you strength — said to anyone working"
+    },
+    {
+      "ar": "صحتين",
+      "translit": "sahtein",
+      "en": "Two healths — bon appétit, or after a bath or haircut"
+    },
+    {
+      "ar": "تفضل",
+      "translit": "tfaddal",
+      "en": "Please — come in, take it, go ahead"
+    },
+    {
+      "ar": "الله يخليك",
+      "translit": "allah yikhallik",
+      "en": "May God keep you — please, or thank you warmly"
+    },
+    {
+      "ar": "بلا زحمة",
+      "translit": "bala zahme",
+      "en": "If it's no trouble — a soft please"
+    },
+    {
+      "ar": "منيح",
+      "translit": "mnih",
+      "en": "Good, fine — the standard Syrian yes-that-works"
+    },
+    {
+      "ar": "مشتاقين",
+      "translit": "mishta'in",
+      "en": "We've missed you — said to someone you haven't seen in a while"
+    }
+  ],
+  "photoCredits": "/syria/data/syria-photo-credits.json"
+}

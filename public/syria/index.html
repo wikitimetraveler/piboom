@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Syria — Layers of the Levant | History, Food &amp; Music</title>
+  <meta name="description" content="A bilingual guided tour of Syria: eleven thousand years of history on the map, the alphabet cut at Ugarit, Zenobia's Palmyra, the Aleppo table, the oud and the qudud — narrated in English or Arabic."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/syria/css/syria.css"/>
+  <script src="/shared/menu-config.js"></script>
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/demo-users.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <script src="/shared/dark-mode.js" defer></script>
+  <script src="/syria/js/syria-splash.js" defer></script>
+</head>
+<body class="sy-page sy-splash-open">
+  <div
+    id="sySplash"
+    class="sy-splash is-ready"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="sySplashTitle"
+    aria-hidden="false"
+  >
+    <button type="button" class="sy-splash__skip" id="sySplashSkip">Skip</button>
+    <div class="sy-splash__veil" aria-hidden="true"></div>
+    <div class="sy-splash__grain" aria-hidden="true"></div>
+    <div class="sy-splash__stage">
+      <div class="sy-splash__flag-wrap" aria-hidden="true">
+        <svg class="sy-splash__flag" viewBox="0 0 1200 600" focusable="false" role="img" aria-label="Flag of Syria">
+          <defs>
+            <linearGradient id="syFlagSheen" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.22"/>
+              <stop offset="45%" stop-color="#ffffff" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#ffffff" stop-opacity="0.08"/>
+            </linearGradient>
+            <filter id="syFlagSoft" x="-5%" y="-5%" width="110%" height="110%">
+              <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000" flood-opacity="0.45"/>
+            </filter>
+          </defs>
+          <g filter="url(#syFlagSoft)">
+            <rect class="sy-splash__stripe sy-splash__stripe--green" width="1200" height="200" fill="#007a3d"/>
+            <rect class="sy-splash__stripe sy-splash__stripe--white" y="200" width="1200" height="200" fill="#ffffff"/>
+            <rect class="sy-splash__stripe sy-splash__stripe--black" y="400" width="1200" height="200" fill="#000000"/>
+            <g class="sy-splash__star" fill="#ce1126">
+              <polygon
+                transform="translate(400 300) scale(1.05)"
+                points="0,-52 8.7,-18 40.7,-32.4 19.5,-4.5 50.7,11.6 15.6,12.5 22.6,46.9 0,20 -22.6,46.9 -15.6,12.5 -50.7,11.6 -19.5,-4.5 -40.7,-32.4 -8.7,-18"
+              />
+              <polygon
+                transform="translate(600 300) scale(1.05)"
+                points="0,-52 8.7,-18 40.7,-32.4 19.5,-4.5 50.7,11.6 15.6,12.5 22.6,46.9 0,20 -22.6,46.9 -15.6,12.5 -50.7,11.6 -19.5,-4.5 -40.7,-32.4 -8.7,-18"
+              />
+              <polygon
+                transform="translate(800 300) scale(1.05)"
+                points="0,-52 8.7,-18 40.7,-32.4 19.5,-4.5 50.7,11.6 15.6,12.5 22.6,46.9 0,20 -22.6,46.9 -15.6,12.5 -50.7,11.6 -19.5,-4.5 -40.7,-32.4 -8.7,-18"
+              />
+            </g>
+          </g>
+          <rect width="1200" height="600" fill="url(#syFlagSheen)" pointer-events="none"/>
+        </svg>
+      </div>
+      <p class="sy-splash__kicker" lang="ar">الجمهورية العربية السورية</p>
+      <h1 class="sy-splash__title" id="sySplashTitle">Syria</h1>
+      <p class="sy-splash__line">Layers of the Levant</p>
+      <div class="sy-splash__rule" aria-hidden="true"></div>
+      <p class="sy-splash__enter" id="sySplashEnterHint">Enter the atlas</p>
+    </div>
+  </div>
+
+  <modern-navbar></modern-navbar>
+
+  <main class="sy-main">
+    <section class="sy-hero" id="syHero">
+      <div class="sy-hero-atmos sy-hero-atmos--storm" id="syHeroAtmos" aria-hidden="true">
+        <div class="sy-hero-sky"></div>
+        <div class="sy-hero-horizon-glow"></div>
+        <canvas class="sy-hero-sparkle" id="sySkySparkle" width="1200" height="600"></canvas>
+        <div class="sy-hero-heat"></div>
+        <svg class="sy-hero-silhouettes" viewBox="0 0 1200 100" preserveAspectRatio="xMidYMax meet" focusable="false">
+          <g class="sy-hero-city sy-hero-city--far" fill="currentColor">
+            <rect x="20" y="58" width="22" height="42"/>
+            <rect x="46" y="48" width="16" height="52"/>
+            <rect x="68" y="62" width="28" height="38"/>
+            <rect x="102" y="52" width="14" height="48"/>
+            <rect x="122" y="58" width="30" height="42"/>
+            <rect x="200" y="55" width="24" height="45"/>
+            <rect x="230" y="45" width="14" height="55"/>
+            <rect x="250" y="60" width="26" height="40"/>
+            <rect x="360" y="50" width="20" height="50"/>
+            <rect x="386" y="42" width="12" height="58"/>
+            <rect x="404" y="56" width="28" height="44"/>
+            <rect x="520" y="54" width="22" height="46"/>
+            <rect x="548" y="44" width="14" height="56"/>
+            <rect x="568" y="58" width="24" height="42"/>
+            <rect x="700" y="52" width="18" height="48"/>
+            <rect x="724" y="46" width="12" height="54"/>
+            <rect x="742" y="58" width="26" height="42"/>
+            <rect x="920" y="50" width="20" height="50"/>
+            <rect x="946" y="56" width="28" height="44"/>
+            <rect x="1100" y="48" width="16" height="52"/>
+            <rect x="1122" y="58" width="24" height="42"/>
+            <rect x="1152" y="44" width="14" height="56"/>
+          </g>
+          <path class="sy-hero-arch" d="M140 100 V55 Q140 28 168 28 Q196 28 196 55 V100 Z"/>
+          <path class="sy-hero-arch sy-hero-arch--mid" d="M280 100 V62 Q280 42 302 42 Q324 42 324 62 V100 Z"/>
+          <path class="sy-hero-arch sy-hero-arch--far" d="M780 100 V50 Q780 26 812 26 Q844 26 844 50 V100 Z"/>
+          <path class="sy-hero-arch sy-hero-arch--far" d="M860 100 V64 Q860 48 882 48 Q904 48 904 64 V100 Z"/>
+          <path class="sy-hero-dune" d="M0 78 C140 68 260 74 400 66 C540 58 680 72 820 64 C960 56 1100 70 1200 62 L1200 100 L0 100 Z"/>
+        </svg>
+        <div class="sy-hero-sand"></div>
+        <canvas class="sy-hero-storm" id="sySandstorm" width="1200" height="400"></canvas>
+        <div class="sy-hero-motes" id="syHeroMotes"></div>
+      </div>
+      <div class="container">
+        <div class="sy-hero-layout">
+          <div class="sy-hero-inner" id="syHeroInner">
+            <p class="sy-kicker" data-i18n="heroKicker">The Syrian Arab Republic</p>
+            <h1 class="sy-hero-title" data-i18n="heroTitle">Syria</h1>
+            <p class="sy-hero-line" data-i18n="heroLine">Where the alphabet was cut into clay and the caravan roads met the sea — Ebla and Ugarit, Zenobia's Palmyra, the Umayyad capital, and a table and a maqam still kept by hand.</p>
+
+            <div class="sy-hero-cta">
+              <a class="sy-btn sy-btn-primary" href="#syMap">
+                <i class="bi bi-geo-alt-fill"></i> <span data-i18n="exploreMap">Explore the atlas</span>
+              </a>
+              <button type="button" class="sy-btn sy-btn-lang" id="syLangToggle" aria-label="Switch language">
+                <i class="bi bi-translate"></i> <span id="syLangToggleLabel">عربي</span>
+              </button>
+            </div>
+
+            <dl class="sy-facts" id="syFacts">
+              <div><dt>2400 BCE</dt><dd data-i18n-fact="ebla">Ebla's clay tablet archive</dd></div>
+              <div><dt>1400 BCE</dt><dd data-i18n-fact="alphabet">Ugarit's 30-sign alphabet</dd></div>
+              <div><dt>661 CE</dt><dd data-i18n-fact="umayyad">Damascus, Umayyad capital</dd></div>
+              <div><dt>1946</dt><dd data-i18n-fact="ind">Independence, 1946</dd></div>
+            </dl>
+          </div>
+
+          <aside class="sy-guide" id="syGuide" aria-label="Syria guide Niqula">
+            <div class="sy-guide-card">
+              <img class="sy-guide-portrait" id="syGuidePortrait" src="/syria/assets/niqula-guide-portrait-256.png" width="72" height="72" alt="Niqula — Syria history guide"/>
+              <div class="sy-guide-meta">
+                <h2 id="syGuideName">Niqula</h2>
+                <p id="syGuideTitle">Syria history guide</p>
+                <p class="sy-guide-status" id="syGuideStatus">Ahlan wa sahlan.</p>
+              </div>
+            </div>
+
+            <label class="sy-narrate sy-narrate--global" for="syNarrate">
+              <input type="checkbox" id="syNarrate" data-sy-narrate checked/>
+              <span class="sy-narrate__copy">
+                <span class="sy-narrate__title" data-i18n="narration">Narration</span>
+                <span class="sy-narrate__scope" data-i18n="narrationScope">Entire page — atlas, tour, and cards</span>
+              </span>
+            </label>
+
+            <div class="sy-guide-actions">
+              <button type="button" class="sy-btn sy-btn-primary sy-btn-sm" id="syStoryPlay" aria-pressed="false">
+                <i class="bi bi-film"></i> <span data-i18n="startTour">Start tour</span>
+              </button>
+              <button type="button" class="sy-btn sy-btn-sand sy-btn-sm" id="syMeetGuide">
+                <i class="bi bi-person-video3"></i> <span data-i18n="meetGuide">Meet Niqula</span>
+              </button>
+              <button type="button" class="sy-btn sy-btn-sand sy-btn-sm" id="syAskGuide">
+                <i class="bi bi-chat-dots-fill"></i> <span data-i18n="askGuide">Ask Niqula</span>
+              </button>
+              <button type="button" class="sy-btn sy-btn-ghost sy-btn-sm" id="syStopAudio">
+                <i class="bi bi-stop-fill"></i> <span data-i18n="stop">Stop</span>
+              </button>
+            </div>
+
+            <div class="sy-story-panel" id="syStoryPanel">
+              <div class="sy-story-status" id="syStoryStatus" hidden aria-live="polite">
+                <span id="syStoryStatusText"></span>
+                <div class="sy-story-dots" id="syStoryDots" aria-hidden="true"></div>
+              </div>
+              <p class="sy-story-error" id="syStoryError" hidden></p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <div class="container sy-sections">
+      <section class="sy-section is-open" id="syMap" data-sy-collapse data-sy-default-open="1">
+        <div class="sy-section-head">
+          <button type="button" class="sy-section-toggle" id="syMapToggle" aria-expanded="true" aria-controls="syMapPanel">
+            <span class="sy-section-toggle__copy">
+              <span class="sy-section-title" data-i18n="mapHeading">Atlas of Syria</span>
+              <span class="sy-section-lead" data-i18n="mapLead">Coast, steppe, and the two great cities. Select a pin or a name to hear its story.</span>
+            </span>
+            <i class="bi bi-chevron-down sy-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="sy-section-panel" id="syMapPanel" role="region" aria-labelledby="syMapToggle">
+          <div class="sy-map-toolbar">
+            <div class="sy-map-filters" id="syMapFilters" role="group" aria-label="Filter map pins">
+              <button type="button" class="sy-chip is-active" data-filter="all" data-i18n="mapAll">All</button>
+              <button type="button" class="sy-chip" data-filter="history" data-i18n="mapHistory">History</button>
+              <button type="button" class="sy-chip" data-filter="food" data-i18n="mapFood">Food</button>
+              <button type="button" class="sy-chip" data-filter="music" data-i18n="mapMusic">Music</button>
+              <button type="button" class="sy-chip" data-filter="living" data-i18n="mapLiving">Living</button>
+            </div>
+            <label class="sy-narrate sy-narrate--section" for="syNarrateMap">
+              <input type="checkbox" id="syNarrateMap" data-sy-narrate checked/>
+              <span data-i18n="narration">Narration</span>
+            </label>
+          </div>
+          <div class="sy-map-layout">
+            <ul class="sy-site-list" id="sySiteList"></ul>
+            <div class="sy-map-wrap">
+              <div id="syMapCanvas" class="sy-map-canvas" role="img" aria-label="Map of historic sites in Syria"></div>
+              <p class="sy-map-status" id="syMapStatus" data-i18n="mapLoading">Loading the atlas…</p>
+              <button type="button" class="sy-btn sy-btn-ghost sy-btn-sm sy-map-reset" id="syMapReset" hidden>
+                <i class="bi bi-arrow-clockwise"></i> <span data-i18n="mapReset">Show all pins</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sy-section" id="syTimeline" data-sy-collapse>
+        <div class="sy-section-head">
+          <button type="button" class="sy-section-toggle" id="syTimelineToggle" aria-expanded="false" aria-controls="syTimelinePanel">
+            <span class="sy-section-toggle__copy">
+              <span class="sy-section-title" data-i18n="timelineHeading">Layers of Syria</span>
+              <span class="sy-section-lead" data-i18n="timelineLead">Eleven eras from the first farming villages on the Euphrates to the republic. Select a layer to hear it and find it on the map.</span>
+            </span>
+            <i class="bi bi-chevron-down sy-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="sy-section-panel" id="syTimelinePanel" role="region" aria-labelledby="syTimelineToggle" hidden>
+          <div class="sy-timeline-stage">
+            <aside class="sy-timeline-selected" id="syTimelineSelected" aria-live="polite">
+              <div class="sy-timeline-selected__empty" id="syTimelineSelectedEmpty">
+                <div class="sy-timeline-3d" id="syTimeline3d" aria-hidden="true"></div>
+                <p class="sy-timeline-selected__prompt" data-i18n="timelineSelectHint">Select an era on the timeline</p>
+              </div>
+              <div class="sy-timeline-selected__card" id="syTimelineSelectedCard" hidden>
+                <div class="sy-timeline-selected__media" id="syTimelineSelectedMedia"></div>
+                <p class="sy-timeline-selected__date" id="syTimelineSelectedDate"></p>
+                <h3 class="sy-timeline-selected__title" id="syTimelineSelectedTitle"></h3>
+              </div>
+            </aside>
+            <div class="sy-calendar" aria-label="Chronological scale">
+              <div class="sy-calendar__head">
+                <span class="sy-calendar__head-label">Chronology</span>
+                <span class="sy-calendar__head-range" id="syCalendarHeadRange">9500 BCE → today</span>
+              </div>
+              <div class="sy-calendar__track">
+                <div class="sy-calendar__rail"></div>
+                <div class="sy-calendar__fill" id="syCalendarFill"></div>
+                <div class="sy-calendar__centuries" id="syCalendarCenturies" aria-hidden="true"></div>
+                <div class="sy-calendar__ticks" id="syCalendarTicks"></div>
+                <div class="sy-calendar__now" id="syCalendarNow" title="Present"></div>
+              </div>
+              <div class="sy-calendar__scale" id="syCalendarScale"></div>
+            </div>
+          </div>
+          <ol class="sy-era-list" id="syEraList">
+            <li class="sy-loading" data-i18n="loading">Loading Syria…</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="sy-section" id="syFood" data-sy-collapse>
+        <div class="sy-section-head">
+          <button type="button" class="sy-section-toggle" id="syFoodToggle" aria-expanded="false" aria-controls="syFoodPanel">
+            <span class="sy-section-toggle__copy">
+              <span class="sy-section-title" data-i18n="foodHeading">The Syrian table</span>
+              <span class="sy-section-lead" data-i18n="foodLead">Aleppo counts its kibbeh in dozens of shapes and Damascus answers with mezze. Flip a plate for where it came from and what it means.</span>
+            </span>
+            <i class="bi bi-chevron-down sy-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="sy-section-panel" id="syFoodPanel" role="region" aria-labelledby="syFoodToggle" hidden>
+          <div class="sy-grid" id="syFoodGrid"></div>
+        </div>
+      </section>
+
+      <section class="sy-section" id="syMusic" data-sy-collapse>
+        <div class="sy-section-head">
+          <button type="button" class="sy-section-toggle" id="syMusicToggle" aria-expanded="false" aria-controls="syMusicPanel">
+            <span class="sy-section-toggle__copy">
+              <span class="sy-section-title" data-i18n="musicHeading">Sound of Syria</span>
+              <span class="sy-section-lead" data-i18n="musicLead">An oud from a Damascus workshop, the qudud of Aleppo, a dhikr circle, and a wedding dabke in the Jazira. Flip a card for the history.</span>
+            </span>
+            <i class="bi bi-chevron-down sy-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="sy-section-panel" id="syMusicPanel" role="region" aria-labelledby="syMusicToggle" hidden>
+          <div class="sy-grid" id="syMusicGrid"></div>
+        </div>
+      </section>
+
+      <section class="sy-section" id="syHookah" data-sy-collapse>
+        <div class="sy-section-head">
+          <button type="button" class="sy-section-toggle" id="syHookahToggle" aria-expanded="false" aria-controls="syHookahPanel">
+            <span class="sy-section-toggle__copy">
+              <span class="sy-section-title" data-i18n="hookahHeading">Argileh — the café smoke</span>
+              <span class="sy-section-lead" data-i18n="hookahLead">The nargileh sits where the storyteller reads, in the courtyard cafés off the Straight Street. History, types, and the two tobaccos. Flip a card for the story.</span>
+            </span>
+            <i class="bi bi-chevron-down sy-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="sy-section-panel" id="syHookahPanel" role="region" aria-labelledby="syHookahToggle" hidden>
+          <div class="sy-grid" id="syHookahGrid"></div>
+        </div>
+      </section>
+
+      <section class="sy-section" id="syLiving" data-sy-collapse>
+        <div class="sy-section-head">
+          <button type="button" class="sy-section-toggle" id="syLivingToggle" aria-expanded="false" aria-controls="syLivingPanel">
+            <span class="sy-section-toggle__copy">
+              <span class="sy-section-title" data-i18n="livingHeading">Living Syria</span>
+              <span class="sy-section-lead" data-i18n="livingLead">Courtyard houses, Aramaic still spoken in Maaloula, the communities of the Jazira and the Jabal, and crafts that still have hands on them. Flip a card for the story.</span>
+            </span>
+            <i class="bi bi-chevron-down sy-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="sy-section-panel" id="syLivingPanel" role="region" aria-labelledby="syLivingToggle" hidden>
+          <div class="sy-grid" id="syLivingGrid"></div>
+        </div>
+      </section>
+
+      <section class="sy-section" id="syPhrases" data-sy-collapse>
+        <div class="sy-section-head">
+          <button type="button" class="sy-section-toggle" id="syPhrasesToggle" aria-expanded="false" aria-controls="syPhrasesPanel">
+            <span class="sy-section-toggle__copy">
+              <span class="sy-section-title" data-i18n="phraseHeading">Speak Syrian</span>
+              <span class="sy-section-lead" data-i18n="phraseLead">Everyday Syrian Levantine Arabic, spoken aloud. Press any phrase to hear it.</span>
+            </span>
+            <i class="bi bi-chevron-down sy-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="sy-section-panel" id="syPhrasesPanel" role="region" aria-labelledby="syPhrasesToggle" hidden>
+          <ul class="sy-phrase-list" id="syPhraseList"></ul>
+        </div>
+      </section>
+
+      <p class="sy-footer-note">
+        Syria — Layers of the Levant · Guide narration by Google TTS &amp; HeyGen ·
+        Photos via Wikimedia Commons · Development by David E Lane · <span id="syFooterYear">2026</span>
+      </p>
+    </div>
+  </main>
+
+  <div class="sy-story-overlay" id="syStoryOverlay" hidden aria-hidden="true" aria-live="polite">
+    <div class="sy-story-chip">
+      <img id="syStoryChipImg" src="/syria/assets/niqula-guide-portrait-256.png" width="56" height="56" alt=""/>
+      <div class="sy-story-chip-copy">
+        <p class="sy-story-kicker" id="syStoryKicker"></p>
+        <h3 class="sy-story-title" id="syStoryTitle"></h3>
+        <p class="sy-story-body" id="syStoryCopy"></p>
+        <p class="sy-story-progress" id="syStoryProgress"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sy-sheet" id="sySheet" hidden role="dialog" aria-modal="true" aria-labelledby="sySheetTitle">
+    <div class="sy-sheet-backdrop" id="sySheetBackdrop"></div>
+    <div class="sy-sheet-panel">
+      <header class="sy-sheet-header">
+        <h2 id="sySheetTitle"></h2>
+        <button type="button" class="btn-close btn-close-white" id="sySheetClose" aria-label="Close"></button>
+      </header>
+      <div class="sy-sheet-body" id="sySheetBody"></div>
+      <footer class="sy-sheet-footer">
+        <button type="button" class="sy-btn sy-btn-sand sy-btn-sm sy-listen-btn" id="sySheetListen" aria-pressed="false">
+          <i class="bi bi-volume-up-fill" aria-hidden="true"></i>
+          <span class="sy-listen-label" data-i18n="listen">Listen</span>
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <script src="/shared/tts.js"></script>
+  <script src="/shared/speech-recognition.js"></script>
+  <script src="/family/js/lane-family-google-maps.js"></script>
+  <script src="/shared/google-advanced-markers.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r160/three.min.js"></script>
+  <script src="/syria/js/syria-i18n.js"></script>
+  <script src="/syria/js/syria-sections.js"></script>
+  <script src="/syria/js/syria-content.js"></script>
+  <script src="/syria/js/syria-desert-atmos.js"></script>
+  <script src="/syria/js/syria-timeline-3d.js"></script>
+  <script src="/syria/js/syria-map.js"></script>
+  <script src="/syria/js/syria-heygen.js"></script>
+  <script src="/syria/js/syria-story-reel.js"></script>
+  <script type="module" src="/syria/js/syria-guide-chat.js"></script>
+</body>
+</html>

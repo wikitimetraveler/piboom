@@ -1,5 +1,5 @@
 /**
- * Jordan — Layers of the Kingdom
+ * Jordan — Eras of the Kingdom
  * Sandstone / basalt palette, bilingual (LTR + RTL) layout.
  * Development work by David Lane
  */
@@ -46,7 +46,7 @@
   background:
     radial-gradient(ellipse at 20% 0%, rgba(212, 162, 76, 0.35), transparent 60%),
     linear-gradient(165deg, #f7ecd8 0%, #e8d3ae 55%, #dcc094 100%);
-  border-bottom: 1px solid var(--jd-sand-line);
+  border-bottom: none;
 }
 
 /* Desert sandstorm — veils + canvas grains obscure the cityscape */
@@ -76,6 +76,39 @@
   animation: jd-sky-storm 9s ease-in-out infinite;
 }
 
+/* Soft dusk/night glow tucked behind the skyline — museum atlas, not neon */
+.jd-hero-horizon-glow {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: min(42%, 220px);
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 100%, rgba(212, 162, 76, 0.22), transparent 70%),
+    radial-gradient(ellipse 40% 40% at 22% 92%, rgba(181, 48, 31, 0.1), transparent 65%),
+    radial-gradient(ellipse 35% 35% at 78% 90%, rgba(255, 236, 200, 0.12), transparent 60%);
+  opacity: 0.72;
+  animation: jd-horizon-breathe 16s ease-in-out infinite;
+}
+
+.jd-hero.is-sandstorm .jd-hero-horizon-glow {
+  opacity: 0.55;
+  height: min(38%, 200px);
+}
+
+/* Full-hero canvas: sparse stars + gold motes (drawn in JS) */
+.jd-hero-sparkle {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
 .jd-hero-heat {
   position: absolute;
   inset: 35% 0 0 0;
@@ -102,7 +135,7 @@
   animation: jd-heat-shimmer 7s ease-in-out infinite;
 }
 
-/* Cityscape aligned to section width (1360) — not full viewport */
+/* Cityscape — soft blend into the sky, no hard frame */
 .jd-hero-silhouettes {
   position: absolute;
   left: 50%;
@@ -110,18 +143,18 @@
   translate: -50% 0;
   width: min(100% - 2rem, 1360px);
   height: 56px;
+  z-index: 1;
   opacity: 0.55;
   color: #4a321c;
   display: block;
-  border: 1px solid color-mix(in srgb, var(--jd-gold) 40%, var(--jd-sand-line));
-  border-bottom: none;
-  border-radius: 0.85rem 0.85rem 0 0;
-  background: linear-gradient(180deg, transparent 0%, rgba(230, 207, 169, 0.35) 100%);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.2) inset,
-    0 -4px 18px rgba(44, 32, 22, 0.08);
-  overflow: hidden;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  overflow: visible;
   box-sizing: border-box;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
 }
 
 .jd-hero.is-sandstorm .jd-hero-silhouettes {
@@ -240,6 +273,11 @@
   border-radius: 999px;
   background: rgba(138, 106, 75, 0.35);
   box-shadow: none;
+}
+
+@keyframes jd-horizon-breathe {
+  0%, 100% { opacity: 0.62; }
+  50% { opacity: 0.82; }
 }
 
 @keyframes jd-sky-breathe {
@@ -2024,14 +2062,42 @@ body.dark-mode.jd-page .jd-narrate--section {
   display: flex;
   align-items: flex-start;
   gap: 0.85rem;
-  max-width: 620px;
-  padding: 0.95rem 1.15rem;
+  max-width: min(640px, 94vw);
+  padding: 1rem 1.2rem;
   border: 1px solid rgba(212, 162, 76, 0.55);
   border-radius: 18px;
-  background: rgba(28, 26, 23, 0.93);
+  background:
+    radial-gradient(ellipse 80% 60% at 12% 0%, rgba(212, 162, 76, 0.18), transparent 55%),
+    rgba(18, 15, 12, 0.94);
   color: var(--jd-panel-ink);
-  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(8px);
+  box-shadow:
+    0 0 0 1px rgba(255, 232, 168, 0.08) inset,
+    0 22px 48px rgba(0, 0, 0, 0.48);
+  backdrop-filter: blur(10px);
+  transform: translateY(0);
+  opacity: 1;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+}
+
+.jd-story-chip.is-beat {
+  animation: jd-story-beat 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes jd-story-beat {
+  0% {
+    transform: translateY(12px) scale(0.97);
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jd-story-chip.is-beat {
+    animation: none;
+  }
 }
 
 .jd-story-chip img {
@@ -2040,6 +2106,7 @@ body.dark-mode.jd-page .jd-narrate--section {
   border-radius: 50%;
   border: 2px solid var(--jd-gold);
   flex: 0 0 auto;
+  box-shadow: 0 0 0 3px rgba(212, 162, 76, 0.2);
 }
 
 .jd-story-kicker {
@@ -2301,6 +2368,7 @@ body.jd-story-running .jd-guide {
 
   .jd-hero-sky,
   .jd-hero-heat,
+  .jd-hero-horizon-glow,
   .jd-hero-arch,
   .jd-hero-dune,
   .jd-hero-sand,
@@ -2308,6 +2376,10 @@ body.jd-story-running .jd-guide {
   .jd-hero-city,
   .jd-hero-silhouettes {
     animation: none !important;
+  }
+
+  .jd-hero-horizon-glow {
+    opacity: 0.55;
   }
 
   .jd-hero-silhouettes {
@@ -2321,6 +2393,11 @@ body.jd-story-running .jd-guide {
   .jd-hero-motes,
   .jd-hero-storm {
     display: none;
+  }
+
+  /* Static starfield may remain; JS paints once and skips RAF */
+  .jd-hero-sparkle {
+    opacity: 0.7;
   }
 
   .jd-hero.is-sandstorm .jd-hero-silhouettes {
@@ -2357,11 +2434,9 @@ body.dark-mode.jd-page .jd-hero.is-sandstorm {
 body.dark-mode.jd-page .jd-hero-silhouettes {
   color: #e2c48a;
   opacity: 0.5;
-  border-color: rgba(212, 162, 76, 0.4);
-  background: linear-gradient(180deg, transparent 0%, rgba(40, 32, 20, 0.55) 100%);
-  box-shadow:
-    0 0 0 1px rgba(212, 162, 76, 0.1) inset,
-    0 -4px 18px rgba(0, 0, 0, 0.25);
+  border: none;
+  background: none;
+  box-shadow: none;
 }
 
 body.dark-mode.jd-page .jd-hero.is-sandstorm .jd-hero-silhouettes {
@@ -2387,6 +2462,23 @@ body.dark-mode.jd-page .jd-hero.is-sandstorm .jd-hero-sky {
   background:
     radial-gradient(ellipse 80% 55% at 55% 15%, rgba(180, 120, 55, 0.22), transparent 60%),
     radial-gradient(ellipse 50% 40% at 15% 35%, rgba(140, 60, 25, 0.16), transparent 55%);
+}
+
+body.dark-mode.jd-page .jd-hero-horizon-glow {
+  background:
+    radial-gradient(ellipse 75% 60% at 50% 100%, rgba(212, 162, 76, 0.28), transparent 72%),
+    radial-gradient(ellipse 42% 42% at 18% 90%, rgba(181, 48, 31, 0.14), transparent 65%),
+    radial-gradient(ellipse 38% 38% at 82% 88%, rgba(246, 230, 196, 0.1), transparent 62%);
+  opacity: 0.85;
+  animation-duration: 20s;
+}
+
+body.dark-mode.jd-page .jd-hero.is-sandstorm .jd-hero-horizon-glow {
+  opacity: 0.7;
+}
+
+body.dark-mode.jd-page .jd-hero-sparkle {
+  opacity: 1;
 }
 
 body.dark-mode.jd-page .jd-hero-heat {

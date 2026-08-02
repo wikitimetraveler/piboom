@@ -442,8 +442,23 @@
       authRequired: false,
       problem: 'Explore Jordan’s history, food, and music in English or Arabic with a local AI guide.',
       consultingBlurb:
-        'Public bilingual atlas — EN/AR toggle, story reel, map layers, and Rami HeyGen clips. Fully public — no login.',
+        'Public bilingual atlas — EN/AR toggle, story reel, eras timeline, and Rami HeyGen clips. Fully public — no login.',
       stack: ['Bootstrap', 'HeyGen', 'Google Maps', 'Google TTS', 'i18n'],
+    },
+    {
+      id: 'syria',
+      label: 'Syria',
+      tagline: 'Bilingual atlas — Ugarit to Aleppo, Niqula guide in EN/AR',
+      path: '/syria/',
+      icon: 'bi-globe-central-south-asia',
+      category: 'other',
+      featured: true,
+      featuredOrder: 8,
+      authRequired: false,
+      problem: 'Explore Syria’s history, table, music, and communities in English or Arabic with a local AI guide.',
+      consultingBlurb:
+        'Public bilingual atlas — EN/AR toggle, chronology, map layers, guided reel, Commons photography, and Niqula HeyGen clips. Fully public — no login.',
+      stack: ['Bootstrap', 'HeyGen', 'Google Maps', 'Google TTS', 'LangChain', 'i18n'],
     },
     {
       id: 'heygen-hub',

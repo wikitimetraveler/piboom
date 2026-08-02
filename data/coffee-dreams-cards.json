@@ -1,15 +1,15 @@
 {
   "title": "Coffee Dreams",
-  "subtitle": "Eight café moods — Saigon to rainy window",
+  "subtitle": "Ten café moods — Saigon to study night",
   "activeVenueId": "cafe-168",
   "venues": {
     "cafe-168": {
       "name": "Cafe 168",
-      "address": "10287 Slater Ave, Fountain Valley, CA"
+      "address": "168 Night Market Lane, Little Saigon, CA 92708"
     },
     "cafe-368": {
       "name": "Cafe 368",
-      "address": "10287 Slater Ave, Fountain Valley, CA"
+      "address": "368 Condensed Milk Way, Little Saigon, CA 92708"
     }
   },
   "cards": [
@@ -19,6 +19,7 @@
       "caption": "Vietnamese iced coffee, condensed milk glass, café neon, confident pose.",
       "moodClass": "mood-neon",
       "imageUrl": "/family/assets/Iced%20Coffeee%20Queen.png",
+      "backImageUrl": "/entertainment/assets/coffee-dreams/iced-coffee-queen-pose2.png",
       "creditText": "Private photo"
     },
     {
@@ -27,6 +28,7 @@
       "caption": "Night-market lighting, espresso machine, soft glow, stylish modern outfit.",
       "moodClass": "mood-night",
       "imageUrl": "/family/assets/saigin%20Night.png",
+      "backImageUrl": "/entertainment/assets/coffee-dreams/saigon-night-barista-pose2.png",
       "creditText": "Private photo"
     },
     {
@@ -35,6 +37,7 @@
       "caption": "Outdoor tropical café, plants, sunlight, relaxed smile.",
       "moodClass": "mood-garden",
       "imageUrl": "/family/assets/GArdn%20Cafe.png",
+      "backImageUrl": "/entertainment/assets/coffee-dreams/garden-cafe-girl-pose2.png",
       "creditText": "Private photo"
     },
     {
@@ -43,6 +46,7 @@
       "caption": "1970s Vietnamese café vibe, vintage dress, old fan, warm sepia tones.",
       "moodClass": "mood-retro",
       "imageUrl": "/family/assets/rETRO%20gIRL.png",
+      "backImageUrl": "/entertainment/assets/coffee-dreams/retro-cafe-hostess-pose2.png",
       "creditText": "Private photo"
     },
     {
@@ -51,6 +55,7 @@
       "caption": "Modern Asian café, playful but tasteful, colorful drink props.",
       "moodClass": "mood-boba",
       "imageUrl": "/family/assets/Bobo.png",
+      "backImageUrl": "/entertainment/assets/coffee-dreams/boba-coffee-model-pose2.png",
       "creditText": "Private photo"
     },
     {
@@ -59,6 +64,7 @@
       "caption": "Scooter parked outside, street café, urban Vietnam-inspired background.",
       "moodClass": "mood-street",
       "imageUrl": "/family/assets/motorcycleGirl.png",
+      "backImageUrl": "/entertainment/assets/coffee-dreams/motorcycle-cafe-girl-pose2.png",
       "creditText": "Private photo"
     },
     {
@@ -67,6 +73,7 @@
       "caption": "Sitting by a rainy café window, holding hot coffee, moody cinematic card.",
       "moodClass": "mood-rain",
       "imageUrl": "/family/assets/The%20Rainy%20Window%20Girl.png",
+      "backImageUrl": "/entertainment/assets/coffee-dreams/rainy-window-girl-pose2.png",
       "creditText": "Private photo"
     },
     {
@@ -75,6 +82,25 @@
       "caption": "Saigon coffee queen energy, full tattoo sleeves, espresso machine, vintage playing-card style.",
       "moodClass": "mood-night",
       "imageUrl": "/family/assets/tatooed.png",
+      "backImageUrl": "/entertainment/assets/coffee-dreams/tattooed-barista-pose2.png",
+      "creditText": "Private photo"
+    },
+    {
+      "id": "matcha-latte-artist",
+      "title": "The Matcha Latte Artist",
+      "caption": "Foam hearts, paint-splatter apron, green latte glow — café creativity on pour.",
+      "moodClass": "mood-garden",
+      "imageUrl": "/entertainment/assets/coffee-dreams/matcha-latte-artist.png",
+      "backImageUrl": "/entertainment/assets/coffee-dreams/matcha-latte-artist-pose2.png",
+      "creditText": "Private photo"
+    },
+    {
+      "id": "late-night-study-twin",
+      "title": "The Late-Night Study Twin",
+      "caption": "Laptop, headphones, iced coffee, and one more chapter before closing time.",
+      "moodClass": "mood-night",
+      "imageUrl": "/entertainment/assets/coffee-dreams/late-night-study-twin.png",
+      "backImageUrl": "/entertainment/assets/coffee-dreams/late-night-study-twin-pose2.png",
       "creditText": "Private photo"
     }
   ]

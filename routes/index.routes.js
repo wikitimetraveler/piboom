@@ -31,6 +31,7 @@ import concertCollectionRoutes from './concert-collection.routes.js';
 import loanPipelineRoutes from './loan-pipeline.routes.js';
 import disastersRoutes from './disasters.routes.js';
 import encompassHubRoutes from './encompass-hub.routes.js';
+import encompassConditionsRoutes from './encompass-conditions.routes.js';
 import encompassWebhookRoutes from './encompass-webhook.routes.js';
 import fishCatchesRoutes from './fish-catches.routes.js';
 import rockDiscoveryRoutes from './rock-discovery.routes.js';
@@ -52,6 +53,7 @@ import heygenRoutes from './heygen.routes.js';
 import heygenAssistantRoutes from './heygen-assistant.routes.js';
 import donutsRoutes from './donuts.routes.js';
 import jordanRoutes from './jordan.routes.js';
+import syriaRoutes from './syria.routes.js';
 import shenangoRoutes from './shenango.routes.js';
 import newportPierRoutes from './newport-pier.routes.js';
 
@@ -84,6 +86,7 @@ export default function buildRoutes(io) {
   api.use('/concert-collection', concertCollectionRoutes);
   api.use('/loan-pipeline', loanPipelineRoutes);
   api.use('/encompass-hub', encompassHubRoutes);
+  api.use('/encompass-conditions', encompassConditionsRoutes);
   api.use('/disasters', disastersRoutes);
   api.use('/webhooks', encompassWebhookRoutes);
   api.use('/fish-catches', fishCatchesRoutes);
@@ -106,6 +109,7 @@ export default function buildRoutes(io) {
   api.use('/heygen-assistant', heygenAssistantRoutes);
   api.use('/donuts', donutsRoutes);
   api.use('/jordan', jordanRoutes);
+  api.use('/syria', syriaRoutes);
   api.use('/shenango', shenangoRoutes);
   api.use('/newport-pier', newportPierRoutes);
   api.use('/', musicHistoryRoutes); // Music history and concert finder

@@ -31,6 +31,7 @@
   --fun-glazed: #e85a7a;
   --fun-heygen: #2a9bb0;
   --fun-jordan: #b5301f;
+  --fun-syria: #9c2233;
 
   --fun-sparkle: #c9a227;
 }
@@ -465,11 +466,29 @@ body[data-theme="dark"] .fun-hero__title {
 
 .fun-hero__cta {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.85rem;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0.75rem;
   justify-content: center;
   align-items: center;
   animation: fadeInUp 0.8s ease-out 0.7s backwards;
+}
+
+.fun-hero__cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.fun-hero__cta-row--projects {
+  margin-bottom: 0.15rem;
+}
+
+.fun-hero__cta-row--work[hidden] {
+  display: none !important;
 }
 
 .fun-btn {
@@ -882,6 +901,101 @@ body[data-theme="dark"] .fun-hero__title {
   gap: 0.4rem;
 }
 
+/* inline-flex above would otherwise win over the hidden attribute */
+.fun-featured-pair[hidden] {
+  display: none;
+}
+
+/* Work tools — only rendered once a finance password has been entered */
+.fun-featured-work {
+  --wk-ink: #eef4f8;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.45rem 1.1rem 0.45rem 0.45rem;
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--wk-ink);
+  background:
+    radial-gradient(ellipse 85% 110% at 15% 12%, rgba(255, 255, 255, 0.28), transparent 52%),
+    linear-gradient(148deg, #2f5f70 0%, #244c5c 45%, #16323e 100%);
+  border: 1px solid rgba(238, 244, 248, 0.35);
+  box-shadow:
+    0 10px 28px rgba(22, 50, 62, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: transform 0.25s cubic-bezier(0.34, 1.4, 0.64, 1), box-shadow 0.25s ease;
+}
+
+.fun-featured-work--tests {
+  background:
+    radial-gradient(ellipse 85% 110% at 15% 12%, rgba(255, 255, 255, 0.26), transparent 52%),
+    linear-gradient(148deg, #3f5a86 0%, #2f4569 45%, #1d2b45 100%);
+  box-shadow:
+    0 10px 28px rgba(29, 43, 69, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.fun-featured-work__mark {
+  display: grid;
+  place-items: center;
+  width: 2.65rem;
+  height: 2.65rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.fun-featured-work__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.02rem;
+  line-height: 1.05;
+  min-width: 0;
+}
+
+.fun-featured-work__eyebrow {
+  font-family: var(--fun-font-body);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(238, 244, 248, 0.78);
+}
+
+.fun-featured-work__name {
+  font-family: var(--fun-font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fbfdff;
+}
+
+.fun-featured-work__arrow {
+  font-size: 1rem;
+  opacity: 0.85;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.fun-featured-work:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 16px 36px rgba(22, 50, 62, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  color: var(--wk-ink);
+}
+
+.fun-featured-work:hover .fun-featured-work__arrow {
+  transform: translateX(3px);
+  opacity: 1;
+}
+
+.fun-featured-work:focus-visible {
+  outline: 2px solid #9ad7ea;
+  outline-offset: 3px;
+}
+
 .fun-featured-qr {
   display: grid;
   place-items: center;
@@ -905,6 +1019,117 @@ body[data-theme="dark"] .fun-hero__title {
 .fun-featured-qr--jordan {
   border-color: rgba(181, 48, 31, 0.35);
   box-shadow: 0 6px 16px rgba(140, 34, 20, 0.22);
+}
+
+.fun-featured-qr--syria {
+  border-color: rgba(200, 16, 46, 0.4);
+  box-shadow: 0 6px 16px rgba(120, 16, 30, 0.22);
+}
+
+/* Featured Syria — flag-band atlas chip beside Jordan */
+.fun-featured-syria {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 1rem 0.55rem 0.65rem;
+  border-radius: 999px;
+  text-decoration: none;
+  color: #f6efe2;
+  background:
+    linear-gradient(115deg, #8c1020 0%, #c8102e 38%, #2a2a2a 72%, #0d0d0d 100%);
+  border: 1px solid rgba(246, 239, 226, 0.28);
+  box-shadow:
+    0 10px 28px rgba(40, 10, 16, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  overflow: hidden;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.fun-featured-syria__glow {
+  position: absolute;
+  inset: -40% -20% auto;
+  height: 90%;
+  background: radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.22), transparent 60%);
+  pointer-events: none;
+}
+
+.fun-featured-syria__mark {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+}
+
+.fun-featured-syria__mark svg {
+  display: block;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+}
+
+.fun-featured-syria__copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.05rem;
+  min-width: 0;
+}
+
+.fun-featured-syria__eyebrow {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(246, 239, 226, 0.78);
+}
+
+.fun-featured-syria__name {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #fffaf2;
+}
+
+.fun-featured-syria__ar {
+  font-family: 'Amiri', Georgia, serif;
+  font-size: 0.95rem;
+  line-height: 1.15;
+  color: rgba(246, 239, 226, 0.9);
+}
+
+.fun-featured-syria__arrow {
+  position: relative;
+  z-index: 1;
+  margin-inline-start: 0.15rem;
+  font-size: 1.05rem;
+  color: rgba(246, 239, 226, 0.85);
+  transition: transform 0.2s ease;
+}
+
+.fun-featured-syria:hover {
+  transform: translateY(-2px);
+  color: #fffaf2;
+  box-shadow:
+    0 14px 32px rgba(40, 10, 16, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.fun-featured-syria:hover .fun-featured-syria__arrow {
+  transform: translateX(3px);
+}
+
+[dir='rtl'] .fun-featured-syria:hover .fun-featured-syria__arrow {
+  transform: translateX(-3px);
+}
+
+.fun-featured-syria:focus-visible {
+  outline: 3px solid rgba(200, 16, 46, 0.55);
+  outline-offset: 3px;
 }
 
 .fun-featured-qr:hover {
@@ -1013,6 +1238,11 @@ body[data-theme="dark"] .fun-featured-qr {
   padding-block: 1.65rem;
 }
 
+.fun-card--syria {
+  grid-column: span 3;
+  padding-block: 1.65rem;
+}
+
 .fun-card--heygen {
   grid-column: span 3;
   padding-block: 1.65rem;
@@ -1098,6 +1328,12 @@ body[data-theme="dark"] .fun-card:hover {
   filter: blur(14px);
 }
 
+.fun-card--syria:hover .fun-card__glow {
+  opacity: 0.7;
+  background: radial-gradient(circle at 50% 0%, rgba(156, 34, 51, 0.22), rgba(201, 153, 47, 0.1) 45%, transparent 70%);
+  filter: blur(14px);
+}
+
 .fun-card--heygen:hover .fun-card__glow {
   opacity: 0.7;
   background: radial-gradient(circle at 50% 0%, rgba(42, 155, 176, 0.2), rgba(42, 155, 176, 0.08) 40%, transparent 70%);
@@ -1156,6 +1392,11 @@ body[data-theme="dark"] .fun-card:hover {
 .fun-card--jordan .fun-card__icon {
   background: rgba(181, 48, 31, 0.1);
   color: var(--fun-jordan);
+}
+
+.fun-card--syria .fun-card__icon {
+  background: rgba(156, 34, 51, 0.1);
+  color: var(--fun-syria);
 }
 
 .fun-card--glazed .fun-card__icon img {
@@ -1414,6 +1655,7 @@ body[data-theme="dark"] .fun-card:hover {
   .fun-card--family,
   .fun-card--glazed,
   .fun-card--jordan,
+  .fun-card--syria,
   .fun-card--heygen {
     grid-column: span 3;
     min-height: 0;
@@ -1447,6 +1689,7 @@ body[data-theme="dark"] .fun-card:hover {
   .fun-card--family,
   .fun-card--glazed,
   .fun-card--jordan,
+  .fun-card--syria,
   .fun-card--heygen {
     grid-column: 1;
     min-height: 0;

@@ -1,0 +1,66 @@
+{
+  "id": "syria-niqula-intro",
+  "title": {
+    "en": "Syria — Meet Niqula",
+    "ar": "سوريا — تعرّف على نقولا"
+  },
+  "ctaLabel": {
+    "en": "Start the tour",
+    "ar": "ابدأ الجولة"
+  },
+  "ctaHref": "/syria/?reel=1",
+  "qrLandingPath": "/syria/?demo=heygen",
+  "brand": {
+    "attribution": {
+      "en": "Avatar narration powered by HeyGen",
+      "ar": "سرد الأفاتار بتقنية HeyGen"
+    },
+    "developmentBy": "David E Lane"
+  },
+  "heygenScriptShort": {
+    "en": "Ahlan wa sahlan — I'm Niqula, your guide to Syria. In a few minutes we'll go from Ugarit's alphabet to Zenobia's Palmyra, then to a plate of kibbeh and the qudud of Aleppo. Press play on the highlight reel, or just ask me a question.",
+    "ar": "أهلاً وسهلاً — أنا نقولا، دليلك إلى سوريا. في دقائق ننتقل من أبجدية أوغاريت إلى تدمر زنوبيا، ثم إلى طبق كبّة وقدود حلب. شغّل الجولة المصوّرة، أو اسألني مباشرة."
+  },
+  "heygenVoiceLanguage": {
+    "en": "English",
+    "ar": "Arabic"
+  },
+  "heygenMotionPrompt": "calm nod, warm local guide speaking to camera",
+  "heygenExpressiveness": "low",
+  "heygenAvatarId": "32c38c2956e94ed584baad737947df7b",
+  "heygenAvatarGroupId": null,
+  "heygenVoiceId": {
+    "en": "453c20e1525a429080e2ad9e4b26f2cd",
+    "ar": "61a4359785664d01a59664ceb87ce6d4"
+  },
+  "heygenVoiceName": {
+    "en": "Archer",
+    "ar": "Hakeem Hassan"
+  },
+  "heygenVideoIdShort": {
+    "en": "5f402c551fb3429c915c0124888a44c8",
+    "ar": "7ac7853ce06a432f89020051506024cb"
+  },
+  "heygenVideoUrlShort": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVideoLocalShort": {
+    "en": "/syria/assets/video/syria-niqula-intro.mp4",
+    "ar": "/syria/assets/video/syria-niqula-intro-ar.mp4"
+  },
+  "generatedAt": {
+    "en": "2026-08-02T02:29:24.450Z",
+    "ar": "2026-08-02T02:30:24.405Z"
+  },
+  "avatar": {
+    "name": "Niqula",
+    "file": "AVATAR-NIQULA.md",
+    "portrait": "/syria/assets/niqula-guide-portrait-256.png",
+    "source": "/syria/assets/niqula-guide-portrait.png",
+    "status": "heygen-ready-with-video",
+    "lookId": "32c38c2956e94ed584baad737947df7b",
+    "groupId": null
+  },
+  "generateHint": "npm run generate:syria-heygen-demo -- --lang both --create-avatar --direct --cache-local"
+}

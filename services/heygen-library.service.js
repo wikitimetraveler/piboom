@@ -15,6 +15,7 @@ const CALC_ENGINE_DEMO_PATH = path.join(ROOT, 'data/calc-engine-heygen-demo.json
 const UNIT_TESTS_DEMO_PATH = path.join(ROOT, 'data/unit-tests-heygen-demo.json');
 const SVEN_UX_DEMO_PATH = path.join(ROOT, 'data/sven-ux-heygen-demo.json');
 const JORDAN_DEMO_PATH = path.join(ROOT, 'data/jordan-heygen-demo.json');
+const SYRIA_DEMO_PATH = path.join(ROOT, 'data/syria-heygen-demo.json');
 const HYPERFRAMES_LIBRARY_PATH = path.join(ROOT, 'data/hyperframes-library.json');
 
 function pickUrl(...candidates) {
@@ -187,6 +188,36 @@ function jordanDemoEntries(demo) {
   });
 }
 
+/** Syria ships one clip per page language, so each language is its own library entry. */
+function syriaDemoEntries(demo) {
+  if (!demo) return [];
+  const langs = [
+    { code: 'en', label: 'English' },
+    { code: 'ar', label: 'Arabic' }
+  ];
+  return langs.flatMap(({ code, label }) => {
+    const url = pickUrl(demo.heygenVideoLocalShort?.[code], demo.heygenVideoUrlShort?.[code]);
+    const videoId = demo.heygenVideoIdShort?.[code] || null;
+    if (!url && !videoId) return [];
+    return [
+      entryBase({
+        id: `syria-niqula-intro-${code}`,
+        videoId,
+        title: `${demo.title?.en || 'Syria — Meet Niqula'} (${label})`,
+        domain: 'syria',
+        variant: 'demo',
+        videoUrl: url,
+        portraitUrl: demo.avatar?.portrait || null,
+        sourcePage: demo.qrLandingPath || '/syria/?demo=heygen',
+        studioPage: demo.ctaHref || '/syria/',
+        script: demo.heygenScriptShort?.[code] || null,
+        tags: ['syria', 'demo', 'popup', 'bilingual', code],
+        generatedAt: demo.generatedAt?.[code] || null
+      })
+    ];
+  });
+}
+
 function financeBoothEntry(demo, { id, tags }) {
   if (!demo) return [];
   const url = pickUrl(demo.heygenVideoLocalShort, demo.heygenVideoUrlShort);
@@ -288,6 +319,7 @@ export async function getHeygenVideoLibrary({ domain, kind } = {}) {
     unitDemo,
     svenDemo,
     jordanDemo,
+    syriaDemo,
     hyperframesCatalog,
     registry
   ] = await Promise.all([
@@ -298,6 +330,7 @@ export async function getHeygenVideoLibrary({ domain, kind } = {}) {
     readJsonSafe(UNIT_TESTS_DEMO_PATH),
     readJsonSafe(SVEN_UX_DEMO_PATH),
     readJsonSafe(JORDAN_DEMO_PATH),
+    readJsonSafe(SYRIA_DEMO_PATH),
     readJsonSafe(HYPERFRAMES_LIBRARY_PATH),
     loadRegistry()
   ]);
@@ -308,6 +341,7 @@ export async function getHeygenVideoLibrary({ domain, kind } = {}) {
   for (const item of musicDemoEntry(musicDemo)) byId.set(item.id, item);
   for (const item of financeDemoEntries(calcDemo, unitDemo, svenDemo)) byId.set(item.id, item);
   for (const item of jordanDemoEntries(jordanDemo)) byId.set(item.id, item);
+  for (const item of syriaDemoEntries(syriaDemo)) byId.set(item.id, item);
   for (const item of registry.videos || []) {
     if (item?.id) byId.set(item.id, { ...byId.get(item.id), ...item, kind: item.kind || 'heygen' });
   }

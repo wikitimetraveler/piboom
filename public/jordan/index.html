@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Jordan — Layers of the Kingdom | History, Food &amp; Music</title>
+  <title>Jordan — Eras of the Kingdom | History, Food &amp; Music</title>
   <meta name="description" content="A bilingual guided tour of Jordan: nine thousand years of history on the map, the story behind mansaf and jameed, the rababa and the dabke line — narrated in English or Arabic."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -62,7 +62,7 @@
       </div>
       <p class="jd-splash__kicker" lang="ar">المملكة الأردنية الهاشمية</p>
       <h1 class="jd-splash__title" id="jdSplashTitle">Jordan</h1>
-      <p class="jd-splash__line">Layers of the Kingdom</p>
+      <p class="jd-splash__line">Eras of the Kingdom</p>
       <div class="jd-splash__rule" aria-hidden="true"></div>
       <p class="jd-splash__enter" id="jdSplashEnterHint">Enter the atlas</p>
     </div>
@@ -74,6 +74,8 @@
     <section class="jd-hero" id="jdHero">
       <div class="jd-hero-atmos jd-hero-atmos--storm" id="jdHeroAtmos" aria-hidden="true">
         <div class="jd-hero-sky"></div>
+        <div class="jd-hero-horizon-glow"></div>
+        <canvas class="jd-hero-sparkle" id="jdSkySparkle" width="1200" height="600"></canvas>
         <div class="jd-hero-heat"></div>
         <svg class="jd-hero-silhouettes" viewBox="0 0 1200 100" preserveAspectRatio="xMidYMax meet" focusable="false">
           <g class="jd-hero-city jd-hero-city--far" fill="currentColor">
@@ -218,8 +220,8 @@
         <div class="jd-section-head">
           <button type="button" class="jd-section-toggle" id="jdTimelineToggle" aria-expanded="false" aria-controls="jdTimelinePanel">
             <span class="jd-section-toggle__copy">
-              <span class="jd-section-title" data-i18n="timelineHeading">Layers of Jordan</span>
-              <span class="jd-section-lead" data-i18n="timelineLead">Ten eras from Neolithic Ain Ghazal to the modern kingdom. Select a layer to hear it and locate it on the map.</span>
+              <span class="jd-section-title" data-i18n="timelineHeading">Eras of Jordan</span>
+              <span class="jd-section-lead" data-i18n="timelineLead">Ten eras from Neolithic Ain Ghazal to the modern kingdom. Select an era to hear it and locate it on the map.</span>
             </span>
             <i class="bi bi-chevron-down jd-section-chevron" aria-hidden="true"></i>
           </button>
@@ -334,14 +336,14 @@
       </section>
 
       <p class="jd-footer-note">
-        Jordan — Layers of the Kingdom · Guide narration by Google TTS &amp; HeyGen ·
+        Jordan — Eras of the Kingdom · Guide narration by Google TTS &amp; HeyGen ·
         Development by David E Lane · <span id="jdFooterYear">2026</span>
       </p>
     </div>
   </main>
 
   <div class="jd-story-overlay" id="jdStoryOverlay" hidden aria-hidden="true" aria-live="polite">
-    <div class="jd-story-chip">
+    <div class="jd-story-chip" id="jdStoryChip">
       <img id="jdStoryChipImg" src="/jordan/assets/rami-guide-portrait-256.png" width="56" height="56" alt=""/>
       <div class="jd-story-chip-copy">
         <p class="jd-story-kicker" id="jdStoryKicker"></p>

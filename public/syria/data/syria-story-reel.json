@@ -1,0 +1,241 @@
+{
+  "id": "syria-hyperframes-reel",
+  "portrait": "/syria/assets/niqula-guide-portrait-256.png",
+  "voice": {
+    "en": "en-US-Neural2-D",
+    "ar": "ar-XA-Wavenet-B"
+  },
+  "pitch": -1,
+  "speakingRate": 0.98,
+  "scenes": [
+    {
+      "id": "welcome",
+      "anchor": "syHero",
+      "spotlight": "#syHero",
+      "durationMs": 7000,
+      "kicker": {
+        "en": "Welcome",
+        "ar": "أهلاً"
+      },
+      "title": {
+        "en": "Ahlan wa sahlan",
+        "ar": "أهلاً وسهلاً"
+      },
+      "copy": {
+        "en": "I am Niqula. Eleven thousand years in about three minutes.",
+        "ar": "أنا نقولا. أحد عشر ألف عام في ثلاث دقائق تقريباً."
+      },
+      "narration": {
+        "en": "Ahlan wa sahlan. I am Niqula, and this is Syria — not a ruin field, a country that has been writing things down since before anyone else. Give me three minutes and I will show you the shape of it.",
+        "ar": "أهلاً وسهلاً. أنا نقولا، وهذه سوريا — ليست حقل أطلال، بل بلد يدوّن منذ ما قبل الجميع. أعطني ثلاث دقائق وأريك شكلها."
+      }
+    },
+    {
+      "id": "damascus",
+      "anchor": "syMap",
+      "spotlight": "#syMap",
+      "action": "focusDamascus",
+      "durationMs": 8200,
+      "kicker": {
+        "en": "Atlas",
+        "ar": "أطلس"
+      },
+      "title": {
+        "en": "Damascus",
+        "ar": "دمشق"
+      },
+      "copy": {
+        "en": "A Roman grid, a Straight Street, and a mosque built over a cathedral built over a temple.",
+        "ar": "تخطيط روماني، وشارع مستقيم، وجامع فوق كاتدرائية فوق معبد."
+      },
+      "narration": {
+        "en": "Start in Damascus. The Straight Street still runs east to west on the Roman line, and the Umayyad Mosque stands on ground that was an Aramaean temple, then a temple of Jupiter, then a cathedral. Nobody here demolishes a good foundation.",
+        "ar": "نبدأ من دمشق. ما زال الشارع المستقيم يمتدّ شرقاً غرباً على الخط الروماني، ويقوم الجامع الأموي على أرض كانت معبداً آرامياً، ثم معبداً لجوبيتر، ثم كاتدرائية. لا أحد هنا يهدم أساساً جيداً."
+      }
+    },
+    {
+      "id": "alphabet",
+      "anchor": "syTimeline",
+      "spotlight": "#syTimeline",
+      "action": "openFirstEra",
+      "durationMs": 8600,
+      "kicker": {
+        "en": "Layers",
+        "ar": "طبقات"
+      },
+      "title": {
+        "en": "Villages, archives, an alphabet",
+        "ar": "قرى وأرشيفات وأبجدية"
+      },
+      "copy": {
+        "en": "Farming on the Euphrates, seventeen thousand tablets at Ebla, thirty signs at Ugarit.",
+        "ar": "زراعة على الفرات، وسبعة عشر ألف رُقيم في إيبلا، وثلاثون علامة في أوغاريت."
+      },
+      "narration": {
+        "en": "The timeline starts on the Euphrates, where hunters became farmers. Then Ebla, whose palace burned and baked seventeen thousand clay tablets into a library. Then Ugarit on the coast, where scribes cut writing down to thirty signs — the alphabet, in an order you would still recognise.",
+        "ar": "يبدأ الخط الزمني على الفرات، حيث صار الصيّادون مزارعين. ثم إيبلا التي احترق قصرها فشوى سبعة عشر ألف رُقيم وصارت مكتبة. ثم أوغاريت على الساحل، حيث اختصر الكتبة الكتابة إلى ثلاثين علامة — الأبجدية، بترتيب ما زلت تعرفه."
+      }
+    },
+    {
+      "id": "palmyra",
+      "anchor": "syMap",
+      "spotlight": "#syMap",
+      "action": "focusPalmyra",
+      "durationMs": 8000,
+      "kicker": {
+        "en": "Steppe",
+        "ar": "بادية"
+      },
+      "title": {
+        "en": "Zenobia's Palmyra",
+        "ar": "تدمر زنوبيا"
+      },
+      "copy": {
+        "en": "A caravan city that taxed the desert road — and then took on Rome.",
+        "ar": "مدينة قوافل فرضت الرسوم على درب الصحراء — ثم تحدّت روما."
+      },
+      "narration": {
+        "en": "Out in the steppe is Palmyra, which grew rich escorting caravans and published its tariff on stone. In the two seventies its queen, Zenobia, broke with Rome and briefly ruled from Egypt to Anatolia. The site is World Heritage, and it lost the Temple of Bel in twenty fifteen.",
+        "ar": "في البادية تقوم تدمر، التي اغتنت من حراسة القوافل ونقشت تعرفتها على الحجر. وفي سبعينيات القرن الثالث انفصلت ملكتها زنوبيا عن روما وحكمت لبرهة من مصر إلى الأناضول. الموقع تراث عالمي، وقد فقد معبد بل عام ٢٠١٥."
+      }
+    },
+    {
+      "id": "table",
+      "anchor": "syFood",
+      "spotlight": "#syFood",
+      "action": "flipFirstFood",
+      "durationMs": 7600,
+      "kicker": {
+        "en": "The table",
+        "ar": "المائدة"
+      },
+      "title": {
+        "en": "Kibbeh, in dozens of shapes",
+        "ar": "الكبّة بعشرات الأشكال"
+      },
+      "copy": {
+        "en": "Aleppo counts its kibbeh the way other cities count their monuments.",
+        "ar": "تعدّ حلب كبّتها كما تعدّ مدن أخرى آثارها."
+      },
+      "narration": {
+        "en": "Now the table. Kibbeh is not one dish — Aleppo cooks name dozens, fried, baked, raw, or cooked in sour cherry sauce with pine nuts. Flip any plate on this page and it will tell you where it came from, honestly, including the ones the whole Levant shares.",
+        "ar": "والآن المائدة. الكبّة ليست طبقاً واحداً — يسمّي طبّاخو حلب عشرات الأنواع، مقلية ومشوية ونيّئة ومطبوخة بالكرز الحامض مع الصنوبر. اقلب أي طبق في هذه الصفحة وسيخبرك من أين جاء بصدق، بما في ذلك ما تتقاسمه بلاد الشام كلها."
+      }
+    },
+    {
+      "id": "sound",
+      "anchor": "syMusic",
+      "spotlight": "#syMusic",
+      "action": "flipFirstMusic",
+      "durationMs": 7800,
+      "kicker": {
+        "en": "Sound",
+        "ar": "صوت"
+      },
+      "title": {
+        "en": "The oud and the qudud",
+        "ar": "العود والقدود"
+      },
+      "copy": {
+        "en": "Damascus built the instrument; Aleppo kept the repertoire.",
+        "ar": "دمشق صنعت الآلة، وحلب حفظت السجلّ."
+      },
+      "narration": {
+        "en": "Damascus workshops built the ouds that set the standard for the whole Arab world. Aleppo kept the qudud — old melodies given new words — and taught an audience to answer the singer inside the maqam. Two cities, one instrument, one long argument about who does it better.",
+        "ar": "صنعت ورش دمشق الأعواد التي وضعت المعيار للعالم العربي كله. وحفظت حلب القدود — ألحان قديمة بكلمات جديدة — وعلّمت جمهوراً أن يردّ على المطرب داخل المقام. مدينتان وآلة واحدة، ونقاش طويل عن أيّهما أفضل."
+      }
+    },
+    {
+      "id": "cafe",
+      "anchor": "syHookah",
+      "spotlight": "#syHookah",
+      "action": "flipFirstHookah",
+      "durationMs": 7000,
+      "kicker": {
+        "en": "The café",
+        "ar": "المقهى"
+      },
+      "title": {
+        "en": "Argileh and the hakawati",
+        "ar": "الأرجيلة والحكواتي"
+      },
+      "copy": {
+        "en": "A water pipe, a raised chair, and a story stopped at the worst moment.",
+        "ar": "نارجيلة وكرسي مرتفع وحكاية تتوقّف في أسوأ لحظة."
+      },
+      "narration": {
+        "en": "At the Nawfara café behind the mosque, the storyteller climbs his chair after sunset, reads the epic of Baybars, and stops at the cliff edge so the room comes back tomorrow. The argileh in front of you is the excuse to stay for it.",
+        "ar": "في مقهى النوفرة خلف الجامع، يصعد الحكواتي كرسيه بعد المغرب، ويقرأ سيرة الظاهر بيبرس، ويتوقّف عند الحافة كي تعود القاعة غداً. والأرجيلة أمامك هي الحجّة للبقاء."
+      }
+    },
+    {
+      "id": "living",
+      "anchor": "syLiving",
+      "spotlight": "#syLiving",
+      "action": "flipFirstLiving",
+      "durationMs": 8200,
+      "kicker": {
+        "en": "Living",
+        "ar": "حياة"
+      },
+      "title": {
+        "en": "Courtyards, languages, hands",
+        "ar": "أفنية ولغات وأيادٍ"
+      },
+      "copy": {
+        "en": "Aramaic in Maaloula, mate in the Jabal, laurel soap curing nine months in Aleppo.",
+        "ar": "آرامية في معلولا، ومتّة في الجبل، وصابون غار ينشف تسعة أشهر في حلب."
+      },
+      "narration": {
+        "en": "Syria is still spoken in more languages than one. Aramaic survives in Maaloula, Syriac in the churches of the Jazira, Kurdish and Armenian in the northeast. And the crafts survive in hands: laurel soap cured nine months, shell cut into rosewood, mate passed round a circle in the Jabal.",
+        "ar": "ما زالت سوريا تُنطق بأكثر من لغة. الآرامية باقية في معلولا، والسريانية في كنائس الجزيرة، والكردية والأرمنية في الشمال الشرقي. والحِرَف باقية في الأيدي: صابون غار ينشف تسعة أشهر، وصدف يُقصّ في خشب الورد، ومتّة تدور في حلقة في الجبل."
+      }
+    },
+    {
+      "id": "phrase",
+      "anchor": "syPhrases",
+      "spotlight": "#syPhrases",
+      "action": "speakFirstPhrase",
+      "durationMs": 7200,
+      "kicker": {
+        "en": "Speak",
+        "ar": "احكِ"
+      },
+      "title": {
+        "en": "Take one word with you",
+        "ar": "خذ معك كلمة"
+      },
+      "copy": {
+        "en": "Ahlein — the answer everyone gives, everywhere in the country.",
+        "ar": "أهلين — الردّ الذي يقوله الجميع في كل البلاد."
+      },
+      "narration": {
+        "en": "Before you go, take one word. Ahlein. It is the answer to a greeting anywhere in Syria, and it is enough to start a conversation. Press any phrase on the page and I will say it for you.",
+        "ar": "قبل أن تذهب، خذ كلمة واحدة. أهلين. إنها الردّ على التحية في أي مكان في سوريا، وتكفي لتبدأ حديثاً. اضغط أي عبارة في الصفحة وسأقولها لك."
+      }
+    },
+    {
+      "id": "close",
+      "anchor": "syGuide",
+      "spotlight": "#syGuide",
+      "action": "unflipCards",
+      "durationMs": 6600,
+      "kicker": {
+        "en": "Ask me",
+        "ar": "اسألني"
+      },
+      "title": {
+        "en": "The atlas is yours now",
+        "ar": "الأطلس لك الآن"
+      },
+      "copy": {
+        "en": "Every pin, plate and card answers when you press it — or just ask me.",
+        "ar": "كل علامة وطبق وبطاقة تجيب حين تضغطها — أو اسألني مباشرة."
+      },
+      "narration": {
+        "en": "That is the shape of it. Every pin, every plate and every card on this page will tell you its story if you press it, in English or in Arabic. Or open the chat and ask me directly — I would rather answer than lecture.",
+        "ar": "هذا هو شكلها. كل علامة وكل طبق وكل بطاقة في هذه الصفحة ستروي حكايتها إن ضغطتها، بالإنجليزية أو بالعربية. أو افتح المحادثة واسألني مباشرة — أفضّل أن أجيب على أن ألقي درساً."
+      }
+    }
+  ]
+}

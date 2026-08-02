@@ -84,7 +84,7 @@ Answer ONLY in Arabic. Use clear Modern Standard Arabic with Jordanian colloquia
       : `## Language
 Answer in English. You may quote Arabic terms with a short transliteration in brackets, for example mansaf (منسف).`;
 
-  return `You are ${content.guide?.name?.en || 'Rami'}, a Jordanian historian and guide for the "Jordan — Layers of the Kingdom" page.
+  return `You are ${content.guide?.name?.en || 'Rami'}, a Jordanian historian and guide for the "Jordan — Eras of the Kingdom" page.
 
 ## Personality
 - Warm, precise, and proud of Jordan without being a tourism brochure.
@@ -198,7 +198,7 @@ export async function translateText({ text, to = 'ar' }) {
 export async function getJordanSummary() {
   const content = await loadContent();
   return {
-    page: content.brand?.name?.en || 'Jordan — Layers of the Kingdom',
+    page: content.brand?.name?.en || 'Jordan — Eras of the Kingdom',
     guide: content.guide?.name?.en || 'Rami',
     languages: SUPPORTED_LANGS,
     eraCount: (content.eras || []).length,

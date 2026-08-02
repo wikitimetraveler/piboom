@@ -5,6 +5,7 @@
   'use strict';
 
   const THEME_KEY = 'funHomeTheme';
+  const WORK_REVEAL_KEY = 'mortgageLinkRevealed';
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Theme toggle
@@ -210,8 +211,11 @@
         
         // Optional: Save to localStorage so it stays revealed
         try {
-          localStorage.setItem('mortgageLinkRevealed', 'true');
+          localStorage.setItem(WORK_REVEAL_KEY, 'true');
         } catch (_) {}
+
+        // The featured work chips ride on the same reveal
+        window.dispatchEvent(new CustomEvent('work-tools-revealed'));
 
         // Console message
         console.log('🔓 Secret mortgage work link revealed!');
@@ -233,7 +237,7 @@
 
     // Check if link was previously revealed
     try {
-      if (localStorage.getItem('mortgageLinkRevealed') === 'true') {
+      if (localStorage.getItem(WORK_REVEAL_KEY) === 'true') {
         secretLink.style.display = 'flex';
       }
     } catch (_) {}
@@ -595,6 +599,40 @@
     }, 50);
   }
 
+  /**
+   * Work tools stay off the home page until the visitor has found the sparkle, or has
+   * already entered the finance password. `loggedInUserId` is the same signal
+   * finance-auth-guard.js gates the tools themselves on, so the chips and the pages
+   * agree on who is let in.
+   */
+  function workToolsUnlocked() {
+    try {
+      return (
+        localStorage.getItem(WORK_REVEAL_KEY) === 'true' ||
+        localStorage.getItem('loggedInUserId') !== null
+      );
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function syncGatedFeatured() {
+    const show = workToolsUnlocked();
+    document.querySelectorAll('[data-gated-featured]').forEach((el) => {
+      el.hidden = !show;
+    });
+  }
+
+  function initGatedFeatured() {
+    if (!document.querySelector('[data-gated-featured]')) return;
+    syncGatedFeatured();
+    window.addEventListener('storage', syncGatedFeatured);
+    window.addEventListener('user-logged-in', syncGatedFeatured);
+    window.addEventListener('work-tools-revealed', syncGatedFeatured);
+    window.addEventListener('pageshow', syncGatedFeatured);
+    window.addEventListener('focus', syncGatedFeatured);
+  }
+
   // Initialize everything
   function init() {
     initThemeToggle();
@@ -606,6 +644,7 @@
     initCardOpen();
     initEasterEgg();
     initSecretMortgageLink();
+    initGatedFeatured();
     initFeaturedQrCodes();
     
     // Wait for libraries to load

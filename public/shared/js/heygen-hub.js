@@ -28,6 +28,7 @@
       finance: 'Finance',
       nature: 'Nature',
       jordan: 'Jordan',
+      syria: 'Syria',
       platform: 'Platform'
     };
     return map[domain] || domain || 'Other';

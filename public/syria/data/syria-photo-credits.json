@@ -1,0 +1,646 @@
+{
+  "source": "Wikimedia Commons",
+  "note": "Every photograph on the Syria atlas is public domain or Creative Commons; the page credits each one.",
+  "generatedAt": "2026-08-02T01:56:32.169Z",
+  "credits": {
+    "aleppo-armenians": {
+      "path": "/syria/assets/living/aleppo-armenians.jpg",
+      "section": "living",
+      "title": "File:Aleppo St. Forty Martyrs Armenian Apostolic Church 9399.jpg",
+      "artist": "Dosseman",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Aleppo_St._Forty_Martyrs_Armenian_Apostolic_Church_9399.jpg"
+    },
+    "aleppo-citadel": {
+      "path": "/syria/assets/site/aleppo-citadel.jpg",
+      "section": "site",
+      "title": "File:Citadel of Aleppo, View of the city, Aleppo, Syria.jpg",
+      "artist": "Vyacheslav Argenberg",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Citadel_of_Aleppo,_View_of_the_city,_Aleppo,_Syria.jpg"
+    },
+    "aleppo-soap": {
+      "path": "/syria/assets/living/aleppo-soap.jpg",
+      "section": "living",
+      "title": "File:Aleppo Soap 9196.jpg",
+      "artist": "Dosseman",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Aleppo_Soap_9196.jpg"
+    },
+    "aleppo-souq": {
+      "path": "/syria/assets/site/aleppo-souq.jpg",
+      "section": "site",
+      "title": "File:Suq al-Atmah, al-Madina Souq, Aleppo (4).jpg",
+      "artist": "(Ergo)",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Suq_al-Atmah,_al-Madina_Souq,_Aleppo_(4).jpg"
+    },
+    "aleppo-tarab": {
+      "path": "/syria/assets/site/aleppo-tarab.jpg",
+      "section": "site",
+      "title": "File:Aleppo-Music0Band.jpg",
+      "artist": "Unknown author Unknown author",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "source": "https://commons.wikimedia.org/wiki/File:Aleppo-Music0Band.jpg"
+    },
+    "apamea": {
+      "path": "/syria/assets/site/apamea.jpg",
+      "section": "site",
+      "title": "File:Great Colonnade at Apamea, Columns, Apamea, Syria.jpg",
+      "artist": "Vyacheslav Argenberg",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Great_Colonnade_at_Apamea,_Columns,_Apamea,_Syria.jpg"
+    },
+    "aram-damascus": {
+      "path": "/syria/assets/era/aram-damascus.jpg",
+      "section": "era",
+      "title": "File:Damascus, Syria, The Old City of Damascus.jpg",
+      "artist": "Vyacheslav Argenberg",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Damascus,_Syria,_The_Old_City_of_Damascus.jpg"
+    },
+    "argileh-etiquette": {
+      "path": "/syria/assets/hookah/argileh-etiquette.jpg",
+      "section": "hookah",
+      "title": "File:Al-Nawfara Coffee Shop, Damascus, Syria (5076634998).jpg",
+      "artist": "yeowatzup",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Al-Nawfara_Coffee_Shop,_Damascus,_Syria_(5076634998).jpg"
+    },
+    "atrash-asmahan": {
+      "path": "/syria/assets/music/atrash-asmahan.jpg",
+      "section": "music",
+      "title": "File:Farid al-Atrash with Nasser, 1955.jpg",
+      "artist": "Not credited",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "source": "https://commons.wikimedia.org/wiki/File:Farid_al-Atrash_with_Nasser,_1955.jpg"
+    },
+    "badia-bedouin": {
+      "path": "/syria/assets/living/badia-bedouin.jpg",
+      "section": "living",
+      "title": "File:Bedouin Tent, Syrian Desert (5079932783).jpg",
+      "artist": "yeowatzup",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Bedouin_Tent,_Syrian_Desert_(5079932783).jpg"
+    },
+    "barazek": {
+      "path": "/syria/assets/food/barazek.jpg",
+      "section": "food",
+      "title": "File:برازق شامية.jpg",
+      "artist": "Mohammed Qays Kazem",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:%D8%A8%D8%B1%D8%A7%D8%B2%D9%82_%D8%B4%D8%A7%D9%85%D9%8A%D8%A9.jpg"
+    },
+    "bayt-arabi": {
+      "path": "/syria/assets/living/bayt-arabi.jpg",
+      "section": "living",
+      "title": "File:Damascus Beit Khalid al-Azem 1336.jpg",
+      "artist": "Dosseman",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Damascus_Beit_Khalid_al-Azem_1336.jpg"
+    },
+    "booza": {
+      "path": "/syria/assets/food/booza.jpg",
+      "section": "food",
+      "title": "File:عامل بوظة.jpg",
+      "artist": "AlUmawi",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:%D8%B9%D8%A7%D9%85%D9%84_%D8%A8%D9%88%D8%B8%D8%A9.jpg"
+    },
+    "bosra": {
+      "path": "/syria/assets/site/bosra.jpg",
+      "section": "site",
+      "title": "File:Bosra theatre cavea 0584.jpg",
+      "artist": "Dosseman",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Bosra_theatre_cavea_0584.jpg"
+    },
+    "byzantine-dead-cities": {
+      "path": "/syria/assets/era/byzantine-dead-cities.jpg",
+      "section": "era",
+      "title": "File:Serjilla 01.jpg",
+      "artist": "Bernard Gagnon",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Serjilla_01.jpg"
+    },
+    "crusades-ayyubid": {
+      "path": "/syria/assets/era/crusades-ayyubid.jpg",
+      "section": "era",
+      "title": "File:Damascus mausoleum of Sultan Saladin 8147.jpg",
+      "artist": "Dosseman",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Damascus_mausoleum_of_Sultan_Saladin_8147.jpg"
+    },
+    "dabke": {
+      "path": "/syria/assets/music/dabke.jpg",
+      "section": "music",
+      "title": "File:Female dabke dancers.jpg",
+      "artist": "Terrance Lindall at English Wikipedia",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+      "source": "https://commons.wikimedia.org/wiki/File:Female_dabke_dancers.jpg"
+    },
+    "damascene-crafts": {
+      "path": "/syria/assets/living/damascene-crafts.jpg",
+      "section": "living",
+      "title": "File:Dresser from Damascus, Syria, 19th century, wood, mother-of-pearl, metal wire and plated copper alloy, HAA.JPG",
+      "artist": "Hiart",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "source": "https://commons.wikimedia.org/wiki/File:Dresser_from_Damascus,_Syria,_19th_century,_wood,_mother-of-pearl,_metal_wire_and_plated_copper_alloy,_HAA.JPG"
+    },
+    "damascus-old-city": {
+      "path": "/syria/assets/site/damascus-old-city.jpg",
+      "section": "site",
+      "title": "File:Damascus, Syria, Street in the Old City of Damascus.jpg",
+      "artist": "Vyacheslav Argenberg",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Damascus,_Syria,_Street_in_the_Old_City_of_Damascus.jpg"
+    },
+    "damascus-oud": {
+      "path": "/syria/assets/site/damascus-oud.jpg",
+      "section": "site",
+      "title": "File:Damascus, Syria, Store, Oud, Arabic musical instruments, and more.jpg",
+      "artist": "Vyacheslav Argenberg",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Damascus,_Syria,_Store,_Oud,_Arabic_musical_instruments,_and_more.jpg"
+    },
+    "dead-cities": {
+      "path": "/syria/assets/site/dead-cities.jpg",
+      "section": "site",
+      "title": "File:Idlib, Syria, Dead Cities, Serjilla.jpg",
+      "artist": "Vyacheslav Argenberg",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Idlib,_Syria,_Dead_Cities,_Serjilla.jpg"
+    },
+    "deir-ez-zor-euphrates": {
+      "path": "/syria/assets/site/deir-ez-zor-euphrates.jpg",
+      "section": "site",
+      "title": "File:Deir Ez-Zor Euphrates 9937.jpg",
+      "artist": "Dosseman",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Deir_Ez-Zor_Euphrates_9937.jpg"
+    },
+    "dhikr-sufi": {
+      "path": "/syria/assets/music/dhikr-sufi.jpg",
+      "section": "music",
+      "title": "File:Syrian whirling dervishes 03.jpg",
+      "artist": "Tmnadili",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Syrian_whirling_dervishes_03.jpg"
+    },
+    "displacement-return": {
+      "path": "/syria/assets/living/displacement-return.jpg",
+      "section": "living",
+      "title": "File:Aleppo, Streets of the city, Syria.jpg",
+      "artist": "Vyacheslav Argenberg",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Aleppo,_Streets_of_the_city,_Syria.jpg"
+    },
+    "druze-mate": {
+      "path": "/syria/assets/living/druze-mate.jpg",
+      "section": "living",
+      "title": "File:Traditional mate set calabash gourd with La Merced yerba mate.jpg",
+      "artist": "Siarhei Besarab",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Traditional_mate_set_calabash_gourd_with_La_Merced_yerba_mate.jpg"
+    },
+    "ebla": {
+      "path": "/syria/assets/era/ebla.jpg",
+      "section": "era",
+      "title": "File:Ebla (Tell Mardikh), Amoriterstadt vom 3. Jt. v.Chr. (37818960975).jpg",
+      "artist": "Herbert Frank from Wien (Vienna), AT",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Ebla_(Tell_Mardikh),_Amoriterstadt_vom_3._Jt._v.Chr._(37818960975).jpg"
+    },
+    "ebla-site": {
+      "path": "/syria/assets/site/ebla-site.jpg",
+      "section": "site",
+      "title": "File:10.4 Tell Mardikh aus SW.jpg",
+      "artist": "Haubi|Gerhard Haubold",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:10.4_Tell_Mardikh_aus_SW.jpg"
+    },
+    "euphrates-villages": {
+      "path": "/syria/assets/era/euphrates-villages.jpg",
+      "section": "era",
+      "title": "File:Deir Ez-Zor Euphrates 9930.jpg",
+      "artist": "Dosseman",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Deir_Ez-Zor_Euphrates_9930.jpg"
+    },
+    "fattoush": {
+      "path": "/syria/assets/food/fattoush.jpg",
+      "section": "food",
+      "title": "File:Fattoush 1.JPG",
+      "artist": "Miansari66",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "source": "https://commons.wikimedia.org/wiki/File:Fattoush_1.JPG"
+    },
+    "freekeh": {
+      "path": "/syria/assets/food/freekeh.jpg",
+      "section": "food",
+      "title": "File:Freekeh (uncooked).jpg",
+      "artist": "Wribln",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Freekeh_(uncooked).jpg"
+    },
+    "greek-roman": {
+      "path": "/syria/assets/era/greek-roman.jpg",
+      "section": "era",
+      "title": "File:Great Colonnade at Apamea, Apamea, Syria.jpg",
+      "artist": "Vyacheslav Argenberg",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Great_Colonnade_at_Apamea,_Apamea,_Syria.jpg"
+    },
+    "hakawati": {
+      "path": "/syria/assets/hookah/hakawati.jpg",
+      "section": "hookah",
+      "title": "File:مقهى النوفرة الشعبي.JPG",
+      "artist": "Sheam k",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "source": "https://commons.wikimedia.org/wiki/File:%D9%85%D9%82%D9%87%D9%89_%D8%A7%D9%84%D9%86%D9%88%D9%81%D8%B1%D8%A9_%D8%A7%D9%84%D8%B4%D8%B9%D8%A8%D9%8A.JPG"
+    },
+    "hama-norias": {
+      "path": "/syria/assets/site/hama-norias.jpg",
+      "section": "site",
+      "title": "File:Norias of Hama, Orontes River, Hama, Syria.jpg",
+      "artist": "Vyacheslav Argenberg",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Norias_of_Hama,_Orontes_River,_Hama,_Syria.jpg"
+    },
+    "hammam": {
+      "path": "/syria/assets/living/hammam.jpg",
+      "section": "living",
+      "title": "File:Damascus Hammam Nur al-Din 5369.jpg",
+      "artist": "Dosseman",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Damascus_Hammam_Nur_al-Din_5369.jpg"
+    },
+    "hero": {
+      "path": "/syria/assets/page/hero.jpg",
+      "section": "page",
+      "title": "File:Palmyra, Syria, The Great Colonnade, Columns.jpg",
+      "artist": "Vyacheslav Argenberg",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Palmyra,_Syria,_The_Great_Colonnade,_Columns.jpg"
+    },
+    "jazira-communities": {
+      "path": "/syria/assets/living/jazira-communities.jpg",
+      "section": "living",
+      "title": "File:Newroz Girê Tertebê 1997.jpg",
+      "artist": "MikaelF",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Newroz_Gir%C3%AA_Terteb%C3%AA_1997.jpg"
+    },
+    "jazira-wedding": {
+      "path": "/syria/assets/music/jazira-wedding.jpg",
+      "section": "music",
+      "title": "File:Omar Souleyman at WOMAD Cáceres 2018.jpg",
+      "artist": "El tiu Cancho",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Omar_Souleyman_at_WOMAD_C%C3%A1ceres_2018.jpg"
+    },
+    "kebab-karaz": {
+      "path": "/syria/assets/food/kebab-karaz.jpg",
+      "section": "food",
+      "title": "File:Cherry Kebab.jpg",
+      "artist": "Elfenbeinturm",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "source": "https://commons.wikimedia.org/wiki/File:Cherry_Kebab.jpg"
+    },
+    "kibbeh": {
+      "path": "/syria/assets/food/kibbeh.jpg",
+      "section": "food",
+      "title": "File:Fried lamb kibbeh 1.JPG",
+      "artist": "Dr. Bernd Gross",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Fried_lamb_kibbeh_1.JPG"
+    },
+    "krak-des-chevaliers": {
+      "path": "/syria/assets/site/krak-des-chevaliers.jpg",
+      "section": "site",
+      "title": "File:Krak des Chevaliers Castle, Syria.jpg",
+      "artist": "Vyacheslav Argenberg",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Krak_des_Chevaliers_Castle,_Syria.jpg"
+    },
+    "latakia-coast": {
+      "path": "/syria/assets/site/latakia-coast.jpg",
+      "section": "site",
+      "title": "File:Fishing boats off the coast of Ibn Hani near Latakia, Syria.jpg",
+      "artist": "Abd Alsattar Ardati",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Fishing_boats_off_the_coast_of_Ibn_Hani_near_Latakia,_Syria.jpg"
+    },
+    "maaloula": {
+      "path": "/syria/assets/site/maaloula.jpg",
+      "section": "site",
+      "title": "File:Maaloula 01.jpg",
+      "artist": "Bernard Gagnon",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Maaloula_01.jpg"
+    },
+    "maaloula-aramaic": {
+      "path": "/syria/assets/living/maaloula-aramaic.jpg",
+      "section": "living",
+      "title": "File:Maaloula - rocher.jpg",
+      "artist": "Eusebius",
+      "license": "CC BY 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/3.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Maaloula_-_rocher.jpg"
+    },
+    "makdous": {
+      "path": "/syria/assets/food/makdous.jpg",
+      "section": "food",
+      "title": "File:Makdous.jpg",
+      "artist": "QuasarFr",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Makdous.jpg"
+    },
+    "mandate-independence": {
+      "path": "/syria/assets/era/mandate-independence.jpg",
+      "section": "era",
+      "title": "File:Blick auf Damaskus 1920-64.jpg",
+      "artist": "Unknown author Unknown author",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "source": "https://commons.wikimedia.org/wiki/File:Blick_auf_Damaskus_1920-64.jpg"
+    },
+    "mari": {
+      "path": "/syria/assets/era/mari.jpg",
+      "section": "era",
+      "title": "File:Mari-Zimri Lim Palace.jpg",
+      "artist": "Heretiq",
+      "license": "CC BY-SA 2.5",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5",
+      "source": "https://commons.wikimedia.org/wiki/File:Mari-Zimri_Lim_Palace.jpg"
+    },
+    "mari-site": {
+      "path": "/syria/assets/site/mari-site.jpg",
+      "section": "site",
+      "title": "File:19.9 Mari.jpg",
+      "artist": "Haubi|Gerhard Haubold",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:19.9_Mari.jpg"
+    },
+    "muhammara": {
+      "path": "/syria/assets/food/muhammara.jpg",
+      "section": "food",
+      "title": "File:Muhammara.jpg",
+      "artist": "Bazel",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "source": "https://commons.wikimedia.org/wiki/File:Muhammara.jpg"
+    },
+    "mujaddara": {
+      "path": "/syria/assets/food/mujaddara.jpg",
+      "section": "food",
+      "title": "File:Mujaddara.jpg",
+      "artist": "Bazel",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+      "source": "https://commons.wikimedia.org/wiki/File:Mujaddara.jpg"
+    },
+    "nargileh-history": {
+      "path": "/syria/assets/hookah/nargileh-history.jpg",
+      "section": "hookah",
+      "title": "File:Hookah Pipes at a Hookah lounge by Don Ramey Logan.jpg",
+      "artist": "Don Ramey Logan",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Hookah_Pipes_at_a_Hookah_lounge_by_Don_Ramey_Logan.jpg"
+    },
+    "nawfara-cafe": {
+      "path": "/syria/assets/site/nawfara-cafe.jpg",
+      "section": "site",
+      "title": "File:مقهى النوفرة.jpg",
+      "artist": "Sheam k",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "source": "https://commons.wikimedia.org/wiki/File:%D9%85%D9%82%D9%87%D9%89_%D8%A7%D9%84%D9%86%D9%88%D9%81%D8%B1%D8%A9.jpg"
+    },
+    "norias-sound": {
+      "path": "/syria/assets/music/norias-sound.jpg",
+      "section": "music",
+      "title": "File:Noria in Hama 01.jpg",
+      "artist": "Bernard Gagnon",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Noria_in_Hama_01.jpg"
+    },
+    "ottoman": {
+      "path": "/syria/assets/era/ottoman.jpg",
+      "section": "era",
+      "title": "File:Aleppo Khan al-Wazir 9018b.jpg",
+      "artist": "Dosseman",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Aleppo_Khan_al-Wazir_9018b.jpg"
+    },
+    "oud-nahat": {
+      "path": "/syria/assets/music/oud-nahat.jpg",
+      "section": "music",
+      "title": "File:Arabic Oud.jpg",
+      "artist": "Mutaz Awad",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Arabic_Oud.jpg"
+    },
+    "palmyra": {
+      "path": "/syria/assets/era/palmyra.jpg",
+      "section": "era",
+      "title": "File:Herbert G Schmalz - Zenobia's last look on Palmyra - Google Art Project.jpg",
+      "artist": "Herbert Gustave Schmalz",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "source": "https://commons.wikimedia.org/wiki/File:Herbert_G_Schmalz_-_Zenobia%27s_last_look_on_Palmyra_-_Google_Art_Project.jpg"
+    },
+    "palmyra-site": {
+      "path": "/syria/assets/site/palmyra-site.jpg",
+      "section": "site",
+      "title": "File:Palmyra, Syria, Colonnade at Palmyra.jpg",
+      "artist": "Vyacheslav Argenberg",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Palmyra,_Syria,_Colonnade_at_Palmyra.jpg"
+    },
+    "qamishli-jazira": {
+      "path": "/syria/assets/site/qamishli-jazira.jpg",
+      "section": "site",
+      "title": "File:شارع البريد بالقامشلي.JPG",
+      "artist": "Arab Salsa",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+      "source": "https://commons.wikimedia.org/wiki/File:%D8%B4%D8%A7%D8%B1%D8%B9_%D8%A7%D9%84%D8%A8%D8%B1%D9%8A%D8%AF_%D8%A8%D8%A7%D9%84%D9%82%D8%A7%D9%85%D8%B4%D9%84%D9%8A.JPG"
+    },
+    "qudud-halabiya": {
+      "path": "/syria/assets/music/qudud-halabiya.jpg",
+      "section": "music",
+      "title": "File:Mohamad Fityan Main Pic.jpg",
+      "artist": "Christophe Losberger",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Mohamad_Fityan_Main_Pic.jpg"
+    },
+    "rababa-badia": {
+      "path": "/syria/assets/music/rababa-badia.jpg",
+      "section": "music",
+      "title": "File:Traditional musician, Palmyra, Syria.jpg",
+      "artist": "James Gordon from Los Angeles, California, USA",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Traditional_musician,_Palmyra,_Syria.jpg"
+    },
+    "republic": {
+      "path": "/syria/assets/era/republic.jpg",
+      "section": "era",
+      "title": "File:St Elias Cathedral Al Jdayde Aleppo 2016.jpg",
+      "artist": "Ortho",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:St_Elias_Cathedral_Al_Jdayde_Aleppo_2016.jpg"
+    },
+    "sabah-fakhri": {
+      "path": "/syria/assets/music/sabah-fakhri.jpg",
+      "section": "music",
+      "title": "File:Sabah Fakhri.png",
+      "artist": "Unknown author Unknown author",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "source": "https://commons.wikimedia.org/wiki/File:Sabah_Fakhri.png"
+    },
+    "saint-simeon": {
+      "path": "/syria/assets/site/saint-simeon.jpg",
+      "section": "site",
+      "title": "File:Church of Saint Simeon Stylites 01.jpg",
+      "artist": "Bernard Gagnon",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Church_of_Saint_Simeon_Stylites_01.jpg"
+    },
+    "shawarma": {
+      "path": "/syria/assets/food/shawarma.jpg",
+      "section": "food",
+      "title": "File:Shawarma at Al Sediq Restaurant, Damascus, Syria.jpg",
+      "artist": "Abd Alsattar Ardati",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Shawarma_at_Al_Sediq_Restaurant,_Damascus,_Syria.jpg"
+    },
+    "souq-al-hamidiyah": {
+      "path": "/syria/assets/site/souq-al-hamidiyah.jpg",
+      "section": "site",
+      "title": "File:Damascus Al-Hamidiyah Souq 5039.jpg",
+      "artist": "Dosseman",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Damascus_Al-Hamidiyah_Souq_5039.jpg"
+    },
+    "suwayda-jabal": {
+      "path": "/syria/assets/site/suwayda-jabal.jpg",
+      "section": "site",
+      "title": "File:Shahba (8).jpg",
+      "artist": "Walidalhaj",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Shahba_(8).jpg"
+    },
+    "tumbak-muassel": {
+      "path": "/syria/assets/hookah/tumbak-muassel.jpg",
+      "section": "hookah",
+      "title": "File:Hookah-parts-EN-SK-2020-11.png",
+      "artist": "Anunaki3000",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Hookah-parts-EN-SK-2020-11.png"
+    },
+    "ugarit": {
+      "path": "/syria/assets/era/ugarit.jpg",
+      "section": "era",
+      "title": "File:Tablet with cuneiform abecedarium-AO 19992-IMG 6956.JPG",
+      "artist": "Rama",
+      "license": "CC BY-SA 3.0 fr",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/fr/deed.en",
+      "source": "https://commons.wikimedia.org/wiki/File:Tablet_with_cuneiform_abecedarium-AO_19992-IMG_6956.JPG"
+    },
+    "ugarit-site": {
+      "path": "/syria/assets/site/ugarit-site.jpg",
+      "section": "site",
+      "title": "File:Ugarit ras shamra.jpg",
+      "artist": "The original uploader was Mbenoist at French Wikipedia .",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+      "source": "https://commons.wikimedia.org/wiki/File:Ugarit_ras_shamra.jpg"
+    },
+    "umayyad": {
+      "path": "/syria/assets/era/umayyad.jpg",
+      "section": "era",
+      "title": "File:The Umayyad Mosque, the Courtyard, Damascus, Syria.jpg",
+      "artist": "Vyacheslav Argenberg",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:The_Umayyad_Mosque,_the_Courtyard,_Damascus,_Syria.jpg"
+    },
+    "umayyad-mosque": {
+      "path": "/syria/assets/site/umayyad-mosque.jpg",
+      "section": "site",
+      "title": "File:Damascus, Syria, The Umayyad Mosque, The Courtyard, Islamic Art.jpg",
+      "artist": "Vyacheslav Argenberg",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Damascus,_Syria,_The_Umayyad_Mosque,_The_Courtyard,_Islamic_Art.jpg"
+    },
+    "yabraq": {
+      "path": "/syria/assets/food/yabraq.jpg",
+      "section": "food",
+      "title": "File:Syrian meal.jpg",
+      "artist": "Paul Joseph",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "source": "https://commons.wikimedia.org/wiki/File:Syrian_meal.jpg"
+    }
+  }
+}

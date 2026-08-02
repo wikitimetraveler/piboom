@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Condition Manager</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="/shared/styles.css" />
+    <script src="/shared/modern-navbar.js" defer></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css" />
+    <style>
+      :root {
+        --zen-primary: #4a90a4;
+        --zen-muted: #647196;
+        --zen-border: rgba(74, 144, 164, 0.18);
+        --zen-card-bg: rgba(255, 255, 255, 0.97);
+      }
+
+      body {
+        min-height: 100vh;
+        font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        position: relative;
+        overflow-x: hidden;
+      }
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background:
+          radial-gradient(circle at 20% 80%, rgba(135, 206, 250, 0.3) 0%, transparent 50%),
+          radial-gradient(circle at 80% 20%, rgba(52, 152, 219, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 40% 40%, rgba(46, 204, 113, 0.05) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      .hero {
+        padding: 4.5rem 1rem 1.5rem;
+        text-align: center;
+      }
+
+      .hero h1 {
+        font-weight: 700;
+        margin-top: 0.8rem;
+      }
+
+      .hero .lead {
+        color: var(--zen-muted);
+        max-width: 860px;
+        margin: 0.5rem auto 1rem;
+      }
+
+      .card {
+        border-radius: 18px;
+        border: 1px solid var(--zen-border);
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+        background: var(--zen-card-bg);
+      }
+
+      .status-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        background: rgba(74, 144, 164, 0.12);
+        color: #1a2856;
+      }
+      .status-chip.busy { background: rgba(234, 179, 8, 0.18); color: #854d0e; }
+      .status-chip.err { background: rgba(220, 38, 38, 0.14); color: #991b1b; }
+
+      .dropzone {
+        border: 2px dashed var(--zen-border);
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        background: rgba(74, 144, 164, 0.04);
+        transition: border-color 0.2s ease, background 0.2s ease;
+        cursor: pointer;
+      }
+      .dropzone:hover,
+      .dropzone.is-dragover {
+        border-color: var(--zen-primary);
+        background: rgba(74, 144, 164, 0.1);
+      }
+      .dropzone .bi {
+        font-size: 1.75rem;
+        color: var(--zen-primary);
+      }
+      .dropzone-file {
+        font-weight: 600;
+        color: #1a2856;
+        word-break: break-all;
+      }
+
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 12px;
+      }
+
+      .metric {
+        border: 1px solid var(--zen-border);
+        border-radius: 14px;
+        padding: 0.9rem 1rem;
+        background: #fff;
+      }
+      .metric .value {
+        font-size: 1.6rem;
+        font-weight: 700;
+        line-height: 1.1;
+        color: #1a2856;
+      }
+      .metric .label {
+        font-size: 0.8rem;
+        color: var(--zen-muted);
+      }
+      .metric.warn .value { color: #b45309; }
+      .metric.danger .value { color: #b91c1c; }
+
+      .accordion-item {
+        border: 1px solid var(--zen-border);
+        border-radius: 16px !important;
+        margin-bottom: 12px;
+        overflow: hidden;
+        background: var(--zen-card-bg);
+      }
+      .accordion-button {
+        font-weight: 600;
+        background: #fff;
+      }
+      .accordion-button:not(.collapsed) {
+        background: rgba(74, 144, 164, 0.1);
+        color: #1a2856;
+        box-shadow: none;
+      }
+      .accordion-button:focus {
+        box-shadow: 0 0 0 0.2rem rgba(74, 144, 164, 0.25);
+      }
+      .section-count {
+        margin-left: 0.6rem;
+        font-weight: 600;
+      }
+
+      .listen-btn {
+        border: none;
+        background: transparent;
+        color: var(--zen-primary);
+        font-size: 1.05rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 999px;
+        line-height: 1;
+      }
+      .listen-btn:hover { background: rgba(74, 144, 164, 0.15); }
+      .listen-btn.is-speaking { color: #b45309; }
+
+      .grid-host {
+        width: 100%;
+        height: 480px;
+      }
+      .grid-host.short { height: 340px; }
+
+      .acl-detail {
+        border: 1px solid var(--zen-border);
+        border-radius: 14px;
+        padding: 1rem;
+        background: #fff;
+        max-height: 480px;
+        overflow-y: auto;
+      }
+      .persona-chip {
+        display: inline-block;
+        padding: 2px 10px;
+        margin: 2px 4px 2px 0;
+        border-radius: 999px;
+        background: rgba(74, 144, 164, 0.12);
+        font-size: 0.78rem;
+      }
+      .persona-chip.missing {
+        background: rgba(220, 38, 38, 0.12);
+        color: #991b1b;
+      }
+
+      .report-preview {
+        max-height: 420px;
+        overflow: auto;
+        background: #0f172a;
+        color: #e2e8f0;
+        border-radius: 14px;
+        padding: 1rem;
+        font-size: 0.8rem;
+        white-space: pre-wrap;
+      }
+
+      .empty-state {
+        text-align: center;
+        color: var(--zen-muted);
+        padding: 2.5rem 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container pb-5">
+      <section class="hero">
+        <h1>Condition Manager</h1>
+        <p class="lead">
+          Converts the legacy <code>ConditionsTemplate.xml</code> custom data object into Encompass
+          Enhanced Conditions — condition types, condition templates, and the persona access
+          patterns the tiered model can no longer store per condition. Everything here is a dry
+          run: nothing is written to Encompass.
+        </p>
+        <div class="d-flex justify-content-center align-items-center gap-3 flex-wrap">
+          <span class="status-chip" id="statusChip"><i class="bi bi-upload"></i> Waiting for a CDO</span>
+          <div class="form-check form-switch m-0">
+            <input class="form-check-input" type="checkbox" role="switch" id="narrationToggle" checked />
+            <label class="form-check-label small" for="narrationToggle">Narration</label>
+          </div>
+          <button class="btn btn-sm btn-outline-secondary" id="stopSpeechBtn" type="button">
+            <i class="bi bi-stop-circle"></i> Stop
+          </button>
+        </div>
+      </section>
+
+      <div class="card p-4 mb-4">
+        <div class="row g-3">
+          <div class="col-lg-6">
+            <label class="form-label fw-semibold" for="cdoFile">Conditions CDO</label>
+            <div class="dropzone" id="cdoDrop">
+              <i class="bi bi-filetype-json"></i>
+              <div class="mt-2">Drop the Postman CDO response here, or click to choose</div>
+              <div class="small text-muted">
+                Save Response as JSON (<code>{ "name", "dataObject" }</code>). Raw base64 or decoded XML also work.
+              </div>
+              <div class="dropzone-file mt-2" id="cdoFileName">No file chosen</div>
+            </div>
+            <input type="file" id="cdoFile" class="d-none" />
+            <label class="form-label fw-semibold mt-3 mb-1" for="cdoPaste">Or paste the Postman JSON</label>
+            <textarea
+              class="form-control font-monospace"
+              id="cdoPaste"
+              rows="4"
+              spellcheck="false"
+              placeholder='{ "name": "ConditionsTemplate.xml", "dataObject": "PD94bWwg..." }'
+            ></textarea>
+            <div class="form-text">Paste the whole Save Response body — do not decode the base64 yourself.</div>
+          </div>
+          <div class="col-lg-6">
+            <label class="form-label fw-semibold" for="personaFile">Personas (optional)</label>
+            <div class="dropzone" id="personaDrop">
+              <i class="bi bi-people"></i>
+              <div class="mt-2">Drop the persona list here, or click to choose</div>
+              <div class="small text-muted">Response from <code>GET /encompass/v3/settings/personas</code></div>
+              <div class="dropzone-file mt-2" id="personaFileName">No file chosen</div>
+            </div>
+            <input type="file" id="personaFile" class="d-none" accept=".json" />
+            <label class="form-label fw-semibold mt-3 mb-1" for="personaSource">Persona list came from</label>
+            <input
+              class="form-control"
+              id="personaSource"
+              list="personaSourceOptions"
+              placeholder="UAT"
+              maxlength="40"
+            />
+            <datalist id="personaSourceOptions">
+              <option value="UAT"></option>
+              <option value="Production"></option>
+            </datalist>
+            <div class="form-text">
+              Anything other than Production is treated as provisional — persona names drift
+              between environments.
+            </div>
+          </div>
+        </div>
+        <div class="d-flex flex-column flex-md-row gap-2 mt-3">
+          <button class="btn btn-primary flex-fill" id="convertBtn" type="button" disabled>
+            <i class="bi bi-arrow-repeat"></i> Convert
+          </button>
+          <button class="btn btn-outline-secondary flex-fill" id="clearBtn" type="button">
+            <i class="bi bi-eraser"></i> Clear
+          </button>
+        </div>
+        <div class="alert alert-danger mt-3 mb-0 d-none" id="errorBox" role="alert"></div>
+      </div>
+
+      <div class="empty-state card p-4" id="emptyState">
+        <i class="bi bi-clipboard-data" style="font-size: 2rem"></i>
+        <p class="mt-3 mb-0">Load a CDO to see the converted conditions, the review queue, and the access profiles.</p>
+      </div>
+
+      <div class="accordion d-none" id="resultsAccordion">
+        <div class="accordion-item">
+          <h2 class="accordion-header d-flex align-items-center">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#sectionBriefing">
+              <i class="bi bi-clipboard-pulse me-2"></i> Briefing
+            </button>
+            <button class="listen-btn me-3" type="button" data-listen="briefing" title="Listen to this section">
+              <i class="bi bi-volume-up"></i>
+            </button>
+          </h2>
+          <div id="sectionBriefing" class="accordion-collapse collapse show" data-bs-parent="#resultsAccordion">
+            <div class="accordion-body">
+              <div class="metric-grid mb-3" id="metricGrid"></div>
+              <p class="mb-2 text-muted" id="briefingText"></p>
+              <p class="mb-0 small text-muted d-none" id="inputFormatNote"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header d-flex align-items-center">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sectionTemplates">
+              <i class="bi bi-card-checklist me-2"></i> Condition templates
+              <span class="badge text-bg-primary section-count" id="countTemplates">0</span>
+            </button>
+            <button class="listen-btn me-3" type="button" data-listen="templates" title="Listen to this section">
+              <i class="bi bi-volume-up"></i>
+            </button>
+          </h2>
+          <div id="sectionTemplates" class="accordion-collapse collapse" data-bs-parent="#resultsAccordion">
+            <div class="accordion-body">
+              <p class="text-muted small">
+                One Enhanced Conditions template per legacy condition. The legacy code travels through
+                as <code>internalId</code> so a migrated condition stays traceable to the CDO row.
+              </p>
+              <div class="grid-host ag-theme-alpine" id="templatesGrid"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header d-flex align-items-center">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sectionReview">
+              <i class="bi bi-exclamation-diamond me-2"></i> Needs a decision
+              <span class="badge text-bg-warning section-count" id="countReview">0</span>
+            </button>
+            <button class="listen-btn me-3" type="button" data-listen="review" title="Listen to this section">
+              <i class="bi bi-volume-up"></i>
+            </button>
+          </h2>
+          <div id="sectionReview" class="accordion-collapse collapse" data-bs-parent="#resultsAccordion">
+            <div class="accordion-body">
+              <p class="text-muted small">
+                Anything the converter refused to guess at. These are business calls, not formatting.
+              </p>
+              <div class="grid-host ag-theme-alpine" id="reviewGrid"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header d-flex align-items-center">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sectionFixed">
+              <i class="bi bi-magic me-2"></i> Applied automatically
+              <span class="badge text-bg-success section-count" id="countFixed">0</span>
+            </button>
+            <button class="listen-btn me-3" type="button" data-listen="fixed" title="Listen to this section">
+              <i class="bi bi-volume-up"></i>
+            </button>
+          </h2>
+          <div id="sectionFixed" class="accordion-collapse collapse" data-bs-parent="#resultsAccordion">
+            <div class="accordion-body">
+              <p class="text-muted small">
+                Cleanups that carry no interpretive risk: enum spellings, boolean coercion, code
+                casing, and whitespace.
+              </p>
+              <div class="grid-host ag-theme-alpine" id="fixedGrid"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header d-flex align-items-center">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sectionAcl">
+              <i class="bi bi-shield-lock me-2"></i> Access profiles
+              <span class="badge text-bg-primary section-count" id="countAcl">0</span>
+            </button>
+            <button class="listen-btn me-3" type="button" data-listen="acl" title="Listen to this section">
+              <i class="bi bi-volume-up"></i>
+            </button>
+          </h2>
+          <div id="sectionAcl" class="accordion-collapse collapse" data-bs-parent="#resultsAccordion">
+            <div class="accordion-body">
+              <p class="text-muted small">
+                Enhanced Conditions has no per-condition ACL — access is configured on the persona.
+                Each profile below is one access pattern to set up once instead of per condition.
+                Select a row to see its eleven permission lists.
+              </p>
+              <div class="row g-3">
+                <div class="col-lg-7">
+                  <div class="grid-host short ag-theme-alpine" id="aclGrid"></div>
+                </div>
+                <div class="col-lg-5">
+                  <div class="acl-detail" id="aclDetail">
+                    <p class="text-muted mb-0">Select a profile to see its permission lists.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header d-flex align-items-center">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sectionPersonas">
+              <i class="bi bi-people me-2"></i> Persona reconciliation
+              <span class="badge text-bg-secondary section-count" id="countPersonas">0</span>
+            </button>
+            <button class="listen-btn me-3" type="button" data-listen="personas" title="Listen to this section">
+              <i class="bi bi-volume-up"></i>
+            </button>
+          </h2>
+          <div id="sectionPersonas" class="accordion-collapse collapse" data-bs-parent="#resultsAccordion">
+            <div class="accordion-body">
+              <div class="alert alert-warning d-none" id="personaHint">
+                No persona list supplied, so every role name is reported as unmatched. Load
+                <code>GET /encompass/v3/settings/personas</code> above to reconcile them.
+              </div>
+              <div class="alert alert-warning d-none" id="personaProvisional"></div>
+              <div class="grid-host ag-theme-alpine" id="personaGrid"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <h2 class="accordion-header d-flex align-items-center">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sectionPayloads">
+              <i class="bi bi-download me-2"></i> Payloads and downloads
+            </button>
+            <button class="listen-btn me-3" type="button" data-listen="payloads" title="Listen to this section">
+              <i class="bi bi-volume-up"></i>
+            </button>
+          </h2>
+          <div id="sectionPayloads" class="accordion-collapse collapse" data-bs-parent="#resultsAccordion">
+            <div class="accordion-body">
+              <p class="text-muted small">
+                The same artifacts <code>npm run convert:conditions-cdo</code> writes to disk.
+              </p>
+              <div class="d-flex flex-wrap gap-2 mb-3" id="downloadButtons"></div>
+              <div class="report-preview" id="reportPreview"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
+    <script src="/shared/tts.js"></script>
+    <script src="/shared/encompass-dark-mode.js"></script>
+    <script src="/finance/js/condition-manager.js"></script>
+    <script src="/shared/finance-auth-guard.js"></script>
+  </body>
+</html>

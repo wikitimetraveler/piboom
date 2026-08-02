@@ -1,6 +1,7 @@
 /**
  * Development work by David Lane
  */
+import { gzipSync } from 'node:zlib';
 import { describe, expect, it } from '@jest/globals';
 import {
   ACCESS_TAGS,
@@ -10,9 +11,12 @@ import {
   buildConditionTypePayloads,
   buildMigrationBundle,
   decodeConditionsCdo,
+  describePersonaSource,
   normalizeConditions,
   parseConditionsXml,
+  readConditionsCdo,
   reconcilePersonas,
+  renderMigrationReport,
 } from '../../services/encompass-conditions-migration.service.js';
 
 function condition({
@@ -43,14 +47,77 @@ describe('encompass-conditions-migration.service', () => {
       expect(decodeConditionsCdo(cdo)).toBe(xml);
     });
 
+    it('decodes the envelope saved straight out of Postman, pretty-printed', () => {
+      const xml = wrap(condition());
+      const saved = JSON.stringify(
+        { name: 'ConditionsTemplate.xml', dataObject: Buffer.from(xml, 'utf8').toString('base64') },
+        null,
+        4,
+      );
+      expect(decodeConditionsCdo(saved)).toBe(xml);
+    });
+
     it('passes through XML that has already been decoded', () => {
       const xml = wrap(condition());
       expect(decodeConditionsCdo(xml)).toBe(xml);
     });
 
-    it('rejects base64 that does not decode to a Conditions document', () => {
-      const cdo = { dataObject: Buffer.from('<Other/>', 'utf8').toString('base64') };
+    it('ignores line breaks inserted into the base64 body', () => {
+      const xml = wrap(condition());
+      const wrapped = Buffer.from(xml, 'utf8').toString('base64').replace(/(.{40})/g, '$1\n');
+      expect(decodeConditionsCdo({ dataObject: wrapped })).toBe(xml);
+    });
+
+    it('pads base64 that lost its trailing "=" rather than truncating the tail', () => {
+      const xml = wrap(condition());
+      const stripped = Buffer.from(xml, 'utf8').toString('base64').replace(/=+$/, '');
+      expect(decodeConditionsCdo(stripped)).toBe(xml);
+    });
+
+    it('unescapes XML that was serialised as a JSON string', () => {
+      const xml = wrap(condition());
+      expect(decodeConditionsCdo(JSON.stringify(xml))).toBe(xml);
+    });
+
+    it('reads a gzipped byte payload', () => {
+      const xml = wrap(condition());
+      expect(decodeConditionsCdo(gzipSync(Buffer.from(xml, 'utf8')))).toBe(xml);
+    });
+
+    it('reads UTF-16LE bytes, with and without a byte order mark', () => {
+      const xml = wrap(condition());
+      const bom = Buffer.concat([Buffer.from([0xff, 0xfe]), Buffer.from(xml, 'utf16le')]);
+      expect(decodeConditionsCdo(bom)).toBe(xml);
+      expect(decodeConditionsCdo(Buffer.from(xml, 'utf16le'))).toBe(xml);
+    });
+
+    it('strips a data URI prefix', () => {
+      const xml = wrap(condition());
+      const uri = `data:text/xml;base64,${Buffer.from(xml, 'utf8').toString('base64')}`;
+      expect(decodeConditionsCdo(uri)).toBe(xml);
+    });
+
+    it('accepts a root element carrying attributes', () => {
+      const xml = `<Conditions xmlns="urn:elli">${condition()}</Conditions>`;
+      expect(parseConditionsXml(decodeConditionsCdo(xml))).toHaveLength(1);
+    });
+
+    it('reports the wrappers it peeled off when no Conditions root turns up', () => {
+      const cdo = { dataObject: Buffer.from('<Other>not it</Other>', 'utf8').toString('base64') };
       expect(() => decodeConditionsCdo(cdo)).toThrow(/Conditions/);
+      expect(() => decodeConditionsCdo(cdo)).toThrow(/base64/);
+    });
+
+    it('stops at the last readable layer instead of re-decoding text into noise', () => {
+      const cdo = Buffer.from('not a conditions document at all', 'utf8').toString('base64');
+      expect(() => decodeConditionsCdo(cdo)).toThrow(/not a conditions document at all/);
+      expect(() => decodeConditionsCdo(cdo)).toThrow(/Detected: base64\./);
+    });
+
+    it('names the layers it unwrapped on the way to the XML', () => {
+      const xml = wrap(condition());
+      const cdo = { name: 'ConditionsTemplate.xml', dataObject: Buffer.from(xml, 'utf8').toString('base64') };
+      expect(readConditionsCdo(cdo).notes).toEqual(['envelope.dataObject', 'base64']);
     });
   });
 
@@ -247,6 +314,50 @@ describe('encompass-conditions-migration.service', () => {
         unresolvedRoles: 0,
       });
       expect(bundle.conditionTemplates).toHaveLength(2);
+    });
+  });
+
+  describe('persona source', () => {
+    const personas = [{ id: '15', name: 'Funder' }];
+    const xml = wrap(condition());
+
+    it('treats a production list as authoritative', () => {
+      const source = describePersonaSource('Production', 1);
+      expect(source).toMatchObject({ label: 'Production', supplied: true, production: true, provisional: false });
+    });
+
+    it('treats any other environment as provisional', () => {
+      expect(describePersonaSource('UAT', 1)).toMatchObject({ production: false, provisional: true });
+    });
+
+    it('treats a supplied list with no label as provisional', () => {
+      expect(describePersonaSource('', 1)).toMatchObject({ label: null, supplied: true, provisional: true });
+    });
+
+    it('reports no persona list as unsupplied', () => {
+      expect(describePersonaSource('UAT', 0)).toMatchObject({ supplied: false, provisional: true });
+    });
+
+    it('carries the source through the bundle', () => {
+      const bundle = buildMigrationBundle(xml, { personas, personaSource: 'UAT' });
+      expect(bundle.personaSource).toMatchObject({ label: 'UAT', supplied: true, provisional: true });
+    });
+
+    it('warns in the report when the personas did not come from production', () => {
+      const report = renderMigrationReport(buildMigrationBundle(xml, { personas, personaSource: 'UAT' }));
+      expect(report).toContain('Persona source: UAT — provisional');
+      expect(report).toContain('not production');
+    });
+
+    it('does not warn when the personas came from production', () => {
+      const report = renderMigrationReport(buildMigrationBundle(xml, { personas, personaSource: 'Production' }));
+      expect(report).toContain('Persona source: Production — authoritative.');
+      expect(report).not.toContain('provisional');
+    });
+
+    it('records that reconciliation was skipped when no personas were supplied', () => {
+      const report = renderMigrationReport(buildMigrationBundle(xml));
+      expect(report).toContain('Persona source: none supplied');
     });
   });
 });

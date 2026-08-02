@@ -46,6 +46,7 @@
     { name: 'Encompass Users', url: '/finance/encompass-users.html', category: 'Encompass', keywords: 'users directory', requiresAuth: true },
     { name: 'Native Loan Fields', url: '/finance/encompass-native-fields.html', category: 'Encompass', keywords: 'field definitions', requiresAuth: true },
     { name: 'Custom Loan Fields', url: '/finance/encompass-custom-fields.html', category: 'Encompass', keywords: 'custom fields', requiresAuth: true },
+    { name: 'Condition Manager', url: '/finance/condition-manager.html', category: 'Encompass', keywords: 'conditions CDO enhanced conditions migration templates personas', requiresAuth: true },
     { name: 'FHA Streamline', url: '/finance/fha-streamline-calculator.html', category: 'Worksheets', keywords: 'FHA refinance', requiresAuth: false },
     { name: 'FHA Loan Amount', url: '/finance/fha-streamline-loan-amount-calculator.html', category: 'Worksheets', keywords: 'FHA streamline loan amount', requiresAuth: false },
     { name: 'FHA NTB', url: '/finance/fha-streamline-ntb-calculator.html', category: 'Worksheets', keywords: 'FHA streamline net tangible benefit', requiresAuth: false },

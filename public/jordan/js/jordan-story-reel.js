@@ -57,12 +57,18 @@
   function speakScene(scene, token) {
     const text = pick(scene.narration);
     if (!text) return Promise.resolve();
+    // HyperFrame tour always narrates — that is the point of Start tour.
     const speech = i18n().speakAsGuide(text, {
+      force: true,
       isCancelled: () => !state.running || state.paused || token !== state.playbackToken
     });
     return withTimeout(speech, TTS_TIMEOUT_MS).catch((err) => {
       console.warn('Jordan reel narration failed', err);
-      showError('Narration hiccup — the reel keeps going. Tap the page once to allow audio.');
+      const msg =
+        i18n()?.lang?.() === 'ar'
+          ? 'تعثّر السرد الصوتي — الجولة تتابع. المس الصفحة مرة للسماح بالصوت.'
+          : 'Narration hiccup — the reel keeps going. Tap the page once to allow audio.';
+      showError(msg);
     });
   }
 
@@ -133,14 +139,33 @@
     const content = window.JordanContent;
     if (!action || !content) return;
     switch (action) {
+      case 'openAtlas':
+        window.JordanSections?.expand('jdMap');
+        content.closeSheet?.();
+        document.getElementById('jdMap')?.scrollIntoView({
+          behavior: state.reducedMotion ? 'auto' : 'smooth',
+          block: 'start'
+        });
+        break;
       case 'openFirstEra':
         content.openFirstEra?.();
         break;
+      case 'openKingdomEra': {
+        const eras = content.getData?.()?.eras || [];
+        const id =
+          eras.find((e) => e.id === 'kingdom')?.id ||
+          eras.find((e) => e.id === 'emirate')?.id ||
+          eras[0]?.id;
+        if (id) content.openEra?.(id);
+        break;
+      }
       case 'focusPetra':
         content.closeSheet?.();
+        window.JordanSections?.expand('jdMap');
         window.JordanMap?.focusSite('petra', { speak: false });
         break;
       case 'focusJerash':
+        window.JordanSections?.expand('jdMap');
         window.JordanMap?.focusSite('jerash', { speak: false });
         break;
       case 'flipFirstFood':
@@ -159,7 +184,7 @@
         content.unflipAll?.();
         break;
       case 'speakFirstPhrase':
-        // Narration is already speaking this scene; the phrase plays after it.
+        // Phrase audio plays after scene narration finishes.
         break;
       default:
         break;
@@ -224,6 +249,10 @@
     renderProgress(index);
     applySpotlight(scene);
     setOverlay(scene);
+    // Beat entrance — chip pulse for cinematic HyperFrame feel
+    document.getElementById('jdStoryChip')?.classList.remove('is-beat');
+    void document.getElementById('jdStoryChip')?.offsetWidth;
+    document.getElementById('jdStoryChip')?.classList.add('is-beat');
     runAction(scene.action);
 
     const started = Date.now();
@@ -231,7 +260,8 @@
       ? Math.min(Number(scene.durationMs) || 6000, 2400)
       : Number(scene.durationMs) || 6000;
 
-    if (narrationOn()) await speakScene(scene, token);
+    // Tour always narrates (force); checkbox still gates non-tour page speech.
+    await speakScene(scene, token);
 
     if (scene.action === 'speakFirstPhrase' && state.running && token === state.playbackToken) {
       window.JordanContent?.speakFirstPhrase?.();

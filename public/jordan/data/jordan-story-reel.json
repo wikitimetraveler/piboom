@@ -1,5 +1,9 @@
 {
   "id": "jordan-hyperframes-reel",
+  "title": {
+    "en": "Jordan HyperFrame Tour",
+    "ar": "جولة الأردن المصوّرة"
+  },
   "portrait": "/jordan/assets/rami-guide-portrait-256.png",
   "voice": { "en": "en-US-Neural2-D", "ar": "ar-XA-Wavenet-B" },
   "pitch": -1,
@@ -9,67 +13,119 @@
       "id": "open",
       "anchor": "jdHero",
       "spotlight": "#jdHeroInner",
-      "durationMs": 6200,
-      "kicker": { "en": "HyperFrame", "ar": "إطار" },
-      "title": { "en": "Ahlan wa sahlan", "ar": "أهلاً وسهلاً" },
+      "durationMs": 7800,
+      "kicker": { "en": "HyperFrame · 01", "ar": "إطار · ٠١" },
+      "title": {
+        "en": "Ahlan — walk nine thousand years",
+        "ar": "أهلاً — امشِ تسعة آلاف سنة"
+      },
       "copy": {
-        "en": "I'm Rami. Nine thousand years in about four minutes — history, food, song, and café argileh.",
-        "ar": "أنا رامي. تسعة آلاف سنة في أربع دقائق تقريباً — تاريخ وطعام وغناء وأرجيلة المقهى."
+        "en": "I'm Rami. Desert sky above, stone below — history, table, and song in one walk.",
+        "ar": "أنا رامي. سماء صحراء فوق، وحجر تحت — تاريخ ومائدة وصوت في مشية واحدة."
       },
       "narration": {
-        "en": "Ahlan wa sahlan. I'm Rami, and this is Jordan — nine thousand years of history, told through its roads, its tables, and its songs.",
-        "ar": "أهلاً وسهلاً. أنا رامي، وهذا هو الأردن — تسعة آلاف سنة من التاريخ، تُروى عبر دروبه وموائده وأغانيه."
+        "en": "Ahlan wa sahlan. I'm Rami. Tonight we walk Jordan as a HyperFrame — nine thousand years under a desert sky, told through roads, tables, and songs. Switch the page to Arabic anytime, and I switch with you.",
+        "ar": "أهلاً وسهلاً. أنا رامي. الليلة نمشي الأردن كإطار حيّ — تسعة آلاف سنة تحت سماء الصحراء، تُروى عبر الدروب والموائد والأغاني. بدّل الصفحة إلى الإنجليزية متى شئت، فأتبدّل معك."
       }
     },
     {
-      "id": "timeline",
+      "id": "atlas",
+      "anchor": "jdMap",
+      "spotlight": "#jdMap",
+      "action": "openAtlas",
+      "durationMs": 7200,
+      "kicker": { "en": "HyperFrame · 02", "ar": "إطار · ٠٢" },
+      "title": {
+        "en": "The atlas opens",
+        "ar": "يُفتح الأطلس"
+      },
+      "copy": {
+        "en": "Every pin is a place you can stand. History, food, music, living country.",
+        "ar": "كل دبوس مكان يمكنك الوقوف فيه. تاريخ وطعام وموسيقى وبلد حيّ."
+      },
+      "narration": {
+        "en": "First, the atlas. Every pin is a place you can visit — Nabataean stone, Roman colonnades, Bedouin hospitality, festival stages. Select a name and the map leans in.",
+        "ar": "أولاً الأطلس. كل دبوس مكان يمكنك زيارته — حجر نبطي، وأعمدة رومانية، وضيافة بدوية، ومسارح مهرجان. اختر اسماً فتميل الخريطة نحوه."
+      }
+    },
+    {
+      "id": "ain-ghazal",
       "anchor": "jdTimeline",
       "spotlight": "#jdEraList .jd-era:first-child",
       "action": "openFirstEra",
-      "durationMs": 7000,
-      "kicker": { "en": "Layers", "ar": "طبقات" },
-      "title": { "en": "Start at Ain Ghazal", "ar": "ابدأ من عين غزال" },
+      "durationMs": 8200,
+      "kicker": { "en": "HyperFrame · 03", "ar": "إطار · ٠٣" },
+      "title": {
+        "en": "Ain Ghazal — faces before cities",
+        "ar": "عين غزال — وجوه قبل المدن"
+      },
       "copy": {
-        "en": "Plaster faces from 7250 BCE, made on ground that is now a suburb of Amman.",
-        "ar": "وجوهٌ من الجصّ من عام ٧٢٥٠ ق.م، صُنعت على أرض صارت اليوم ضاحية من عمّان."
+        "en": "Lime-plaster statues, 7250 BCE, on ground that is now Amman's edge.",
+        "ar": "تماثيل جصّية من ٧٢٥٠ ق.م، على أرض صارت طرف عمّان."
       },
       "narration": {
-        "en": "The story starts at Ain Ghazal, where Neolithic villagers shaped human faces out of lime plaster more than nine thousand years ago, on ground that is now a suburb of Amman.",
-        "ar": "تبدأ الحكاية في عين غزال، حيث شكّل سكان العصر الحجري الحديث وجوهاً بشرية من الجصّ قبل أكثر من تسعة آلاف عام، على أرض صارت اليوم ضاحية من عمّان."
+        "en": "Open the eras. The story starts at Ain Ghazal, where Neolithic villagers shaped human faces from lime plaster more than nine thousand years ago — on ground that is now a suburb of Amman. Jordan's timeline begins with people, not kings.",
+        "ar": "افتح العصور. تبدأ الحكاية في عين غزال، حيث شكّل أهل العصر الحجري وجوهًا من الجصّ قبل أكثر من تسعة آلاف عام — على أرض صارت ضاحية من عمّان. خطّ الأردن الزمني يبدأ بالناس، لا بالملوك."
       }
     },
     {
       "id": "petra",
       "anchor": "jdMap",
-      "spotlight": "#jdMap",
+      "spotlight": "#jdMapCanvas",
       "action": "focusPetra",
-      "durationMs": 7200,
-      "kicker": { "en": "Atlas", "ar": "أطلس" },
-      "title": { "en": "Petra, and the water trick", "ar": "البتراء وحيلة الماء" },
+      "durationMs": 8400,
+      "kicker": { "en": "HyperFrame · 04", "ar": "إطار · ٠٤" },
+      "title": {
+        "en": "Petra — stone that drinks",
+        "ar": "البتراء — حجر يشرب"
+      },
       "copy": {
-        "en": "The Nabataeans are remembered for carving. They should be remembered for plumbing.",
-        "ar": "يُذكر الأنباط بالنحت. والأولى أن يُذكروا بهندسة الماء."
+        "en": "Rose sandstone for the cameras. Water engineering for the capital.",
+        "ar": "حجر وردي للكاميرات. وهندسة ماء للعاصمة."
       },
       "narration": {
-        "en": "Here is Petra. The Nabataeans are remembered for carving rose sandstone, but their real achievement was water — dams, channels and cisterns that let a capital city live in a desert.",
-        "ar": "هذه هي البتراء. يُذكر الأنباط بنحت الحجر الوردي، لكن إنجازهم الحقيقي كان الماء — سدودٌ وقنوات وصهاريج جعلت عاصمة تعيش في الصحراء."
+        "en": "Here is Petra. The Nabataeans are famous for carving rose sandstone — the Siq, the Treasury, the theatre. Remember them also for plumbing: dams, channels, and cisterns that let a desert capital live. Beauty was the face. Water was the mind.",
+        "ar": "هذه البتراء. يشتهر الأنباط بنحت الحجر الوردي — السيق والخزنة والمسرح. واذكرهم أيضًا بهندسة الماء: سدود وقنوات وصهاريج أحيَت عاصمة في الصحراء. الجمال وجه. والماء عقل."
       }
     },
     {
-      "id": "rome",
+      "id": "jerash",
       "anchor": "jdMap",
       "spotlight": "#jdSiteList",
       "action": "focusJerash",
-      "durationMs": 6600,
-      "kicker": { "en": "Atlas", "ar": "أطلس" },
-      "title": { "en": "Rome, then everyone after", "ar": "روما، ثم كل من بعدها" },
+      "durationMs": 7800,
+      "kicker": { "en": "HyperFrame · 05", "ar": "إطار · ٠٥" },
+      "title": {
+        "en": "Jerash — Rome under Jordan light",
+        "ar": "جرش — روما تحت ضوء الأردن"
+      },
       "copy": {
-        "en": "Jerash, Madaba's mosaic map, Umayyad frescoes, Crusader Karak — all still standing.",
-        "ar": "جرش، وخريطة مادبا الفسيفسائية، والجداريات الأموية، وكرك الصليبيين — كلها ما زالت قائمة."
+        "en": "Colonnaded streets still standing. Festival sound since 1981.",
+        "ar": "شوارع أعمدة ما زالت قائمة. وصوت مهرجان منذ ١٩٨١."
       },
       "narration": {
-        "en": "Rome annexed the Nabataean kingdom in one hundred six, and Jerash grew colonnaded streets. After that came Byzantine mosaics at Madaba, Umayyad frescoes in the eastern desert, and Crusader castles on the King's Highway. Every layer is still standing.",
-        "ar": "ضمّت روما مملكة الأنباط عام مئة وستة، فنمت في جرش شوارع الأعمدة. ثم جاءت الفسيفساء البيزنطية في مادبا، والجداريات الأموية في الصحراء الشرقية، وقلاع الصليبيين على طريق الملوك. وكل طبقة ما زالت قائمة."
+        "en": "Rome annexed Nabataea in one hundred six. Jerash grew colonnades you can still walk. Later eras kept arriving — Byzantine mosaics at Madaba, Umayyad desert castles, Crusader Karak on the King's Highway. Every era still stands in the sun.",
+        "ar": "ضمّت روما مملكة الأنباط عام مئة وستة. فنمت جرش أعمدة يمكنك المشي بينها حتى اليوم. ثم توالت العصور — فسيفساء مادبا البيزنطية، وقصور أموية في الصحراء، وكرك الصليبيين على طريق الملوك. وكل عصر ما زال قائماً في الشمس."
+      }
+    },
+    {
+      "id": "kingdom",
+      "anchor": "jdTimeline",
+      "spotlight": "#jdCalendar",
+      "action": "openKingdomEra",
+      "durationMs": 7600,
+      "kicker": { "en": "HyperFrame · 06", "ar": "إطار · ٠٦" },
+      "title": {
+        "en": "From emirate to kingdom",
+        "ar": "من الإمارة إلى المملكة"
+      },
+      "copy": {
+        "en": "Hashemite continuity, independence in 1946, Amman as living capital.",
+        "ar": "استمرارية هاشمية، واستقلال ١٩٤٦، وعمّان عاصمة حيّة."
+      },
+      "narration": {
+        "en": "Slide the chronology forward. The Great Arab Revolt, the Emirate, then independence in nineteen forty-six — the Hashemite Kingdom of Jordan. The atlas is not only ruins. It is a modern capital that still hosts the old roads.",
+        "ar": "حرّك الخط الزمني إلى الأمام. الثورة العربية الكبرى، ثم الإمارة، ثم الاستقلال عام ألف وتسعمائة وستة وأربعين — المملكة الأردنية الهاشمية. الأطلس ليس أطلالًا فحسب. إنه عاصمة حديثة ما زالت تحتضن الطرق القديمة."
       }
     },
     {
@@ -77,16 +133,19 @@
       "anchor": "jdFood",
       "spotlight": "#jdFoodGrid .jd-card",
       "action": "flipFirstFood",
-      "durationMs": 7600,
-      "kicker": { "en": "The table", "ar": "المائدة" },
-      "title": { "en": "Mansaf is a contract", "ar": "المنسف عقد" },
+      "durationMs": 8600,
+      "kicker": { "en": "HyperFrame · 07", "ar": "إطار · ٠٧" },
+      "title": {
+        "en": "Mansaf — hospitality as law",
+        "ar": "المنسف — الضيافة قانون"
+      },
       "copy": {
-        "en": "Lamb in jameed over shrak bread. One tray, right hand, best cuts to the guest.",
-        "ar": "لحمٌ بالجميد فوق خبز الشراك. صينية واحدة، واليد اليمنى، وأفضل القطع للضيف."
+        "en": "Jameed, shrak, one tray. Best cuts to the guest.",
+        "ar": "جميد وشراك وصينية واحدة. وأفضل القطع للضيف."
       },
       "narration": {
-        "en": "Now the table. Mansaf is lamb cooked in jameed, dried sheep yogurt, poured over rice and thin shrak bread. Everyone eats from one tray with the right hand, and the host gives the best cuts to the guest. It is less a recipe than a contract of hospitality.",
-        "ar": "والآن المائدة. المنسف لحمُ ضأنٍ يُطهى بالجميد، لبن الغنم المجفّف، ويُسكب فوق الأرز وخبز الشراك الرقيق. يأكل الجميع من صينية واحدة باليد اليمنى، ويعطي المضيف أفضل القطع لضيفه. إنه عقد ضيافة أكثر منه وصفة."
+        "en": "Now the table. Mansaf is lamb in jameed — dried sheep yogurt — over rice and thin shrak bread. One communal tray, right hand only, and the host serves the finest cuts to the guest. UNESCO listed it as living heritage. It is less a recipe than a contract.",
+        "ar": "والآن المائدة. المنسف لحم بالجميد — لبن الغنم المجفّف — فوق الأرز وخبز الشراك. صينية واحدة، واليد اليمنى فقط، والمضيف يقدّم أطيب القطع للضيف. وأدرجته اليونسكو تراثًا حيًّا. إنه عقد أكثر منه وصفة."
       }
     },
     {
@@ -94,16 +153,19 @@
       "anchor": "jdFood",
       "spotlight": "#jdFoodGrid",
       "action": "unflipCards",
-      "durationMs": 6600,
-      "kicker": { "en": "The table", "ar": "المائدة" },
-      "title": { "en": "Three cups, then shake", "ar": "ثلاثة فناجين ثم هزّ" },
+      "durationMs": 7200,
+      "kicker": { "en": "HyperFrame · 08", "ar": "إطار · ٠٨" },
+      "title": {
+        "en": "Three cups — then shake",
+        "ar": "ثلاثة فناجين — ثم هزّ"
+      },
       "copy": {
-        "en": "Bitter cardamom coffee opens every welcome. Shaking the cup means enough.",
-        "ar": "القهوة المُرّة بالهيل تفتتح كل ترحيب. وهزّ الفنجان يعني: يكفي."
+        "en": "Bitter cardamom coffee. Shake the cup when you have had enough.",
+        "ar": "قهوة مُرّة بالهيل. هزّ الفنجان إذا اكتفيت."
       },
       "narration": {
-        "en": "Before any of it comes coffee — bitter, green with cardamom, poured from a brass dallah. Take one cup, or two, or at most three, then shake the cup side to side to say enough. That gesture is the whole etiquette in one movement.",
-        "ar": "وقبل كل ذلك تأتي القهوة — مُرّة، خضراء بالهيل، تُسكب من دلّة نحاسية. خذ فنجاناً أو اثنين أو ثلاثة على الأكثر، ثم هزّ الفنجان يميناً وشمالاً لتقول: يكفي. هذه الحركة وحدها هي الأصول كلها."
+        "en": "Before the feast, coffee. Bitter, green with cardamom, poured from a brass dallah. One cup, or two, or at most three — then shake the cup gently side to side. That small gesture means enough. In Jordan, etiquette often fits in one motion.",
+        "ar": "وقبل الوليمة، القهوة. مُرّة خضراء بالهيل، من دلّة نحاسية. فنجان أو اثنان أو ثلاثة على الأكثر — ثم هزّ الفنجان بلطف يمينًا وشمالًا. هذه الحركة الصغيرة تعني: يكفي. في الأردن كثير من الأصول يُختصر في حركة واحدة."
       }
     },
     {
@@ -111,33 +173,19 @@
       "anchor": "jdMusic",
       "spotlight": "#jdMusicGrid .jd-card",
       "action": "flipFirstMusic",
-      "durationMs": 7400,
-      "kicker": { "en": "Sound", "ar": "صوت" },
-      "title": { "en": "One string, then a stadium", "ar": "وترٌ واحد، ثم مدرّج" },
+      "durationMs": 8200,
+      "kicker": { "en": "HyperFrame · 09", "ar": "إطار · ٠٩" },
+      "title": {
+        "en": "Rababa, mijwiz, Jerash night",
+        "ar": "ربابة ومجوز وليلة جرش"
+      },
       "copy": {
-        "en": "Rababa and nabati poetry, mijwiz for the dabke line, and Roman stone at Jerash.",
-        "ar": "ربابةٌ وشعرٌ نبطي، ومجوزٌ لصفّ الدبكة، وحجرٌ روماني في جرش."
+        "en": "One string for poetry. Two reeds for the dabke line. Roman stone for the festival.",
+        "ar": "وتر للشعر. وقصبتان لصف الدبكة. وحجر روماني للمهرجان."
       },
       "narration": {
-        "en": "Then the sound. A one-string rababa holding the floor for a nabati poet. A double-reed mijwiz driving a dabke line, played with circular breathing so it never stops. And since nineteen eighty one, all of it amplified inside second-century Roman theatres at the Jerash Festival.",
-        "ar": "ثم الصوت. ربابةٌ بوترٍ واحد تفتح المجلس لشاعرٍ نبطي. ومجوزٌ بقصبتين يقود صفّ الدبكة، يُعزف بالتنفّس الدائري فلا ينقطع. ومنذ عام ١٩٨١ يتردّد كل ذلك في مسارح رومانية من القرن الثاني في مهرجان جرش."
-      }
-    },
-    {
-      "id": "hookah",
-      "anchor": "jdHookah",
-      "spotlight": "#jdHookahGrid .jd-card",
-      "action": "flipFirstHookah",
-      "durationMs": 7000,
-      "kicker": { "en": "Argileh", "ar": "أرجيلة" },
-      "title": { "en": "Apple on the terrace", "ar": "تفاح على الشرفة" },
-      "copy": {
-        "en": "Café argileh — history, shared hoses, and the classic two-apple blend.",
-        "ar": "أرجيلة المقهى — تاريخ، وخراطيم مشتركة، ونكهة التفاحتين الكلاسيكية."
-      },
-      "narration": {
-        "en": "After the music, the café. Argileh arrived centuries ago and stayed on Amman terraces — glass vase, clay head, coals on foil. The default flavor is two-apple, tufahtayn — sweet, familiar, and yes, the blend a neighbor still orders first.",
-        "ar": "بعد الموسيقى، المقهى. جاءت الأرجيلة قبل قرون وبقيت على شرفات عمّان — مزهرية زجاج ورأس فخار وفحم على الورق. والنكهة الافتراضية تفاحتين — حلوة ومألوفة، ونعم، الخلطة التي ما زال جار يطلبها أولاً."
+        "en": "Listen. A one-string rababa holds the floor for nabati poetry. A double-reed mijwiz drives the dabke line with circular breathing so the melody never breaks. And since nineteen eighty-one, that sound fills second-century Roman theatres at the Jerash Festival — old stone, new night.",
+        "ar": "اسمع. ربابة بوتر واحد تفتح المجلس للشعر النبطي. ومجوز بقصبتين يقود صف الدبكة بتنفّس دائري فلا ينقطع اللحن. ومنذ عام ألف وتسعمائة وواحد وثمانين يملأ ذلك الصوت مسارح رومانية من القرن الثاني في مهرجان جرش — حجر قديم، وليلة جديدة."
       }
     },
     {
@@ -145,16 +193,19 @@
       "anchor": "jdLiving",
       "spotlight": "#jdLivingGrid .jd-card",
       "action": "flipFirstLiving",
-      "durationMs": 7600,
-      "kicker": { "en": "Living", "ar": "حيّ" },
-      "title": { "en": "People, badia, hands", "ar": "ناس وبادية وأيادٍ" },
+      "durationMs": 8200,
+      "kicker": { "en": "HyperFrame · 10", "ar": "إطار · ١٠" },
+      "title": {
+        "en": "Living country — diwan to badia",
+        "ar": "بلد حيّ — من الديوان إلى البادية"
+      },
       "copy": {
-        "en": "Bedouin diwan, neighbor communities, eastern desert, mosaics and rugs.",
-        "ar": "ديوان بدوي، ومجتمعات جارة، وصحراء شرقية، وفسيفساء وسجاد."
+        "en": "Bedouin coffee floors, neighbor kitchens, eastern desert, crafts that still pay.",
+        "ar": "مجالس قهوة بدوية، ومطابخ جارة، وصحراء شرقية، وحِرَف ما زالت ترزق."
       },
       "narration": {
-        "en": "Then the living country. A Bedouin diwan where coffee opens the floor. Palestinian bakeries and Syrian sweets on Amman stairs. The eastern badia beyond postcard Rum — and Azraq's water lesson. Madaba mosaic hands and Bani Hamida looms still earning a living.",
-        "ar": "ثم البلد الحيّ. ديوان بدوي تفتتحه القهوة. مخابز فلسطينية وحلويات سورية على سلالم عمّان. البادية الشرقية أبعد من رم البطاقية — ودرس الماء في الأزرق. أيادي فسيفساء مادبا وأنوال بني حميدة ما زالت ترزق."
+        "en": "Then the living country. A Bedouin diwan where coffee opens the floor. Neighbor communities — Palestinian bakeries, Circassian heritage, Syrian sweets on Amman stairs. The eastern badia beyond postcard Wadi Rum. Madaba mosaic hands and Bani Hamida looms still earning a living.",
+        "ar": "ثم البلد الحيّ. ديوان بدوي تفتتحه القهوة. ومجتمعات جارة — مخابز فلسطينية، وتراث شركسي، وحلويات سورية على سلالم عمّان. والبادية الشرقية أبعد من رم البطاقات البريدية. وأيادي فسيفساء مادبا وأنوال بني حميدة ما زالت ترزق."
       }
     },
     {
@@ -162,32 +213,39 @@
       "anchor": "jdPhrases",
       "spotlight": "#jdPhraseList",
       "action": "speakFirstPhrase",
-      "durationMs": 6400,
-      "kicker": { "en": "Speak", "ar": "احكِ" },
-      "title": { "en": "Try it in Arabic", "ar": "جرّبها بالعربية" },
+      "durationMs": 7000,
+      "kicker": { "en": "HyperFrame · 11", "ar": "إطار · ١١" },
+      "title": {
+        "en": "Speak Jordanian — aloud",
+        "ar": "احكِ أردني — بصوت"
+      },
       "copy": {
-        "en": "Every phrase here speaks aloud. Switch the page to عربي and the whole tour follows.",
-        "ar": "كل عبارة هنا تُنطق بصوت. بدّل الصفحة إلى العربية وستتبعك الجولة كلها."
+        "en": "Tap any phrase. Arabic voice answers. The tour language follows the page.",
+        "ar": "اضغط أي عبارة. فيجيبك صوت عربي. ولغة الجولة تتبع الصفحة."
       },
       "narration": {
-        "en": "And you can answer back. Every phrase on this page speaks aloud in Arabic — and if you switch the page to Arabic, this entire tour, narration included, switches with it.",
-        "ar": "ويمكنك أن تردّ. كل عبارة في هذه الصفحة تُنطق بالعربية — وإذا بدّلت الصفحة إلى العربية، فإن هذه الجولة كلها، بسردها الصوتي، تتبدّل معها."
+        "en": "Now answer back. Every phrase on this page speaks Arabic aloud — ahlan, keefak, yislamou. Practice is the point. And if you flip the page language, this entire HyperFrame tour — captions and my voice — flips with it.",
+        "ar": "والآن رُدّ. كل عبارة هنا تُنطق بالعربية — أهلاً، كيفك، يسلموا. التدريب هو القصد. وإذا بدّلت لغة الصفحة، فإن جولة الإطار كلها — عناوينها وصوتي — تتبدّل معها."
       }
     },
     {
-      "id": "ask",
+      "id": "close",
       "anchor": "jdGuide",
       "spotlight": "#jdAskGuide",
-      "durationMs": 6000,
-      "kicker": { "en": "Ask", "ar": "اسأل" },
-      "title": { "en": "Ask me anything", "ar": "اسألني أي شيء" },
+      "action": "unflipCards",
+      "durationMs": 7200,
+      "kicker": { "en": "HyperFrame · 12", "ar": "إطار · ١٢" },
+      "title": {
+        "en": "Ask Rami — ma'a as-salama",
+        "ar": "اسأل رامي — مع السلامة"
+      },
       "copy": {
-        "en": "Nabataean water systems, jameed, the Hejaz Railway — I answer in English or Arabic.",
-        "ar": "أنظمة المياه النبطية، والجميد، وسكة حديد الحجاز — أجيب بالعربية أو بالإنجليزية."
+        "en": "Nabataean water, jameed, the Hejaz Railway — English or Arabic.",
+        "ar": "ماء الأنباط، والجميد، وسكة الحجاز — بالعربية أو الإنجليزية."
       },
       "narration": {
-        "en": "That's the tour. Ask me anything else — Nabataean water systems, how jameed is made, why there are bagpipes in the army. I answer in English or in Arabic. Ma'a as-salama.",
-        "ar": "هذه هي الجولة. اسألني عن أي شيء آخر — أنظمة المياه النبطية، أو كيف يُصنع الجميد، أو لماذا في الجيش مزمار قِرَب. أجيب بالعربية أو بالإنجليزية. مع السلامة."
+        "en": "That's the HyperFrame. Ask me anything next — Nabataean water systems, how jameed is made, why bagpipes march with the army. I answer in English or Arabic. Ma'a as-salama — until the next road.",
+        "ar": "هذا هو الإطار. اسألني بعد ذلك أي شيء — أنظمة مياه الأنباط، أو كيف يُصنع الجميد، أو لماذا تسير مزامير القِرَب مع الجيش. أجيب بالعربية أو الإنجليزية. مع السلامة — إلى الطريق التالي."
       }
     }
   ]
