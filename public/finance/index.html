@@ -50,11 +50,13 @@
 window.addEventListener('DOMContentLoaded', () => {
   function renderFinanceTools() {
     const grid = document.getElementById('financeToolGrid');
-    if (!grid || !window.MENU_CONFIG || !window.MENU_CONFIG.FINANCE_TOOLS) return;
+    if (!grid || !window.MENU_CONFIG) return;
     const loggedIn = typeof window.isLoggedIn === 'function' && window.isLoggedIn();
-    const tools = window.MENU_CONFIG.filterToolsByAuth
-      ? window.MENU_CONFIG.filterToolsByAuth(window.MENU_CONFIG.FINANCE_TOOLS, loggedIn)
-      : window.MENU_CONFIG.FINANCE_TOOLS;
+    const tools = typeof window.MENU_CONFIG.getMortgageTools === 'function'
+      ? window.MENU_CONFIG.getMortgageTools(loggedIn)
+      : (window.MENU_CONFIG.filterToolsByAuth
+        ? window.MENU_CONFIG.filterToolsByAuth(window.MENU_CONFIG.FINANCE_TOOLS || [], loggedIn)
+        : (window.MENU_CONFIG.FINANCE_TOOLS || []));
     grid.innerHTML = tools.map(function (item) {
       const title = (item.title || item.label || '').replace(/"/g, '&quot;');
       const label = (item.label || '').replace(/"/g, '&quot;');
@@ -67,6 +69,7 @@ window.addEventListener('DOMContentLoaded', () => {
       );
     }).join('');
   }
+  window.renderFinanceTools = renderFinanceTools;
   renderFinanceTools();
   window.addEventListener('user-logged-in', renderFinanceTools);
 });

@@ -557,6 +557,7 @@ window.addEventListener('user-logged-in', () => {
   if (window.FinanceFireGate && window.FinanceFireGate.isMounted()) {
     window.FinanceFireGate.unmount();
   }
+  updateNavbarUserDisplay();
 });
 
 // Export functions

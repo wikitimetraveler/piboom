@@ -49,4 +49,40 @@ describe('menu-config auth filtering', () => {
     expect(MENU_CONFIG.pathRequiresAuth('/finance/processor-assignment.html')).toBe(true);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/processor-assignment-mock.html')).toBe(true);
   });
+
+  test('getFinanceNavItems expands to every mortgage app when logged in', () => {
+    const loggedOut = MENU_CONFIG.getFinanceNavItems(false);
+    const loggedIn = MENU_CONFIG.getFinanceNavItems(true);
+    expect(loggedOut).toEqual(MENU_CONFIG.NAV_FINANCE);
+    const hrefs = loggedIn.filter((t) => t.href).map((t) => t.href);
+    expect(hrefs).toEqual(
+      expect.arrayContaining([
+        '/finance/encompass-hub.html',
+        '/finance/encompass-assistant.html',
+        '/finance/condition-manager.html',
+        '/finance/processor-assignment.html',
+        '/finance/unit-tests.html',
+        '/finance/fha-streamline-calculator.html',
+        '/finance/disasters-unified.html',
+      ]),
+    );
+    expect(hrefs.indexOf('/finance/encompass-hub.html')).toBeLessThan(
+      hrefs.indexOf('/finance/fha-streamline-calculator.html'),
+    );
+  });
+
+  test('getMortgageTools returns calculators plus full Encompass set when logged in', () => {
+    const loggedOut = MENU_CONFIG.getMortgageTools(false);
+    const loggedIn = MENU_CONFIG.getMortgageTools(true);
+    expect(loggedOut.map((t) => t.href)).not.toContain('/finance/encompass-assistant.html');
+    expect(loggedIn.map((t) => t.href)).toEqual(
+      expect.arrayContaining([
+        '/finance/encompass-hub.html',
+        '/finance/encompass-assistant.html',
+        '/finance/unit-tests.html',
+        '/finance/dti-calculator.html',
+      ]),
+    );
+    expect(loggedIn.length).toBeGreaterThan(loggedOut.length);
+  });
 });

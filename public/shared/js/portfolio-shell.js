@@ -140,10 +140,6 @@
     const params = new URLSearchParams(window.location.search);
     let activeFilter = params.get('filter') || 'mortgage';
 
-    function mortgageCategories() {
-      return ['encompass', 'ai', 'disasters'];
-    }
-
     function renderFilters() {
       if (!filterBar) return;
       const filters = [
@@ -180,21 +176,27 @@
     }
 
     function renderGrid() {
-      let projects;
-      if (activeFilter === 'mortgage') {
-        projects = pf.getPortfolioProjects({ includeDemo: true }).filter((p) =>
-          mortgageCategories().includes(p.category)
-        );
-      } else if (activeFilter === 'all') {
-        projects = pf.getPortfolioProjects({ includeDemo: true });
-      } else {
-        projects = pf.getPortfolioProjects({ category: activeFilter, includeDemo: true });
-      }
-      grid.innerHTML = pf.renderProjectCards(projects);
+      const loggedIn = isPortfolioLoggedIn();
+      const filter = activeFilter === 'all' ? 'all' : activeFilter;
+      // Full mortgage catalog when logged in (menu tools + portfolio cards).
+      // Logged-out visitors still see public demos only.
+      const projects =
+        typeof pf.getWorkCatalogProjects === 'function'
+          ? pf.getWorkCatalogProjects({ filter: filter, loggedIn: loggedIn })
+          : pf.getPortfolioProjects({
+              includeDemo: true,
+              filter: filter,
+              loggedIn: loggedIn,
+            });
+      grid.innerHTML = pf.renderProjectCards(projects, { showThumbs: false });
+      grid.setAttribute('data-tool-count', String(projects.length));
+      grid.setAttribute('data-auth', loggedIn ? 'in' : 'out');
     }
 
     renderFilters();
     renderGrid();
+    // Re-render after auth scripts finish so login-required tools appear.
+    initWork.renderGrid = renderGrid;
   }
 
   function initStack() {
@@ -276,7 +278,13 @@
   }
 
   function isPortfolioLoggedIn() {
-    return typeof window.isLoggedIn === 'function' && !!window.isLoggedIn();
+    if (typeof window.isLoggedIn === 'function') return !!window.isLoggedIn();
+    // Fallback before user-login.js loads — same key the login module uses.
+    try {
+      return localStorage.getItem('loggedInUserId') !== null;
+    } catch (_) {
+      return false;
+    }
   }
 
   function renderAuthButton() {
@@ -298,8 +306,8 @@
       btn.addEventListener('click', onAuthButtonClick);
     }
 
-    if (isPortfolioLoggedIn() && typeof window.getLoggedInUser === 'function') {
-      const user = window.getLoggedInUser();
+    if (isPortfolioLoggedIn()) {
+      const user = typeof window.getLoggedInUser === 'function' ? window.getLoggedInUser() : null;
       const name = user && user.name ? user.name.split(' ').slice(-1)[0] : 'Account';
       btn.classList.add('portfolio-auth-btn--out');
       btn.setAttribute('aria-label', 'Log out as ' + name);
@@ -320,6 +328,7 @@
     event.preventDefault();
     ensureAuthScripts()
       .then(() => {
+        renderAuthButton();
         if (isPortfolioLoggedIn()) {
           if (typeof window.logout === 'function') {
             window.logout();
@@ -335,8 +344,37 @@
       });
   }
 
+  function refreshPortfolioForAuth() {
+    renderAuthButton();
+    if (typeof window.updateNavbarUserDisplay === 'function') {
+      window.updateNavbarUserDisplay();
+    }
+    const page = document.body.getAttribute('data-portfolio-page');
+    if (page === 'home') initHome();
+    else if (page === 'work' && !document.getElementById('portfolioCaseStudy')) {
+      if (typeof initWork.renderGrid === 'function') initWork.renderGrid();
+      else initWork();
+    } else if (page === 'finance' && typeof window.renderFinanceTools === 'function') {
+      window.renderFinanceTools();
+    }
+  }
+
   function initAuthControls() {
     renderAuthButton();
+    ensureAuthScripts()
+      .then(() => {
+        refreshPortfolioForAuth();
+      })
+      .catch((err) => {
+        console.error('Portfolio auth scripts failed', err);
+      });
+    window.addEventListener('storage', (event) => {
+      if (!event.key || event.key === 'loggedInUserId' || event.key === 'currentUserId') {
+        refreshPortfolioForAuth();
+      }
+    });
+    window.addEventListener('pageshow', refreshPortfolioForAuth);
+    window.addEventListener('focus', renderAuthButton);
   }
 
   function init() {
@@ -362,10 +400,5 @@
     init();
   }
 
-  window.addEventListener('user-logged-in', () => {
-    renderAuthButton();
-    const page = document.body.getAttribute('data-portfolio-page');
-    if (page === 'home') initHome();
-    else if (page === 'work' && !document.getElementById('portfolioCaseStudy')) initWork();
-  });
+  window.addEventListener('user-logged-in', refreshPortfolioForAuth);
 })();

@@ -638,6 +638,40 @@
     return list;
   }
 
+  const MORTGAGE_CATEGORIES = ['encompass', 'ai', 'disasters'];
+
+  /** Stack / copy signals that mark a project as an AI surface (incl. Encompass AI tools). */
+  const AI_SIGNAL =
+    /\b(ai|langchain|openai|gpt|rag|heygen|vision|assistant|llm|pgvector)\b/i;
+
+  function projectLooksLikeAi(project) {
+    if (!project) return false;
+    if (project.category === 'ai') return true;
+    const blob = [project.label, project.tagline, project.consultingBlurb, project.problem]
+      .concat(project.stack || [])
+      .concat((project.caseStudy && project.caseStudy.highlights) || [])
+      .filter(Boolean)
+      .join(' ');
+    return AI_SIGNAL.test(blob);
+  }
+
+  /**
+   * Work-page filter chips. `ai` includes every AI tool plus the full Encompass suite
+   * (Hub, Assistant, Unit Tests, Automator, Screen Test, etc.).
+   */
+  function projectMatchesPortfolioFilter(project, filterId) {
+    if (!project) return false;
+    const filter = String(filterId || 'all').toLowerCase();
+    if (filter === 'all' || filter === 'everything') return true;
+    if (filter === 'mortgage') return MORTGAGE_CATEGORIES.indexOf(project.category) !== -1;
+    if (filter === 'ai') {
+      return project.category === 'ai'
+        || project.category === 'encompass'
+        || projectLooksLikeAi(project);
+    }
+    return project.category === filter;
+  }
+
   function getPortfolioProjects(options) {
     const opts = options || {};
     let list = PORTFOLIO_PROJECTS.slice();
@@ -646,7 +680,9 @@
     } else if (!opts.includeDemo) {
       list = list.filter((p) => !p.demoOnly);
     }
-    if (opts.category && opts.category !== 'all') {
+    if (opts.filter) {
+      list = list.filter((p) => projectMatchesPortfolioFilter(p, opts.filter));
+    } else if (opts.category && opts.category !== 'all') {
       list = list.filter((p) => p.category === opts.category);
     }
     if (opts.featuredOnly) {
@@ -656,9 +692,7 @@
       list = list.filter((p) => p.category !== 'other');
     }
     const loggedIn =
-      typeof opts.loggedIn === 'boolean'
-        ? opts.loggedIn
-        : typeof global.isLoggedIn === 'function' && !!global.isLoggedIn();
+      typeof opts.loggedIn === 'boolean' ? opts.loggedIn : isPortfolioSessionActive();
     if (!loggedIn && opts.hideAuthRequired !== false) {
       list = list.filter((p) => !p.authRequired);
     }
@@ -666,6 +700,100 @@
       if (a.featured && b.featured) return (a.featuredOrder || 0) - (b.featuredOrder || 0);
       if (a.featured) return -1;
       if (b.featured) return 1;
+      return a.label.localeCompare(b.label);
+    });
+  }
+
+  /** Same signal as user-login.js — works even before that script finishes loading. */
+  function isPortfolioSessionActive() {
+    if (typeof global.isLoggedIn === 'function') return !!global.isLoggedIn();
+    try {
+      return global.localStorage && global.localStorage.getItem('loggedInUserId') !== null;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function categorizeToolHref(href) {
+    const path = String(href || '').toLowerCase();
+    if (/disaster|webcam|pipeline-risk|risk-analysis/.test(path)) return 'disasters';
+    if (/assistant|tool9|heygen|ai\//.test(path)) return 'ai';
+    if (/finance\/|gse-analyzer|encompass/.test(path)) return 'encompass';
+    return 'other';
+  }
+
+  /**
+   * Work page catalog: curated portfolio cards plus every mortgage tool from MENU_CONFIG
+   * when logged in, so the grid matches the real ~40-tool set instead of only demos.
+   */
+  function getWorkCatalogProjects(options) {
+    const opts = options || {};
+    const loggedIn =
+      typeof opts.loggedIn === 'boolean' ? opts.loggedIn : isPortfolioSessionActive();
+    const filter = opts.filter || 'mortgage';
+    const portfolio = getPortfolioProjects({
+      includeDemo: true,
+      filter: filter,
+      loggedIn: loggedIn,
+      hideAuthRequired: opts.hideAuthRequired,
+    });
+
+    const menu = global.MENU_CONFIG;
+    if (!loggedIn || !menu) return portfolio;
+
+    let tools = [];
+    if (typeof menu.getMortgageTools === 'function') {
+      tools = menu.getMortgageTools(true);
+    } else {
+      tools = [].concat(menu.ENCOMPASS_TOOLS || [], menu.FINANCE_TOOLS || []);
+    }
+
+    if (filter === 'encompass') {
+      tools = tools.filter((t) => categorizeToolHref(t.href) === 'encompass');
+    } else if (filter === 'ai') {
+      tools = tools.filter((t) => {
+        const cat = categorizeToolHref(t.href);
+        return cat === 'ai' || cat === 'encompass';
+      });
+    } else if (filter === 'disasters') {
+      tools = tools.filter((t) => categorizeToolHref(t.href) === 'disasters');
+    } else if (filter === 'other') {
+      tools = [];
+    } else if (filter === 'mortgage') {
+      tools = tools.filter((t) => categorizeToolHref(t.href) !== 'other');
+    }
+
+    const seen = new Set(
+      portfolio.map((p) => String(p.path || '').toLowerCase().split('?')[0]),
+    );
+    const extras = [];
+    tools.forEach((tool) => {
+      if (!tool || !tool.href || tool.divider) return;
+      const path = String(tool.href).toLowerCase().split('?')[0];
+      if (seen.has(path)) return;
+      seen.add(path);
+      const category = categorizeToolHref(path);
+      extras.push({
+        id: 'tool-' + path.replace(/[^a-z0-9]+/g, '-'),
+        label: tool.label,
+        tagline: tool.title || tool.label,
+        path: tool.href,
+        icon: tool.icon || 'bi-box',
+        category: category,
+        authRequired: typeof menu.pathRequiresAuth === 'function'
+          ? menu.pathRequiresAuth(tool.href)
+          : path.startsWith('/finance/') && !/disasters-unified|calculator/.test(path),
+        problem: tool.title || tool.label,
+        consultingBlurb: tool.title || tool.label,
+        stack: [],
+      });
+    });
+
+    return portfolio.concat(extras).sort((a, b) => {
+      if (a.featured && !b.featured) return -1;
+      if (!a.featured && b.featured) return 1;
+      if (a.caseStudy && !b.caseStudy) return -1;
+      if (!a.caseStudy && b.caseStudy) return 1;
       return a.label.localeCompare(b.label);
     });
   }
@@ -1184,6 +1312,10 @@
     getPortfolioSites,
     getPortfolioProjects,
     getPortfolioProjectById,
+    getWorkCatalogProjects,
+    isPortfolioSessionActive,
+    projectMatchesPortfolioFilter,
+    projectLooksLikeAi,
     resolveSiteUrl,
     resolveSiteHref,
     resolveProjectHref,

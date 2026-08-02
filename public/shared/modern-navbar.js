@@ -169,11 +169,18 @@ class ModernNavbar extends HTMLElement {
     }).join('\n                  ');
   }
 
-  refreshFinanceDropdown() {
+  getFinanceNavItems() {
     const cfg = window.MENU_CONFIG || {};
+    if (typeof cfg.getFinanceNavItems === 'function') {
+      return cfg.getFinanceNavItems(this.isUserLoggedIn());
+    }
+    return cfg.NAV_FINANCE || [];
+  }
+
+  refreshFinanceDropdown() {
     const menu = this.shadowRoot?.querySelector('#navFinanceDropdown .dropdown-menu');
     if (!menu) return;
-    menu.innerHTML = this.renderDropdownItems(cfg.NAV_FINANCE || []);
+    menu.innerHTML = this.renderDropdownItems(this.getFinanceNavItems());
     this.markActiveNavItems();
   }
 
@@ -182,7 +189,7 @@ class ModernNavbar extends HTMLElement {
     const compact = this.hasAttribute('compact');
     const demoMode = this.isDemoMode();
     const cfg = window.MENU_CONFIG || {};
-    const navFinance = cfg.NAV_FINANCE || [];
+    const navFinance = this.getFinanceNavItems();
     const navMusic = cfg.NAV_MUSIC || [];
     const navEnt = cfg.NAV_ENTERTAINMENT || [];
     const navMore = cfg.NAV_MORE || [];

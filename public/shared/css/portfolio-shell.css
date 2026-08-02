@@ -135,6 +135,13 @@
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(255, 80, 0, 0.28);
   white-space: nowrap;
+  max-width: min(14rem, 42vw);
+  flex-shrink: 0;
+}
+
+.portfolio-auth-btn span {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .portfolio-auth-btn:hover {

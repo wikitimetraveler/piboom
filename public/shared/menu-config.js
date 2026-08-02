@@ -31,24 +31,33 @@
     { href: '/finance/index.html', icon: 'bi-grid-3x3-gap', label: 'All Worksheets Tools' },
   ];
 
-  /** Navbar Encompass dropdown items (under Worksheets or standalone) */
+  /** Navbar Encompass items — full catalog when logged in (Worksheets dropdown expands to this). */
   const NAV_ENCOMPASS = [
     { href: '/finance/encompass-hub.html', icon: 'bi-cloud-arrow-down', label: 'Encompass Hub' },
-    { href: '/finance/loan-batch-update.html', icon: 'bi-layers-half', label: 'Loan batch update' },
     { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant' },
+    { href: '/finance/encompass-analytics.html', icon: 'bi-bar-chart-line', label: 'Analytics' },
+    { href: '/finance/loan-batch-update.html', icon: 'bi-layers-half', label: 'Loan batch update' },
+    { href: '/finance/processor-assignment.html', icon: 'bi-people-fill', label: 'Processor assignment' },
+    { href: '/finance/processor-assignment-mock.html', icon: 'bi-people', label: 'Processor assignment (demo)' },
     { href: '/finance/pipeline-risk-dashboard.html', icon: 'bi-shield-check', label: 'Pipeline Risk' },
+    { href: '/finance/risk-analysis-dashboard.html', icon: 'bi-graph-up', label: 'Risk Analysis' },
     { href: '/finance/unit-tests.html', icon: 'bi-clipboard-check', label: 'Unit Tests' },
     { href: '/finance/tool9.html', icon: 'bi-camera-reels', label: 'Screen Test' },
     { href: '/finance/encompass-users.html', icon: 'bi-people', label: 'Users' },
     { href: '/finance/encompass-native-fields.html', icon: 'bi-list-columns', label: 'Native Fields' },
     { href: '/finance/encompass-custom-fields.html', icon: 'bi-sliders', label: 'Custom Fields' },
     { href: '/finance/condition-manager.html', icon: 'bi-clipboard-check', label: 'Condition Manager' },
+    { href: '/finance/encompass-hub-test.html', icon: 'bi-plug', label: 'Test Endpoints' },
     { href: '/finance/tool2.html', icon: 'bi-code-slash', label: 'Parser' },
     { href: '/finance/tool3.html', icon: 'bi-globe', label: 'Mashup' },
     { href: '/finance/tool4.html', icon: 'bi-gear', label: 'Automator' },
     { href: '/finance/tool5.html', icon: 'bi-rulers', label: 'Ruler' },
     { href: '/finance/tool6.html', icon: 'bi-arrow-repeat', label: 'Transformer' },
     { href: '/finance/tool8.html', icon: 'bi-magic', label: 'Alchemist' },
+    { href: '/finance/disasters-unified.html', icon: 'bi-globe2', label: 'Unified Disasters' },
+    { href: '/gse-analyzer.html', icon: 'bi-graph-up-arrow', label: 'GSE scenario analyzer' },
+    { divider: true },
+    { href: '/finance/index.html', icon: 'bi-calculator', label: 'Worksheets Hub' },
   ];
 
   /** Navbar Music dropdown items */
@@ -131,23 +140,26 @@
     { href: '/finance/disasters-unified.html', icon: 'bi-globe', label: 'Unified Disasters', title: 'Unified Disasters (90-day)' },
   ];
 
-  /** Encompass hub tool grid (Encompass Assistant, pipeline, fields, tools) */
+  /** Encompass hub / AI Assistant tool grid — full catalog when logged in. */
   const ENCOMPASS_TOOLS = [
     { href: '/finance/index.html', icon: 'bi-calculator', label: 'Worksheets Hub', title: 'Worksheets Hub, calculators, disasters' },
     { href: '/gse-analyzer.html', icon: 'bi-graph-up-arrow', label: 'GSE scenario analyzer', title: 'Fannie / Freddie / FHFA public rules — research only' },
     { href: '/finance/encompass-hub.html', icon: 'bi-cloud-arrow-down', label: 'Encompass Hub', title: 'Encompass Hub' },
+    { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant', title: 'Encompass AI Assistant' },
+    { href: '/finance/encompass-analytics.html', icon: 'bi-bar-chart-line', label: 'Analytics', title: 'Encompass Analytics' },
     { href: '/finance/disasters-unified.html', icon: 'bi-globe', label: 'Unified Disasters', title: 'Unified Disasters (90-day)' },
     { href: '/finance/loan-batch-update.html', icon: 'bi-layers-half', label: 'Loan batch update', title: 'Encompass loanBatch/updateRequests' },
-    { href: '/finance/processor-assignment-mock.html', icon: 'bi-people-fill', label: 'Processor assignment', title: 'Processor assignment demo with synthetic loans and processors' },
-    { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant', title: 'Encompass AI Assistant' },
+    { href: '/finance/processor-assignment.html', icon: 'bi-people-fill', label: 'Processor assignment', title: 'Live processor assignment against Encompass pipeline' },
+    { href: '/finance/processor-assignment-mock.html', icon: 'bi-people', label: 'Processor assignment (demo)', title: 'Processor assignment demo with synthetic loans' },
     { href: '/finance/pipeline-risk-dashboard.html', icon: 'bi-shield-check', label: 'Pipeline Risk', title: 'Pipeline Risk Dashboard' },
+    { href: '/finance/risk-analysis-dashboard.html', icon: 'bi-graph-up', label: 'Risk Analysis', title: 'Risk Analysis Dashboard' },
     { href: '/finance/unit-tests.html', icon: 'bi-check2-circle', label: 'Unit Tests', title: 'Unit Test Runner' },
     { href: '/finance/tool9.html', icon: 'bi-camera-reels', label: 'Screen Test', title: 'The Screen Test' },
     { href: '/finance/encompass-users.html', icon: 'bi-people', label: 'Users', title: 'Encompass Users' },
     { href: '/finance/encompass-native-fields.html', icon: 'bi-list-columns', label: 'Native Fields', title: 'Native Loan Fields' },
     { href: '/finance/encompass-custom-fields.html', icon: 'bi-sliders', label: 'Custom Fields', title: 'Custom Loan Fields' },
     { href: '/finance/condition-manager.html', icon: 'bi-clipboard-check', label: 'Condition Manager', title: 'Convert the legacy Conditions CDO into Enhanced Conditions' },
-    { href: '/finance/encompass-hub-test.html', icon: 'bi-clipboard-check', label: 'Test Endpoints', title: 'Test API endpoints' },
+    { href: '/finance/encompass-hub-test.html', icon: 'bi-plug', label: 'Test Endpoints', title: 'Test API endpoints' },
     { href: '/finance/tool2.html', icon: 'bi-code-slash', label: 'Parser', title: 'The Parser' },
     { href: '/finance/tool3.html', icon: 'bi-globe', label: 'Mashup', title: 'The Mashup' },
     { href: '/finance/tool4.html', icon: 'bi-gear', label: 'Automator', title: 'The Automator' },
@@ -155,6 +167,54 @@
     { href: '/finance/tool6.html', icon: 'bi-arrow-repeat', label: 'Transformer', title: 'The Transformer' },
     { href: '/finance/tool8.html', icon: 'bi-magic', label: 'Alchemist', title: 'The Alchemist' },
   ];
+
+  /** Drop duplicate hrefs; keep the first label/icon and tidy dividers. */
+  function dedupeMenuItems(items) {
+    const seen = new Set();
+    const out = [];
+    (items || []).forEach(function (item) {
+      if (!item) return;
+      if (item.divider) {
+        if (out.length && !out[out.length - 1].divider) out.push(item);
+        return;
+      }
+      const key = normalizeHrefPath(item.href);
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      out.push(item);
+    });
+    if (out.length && out[out.length - 1].divider) out.pop();
+    return out;
+  }
+
+  /**
+   * Worksheets navbar: short essentials when logged out; every mortgage app
+   * (Encompass Hub, AI Assistant, tools, calculators) when logged in.
+   */
+  function getFinanceNavItems(loggedIn) {
+    const authed = typeof loggedIn === 'boolean' ? loggedIn : isUserLoggedIn();
+    if (!authed) return NAV_FINANCE.slice();
+    return dedupeMenuItems([
+      { href: '/finance/encompass-hub.html', icon: 'bi-columns-gap', label: 'Encompass Hub' },
+      { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass AI Assistant' },
+      ...NAV_ENCOMPASS,
+      { divider: true },
+      ...FINANCE_TOOLS,
+      { divider: true },
+      { href: '/finance/index.html', icon: 'bi-grid-3x3-gap', label: 'All Worksheets Tools' },
+    ]);
+  }
+
+  /**
+   * Worksheets hub tile grid: calculators when logged out; full mortgage catalog
+   * (Encompass + calculators) when logged in.
+   */
+  function getMortgageTools(loggedIn) {
+    const authed = typeof loggedIn === 'boolean' ? loggedIn : isUserLoggedIn();
+    if (!authed) return filterToolsByAuth(FINANCE_TOOLS, false);
+    return dedupeMenuItems([...ENCOMPASS_TOOLS, { divider: true }, ...FINANCE_TOOLS])
+      .filter(function (item) { return item && !item.divider; });
+  }
 
   /** Nature hub tool grid */
   const NATURE_TOOLS = [
@@ -354,6 +414,9 @@
     FINANCE_PUBLIC_PATHS,
     getDomainTiles,
     getAllTools,
+    getFinanceNavItems,
+    getMortgageTools,
+    dedupeMenuItems,
     makeToolId,
     normalizeToolItem,
     pathRequiresAuth,
