@@ -29,22 +29,25 @@ describe('resolveGoogleClientOptions', () => {
     }
   });
 
-  test('uses inline GOOGLE_CREDENTIALS_JSON and clears a bad file path', async () => {
+  test('uses inline GOOGLE_CREDENTIALS_JSON via a temp key file for ADC', async () => {
     process.env.GOOGLE_APPLICATION_CREDENTIALS = '/google-credentials.json';
     process.env.GOOGLE_CREDENTIALS_JSON = JSON.stringify({
       type: 'service_account',
       project_id: 'demo-proj',
       client_email: 'demo@demo.iam.gserviceaccount.com',
-      private_key: 'fake'
+      private_key: 'fake\\nkey'
     });
 
     const { resolveGoogleClientOptions } = await import('../../lib/google-cloud-credentials.js');
     const opts = resolveGoogleClientOptions();
 
-    expect(opts.credentials?.project_id).toBe('demo-proj');
     expect(opts.projectId).toBe('demo-proj');
-    expect(opts.keyFilename).toBeUndefined();
-    expect(process.env.GOOGLE_APPLICATION_CREDENTIALS).toBeUndefined();
+    expect(opts.keyFilename).toBeTruthy();
+    expect(fs.existsSync(opts.keyFilename)).toBe(true);
+    expect(process.env.GOOGLE_APPLICATION_CREDENTIALS).toBe(opts.keyFilename);
+    const written = JSON.parse(fs.readFileSync(opts.keyFilename, 'utf8'));
+    expect(written.private_key).toBe('fake\nkey');
+    expect(written.client_email).toBe('demo@demo.iam.gserviceaccount.com');
   });
 
   test('uses an existing key file and rewrites GOOGLE_APPLICATION_CREDENTIALS', async () => {
@@ -71,9 +74,11 @@ describe('resolveGoogleClientOptions', () => {
     const { resolveGoogleClientOptions } = await import('../../lib/google-cloud-credentials.js');
     const opts = resolveGoogleClientOptions();
 
-    expect(opts.credentials?.project_id).toBe('from-path-var');
-    expect(opts.credentials.private_key).toBe('line1\nline2');
-    expect(process.env.GOOGLE_APPLICATION_CREDENTIALS).toBeUndefined();
+    expect(opts.projectId).toBe('from-path-var');
+    expect(opts.keyFilename).toBeTruthy();
+    const written = JSON.parse(fs.readFileSync(opts.keyFilename, 'utf8'));
+    expect(written.private_key).toBe('line1\nline2');
+    expect(process.env.GOOGLE_APPLICATION_CREDENTIALS).toBe(opts.keyFilename);
   });
 
   test('falls back to ./google-credentials.json when absolute path is missing', async () => {
