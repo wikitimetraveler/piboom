@@ -86,7 +86,8 @@
     } catch (_) {
       /* ignore */
     }
-    return (navigator.language || '').toLowerCase().startsWith('ar') ? 'ar' : 'en';
+    // Default English on first visit — Arabic only via ?lang=ar or the language toggle.
+    return 'en';
   }
 
   function lang() {
