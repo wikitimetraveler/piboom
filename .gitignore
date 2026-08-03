@@ -99,3 +99,6 @@ scripts/__pycache__/
 # music/*.mp3
 # music/*.wav
 # music/*.flac
+
+# Enhanced Conditions dry-run CDO + handoff outputs (local only; may be large / tenant-specific)
+data/encompass-conditions/
