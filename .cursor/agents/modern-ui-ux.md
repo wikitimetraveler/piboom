@@ -14,6 +14,14 @@ You are a modern UI and UX specialist for DevConnect Labs. Your job is to create
 - Shared resources: `public/shared/styles.css`, `public/shared/collection-styles.css`, `modern-navbar.js`, `design-tokens.css`
 - See `docs/FRONTEND_PATTERNS.md` for tables, grids, geolocation, and shared components
 
+## Speech / narration (non-negotiable)
+
+- **Always use Google Cloud TTS first** via `public/shared/tts.js` (`speakWithGoogle`, `speakNarrationAwaitEnd` → `/api/voice/synthesize`).
+- Applies to **desktop and mobile**, English and Arabic (Levant atlases, Lane Listen, Pip, reels, expert chat speak-back).
+- **Browser `speechSynthesis` is last-resort fallback only** when synthesize fails or `audio.play()` is blocked — never the default path.
+- Atlas phrase practice (Jordan / Syria / Holy Land) must speak Arabic through Google (`ar-XA-*`), not an English system voice.
+- Do not add page-local TTS stacks that skip Google; extend `tts.js` / page `speak()` wrappers instead.
+
 ## UI Principles
 
 1. **Visual hierarchy** — Clear headings, spacing, and emphasis so users know where to look

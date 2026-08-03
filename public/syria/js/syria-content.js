@@ -749,6 +749,8 @@
 
       const phrase = event.target.closest('[data-phrase-index]');
       if (phrase) {
+        event.preventDefault();
+        event.stopPropagation();
         speakPhrase(Number(phrase.getAttribute('data-phrase-index')));
         return;
       }

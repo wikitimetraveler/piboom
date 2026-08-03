@@ -34,7 +34,7 @@ When the page lists time-ordered or sectioned content (centuries, cohorts, rooms
 1. **Controls** — A compact **Story mode** panel: toggle to **play highlight reel**, checkboxes for **era chapter intros** and **optional narration**.
 2. **Scenes** — Timed beats aligned to **anchors in the DOM** (scroll highlights). Each scene: **kicker**, **title**, **short body copy** (`aria-live` on the overlay region).
 3. **Floating caption** — Prefer a **fixed-position overlay** positioned near the **spotlight row/section**, clamped inside the viewport (`max-width`, safe padding); **pointer-events: none** on the overlay if it must not steal clicks from the list. Optional blur/shadow so text stays readable over the wall.
-4. **Audio** — Reuse Lane **Listen / TTS** stack (`tts.js`, `lane-tts.js`) where narration is toggled on; browser fallback when server voice is unavailable.
+4. **Audio** — Reuse Lane **Listen / TTS** stack (`tts.js`, `lane-tts.js`) where narration is toggled on. **Always Google Cloud TTS first** (desktop and mobile); browser `speechSynthesis` only if synthesize fails or playback is blocked.
 5. **Interruptibility** — Stop audio and clear overlays on toggle-off, route change where applicable; do not strand focus inside a hidden overlay.
 
 ## Visual continuity

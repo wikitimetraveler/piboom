@@ -151,6 +151,10 @@ describe('shared tts helper', () => {
     global.speechSynthesis.speak = jest.fn((utterance) => {
       queueMicrotask(() => utterance.onend && utterance.onend());
     });
+    // Cloud synth attempted first for non-English on mobile; force browser fallback.
+    global.fetch = jest.fn().mockResolvedValue({
+      json: async () => ({ success: false })
+    });
 
     await import('../../public/shared/tts.js');
 
@@ -161,8 +165,46 @@ describe('shared tts helper', () => {
       preferFemale: false
     });
 
+    expect(global.fetch).toHaveBeenCalled();
     expect(global.speechSynthesis.speak).toHaveBeenCalled();
     const uttered = global.speechSynthesis.speak.mock.calls[0][0];
     expect(uttered.voice).toBe(maleAr);
+  });
+
+  test('mobile Arabic narration tries Google cloud synth before browser voices', async () => {
+    global.navigator = { userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)', maxTouchPoints: 5 };
+    global.Audio = class {
+      constructor() {
+        this.volume = 1;
+        this.onended = null;
+      }
+      async play() {
+        const cb = this.onended;
+        queueMicrotask(() => {
+          if (cb) cb();
+        });
+        return Promise.resolve();
+      }
+      pause() {}
+    };
+    global.fetch = jest.fn().mockResolvedValue({
+      json: async () => ({ success: true, audio: Buffer.from('a').toString('base64') })
+    });
+
+    await import('../../public/shared/tts.js');
+
+    await window.speakNarrationAwaitEnd('مرحبا', {
+      voice: 'ar-XA-Wavenet-B',
+      lang: 'ar-XA',
+      gender: 'male'
+    });
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      '/api/voice/synthesize',
+      expect.objectContaining({
+        method: 'POST',
+        body: expect.stringContaining('ar-XA-Wavenet-B')
+      })
+    );
   });
 });

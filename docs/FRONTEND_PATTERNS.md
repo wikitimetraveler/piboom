@@ -220,6 +220,19 @@ Use `value ? 'Yes' : 'No'` or equivalent. AG Grid/DataTables cell renderers and 
 - Dashboard-only variables still allowed (e.g. `--primary-color`, `--danger-color` on pipeline-risk pages).
 - Inter or similar fonts via Google Fonts; Lane heritage serif: `--lf-serif` (Source Serif 4 on hub)
 
+## Speech / Google TTS
+
+**Rule: always use Google Cloud TTS first.** Shared stack: [`public/shared/tts.js`](../public/shared/tts.js) → `POST /api/voice/synthesize`.
+
+| Path | When |
+|------|------|
+| `speakWithGoogle` / `speakNarrationAwaitEnd` | Default for all Listen, phrase practice, reels, guide speak-back |
+| Browser `speechSynthesis` | Last-resort only if synthesize fails or `audio.play()` is blocked |
+
+- Desktop **and** mobile — do not short-circuit mobile to system voices.
+- Arabic (Jordan / Syria / Holy Land phrases and guides) must use `ar-XA-*` Google voices, never an English browser voice reading Arabic script.
+- Do not invent page-local TTS helpers that skip Google; extend `tts.js` or thin page wrappers (`JordanI18N.speak`, etc.).
+
 ## Toast Notifications
 
 Use the shared toast instead of `alert()` for user feedback. Include `toast.js` and `collection-styles.css` on pages that need feedback.

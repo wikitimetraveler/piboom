@@ -81,8 +81,8 @@
 
   async function speakWithGoogle(text, voice = 'en-US-Standard-D', options = {}) {
     try {
-      // Always try Google first for Pip / young-female — mobile browser voices sound matron (Zira/Susan).
-      // Hear Pip / reel / chat are user gestures, so audio.play() usually works; browser is fallback only.
+      // Always Google Cloud TTS first (every surface, every language). Browser speech is
+      // last-resort only — mobile system voices are unreliable (matron EN, missing AR, etc.).
       if (currentAudio) {
         currentAudio.pause();
         currentAudio = null;
@@ -256,15 +256,19 @@
     const maleHit = (v) => isMaleBrowserVoice(v);
     const prefix = String(langCode || 'en').slice(0, 2).toLowerCase();
     const langOk = (v) => String(v.lang || '').toLowerCase().startsWith(prefix);
-    // Prefer young/playful — never lead with Zira/Susan (matron)
-    return (
+    // Prefer young/playful — never lead with Zira/Susan (matron). Stay in-language for non-English.
+    const inLang =
       list.find((v) => langOk(v) && youngHit(v) && !matronHit(v)) ||
+      list.find((v) => langOk(v) && femaleHit(v) && !matronHit(v)) ||
+      list.find((v) => langOk(v) && !maleHit(v) && !matronHit(v)) ||
+      list.find((v) => langOk(v)) ||
+      null;
+    if (inLang || prefix !== 'en') return inLang;
+    return (
       list.find((v) => /en(-|_)?us/i.test(v.lang) && youngHit(v) && !matronHit(v)) ||
       list.find((v) => /^en/i.test(v.lang) && youngHit(v) && !matronHit(v)) ||
-      list.find((v) => langOk(v) && femaleHit(v) && !matronHit(v)) ||
       list.find((v) => /en(-|_)?us/i.test(v.lang) && femaleHit(v) && !matronHit(v)) ||
       list.find((v) => /^en/i.test(v.lang) && femaleHit(v) && !matronHit(v)) ||
-      list.find((v) => langOk(v) && !maleHit(v) && !matronHit(v)) ||
       list.find((v) => /en(-|_)?us/i.test(v.lang) && !maleHit(v) && !matronHit(v)) ||
       list.find((v) => /^en/i.test(v.lang) && !maleHit(v)) ||
       null
@@ -276,11 +280,16 @@
     const list = Array.isArray(voices) ? voices : [];
     const prefix = String(langCode || 'en').slice(0, 2).toLowerCase();
     const langOk = (v) => String(v.lang || '').toLowerCase().startsWith(prefix);
-    return (
+    // Stay in the requested language first — never read Arabic with an English voice.
+    const inLang =
       list.find((v) => langOk(v) && isMaleBrowserVoice(v) && !isFemaleBrowserVoice(v)) ||
+      list.find((v) => langOk(v) && !isFemaleBrowserVoice(v)) ||
+      list.find((v) => langOk(v)) ||
+      null;
+    if (inLang || prefix !== 'en') return inLang;
+    return (
       list.find((v) => /en(-|_)?us/i.test(v.lang) && isMaleBrowserVoice(v) && !isFemaleBrowserVoice(v)) ||
       list.find((v) => /^en/i.test(v.lang) && isMaleBrowserVoice(v) && !isFemaleBrowserVoice(v)) ||
-      list.find((v) => langOk(v) && !isFemaleBrowserVoice(v)) ||
       list.find((v) => /en(-|_)?us/i.test(v.lang) && !isFemaleBrowserVoice(v)) ||
       list.find((v) => isMaleBrowserVoice(v) && !isFemaleBrowserVoice(v)) ||
       null
@@ -412,7 +421,8 @@
 
   /**
    * Speak text to completion for HyperFrames / guided narration.
-   * Uses same stack as Listen: desktop Google synth + fallback; mobile browser utterance.
+   * Always Google Cloud TTS first (desktop and mobile). Browser speech is last-resort
+   * fallback only when synthesize fails or audio.play is blocked.
    * @param {string} text
    * @param {object} [options]
    * @param {() => boolean} [options.isCancelled] - abort between chunks / before play
@@ -445,12 +455,7 @@
     const chunks = splitNarrationChunks(t, NARRATION_CHUNK_MAX);
     for (let i = 0; i < chunks.length; i++) {
       if (isCancelled()) return;
-      const piece = chunks[i];
-      if (isMobile()) {
-        await speakBrowserChunkAwaitEnd(piece, baseOpts);
-      } else {
-        await synthChunkAwaitEnd(piece, voice, baseOpts);
-      }
+      await synthChunkAwaitEnd(chunks[i], voice, baseOpts);
     }
   }
 
