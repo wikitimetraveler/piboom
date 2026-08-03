@@ -51,7 +51,8 @@ Hybrid vector RAG + GraphRAG details: `docs/VECTOR_RAG.md`.
 | `SPOTIFY_CLIENT_ID` | Spotify OAuth client ID |
 | `SPOTIFY_CLIENT_SECRET` | Spotify OAuth client secret |
 | `SPOTIFY_REDIRECT_URI` | OAuth callback URL |
-| `GOOGLE_APPLICATION_CREDENTIALS` | Path to Google Cloud credentials JSON |
+| `GOOGLE_APPLICATION_CREDENTIALS` | Path to Google Cloud credentials JSON (local) |
+| `GOOGLE_CREDENTIALS_JSON` | Full service-account JSON string (preferred on Render — fixes missing `/google-credentials.json`) |
 | `GOOGLE_CLOUD_PROJECT` | Google Cloud project ID |
 | `SHAZAM_API_KEY` | Shazam/RapidAPI song identification |
 | `SETLISTFM_API_KEY` | Setlist.fm API |

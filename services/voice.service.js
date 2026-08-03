@@ -4,6 +4,7 @@
 import { spawn, exec } from 'child_process';
 import { run } from '../lib/exec.js';
 import { config } from '../config/index.js';
+import { resolveGoogleClientOptions } from '../lib/google-cloud-credentials.js';
 import { SpeechClient } from '@google-cloud/speech';
 import textToSpeech from '@google-cloud/text-to-speech';
 import fs from 'fs';
@@ -44,15 +45,23 @@ export class VoiceService {
   // Initialize voice recognition
   async init() {
     try {
+      const googleOpts = resolveGoogleClientOptions();
+      if (!googleOpts.credentials && !googleOpts.keyFilename) {
+        console.warn(
+          'Google Cloud TTS/Speech: no credentials resolved; synthesize will fall back. ' +
+            'On Render set GOOGLE_CREDENTIALS_JSON to the service-account JSON (keeps all TTS apps working).'
+        );
+      }
+
       // Initialize Google Cloud Speech client for both pi and cloud modes
-      this.speechClient = new SpeechClient();
-      
+      this.speechClient = new SpeechClient(googleOpts);
+
       // Initialize Google Cloud Text-to-Speech client
-      this.ttsClient = new textToSpeech.TextToSpeechClient();
-      
+      this.ttsClient = new textToSpeech.TextToSpeechClient(googleOpts);
+
       // Test TTS availability
       this.testTTSAvailability();
-      
+
       return true;
     } catch (error) {
       console.error('Voice activation initialization error:', error.message);
