@@ -506,11 +506,20 @@
     }
 
     stopMusic();
-    stopListenSpeech();
+    // Stop prior audio without bumping the generation twice (that raced the new token).
+    if (typeof window.stopSpeech === 'function') window.stopSpeech();
+    else if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    document.getElementById('hlGuide')?.classList.remove('is-speaking');
+
     const gen = ++listenGeneration;
     listenSpeakingKey = key;
     syncListenButtons();
     i18n()?.unlockAudio();
+
+    // Chrome: speechSynthesis.cancel() can kill an utterance started in the same turn.
+    await new Promise((resolve) => window.setTimeout(resolve, 50));
+    if (gen !== listenGeneration) return;
+
     try {
       await speakFn();
     } finally {
@@ -613,11 +622,16 @@
 
   function speakPhrase(index) {
     const phrase = state.data?.phrases?.[index];
-    if (!phrase) return;
+    if (!phrase?.ar) return;
     // Speak Levantine is practice audio — always on, ignore the page Narration toggle.
     return toggleGuideSpeech(
       `phrase:${index}`,
-      () => i18n()?.speak(phrase.ar, { lang: 'ar', force: true }),
+      async () => {
+        const api = i18n();
+        if (!api?.speak) return;
+        api.unlockAudio?.();
+        await api.speak(phrase.ar, { lang: 'ar', force: true });
+      },
       { force: true }
     );
   }
