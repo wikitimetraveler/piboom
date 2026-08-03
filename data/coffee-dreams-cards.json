@@ -1,6 +1,6 @@
 {
   "title": "Coffee Dreams",
-  "subtitle": "Ten café moods — Saigon to study night",
+  "subtitle": "Ten café moods — late-night heat to window light",
   "activeVenueId": "cafe-168",
   "venues": {
     "cafe-168": {
@@ -16,91 +16,91 @@
     {
       "id": "iced-coffee-queen",
       "title": "The Iced Coffee Queen",
-      "caption": "Vietnamese iced coffee, condensed milk glass, café neon, confident pose.",
+      "caption": "Condensed-milk glass, neon blush, and a look that could melt the ice.",
       "moodClass": "mood-neon",
-      "imageUrl": "/family/assets/Iced%20Coffeee%20Queen.png",
-      "backImageUrl": "/entertainment/assets/coffee-dreams/iced-coffee-queen-pose2.png",
+      "imageUrl": "/entertainment/assets/coffee-dreams/glam-iced-coffee-queen.png",
+      "backImageUrl": "/entertainment/assets/coffee-dreams/glam-iced-coffee-queen-pose2.png",
       "creditText": "Private photo"
     },
     {
       "id": "saigon-night-barista",
       "title": "The Saigon Night Barista",
-      "caption": "Night-market lighting, espresso machine, soft glow, stylish modern outfit.",
+      "caption": "Espresso steam, night-market glow, and a smile that pulls you closer.",
       "moodClass": "mood-night",
-      "imageUrl": "/family/assets/saigin%20Night.png",
-      "backImageUrl": "/entertainment/assets/coffee-dreams/saigon-night-barista-pose2.png",
+      "imageUrl": "/entertainment/assets/coffee-dreams/glam-saigon-night-barista.png",
+      "backImageUrl": "/entertainment/assets/coffee-dreams/glam-saigon-night-barista-pose2.png",
       "creditText": "Private photo"
     },
     {
       "id": "garden-cafe-girl",
       "title": "The Garden Café Girl",
-      "caption": "Outdoor tropical café, plants, sunlight, relaxed smile.",
+      "caption": "Sun on skin, plants all around, lazy afternoon temptation outdoors.",
       "moodClass": "mood-garden",
-      "imageUrl": "/family/assets/GArdn%20Cafe.png",
-      "backImageUrl": "/entertainment/assets/coffee-dreams/garden-cafe-girl-pose2.png",
+      "imageUrl": "/entertainment/assets/coffee-dreams/glam-garden-cafe-girl.png",
+      "backImageUrl": "/entertainment/assets/coffee-dreams/glam-garden-cafe-girl-pose2.png",
       "creditText": "Private photo"
     },
     {
       "id": "retro-cafe-hostess",
       "title": "The Retro Café Hostess",
-      "caption": "1970s Vietnamese café vibe, vintage dress, old fan, warm sepia tones.",
+      "caption": "1970s curves, vintage fan, and a welcome you won’t forget.",
       "moodClass": "mood-retro",
-      "imageUrl": "/family/assets/rETRO%20gIRL.png",
-      "backImageUrl": "/entertainment/assets/coffee-dreams/retro-cafe-hostess-pose2.png",
+      "imageUrl": "/entertainment/assets/coffee-dreams/glam-retro-cafe-hostess.png",
+      "backImageUrl": "/entertainment/assets/coffee-dreams/glam-retro-cafe-hostess-pose2.png",
       "creditText": "Private photo"
     },
     {
       "id": "boba-coffee-model",
       "title": "The Boba & Coffee Model",
-      "caption": "Modern Asian café, playful but tasteful, colorful drink props.",
+      "caption": "Sweet drink, sharper stare — playful, glossy, camera-ready.",
       "moodClass": "mood-boba",
-      "imageUrl": "/family/assets/Bobo.png",
-      "backImageUrl": "/entertainment/assets/coffee-dreams/boba-coffee-model-pose2.png",
+      "imageUrl": "/entertainment/assets/coffee-dreams/glam-boba-coffee-model.png",
+      "backImageUrl": "/entertainment/assets/coffee-dreams/glam-boba-coffee-model-pose2.png",
       "creditText": "Private photo"
     },
     {
       "id": "motorcycle-cafe-girl",
       "title": "The Motorcycle Café Girl",
-      "caption": "Scooter parked outside, street café, urban Vietnam-inspired background.",
+      "caption": "Scooter, street neon, leather edge — ride over, stay for coffee.",
       "moodClass": "mood-street",
-      "imageUrl": "/family/assets/motorcycleGirl.png",
-      "backImageUrl": "/entertainment/assets/coffee-dreams/motorcycle-cafe-girl-pose2.png",
+      "imageUrl": "/entertainment/assets/coffee-dreams/glam-motorcycle-cafe-girl.png",
+      "backImageUrl": "/entertainment/assets/coffee-dreams/glam-motorcycle-cafe-girl-pose2.png",
       "creditText": "Private photo"
     },
     {
       "id": "rainy-window-girl",
       "title": "The Rainy Window Girl",
-      "caption": "Sitting by a rainy café window, holding hot coffee, moody cinematic card.",
+      "caption": "Rain on glass, hot cup in hand, quiet heat in the fogged light.",
       "moodClass": "mood-rain",
-      "imageUrl": "/family/assets/The%20Rainy%20Window%20Girl.png",
-      "backImageUrl": "/entertainment/assets/coffee-dreams/rainy-window-girl-pose2.png",
+      "imageUrl": "/entertainment/assets/coffee-dreams/glam-rainy-window-girl.png",
+      "backImageUrl": "/entertainment/assets/coffee-dreams/glam-rainy-window-girl-pose2.png",
       "creditText": "Private photo"
     },
     {
       "id": "tattooed-barista",
       "title": "The Tattooed Barista",
-      "caption": "Saigon coffee queen energy, full tattoo sleeves, espresso machine, vintage playing-card style.",
+      "caption": "Ink sleeves, machine hiss, coffee-queen energy with a dare in her eyes.",
       "moodClass": "mood-night",
-      "imageUrl": "/family/assets/tatooed.png",
-      "backImageUrl": "/entertainment/assets/coffee-dreams/tattooed-barista-pose2.png",
+      "imageUrl": "/entertainment/assets/coffee-dreams/glam-tattooed-barista.png",
+      "backImageUrl": "/entertainment/assets/coffee-dreams/glam-tattooed-barista-pose2.png",
       "creditText": "Private photo"
     },
     {
       "id": "matcha-latte-artist",
       "title": "The Matcha Latte Artist",
-      "caption": "Foam hearts, paint-splatter apron, green latte glow — café creativity on pour.",
+      "caption": "Foam hearts and a pour so slow it feels like a tease.",
       "moodClass": "mood-garden",
-      "imageUrl": "/entertainment/assets/coffee-dreams/matcha-latte-artist.png",
-      "backImageUrl": "/entertainment/assets/coffee-dreams/matcha-latte-artist-pose2.png",
+      "imageUrl": "/entertainment/assets/coffee-dreams/glam-matcha-latte-artist.png",
+      "backImageUrl": "/entertainment/assets/coffee-dreams/glam-matcha-latte-artist-pose2.png",
       "creditText": "Private photo"
     },
     {
       "id": "late-night-study-twin",
       "title": "The Late-Night Study Twin",
-      "caption": "Laptop, headphones, iced coffee, and one more chapter before closing time.",
+      "caption": "Laptop half-closed, iced coffee up — studying never looked this distracting.",
       "moodClass": "mood-night",
-      "imageUrl": "/entertainment/assets/coffee-dreams/late-night-study-twin.png",
-      "backImageUrl": "/entertainment/assets/coffee-dreams/late-night-study-twin-pose2.png",
+      "imageUrl": "/entertainment/assets/coffee-dreams/glam-late-night-study-twin.png",
+      "backImageUrl": "/entertainment/assets/coffee-dreams/glam-late-night-study-twin-pose2.png",
       "creditText": "Private photo"
     }
   ]

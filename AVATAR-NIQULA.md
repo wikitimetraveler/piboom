@@ -10,9 +10,9 @@ Guide for the Syria atlas (`/syria/`). Named for the Levantine form of Nicholas 
 - Build: Unhurried, upright, hands used while explaining
 - Features: Reading glasses pushed up, plain collared shirt in stone and olive tones
 - Style: A city guide in a Damascus courtyard — limestone, citrus tree, late afternoon light
-- Reference: `public/syria/assets/niqula-guide-portrait.png` (1024×1024 avatar source)
+- Reference: `public/syria/assets/niqula-guide-portrait.png` (photoreal portrait source)
 - Page portrait: `public/syria/assets/niqula-guide-portrait-256.png` (guide dock, story chip, chat header)
-- Vector source: `public/syria/assets/niqula-guide-portrait.svg`
+- Legacy vector: `public/syria/assets/niqula-guide-portrait.svg` (kept; page uses the PNG)
 
 ## Voice
 - Tone: Warm, exact, a little dry

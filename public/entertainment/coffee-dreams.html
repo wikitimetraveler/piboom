@@ -475,37 +475,41 @@
       border-bottom-color: var(--cd-caramel);
     }
 
-    /* Café mood filters — warm, no neon pink */
+    /* Café mood filters — warmer, glossier print feel */
     .mood-neon .cd-card-img-wrap::after {
       content: "";
       position: absolute;
       inset: 0;
-      box-shadow: inset 0 0 50px rgba(196, 132, 74, 0.18);
+      box-shadow: inset 0 0 55px rgba(196, 132, 74, 0.28);
       pointer-events: none;
     }
 
+    .mood-neon .cd-card-img-wrap img {
+      filter: saturate(1.15) contrast(1.08) brightness(1.02);
+    }
+
     .mood-night .cd-card-img-wrap img {
-      filter: saturate(1.08) contrast(1.06) brightness(0.86);
+      filter: saturate(1.12) contrast(1.1) brightness(0.9);
     }
 
     .mood-garden .cd-card-img-wrap img {
-      filter: saturate(1.12) brightness(1.04);
+      filter: saturate(1.18) brightness(1.06) contrast(1.04);
     }
 
     .mood-retro .cd-card-img-wrap img {
-      filter: sepia(0.4) contrast(1.05) brightness(0.95);
+      filter: sepia(0.42) contrast(1.08) brightness(0.96) saturate(1.05);
     }
 
     .mood-boba .cd-card-img-wrap img {
-      filter: saturate(1.18) hue-rotate(-4deg);
+      filter: saturate(1.22) contrast(1.05) hue-rotate(-4deg);
     }
 
     .mood-street .cd-card-img-wrap img {
-      filter: contrast(1.08) saturate(0.95);
+      filter: contrast(1.12) saturate(1.05) brightness(0.96);
     }
 
     .mood-rain .cd-card-img-wrap img {
-      filter: saturate(0.78) contrast(1.08) brightness(0.9);
+      filter: saturate(0.82) contrast(1.12) brightness(0.92);
     }
 
     .mood-rain .cd-card-img-wrap::after {

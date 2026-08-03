@@ -1,0 +1,305 @@
+[
+  {
+    "title": "Post-Purchase",
+    "definitions": {
+      "categoryDefinitions": [
+        {
+          "name": "Assets"
+        },
+        {
+          "name": "Borrower and Mortgage Eligibility"
+        },
+        {
+          "name": "Cenlar Missing Docs"
+        },
+        {
+          "name": "Credit"
+        },
+        {
+          "name": "ESHB"
+        },
+        {
+          "name": "Escrow Holdback"
+        },
+        {
+          "name": "Income/Employment"
+        },
+        {
+          "name": "Insurance"
+        },
+        {
+          "name": "Liabilities"
+        },
+        {
+          "name": "Loan Package Documentation"
+        },
+        {
+          "name": "MISC"
+        },
+        {
+          "name": "Post Closing"
+        },
+        {
+          "name": "Property/Appraisal"
+        }
+      ],
+      "recipientDefinitions": [
+        {
+          "name": "Borrower / TPO"
+        }
+      ],
+      "sourceDefinitions": [
+        {
+          "name": "Ops"
+        },
+        {
+          "name": "Post Purchase"
+        },
+        {
+          "name": "QC"
+        }
+      ],
+      "priorToDefinitions": [
+        {
+          "name": "Post-Purchase"
+        }
+      ],
+      "trackingDefinitions": [
+        {
+          "name": "Opened"
+        },
+        {
+          "name": "Fulfilled"
+        },
+        {
+          "name": "Re-requested"
+        },
+        {
+          "name": "Received"
+        },
+        {
+          "name": "Not-Fulfilled"
+        },
+        {
+          "name": "Deactivated"
+        },
+        {
+          "name": "Waived"
+        }
+      ]
+    }
+  },
+  {
+    "title": "Pre-Purchase",
+    "definitions": {
+      "categoryDefinitions": [
+        {
+          "name": "1003"
+        },
+        {
+          "name": "1008"
+        },
+        {
+          "name": "ALTA Settlement Statement"
+        },
+        {
+          "name": "Appraisal"
+        },
+        {
+          "name": "Assets"
+        },
+        {
+          "name": "Attorney Opinion Letter"
+        },
+        {
+          "name": "Aus Findings"
+        },
+        {
+          "name": "Borrower"
+        },
+        {
+          "name": "Borrower Documentation"
+        },
+        {
+          "name": "CD Under Disclosed"
+        },
+        {
+          "name": "Closing Disclosure"
+        },
+        {
+          "name": "Collateral"
+        },
+        {
+          "name": "Compliance"
+        },
+        {
+          "name": "Credit"
+        },
+        {
+          "name": "DTI"
+        },
+        {
+          "name": "Debt"
+        },
+        {
+          "name": "Disclosures"
+        },
+        {
+          "name": "ESHB"
+        },
+        {
+          "name": "Early Consummation"
+        },
+        {
+          "name": "Early Disbursement"
+        },
+        {
+          "name": "Flood"
+        },
+        {
+          "name": "General"
+        },
+        {
+          "name": "Government"
+        },
+        {
+          "name": "Hud1"
+        },
+        {
+          "name": "IEFP"
+        },
+        {
+          "name": "Income"
+        },
+        {
+          "name": "Income / Employment"
+        },
+        {
+          "name": "Initial LE"
+        },
+        {
+          "name": "Insurance"
+        },
+        {
+          "name": "Internal"
+        },
+        {
+          "name": "MISC"
+        },
+        {
+          "name": "Mgr Exception"
+        },
+        {
+          "name": "Mgr. Escalation"
+        },
+        {
+          "name": "Miscellaneous"
+        },
+        {
+          "name": "Mortgage Insurance"
+        },
+        {
+          "name": "Nrtc"
+        },
+        {
+          "name": "Property"
+        },
+        {
+          "name": "Purchase Eligibility Pending"
+        },
+        {
+          "name": "Rate Lock Sheet"
+        },
+        {
+          "name": "Respa"
+        },
+        {
+          "name": "Risk"
+        },
+        {
+          "name": "SSPL"
+        },
+        {
+          "name": "Sales Contract"
+        },
+        {
+          "name": "Seasoned Loan Pends"
+        },
+        {
+          "name": "Tax/Insurance"
+        },
+        {
+          "name": "Testing Report"
+        },
+        {
+          "name": "Title"
+        },
+        {
+          "name": "Tolerance Excess"
+        },
+        {
+          "name": "UCDP"
+        },
+        {
+          "name": "VA"
+        },
+        {
+          "name": "VA Origination Fee"
+        }
+      ],
+      "recipientDefinitions": [
+        {
+          "name": "Borrower / TPO"
+        },
+        {
+          "name": "Internal Only"
+        }
+      ],
+      "sourceDefinitions": [
+        {
+          "name": "Compliance"
+        },
+        {
+          "name": "Debt"
+        },
+        {
+          "name": "ILQA"
+        },
+        {
+          "name": "Ops"
+        },
+        {
+          "name": "UW"
+        }
+      ],
+      "priorToDefinitions": [
+        {
+          "name": "Pre-Purchase"
+        }
+      ],
+      "trackingDefinitions": [
+        {
+          "name": "Opened"
+        },
+        {
+          "name": "Fulfilled"
+        },
+        {
+          "name": "Re-requested"
+        },
+        {
+          "name": "Received"
+        },
+        {
+          "name": "Not-Fulfilled"
+        },
+        {
+          "name": "Deactivated"
+        },
+        {
+          "name": "Waived"
+        }
+      ]
+    }
+  }
+]

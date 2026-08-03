@@ -6,7 +6,9 @@
 (function () {
   'use strict';
 
-  const STORAGE_KEY = 'holyLandLang';
+  /** Shared across Jordan / Syria / Holy Land so a choice sticks on every atlas page. */
+  const STORAGE_KEY = 'meAtlasLang';
+  const LEGACY_STORAGE_KEY = 'holyLandLang';
   const NARRATE_KEY = 'holyLandStoryNarrate';
   const LANGS = ['en', 'ar'];
 

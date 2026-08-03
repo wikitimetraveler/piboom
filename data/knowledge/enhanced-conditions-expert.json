@@ -1,0 +1,281 @@
+{
+  "title": "Enhanced Conditions Expert",
+  "guide": {
+    "name": "Enhanced Conditions Expert",
+    "role": "Encompass Enhanced Conditions migration and API specialist for DevConnect Labs"
+  },
+  "overview": [
+    "Enhanced Conditions (Encompass 20.2+) replace flat standard/eFolder conditions with a tiered model: condition types own shared vocabularies; condition templates reference a type.",
+    "Access is configured on personas (Company/User Setup > Personas > Enhanced Conditions tab), not on individual user accounts and not as a per-condition ACL like the legacy ConditionsTemplate.xml CDO.",
+    "DevConnect Labs Condition Manager converts the legacy ConditionsTemplate.xml Custom Data Object into dry-run Enhanced Conditions payloads. It never writes to Encompass."
+  ],
+  "concepts": [
+    {
+      "name": "Condition type",
+      "summary": "Owns option vocabularies: categoryDefinitions, recipientDefinitions, sourceDefinitions, priorToDefinitions, trackingDefinitions. Create types before templates."
+    },
+    {
+      "name": "Condition template",
+      "summary": "Reusable condition definition that references a conditionType. Carries title, internalId, descriptions, category, source, priorTo, recipient, printDefinitions, optional externalId/externalDescription."
+    },
+    {
+      "name": "Condition set",
+      "summary": "Grouping of templates used when applying conditions to loans."
+    },
+    {
+      "name": "Loan enhanced conditions",
+      "summary": "Instances of templates/conditions on a loan file. Managed with /encompass/v3/loans/{loanId}/conditions. Loan flag ENHANCEDCOND.X1 / useEnhancedConditionIndicator selects Enhanced vs Standard."
+    },
+    {
+      "name": "Persona access",
+      "summary": "Who can Add, edit details, comments, and set statuses (Opened, Fulfilled, Re-requested, Received, Not-Fulfilled, Deactivated, Waived). Configured on the persona, not per template row."
+    },
+    {
+      "name": "Workflow roles vs personas",
+      "summary": "Milestone/loan-team Roles are a different Encompass object. Legacy CDO ConditionAccess lists are persona names. Do not import users for this migration."
+    }
+  ],
+  "migration": {
+    "source": "Legacy ConditionsTemplate.xml Custom Data Object (GET settings CDO / Postman Save Response as { name, dataObject }).",
+    "tools": [
+      "UI: /finance/condition-manager.html",
+      "API dry-run: POST /api/encompass-conditions/convert",
+      "CLI: npm run convert:conditions-cdo -- --input <cdo.json> [--personas <personas.json>] [--persona-source Production|UAT]"
+    ],
+    "outputs": [
+      "condition-types.json — one type per stage (Pre-Purchase, Post-Purchase in the AmeriHome CDO)",
+      "condition-templates.json — one template per legacy condition; internalId = legacy code",
+      "acl-profiles.json — collapsed persona permission patterns for admin handoff",
+      "data-quality-report.md — review queue and auto-fixes"
+    ],
+    "iceAdminTool": "Encompass Admin Tools > Enhanced Conditions Tool: Convert Standard to Enhanced Conditions, or Migrate Enhanced Conditions between instances. Converted conditions stay inactive until an admin activates them. Prerequisites: condition types (matching Category/Prior To/Source/Recipient), documents, matching roles/personas, Enable Enhanced Conditions.",
+    "rules": [
+      "Dry-run only in DevConnect Labs until an explicit write path is approved.",
+      "Create condition types first, then templates.",
+      "Apply ACL profiles on personas; Enhanced Conditions has no per-condition ACL.",
+      "Reconcile CDO role names against GET /encompass/v3/settings/personas. Only a Production persona list is authoritative; UAT is provisional.",
+      "Persona names are capped at 20 characters in Encompass; truncated or merged names need a human decision."
+    ]
+  },
+  "apis": {
+    "settingsBase": "/encompass/v3/settings/loan/conditions",
+    "loanBase": "/encompass/v3/loans/{{loanId}}/conditions",
+    "settings": [
+      {
+        "title": "Get list of condition types",
+        "method": "GET",
+        "path": "/encompass/v3/settings/loan/conditions/types"
+      },
+      {
+        "title": "Get a condition type",
+        "method": "GET",
+        "path": "/encompass/v3/settings/loan/conditions/types/{{typeId}}"
+      },
+      {
+        "title": "Create condition types",
+        "method": "PATCH",
+        "path": "/encompass/v3/settings/loan/conditions/types?action=add&view=entity",
+        "notes": "Body is a JSON array of { title, definitions: { categoryDefinitions, recipientDefinitions, sourceDefinitions, priorToDefinitions, trackingDefinitions } }."
+      },
+      {
+        "title": "Update condition types",
+        "method": "PATCH",
+        "path": "/encompass/v3/settings/loan/conditions/types?action=update&view=entity",
+        "notes": "Activate with { id, active: true }."
+      },
+      {
+        "title": "Delete condition types",
+        "method": "PATCH",
+        "path": "/encompass/v3/settings/loan/conditions/types?action=delete&templateOption=delete&view=entity"
+      },
+      {
+        "title": "Get list of condition templates",
+        "method": "GET",
+        "path": "/encompass/v3/settings/loan/conditions/templates"
+      },
+      {
+        "title": "Get a condition template",
+        "method": "GET",
+        "path": "/encompass/v3/settings/loan/conditions/templates/{{templateId}}"
+      },
+      {
+        "title": "Create condition templates",
+        "method": "PATCH",
+        "path": "/encompass/v3/settings/loan/conditions/templates?action=add&view=entity",
+        "notes": "Body array fields include title, conditionType, internalId (alphanumeric), internalDescription, category, source, priorTo, recipient, printDefinitions (InternalPrint|ExternalPrint), optional externalId/externalDescription. Types must exist first."
+      },
+      {
+        "title": "Update condition templates",
+        "method": "PATCH",
+        "path": "/encompass/v3/settings/loan/conditions/templates?action=update&view=entity"
+      },
+      {
+        "title": "Get condition sets",
+        "method": "GET",
+        "path": "/encompass/v3/settings/loan/conditions/sets"
+      },
+      {
+        "title": "Automated conditions evaluator",
+        "method": "POST",
+        "path": "/encompass/v3/calculators/automatedConditions?loanId={{loanId}}"
+      },
+      {
+        "title": "List personas (ACL reconciliation)",
+        "method": "GET",
+        "path": "/encompass/v3/settings/personas"
+      }
+    ],
+    "loan": [
+      {
+        "title": "Get list of loan conditions",
+        "method": "GET",
+        "path": "/encompass/v3/loans/{{loanId}}/conditions"
+      },
+      {
+        "title": "Add loan conditions",
+        "method": "PATCH",
+        "path": "/encompass/v3/loans/{{loanId}}/conditions?action=add&view=entity"
+      },
+      {
+        "title": "Update / remove / duplicate loan conditions",
+        "method": "PATCH",
+        "path": "/encompass/v3/loans/{{loanId}}/conditions?action=update|remove|duplicate&view=entity"
+      },
+      {
+        "title": "Comments, tracking, documents",
+        "method": "various",
+        "path": "/encompass/v3/loans/{{loanId}}/conditions/{{ConditionId}}/{comments|tracking|documents}"
+      }
+    ]
+  },
+  "postman": {
+    "collectionHint": "ICE Postman collection folder: Encompass Loan > Enhanced Conditions > Enhanced Condition Settings (and Manage Enhanced Conditions for loan-level).",
+    "environmentVars": ["API_SERVER", "ACCESS_TOKEN", "loanId", "ConditionTypeId", "templateId", "ConditionId"],
+    "headers": {
+      "Authorization": "Bearer {{ACCESS_TOKEN}}",
+      "Content-Type": "application/json"
+    },
+    "safeOrder": [
+      "1. Authenticate / get ACCESS_TOKEN",
+      "2. GET types (see what already exists)",
+      "3. PATCH create types from handoff condition-types.json (UAT first)",
+      "4. PATCH activate types if needed",
+      "5. PATCH create a small smoke batch of templates (not all 826 at once)",
+      "6. GET templates to verify",
+      "7. Configure persona Enhanced Conditions rights from acl-profiles.json",
+      "8. Only then consider Production"
+    ],
+    "handoffDir": "data/encompass-conditions/handoff/"
+  },
+  "officialLinks": [
+    {
+      "group": "Guides",
+      "title": "Working with Enhanced Conditions",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/docs/working-with-enhanced-conditions"
+    },
+    {
+      "group": "Overview",
+      "title": "Loan Enhanced Conditions (API overview)",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/reference/loan-enhanced-conditions"
+    },
+    {
+      "group": "Loan conditions",
+      "title": "V3 Manage Enhanced Conditions (loan)",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/reference/manage-enhanced-conditions-1"
+    },
+    {
+      "group": "Types",
+      "title": "V3 Get All Enhanced Condition Types",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/reference/get-all-enhanced-condition-types"
+    },
+    {
+      "group": "Types",
+      "title": "V3 Get an Enhanced Condition Type",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/reference/get-an-enhanced-condition-type"
+    },
+    {
+      "group": "Types",
+      "title": "V3 Manage Enhanced Condition Types",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/reference/manage-enhanced-condition-types"
+    },
+    {
+      "group": "Templates",
+      "title": "V3 Get All Enhanced Condition Templates",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/reference/get-all-enhanced-condition-templates"
+    },
+    {
+      "group": "Templates",
+      "title": "V3 Get an Enhanced Condition Template",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/reference/get-an-enhanced-condition-template"
+    },
+    {
+      "group": "Templates",
+      "title": "V3 Manage Enhanced Condition Templates",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/reference/manage-enhanced-condition-templates"
+    },
+    {
+      "group": "Sets",
+      "title": "V3 Get All Enhanced Condition Sets",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/reference/get-all-enhanced-condition-sets"
+    },
+    {
+      "group": "Sets",
+      "title": "V3 Get an Enhanced Condition Set",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/reference/get-an-enhanced-condition-set"
+    },
+    {
+      "group": "Automation",
+      "title": "V3 Evaluate Automated Conditions",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/reference/evaluate-automated-conditions"
+    },
+    {
+      "group": "Release notes",
+      "title": "November 20.2 Major Release (Enhanced Conditions intro)",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/changelog/november-202-major-release"
+    }
+  ],
+  "devconnectSurfaces": [
+    {
+      "name": "Condition Manager",
+      "path": "/finance/condition-manager.html",
+      "purpose": "Dry-run CDO → types/templates/ACL profiles UI"
+    },
+    {
+      "name": "Enhanced Conditions Expert",
+      "path": "/finance/enhanced-conditions-expert.html",
+      "purpose": "This chat — consolidates migration, API, persona, and Postman guidance"
+    },
+    {
+      "name": "Convert API",
+      "path": "POST /api/encompass-conditions/convert",
+      "purpose": "Server-side dry-run conversion"
+    },
+    {
+      "name": "Expert API",
+      "path": "/api/encompass-conditions/assistant/*",
+      "purpose": "health, summary, search, chat, history"
+    }
+  ],
+  "faqs": [
+    {
+      "q": "Do we import users?",
+      "a": "No. Import/create condition types and templates. Configure access on personas. Users already exist and inherit persona rights."
+    },
+    {
+      "q": "Do we import roles?",
+      "a": "Not as a bulk user/role import. Ensure persona names referenced by the legacy ACL lists exist, then configure Enhanced Conditions rights on those personas. Workflow milestone Roles are separate."
+    },
+    {
+      "q": "What is the admin handoff pack?",
+      "a": "Dry-run JSON under data/encompass-conditions/handoff/: condition-types.json, condition-templates.json, acl-profiles.json, plus the data-quality report. Admins use these to configure Encompass; DevConnect Labs does not auto-push them."
+    },
+    {
+      "q": "Types or templates first?",
+      "a": "Types first. Templates reference conditionType titles that must already exist."
+    },
+    {
+      "q": "Does conversion activate Enhanced Conditions?",
+      "a": "No. ICE's conversion tool and our dry-run both leave activation as an admin step (Enable Enhanced Conditions / activate types/templates)."
+    }
+  ]
+}

@@ -6,7 +6,9 @@
 (function () {
   'use strict';
 
-  const STORAGE_KEY = 'syriaLang';
+  /** Shared across Jordan / Syria / Holy Land so a choice sticks on every atlas page. */
+  const STORAGE_KEY = 'meAtlasLang';
+  const LEGACY_STORAGE_KEY = 'syriaLang';
   const NARRATE_KEY = 'syriaStoryNarrate';
   const LANGS = ['en', 'ar'];
 
@@ -83,6 +85,8 @@
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (LANGS.includes(saved)) return saved;
+      const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (LANGS.includes(legacy)) return legacy;
     } catch (_) {
       /* ignore */
     }

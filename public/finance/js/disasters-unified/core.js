@@ -26,6 +26,7 @@ var lastNearbyCameras = [];
 var lastNearbyWeatherAlerts = [];
 var nwsGridFilterActive = false;
 var nwsGridFilterContext = null;
+var timeRangeFilterHours = null;
 var aiChatWidget = null;
 var aiInsightsCard = null;
 var voiceRecognition = null;

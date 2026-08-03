@@ -60,6 +60,7 @@ describe('menu-config auth filtering', () => {
         '/finance/encompass-hub.html',
         '/finance/encompass-assistant.html',
         '/finance/condition-manager.html',
+        '/finance/enhanced-conditions-expert.html',
         '/finance/processor-assignment.html',
         '/finance/unit-tests.html',
         '/finance/fha-streamline-calculator.html',

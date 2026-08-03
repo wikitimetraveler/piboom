@@ -11,6 +11,18 @@
  */
 
 const DARK_MODE_KEY = 'devConnectLabs_darkMode';
+/** Jordan / Syria / Holy Land — default night mode; own preference (does not follow sitewide). */
+const ME_ATLAS_DARK_MODE_KEY = 'devConnectLabs_meAtlas_darkMode';
+
+function isMiddleEastAtlasPage() {
+  const body = document.body;
+  if (!body) return false;
+  return (
+    body.classList.contains('jd-page')
+    || body.classList.contains('sy-page')
+    || body.classList.contains('hl-page')
+  );
+}
 
 const darkModeStyles = `
   body.dark-mode {
@@ -459,16 +471,26 @@ function initDarkMode() {
   }
 
   const isGlazedPage = document.body.classList.contains('gz-page');
+  const isMeAtlas = isMiddleEastAtlasPage();
   const storedPref = localStorage.getItem(DARK_MODE_KEY);
-  
-  // Glazed page defaults to dark mode (current design)
-  // Other pages respect saved preference or stay light
-  const shouldBeDark = isGlazedPage 
-    ? (storedPref === null ? true : storedPref === 'true')
-    : storedPref === 'true';
-  
+  const meAtlasPref = localStorage.getItem(ME_ATLAS_DARK_MODE_KEY);
+
+  // Glazed + Middle East atlas pages default to night mode.
+  // ME atlas uses its own key so a light/dark choice sticks without following sitewide.
+  // Other pages respect saved preference or stay light.
+  let shouldBeDark = false;
+  if (isMeAtlas) {
+    shouldBeDark = meAtlasPref === null ? true : meAtlasPref === 'true';
+  } else if (isGlazedPage) {
+    shouldBeDark = storedPref === null ? true : storedPref === 'true';
+  } else {
+    shouldBeDark = storedPref === 'true';
+  }
+
   if (shouldBeDark) {
     document.body.classList.add('dark-mode');
+  } else {
+    document.body.classList.remove('dark-mode');
   }
 
   if (!document.querySelector('.dark-mode-toggle')) {
@@ -489,7 +511,11 @@ function createDarkModeToggle() {
 
 function toggleDarkMode() {
   const isDark = document.body.classList.toggle('dark-mode');
-  localStorage.setItem(DARK_MODE_KEY, isDark);
+  if (isMiddleEastAtlasPage()) {
+    localStorage.setItem(ME_ATLAS_DARK_MODE_KEY, String(isDark));
+  } else {
+    localStorage.setItem(DARK_MODE_KEY, String(isDark));
+  }
   const toggleBtn = document.querySelector('.dark-mode-toggle');
   updateToggleIcon(toggleBtn);
   document.body.style.transition = 'background 0.3s ease, color 0.3s ease';
