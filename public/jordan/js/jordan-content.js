@@ -521,11 +521,9 @@
     const gen = ++listenGeneration;
     listenSpeakingKey = key;
     syncListenButtons();
+    // Re-prime AFTER stop, in the same click — needed for English Listen and Arabic phrases.
+    if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
     i18n()?.unlockAudio();
-
-    // Chrome: speechSynthesis.cancel() can kill an utterance started in the same turn.
-    await new Promise((resolve) => window.setTimeout(resolve, 50));
-    if (gen !== listenGeneration) return;
 
     try {
       await speakFn();
@@ -636,9 +634,9 @@
       stopListenSpeech();
       return;
     }
-    // Practice audio: always on. Keep this path simple like when phrases last worked —
-    // no stopSpeech()/50ms delay (that race kills short Arabic Google clips).
+    // Practice audio: always on. Stop prior clip, then re-prime in the same click.
     stopMusic();
+    if (typeof window.stopSpeech === 'function') window.stopSpeech();
     if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
     i18n()?.unlockAudio?.();
 

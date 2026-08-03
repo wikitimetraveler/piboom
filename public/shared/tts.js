@@ -44,20 +44,19 @@
   }
 
   function primePlayerForGesture() {
-    if (!primedPlayer) {
-      primedPlayer = new Audio();
-      try {
-        primedPlayer.setAttribute('playsinline', 'true');
-      } catch (_) {
-        /* ignore */
-      }
+    // Always mint a fresh element on the user gesture (English Listen + Arabic phrases).
+    primedPlayer = new Audio();
+    try {
+      primedPlayer.setAttribute('playsinline', 'true');
+    } catch (_) {
+      /* ignore */
     }
     return primedPlayer;
   }
 
   function doUnlock() {
     try {
-      // Web Audio unlock — reliable in Firefox (no bad data: URI decode).
+      // Web Audio unlock — reliable across browsers (no bad data: URI decode).
       unlockWebAudio();
       // Create the player during the gesture so later src+play after fetch is allowed.
       primePlayerForGesture();
@@ -238,7 +237,8 @@
       }
       currentAudio = null;
     }
-    primedPlayer = null;
+    // Do NOT clear primedPlayer here — Listen/phrase clicks call stop then unlock in the
+    // same gesture; wiping the primed element was killing English and Arabic Google TTS.
 
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
