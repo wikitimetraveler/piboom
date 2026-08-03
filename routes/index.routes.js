@@ -54,6 +54,7 @@ import heygenAssistantRoutes from './heygen-assistant.routes.js';
 import donutsRoutes from './donuts.routes.js';
 import jordanRoutes from './jordan.routes.js';
 import syriaRoutes from './syria.routes.js';
+import holyLandRoutes from './holy-land.routes.js';
 import shenangoRoutes from './shenango.routes.js';
 import newportPierRoutes from './newport-pier.routes.js';
 
@@ -110,6 +111,7 @@ export default function buildRoutes(io) {
   api.use('/donuts', donutsRoutes);
   api.use('/jordan', jordanRoutes);
   api.use('/syria', syriaRoutes);
+  api.use('/holy-land', holyLandRoutes);
   api.use('/shenango', shenangoRoutes);
   api.use('/newport-pier', newportPierRoutes);
   api.use('/', musicHistoryRoutes); // Music history and concert finder

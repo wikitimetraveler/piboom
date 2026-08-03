@@ -1,0 +1,62 @@
+{
+  "id": "holy-land-noor-intro",
+  "title": {
+    "en": "Palestine · Israel — Meet Noor",
+    "ar": "فلسطين · إسرائيل — تعرّف على نور"
+  },
+  "ctaLabel": {
+    "en": "Start the tour",
+    "ar": "ابدأ الجولة"
+  },
+  "ctaHref": "/holy-land/?reel=1",
+  "qrLandingPath": "/holy-land/?demo=heygen",
+  "brand": {
+    "attribution": {
+      "en": "Avatar narration powered by HeyGen",
+      "ar": "سرد الأفاتار بتقنية HeyGen"
+    },
+    "developmentBy": "David E Lane"
+  },
+  "heygenScriptShort": {
+    "en": "Ahlan wa sahlan — I'm Noor. This atlas walks shared ground: Jerusalem and Bethlehem, olive terraces, knafeh and shakshuka, dabke and song. Press play on the HyperFrame tour, or ask me anything on the page.",
+    "ar": "أهلاً وسهلاً — أنا نور. هذا الأطلس يمشي على أرض مشتركة: القدس وبيت لحم، مدرجات الزيتون، الكنافة والشكشوكة، الدبكة والغناء. شغّل جولة HyperFrame، أو اسألني عن أي شيء في الصفحة."
+  },
+  "heygenVoiceLanguage": {
+    "en": "English",
+    "ar": "Arabic"
+  },
+  "heygenMotionPrompt": "calm nod, warm local guide speaking to camera",
+  "heygenExpressiveness": "low",
+  "heygenAvatarId": null,
+  "heygenAvatarGroupId": null,
+  "heygenVoiceId": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVoiceName": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVideoIdShort": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVideoUrlShort": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVideoLocalShort": {
+    "en": null,
+    "ar": null
+  },
+  "generatedAt": {
+    "en": null,
+    "ar": null
+  },
+  "avatar": {
+    "name": "Noor",
+    "file": null,
+    "portrait": "/holy-land/assets/noor-guide-portrait-256.png",
+    "source": "/holy-land/assets/noor-guide-portrait.png"
+  }
+}

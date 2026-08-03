@@ -1,0 +1,291 @@
+{
+  "id": "holy-land-hyperframes-reel",
+  "title": {
+    "en": "Palestine · Israel HyperFrame Tour",
+    "ar": "جولة فلسطين · إسرائيل المصوّرة"
+  },
+  "portrait": "/holy-land/assets/noor-guide-portrait-256.png",
+  "voice": {
+    "en": "en-US-Neural2-D",
+    "ar": "ar-XA-Wavenet-B"
+  },
+  "pitch": -1,
+  "speakingRate": 0.98,
+  "scenes": [
+    {
+      "id": "welcome",
+      "anchor": "hlHero",
+      "spotlight": "#hlHero",
+      "durationMs": 7200,
+      "kicker": {
+        "en": "Welcome",
+        "ar": "أهلاً"
+      },
+      "title": {
+        "en": "Ahlan — shared ground",
+        "ar": "أهلاً — أرض مشتركة"
+      },
+      "copy": {
+        "en": "I am Noor. One atlas of geography and living cultures — told with care.",
+        "ar": "أنا نور. أطلس واحد للجغرافيا والثقافات الحيّة — يُروى بعناية."
+      },
+      "narration": {
+        "en": "Ahlan wa sahlan. I am Noor. This atlas is called Palestine · Israel — shared ground. Give me a few minutes and I will walk you through layers of history and living culture, without turning the page into a political brief.",
+        "ar": "أهلاً وسهلاً. أنا نور. اسم هذا الأطلس فلسطين · إسرائيل — أرض مشتركة. أعطني دقائق وأمشيك عبر طبقات التاريخ والثقافة الحيّة، دون أن أصيّر الصفحة مذكّرة سياسية."
+      }
+    },
+    {
+      "id": "atlas",
+      "anchor": "hlMap",
+      "spotlight": "#hlMap",
+      "action": "openAtlas",
+      "durationMs": 7000,
+      "kicker": {
+        "en": "Atlas",
+        "ar": "أطلس"
+      },
+      "title": {
+        "en": "The map opens",
+        "ar": "تُفتح الخريطة"
+      },
+      "copy": {
+        "en": "Hills, coast, and rift valley — every pin a place you can stand.",
+        "ar": "تلال وساحل وأخدود — كل علامة مكان يمكنك الوقوف فيه."
+      },
+      "narration": {
+        "en": "First, the atlas. From Jerusalem to Jaffa, from the Galilee to the Negev — history pins, food towns, and living places. Select a name and the map leans in.",
+        "ar": "أولاً الأطلس. من القدس إلى يافا، من الجليل إلى النقب — علامات تاريخ وبلدات طعام وأماكن حيّة. اختر اسماً فتميل الخريطة نحوه."
+      }
+    },
+    {
+      "id": "jerusalem",
+      "anchor": "hlMap",
+      "spotlight": "#hlMapCanvas",
+      "action": "focusJerusalem",
+      "durationMs": 8200,
+      "kicker": {
+        "en": "Sacred city",
+        "ar": "مدينة مقدّسة"
+      },
+      "title": {
+        "en": "Jerusalem / Al-Quds",
+        "ar": "القدس / أورشليم"
+      },
+      "copy": {
+        "en": "Walls, the Haram, and neighborhoods stacked for millennia.",
+        "ar": "أسوار والحرم وأحياء متراكمة منذ آلاف السنين."
+      },
+      "narration": {
+        "en": "Start in Jerusalem — Al-Quds. Jewish, Christian, and Muslim holy places share one Old City. This atlas treats the stones as shared geography, and the living neighborhoods as evidence that people still pray and bargain here.",
+        "ar": "نبدأ من القدس. أماكن يهودية ومسيحية وإسلامية مقدّسة تتشارك بلدة قديمة واحدة. يعامل هذا الأطلس الحجر كجغرافيا مشتركة، والأحياء الحيّة كدليل أن الناس ما زالوا يصلّون ويساومون هنا."
+      }
+    },
+    {
+      "id": "eras",
+      "anchor": "hlTimeline",
+      "spotlight": "#hlTimeline",
+      "action": "openFirstEra",
+      "durationMs": 8400,
+      "kicker": {
+        "en": "Layers",
+        "ar": "طبقات"
+      },
+      "title": {
+        "en": "From Jericho’s tell to today",
+        "ar": "من تل أريحا إلى اليوم"
+      },
+      "copy": {
+        "en": "Bronze Age Canaan, Iron Age kingdoms, Umayyad Jerusalem, Ottoman walls.",
+        "ar": "كنعان البرونزية، وممالك الحديد، وقدس أموية، وأسوار عثمانية."
+      },
+      "narration": {
+        "en": "Open the eras. We begin at Jericho’s ancient tell, then Canaanite cities, Iron Age kingdoms, Roman harbors, the Dome of the Rock, Crusader Acre, Ottoman centuries, and the careful mid-twentieth-century chapter — told as history, not advocacy.",
+        "ar": "افتح العصور. نبدأ من تل أريحا القديم، ثم مدن كنعان، وممالك الحديد، وموانئ رومانية، وقبّة الصخرة، وعكّا الصليبية، والقرون العثمانية، وفصل منتصف القرن العشرين الحذر — يُروى كتاريخ لا كمناصرة."
+      }
+    },
+    {
+      "id": "bethlehem",
+      "anchor": "hlMap",
+      "spotlight": "#hlMapCanvas",
+      "action": "focusBethlehem",
+      "durationMs": 7800,
+      "kicker": {
+        "en": "Pilgrimage",
+        "ar": "حجّ"
+      },
+      "title": {
+        "en": "Bethlehem",
+        "ar": "بيت لحم"
+      },
+      "copy": {
+        "en": "Nativity stone, olive hills, and a living Palestinian town.",
+        "ar": "حجر المهد وتلال زيتون وبلدة فلسطينية حيّة."
+      },
+      "narration": {
+        "en": "South of Jerusalem is Bethlehem — Church of the Nativity, craft shops, and olive country. Christian Holy Land communities still process here; the town is pilgrimage and ordinary life at once.",
+        "ar": "جنوب القدس بيت لحم — كنيسة المهد ودكاكين الحِرفة وبلاد الزيتون. ما زالت جماعات الأرض المقدسة المسيحية تمشي المواكب هنا؛ والبلدة حجّ وحياة عادية معاً."
+      }
+    },
+    {
+      "id": "acre",
+      "anchor": "hlMap",
+      "spotlight": "#hlMapCanvas",
+      "action": "focusAcre",
+      "durationMs": 7800,
+      "kicker": {
+        "en": "Coast",
+        "ar": "ساحل"
+      },
+      "title": {
+        "en": "Acre / Akko",
+        "ar": "عكّا"
+      },
+      "copy": {
+        "en": "Crusader halls and Ottoman khans on one harbor.",
+        "ar": "قاعات صليبية وخانات عثمانية على مرفأ واحد."
+      },
+      "narration": {
+        "en": "On the northern coast, Acre — Akko — stacks Crusader vaults and Ottoman courtyards. Empires contested this harbor; café nargila and fish stalls keep it alive today.",
+        "ar": "على الساحل الشمالي عكّا — تكدّس أقبية صليبية وأفنية عثمانية. تنازعت الإمبراطوريات على هذا المرفأ؛ والنرجيلة في المقهى وأكشاك السمك تبقيه حيّاً اليوم."
+      }
+    },
+    {
+      "id": "table",
+      "anchor": "hlFood",
+      "spotlight": "#hlFood",
+      "action": "flipFirstFood",
+      "durationMs": 7600,
+      "kicker": {
+        "en": "The table",
+        "ar": "المائدة"
+      },
+      "title": {
+        "en": "Hummus, knafeh, shared bread",
+        "ar": "حمّص وكنافة وخبز مشترك"
+      },
+      "copy": {
+        "en": "Flip a plate — Levantine food with local names and pride.",
+        "ar": "اقلب طبقاً — طعام شامي بأسماء محلية وفخر."
+      },
+      "narration": {
+        "en": "Now the table. Hummus and falafel, Nablus knafeh, msakhan with sumac, shakshuka on weekend mornings. Flip any plate and it will tell you where it came from — including the dishes the whole Levant shares.",
+        "ar": "والآن المائدة. حمّص وفلافل وكنافة نابلس ومسخّن بالسماق وشكشوكة في صباحات العطلة. اقلب أي طبق وسيخبرك من أين جاء — بما في ذلك ما تتقاسمه بلاد الشام كلها."
+      }
+    },
+    {
+      "id": "sound",
+      "anchor": "hlMusic",
+      "spotlight": "#hlMusic",
+      "action": "flipFirstMusic",
+      "durationMs": 7800,
+      "kicker": {
+        "en": "Sound",
+        "ar": "صوت"
+      },
+      "title": {
+        "en": "Dabke, oud, and piyut",
+        "ar": "دبكة وعود وبيوط"
+      },
+      "copy": {
+        "en": "Wedding lines, maqam nights, and synagogue song.",
+        "ar": "صفوف أعراس وليالي مقام وغناء كنيس."
+      },
+      "narration": {
+        "en": "Listen next. Dabke stamps at weddings, the oud carries Arabic maqam, piyutim fill synagogue and home, and Israeli folk song gathers many diasporas into Hebrew circles. Neighboring traditions on one map.",
+        "ar": "استمع بعد ذلك. دقّات الدبكة في الأعراس، والعود يحمل المقام العربي، والبيوطيم تملأ الكنيس والبيت، والأغنية الشعبية الإسرائيلية تجمع شتاتاً كثيراً في حلقات عبرية. تقاليد متجاورة على خريطة واحدة."
+      }
+    },
+    {
+      "id": "cafe",
+      "anchor": "hlHookah",
+      "spotlight": "#hlHookah",
+      "action": "flipFirstHookah",
+      "durationMs": 7000,
+      "kicker": {
+        "en": "The café",
+        "ar": "المقهى"
+      },
+      "title": {
+        "en": "Nargila and slow talk",
+        "ar": "نرجيلة وحديث بطيء"
+      },
+      "copy": {
+        "en": "Apple blend, shared hose, an evening that refuses to rush.",
+        "ar": "نكهة تفاح وخرطوم مشترك وأمسية ترفض الاستعجال."
+      },
+      "narration": {
+        "en": "In the café the nargila paces the night — tufahtayn apple, coals refreshed, conversation longer than the pipe. It is Levantine social furniture from Acre courtyards to Ramallah terraces.",
+        "ar": "في المقهى تضبط النرجيلة إيقاع الليل — تفاحتين، وفحم يُجدَّد، وحديث أطول من الخرطوم. هي أثاث اجتماعي شامي من أفنية عكّا إلى شرفات رام الله."
+      }
+    },
+    {
+      "id": "living",
+      "anchor": "hlLiving",
+      "spotlight": "#hlLiving",
+      "action": "flipFirstLiving",
+      "durationMs": 8200,
+      "kicker": {
+        "en": "Living",
+        "ar": "حياة"
+      },
+      "title": {
+        "en": "Harvest, embroidery, languages",
+        "ar": "موسم وتطريز ولغات"
+      },
+      "copy": {
+        "en": "Olives, tatreez, holiday tables, Bedouin Negev, Arabic and Hebrew.",
+        "ar": "زيتون وتطريز ومائدة أعياد وبدو النقب وعربية وعبرية."
+      },
+      "narration": {
+        "en": "Living culture is the point of this atlas. Olive harvests, Palestinian tatreez, Jewish holiday tables, Christian processions, Bedouin hospitality in the Negev, and Arabic and Hebrew spoken in the same markets.",
+        "ar": "الثقافة الحيّة هي مقصد هذا الأطلس. مواسم الزيتون والتطريز الفلسطيني ومائدة الأعياد اليهودية ومواكب مسيحية وضيافة بدو النقب والعربية والعبرية في الأسواق نفسها."
+      }
+    },
+    {
+      "id": "phrase",
+      "anchor": "hlPhrases",
+      "spotlight": "#hlPhrases",
+      "action": "speakFirstPhrase",
+      "durationMs": 7000,
+      "kicker": {
+        "en": "Speak",
+        "ar": "احكِ"
+      },
+      "title": {
+        "en": "Take one word with you",
+        "ar": "خذ معك كلمة"
+      },
+      "copy": {
+        "en": "Ahlan wa sahlan — enough to open a door.",
+        "ar": "أهلاً وسهلاً — تكفي لتفتح باباً."
+      },
+      "narration": {
+        "en": "Before you go, take a Levantine greeting. Ahlan wa sahlan. Press any phrase on the page and I will say it for you in everyday Arabic.",
+        "ar": "قبل أن تذهب، خذ تحية شامية. أهلاً وسهلاً. اضغط أي عبارة في الصفحة وسأقولها لك بعربية يومية."
+      }
+    },
+    {
+      "id": "close",
+      "anchor": "hlGuide",
+      "spotlight": "#hlGuide",
+      "action": "unflipCards",
+      "durationMs": 6600,
+      "kicker": {
+        "en": "Ask me",
+        "ar": "اسألني"
+      },
+      "title": {
+        "en": "The atlas is yours now",
+        "ar": "الأطلس لك الآن"
+      },
+      "copy": {
+        "en": "Every pin and card answers when you press it — or just ask Noor.",
+        "ar": "كل علامة وبطاقة تجيب حين تضغطها — أو اسأل نور."
+      },
+      "narration": {
+        "en": "That is the shape of it. Every pin, plate, and card will tell its story in English or Arabic. Or open the chat and ask me — I would rather answer than lecture.",
+        "ar": "هذا هو شكلها. كل علامة وطبق وبطاقة ستروي حكايتها بالإنجليزية أو بالعربية. أو افتح المحادثة واسألني — أفضّل أن أجيب على أن ألقي درساً."
+      }
+    }
+  ]
+}

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Palestine · Israel — Layers of the Levant | History, Food &amp; Music</title>
+  <meta name="description" content="A bilingual cultural atlas of Palestine and Israel: shared geography, sacred places, Levantine tables, music, and living cultures — narrated in English or Arabic by Noor."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/holy-land/css/holy-land.css"/>
+  <script src="/shared/menu-config.js"></script>
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/demo-users.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <script src="/shared/dark-mode.js" defer></script>
+  <script src="/holy-land/js/holy-land-splash.js" defer></script>
+</head>
+<body class="hl-page hl-splash-open">
+  <div
+    id="hlSplash"
+    class="hl-splash is-ready"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="hlSplashTitle"
+    aria-hidden="false"
+  >
+    <button type="button" class="hl-splash__skip" id="hlSplashSkip">Skip</button>
+    <div class="hl-splash__veil" aria-hidden="true"></div>
+    <div class="hl-splash__grain" aria-hidden="true"></div>
+    <div class="hl-splash__stage">
+      <div class="hl-splash__flag-wrap" aria-hidden="true">
+        <svg class="hl-splash__flag hl-splash__mark" viewBox="0 0 640 640" focusable="false" role="img" aria-label="Olive branch mark — shared ground">
+          <defs>
+            <radialGradient id="hlMarkGlow" cx="50%" cy="45%" r="55%">
+              <stop offset="0%" stop-color="#f5e6c8" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#1a1a19" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="hlMarkRing" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#d4a24c"/>
+              <stop offset="55%" stop-color="#e3d3b4"/>
+              <stop offset="100%" stop-color="#5c7050"/>
+            </linearGradient>
+          </defs>
+          <circle cx="320" cy="320" r="280" fill="url(#hlMarkGlow)"/>
+          <circle class="hl-splash__ring" cx="320" cy="320" r="210" fill="none" stroke="url(#hlMarkRing)" stroke-width="10"/>
+          <circle class="hl-splash__ring-soft" cx="320" cy="320" r="168" fill="none" stroke="#c9992f" stroke-opacity="0.35" stroke-width="2"/>
+          <g class="hl-splash__olive" fill="#7a9168" stroke="#3f5236" stroke-width="3" stroke-linejoin="round">
+            <ellipse transform="translate(248 300) rotate(-28)" rx="34" ry="16"/>
+            <ellipse transform="translate(292 268) rotate(-8)" rx="36" ry="15"/>
+            <ellipse transform="translate(340 252) rotate(12)" rx="38" ry="15"/>
+            <ellipse transform="translate(388 270) rotate(32)" rx="34" ry="15"/>
+            <ellipse transform="translate(420 310) rotate(48)" rx="32" ry="14"/>
+            <path fill="none" stroke="#5c7050" stroke-width="6" stroke-linecap="round" d="M248 300 C292 250 360 236 420 310"/>
+            <ellipse cx="320" cy="368" rx="18" ry="28" fill="#5c7050"/>
+            <ellipse cx="292" cy="390" rx="14" ry="22" fill="#6f7f52"/>
+            <ellipse cx="348" cy="390" rx="14" ry="22" fill="#6f7f52"/>
+          </g>
+        </svg>
+      </div>
+      <p class="hl-splash__kicker" lang="ar">أرض مشتركة</p>
+      <h1 class="hl-splash__title" id="hlSplashTitle">Palestine · Israel</h1>
+      <p class="hl-splash__line">One atlas · shared ground</p>
+      <div class="hl-splash__rule" aria-hidden="true"></div>
+      <p class="hl-splash__enter" id="hlSplashEnterHint">Enter the atlas</p>
+    </div>
+  </div>
+
+  <modern-navbar></modern-navbar>
+
+  <main class="hl-main">
+    <section class="hl-hero" id="hlHero">
+      <div class="hl-hero-atmos hl-hero-atmos--storm" id="hlHeroAtmos" aria-hidden="true">
+        <div class="hl-hero-sky"></div>
+        <div class="hl-hero-horizon-glow"></div>
+        <canvas class="hl-hero-sparkle" id="hlSkySparkle" width="1200" height="600"></canvas>
+        <div class="hl-hero-heat"></div>
+        <svg class="hl-hero-silhouettes" viewBox="0 0 1200 100" preserveAspectRatio="xMidYMax meet" focusable="false">
+          <g class="hl-hero-city hl-hero-city--far" fill="currentColor">
+            <rect x="20" y="58" width="22" height="42"/>
+            <rect x="46" y="48" width="16" height="52"/>
+            <rect x="68" y="62" width="28" height="38"/>
+            <rect x="102" y="52" width="14" height="48"/>
+            <rect x="122" y="58" width="30" height="42"/>
+            <rect x="200" y="55" width="24" height="45"/>
+            <rect x="230" y="45" width="14" height="55"/>
+            <rect x="250" y="60" width="26" height="40"/>
+            <rect x="360" y="50" width="20" height="50"/>
+            <rect x="386" y="42" width="12" height="58"/>
+            <rect x="404" y="56" width="28" height="44"/>
+            <rect x="520" y="54" width="22" height="46"/>
+            <rect x="548" y="44" width="14" height="56"/>
+            <rect x="568" y="58" width="24" height="42"/>
+            <rect x="700" y="52" width="18" height="48"/>
+            <rect x="724" y="46" width="12" height="54"/>
+            <rect x="742" y="58" width="26" height="42"/>
+            <rect x="920" y="50" width="20" height="50"/>
+            <rect x="946" y="56" width="28" height="44"/>
+            <rect x="1100" y="48" width="16" height="52"/>
+            <rect x="1122" y="58" width="24" height="42"/>
+            <rect x="1152" y="44" width="14" height="56"/>
+          </g>
+          <path class="hl-hero-arch" d="M140 100 V55 Q140 28 168 28 Q196 28 196 55 V100 Z"/>
+          <path class="hl-hero-arch hl-hero-arch--mid" d="M280 100 V62 Q280 42 302 42 Q324 42 324 62 V100 Z"/>
+          <path class="hl-hero-arch hl-hero-arch--far" d="M780 100 V50 Q780 26 812 26 Q844 26 844 50 V100 Z"/>
+          <path class="hl-hero-arch hl-hero-arch--far" d="M860 100 V64 Q860 48 882 48 Q904 48 904 64 V100 Z"/>
+          <path class="hl-hero-dune" d="M0 78 C140 68 260 74 400 66 C540 58 680 72 820 64 C960 56 1100 70 1200 62 L1200 100 L0 100 Z"/>
+        </svg>
+        <div class="hl-hero-sand"></div>
+        <canvas class="hl-hero-storm" id="hlSandstorm" width="1200" height="400"></canvas>
+        <div class="hl-hero-motes" id="hlHeroMotes"></div>
+      </div>
+      <div class="container">
+        <div class="hl-hero-layout">
+          <div class="hl-hero-inner" id="hlHeroInner">
+            <p class="hl-kicker" data-i18n="heroKicker">One atlas · shared ground</p>
+            <h1 class="hl-hero-title" data-i18n="heroTitle">Palestine · Israel</h1>
+            <p class="hl-hero-line" data-i18n="heroLine">A scholarly walk through shared geography and distinct living cultures — Canaanite cities, sacred stones, Levantine tables, and languages still spoken at the same markets.</p>
+
+            <div class="hl-hero-cta">
+              <a class="hl-btn hl-btn-primary" href="#hlMap">
+                <i class="bi bi-geo-alt-fill"></i> <span data-i18n="exploreMap">Explore the atlas</span>
+              </a>
+              <button type="button" class="hl-btn hl-btn-lang" id="hlLangToggle" aria-label="Switch language">
+                <i class="bi bi-translate"></i> <span id="hlLangToggleLabel">عربي</span>
+              </button>
+            </div>
+
+            <dl class="hl-facts" id="hlFacts">
+              <div><dt>9000 BCE</dt><dd data-i18n-fact="jericho">Jericho among the oldest towns</dd></div>
+              <div><dt>691 CE</dt><dd data-i18n-fact="dome">Dome of the Rock completed</dd></div>
+              <div><dt>Olive</dt><dd data-i18n-fact="olive">Olive harvest still marks the year</dd></div>
+              <div><dt>Today</dt><dd data-i18n-fact="living">Hebrew and Arabic in living use</dd></div>
+            </dl>
+          </div>
+
+          <aside class="hl-guide" id="hlGuide" aria-label="Palestine · Israel guide Noor">
+            <div class="hl-guide-card">
+              <img class="hl-guide-portrait" id="hlGuidePortrait" src="/holy-land/assets/noor-guide-portrait-256.png" width="72" height="72" alt="Noor — Palestine · Israel history guide"/>
+              <div class="hl-guide-meta">
+                <h2 id="hlGuideName">Noor</h2>
+                <p id="hlGuideTitle">Palestine · Israel history guide</p>
+                <p class="hl-guide-status" id="hlGuideStatus">Ahlan wa sahlan.</p>
+              </div>
+            </div>
+
+            <label class="hl-narrate hl-narrate--global" for="hlNarrate">
+              <input type="checkbox" id="hlNarrate" data-hl-narrate checked/>
+              <span class="hl-narrate__copy">
+                <span class="hl-narrate__title" data-i18n="narration">Narration</span>
+                <span class="hl-narrate__scope" data-i18n="narrationScope">Entire page — atlas, tour, and cards</span>
+              </span>
+            </label>
+
+            <div class="hl-guide-actions">
+              <button type="button" class="hl-btn hl-btn-primary hl-btn-sm" id="hlStoryPlay" aria-pressed="false">
+                <i class="bi bi-film"></i> <span data-i18n="startTour">Start tour</span>
+              </button>
+              <button type="button" class="hl-btn hl-btn-sand hl-btn-sm" id="hlMeetGuide">
+                <i class="bi bi-person-video3"></i> <span data-i18n="meetGuide">Meet Noor</span>
+              </button>
+              <button type="button" class="hl-btn hl-btn-sand hl-btn-sm" id="hlAskGuide">
+                <i class="bi bi-chat-dots-fill"></i> <span data-i18n="askGuide">Ask Noor</span>
+              </button>
+              <button type="button" class="hl-btn hl-btn-ghost hl-btn-sm" id="hlStopAudio">
+                <i class="bi bi-stop-fill"></i> <span data-i18n="stop">Stop</span>
+              </button>
+            </div>
+
+            <div class="hl-story-panel" id="hlStoryPanel">
+              <div class="hl-story-status" id="hlStoryStatus" hidden aria-live="polite">
+                <span id="hlStoryStatusText"></span>
+                <div class="hl-story-dots" id="hlStoryDots" aria-hidden="true"></div>
+              </div>
+              <p class="hl-story-error" id="hlStoryError" hidden></p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <div class="container hl-sections">
+      <section class="hl-section is-open" id="hlMap" data-hl-collapse data-hl-default-open="1">
+        <div class="hl-section-head">
+          <button type="button" class="hl-section-toggle" id="hlMapToggle" aria-expanded="true" aria-controls="hlMapPanel">
+            <span class="hl-section-toggle__copy">
+              <span class="hl-section-title" data-i18n="mapHeading">Atlas of shared ground</span>
+              <span class="hl-section-lead" data-i18n="mapLead">Hills, coast, and rift valley. Select a pin or a name to hear its story.</span>
+            </span>
+            <i class="bi bi-chevron-down hl-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="hl-section-panel" id="hlMapPanel" role="region" aria-labelledby="hlMapToggle">
+          <div class="hl-map-toolbar">
+            <div class="hl-map-filters" id="hlMapFilters" role="group" aria-label="Filter map pins">
+              <button type="button" class="hl-chip is-active" data-filter="all" data-i18n="mapAll">All</button>
+              <button type="button" class="hl-chip" data-filter="history" data-i18n="mapHistory">History</button>
+              <button type="button" class="hl-chip" data-filter="food" data-i18n="mapFood">Food</button>
+              <button type="button" class="hl-chip" data-filter="music" data-i18n="mapMusic">Music</button>
+              <button type="button" class="hl-chip" data-filter="living" data-i18n="mapLiving">Living</button>
+            </div>
+            <label class="hl-narrate hl-narrate--section" for="hlNarrateMap">
+              <input type="checkbox" id="hlNarrateMap" data-hl-narrate checked/>
+              <span data-i18n="narration">Narration</span>
+            </label>
+          </div>
+          <div class="hl-map-layout">
+            <ul class="hl-site-list" id="hlSiteList"></ul>
+            <div class="hl-map-wrap">
+              <div id="hlMapCanvas" class="hl-map-canvas" role="img" aria-label="Map of historic sites across Palestine and Israel"></div>
+              <p class="hl-map-status" id="hlMapStatus" data-i18n="mapLoading">Loading the atlas…</p>
+              <button type="button" class="hl-btn hl-btn-ghost hl-btn-sm hl-map-reset" id="hlMapReset" hidden>
+                <i class="bi bi-arrow-clockwise"></i> <span data-i18n="mapReset">Show all pins</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="hl-section" id="hlTimeline" data-hl-collapse>
+        <div class="hl-section-head">
+          <button type="button" class="hl-section-toggle" id="hlTimelineToggle" aria-expanded="false" aria-controls="hlTimelinePanel">
+            <span class="hl-section-toggle__copy">
+              <span class="hl-section-title" data-i18n="timelineHeading">Layers of the land</span>
+              <span class="hl-section-lead" data-i18n="timelineLead">From Bronze Age Canaan to living cultures today. Select a layer to hear it and find it on the map.</span>
+            </span>
+            <i class="bi bi-chevron-down hl-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="hl-section-panel" id="hlTimelinePanel" role="region" aria-labelledby="hlTimelineToggle" hidden>
+          <div class="hl-timeline-stage">
+            <aside class="hl-timeline-selected" id="hlTimelineSelected" aria-live="polite">
+              <div class="hl-timeline-selected__empty" id="hlTimelineSelectedEmpty">
+                <div class="hl-timeline-3d" id="hlTimeline3d" aria-hidden="true"></div>
+                <p class="hl-timeline-selected__prompt" data-i18n="timelineSelectHint">Select an era on the timeline</p>
+              </div>
+              <div class="hl-timeline-selected__card" id="hlTimelineSelectedCard" hidden>
+                <div class="hl-timeline-selected__media" id="hlTimelineSelectedMedia"></div>
+                <p class="hl-timeline-selected__date" id="hlTimelineSelectedDate"></p>
+                <h3 class="hl-timeline-selected__title" id="hlTimelineSelectedTitle"></h3>
+              </div>
+            </aside>
+            <div class="hl-calendar" aria-label="Chronological scale">
+              <div class="hl-calendar__head">
+                <span class="hl-calendar__head-label">Chronology</span>
+                <span class="hl-calendar__head-range" id="hlCalendarHeadRange">9500 BCE → today</span>
+              </div>
+              <div class="hl-calendar__track">
+                <div class="hl-calendar__rail"></div>
+                <div class="hl-calendar__fill" id="hlCalendarFill"></div>
+                <div class="hl-calendar__centuries" id="hlCalendarCenturies" aria-hidden="true"></div>
+                <div class="hl-calendar__ticks" id="hlCalendarTicks"></div>
+                <div class="hl-calendar__now" id="hlCalendarNow" title="Present"></div>
+              </div>
+              <div class="hl-calendar__scale" id="hlCalendarScale"></div>
+            </div>
+          </div>
+          <ol class="hl-era-list" id="hlEraList">
+            <li class="hl-loading" data-i18n="loading">Loading the atlas…</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="hl-section" id="hlFood" data-hl-collapse>
+        <div class="hl-section-head">
+          <button type="button" class="hl-section-toggle" id="hlFoodToggle" aria-expanded="false" aria-controls="hlFoodPanel">
+            <span class="hl-section-toggle__copy">
+              <span class="hl-section-title" data-i18n="foodHeading">The shared table</span>
+              <span class="hl-section-lead" data-i18n="foodLead">Hummus, knafeh, shakshuka, and olive oil — Levantine plates with local names. Flip a dish for its origin and meaning.</span>
+            </span>
+            <i class="bi bi-chevron-down hl-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="hl-section-panel" id="hlFoodPanel" role="region" aria-labelledby="hlFoodToggle" hidden>
+          <div class="hl-grid" id="hlFoodGrid"></div>
+        </div>
+      </section>
+
+      <section class="hl-section" id="hlMusic" data-hl-collapse>
+        <div class="hl-section-head">
+          <button type="button" class="hl-section-toggle" id="hlMusicToggle" aria-expanded="false" aria-controls="hlMusicPanel">
+            <span class="hl-section-toggle__copy">
+              <span class="hl-section-title" data-i18n="musicHeading">Sound of the land</span>
+              <span class="hl-section-lead" data-i18n="musicLead">Dabke lines, oud maqam, piyutim, and wedding song. Flip a card for the history.</span>
+            </span>
+            <i class="bi bi-chevron-down hl-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="hl-section-panel" id="hlMusicPanel" role="region" aria-labelledby="hlMusicToggle" hidden>
+          <div class="hl-grid" id="hlMusicGrid"></div>
+        </div>
+      </section>
+
+      <section class="hl-section" id="hlHookah" data-hl-collapse>
+        <div class="hl-section-head">
+          <button type="button" class="hl-section-toggle" id="hlHookahToggle" aria-expanded="false" aria-controls="hlHookahPanel">
+            <span class="hl-section-toggle__copy">
+              <span class="hl-section-title" data-i18n="hookahHeading">Nargila — the café smoke</span>
+              <span class="hl-section-lead" data-i18n="hookahLead">Water-pipe evenings shared across the Levant — courtyards, terraces, and slow conversation.</span>
+            </span>
+            <i class="bi bi-chevron-down hl-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="hl-section-panel" id="hlHookahPanel" role="region" aria-labelledby="hlHookahToggle" hidden>
+          <div class="hl-grid" id="hlHookahGrid"></div>
+        </div>
+      </section>
+
+      <section class="hl-section" id="hlLiving" data-hl-collapse>
+        <div class="hl-section-head">
+          <button type="button" class="hl-section-toggle" id="hlLivingToggle" aria-expanded="false" aria-controls="hlLivingPanel">
+            <span class="hl-section-toggle__copy">
+              <span class="hl-section-title" data-i18n="livingHeading">Living cultures</span>
+              <span class="hl-section-lead" data-i18n="livingLead">Olive harvest, embroidery, holiday tables, Bedouin Negev life, and languages still heard in the market.</span>
+            </span>
+            <i class="bi bi-chevron-down hl-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="hl-section-panel" id="hlLivingPanel" role="region" aria-labelledby="hlLivingToggle" hidden>
+          <div class="hl-grid" id="hlLivingGrid"></div>
+        </div>
+      </section>
+
+      <section class="hl-section" id="hlPhrases" data-hl-collapse>
+        <div class="hl-section-head">
+          <button type="button" class="hl-section-toggle" id="hlPhrasesToggle" aria-expanded="false" aria-controls="hlPhrasesPanel">
+            <span class="hl-section-toggle__copy">
+              <span class="hl-section-title" data-i18n="phraseHeading">Speak Levantine</span>
+              <span class="hl-section-lead" data-i18n="phraseLead">Everyday Levantine Arabic, spoken aloud. Press any phrase to hear it.</span>
+            </span>
+            <i class="bi bi-chevron-down hl-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="hl-section-panel" id="hlPhrasesPanel" role="region" aria-labelledby="hlPhrasesToggle" hidden>
+          <ul class="hl-phrase-list" id="hlPhraseList"></ul>
+        </div>
+      </section>
+
+      <p class="hl-footer-note">
+        Palestine · Israel — Layers of the Levant · Guide narration by Google TTS &amp; HeyGen ·
+        Photos via Wikimedia Commons · Development by David E Lane · <span id="hlFooterYear">2026</span>
+      </p>
+    </div>
+  </main>
+
+  <div class="hl-story-overlay" id="hlStoryOverlay" hidden aria-hidden="true" aria-live="polite">
+    <div class="hl-story-chip">
+      <img id="hlStoryChipImg" src="/holy-land/assets/noor-guide-portrait-256.png" width="56" height="56" alt=""/>
+      <div class="hl-story-chip-copy">
+        <p class="hl-story-kicker" id="hlStoryKicker"></p>
+        <h3 class="hl-story-title" id="hlStoryTitle"></h3>
+        <p class="hl-story-body" id="hlStoryCopy"></p>
+        <p class="hl-story-progress" id="hlStoryProgress"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="hl-sheet" id="hlSheet" hidden role="dialog" aria-modal="true" aria-labelledby="hlSheetTitle">
+    <div class="hl-sheet-backdrop" id="hlSheetBackdrop"></div>
+    <div class="hl-sheet-panel">
+      <header class="hl-sheet-header">
+        <h2 id="hlSheetTitle"></h2>
+        <button type="button" class="btn-close btn-close-white" id="hlSheetClose" aria-label="Close"></button>
+      </header>
+      <div class="hl-sheet-body" id="hlSheetBody"></div>
+      <footer class="hl-sheet-footer">
+        <button type="button" class="hl-btn hl-btn-sand hl-btn-sm hl-listen-btn" id="hlSheetListen" aria-pressed="false">
+          <i class="bi bi-volume-up-fill" aria-hidden="true"></i>
+          <span class="hl-listen-label" data-i18n="listen">Listen</span>
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <script src="/shared/tts.js"></script>
+  <script src="/shared/speech-recognition.js"></script>
+  <script src="/family/js/lane-family-google-maps.js"></script>
+  <script src="/shared/google-advanced-markers.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r160/three.min.js"></script>
+  <script src="/holy-land/js/holy-land-i18n.js"></script>
+  <script src="/holy-land/js/holy-land-sections.js"></script>
+  <script src="/holy-land/js/holy-land-content.js"></script>
+  <script src="/holy-land/js/holy-land-desert-atmos.js"></script>
+  <script src="/holy-land/js/holy-land-timeline-3d.js"></script>
+  <script src="/holy-land/js/holy-land-map.js"></script>
+  <script src="/holy-land/js/holy-land-heygen.js"></script>
+  <script src="/holy-land/js/holy-land-story-reel.js"></script>
+  <script type="module" src="/holy-land/js/holy-land-guide-chat.js"></script>
+</body>
+</html>

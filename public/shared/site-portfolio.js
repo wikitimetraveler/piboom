@@ -461,6 +461,21 @@
       stack: ['Bootstrap', 'HeyGen', 'Google Maps', 'Google TTS', 'LangChain', 'i18n'],
     },
     {
+      id: 'holy-land',
+      label: 'Palestine · Israel',
+      tagline: 'One bilingual atlas — shared ground, places, table, and song',
+      path: '/holy-land/',
+      icon: 'bi-globe-central-south-asia',
+      category: 'other',
+      featured: true,
+      featuredOrder: 9,
+      authRequired: false,
+      problem: 'Explore Palestine and Israel as one cultural atlas in English or Arabic.',
+      consultingBlurb:
+        'Public bilingual atlas — EN/AR toggle, chronology, map layers, HyperFrame tour, Levantine table and living cultures, and Noor AI guide. Fully public — no login.',
+      stack: ['Bootstrap', 'Google Maps', 'Google TTS', 'LangChain', 'i18n'],
+    },
+    {
       id: 'heygen-hub',
       label: 'HeyGen Hub',
       tagline: 'Avatar clips and HyperFrames narrated reels',

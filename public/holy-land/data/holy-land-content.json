@@ -1,0 +1,1657 @@
+{
+  "id": "holy-land-atlas",
+  "brand": {
+    "name": {
+      "en": "Palestine · Israel — Shared Ground",
+      "ar": "فلسطين · إسرائيل — أرض مشتركة"
+    },
+    "tagline": {
+      "en": "One atlas of shared geography and living cultures — told with care",
+      "ar": "أطلس واحد لجغرافيا مشتركة وثقافات حيّة — يُروى بعناية"
+    }
+  },
+  "guide": {
+    "name": {
+      "en": "Noor",
+      "ar": "نور"
+    },
+    "title": {
+      "en": "Holy Land history guide",
+      "ar": "دليل تاريخ الأرض المقدسة"
+    },
+    "portrait": "/holy-land/assets/noor-guide-portrait-256.png",
+    "greeting": {
+      "en": "Ahlan wa sahlan. I am Noor — walk with me across shared ground.",
+      "ar": "أهلاً وسهلاً. أنا نور — امشِ معي على أرض مشتركة."
+    }
+  },
+  "ui": {
+    "en": {
+      "dir": "ltr",
+      "langLabel": "English",
+      "switchTo": "عربي",
+      "heroKicker": "One atlas · shared ground",
+      "heroTitle": "Palestine · Israel",
+      "heroLine": "A scholarly walk through shared geography and distinct living cultures — Canaanite cities, sacred stones, Levantine tables, and languages still spoken at the same markets.",
+      "playReel": "Play HyperFrame tour",
+      "pauseReel": "Pause tour",
+      "resumeReel": "Resume tour",
+      "stopReel": "Stop tour",
+      "narration": "Narration",
+      "narrationScope": "Entire page — atlas, tour, and cards",
+      "hearWelcome": "Hear welcome",
+      "askGuide": "Ask Noor",
+      "stop": "Stop",
+      "listen": "Listen",
+      "exploreMap": "Explore the atlas",
+      "timelineHeading": "Layers of the land",
+      "timelineLead": "From Bronze Age Canaan to living cultures today. Select a layer to hear it and find it on the map.",
+      "timelineSelectHint": "Select an era on the timeline",
+      "mapHeading": "Atlas of shared ground",
+      "mapLead": "Hills, coast, and rift valley. Select a pin or a name to hear its story.",
+      "mapAll": "All",
+      "mapHistory": "History",
+      "mapFood": "Food",
+      "mapMusic": "Music",
+      "mapHookah": "Café",
+      "mapLiving": "Living",
+      "mapReset": "Show all pins",
+      "mapLoading": "Loading the atlas…",
+      "foodHeading": "The shared table",
+      "foodLead": "Hummus, knafeh, shakshuka, and olive oil — Levantine plates with local names. Flip a dish for its origin and meaning.",
+      "musicHeading": "Sound of the land",
+      "musicLead": "Dabke lines, oud maqam, piyutim, and wedding song. Flip a card for the history.",
+      "hookahHeading": "Nargila — the café smoke",
+      "hookahLead": "Water-pipe evenings shared across the Levant — courtyards, terraces, and slow conversation.",
+      "livingHeading": "Living cultures",
+      "livingLead": "Olive harvest, embroidery, holiday tables, Bedouin Negev life, and languages still heard in the market.",
+      "phraseHeading": "Speak Levantine",
+      "phraseLead": "Everyday Levantine Arabic, spoken aloud. Press any phrase to hear it.",
+      "flipHint": "Flip for the history",
+      "playMusic": "Play music",
+      "stopMusic": "Stop music",
+      "back": "Back",
+      "loading": "Loading the atlas…",
+      "readMore": "Read the full story",
+      "close": "Close",
+      "unesco": "UNESCO World Heritage",
+      "context": "Context",
+      "evidence": "On the ground",
+      "startTour": "HyperFrame tour",
+      "meetGuide": "Meet Noor"
+    },
+    "ar": {
+      "dir": "rtl",
+      "langLabel": "العربية",
+      "switchTo": "English",
+      "heroKicker": "أطلس واحد · أرض مشتركة",
+      "heroTitle": "فلسطين · إسرائيل",
+      "heroLine": "جولة علمية في جغرافيا مشتركة وثقافات حيّة متمايزة — مدن كنعانية، وحجر مقدّس، ومائدة شامية، ولغات ما زالت تُسمَع في الأسواق نفسها.",
+      "playReel": "شغّل الجولة",
+      "pauseReel": "إيقاف مؤقت",
+      "resumeReel": "متابعة الجولة",
+      "stopReel": "إنهاء الجولة",
+      "narration": "السرد الصوتي",
+      "narrationScope": "الصفحة كاملة — الأطلس والجولة والبطاقات",
+      "hearWelcome": "استمع للترحيب",
+      "askGuide": "اسأل نور",
+      "stop": "إيقاف",
+      "listen": "استمع",
+      "exploreMap": "استكشف الأطلس",
+      "timelineHeading": "طبقات الأرض",
+      "timelineLead": "من كنعان في العصر البرونزي إلى الثقافات الحيّة اليوم. اختر طبقة لتسمعها وتجدها على الخريطة.",
+      "timelineSelectHint": "اختر حقبة من الخط الزمني",
+      "mapHeading": "أطلس الأرض المشتركة",
+      "mapLead": "تلال وساحل وأخدود. اختر علامة أو اسماً لتسمع حكايته.",
+      "mapAll": "الكل",
+      "mapHistory": "تاريخ",
+      "mapFood": "طعام",
+      "mapMusic": "موسيقى",
+      "mapHookah": "مقهى",
+      "mapLiving": "حياة",
+      "mapReset": "أظهر كل العلامات",
+      "mapLoading": "جارٍ تحميل الأطلس…",
+      "foodHeading": "المائدة المشتركة",
+      "foodLead": "حمّص وكنافة وشكشوكة وزيت زيتون — أطباق شامية بأسماء محلية. اقلب الطبق لتعرف أصله ومعناه.",
+      "musicHeading": "صوت الأرض",
+      "musicLead": "صفوف دبكة، ومقام عود، وبيوطيم، وأغاني أعراس. اقلب البطاقة لتقرأ الحكاية.",
+      "hookahHeading": "النرجيلة — دخان المقهى",
+      "hookahLead": "أمسيات الأرجيلة المشتركة عبر بلاد الشام — أفنية وشرفات وحديث بطيء.",
+      "livingHeading": "ثقافات حيّة",
+      "livingLead": "موسم الزيتون، والتطريز، ومائدة الأعياد، وحياة البدو في النقب، ولغات ما زالت تُسمَع في السوق.",
+      "phraseHeading": "احكِ شامي",
+      "phraseLead": "عربية شامية يومية، منطوقة بصوت عالٍ. اضغط أي عبارة لتسمعها.",
+      "flipHint": "اقلب البطاقة للحكاية",
+      "playMusic": "شغّل المقطع",
+      "stopMusic": "أوقف المقطع",
+      "back": "رجوع",
+      "loading": "جارٍ تحميل الأطلس…",
+      "readMore": "اقرأ الحكاية كاملة",
+      "close": "إغلاق",
+      "unesco": "تراث عالمي — اليونسكو",
+      "context": "السياق",
+      "evidence": "على الأرض",
+      "startTour": "جولة مصوّرة",
+      "meetGuide": "تعرّف على نور"
+    }
+  },
+  "eras": [
+    {
+      "id": "neolithic-jericho",
+      "siteId": "jericho",
+      "yearCE": -9000,
+      "years": {
+        "en": "c. 10th–8th millennia BCE",
+        "ar": "نحو الألف العاشر–الثامن ق.م"
+      },
+      "title": {
+        "en": "First settled ground",
+        "ar": "أولى الأرض المستقرّة"
+      },
+      "copy": {
+        "en": "Jericho’s tell rises above the rift — among the earliest long-lived settlements in the world.",
+        "ar": "يرتفع تل أريحا فوق الأخدود — من أقدم المستوطنات طويلة العمر في العالم."
+      },
+      "narration": {
+        "en": "We begin at Jericho, where people settled the rift valley millennia before writing. The tell stacks houses, walls, and memory — a reminder that this land’s story starts with villages, not empires.",
+        "ar": "نبدأ من أريحا، حيث استقرّ الناس في الأخدود قبل الكتابة بآلاف السنين. يكدّس التل البيوت والأسوار والذاكرة — تذكير بأن حكاية هذه الأرض تبدأ بالقرى لا بالإمبراطوريات."
+      },
+      "history": {
+        "en": "Tell es-Sultan at Jericho preserves Pre-Pottery Neolithic layers with early architecture and communal works often cited among the oldest continuous settlement sequences in the southern Levant. Later Bronze and Iron Age cities reused the same oasis corridor between the Judean hills and the Jordan Valley. Archaeology here is about water, agriculture, and repeated rebuilding — not a single founding myth.",
+        "ar": "يحفظ تل السلطان في أريحا طبقات من العصر الحجري الحديث قبل الفخاري بعمارة مبكرة وأعمال جماعية تُعدّ من أقدم سلاسل الاستيطان المتواصل في جنوب بلاد الشام. وأعادت مدن العصرين البرونزي والحديدي استخدام ممر الواحة نفسه بين تلال اليهودية وغور الأردن. الآثار هنا عن الماء والزراعة وإعادة البناء المتكررة — لا عن أسطورة تأسيس واحدة."
+      }
+    },
+    {
+      "id": "canaanite-bronze",
+      "siteId": "jerusalem",
+      "yearCE": -1800,
+      "years": {
+        "en": "c. 3000–1200 BCE",
+        "ar": "نحو ٣٠٠٠–١٢٠٠ ق.م"
+      },
+      "title": {
+        "en": "Canaanite Bronze Age",
+        "ar": "كنعان في العصر البرونزي"
+      },
+      "copy": {
+        "en": "City-states, Egyptian letters, and ports that linked the highlands to the sea.",
+        "ar": "دول مدن، ورسائل مصرية، وموانئ ربطت المرتفعات بالبحر."
+      },
+      "narration": {
+        "en": "In the Bronze Age this land was Canaan — a mosaic of city-states writing to pharaohs, trading olive oil and wine, and building temples on the hills. The coast and the highlands already shared one commercial world.",
+        "ar": "في العصر البرونزي كانت هذه الأرض كنعان — فسيفساء من دول المدن تكتب إلى الفراعنة، وتتاجر بزيت الزيتون والخمر، وتبني المعابد على التلال. وكان الساحل والمرتفعات يتشاركان عالماً تجارياً واحداً."
+      },
+      "history": {
+        "en": "Middle and Late Bronze Age Canaan appears in Egyptian execration texts, the Amarna letters, and coastal and highland excavations from Megiddo and Hazor to Gaza and Lachish. Palaces, fortifications, and imported pottery show a Levantine corridor between Egypt, Cyprus, and inland Syria. Jerusalem’s earliest urban phases belong to this world of Canaanite highland towns before the Iron Age kingdoms took clearer political shape.",
+        "ar": "تظهر كنعان في العصر البرونزي الأوسط والمتأخر في النصوص المصرية ولعنات الأسماء ورسائل تل العمارنة، وفي حفريات الساحل والمرتفعات من مجدّو وحاصور إلى غزة ولخيش. القصور والتحصينات والفخار المستورد تُظهر ممرّاً شاميّاً بين مصر وقبرص وسوريا الداخلية. وتنتمي أقدم مراحل أورشليم/القدس الحضرية إلى عالم مدن المرتفعات الكنعانية قبل أن تتضح ممالك العصر الحديدي."
+      }
+    },
+    {
+      "id": "iron-age",
+      "siteId": "jerusalem",
+      "yearCE": -900,
+      "years": {
+        "en": "c. 1200–586 BCE",
+        "ar": "نحو ١٢٠٠–٥٨٦ ق.م"
+      },
+      "title": {
+        "en": "Iron Age kingdoms",
+        "ar": "ممالك العصر الحديدي"
+      },
+      "copy": {
+        "en": "Israel, Judah, Philistine cities, and neighbors carved into stone and ostraca.",
+        "ar": "إسرائيل ويهوذا ومدن فلسطية وجيران نُقشوا في الحجر والأوستراكا."
+      },
+      "narration": {
+        "en": "After the Late Bronze collapse, new kingdoms and city cultures took shape: Israel and Judah in the highlands, Philistine cities on the southern coast, and neighboring peoples whose names survive on stelae and sherds. Archaeology and texts together sketch a crowded Iron Age map.",
+        "ar": "بعد انهيار العصر البرونزي المتأخر تشكّلت ممالك وثقافات مدنية جديدة: إسرائيل ويهوذا في المرتفعات، ومدن فلسطية على الساحل الجنوبي، وشعوب مجاورة بقيت أسماؤها على الأنصاب والكِسَر. الآثار والنصوص معاً ترسم خريطة حديدية مكتظّة."
+      },
+      "history": {
+        "en": "Iron Age I–II in the southern Levant includes highland settlement growth, Philistine material culture along the coast, and kingdoms attested in Hebrew Bible traditions and in Assyrian, Moabite, and Aramean inscriptions. Sites such as Tel Dan, Samaria, Lachish, and Jerusalem’s City of David layers document administration, fortification, and destruction horizons culminating in Babylon’s campaigns of the early sixth century BCE.",
+        "ar": "يشمل العصر الحديدي الأول والثاني في جنوب بلاد الشام نموّ استيطان المرتفعات، وثقافة مادّية فلسطية على الساحل، وممالك يشهد عليها التراث التوراتي ونقوش آشورية ومؤابية وآرامية. مواقع مثل تل دان والسامرة ولخيش وطبقات مدينة داود في القدس توثّق الإدارة والتحصين وطبقات الدمار التي بلغت ذروتها في حملات بابل أوائل القرن السادس ق.م."
+      }
+    },
+    {
+      "id": "second-temple",
+      "siteId": "masada",
+      "yearCE": -37,
+      "years": {
+        "en": "c. 516 BCE – 70 CE",
+        "ar": "نحو ٥١٦ ق.م — ٧٠ م"
+      },
+      "title": {
+        "en": "Second Temple and Herodian stone",
+        "ar": "الهيكل الثاني وحجر هيرودس"
+      },
+      "copy": {
+        "en": "Temple Mount expansion, desert fortresses, and a Judaism remade after 70 CE.",
+        "ar": "توسعة الحرم، وحصون صحراوية، ويهودية أُعيد تشكيلها بعد ٧٠ م."
+      },
+      "narration": {
+        "en": "Between the Persian return and Rome’s destruction of the Temple in seventy CE, Judean life centered on Jerusalem’s sanctuary — and on fortresses like Masada that still catch the desert light.",
+        "ar": "بين العودة الفارسية ودمار الرومان للهيكل عام سبعين ميلادي، تمحورت الحياة اليهودية حول مقدّس القدس — وحول حصون مثل مسعدة ما زالت تلتقط ضوء الصحراء."
+      },
+      "history": {
+        "en": "The Second Temple period spans Persian, Hellenistic, Hasmonean, and Herodian rule. Herod the Great’s building program enlarged the Temple Mount platform and dotted the landscape with palaces and fortresses including Masada and Herodium. The Temple’s destruction in 70 CE and the Bar Kokhba revolt reshaped Jewish religious life toward rabbinic centers — a hinge that Jewish memory and Christian pilgrimage both inherit.",
+        "ar": "يمتدّ عصر الهيكل الثاني عبر الحكم الفارسي والهلنستي والحشموني والهيرودي. ووسّع برنامج هيرودس الكبير بناء منصّة الحرم ونثر القصور والحصون — ومنها مسعدة والهيروديون. ودمار الهيكل عام ٧٠ م وثورة بار كوخبا أعادا تشكيل الحياة الدينية اليهودية نحو مراكز ربّانية — مفصلاً يرثه الذاكرة اليهودية والحجّ المسيحي معاً."
+      }
+    },
+    {
+      "id": "classical",
+      "siteId": "caesarea",
+      "yearCE": 70,
+      "years": {
+        "en": "63 BCE – 638 CE",
+        "ar": "٦٣ ق.م — ٦٣٨ م"
+      },
+      "title": {
+        "en": "Classical — Roman and Byzantine",
+        "ar": "العصر الكلاسيكي — روماني وبيزنطي"
+      },
+      "copy": {
+        "en": "Herod’s harbors, Roman roads, synagogue floors, and church mosaics.",
+        "ar": "موانئ هيرودس، وطرق رومانية، وأرضيات كنس، وفسيفساء كنائس."
+      },
+      "narration": {
+        "en": "Rome annexed the coast and remade cities: Caesarea’s artificial harbor, aqueducts, theatres, and later Byzantine churches and synagogues across Galilee and Judea. Classical stone still frames pilgrimage and scholarship.",
+        "ar": "ضمّت روما الساحل وأعادت تشكيل المدن: ميناء قيسارية الصناعي، والقنوات والمسارح، ثم كنائس بيزنطية وكنس في الجليل واليهودية. وما زال الحجر الكلاسيكي يؤطّر الحجّ والعلم."
+      },
+      "history": {
+        "en": "From Pompey's settlement through Herodian client rule, Judaea and neighboring districts entered the Roman and later Byzantine provincial system. Caesarea Maritima became a provincial capital; Jerusalem was rebuilt after the First Jewish–Roman War and again as Aelia Capitolina. Byzantine centuries left churches, monasteries, and mosaic floors — including Jewish synagogue art — that make this era one of the densest archaeological layers visitors still walk.",
+        "ar": "من تسوية بومبيوس عبر حكم هيرودس التابع دخلت اليهودية والمناطق المجاورة النظام الروماني ثم البيزنطي. وصارت قيسارية عاصمة ولاية؛ وأُعيد بناء أورشليم بعد الحرب اليهودية–الرومانية الأولى ثم كإيليا كابيتولينا. وتركت القرون البيزنطية كنائس وأديرة وأرضيات فسيفساء — بما فيها فن الكنيس اليهودي — فجعلت هذه الحقبة من أكثف الطبقات التي ما زال الزائر يمشي عليها."
+      }
+    },
+    {
+      "id": "early-islamic",
+      "siteId": "jerusalem",
+      "yearCE": 691,
+      "years": {
+        "en": "638 – 1099 CE",
+        "ar": "٦٣٨ — ١٠٩٩ م"
+      },
+      "title": {
+        "en": "Early Islamic Jerusalem",
+        "ar": "القدس الإسلامية المبكرة"
+      },
+      "copy": {
+        "en": "The Dome of the Rock crowns the Haram — Umayyad craft on sacred ground.",
+        "ar": "قبّة الصخرة تتوّج الحرم — صنعة أموية على أرض مقدّسة."
+      },
+      "narration": {
+        "en": "In the seventh century Jerusalem entered the early Islamic world. The Umayyads built the Dome of the Rock and al-Aqsa on the Haram al-Sharif — architecture that still defines the city’s skyline and its shared sacred geography.",
+        "ar": "في القرن السابع دخلت القدس العالم الإسلامي المبكر. بنى الأمويون قبّة الصخرة والمسجد الأقصى على الحرم الشريف — عمارة ما زالت تحدّد أفق المدينة وجغرافيتها المقدّسة المشتركة."
+      },
+      "history": {
+        "en": "After the Muslim conquest of the 630s, Jerusalem (Bayt al-Maqdis / al-Quds) became a major Islamic sanctuary alongside Mecca and Medina. The Dome of the Rock (completed under Abd al-Malik, 691–692) and the Aqsa mosque complex express Umayyad imperial piety and craft. Christian and Jewish communities continued under dhimma arrangements; pilgrimage routes adapted to a new political order without erasing older holy places.",
+        "ar": "بعد الفتح الإسلامي في ثلاثينيات القرن السابع صارت القدس (بيت المقدس / القدس) حرماً إسلامياً كبيراً إلى جانب مكة والمدينة. وتعبّر قبّة الصخرة (أُتمّت في عهد عبد الملك، ٦٩١–٦٩٢) ومجمّع المسجد الأقصى عن تقوى الأمويين وصنعتهم. واستمرّت الجماعات المسيحية واليهودية في إطار أهل الذمة؛ وتكيّفت طرق الحجّ مع نظام سياسي جديد دون محو الأماكن المقدّسة الأقدم."
+      }
+    },
+    {
+      "id": "crusader-ayyubid",
+      "siteId": "acre",
+      "yearCE": 1187,
+      "years": {
+        "en": "1099 – 1291 CE",
+        "ar": "١٠٩٩ — ١٢٩١ م"
+      },
+      "title": {
+        "en": "Crusader and Ayyubid centuries",
+        "ar": "قرون الصليبيين والأيوبيين"
+      },
+      "copy": {
+        "en": "Latin kingdoms, Saladin’s campaigns, and Acre as a Mediterranean fortress-port.",
+        "ar": "ممالك لاتينية، وحملات صلاح الدين، وعكّا حصناً وميناء متوسطياً."
+      },
+      "narration": {
+        "en": "The Crusader period remade coasts and castles; Saladin’s Ayyubids and later Mamluks contested the same roads. Acre’s walls still hold the density of that Mediterranean struggle.",
+        "ar": "أعادت الحقبة الصليبية تشكيل السواحل والقلاع؛ ونازع الأيوبيون بقيادة صلاح الدين ثم المماليك على الدروب نفسها. وما زالت أسوار عكّا تحتفظ بكثافة ذلك الصراع المتوسطي."
+      },
+      "history": {
+        "en": "Latin Christian states established after 1099 controlled Jerusalem for decades and coastal cities longer. Salah al-Din’s victory at Hattin (1187) and the recovery of Jerusalem reshaped the map; Acre remained a Crusader capital until 1291. Frankish churches, Hospitaller halls, and Ayyubid–Mamluk rebuilds layer the same ports — evidence of rivalry and exchange rather than a single ownership story.",
+        "ar": "أقامت الدول المسيحية اللاتينية بعد ١٠٩٩ سيطرة على القدس لعقود وعلى المدن الساحلية أطول. وأعادت نصرة صلاح الدين في حطّين (١١٨٧) واستعادة القدس تشكيل الخريطة؛ وبقيت عكّا عاصمة صليبية حتى ١٢٩١. كنائس الفرنجة وقاعات الإسبتارية وإعادة البناء الأيوبية–المملوكية تتكدّس في الموانئ نفسها — أدلّة على التنافس والتبادل لا على ملكية واحدة."
+      }
+    },
+    {
+      "id": "ottoman",
+      "siteId": "jerusalem",
+      "yearCE": 1538,
+      "years": {
+        "en": "1516 – 1917 CE",
+        "ar": "١٥١٦ — ١٩١٧ م"
+      },
+      "title": {
+        "en": "Ottoman centuries",
+        "ar": "القرون العثمانية"
+      },
+      "copy": {
+        "en": "Süleyman’s walls, millet communities, and a province tied to Damascus and Istanbul.",
+        "ar": "أسوار سليمان، وطوائف الملّة، وولاية مربوطة بدمشق وإسطنبول."
+      },
+      "narration": {
+        "en": "For four centuries Ottoman rule framed daily life: city walls rebuilt under Süleyman, Muslim, Christian, and Jewish communities under millet arrangements, and roads linking Jaffa, Jerusalem, Nablus, and the Galilee to the wider empire.",
+        "ar": "أربعة قرون من الحكم العثماني أطّرت الحياة اليومية: أسوار مدينة أُعيد بناؤها في عهد سليمان، وجماعات مسلمة ومسيحية ويهودية في نظام الملّة، ودروب تربط يافا والقدس ونابلس والجليل بالإمبراطورية الأوسع."
+      },
+      "history": {
+        "en": "After 1516 the region fell under Ottoman administration, later organized in districts tied to Damascus and Beirut. Süleyman the Magnificent’s mid-sixteenth-century walls still encircle the Old City of Jerusalem. Tax registers, waqf deeds, and travel accounts document olive oil, soap, pilgrimage, and multi-communal neighborhoods — a provincial society within a vast empire, not a modern nation-state.",
+        "ar": "بعد ١٥١٦ دخلت المنطقة الإدارة العثمانية، ثم نُظّمت في أقضية مرتبطة بدمشق وبيروت. وما زالت أسوار سليمان في منتصف القرن السادس عشر تحيط بالبلدة القديمة في القدس. سجلات الضرائب ووقفيات وأدب الرحلات توثّق زيت الزيتون والصابون والحجّ وأحياء متعددة الطوائف — مجتمعاً ولائياً داخل إمبراطورية واسعة، لا دولة قومية حديثة."
+      }
+    },
+    {
+      "id": "mandate",
+      "siteId": "haifa",
+      "yearCE": 1920,
+      "years": {
+        "en": "Late Ottoman – British Mandate",
+        "ar": "أواخر العثمانية — الانتداب البريطاني"
+      },
+      "title": {
+        "en": "Rail, ports, and the Mandate",
+        "ar": "سكة وموانئ والانتداب"
+      },
+      "copy": {
+        "en": "New harbors, Hebrew and Arabic presses, and a map redrawn after World War I.",
+        "ar": "موانئ جديدة، ومطابع عبرية وعربية، وخريطة أُعيد رسمها بعد الحرب العالمية الأولى."
+      },
+      "narration": {
+        "en": "The late Ottoman decades and the British Mandate brought railways, modern ports at Haifa and Jaffa, rival national movements, and cities that grew faster than any earlier century. This atlas notes the transformation without claiming a single verdict.",
+        "ar": "جلبت العقود العثمانية المتأخرة والانتداب البريطاني سككاً حديدية وموانئ حديثة في حيفا ويافا وحركات قومية متنافسة ومدناً نمت أسرع من أي قرن سابق. يسجّل هذا الأطلس التحوّل دون أن يدّعي حكماً واحداً."
+      },
+      "history": {
+        "en": "Nineteenth-century reforms, steam shipping, and Zionist and Arab cultural revivals remade demography and print culture. After World War I the League of Nations Mandate for Palestine (1920–1948) administered the territory under British rule. Haifa’s harbor, Tel Aviv’s growth beside Jaffa, and expanding Hebrew and Arabic newspapers mark an era of infrastructure and political conflict that historians still debate with care.",
+        "ar": "أعادت إصلاحات القرن التاسع عشر والبواخر والنهضتان الصهيونية والعربية تشكيل الديموغرافيا وثقافة الطباعة. وبعد الحرب العالمية الأولى أدار انتداب عصبة الأمم على فلسطين (١٩٢٠–١٩٤٨) الإقليم تحت الحكم البريطاني. ميناء حيفا ونمو تل أبيب إلى جوار يافا وتوسّع الصحف العبرية والعربية تعلن عصر بنية تحتية وصراع سياسي ما زال المؤرخون يناقشونه بحذر."
+      }
+    },
+    {
+      "id": "mid-20th",
+      "siteId": "tel-aviv",
+      "yearCE": 1948,
+      "years": {
+        "en": "Mid-20th century",
+        "ar": "منتصف القرن العشرين"
+      },
+      "title": {
+        "en": "Mid-century upheaval",
+        "ar": "تحوّل منتصف القرن"
+      },
+      "copy": {
+        "en": "War, displacement, statehood, and communities remade across the map.",
+        "ar": "حرب وتهجير ودولة ومجتمعات أُعيد تشكيلها على الخريطة."
+      },
+      "narration": {
+        "en": "The mid-twentieth century brought war, the establishment of the State of Israel, Palestinian displacement and steadfastness, and borders that still shape daily movement. This atlas records the human geography — not a political brief.",
+        "ar": "جلب منتصف القرن العشرين حرباً وقيام دولة إسرائيل وتهجيراً فلسطينياً وصموداً، وحدوداً ما زالت تشكّل الحركة اليومية. يسجّل هذا الأطلس الجغرافيا البشرية — لا مذكّرة سياسية."
+      },
+      "history": {
+        "en": "The 1947–49 war, Israeli independence (1948), the Nakba for Palestinian society, later wars, and occupation after 1967 transformed residence, citizenship, and memory for Jews, Palestinians, and smaller communities alike. Cultural atlases can acknowledge loss, survival, and new institutions without adjudicating sovereignty. The living cultures in later cards grow from this rupture as much as from older roots.",
+        "ar": "حوّلت حرب ١٩٤٧–٤٩ واستقلال إسرائيل (١٩٤٨) والنكبة للمجتمع الفلسطيني والحروب اللاحقة والاحتلال بعد ١٩٦٧ السكن والمواطنة والذاكرة لليهود والفلسطينيين والجماعات الأصغر على حدّ سواء. تستطيع أطالس الثقافة أن تعترف بالخسارة والبقاء والمؤسسات الجديدة دون أن تحسم السيادة. والثقافات الحيّة في البطاقات اللاحقة تنبت من هذا الانقطاع بقدر ما تنبت من الجذور الأقدم."
+      }
+    },
+    {
+      "id": "contemporary",
+      "siteId": "olive-country",
+      "yearCE": 2000,
+      "years": {
+        "en": "Contemporary living cultures",
+        "ar": "ثقافات معاصرة حيّة"
+      },
+      "title": {
+        "en": "Living cultures today",
+        "ar": "ثقافات حيّة اليوم"
+      },
+      "copy": {
+        "en": "Markets, holidays, harvests, and songs that still gather people.",
+        "ar": "أسواق وأعياد ومواسم وأغانٍ ما زالت تجمع الناس."
+      },
+      "narration": {
+        "en": "Today the atlas turns to living culture: olive harvests, embroidery, holiday tables, café evenings, Arabic and Hebrew in the same streets. Shared geography does not erase difference — it asks us to look carefully at both.",
+        "ar": "اليوم يلتفت الأطلس إلى الثقافة الحيّة: مواسم الزيتون والتطريز ومائدة الأعياد وأمسيات المقاهي والعربية والعبرية في الشوارع نفسها. الجغرافيا المشتركة لا تمحو الاختلاف — بل تطلب أن ننظر إلى الاثنين بعناية."
+      },
+      "history": {
+        "en": "Contemporary life across Israel and the Palestinian territories includes Jewish Israeli culture in many languages of origin, Palestinian urban and village traditions, Christian Holy Land communities, Druze and Bedouin societies, and migrant and minority voices. Cuisine, music, crafts, and worship remain the clearest shared evidence of continuity. This era card deliberately privileges cultural description over political advocacy.",
+        "ar": "تشمل الحياة المعاصرة عبر إسرائيل والأراضي الفلسطينية الثقافة اليهودية الإسرائيلية بلغات منشأ كثيرة، والتقاليد الفلسطينية المدنية والقروية، وجماعات الأرض المقدسة المسيحية، ومجتمعات درزية وبدوية، وأصوات مهاجرين وأقليات. المطبخ والموسيقى والحِرَف والعبادة تبقى أوضح أدلّة الاستمرار المشتركة. وبطاقة هذا العصر تُؤثر عمداً الوصف الثقافي على المناصرة السياسية."
+      }
+    }
+  ],
+  "sites": [
+    {
+      "id": "jerusalem",
+      "category": "history",
+      "emoji": "🕌",
+      "lat": 31.778,
+      "lng": 35.2354,
+      "unesco": true,
+      "name": {
+        "en": "Jerusalem / Al-Quds",
+        "ar": "القدس / أورشليم"
+      },
+      "place": {
+        "en": "Judean hills",
+        "ar": "تلال اليهودية"
+      },
+      "blurb": {
+        "en": "A city sacred to Judaism, Christianity, and Islam — Old City walls, the Haram, and neighborhoods stacked for millennia.",
+        "ar": "مدينة مقدّسة لليهودية والمسيحية والإسلام — أسوار البلدة القديمة والحرم وأحياء متراكمة منذ آلاف السنين."
+      }
+    },
+    {
+      "id": "bethlehem",
+      "category": "history",
+      "emoji": "⛪",
+      "lat": 31.7054,
+      "lng": 35.2024,
+      "unesco": true,
+      "name": {
+        "en": "Bethlehem",
+        "ar": "بيت لحم"
+      },
+      "place": {
+        "en": "West Bank",
+        "ar": "الضفة الغربية"
+      },
+      "blurb": {
+        "en": "Church of the Nativity and a living Palestinian town of pilgrimage, craft, and olive hills.",
+        "ar": "كنيسة المهد وبلدة فلسطينية حيّة للحجّ والحِرفة وتلال الزيتون."
+      }
+    },
+    {
+      "id": "hebron",
+      "category": "history",
+      "emoji": "🏛️",
+      "lat": 31.5326,
+      "lng": 35.0998,
+      "unesco": true,
+      "name": {
+        "en": "Hebron / Al-Khalil",
+        "ar": "الخليل"
+      },
+      "place": {
+        "en": "southern West Bank",
+        "ar": "جنوب الضفة الغربية"
+      },
+      "blurb": {
+        "en": "Old City stone, the Tomb of the Patriarchs / Ibrahimi Mosque, and a deep shared Abrahamic memory.",
+        "ar": "حجر البلدة القديمة، والحرم الإبراهيمي / مغارة الآباء، وذاكرة إبراهيمية مشتركة عميقة."
+      }
+    },
+    {
+      "id": "nazareth",
+      "category": "history",
+      "emoji": "🔔",
+      "lat": 32.6996,
+      "lng": 35.3035,
+      "name": {
+        "en": "Nazareth",
+        "ar": "الناصرة"
+      },
+      "place": {
+        "en": "Lower Galilee",
+        "ar": "الجليل الأسفل"
+      },
+      "blurb": {
+        "en": "A Galilean city of churches, markets, and Arab Christian and Muslim neighborhoods.",
+        "ar": "مدينة جليلية بالكنائس والأسواق وأحياء عربية مسيحية ومسلمة."
+      }
+    },
+    {
+      "id": "acre",
+      "category": "history",
+      "emoji": "🏰",
+      "lat": 32.9234,
+      "lng": 35.071,
+      "unesco": true,
+      "name": {
+        "en": "Acre / Akko",
+        "ar": "عكّا"
+      },
+      "place": {
+        "en": "northern coast",
+        "ar": "الساحل الشمالي"
+      },
+      "blurb": {
+        "en": "UNESCO Crusader and Ottoman port city — khans, mosques, and a harbor that outlived empires.",
+        "ar": "مدينة ميناء صليبية وعثمانية على قائمة اليونسكو — خانات ومساجد ومرفأ عاش أطول من الإمبراطوريات."
+      }
+    },
+    {
+      "id": "haifa",
+      "category": "living",
+      "emoji": "🚢",
+      "lat": 32.794,
+      "lng": 34.9896,
+      "name": {
+        "en": "Haifa",
+        "ar": "حيفا"
+      },
+      "place": {
+        "en": "Mount Carmel coast",
+        "ar": "ساحل جبل الكرمل"
+      },
+      "blurb": {
+        "en": "Port city on Carmel’s slope — Baháʼí gardens, mixed neighborhoods, and Mediterranean industry.",
+        "ar": "مدينة ميناء على سفح الكرمل — حدائق بهائية وأحياء مختلطة وصناعة متوسطية."
+      }
+    },
+    {
+      "id": "jaffa",
+      "category": "food",
+      "emoji": "🍊",
+      "lat": 32.053,
+      "lng": 34.7519,
+      "name": {
+        "en": "Jaffa / Yafa",
+        "ar": "يافا"
+      },
+      "place": {
+        "en": "central coast",
+        "ar": "الساحل الأوسط"
+      },
+      "blurb": {
+        "en": "Ancient port, orange groves in memory, and a cuisine shared with neighboring Tel Aviv.",
+        "ar": "ميناء قديم، وبساتين برتقال في الذاكرة، ومطبخ مشترك مع تل أبيب المجاورة."
+      }
+    },
+    {
+      "id": "tel-aviv",
+      "category": "music",
+      "emoji": "🎵",
+      "lat": 32.0853,
+      "lng": 34.7818,
+      "unesco": true,
+      "name": {
+        "en": "Tel Aviv",
+        "ar": "تل أبيب"
+      },
+      "place": {
+        "en": "central coast",
+        "ar": "الساحل الأوسط"
+      },
+      "blurb": {
+        "en": "Hebrew stages, jazz clubs, and beachfront song beside historic Jaffa — a modern music city on an old coast.",
+        "ar": "مسارح عبرية ونوادي جاز وأغانٍ على الشاطئ إلى جوار يافا التاريخية — مدينة موسيقى حديثة على ساحل قديم."
+      }
+    },
+    {
+      "id": "jericho",
+      "category": "history",
+      "emoji": "🌴",
+      "lat": 31.8667,
+      "lng": 35.45,
+      "name": {
+        "en": "Jericho",
+        "ar": "أريحا"
+      },
+      "place": {
+        "en": "Jordan Valley",
+        "ar": "غور الأردن"
+      },
+      "blurb": {
+        "en": "Older oasis city of the rift — tell layers, winter warmth, and date palms.",
+        "ar": "مدينة واحة قديمة في الأخدود — طبقات تلّ، ودِفء شتاء، ونخيل تمر."
+      }
+    },
+    {
+      "id": "masada",
+      "category": "history",
+      "emoji": "🏜️",
+      "lat": 31.3156,
+      "lng": 35.3533,
+      "unesco": true,
+      "name": {
+        "en": "Masada",
+        "ar": "مسعدة"
+      },
+      "place": {
+        "en": "Judean Desert",
+        "ar": "صحراء اليهودية"
+      },
+      "blurb": {
+        "en": "Herodian fortress plateau above the Dead Sea — UNESCO site of archaeology and Jewish memory.",
+        "ar": "هضبة حصن هيرودي فوق البحر الميت — موقع يونسكو للآثار والذاكرة اليهودية."
+      }
+    },
+    {
+      "id": "caesarea",
+      "category": "history",
+      "emoji": "🏟️",
+      "lat": 32.5018,
+      "lng": 34.8945,
+      "name": {
+        "en": "Caesarea",
+        "ar": "قيسارية"
+      },
+      "place": {
+        "en": "coastal plain",
+        "ar": "السهل الساحلي"
+      },
+      "blurb": {
+        "en": "Herod’s harbor city — Roman theatre, hippodrome, and underwater archaeology.",
+        "ar": "مدينة ميناء هيرودس — مسرح روماني ومضمار وآثار تحت الماء."
+      }
+    },
+    {
+      "id": "dead-sea",
+      "category": "history",
+      "emoji": "🌊",
+      "lat": 31.5,
+      "lng": 35.5,
+      "name": {
+        "en": "Dead Sea",
+        "ar": "البحر الميت"
+      },
+      "place": {
+        "en": "Jordan Rift Valley",
+        "ar": "أخدود الأردن"
+      },
+      "blurb": {
+        "en": "Lowest land surface on Earth — salt, mineral shores, and desert monasteries nearby.",
+        "ar": "أخفض يابسة على الأرض — ملح وشواطئ معدنية وأديرة صحراوية قريبة."
+      }
+    },
+    {
+      "id": "sea-of-galilee",
+      "category": "history",
+      "emoji": "🐟",
+      "lat": 32.824,
+      "lng": 35.58,
+      "name": {
+        "en": "Sea of Galilee / Kinneret",
+        "ar": "بحيرة طبريا / كنّرت"
+      },
+      "place": {
+        "en": "eastern Galilee",
+        "ar": "الجليل الشرقي"
+      },
+      "blurb": {
+        "en": "Freshwater lake of fisheries, Gospel geography, and kibbutz and Arab shore towns.",
+        "ar": "بحيرة عذبة للصيد وجغرافيا الأناجيل ومدن شاطئية كيبوتسية وعربية."
+      }
+    },
+    {
+      "id": "nablus",
+      "category": "food",
+      "emoji": "🧀",
+      "lat": 32.2211,
+      "lng": 35.2544,
+      "name": {
+        "en": "Nablus",
+        "ar": "نابلس"
+      },
+      "place": {
+        "en": "northern West Bank",
+        "ar": "شمال الضفة الغربية"
+      },
+      "blurb": {
+        "en": "Old City soap and knafeh capital — market alleys between Mount Gerizim and Ebal.",
+        "ar": "عاصمة الصابون والكنافة في البلدة القديمة — أزقّة سوق بين جبلَي جرزيم وعيبال."
+      }
+    },
+    {
+      "id": "ramallah",
+      "category": "living",
+      "emoji": "🎭",
+      "lat": 31.9038,
+      "lng": 35.2034,
+      "name": {
+        "en": "Ramallah",
+        "ar": "رام الله"
+      },
+      "place": {
+        "en": "central West Bank",
+        "ar": "وسط الضفة الغربية"
+      },
+      "blurb": {
+        "en": "Cultural and civic hub — galleries, cafés, and contemporary Palestinian stages.",
+        "ar": "مركز ثقافي ومدني — معارض ومقاهٍ ومسارح فلسطينية معاصرة."
+      }
+    },
+    {
+      "id": "beersheba",
+      "category": "living",
+      "emoji": "🏕️",
+      "lat": 31.2518,
+      "lng": 34.7915,
+      "name": {
+        "en": "Beersheba / Beer Sheva",
+        "ar": "بئر السبع"
+      },
+      "place": {
+        "en": "northern Negev",
+        "ar": "شمال النقب"
+      },
+      "blurb": {
+        "en": "Gateway to the Negev — Ottoman town plan, Bedouin hinterland, and a growing desert city.",
+        "ar": "بوابة النقب — تخطيط عثماني، وريف بدوي، ومدينة صحراوية تنمو."
+      }
+    },
+    {
+      "id": "olive-country",
+      "category": "living",
+      "emoji": "🫒",
+      "lat": 32.15,
+      "lng": 35.25,
+      "name": {
+        "en": "West Bank olive country",
+        "ar": "بلاد الزيتون في الضفة"
+      },
+      "place": {
+        "en": "hill villages, West Bank",
+        "ar": "قرى التلال، الضفة الغربية"
+      },
+      "blurb": {
+        "en": "Terraced groves, autumn harvest, and oil that seasons the shared Levantine table.",
+        "ar": "بساتين مدرّجة وموسم خريف وزيت يُتبّل المائدة الشامية المشتركة."
+      }
+    }
+  ],
+  "foods": [
+    {
+      "id": "hummus",
+      "emoji": "🥣",
+      "siteId": "jaffa",
+      "name": {
+        "en": "Hummus",
+        "ar": "الحمّص"
+      },
+      "tagline": {
+        "en": "Chickpeas, tahini, and a plate argued over lovingly",
+        "ar": "حمّص وطحينة وصحن يُتنازع عليه بحبّ"
+      },
+      "history": {
+        "en": "Cooked chickpeas whipped with tahini, lemon, and garlic appear across the Levant. In this land hummus is breakfast, lunch, and identity talk — Palestinian village kitchens and Israeli city counters share the bowl even when they disagree about who perfected it. Olive oil and paprika finish a plate meant to be scooped, not plated alone.",
+        "ar": "يظهر الحمّص المطبوخ المخفوق بالطحينة والليمون والثوم في بلاد الشام كلها. وهنا هو فطور وغداء وحديث هوية — مطابخ القرى الفلسطينية وعدّادات المدن الإسرائيلية تتشارك الصحن حتى حين تختلف على من أتقنه. زيت الزيتون والفلفل يُكملان طبقاً يُغرف لا يُقدَّم وحيداً."
+      },
+      "tags": {
+        "en": [
+          "chickpeas",
+          "tahini",
+          "Levantine"
+        ],
+        "ar": [
+          "حمّص",
+          "طحينة",
+          "شامي"
+        ]
+      }
+    },
+    {
+      "id": "falafel",
+      "emoji": "🧆",
+      "siteId": "ramallah",
+      "name": {
+        "en": "Falafel",
+        "ar": "الفلافل"
+      },
+      "tagline": {
+        "en": "Fried chickpea balls in pita — street food of the region",
+        "ar": "كرات حمّص مقلية في خبز — طعام شارع المنطقة"
+      },
+      "history": {
+        "en": "Ground chickpeas or fava, herbs, and spice, fried crisp and stuffed into bread with salad and tahini. Falafel stands mark Palestinian towns and Israeli cities alike. The recipe travels the eastern Mediterranean; local pride rests in the spice mix and the freshness of the fry.",
+        "ar": "حمّص أو فول مطحون وأعشاب وتوابل، يُقلى مقرمشاً ويُحشى في الخبز مع السلطة والطحينة. أكشاك الفلافل تعلّم البلدات الفلسطينية والمدن الإسرائيلية على حدّ سواء. والوصفة تسافر شرق المتوسط؛ والفخر المحلي في خلطة التوابل وطزاجة القلي."
+      },
+      "tags": {
+        "en": [
+          "street food",
+          "pita",
+          "chickpea"
+        ],
+        "ar": [
+          "طعام شارع",
+          "خبز",
+          "حمّص"
+        ]
+      }
+    },
+    {
+      "id": "msakhan",
+      "emoji": "🍗",
+      "siteId": "olive-country",
+      "name": {
+        "en": "Msakhan",
+        "ar": "المسخّن"
+      },
+      "tagline": {
+        "en": "Sumac chicken on taboon bread — a Palestinian feast plate",
+        "ar": "دجاج بسماق على خبز الطابون — وليمة فلسطينية"
+      },
+      "history": {
+        "en": "Chicken baked with mountains of caramelized onion and tart sumac, laid over taboon flatbread soaked in olive oil. Msakhan is a harvest and hospitality dish of the highland villages — olive oil country on a single tray.",
+        "ar": "دجاج يُخبز مع جبال من البصل المكرمل والسماق الحامض، ويُفرش على خبز طابون منقوع بزيت الزيتون. المسخّن طبق موسم وضيافة في قرى المرتفعات — بلاد الزيت على صينية واحدة."
+      },
+      "tags": {
+        "en": [
+          "sumac",
+          "olive oil",
+          "taboon"
+        ],
+        "ar": [
+          "سماق",
+          "زيت زيتون",
+          "طابون"
+        ]
+      }
+    },
+    {
+      "id": "shakshuka",
+      "emoji": "🍳",
+      "siteId": "tel-aviv",
+      "name": {
+        "en": "Shakshuka",
+        "ar": "الشكشوكة"
+      },
+      "tagline": {
+        "en": "Eggs in pepper-tomato sauce — Maghrebi roots, local mornings",
+        "ar": "بيض في صلصة بندورة وفلفل — جذور مغاربية وصباحات محلية"
+      },
+      "history": {
+        "en": "Eggs poached in a spiced tomato and pepper sauce, often credited to North African Jewish kitchens and now a weekend staple in Israeli cafés and many Levantine homes. It shows how migration remade the breakfast table without erasing older mezze habits.",
+        "ar": "بيض يُسلق في صلصة بندورة وفلفل متبّلة، يُنسب غالباً إلى مطابخ يهود شمال أفريقيا وصار أساسي عطلة في مقاهي إسرائيل وكثير من بيوت الشام. يُظهر كيف أعادت الهجرة تشكيل مائدة الفطور دون محو عادات المازة الأقدم."
+      },
+      "tags": {
+        "en": [
+          "eggs",
+          "brunch",
+          "migration"
+        ],
+        "ar": [
+          "بيض",
+          "فطور",
+          "هجرة"
+        ]
+      }
+    },
+    {
+      "id": "knafeh",
+      "emoji": "🍮",
+      "siteId": "nablus",
+      "name": {
+        "en": "Knafeh Nabulsiyeh",
+        "ar": "الكنافة النابلسية"
+      },
+      "tagline": {
+        "en": "Nablus cheese under crisp pastry and syrup",
+        "ar": "جبن نابلس تحت عجينة مقرمشة وقطر"
+      },
+      "history": {
+        "en": "Shredded or fine pastry over soft Nabulsi cheese, baked gold, flipped, and drowned in scented syrup. Nablus claims the benchmark; trays travel to Amman, Beirut, and diaspora bakeries. Sweetness here is civic pride as much as dessert.",
+        "ar": "عجينة رفيعة فوق جبن نابلسي طري، تُخبز ذهبية وتُقلب وتُغرق بقطر معطّر. نابلس تدّعي المعيار؛ والصواني تسافر إلى عمّان وبيروت ومخابز المهجر. الحلاوة هنا فخر مدني بقدر ما هي حلوى."
+      },
+      "tags": {
+        "en": [
+          "Nablus",
+          "cheese",
+          "syrup"
+        ],
+        "ar": [
+          "نابلس",
+          "جبن",
+          "قطر"
+        ]
+      }
+    },
+    {
+      "id": "sabich",
+      "emoji": "🍆",
+      "siteId": "tel-aviv",
+      "name": {
+        "en": "Sabich",
+        "ar": "الصبيح"
+      },
+      "tagline": {
+        "en": "Eggplant, egg, and amba in pita — Iraqi Jewish street classic",
+        "ar": "باذنجان وبيض وعمبة في خبز — كلاسيكية يهود العراق في الشارع"
+      },
+      "history": {
+        "en": "Fried eggplant, hard-boiled egg, salad, tahini, and tangy mango amba stuffed into pita. Brought by Iraqi Jewish immigrants and popularized in Israeli street food, sabich is a diaspora dish that became local — another layer on the shared bread counter.",
+        "ar": "باذنجان مقلي وبيض مسلوق وسلطة وطحينة وعمبة المانجو الحامضة في خبز. جاء مع يهود العراق واشتهر في طعام الشارع الإسرائيلي، فصار طبق شتات محلياً — طبقة أخرى على عدّاد الخبز المشترك."
+      },
+      "tags": {
+        "en": [
+          "eggplant",
+          "amba",
+          "Iraqi Jewish"
+        ],
+        "ar": [
+          "باذنجان",
+          "عمبة",
+          "يهود العراق"
+        ]
+      }
+    },
+    {
+      "id": "zaatar-manaeesh",
+      "emoji": "🫓",
+      "siteId": "olive-country",
+      "name": {
+        "en": "Zaʿatar manaqish",
+        "ar": "مناقيش الزعتر"
+      },
+      "tagline": {
+        "en": "Flatbread, wild thyme mix, and olive oil",
+        "ar": "خبز مسطّح وخلطة زعتر وزيت زيتون"
+      },
+      "history": {
+        "en": "Dough pressed with zaʿatar — thyme, sumac, sesame — and olive oil, baked in a saj or oven. A Palestinian and wider Levantine morning staple, sold from bakeries before work and packed for school. The herb mix tastes of hillside foraging as much as spice shops.",
+        "ar": "عجينة تُضغط بالزعتر — زعتر وسماق وسمسم — وزيت الزيتون، وتُخبز على الصاج أو في الفرن. أساسي صباحي فلسطيني وشامي أوسع، يُباع من المخابز قبل العمل ويُحضَّر للمدرسة. وخلطة العشب بطعم القطاف الجبلي بقدر دكاكين العطارة."
+      },
+      "tags": {
+        "en": [
+          "zaʿatar",
+          "bakery",
+          "breakfast"
+        ],
+        "ar": [
+          "زعتر",
+          "مخبز",
+          "فطور"
+        ]
+      }
+    },
+    {
+      "id": "labneh",
+      "emoji": "🥛",
+      "siteId": "nazareth",
+      "name": {
+        "en": "Labneh",
+        "ar": "اللبنة"
+      },
+      "tagline": {
+        "en": "Strained yogurt, oil pool, and zaʿatar on top",
+        "ar": "لبن مصفى وبركة زيت وزعتر فوقه"
+      },
+      "history": {
+        "en": "Yogurt strained until thick, served with olive oil and herbs or rolled into oil-cured balls. Labneh is pantry cheese for highland and coastal tables — breakfast with bread, or mezze beside olives and pickles.",
+        "ar": "لبن يُصفّى حتى يثخّن، ويُقدَّم بزيت الزيتون والأعشاب أو يُكرَّر كرات منقوعة بالزيت. اللبنة جبن مؤونة لمائدة المرتفعات والساحل — فطور مع الخبز، أو مازة إلى جوار الزيتون والمخلّلات."
+      },
+      "tags": {
+        "en": [
+          "yogurt",
+          "mezze",
+          "olive oil"
+        ],
+        "ar": [
+          "لبن",
+          "مازة",
+          "زيت زيتون"
+        ]
+      }
+    },
+    {
+      "id": "maqluba",
+      "emoji": "🍆",
+      "siteId": "jerusalem",
+      "name": {
+        "en": "Maqluba",
+        "ar": "المقلوبة"
+      },
+      "tagline": {
+        "en": "Upside-down rice, meat, and fried vegetables",
+        "ar": "أرز ولحم وخضار مقلية — وتُقلب على المائدة"
+      },
+      "history": {
+        "en": "Layered rice, meat, and fried aubergine or cauliflower inverted onto a tray at the table. A Levantine celebration dish with medieval Arabic cookbook cousins, beloved in Palestinian homes and familiar across neighboring kitchens.",
+        "ar": "أرز ولحم وباذنجان أو قرنبيط مقلي يُرصف طبقات ويُقلب على صينية أمام الضيوف. طبق احتفال شامي له أقارب في كتب الطبخ العربية الوسيطة، محبوب في البيوت الفلسطينية ومألوف في المطابخ المجاورة."
+      },
+      "tags": {
+        "en": [
+          "one pot",
+          "celebration",
+          "Levantine"
+        ],
+        "ar": [
+          "قدر واحد",
+          "احتفال",
+          "شامي"
+        ]
+      }
+    },
+    {
+      "id": "couscous-mfrum",
+      "emoji": "🍲",
+      "siteId": "haifa",
+      "name": {
+        "en": "North African Jewish tables",
+        "ar": "مائدة يهود شمال أفريقيا"
+      },
+      "tagline": {
+        "en": "Couscous, mfrum, and Friday spice from Maghrebi homes",
+        "ar": "كسكس ومفروم وتوابل جمعة من بيوت مغاربية"
+      },
+      "history": {
+        "en": "Jewish communities from Morocco, Tunisia, and Libya brought couscous Fridays, stuffed vegetable mfrum, and harissa heat into Israeli kitchens. Their dishes sit beside Levantine mezze as part of one crowded national table — migration cuisine with deep roots.",
+        "ar": "جلبت الجماعات اليهودية من المغرب وتونس وليبيا كسكس الجمعة والمفروم المحشي وحرارة الهريسة إلى المطابخ الإسرائيلية. أطباقها تجلس إلى جوار المازة الشامية على مائدة وطنية مكتظّة — مطبخ هجرة بجذور عميقة."
+      },
+      "tags": {
+        "en": [
+          "couscous",
+          "Maghrebi",
+          "Friday"
+        ],
+        "ar": [
+          "كسكس",
+          "مغاربي",
+          "جمعة"
+        ]
+      }
+    }
+  ],
+  "music": [
+    {
+      "id": "dabke",
+      "emoji": "💃",
+      "siteId": "ramallah",
+      "name": {
+        "en": "Dabke",
+        "ar": "الدبكة"
+      },
+      "tagline": {
+        "en": "Shoulder-to-shoulder line dance of Levantine weddings",
+        "ar": "رقصة صفّ كتف بكتف في أعراس الشام"
+      },
+      "history": {
+        "en": "Dancers link in a line, stamping while a leader improvises at the head. Dabke is central to Palestinian and wider Levantine weddings; related steps appear across Jordan, Lebanon, and Syria. The mijwiz and tableh often drive the beat.",
+        "ar": "يتشابك الراقصون في صفّ ويدقّون بينما يرتجل القائد في المقدمة. الدبكة محور أعراس فلسطينية وشامية أوسع؛ وخطوات قريبة تظهر في الأردن ولبنان وسوريا. وغالباً ما يقود الإيقاع المجوز والطبلة."
+      },
+      "tags": {
+        "en": [
+          "wedding",
+          "line dance",
+          "Levant"
+        ],
+        "ar": [
+          "عرس",
+          "رقصة صفّ",
+          "شام"
+        ]
+      }
+    },
+    {
+      "id": "oud-maqam",
+      "emoji": "🎸",
+      "siteId": "jerusalem",
+      "name": {
+        "en": "Oud and maqam",
+        "ar": "العود والمقام"
+      },
+      "tagline": {
+        "en": "The fretless lute that carries Arabic classical song",
+        "ar": "العود بلا دساتين يحمل الغناء العربي الكلاسيكي"
+      },
+      "history": {
+        "en": "The oud anchors tarab and classical Arabic repertoire across the Levant. Jerusalem, Nazareth, and coastal cities kept teachers and radio voices; Palestinian and Arab Israeli musicians still argue lovingly over maqam and ornament.",
+        "ar": "العود يرتكز عليه الطرب والذخيرة العربية الكلاسيكية في بلاد الشام. حفظت القدس والناصرة ومدن الساحل المعلّمين وأصوات الإذاعة؛ وما زال الموسيقيون الفلسطينيون والعرب الإسرائيليون يتناقشون بحبّ عن المقام والزخرفة."
+      },
+      "tags": {
+        "en": [
+          "oud",
+          "maqam",
+          "tarab"
+        ],
+        "ar": [
+          "عود",
+          "مقام",
+          "طرب"
+        ]
+      }
+    },
+    {
+      "id": "piyut",
+      "emoji": "🕊️",
+      "siteId": "jerusalem",
+      "name": {
+        "en": "Piyut and synagogue song",
+        "ar": "البيوط وغناء الكنيس"
+      },
+      "tagline": {
+        "en": "Liturgical poetry sung across Jewish communities",
+        "ar": "شعر طقسي يُغنّى عبر الجماعات اليهودية"
+      },
+      "history": {
+        "en": "Piyutim are Hebrew (and sometimes Aramaic) liturgical poems set to melody — Sephardi, Mizrahi, Ashkenazi, and Yemenite traditions each keeping distinct modes. In Jerusalem and elsewhere, synagogue and home singing carry festival and Sabbath memory as living music, not museum sound.",
+        "ar": "البيوطيم قصائد طقسية عبرية (وأحياناً آرامية) تُلحَّن — وكلّ من التقاليد السفاردية والمزراحيم والأشكناز واليمنية يحفظ مقاماته. في القدس وغيرها يحمل غناء الكنيس والبيت ذاكرة الأعياد والسبت كموسيقى حيّة لا صوت متحف."
+      },
+      "tags": {
+        "en": [
+          "liturgy",
+          "Hebrew",
+          "Sabbath"
+        ],
+        "ar": [
+          "طقس",
+          "عبرية",
+          "سبت"
+        ]
+      }
+    },
+    {
+      "id": "zajal",
+      "emoji": "🎤",
+      "siteId": "bethlehem",
+      "name": {
+        "en": "Wedding zajal",
+        "ar": "زجل الأعراس"
+      },
+      "tagline": {
+        "en": "Improvised verse traded between poets at the feast",
+        "ar": "شعر مرتجل يتبادله الشعراء في الوليمة"
+      },
+      "history": {
+        "en": "Zajal and related sung poetry turn weddings into contests of wit — praise of the families, teasing, and blessing in colloquial Arabic. Microphone or not, the form keeps oral skill at the center of celebration.",
+        "ar": "الزجل وما قاربه من الشعر المغنّى يحوّلان العرس إلى مباراة ذكاء — مديح للعائلات ومداعبة وبركة بعربية دارجة. بميكروفون أو بدونه، يبقى الشكل يحفظ المهارة الشفهية في قلب الاحتفال."
+      },
+      "tags": {
+        "en": [
+          "oral poetry",
+          "wedding",
+          "colloquial"
+        ],
+        "ar": [
+          "شعر شفهي",
+          "عرس",
+          "دارجة"
+        ]
+      }
+    },
+    {
+      "id": "classical-arabic",
+      "emoji": "🎵",
+      "siteId": "haifa",
+      "name": {
+        "en": "Classical Arabic song",
+        "ar": "الغناء العربي الأصيل"
+      },
+      "tagline": {
+        "en": "Umm Kulthum’s century on radios from Jaffa to Nazareth",
+        "ar": "قرن أم كلثوم على المذياع من يافا إلى الناصرة"
+      },
+      "history": {
+        "en": "Twentieth-century Arabic song — Cairo stages, Levantine listeners — filled cafés and taxis here as elsewhere. Local singers adapted Egyptian and Syrian repertoire while composing in Palestinian dialect; the radio was a shared school of maqam.",
+        "ar": "غناء القرن العشرين العربي — مسارح القاهرة ومستمعو الشام — ملأ المقاهي والسيارات هنا كما في غيرها. تكيّف المغنّون المحليون مع الذخيرة المصرية والسورية وألّفوا باللهجة الفلسطينية؛ وكان المذياع مدرسة مقام مشتركة."
+      },
+      "tags": {
+        "en": [
+          "radio",
+          "tarab",
+          "20th century"
+        ],
+        "ar": [
+          "إذاعة",
+          "طرب",
+          "القرن العشرين"
+        ]
+      }
+    },
+    {
+      "id": "israeli-folk",
+      "emoji": "🎶",
+      "siteId": "sea-of-galilee",
+      "name": {
+        "en": "Israeli folk and song traditions",
+        "ar": "تقاليد الأغنية الشعبية الإسرائيلية"
+      },
+      "tagline": {
+        "en": "Hebrew song circles, hora steps, and many diasporas",
+        "ar": "حلقات أغنية عبرية وخطوات الهورا وشتات كثير"
+      },
+      "history": {
+        "en": "Israeli folk song (shirei Eretz Yisrael and later pop-folk) gathered melodies from Europe, Yemen, North Africa, and local landscapes into Hebrew communal singing and dance. It is one living Jewish musical culture among others — not a claim over Arab song, but a neighboring tradition on the same map.",
+        "ar": "جمعت الأغنية الشعبية الإسرائيلية (شيري إيرتس يسرائيل ثم البوب الشعبي) ألحاناً من أوروبا واليمن وشمال أفريقيا والمناظر المحلية في غناء جماعي عبري ورقص. إنها ثقافة موسيقية يهودية حيّة بين أخريات — لا ادّعاء على الغناء العربي، بل تقليد مجاور على الخريطة نفسها."
+      },
+      "tags": {
+        "en": [
+          "Hebrew song",
+          "hora",
+          "diaspora roots"
+        ],
+        "ar": [
+          "أغنية عبرية",
+          "هورا",
+          "جذور شتات"
+        ]
+      }
+    },
+    {
+      "id": "andalusi-mizrahi",
+      "emoji": "✨",
+      "siteId": "jaffa",
+      "name": {
+        "en": "Mizrahi and Andalusi echoes",
+        "ar": "أصداء مزراحيم وأندلسية"
+      },
+      "tagline": {
+        "en": "Maqam memory from Iraq, Yemen, and the Maghreb",
+        "ar": "ذاكرة مقام من العراق واليمن والمغرب"
+      },
+      "history": {
+        "en": "Jewish musicians from Arabic-speaking lands kept maqam, piyut, and popular song that converse with Arab neighbors’ ears. In Jaffa, Haifa, and elsewhere, those repertoires remain part of the region’s soundscape — bridges of scale and ornament across community lines.",
+        "ar": "حفظ موسيقيون يهود من بلدان ناطقة بالعربية المقامات والبيوط والأغنية الشعبية التي تحاور آذان الجيران العرب. في يافا وحيفا وغيرهما تبقى تلك الذخائر جزءاً من المشهد الصوتي — جسور سلم وزخرفة عبر خطوط الجماعات."
+      },
+      "tags": {
+        "en": [
+          "Mizrahi",
+          "maqam",
+          "shared ear"
+        ],
+        "ar": [
+          "مزراحيم",
+          "مقام",
+          "أذن مشتركة"
+        ]
+      }
+    }
+  ],
+  "hookah": [
+    {
+      "id": "nargila-cafe",
+      "emoji": "🫖",
+      "siteId": "acre",
+      "name": {
+        "en": "Nargila in the courtyard café",
+        "ar": "نرجيلة في مقهى الفناء"
+      },
+      "tagline": {
+        "en": "A Levant ritual of coals, water, and lingering talk",
+        "ar": "طقس شامي من فحم وماء وحديث طويل"
+      },
+      "history": {
+        "en": "The water pipe — nargila, argileh, hookah — settled into Ottoman Levant café life centuries ago. In Acre’s khans, Jerusalem’s alleys, and coastal terraces, friends share a hose over tea and cards. It is social furniture across Arab towns and familiar in mixed cities too.",
+        "ar": "استقرّت النرجيلة — أو الأرجيلة — في مقاهي بلاد الشام العثمانية قبل قرون. في خانات عكّا وأزقّة القدس وشرفات الساحل يتشارك الأصحاب الخرطوم فوق الشاي والورق. هي أثاث اجتماعي في البلدات العربية ومألوفة في المدن المختلطة أيضاً."
+      },
+      "tags": {
+        "en": [
+          "café",
+          "Levant",
+          "shared hose"
+        ],
+        "ar": [
+          "مقهى",
+          "شام",
+          "خرطوم مشترك"
+        ]
+      }
+    },
+    {
+      "id": "tufahtayn",
+      "emoji": "🍎",
+      "siteId": "ramallah",
+      "name": {
+        "en": "Apple blend (tufahtayn)",
+        "ar": "نكهة التفاح (تفاحتين)"
+      },
+      "tagline": {
+        "en": "The default sweet molasses tobacco of the region",
+        "ar": "المعسّل الحلو الافتراضي في المنطقة"
+      },
+      "history": {
+        "en": "Two-apple — tufahtayn — is the café classic from Beirut to Ramallah to Haifa side streets: green-apple molasses tobacco that smells like candy. Mint and grape chase it; apple still opens half the first-time tables.",
+        "ar": "«تفاحتين» كلاسيكية المقهى من بيروت إلى رام الله إلى أزقّة حيفا: معسّل تفاح أخضر يفوح كالحلوى. يأتي بعدها النعناع والعنب؛ والتفاح ما زال يفتح نصف الطاولات لأول مرة."
+      },
+      "tags": {
+        "en": [
+          "tufahtayn",
+          "molasses",
+          "café order"
+        ],
+        "ar": [
+          "تفاحتين",
+          "معسّل",
+          "طلب مقهى"
+        ]
+      }
+    },
+    {
+      "id": "pipe-parts",
+      "emoji": "🏺",
+      "siteId": "jaffa",
+      "name": {
+        "en": "Glass base and clay head",
+        "ar": "قاعدة زجاج ورأس فخار"
+      },
+      "tagline": {
+        "en": "How the pipe is built for a shared table",
+        "ar": "كيف تُبنى النرجيلة لطاولة مشتركة"
+      },
+      "history": {
+        "en": "A water-filled glass or metal vase, clay head, foil, charcoal, and one or more hoses. Waiters refresh coals; disposable tips appear in newer cafés. The engineering is simple; the etiquette is the culture.",
+        "ar": "مزهرية زجاج أو معدن فيها ماء، ورأس فخار، وورق، وفحم، وخرطوم أو أكثر. يجدّد النادل الفحم؛ وتظهر قطع الفم للاستخدام مرة في المقاهي الأحدث. الهندسة بسيطة؛ والأصول هي الثقافة."
+      },
+      "tags": {
+        "en": [
+          "glass vase",
+          "clay head",
+          "coals"
+        ],
+        "ar": [
+          "مزهرية زجاج",
+          "رأس فخار",
+          "فحم"
+        ]
+      }
+    },
+    {
+      "id": "slow-evening",
+      "emoji": "🤝",
+      "siteId": "haifa",
+      "name": {
+        "en": "The slow evening",
+        "ar": "الأمسية البطيئة"
+      },
+      "tagline": {
+        "en": "Pass the hose, mind the coals, stay for the story",
+        "ar": "مرّر الخرطوم، راعِ الفحم، وابقَ للحكاية"
+      },
+      "history": {
+        "en": "Nargila etiquette is soft hospitality: do not blow into the hose, pass a clean tip, let the session last. Across the Levant the pipe paces conversation — the opposite of a rushed cigarette break.",
+        "ar": "أصول النرجيلة ضيافة هادئة: لا تنفخ في الخرطوم، ومرّر طرفاً نظيفاً، ودع الجلسة تطول. عبر بلاد الشام تضبط النرجيلة إيقاع الحديث — عكس استراحة سيجارة مستعجلة."
+      },
+      "tags": {
+        "en": [
+          "etiquette",
+          "hospitality",
+          "evening"
+        ],
+        "ar": [
+          "أصول",
+          "ضيافة",
+          "أمسية"
+        ]
+      }
+    }
+  ],
+  "living": [
+    {
+      "id": "olive-harvest",
+      "emoji": "🫒",
+      "siteId": "olive-country",
+      "name": {
+        "en": "Olive harvest",
+        "ar": "موسم الزيتون"
+      },
+      "tagline": {
+        "en": "Autumn nets under trees older than borders",
+        "ar": "شِباك خريف تحت أشجار أقدم من الحدود"
+      },
+      "history": {
+        "en": "Families spread nets, climb ladders, and press oil in cooperatives and stone presses. The olive harvest binds Palestinian highland villages especially, and olive oil seasons Jewish and Arab tables alike. Trees and terraces are cultural landscape as much as crop.",
+        "ar": "تبسط العائلات الشِباك وتصعد السلالم وتعصر الزيت في التعاونيات والمعاصر الحجرية. يربط موسم الزيتون قرى المرتفعات الفلسطينية خاصة، ويُتبّل زيت الزيتون موائد اليهود والعرب على حدّ سواء. الأشجار والمدرجات مشهد ثقافي بقدر ما هي محصول."
+      },
+      "tags": {
+        "en": [
+          "harvest",
+          "oil",
+          "terraces"
+        ],
+        "ar": [
+          "موسم",
+          "زيت",
+          "مدرجات"
+        ]
+      }
+    },
+    {
+      "id": "shared-markets",
+      "emoji": "🛒",
+      "siteId": "jerusalem",
+      "name": {
+        "en": "Shared markets",
+        "ar": "الأسواق المشتركة"
+      },
+      "tagline": {
+        "en": "Spice, bread, and bargaining in mixed city souks",
+        "ar": "توابل وخبز ومساومة في أسواق المدن المختلطة"
+      },
+      "history": {
+        "en": "From Jerusalem’s Old City alleys to Haifa’s Wadi Nisnas and Jaffa’s flea market, commerce still mixes languages and communities. Markets are where cultural atlases become audible — prices, greetings, and recipes shouted across stalls.",
+        "ar": "من أزقّة البلدة القديمة في القدس إلى وادي النسناس في حيفا وسوق يافا، ما زالت التجارة تخلط اللغات والجماعات. الأسواق حيث يصير الأطلس الثقافي مسموعاً — أسعار وتحيات ووصفات تُنادى بين الأكشاك."
+      },
+      "tags": {
+        "en": [
+          "souk",
+          "languages",
+          "daily life"
+        ],
+        "ar": [
+          "سوق",
+          "لغات",
+          "حياة يومية"
+        ]
+      }
+    },
+    {
+      "id": "living-languages",
+      "emoji": "🗣️",
+      "siteId": "haifa",
+      "name": {
+        "en": "Arabic and Hebrew living",
+        "ar": "العربية والعبرية الحيّتان"
+      },
+      "tagline": {
+        "en": "Two official languages, many accents on one map",
+        "ar": "لغتان رسميتان ولهجات كثيرة على خريطة واحدة"
+      },
+      "history": {
+        "en": "Modern Hebrew revived as a vernacular; Levantine Arabic remains the mother tongue of Palestinian communities and many mixed towns. Street signs, radio, and schoolyards carry both — plus English, Russian, Amharic, and more. Language here is daily evidence of plurality.",
+        "ar": "انبعثت العبرية الحديثة لغة يومية؛ وبقيت العربية الشامية لغة أمّ للجماعات الفلسطينية وكثير من البلدات المختلطة. اللافتات والمذياع وساحات المدارس تحمل الاثنتين — فضلاً عن الإنجليزية والروسية والأمهرية وغيرها. اللغة هنا دليل يومي على التعدّد."
+      },
+      "tags": {
+        "en": [
+          "Hebrew",
+          "Arabic",
+          "plurality"
+        ],
+        "ar": [
+          "عبرية",
+          "عربية",
+          "تعدّد"
+        ]
+      }
+    },
+    {
+      "id": "bedouin-negev",
+      "emoji": "⛺",
+      "siteId": "beersheba",
+      "name": {
+        "en": "Bedouin Negev",
+        "ar": "بدو النقب"
+      },
+      "tagline": {
+        "en": "Desert hospitality, herds, and towns of the south",
+        "ar": "ضيافة صحراء وقطعان ومدن الجنوب"
+      },
+      "history": {
+        "en": "Naqab/Negev Bedouin societies keep coffee codes, oral genealogy, and herding knowledge even as many live in recognized or unrecognized towns around Beersheba. Their culture is Arab and local to the desert — part of the land’s living map, not a costume for tourists alone.",
+        "ar": "تحفظ مجتمعات بدو النقب/النقب أصول القهوة والنسب الشفهي ومعرفة الرعي حتى حين يسكن كثيرون بلدات معترفاً بها أو غير معترف حول بئر السبع. ثقافتهم عربية ومحلية للصحراء — جزء من خريطة الأرض الحيّة، لا زياً للسياح وحدهم."
+      },
+      "tags": {
+        "en": [
+          "Negev",
+          "hospitality",
+          "herding"
+        ],
+        "ar": [
+          "النقب",
+          "ضيافة",
+          "رعي"
+        ]
+      }
+    },
+    {
+      "id": "christian-holy-land",
+      "emoji": "✝️",
+      "siteId": "bethlehem",
+      "name": {
+        "en": "Christian Holy Land communities",
+        "ar": "جماعات الأرض المقدسة المسيحية"
+      },
+      "tagline": {
+        "en": "Processions, church schools, and Arabic liturgy",
+        "ar": "مواكب ومدارس كنسية وليتورجيا عربية"
+      },
+      "history": {
+        "en": "Palestinian and other local Christians — Orthodox, Catholic, Protestant, Armenian, and more — steward shrines from Bethlehem to Nazareth while living ordinary town life. Easter and Christmas processions, scout bands, and church schools remain cultural anchors.",
+        "ar": "يرعى المسيحيون الفلسطينيون وغيرهم — أرثوذكس وكاثوليك وبروتستانت وأرمن وغيرهم — المقامات من بيت لحم إلى الناصرة وهم يعيشون حياة بلدة عادية. مواكب الفصح والميلاد وفرق الكشافة ومدارس الكنائس تبقى مراسي ثقافية."
+      },
+      "tags": {
+        "en": [
+          "pilgrimage",
+          "Arabic Christians",
+          "festivals"
+        ],
+        "ar": [
+          "حجّ",
+          "مسيحيون عرب",
+          "أعياد"
+        ]
+      }
+    },
+    {
+      "id": "jewish-holiday-table",
+      "emoji": "🍞",
+      "siteId": "tel-aviv",
+      "name": {
+        "en": "Jewish holiday table",
+        "ar": "مائدة الأعياد اليهودية"
+      },
+      "tagline": {
+        "en": "Sabbath candles, Rosh Hashanah honey, Passover story",
+        "ar": "شموع سبت وعسل رأس السنة وقصّة الفصح"
+      },
+      "history": {
+        "en": "Weekly Shabbat dinners and annual festivals structure Jewish time — challah, wine blessings, seder storytelling, sukkah meals. Israeli tables mix Ashkenazi, Mizrahi, and Ethiopian dishes; the calendar itself is cultural architecture.",
+        "ar": "تنظّم عشاءات السبت الأسبوعية والأعياد السنوية الزمن اليهودي — خلة وبركات خمر وقصّ السيدر ووجبات السكّة. تخلط الموائد الإسرائيلية أطباق أشكناز ومزراحيم وإثيوبيين؛ والتقويم نفسه عمارة ثقافية."
+      },
+      "tags": {
+        "en": [
+          "Shabbat",
+          "festivals",
+          "home table"
+        ],
+        "ar": [
+          "سبت",
+          "أعياد",
+          "مائدة البيت"
+        ]
+      }
+    },
+    {
+      "id": "tatreez",
+      "emoji": "🧵",
+      "siteId": "bethlehem",
+      "name": {
+        "en": "Palestinian tatreez",
+        "ar": "التطريز الفلسطيني"
+      },
+      "tagline": {
+        "en": "Cross-stitch maps of village identity on cloth",
+        "ar": "غرزة صليب ترسم هوية القرية على القماش"
+      },
+      "history": {
+        "en": "Tatreez embroidery once signaled a woman’s village in the colors and motifs of her thobe. Today cooperatives and designers keep the craft as heritage, livelihood, and quiet resistance of memory — stitches that outlast fashion cycles.",
+        "ar": "كان التطريز يعلن قرية المرأة بألوان ثوبها وزخارفه. واليوم تحفظ التعاونيات والمصمّمون الحرفة تراثاً ورزقاً ومقاومة هادئة للذاكرة — غُرَزاً تبقى أطول من دورات الموضة."
+      },
+      "tags": {
+        "en": [
+          "embroidery",
+          "thobe",
+          "heritage"
+        ],
+        "ar": [
+          "تطريز",
+          "ثوب",
+          "تراث"
+        ]
+      }
+    },
+    {
+      "id": "druze-galilee",
+      "emoji": "🏔️",
+      "siteId": "nazareth",
+      "name": {
+        "en": "Druze Galilee and Carmel",
+        "ar": "الدروز في الجليل والكرمل"
+      },
+      "tagline": {
+        "en": "Village hospitality, shrine visits, and a distinct faith community",
+        "ar": "ضيافة قرى وزيارات مقامات وجماعة إيمان متميّزة"
+      },
+      "history": {
+        "en": "Druze towns in the Galilee and on Carmel keep Arabic speech, distinctive religious practice, and strong local hospitality. Their place on the map reminds visitors that the land’s cultures are more than a binary of two peoples.",
+        "ar": "تحفظ بلدات الدروز في الجليل والكرمل العربية وممارسة دينية متميّزة وضيافة محلية قوية. ومكانهم على الخريطة يذكّر الزائر بأن ثقافات الأرض أكثر من ثنائية شعبين."
+      },
+      "tags": {
+        "en": [
+          "Druze",
+          "Galilee",
+          "hospitality"
+        ],
+        "ar": [
+          "دروز",
+          "الجليل",
+          "ضيافة"
+        ]
+      }
+    }
+  ],
+  "phrases": [
+    {
+      "ar": "أهلاً وسهلاً",
+      "translit": "ahlan wa sahlan",
+      "en": "Welcome — the standard greeting to a guest"
+    },
+    {
+      "ar": "أهلين",
+      "translit": "ahlein",
+      "en": "Hi / welcome back — the warm everyday reply"
+    },
+    {
+      "ar": "صباح الخير",
+      "translit": "sabah al-khair",
+      "en": "Good morning"
+    },
+    {
+      "ar": "مساء الخير",
+      "translit": "masa al-khair",
+      "en": "Good evening"
+    },
+    {
+      "ar": "كيفك؟ / كيفكِ؟",
+      "translit": "keefak? / keefek?",
+      "en": "How are you? (to a man / to a woman)"
+    },
+    {
+      "ar": "الحمد لله، تمام",
+      "translit": "al-hamdu lillah, tamam",
+      "en": "Thank God, all good"
+    },
+    {
+      "ar": "شكراً",
+      "translit": "shukran",
+      "en": "Thank you"
+    },
+    {
+      "ar": "عفواً",
+      "translit": "ʿafwan",
+      "en": "You’re welcome / excuse me"
+    },
+    {
+      "ar": "يلا",
+      "translit": "yalla",
+      "en": "Come on / let’s go — the versatile nudge"
+    },
+    {
+      "ar": "تفضّل",
+      "translit": "tfaddal",
+      "en": "Please, go ahead / help yourself"
+    },
+    {
+      "ar": "يعطيك العافية",
+      "translit": "yaʿteek al-ʿafyeh",
+      "en": "May God give you strength — said to anyone working"
+    },
+    {
+      "ar": "صحتين",
+      "translit": "sahtain",
+      "en": "Double health — said when someone is eating or drinking"
+    }
+  ]
+}

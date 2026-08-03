@@ -107,6 +107,7 @@
     { href: '/donuts/', icon: 'bi-hearts', label: 'Glazed', title: 'Glazed — public donut gallery with Pip (no login)' },
     { href: '/jordan/', icon: 'bi-globe-central-south-asia', label: 'Jordan', title: 'Jordan — bilingual history, food, music, argileh and living culture atlas with Rami (no login)' },
     { href: '/syria/', icon: 'bi-globe-central-south-asia', label: 'Syria', title: 'Syria — bilingual history, food, music, argileh and living culture atlas with Niqula (no login)' },
+    { href: '/holy-land/', icon: 'bi-globe-central-south-asia', label: 'Palestine · Israel', title: 'Palestine · Israel — one bilingual cultural atlas (no login)' },
     { href: '/nature/shenango-valley.html', icon: 'bi-geo-alt', label: 'Shenango Valley', title: 'Shenango Valley local atlas — Buhl Park, Amish country, Quaker Steak & Lube, Luigi\'s (David HeyGen + AI)' },
     { href: '/gse-analyzer.html', icon: 'bi-graph-up-arrow', label: 'GSE scenario analyzer' },
     { href: '/bike-store-home.html', icon: 'bi-bicycle', label: 'Bike Store' },
