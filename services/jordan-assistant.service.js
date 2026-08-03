@@ -105,6 +105,104 @@ ${factSheet(content)}
 6. When a place is mentioned, name the governorate or nearest city so the visitor can find it on the map.`;
 }
 
+function pickLocalized(value, lang) {
+  if (!value || typeof value !== 'object') return String(value || '');
+  return String(value[lang] || value.en || value.ar || '').trim();
+}
+
+function isOpenAiQuotaError(error) {
+  const code = String(error?.code || error?.error?.code || '').toLowerCase();
+  const type = String(error?.type || error?.error?.type || '').toLowerCase();
+  const msg = String(error?.message || '').toLowerCase();
+  return (
+    code === 'credit_balance_exhausted' ||
+    code === 'insufficient_quota' ||
+    type === 'insufficient_quota' ||
+    msg.includes('credit_balance_exhausted') ||
+    msg.includes('insufficient_quota') ||
+    msg.includes('no credits remaining') ||
+    msg.includes('rate limit')
+  );
+}
+
+/**
+ * Offline/page-grounded answer when OpenAI is unavailable (quota, outage).
+ * Matches sites, eras, food, music, living, and phrases from jordan-content.json.
+ */
+function groundedReply(content, message, lang) {
+  const q = String(message || '')
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!q) {
+    return lang === 'ar'
+      ? 'أهلاً وسهلاً. اسألني عن موقع أو طبق أو عبارة من الصفحة.'
+      : 'Ahlan. Ask me about a place, dish, or phrase from the page.';
+  }
+
+  const buckets = [
+    ...(content.sites || []).map((item) => ({ kind: 'site', item })),
+    ...(content.eras || []).map((item) => ({ kind: 'era', item })),
+    ...(content.foods || []).map((item) => ({ kind: 'food', item })),
+    ...(content.music || []).map((item) => ({ kind: 'music', item })),
+    ...(content.hookah || []).map((item) => ({ kind: 'hookah', item })),
+    ...(content.living || []).map((item) => ({ kind: 'living', item }))
+  ];
+
+  let best = null;
+  let bestScore = 0;
+  for (const entry of buckets) {
+    const item = entry.item;
+    const names = [item.name?.en, item.name?.ar, item.title?.en, item.title?.ar, item.place?.en, item.place?.ar]
+      .filter(Boolean)
+      .map((s) => String(s).toLowerCase());
+    let score = 0;
+    for (const name of names) {
+      if (!name) continue;
+      if (q.includes(name) || name.includes(q)) score += name.length;
+      for (const token of name.split(/\s+/)) {
+        if (token.length >= 4 && q.includes(token)) score += token.length;
+      }
+    }
+    if (score > bestScore) {
+      bestScore = score;
+      best = entry;
+    }
+  }
+
+  if (best && bestScore >= 4) {
+    const item = best.item;
+    const name = pickLocalized(item.name || item.title, lang);
+    const place = pickLocalized(item.place, lang);
+    const body =
+      pickLocalized(item.narration, lang) ||
+      pickLocalized(item.history, lang) ||
+      pickLocalized(item.blurb, lang) ||
+      pickLocalized(item.copy, lang) ||
+      pickLocalized(item.tagline, lang);
+    if (lang === 'ar') {
+      const where = place ? ` في ${place}.` : '.';
+      return `بخصوص ${name}${where} ${body}`.replace(/\s+/g, ' ').trim();
+    }
+    const where = place ? ` in ${place}.` : '.';
+    return `About ${name}${where} ${body}`.replace(/\s+/g, ' ').trim();
+  }
+
+  for (const phrase of content.phrases || []) {
+    const hay = `${phrase.ar || ''} ${phrase.en || ''} ${phrase.translit || ''}`.toLowerCase();
+    if (hay && (q.includes(String(phrase.en || '').toLowerCase()) || q.includes(String(phrase.translit || '').toLowerCase()))) {
+      return lang === 'ar'
+        ? `${phrase.ar} — ${phrase.en}`
+        : `${phrase.ar} (${phrase.translit}) means “${phrase.en}.”`;
+    }
+  }
+
+  return lang === 'ar'
+    ? 'أجاوبك الآن من محتوى الصفحة فقط لأن خدمة الذكاء متوقفة مؤقتاً. اسأل عن البتراء أو المنسف أو جرش أو عبارة أردنية.'
+    : 'I can answer from the page facts right now while the AI service is unavailable. Try Petra, mansaf, Jerash, or a Jordanian phrase.';
+}
+
 /**
  * Ask Rami a question about Jordan.
  * @param {{message: string, history?: Array, lang?: string, userId?: string, sessionId?: string}} params
@@ -116,36 +214,51 @@ export async function chatWithRami({
   userId = 'jordan-anon',
   sessionId = 'jordan-rami'
 }) {
-  const openaiKey = (process.env.OPENAI_API_KEY || '').trim();
-  if (!openaiKey) {
-    const err = new Error('OPENAI_API_KEY is not configured');
-    err.code = 'OPENAI_NOT_CONFIGURED';
-    throw err;
-  }
-
   const language = normalizeLang(lang);
   const content = await loadContent();
-  const model = new ChatOpenAI({
-    modelName: resolveOpenAiAgentModel('JORDAN_ASSISTANT_MODEL'),
-    temperature: 0.5,
-    openAIApiKey: openaiKey
-  });
+  const openaiKey = (process.env.OPENAI_API_KEY || '').trim();
 
-  const messages = [new SystemMessage(buildSystemPrompt(content, language))];
-  for (const turn of history.slice(-8)) {
-    const text = String(turn.content || '');
-    if (!text) continue;
-    if (turn.role === 'user') messages.push(new HumanMessage(text));
-    if (turn.role === 'assistant') messages.push(new AIMessage(text));
+  let reply;
+  let source = 'openai';
+
+  if (!openaiKey) {
+    reply = groundedReply(content, message, language);
+    source = 'page-facts';
+  } else {
+    try {
+      const model = new ChatOpenAI({
+        modelName: resolveOpenAiAgentModel('JORDAN_ASSISTANT_MODEL'),
+        temperature: 0.5,
+        openAIApiKey: openaiKey,
+        // Quota/rate-limit errors should fall back to page facts quickly, not retry for minutes.
+        maxRetries: 0
+      });
+
+      const messages = [new SystemMessage(buildSystemPrompt(content, language))];
+      for (const turn of history.slice(-8)) {
+        const text = String(turn.content || '');
+        if (!text) continue;
+        if (turn.role === 'user') messages.push(new HumanMessage(text));
+        if (turn.role === 'assistant') messages.push(new AIMessage(text));
+      }
+      messages.push(new HumanMessage(String(message).trim()));
+
+      const response = await model.invoke(messages);
+      const fallback =
+        language === 'ar'
+          ? 'سامحني، ضاع منّي الخيط. أعِد السؤال من فضلك.'
+          : 'Forgive me, I lost the thread there. Ask me again?';
+      reply = String(response?.content || '').trim() || fallback;
+    } catch (error) {
+      if (isOpenAiQuotaError(error) || error?.status === 429) {
+        console.warn('Rami falling back to page facts (OpenAI unavailable):', error?.message || error);
+        reply = groundedReply(content, message, language);
+        source = 'page-facts';
+      } else {
+        throw error;
+      }
+    }
   }
-  messages.push(new HumanMessage(String(message).trim()));
-
-  const response = await model.invoke(messages);
-  const fallback =
-    language === 'ar'
-      ? 'سامحني، ضاع منّي الخيط. أعِد السؤال من فضلك.'
-      : 'Forgive me, I lost the thread there. Ask me again?';
-  const reply = String(response?.content || '').trim() || fallback;
 
   try {
     await persistConversationTurn(userId, sessionId, String(message), reply, 'rami');
@@ -156,7 +269,8 @@ export async function chatWithRami({
   return {
     reply,
     lang: language,
-    guideName: content.guide?.name?.[language] || 'Rami'
+    guideName: content.guide?.name?.[language] || 'Rami',
+    source
   };
 }
 

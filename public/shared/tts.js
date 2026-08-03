@@ -17,23 +17,126 @@
   let currentAudio = null;
   let audioUnlocked = false;
   let speechPrimed = false;
+  /** One element for unlock + Google TTS — a fresh `new Audio()` after fetch is often blocked. */
+  let sharedAudio = null;
+  let currentObjectUrl = null;
+  let unlockGeneration = 0;
+  const SILENT_WAV =
+    'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQAAAAA=';
+
+  function getSharedAudio() {
+    if (!sharedAudio) {
+      sharedAudio = new Audio();
+      try {
+        sharedAudio.setAttribute('playsinline', 'true');
+        sharedAudio.preload = 'auto';
+      } catch (_) {
+        /* ignore */
+      }
+    }
+    return sharedAudio;
+  }
+
+  function revokeCurrentObjectUrl() {
+    if (!currentObjectUrl) return;
+    try {
+      URL.revokeObjectURL(currentObjectUrl);
+    } catch (_) {
+      /* ignore */
+    }
+    currentObjectUrl = null;
+  }
 
   function doUnlock() {
-    if (audioUnlocked) return true;
     try {
-      const unlockAudio = new Audio(
-        'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQAAAAA='
-      );
-      unlockAudio.volume = 0;
-      unlockAudio.play().then(() => {
-        unlockAudio.pause();
-        unlockAudio.currentTime = 0;
-      }).catch(() => {});
+      const audio = getSharedAudio();
+      // Already unlocked and not mid-silent-prime — keep the element warm.
+      if (audioUnlocked && audio.src && !String(audio.src).includes('data:audio')) {
+        return true;
+      }
+      if (audioUnlocked && currentAudio === audio && !audio.paused) {
+        return true;
+      }
+      const gen = ++unlockGeneration;
+      // volume=0 does NOT unlock unmuted playback in Chrome. Mute, play, then unmute.
+      audio.muted = true;
+      audio.volume = 1;
+      audio.src = SILENT_WAV;
+      const playResult = audio.play();
+      if (playResult && typeof playResult.then === 'function') {
+        playResult
+          .then(() => {
+            if (gen !== unlockGeneration) return;
+            try {
+              audio.pause();
+              audio.currentTime = 0;
+            } catch (_) {
+              /* ignore */
+            }
+            audio.muted = false;
+            audioUnlocked = true;
+          })
+          .catch(() => {
+            audio.muted = false;
+          });
+      } else {
+        audio.muted = false;
+      }
       audioUnlocked = true;
       return true;
     } catch (e) {
       return false;
     }
+  }
+
+  /**
+   * Play a synthesized MP3 on the same element unlocked during the user gesture.
+   * A fresh `new Audio()` after fetch is often blocked; English then falls back to
+   * speechSynthesis, but Arabic usually has no system voice — phrases go silent.
+   * @returns {Promise<boolean>} true if playback completed (or was cancelled cleanly)
+   */
+  function playSynthesizedBlob(audioBlob, options = {}) {
+    const audioUrl = URL.createObjectURL(audioBlob);
+    revokeCurrentObjectUrl();
+    currentObjectUrl = audioUrl;
+    const audio = getSharedAudio();
+    try {
+      audio.pause();
+    } catch (_) {
+      /* ignore */
+    }
+    return new Promise((resolve) => {
+      if (typeof options.isCancelled === 'function' && options.isCancelled()) {
+        revokeCurrentObjectUrl();
+        resolve(false);
+        return;
+      }
+      let settled = false;
+      const finish = (ok) => {
+        if (settled) return;
+        settled = true;
+        audio.onended = null;
+        audio.onerror = null;
+        revokeCurrentObjectUrl();
+        if (currentAudio === audio) currentAudio = null;
+        resolve(ok);
+      };
+      currentAudio = audio;
+      audio.muted = false;
+      audio.volume = typeof options.volume === 'number' ? options.volume : 0.85;
+      audio.onended = () => finish(true);
+      audio.onerror = () => finish(false);
+      audio.src = audioUrl;
+      const tryPlay = () =>
+        audio.play().then(() => {
+          audioUnlocked = true;
+          if (audio.ended) finish(true);
+        });
+      tryPlay().catch(() => {
+        // One retry: some browsers need a second play() after src swap.
+        tryPlay().catch(() => finish(false));
+      });
+    });
   }
 
   function initAudioUnlock() {
@@ -84,9 +187,14 @@
       // Always Google Cloud TTS first (every surface, every language). Browser speech is
       // last-resort only — mobile system voices are unreliable (matron EN, missing AR, etc.).
       if (currentAudio) {
-        currentAudio.pause();
+        try {
+          currentAudio.pause();
+        } catch (_) {
+          /* ignore */
+        }
         currentAudio = null;
       }
+      unlockGeneration += 1;
 
       const response = await fetch('/api/voice/synthesize', {
         method: 'POST',
@@ -106,24 +214,13 @@
 
       if (data.success && data.audio) {
         const audioBlob = base64ToBlob(data.audio, 'audio/mp3');
-        const audioUrl = URL.createObjectURL(audioBlob);
-
-        currentAudio = new Audio(audioUrl);
-        currentAudio.volume = options.volume || 0.8;
-
-        currentAudio.onended = () => {
-          URL.revokeObjectURL(audioUrl);
-          currentAudio = null;
-        };
-
-        try {
-          await currentAudio.play();
-          audioUnlocked = true;
-          return true;
-        } catch (playError) {
-          console.warn('Audio play blocked; user interaction required.', playError);
-          return speakWithBrowser(text, options);
-        }
+        const played = await playSynthesizedBlob(audioBlob, {
+          volume: options.volume || 0.8,
+          isCancelled: options.isCancelled
+        });
+        if (played) return true;
+        console.warn('Audio play blocked; user interaction required.');
+        return speakWithBrowser(text, options);
       }
 
       return speakWithBrowser(text, options);
@@ -134,11 +231,25 @@
   }
 
   function stopSpeech() {
+    unlockGeneration += 1;
     if (currentAudio) {
-      currentAudio.pause();
-      currentAudio.currentTime = 0;
+      try {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+      } catch (_) {
+        /* ignore */
+      }
       currentAudio = null;
     }
+    if (sharedAudio && sharedAudio !== currentAudio) {
+      try {
+        sharedAudio.pause();
+        sharedAudio.currentTime = 0;
+      } catch (_) {
+        /* ignore */
+      }
+    }
+    revokeCurrentObjectUrl();
 
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
@@ -369,9 +480,14 @@
   async function synthChunkAwaitEnd(text, voice, options) {
     try {
       if (currentAudio) {
-        currentAudio.pause();
+        try {
+          currentAudio.pause();
+        } catch (_) {
+          /* ignore */
+        }
         currentAudio = null;
       }
+      unlockGeneration += 1;
       const response = await fetch('/api/voice/synthesize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -390,29 +506,14 @@
         return;
       }
       const audioBlob = base64ToBlob(data.audio, 'audio/mp3');
-      const audioUrl = URL.createObjectURL(audioBlob);
-      await new Promise((resolve) => {
-        if (typeof options.isCancelled === 'function' && options.isCancelled()) {
-          URL.revokeObjectURL(audioUrl);
-          resolve();
-          return;
-        }
-        const audio = new Audio(audioUrl);
-        currentAudio = audio;
-        audio.volume = typeof options.volume === 'number' ? options.volume : 0.85;
-        const done = () => {
-          URL.revokeObjectURL(audioUrl);
-          if (currentAudio === audio) currentAudio = null;
-          resolve();
-        };
-        audio.onended = done;
-        audio.onerror = done;
-        audio.play().catch(() => {
-          if (currentAudio === audio) currentAudio = null;
-          URL.revokeObjectURL(audioUrl);
-          speakBrowserChunkAwaitEnd(text, options).then(resolve);
-        });
+      const played = await playSynthesizedBlob(audioBlob, {
+        volume: typeof options.volume === 'number' ? options.volume : 0.85,
+        isCancelled: options.isCancelled
       });
+      if (!played) {
+        await speakBrowserChunkAwaitEnd(text, options);
+        return;
+      }
       audioUnlocked = true;
     } catch (_) {
       await speakBrowserChunkAwaitEnd(text, options);

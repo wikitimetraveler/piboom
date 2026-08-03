@@ -7,9 +7,9 @@
   'use strict';
 
   const STORAGE_KEY = 'jordanSplashShown_v1';
-  const AUTO_MS = 4200;
-  const REDUCED_MS = 900;
-  const CLOSE_MS = 850;
+  const AUTO_MS = 2100;
+  const REDUCED_MS = 450;
+  const CLOSE_MS = 420;
 
   function init() {
     const root = document.getElementById('jdSplash');

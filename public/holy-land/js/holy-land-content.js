@@ -620,20 +620,30 @@
     );
   }
 
-  function speakPhrase(index) {
+  async function speakPhrase(index) {
     const phrase = state.data?.phrases?.[index];
     if (!phrase?.ar) return;
-    // Speak Levantine is practice audio — always on, ignore the page Narration toggle.
-    return toggleGuideSpeech(
-      `phrase:${index}`,
-      async () => {
-        const api = i18n();
-        if (!api?.speak) return;
-        api.unlockAudio?.();
-        await api.speak(phrase.ar, { lang: 'ar', force: true });
-      },
-      { force: true }
-    );
+    const key = `phrase:${index}`;
+    if (listenSpeakingKey === key) {
+      stopListenSpeech();
+      return;
+    }
+    // Practice audio: always on. Keep simple — no stopSpeech()/50ms delay race.
+    stopMusic();
+    if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
+    i18n()?.unlockAudio?.();
+
+    const gen = ++listenGeneration;
+    listenSpeakingKey = key;
+    syncListenButtons();
+
+    try {
+      const api = i18n();
+      if (!api?.speak) return;
+      await api.speak(phrase.ar, { lang: 'ar', force: true });
+    } finally {
+      if (gen === listenGeneration) clearListenUi();
+    }
   }
 
   function speakSheet() {
@@ -686,6 +696,17 @@
   /* --------------------------------------------------------------- binding */
 
   function bindDelegates() {
+    // Prime the shared Audio element on pointerdown so Google TTS can play after fetch.
+    document.addEventListener(
+      'pointerdown',
+      (event) => {
+        if (event.target.closest('[data-phrase-index], [data-card-listen], [data-era-listen], #hlSheetListen')) {
+          i18n()?.unlockAudio();
+        }
+      },
+      true
+    );
+
     document.addEventListener('click', (event) => {
       const eraListen = event.target.closest('[data-era-listen]');
       if (eraListen) {

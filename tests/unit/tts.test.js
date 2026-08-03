@@ -32,12 +32,28 @@ const setupBrowserGlobals = () => {
   global.Audio = class {
     constructor() {
       this.volume = 1;
+      this.muted = false;
+      this.src = '';
+      this.paused = true;
+      this.ended = false;
       this.onended = null;
+      this.onerror = null;
     }
+    load() {}
     async play() {
+      this.paused = false;
+      const cb = this.onended;
+      queueMicrotask(() => {
+        this.paused = true;
+        this.ended = true;
+        if (cb) cb();
+      });
       return Promise.resolve();
     }
-    pause() {}
+    pause() {
+      this.paused = true;
+    }
+    setAttribute() {}
   };
   global.SpeechSynthesisUtterance = class {
     constructor(text) {
@@ -173,20 +189,6 @@ describe('shared tts helper', () => {
 
   test('mobile Arabic narration tries Google cloud synth before browser voices', async () => {
     global.navigator = { userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)', maxTouchPoints: 5 };
-    global.Audio = class {
-      constructor() {
-        this.volume = 1;
-        this.onended = null;
-      }
-      async play() {
-        const cb = this.onended;
-        queueMicrotask(() => {
-          if (cb) cb();
-        });
-        return Promise.resolve();
-      }
-      pause() {}
-    };
     global.fetch = jest.fn().mockResolvedValue({
       json: async () => ({ success: true, audio: Buffer.from('a').toString('base64') })
     });
@@ -206,5 +208,52 @@ describe('shared tts helper', () => {
         body: expect.stringContaining('ar-XA-Wavenet-B')
       })
     );
+  });
+
+  test('Google TTS reuses the unlocked shared Audio element after gesture unlock', async () => {
+    global.navigator = {
+      userAgent: 'Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/120 Mobile',
+      maxTouchPoints: 5
+    };
+    const instances = [];
+    global.Audio = class {
+      constructor() {
+        this.volume = 1;
+        this.src = '';
+        this.paused = true;
+        this.onended = null;
+        this.onerror = null;
+        instances.push(this);
+      }
+      load() {}
+      async play() {
+        this.paused = false;
+        const cb = this.onended;
+        queueMicrotask(() => {
+          this.paused = true;
+          if (cb) cb();
+        });
+        return Promise.resolve();
+      }
+      pause() {
+        this.paused = true;
+      }
+      setAttribute() {}
+    };
+    global.fetch = jest.fn().mockResolvedValue({
+      json: async () => ({ success: true, audio: Buffer.from('ar').toString('base64') })
+    });
+
+    await import('../../public/shared/tts.js');
+
+    expect(window.ensureAudioUnlock()).toBe(true);
+    await window.speakNarrationAwaitEnd('أهلا', {
+      voice: 'ar-XA-Wavenet-B',
+      lang: 'ar-XA',
+      gender: 'male'
+    });
+
+    expect(instances.length).toBe(1);
+    expect(global.fetch).toHaveBeenCalled();
   });
 });

@@ -380,7 +380,13 @@ class AIChatWidget {
                     this.onMessageReceived(data.response, data);
                 }
             } else {
-                this.addMessage('Sorry, I encountered an error. Please try again.', 'assistant');
+                const detail = String(data.error || data.message || '').trim();
+                this.addMessage(
+                  detail
+                    ? `Sorry — ${detail}`
+                    : 'Sorry, I encountered an error. Please try again.',
+                  'assistant'
+                );
             }
         } catch (error) {
             console.error('Chat error:', error);
