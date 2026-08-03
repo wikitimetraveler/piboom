@@ -17,124 +17,123 @@
   let currentAudio = null;
   let audioUnlocked = false;
   let speechPrimed = false;
-  /** One element for unlock + Google TTS — a fresh `new Audio()` after fetch is often blocked. */
-  let sharedAudio = null;
-  let currentObjectUrl = null;
-  let unlockGeneration = 0;
+  let audioCtx = null;
+  /** Created during a user gesture; reused for the next Google MP3 (phrases). */
+  let primedPlayer = null;
+  // Valid tiny silent WAV — the old truncated URI made Firefox throw NS_ERROR_DOM_MEDIA_METADATA_ERR.
   const SILENT_WAV =
-    'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQAAAAA=';
+    'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
 
-  function getSharedAudio() {
-    if (!sharedAudio) {
-      sharedAudio = new Audio();
-      try {
-        sharedAudio.setAttribute('playsinline', 'true');
-        sharedAudio.preload = 'auto';
-      } catch (_) {
-        /* ignore */
-      }
-    }
-    return sharedAudio;
-  }
-
-  function revokeCurrentObjectUrl() {
-    if (!currentObjectUrl) return;
+  function unlockWebAudio() {
     try {
-      URL.revokeObjectURL(currentObjectUrl);
-    } catch (_) {
-      /* ignore */
-    }
-    currentObjectUrl = null;
-  }
-
-  function doUnlock() {
-    try {
-      const audio = getSharedAudio();
-      // Already unlocked and not mid-silent-prime — keep the element warm.
-      if (audioUnlocked && audio.src && !String(audio.src).includes('data:audio')) {
-        return true;
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return false;
+      if (!audioCtx) audioCtx = new AC();
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
       }
-      if (audioUnlocked && currentAudio === audio && !audio.paused) {
-        return true;
-      }
-      const gen = ++unlockGeneration;
-      // volume=0 does NOT unlock unmuted playback in Chrome. Mute, play, then unmute.
-      audio.muted = true;
-      audio.volume = 1;
-      audio.src = SILENT_WAV;
-      const playResult = audio.play();
-      if (playResult && typeof playResult.then === 'function') {
-        playResult
-          .then(() => {
-            if (gen !== unlockGeneration) return;
-            try {
-              audio.pause();
-              audio.currentTime = 0;
-            } catch (_) {
-              /* ignore */
-            }
-            audio.muted = false;
-            audioUnlocked = true;
-          })
-          .catch(() => {
-            audio.muted = false;
-          });
-      } else {
-        audio.muted = false;
-      }
-      audioUnlocked = true;
+      const buffer = audioCtx.createBuffer(1, 1, 22050);
+      const source = audioCtx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(audioCtx.destination);
+      source.start(0);
       return true;
-    } catch (e) {
+    } catch (_) {
       return false;
     }
   }
 
+  function primePlayerForGesture() {
+    if (!primedPlayer) {
+      primedPlayer = new Audio();
+      try {
+        primedPlayer.setAttribute('playsinline', 'true');
+      } catch (_) {
+        /* ignore */
+      }
+    }
+    return primedPlayer;
+  }
+
+  function doUnlock() {
+    try {
+      // Web Audio unlock — reliable in Firefox (no bad data: URI decode).
+      unlockWebAudio();
+      // Create the player during the gesture so later src+play after fetch is allowed.
+      primePlayerForGesture();
+      if (!audioUnlocked) {
+        const unlockAudio = new Audio(SILENT_WAV);
+        unlockAudio.muted = true;
+        unlockAudio
+          .play()
+          .then(() => {
+            try {
+              unlockAudio.pause();
+              unlockAudio.currentTime = 0;
+            } catch (_) {
+              /* ignore */
+            }
+          })
+          .catch(() => {});
+      }
+      audioUnlocked = true;
+      return true;
+    } catch (e) {
+      return unlockWebAudio();
+    }
+  }
+
   /**
-   * Play a synthesized MP3 on the same element unlocked during the user gesture.
-   * A fresh `new Audio()` after fetch is often blocked; English then falls back to
-   * speechSynthesis, but Arabic usually has no system voice — phrases go silent.
-   * @returns {Promise<boolean>} true if playback completed (or was cancelled cleanly)
+   * Play Google TTS MP3. Prefers the Audio element primed during the click gesture
+   * (what made phrases reliable), else falls back to `new Audio(url)`.
+   * @returns {Promise<boolean>}
    */
   function playSynthesizedBlob(audioBlob, options = {}) {
     const audioUrl = URL.createObjectURL(audioBlob);
-    revokeCurrentObjectUrl();
-    currentObjectUrl = audioUrl;
-    const audio = getSharedAudio();
-    try {
-      audio.pause();
-    } catch (_) {
-      /* ignore */
-    }
     return new Promise((resolve) => {
       if (typeof options.isCancelled === 'function' && options.isCancelled()) {
-        revokeCurrentObjectUrl();
+        URL.revokeObjectURL(audioUrl);
         resolve(false);
         return;
       }
       let settled = false;
-      const finish = (ok) => {
+      const done = (ok, el) => {
         if (settled) return;
         settled = true;
-        audio.onended = null;
-        audio.onerror = null;
-        revokeCurrentObjectUrl();
-        if (currentAudio === audio) currentAudio = null;
+        if (el) {
+          el.onended = null;
+          el.onerror = null;
+        }
+        URL.revokeObjectURL(audioUrl);
+        if (currentAudio === el) currentAudio = null;
         resolve(ok);
       };
-      currentAudio = audio;
-      audio.muted = false;
-      audio.volume = typeof options.volume === 'number' ? options.volume : 0.85;
-      audio.onended = () => finish(true);
-      audio.onerror = () => finish(false);
-      audio.src = audioUrl;
-      const tryPlay = () =>
-        audio.play().then(() => {
+
+      const wireAndPlay = (audio) => {
+        currentAudio = audio;
+        audio.muted = false;
+        audio.volume = typeof options.volume === 'number' ? options.volume : 0.85;
+        audio.onended = () => done(true, audio);
+        audio.onerror = () => done(false, audio);
+        audio.src = audioUrl;
+        return audio.play().then(() => {
           audioUnlocked = true;
-          if (audio.ended) finish(true);
+          if (audio.ended) done(true, audio);
         });
-      tryPlay().catch(() => {
-        // One retry: some browsers need a second play() after src swap.
-        tryPlay().catch(() => finish(false));
+      };
+
+      const audio = primedPlayer || new Audio();
+      primedPlayer = null;
+      try {
+        audio.setAttribute('playsinline', 'true');
+      } catch (_) {
+        /* ignore */
+      }
+
+      wireAndPlay(audio).catch(() => {
+        // Classic one-shot path (how phrases used to work before the shared-element rewrite).
+        const fresh = new Audio();
+        wireAndPlay(fresh).catch(() => done(false, fresh));
       });
     });
   }
@@ -194,7 +193,6 @@
         }
         currentAudio = null;
       }
-      unlockGeneration += 1;
 
       const response = await fetch('/api/voice/synthesize', {
         method: 'POST',
@@ -231,7 +229,6 @@
   }
 
   function stopSpeech() {
-    unlockGeneration += 1;
     if (currentAudio) {
       try {
         currentAudio.pause();
@@ -241,15 +238,7 @@
       }
       currentAudio = null;
     }
-    if (sharedAudio && sharedAudio !== currentAudio) {
-      try {
-        sharedAudio.pause();
-        sharedAudio.currentTime = 0;
-      } catch (_) {
-        /* ignore */
-      }
-    }
-    revokeCurrentObjectUrl();
+    primedPlayer = null;
 
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
@@ -487,7 +476,6 @@
         }
         currentAudio = null;
       }
-      unlockGeneration += 1;
       const response = await fetch('/api/voice/synthesize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
