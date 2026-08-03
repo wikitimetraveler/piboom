@@ -60,6 +60,22 @@ describe('resolveGoogleClientOptions', () => {
     expect(opts.credentials).toBeUndefined();
   });
 
+  test('accepts JSON pasted into GOOGLE_APPLICATION_CREDENTIALS', async () => {
+    process.env.GOOGLE_APPLICATION_CREDENTIALS = JSON.stringify({
+      type: 'service_account',
+      project_id: 'from-path-var',
+      private_key: 'line1\\nline2',
+      client_email: 'a@b.com'
+    });
+
+    const { resolveGoogleClientOptions } = await import('../../lib/google-cloud-credentials.js');
+    const opts = resolveGoogleClientOptions();
+
+    expect(opts.credentials?.project_id).toBe('from-path-var');
+    expect(opts.credentials.private_key).toBe('line1\nline2');
+    expect(process.env.GOOGLE_APPLICATION_CREDENTIALS).toBeUndefined();
+  });
+
   test('falls back to ./google-credentials.json when absolute path is missing', async () => {
     process.env.GOOGLE_APPLICATION_CREDENTIALS = '/google-credentials.json';
     const localKey = path.resolve(process.cwd(), 'google-credentials.json');
