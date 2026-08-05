@@ -80,12 +80,12 @@
 
   /** Navbar Entertainment dropdown items */
   const NAV_ENTERTAINMENT = [
+    { href: '/entertainment/coffee-dreams.html', icon: 'bi-cup-hot', label: 'Coffee Dreams' },
     { href: '/entertainment/player.html', icon: 'bi-volume-up', label: 'The Boombox' },
     { href: '/entertainment/visualizer.html', icon: 'bi-palette-fill', label: 'Psychedelic Visualizer' },
     { href: '/entertainment/blacklight.html', icon: 'bi-lightning', label: 'Black Light Zone' },
     { href: '/entertainment/poster-generator.html', icon: 'bi-palette', label: 'Poster Generator' },
     { href: '/entertainment/art-gallery.html', icon: 'bi-image', label: 'Art Gallery' },
-    { href: '/entertainment/coffee-dreams.html', icon: 'bi-cup-hot', label: 'Coffee Dreams' },
     { href: '/entertainment/ouija-board.html', icon: 'bi-magic', label: 'Ouija Board' },
     { divider: true },
     { href: '/entertainment/index.html', icon: 'bi-grid-3x3-gap', label: 'Entertainment Hub' },
@@ -93,17 +93,18 @@
 
   /** Entertainment hub tool grid */
   const ENTERTAINMENT_TOOLS = [
+    { href: '/entertainment/coffee-dreams.html', icon: 'bi-cup-hot', label: 'Coffee Dreams', title: 'Private coffee photo gallery' },
     { href: '/entertainment/player.html', icon: 'bi-volume-up', label: 'The Boombox', title: 'Boombox audio player' },
     { href: '/entertainment/visualizer.html', icon: 'bi-palette-fill', label: 'Psychedelic Visualizer', title: 'Psychedelic visualizer' },
     { href: '/entertainment/blacklight.html', icon: 'bi-lightning', label: 'Black Light Zone', title: 'Black light neon scene' },
     { href: '/entertainment/poster-generator.html', icon: 'bi-palette', label: 'Poster Generator', title: 'Generate psychedelic posters' },
     { href: '/entertainment/art-gallery.html', icon: 'bi-image', label: 'Art Gallery', title: 'Entertainment art gallery' },
-    { href: '/entertainment/coffee-dreams.html', icon: 'bi-cup-hot', label: 'Coffee Dreams', title: 'Private coffee photo gallery' },
     { href: '/entertainment/ouija-board.html', icon: 'bi-magic', label: 'Ouija Board', title: 'Spirit board experience' },
   ];
 
   /** Navbar More dropdown items */
   const NAV_MORE = [
+    { href: '/entertainment/coffee-dreams.html', icon: 'bi-cup-hot', label: 'Coffee Dreams', title: 'Coffee Dreams — private café gallery (password)' },
     { href: '/heygen-hub.html', icon: 'bi-collection-play', label: 'HeyGen & HyperFrames', title: 'All HeyGen avatar videos and HyperFrames reels (public)' },
     { href: '/donuts/', icon: 'bi-hearts', label: 'Glazed', title: 'Glazed — public donut gallery with Pip (no login)' },
     { href: '/jordan/', icon: 'bi-globe-central-south-asia', label: 'Jordan', title: 'Jordan — bilingual history, food, music, argileh and living culture atlas with Rami (no login)' },
