@@ -8,13 +8,6 @@ export async function postVerifyCoffeeDreams(req, res) {
     const password = typeof req.body?.password === 'string' ? req.body.password : '';
     const result = verifyCoffeeDreamsPassword(password);
 
-    if (result.reason === 'unconfigured') {
-      return res.status(503).json({
-        valid: false,
-        error: 'COFFEE_DREAMS_PASSWORD not configured',
-      });
-    }
-
     if (!result.valid) {
       return res.status(401).json({ valid: false });
     }

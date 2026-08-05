@@ -182,10 +182,6 @@
         });
         const data = await res.json().catch(() => ({}));
 
-        if (res.status === 503) {
-          showError(errorEl, data.error || 'Page not configured on server.');
-          return;
-        }
         if (!res.ok || !data.valid) {
           showError(errorEl, 'Incorrect password. Try again.');
           input.select();

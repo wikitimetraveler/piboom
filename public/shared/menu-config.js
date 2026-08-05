@@ -104,7 +104,6 @@
 
   /** Navbar More dropdown items */
   const NAV_MORE = [
-    { href: '/entertainment/coffee-dreams.html', icon: 'bi-cup-hot', label: 'Coffee Dreams', title: 'Coffee Dreams — private café gallery (password)' },
     { href: '/heygen-hub.html', icon: 'bi-collection-play', label: 'HeyGen & HyperFrames', title: 'All HeyGen avatar videos and HyperFrames reels (public)' },
     { href: '/donuts/', icon: 'bi-hearts', label: 'Glazed', title: 'Glazed — public donut gallery with Pip (no login)' },
     { href: '/jordan/', icon: 'bi-globe-central-south-asia', label: 'Jordan', title: 'Jordan — bilingual history, food, music, argileh and living culture atlas with Rami (no login)' },
