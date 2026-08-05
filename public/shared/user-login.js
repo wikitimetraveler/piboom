@@ -495,6 +495,25 @@ function updateNavbarUserDisplay() {
       portfolioAuthBtn.innerHTML = '<i class="bi bi-box-arrow-in-right" aria-hidden="true"></i><span>Log in</span>';
     }
   }
+
+  const funAuthBtn = document.getElementById('funAuthBtn');
+  if (funAuthBtn) {
+    if (user) {
+      const name = user.name ? user.name.split(' ').slice(-1)[0] : 'Account';
+      funAuthBtn.classList.add('fun-auth-btn--out');
+      funAuthBtn.setAttribute('aria-label', 'Log out as ' + name);
+      funAuthBtn.innerHTML =
+        (user.avatar
+          ? '<img class="fun-auth-btn__avatar" src="' + user.avatar + '" alt="" />'
+          : '<i class="bi bi-person-check" aria-hidden="true"></i>') +
+        '<span>' + name + ' · Log out</span>';
+    } else {
+      funAuthBtn.classList.remove('fun-auth-btn--out');
+      funAuthBtn.setAttribute('aria-label', 'Log in');
+      funAuthBtn.innerHTML =
+        '<i class="bi bi-box-arrow-in-right" aria-hidden="true"></i><span>Log in</span>';
+    }
+  }
 }
 
 // Initialize on page load

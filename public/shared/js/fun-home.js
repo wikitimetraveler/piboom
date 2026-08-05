@@ -177,6 +177,64 @@
     });
   }
 
+  function isFunHomeLoggedIn() {
+    if (typeof window.isLoggedIn === 'function') return !!window.isLoggedIn();
+    try {
+      return localStorage.getItem('loggedInUserId') !== null;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function renderFunAuthButton() {
+    const btn = document.getElementById('funAuthBtn');
+    if (!btn) return null;
+
+    if (isFunHomeLoggedIn()) {
+      const user = typeof window.getLoggedInUser === 'function' ? window.getLoggedInUser() : null;
+      const name = user && user.name ? user.name.split(' ').slice(-1)[0] : 'Account';
+      btn.classList.add('fun-auth-btn--out');
+      btn.setAttribute('aria-label', 'Log out as ' + name);
+      btn.innerHTML =
+        (user && user.avatar
+          ? '<img class="fun-auth-btn__avatar" src="' + user.avatar + '" alt="" />'
+          : '<i class="bi bi-person-check" aria-hidden="true"></i>') +
+        '<span>' + name + ' · Log out</span>';
+    } else {
+      btn.classList.remove('fun-auth-btn--out');
+      btn.setAttribute('aria-label', 'Log in');
+      btn.innerHTML =
+        '<i class="bi bi-box-arrow-in-right" aria-hidden="true"></i><span>Log in</span>';
+    }
+    return btn;
+  }
+
+  function initFunAuthButton() {
+    const btn = document.getElementById('funAuthBtn');
+    if (!btn) return;
+
+    renderFunAuthButton();
+    btn.addEventListener('click', (event) => {
+      event.preventDefault();
+      if (isFunHomeLoggedIn()) {
+        if (typeof window.logout === 'function') window.logout();
+        return;
+      }
+      if (typeof window.showLoginPopup === 'function') {
+        window.showLoginPopup();
+      }
+    });
+
+    window.addEventListener('user-logged-in', renderFunAuthButton);
+    window.addEventListener('pageshow', renderFunAuthButton);
+    window.addEventListener('focus', renderFunAuthButton);
+    window.addEventListener('storage', (event) => {
+      if (!event.key || event.key === 'loggedInUserId' || event.key === 'currentUserId') {
+        renderFunAuthButton();
+      }
+    });
+  }
+
   // Secret 5-click mechanism to reveal mortgage work link
   function initSecretMortgageLink() {
     const sparkle = document.getElementById('secretSparkle');
@@ -235,12 +293,19 @@
       }
     });
 
-    // Check if link was previously revealed
-    try {
-      if (localStorage.getItem(WORK_REVEAL_KEY) === 'true') {
-        secretLink.style.display = 'flex';
+    function syncSecretMortgageVisibility() {
+      try {
+        if (isFunHomeLoggedIn() || localStorage.getItem(WORK_REVEAL_KEY) === 'true') {
+          secretLink.style.display = 'flex';
+        }
+      } catch (_) {
+        if (isFunHomeLoggedIn()) secretLink.style.display = 'flex';
       }
-    } catch (_) {}
+    }
+
+    syncSecretMortgageVisibility();
+    window.addEventListener('user-logged-in', syncSecretMortgageVisibility);
+    window.addEventListener('pageshow', syncSecretMortgageVisibility);
   }
 
   // Easter egg: Konami code for extra sparkles
@@ -643,6 +708,7 @@
     initScrollAnimations();
     initCardOpen();
     initEasterEgg();
+    initFunAuthButton();
     initSecretMortgageLink();
     initGatedFeatured();
     initFeaturedQrCodes();
