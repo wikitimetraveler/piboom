@@ -217,6 +217,8 @@
     if (deliveryLinks) {
       fillLinkList('gseExhibitGinnieLinks', deliveryLinks.ginnie);
     }
+
+    fillLinkList('gsePoolingLinks', metadata && metadata.poolingExhibitLinks);
   }
 
   function resetGinnieDeliveryEvidence() {
@@ -790,28 +792,246 @@
     el.innerHTML = list.map((row) => `<li>${mapFn(row)}</li>`).join('');
   }
 
+  let gseAiMode = 'rag';
+  const gseChatSessionId = 'gse-loan-program-expert';
+
   function renderLoanExpertResult(data) {
     const box = $('gseAiResult');
     if (!box) return;
     box.classList.remove('d-none');
-    $('gseAiRecommendationTitle').textContent = `Recommendation (${data.expertMode || 'loan expert'})`;
-    $('gseAiRecommendationText').textContent = data.recommendation || 'No recommendation available.';
-    renderList($('gseAiRationale'), data.rationale || [], (x) => String(x));
-    renderList($('gseAiVerifications'), data.requiredVerifications || [], (x) => String(x));
+    const modeLabel = data.mode || data.expertMode || 'loan expert';
+    $('gseAiRecommendationTitle').textContent = `Recommendation (${modeLabel})`;
+    $('gseAiRecommendationText').textContent =
+      data.recommendation || data.message || data.response || 'No recommendation available.';
+
+    const rationale =
+      data.rationale ||
+      (data.rules && data.rules.rationale) ||
+      (Array.isArray(data.sources)
+        ? data.sources.map((s) => `${s.id || ''} ${s.title || ''}`.trim())
+        : []);
+    const verifications =
+      data.requiredVerifications || (data.rules && data.rules.requiredVerifications) || [];
+    const overlayRisks = data.overlayRisks || (data.rules && data.rules.overlayRisks) || [];
+    const citations =
+      data.citations ||
+      data.sources ||
+      (data.rules && data.rules.citations) ||
+      [];
+
+    renderList($('gseAiRationale'), rationale, (x) => String(x));
+    renderList($('gseAiVerifications'), verifications, (x) => String(x));
     renderList(
       $('gseAiOverlayRisks'),
-      data.overlayRisks || [],
-      (x) => `<strong>${x.investor}</strong>: ${x.title} (${x.status}) ${x.operationsNote ? `— ${x.operationsNote}` : ''}`
+      overlayRisks,
+      (x) =>
+        typeof x === 'string'
+          ? x
+          : `<strong>${x.investor || 'Investor'}</strong>: ${x.title || ''} (${x.status || ''}) ${
+              x.operationsNote ? `— ${x.operationsNote}` : ''
+            }`
     );
-    renderList(
-      $('gseAiCitations'),
-      data.citations || [],
-      (x) => (x.url ? `<a href="${x.url}" target="_blank" rel="noopener noreferrer">${x.title}</a>` : x.title)
-    );
+    renderList($('gseAiCitations'), citations, (x) => {
+      if (typeof x === 'string') return x;
+      const label = [x.id, x.title].filter(Boolean).join(' · ') || 'Source';
+      const meta = [x.retrieval, x.category].filter(Boolean).join(' · ');
+      const link = x.url
+        ? `<a href="${escapeHtmlAttr(x.url)}" target="_blank" rel="noopener noreferrer">${escapeHtmlAttr(label)}</a>`
+        : escapeHtmlAttr(label);
+      return meta ? `${link} <span class="text-muted">(${escapeHtmlAttr(meta)})</span>` : link;
+    });
     box.focus({ preventScroll: false });
   }
 
-  async function runLoanExpert(questionText, options = {}) {
+  function appendChatBubble(role, text) {
+    const thread = $('gseChatThread');
+    if (!thread) return;
+    thread.classList.remove('d-none');
+    const bubble = document.createElement('div');
+    bubble.className = `gse-chat-bubble gse-chat-bubble--${role === 'user' ? 'user' : 'assistant'}`;
+    bubble.textContent = text;
+    thread.appendChild(bubble);
+    thread.scrollTop = thread.scrollHeight;
+  }
+
+  function renderKnowledgeBars(counts = {}) {
+    const host = $('gseKnowledgeBars');
+    if (!host) return;
+    const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    if (!entries.length) {
+      host.innerHTML = '<p class="small text-muted mb-0">No indexed categories yet. Run <code>npm run build:gse-knowledge</code>.</p>';
+      return;
+    }
+    const max = Math.max(...entries.map(([, n]) => n), 1);
+    host.innerHTML = entries
+      .map(([name, n]) => {
+        const pct = Math.max(8, Math.round((n / max) * 100));
+        return `<div class="gse-knowledge-bar-row">
+          <span>${escapeHtmlAttr(name)}</span>
+          <div class="gse-knowledge-bar-track" aria-hidden="true"><div class="gse-knowledge-bar-fill" style="width:${pct}%"></div></div>
+          <span>${n}</span>
+        </div>`;
+      })
+      .join('');
+  }
+
+  function layoutKnowledgeGraph(nodes = []) {
+    const width = 640;
+    const height = 320;
+    const cx = width / 2;
+    const cy = height / 2;
+    const positioned = new Map();
+    const hubs = nodes.filter((n) => n.kind === 'hub');
+    const cats = nodes.filter((n) => n.kind === 'category');
+    const docs = nodes.filter((n) => n.kind === 'document');
+
+    hubs.forEach((n) => positioned.set(n.id, { x: cx, y: cy, ...n }));
+
+    cats.forEach((n, i) => {
+      const angle = (Math.PI * 2 * i) / Math.max(cats.length, 1) - Math.PI / 2;
+      const r = 105;
+      positioned.set(n.id, {
+        x: cx + Math.cos(angle) * r,
+        y: cy + Math.sin(angle) * r,
+        ...n
+      });
+    });
+
+    docs.forEach((n, i) => {
+      const parentCat = String(n.meta?.category || '');
+      const parent = positioned.get(`cat:${parentCat}`) || { x: cx, y: cy };
+      const siblings = docs.filter((d) => (d.meta?.category || '') === parentCat);
+      const idx = siblings.findIndex((d) => d.id === n.id);
+      const angle = (Math.PI * 2 * (idx >= 0 ? idx : i)) / Math.max(siblings.length, 1);
+      const r = 48;
+      positioned.set(n.id, {
+        x: parent.x + Math.cos(angle) * r,
+        y: parent.y + Math.sin(angle) * r,
+        ...n
+      });
+    });
+
+    return positioned;
+  }
+
+  function renderKnowledgeGraph(graph) {
+    const svg = $('gseKnowledgeGraph');
+    if (!svg) return;
+    const nodes = graph?.nodes || [];
+    const links = graph?.links || [];
+    const positioned = layoutKnowledgeGraph(nodes);
+
+    const linkSvg = links
+      .map((link) => {
+        const a = positioned.get(link.source);
+        const b = positioned.get(link.target);
+        if (!a || !b) return '';
+        const opacity = link.kind === 'contains' ? 0.45 : 0.28;
+        return `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#64748b" stroke-opacity="${opacity}" stroke-width="1.2" />`;
+      })
+      .join('');
+
+    const nodeSvg = [...positioned.values()]
+      .map((n) => {
+        const fill =
+          n.kind === 'hub' ? '#0f766e' : n.kind === 'category' ? '#2563eb' : '#94a3b8';
+        const r = n.kind === 'hub' ? 22 : n.kind === 'category' ? 14 : 7;
+        const label =
+          n.kind === 'document'
+            ? ''
+            : `<text x="${n.x}" y="${n.y + r + 12}" text-anchor="middle" font-size="11" fill="#334155">${escapeHtmlAttr(
+                String(n.label || '').slice(0, 18)
+              )}</text>`;
+        const title = escapeHtmlAttr(
+          `${n.label || ''}${n.meta?.count != null ? ` (${n.meta.count})` : ''}${
+            n.meta?.excerpt ? ` — ${n.meta.excerpt}` : ''
+          }`
+        );
+        return `<g>
+          <title>${title}</title>
+          <circle cx="${n.x}" cy="${n.y}" r="${r}" fill="${fill}" stroke="#fff" stroke-width="2" />
+          ${label}
+        </g>`;
+      })
+      .join('');
+
+    svg.innerHTML = `${linkSvg}${nodeSvg}`;
+    const caption = $('gseKnowledgeGraphCaption');
+    if (caption && graph?.summary) {
+      const s = graph.summary;
+      caption.textContent = `${s.totalRecords || 0} slips · ${s.vectorCount || 0} vectors · indexed ${
+        s.lastIndexed ? new Date(s.lastIndexed).toLocaleString() : 'n/a'
+      }`;
+    }
+  }
+
+  function renderKnowledgeHits(rows = []) {
+    const host = $('gseKnowledgeHits');
+    if (!host) return;
+    if (!rows.length) {
+      host.innerHTML = '<li class="text-muted">No matches in the knowledge bank.</li>';
+      return;
+    }
+    host.innerHTML = rows
+      .map((row) => {
+        const title = escapeHtmlAttr(row.title || 'Untitled');
+        const meta = escapeHtmlAttr(
+          [row.retrieval, row.category, row.score != null ? `score ${Number(row.score).toFixed(2)}` : '']
+            .filter(Boolean)
+            .join(' · ')
+        );
+        const excerpt = escapeHtmlAttr(String(row.content || '').slice(0, 180));
+        const link = row.url
+          ? `<a href="${escapeHtmlAttr(row.url)}" target="_blank" rel="noopener noreferrer">${title}</a>`
+          : title;
+        return `<li><div><strong>${link}</strong></div><div class="gse-hit-meta">${meta}</div><div>${excerpt}</div></li>`;
+      })
+      .join('');
+  }
+
+  async function loadKnowledgeBank() {
+    const badge = $('gseKnowledgeBadge');
+    try {
+      const [healthRes, graphRes] = await Promise.all([
+        fetch('/api/gse-assistant/health'),
+        fetch('/api/gse-assistant/graph?limit=3')
+      ]);
+      const health = await healthRes.json().catch(() => ({}));
+      const graph = await graphRes.json().catch(() => ({}));
+      const k = health.knowledge || graph.summary || {};
+      if (badge) {
+        const vectors = k.vectorCount || 0;
+        const docs = k.totalRecords || 0;
+        const openai = health.openaiConfigured ? 'OpenAI on' : 'OpenAI off';
+        badge.textContent = `${docs} docs · ${vectors} vectors · ${openai}`;
+        badge.className = `badge rounded-pill border ${
+          docs > 0 ? 'text-bg-success' : 'text-bg-warning'
+        }`;
+      }
+      renderKnowledgeBars(k.counts || {});
+      if (graph.nodes) renderKnowledgeGraph(graph);
+    } catch (_) {
+      if (badge) {
+        badge.textContent = 'Knowledge unavailable';
+        badge.className = 'badge rounded-pill text-bg-warning border';
+      }
+    }
+  }
+
+  async function runKnowledgeSearch(queryText) {
+    const q = String(queryText || $('gseKnowledgeSearch')?.value || '').trim();
+    if (!q) return;
+    try {
+      const res = await fetch(`/api/gse-assistant/search?q=${encodeURIComponent(q)}&limit=6`);
+      const data = await res.json();
+      renderKnowledgeHits(data.data || []);
+    } catch (e) {
+      renderKnowledgeHits([]);
+      setAiStatus(`Knowledge search error: ${e.message || e}`, true);
+    }
+  }
+
+  async function runRulesExpert(questionText, options = {}) {
     const askBtn = $('btnAskLoanExpert');
     const q = String(questionText || $('gseAiQuestion').value || '').trim();
     if (!q) {
@@ -819,7 +1039,7 @@
       alert('Enter a question for the AI Loan Program Expert.');
       return;
     }
-    setAiStatus('Asking AI Loan Program Expert...', false);
+    setAiStatus('Asking quick-rules expert...', false);
     setBusy(askBtn, true);
     try {
       const body = {
@@ -839,8 +1059,10 @@
         alert(msg);
         return;
       }
-      renderLoanExpertResult(data);
-      setAiStatus(`Answer ready • ${data.availableOverlayProfiles || 0} overlay profile(s) loaded.`, false);
+      appendChatBubble('user', q);
+      appendChatBubble('assistant', data.recommendation || 'No recommendation.');
+      renderLoanExpertResult({ ...data, mode: 'rules' });
+      setAiStatus(`Rules answer ready • ${data.availableOverlayProfiles || 0} overlay profile(s).`, false);
     } catch (e) {
       const msg = e.message || String(e);
       setAiStatus(`Error: ${msg}`, true);
@@ -851,10 +1073,100 @@
     }
   }
 
+  async function runRagExpert(questionText, options = {}) {
+    const askBtn = $('btnAskLoanExpert');
+    const q = String(questionText || $('gseAiQuestion').value || '').trim();
+    if (!q) {
+      if (options.voiceFeedback) speak('Enter a question for the AI Loan Program Expert.');
+      alert('Enter a question for the AI Loan Program Expert.');
+      return;
+    }
+    setAiStatus('Searching knowledge bank + asking RAG expert...', false);
+    setBusy(askBtn, true);
+    appendChatBubble('user', q);
+    try {
+      runKnowledgeSearch(q);
+      const body = {
+        message: q,
+        scenario: readScenarioFromForm(),
+        sessionId: gseChatSessionId,
+        includeRules: true
+      };
+      const res = await fetch('/api/gse-assistant/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.error) {
+        const msg = data.error || data.details || 'RAG expert request failed';
+        setAiStatus(`Error: ${msg}`, true);
+        appendChatBubble('assistant', msg);
+        if (options.voiceFeedback) speak(msg);
+        if (data.sources) renderKnowledgeHits(data.context || data.sources);
+        return;
+      }
+      const answer = data.message || data.response || data.recommendation || 'No answer.';
+      appendChatBubble('assistant', answer);
+      renderLoanExpertResult(data);
+      if (Array.isArray(data.context)) renderKnowledgeHits(data.context);
+      const srcCount = Array.isArray(data.sources) ? data.sources.length : 0;
+      const k = data.knowledge || {};
+      setAiStatus(
+        `RAG answer ready • ${srcCount} source(s) · ${k.vectorCount || 0} vector(s) · mode ${data.mode || 'rag-chat'}`,
+        false
+      );
+      if (options.voiceFeedback) speak(answer.slice(0, 280));
+    } catch (e) {
+      const msg = e.message || String(e);
+      setAiStatus(`Error: ${msg}`, true);
+      appendChatBubble('assistant', msg);
+      if (options.voiceFeedback) speak(msg);
+    } finally {
+      setBusy(askBtn, false);
+    }
+  }
+
+  async function runLoanExpert(questionText, options = {}) {
+    if (gseAiMode === 'rules') return runRulesExpert(questionText, options);
+    return runRagExpert(questionText, options);
+  }
+
+  async function clearGseChat() {
+    try {
+      await fetch(
+        `/api/gse-assistant/history?sessionId=${encodeURIComponent(gseChatSessionId)}`,
+        { method: 'DELETE' }
+      );
+      const thread = $('gseChatThread');
+      if (thread) {
+        thread.innerHTML = '';
+        thread.classList.add('d-none');
+      }
+      setAiStatus('Chat memory cleared for this session.', false);
+    } catch (e) {
+      setAiStatus(`Clear failed: ${e.message || e}`, true);
+    }
+  }
+
+  function setAiMode(mode) {
+    gseAiMode = mode === 'rules' ? 'rules' : 'rag';
+    document.querySelectorAll('[data-gse-ai-mode]').forEach((btn) => {
+      btn.classList.toggle('active', btn.getAttribute('data-gse-ai-mode') === gseAiMode);
+    });
+    setAiStatus(
+      gseAiMode === 'rules'
+        ? 'Quick rules mode → /api/gse/loan-program-expert'
+        : 'Knowledge RAG mode → /api/gse-assistant/chat (+ Postgres bank)',
+      false
+    );
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     initProductsGrid();
     initSuggestionsGrid();
     loadMeta();
+    loadKnowledgeBank();
     $('btnAnalyze').addEventListener('click', runAnalyze);
     $('btnLoanLimits').addEventListener('click', runLoanLimits);
     const loadBtn = $('btnLoadPipeline');
@@ -892,5 +1204,24 @@
         runLoanExpert(prompt);
       });
     });
+    document.querySelectorAll('[data-gse-ai-mode]').forEach((btn) => {
+      btn.addEventListener('click', () => setAiMode(btn.getAttribute('data-gse-ai-mode')));
+    });
+    const refreshBtn = $('btnRefreshGseKnowledge');
+    if (refreshBtn) refreshBtn.addEventListener('click', loadKnowledgeBank);
+    const searchBtn = $('btnGseKnowledgeSearch');
+    if (searchBtn) searchBtn.addEventListener('click', () => runKnowledgeSearch());
+    const searchInput = $('gseKnowledgeSearch');
+    if (searchInput) {
+      searchInput.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter') {
+          ev.preventDefault();
+          runKnowledgeSearch();
+        }
+      });
+    }
+    const clearBtn = $('btnClearGseChat');
+    if (clearBtn) clearBtn.addEventListener('click', clearGseChat);
+    setAiMode('rag');
   });
 })();

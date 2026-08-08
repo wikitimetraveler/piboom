@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Iran — Plateau of Empires | History, Food &amp; Music</title>
+  <meta name="description" content="A bilingual cultural atlas of Iran: Persepolis and Isfahan, Nowruz and tahdig, tar and radif — narrated in English or Arabic by Nima."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/shared/css/levant-atlas-nav.css"/>
+  <link rel="stylesheet" href="/iran/css/iran.css"/>
+  <script src="/shared/menu-config.js"></script>
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/js/levant-atlas-nav.js" defer></script>
+  <script src="/shared/demo-users.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <script src="/shared/dark-mode.js" defer></script>
+  <script src="/iran/js/iran-splash.js" defer></script>
+</head>
+<body class="ir-page ir-splash-open">
+  <div
+    id="irSplash"
+    class="ir-splash is-ready"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="irSplashTitle"
+    aria-hidden="false"
+  >
+    <button type="button" class="ir-splash__skip" id="irSplashSkip">Skip</button>
+    <div class="ir-splash__veil" aria-hidden="true"></div>
+    <div class="ir-splash__grain" aria-hidden="true"></div>
+    <div class="ir-splash__stage">
+      <div class="ir-splash__flag-wrap" aria-hidden="true">
+        <svg class="ir-splash__flag" viewBox="0 0 1200 600" focusable="false" role="img" aria-label="Flag of Iran">
+          <defs>
+            <linearGradient id="irFlagSheen" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.22"/>
+              <stop offset="45%" stop-color="#ffffff" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#ffffff" stop-opacity="0.08"/>
+            </linearGradient>
+            <filter id="irFlagSoft" x="-5%" y="-5%" width="110%" height="110%">
+              <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000" flood-opacity="0.45"/>
+            </filter>
+          </defs>
+          <g filter="url(#irFlagSoft)">
+            <rect class="ir-splash__stripe ir-splash__stripe--green" width="1200" height="200" fill="#239f40"/>
+            <rect class="ir-splash__stripe ir-splash__stripe--white" y="200" width="1200" height="200" fill="#ffffff"/>
+            <rect class="ir-splash__stripe ir-splash__stripe--red" y="400" width="1200" height="200" fill="#da0000"/>
+            <g class="ir-splash__emblem" transform="translate(600 300)" fill="#da0000">
+              <path d="M0 -48 L6 -10 L28 -34 L12 -4 L46 0 L12 4 L28 34 L6 10 L0 48 L-6 10 L-28 34 L-12 4 L-46 0 L-12 -4 L-28 -34 L-6 -10 Z"/>
+              <circle cx="0" cy="0" r="7" fill="#da0000"/>
+            </g>
+          </g>
+          <rect width="1200" height="600" fill="url(#irFlagSheen)" pointer-events="none"/>
+        </svg>
+      </div>
+      <p class="ir-splash__kicker" lang="ar">إيران — هضبة الإمبراطوريات</p>
+      <h1 class="ir-splash__title" id="irSplashTitle">Iran</h1>
+      <p class="ir-splash__line">Plateau · empires · Nowruz</p>
+      <div class="ir-splash__rule" aria-hidden="true"></div>
+      <p class="ir-splash__enter" id="irSplashEnterHint">Enter the atlas</p>
+    </div>
+  </div>
+
+  <modern-navbar></modern-navbar>
+
+  <main class="ir-main">
+    <section class="ir-hero" id="irHero">
+      <div class="ir-hero-atmos ir-hero-atmos--storm" id="irHeroAtmos" aria-hidden="true">
+        <div class="ir-hero-sky"></div>
+        <div class="ir-hero-horizon-glow"></div>
+        <canvas class="ir-hero-sparkle" id="irSkySparkle" width="1200" height="600"></canvas>
+        <div class="ir-hero-heat"></div>
+        <svg class="ir-hero-silhouettes" viewBox="0 0 1200 100" preserveAspectRatio="xMidYMax meet" focusable="false">
+          <g class="ir-hero-city ir-hero-city--far" fill="currentColor">
+            <rect x="20" y="58" width="22" height="42"/>
+            <rect x="46" y="48" width="16" height="52"/>
+            <rect x="68" y="62" width="28" height="38"/>
+            <rect x="102" y="52" width="14" height="48"/>
+            <rect x="122" y="58" width="30" height="42"/>
+            <rect x="200" y="55" width="24" height="45"/>
+            <rect x="230" y="45" width="14" height="55"/>
+            <rect x="250" y="60" width="26" height="40"/>
+            <rect x="360" y="50" width="20" height="50"/>
+            <rect x="386" y="42" width="12" height="58"/>
+            <rect x="404" y="56" width="28" height="44"/>
+            <rect x="520" y="54" width="22" height="46"/>
+            <rect x="548" y="44" width="14" height="56"/>
+            <rect x="568" y="58" width="24" height="42"/>
+            <rect x="700" y="52" width="18" height="48"/>
+            <rect x="724" y="46" width="12" height="54"/>
+            <rect x="742" y="58" width="26" height="42"/>
+            <rect x="920" y="50" width="20" height="50"/>
+            <rect x="946" y="56" width="28" height="44"/>
+            <rect x="1100" y="48" width="16" height="52"/>
+            <rect x="1122" y="58" width="24" height="42"/>
+            <rect x="1152" y="44" width="14" height="56"/>
+          </g>
+          <path class="ir-hero-arch" d="M140 100 V55 Q140 28 168 28 Q196 28 196 55 V100 Z"/>
+          <path class="ir-hero-arch ir-hero-arch--mid" d="M280 100 V62 Q280 42 302 42 Q324 42 324 62 V100 Z"/>
+          <path class="ir-hero-arch ir-hero-arch--far" d="M780 100 V50 Q780 26 812 26 Q844 26 844 50 V100 Z"/>
+          <path class="ir-hero-arch ir-hero-arch--far" d="M860 100 V64 Q860 48 882 48 Q904 48 904 64 V100 Z"/>
+          <path class="ir-hero-dune" d="M0 78 C140 68 260 74 400 66 C540 58 680 72 820 64 C960 56 1100 70 1200 62 L1200 100 L0 100 Z"/>
+        </svg>
+        <div class="ir-hero-sand"></div>
+        <canvas class="ir-hero-storm" id="irSandstorm" width="1200" height="400"></canvas>
+        <div class="ir-hero-motes" id="irHeroMotes"></div>
+      </div>
+      <div class="container">
+        <div class="ir-hero-layout">
+          <div class="ir-hero-inner" id="irHeroInner">
+            <p class="ir-kicker" data-i18n="heroKicker">The Iranian Plateau</p>
+            <h1 class="ir-hero-title" data-i18n="heroTitle">Iran</h1>
+            <p class="ir-hero-line" data-i18n="heroLine">A highland of empires between Caspian and Gulf — Achaemenid stone, Safavid blues, Nowruz fire, and a living table of kebab, tahdig, and tar.</p>
+
+            <div class="ir-hero-cta">
+              <a class="ir-btn ir-btn-primary" href="#irMap">
+                <i class="bi bi-geo-alt-fill"></i> <span data-i18n="exploreMap">Explore the atlas</span>
+              </a>
+              <button type="button" class="ir-btn ir-btn-lang" id="irLangToggle" aria-label="Switch language">
+                <i class="bi bi-translate"></i> <span id="irLangToggleLabel">عربي</span>
+              </button>
+            </div>
+
+            <dl class="ir-facts" id="irFacts">
+              <div><dt>550 BCE</dt><dd data-i18n-fact="achaemenid">Achaemenid empire rises on the plateau</dd></div>
+              <div><dt>Persepolis</dt><dd data-i18n-fact="persepolis">Persepolis built as ceremonial capital</dd></div>
+              <div><dt>Nowruz</dt><dd data-i18n-fact="nowruz">Nowruz still greets the spring equinox</dd></div>
+              <div><dt>1979</dt><dd data-i18n-fact="revolution">1979 revolution founds the Islamic Republic</dd></div>
+            </dl>
+          </div>
+
+          <aside class="ir-guide" id="irGuide" aria-label="Iran guide Nima">
+            <div class="ir-guide-card">
+              <img class="ir-guide-portrait" id="irGuidePortrait" src="/iran/assets/nima-guide-portrait-256.png" width="72" height="72" alt="Nima — Iran history guide"/>
+              <div class="ir-guide-meta">
+                <h2 id="irGuideName">Nima</h2>
+                <p id="irGuideTitle">Iran history guide</p>
+                <p class="ir-guide-status" id="irGuideStatus">Ahlan wa sahlan.</p>
+              </div>
+            </div>
+
+            <label class="ir-narrate ir-narrate--global" for="irNarrate">
+              <input type="checkbox" id="irNarrate" data-ir-narrate checked/>
+              <span class="ir-narrate__copy">
+                <span class="ir-narrate__title" data-i18n="narration">Narration</span>
+                <span class="ir-narrate__scope" data-i18n="narrationScope">Entire page — atlas, tour, and cards</span>
+              </span>
+            </label>
+
+            <div class="ir-guide-actions">
+              <button type="button" class="ir-btn ir-btn-primary ir-btn-sm" id="irStoryPlay" aria-pressed="false">
+                <i class="bi bi-film"></i> <span data-i18n="startTour">Start tour</span>
+              </button>
+              <button type="button" class="ir-btn ir-btn-sand ir-btn-sm" id="irMeetGuide">
+                <i class="bi bi-person-video3"></i> <span data-i18n="meetGuide">Meet Nima</span>
+              </button>
+              <button type="button" class="ir-btn ir-btn-sand ir-btn-sm" id="irAskGuide">
+                <i class="bi bi-chat-dots-fill"></i> <span data-i18n="askGuide">Ask Nima</span>
+              </button>
+              <button type="button" class="ir-btn ir-btn-ghost ir-btn-sm" id="irStopAudio">
+                <i class="bi bi-stop-fill"></i> <span data-i18n="stop">Stop</span>
+              </button>
+            </div>
+
+            <div class="ir-story-panel" id="irStoryPanel">
+              <div class="ir-story-status" id="irStoryStatus" hidden aria-live="polite">
+                <span id="irStoryStatusText"></span>
+                <div class="ir-story-dots" id="irStoryDots" aria-hidden="true"></div>
+              </div>
+              <p class="ir-story-error" id="irStoryError" hidden></p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <div class="container ir-sections">
+      <section class="ir-section is-open" id="irMap" data-ir-collapse data-ir-default-open="1">
+        <div class="ir-section-head">
+          <button type="button" class="ir-section-toggle" id="irMapToggle" aria-expanded="true" aria-controls="irMapPanel">
+            <span class="ir-section-toggle__copy">
+              <span class="ir-section-title" data-i18n="mapHeading">Atlas of Iran</span>
+              <span class="ir-section-lead" data-i18n="mapLead">Plateau, desert, and Caspian shore. Select a pin or a name to hear its story.</span>
+            </span>
+            <i class="bi bi-chevron-down ir-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="ir-section-panel" id="irMapPanel" role="region" aria-labelledby="irMapToggle">
+          <div class="ir-map-toolbar">
+            <div class="ir-map-filters" id="irMapFilters" role="group" aria-label="Filter map pins">
+              <button type="button" class="ir-chip is-active" data-filter="all" data-i18n="mapAll">All</button>
+              <button type="button" class="ir-chip" data-filter="history" data-i18n="mapHistory">History</button>
+              <button type="button" class="ir-chip" data-filter="food" data-i18n="mapFood">Food</button>
+              <button type="button" class="ir-chip" data-filter="music" data-i18n="mapMusic">Music</button>
+              <button type="button" class="ir-chip" data-filter="living" data-i18n="mapLiving">Living</button>
+            </div>
+            <label class="ir-narrate ir-narrate--section" for="irNarrateMap">
+              <input type="checkbox" id="irNarrateMap" data-ir-narrate checked/>
+              <span data-i18n="narration">Narration</span>
+            </label>
+          </div>
+          <div class="ir-map-layout">
+            <ul class="ir-site-list" id="irSiteList"></ul>
+            <div class="ir-map-wrap">
+              <div id="irMapCanvas" class="ir-map-canvas" role="img" aria-label="Map of historic sites across Iran"></div>
+              <p class="ir-map-status" id="irMapStatus" data-i18n="mapLoading">Loading the atlas…</p>
+              <button type="button" class="ir-btn ir-btn-ghost ir-btn-sm ir-map-reset" id="irMapReset" hidden>
+                <i class="bi bi-arrow-clockwise"></i> <span data-i18n="mapReset">Show all pins</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="ir-section" id="irTimeline" data-ir-collapse>
+        <div class="ir-section-head">
+          <button type="button" class="ir-section-toggle" id="irTimelineToggle" aria-expanded="false" aria-controls="irTimelinePanel">
+            <span class="ir-section-toggle__copy">
+              <span class="ir-section-title" data-i18n="timelineHeading">Eras of Iran</span>
+              <span class="ir-section-lead" data-i18n="timelineLead">From Elamite Susa to the Islamic Republic. Select an era to hear it and find it on the map.</span>
+            </span>
+            <i class="bi bi-chevron-down ir-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="ir-section-panel" id="irTimelinePanel" role="region" aria-labelledby="irTimelineToggle" hidden>
+          <div class="ir-timeline-stage">
+            <aside class="ir-timeline-selected" id="irTimelineSelected" aria-live="polite">
+              <div class="ir-timeline-selected__empty" id="irTimelineSelectedEmpty">
+                <div class="ir-timeline-3d" id="irTimeline3d" aria-hidden="true"></div>
+                <p class="ir-timeline-selected__prompt" data-i18n="timelineSelectHint">Select an era on the timeline</p>
+              </div>
+              <div class="ir-timeline-selected__card" id="irTimelineSelectedCard" hidden>
+                <div class="ir-timeline-selected__media" id="irTimelineSelectedMedia"></div>
+                <p class="ir-timeline-selected__date" id="irTimelineSelectedDate"></p>
+                <h3 class="ir-timeline-selected__title" id="irTimelineSelectedTitle"></h3>
+              </div>
+            </aside>
+            <div class="ir-calendar" aria-label="Chronological scale">
+              <div class="ir-calendar__head">
+                <span class="ir-calendar__head-label">Chronology</span>
+                <span class="ir-calendar__head-range" id="irCalendarHeadRange">2500 BCE → today</span>
+              </div>
+              <div class="ir-calendar__track">
+                <div class="ir-calendar__rail"></div>
+                <div class="ir-calendar__fill" id="irCalendarFill"></div>
+                <div class="ir-calendar__centuries" id="irCalendarCenturies" aria-hidden="true"></div>
+                <div class="ir-calendar__ticks" id="irCalendarTicks"></div>
+                <div class="ir-calendar__now" id="irCalendarNow" title="Present"></div>
+              </div>
+              <div class="ir-calendar__scale" id="irCalendarScale"></div>
+            </div>
+          </div>
+          <ol class="ir-era-list" id="irEraList">
+            <li class="ir-loading" data-i18n="loading">Loading the atlas…</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="ir-section" id="irFood" data-ir-collapse>
+        <div class="ir-section-head">
+          <button type="button" class="ir-section-toggle" id="irFoodToggle" aria-expanded="false" aria-controls="irFoodPanel">
+            <span class="ir-section-toggle__copy">
+              <span class="ir-section-title" data-i18n="foodHeading">The Iranian table</span>
+              <span class="ir-section-lead" data-i18n="foodLead">Chelo-kebab, ghormeh sabzi, fesenjan, and tahdig — flip a dish for its origin and meaning.</span>
+            </span>
+            <i class="bi bi-chevron-down ir-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="ir-section-panel" id="irFoodPanel" role="region" aria-labelledby="irFoodToggle" hidden>
+          <div class="ir-grid" id="irFoodGrid"></div>
+        </div>
+      </section>
+
+      <section class="ir-section" id="irMusic" data-ir-collapse>
+        <div class="ir-section-head">
+          <button type="button" class="ir-section-toggle" id="irMusicToggle" aria-expanded="false" aria-controls="irMusicPanel">
+            <span class="ir-section-toggle__copy">
+              <span class="ir-section-title" data-i18n="musicHeading">Sound of Iran</span>
+              <span class="ir-section-lead" data-i18n="musicLead">Tar, setar, daf, and the radif. Flip a card for the history.</span>
+            </span>
+            <i class="bi bi-chevron-down ir-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="ir-section-panel" id="irMusicPanel" role="region" aria-labelledby="irMusicToggle" hidden>
+          <div class="ir-grid" id="irMusicGrid"></div>
+        </div>
+      </section>
+
+      <section class="ir-section" id="irHookah" data-ir-collapse>
+        <div class="ir-section-head">
+          <button type="button" class="ir-section-toggle" id="irHookahToggle" aria-expanded="false" aria-controls="irHookahPanel">
+            <span class="ir-section-toggle__copy">
+              <span class="ir-section-title" data-i18n="hookahHeading">Qahveh-khaneh — tea and slow talk</span>
+              <span class="ir-section-lead" data-i18n="hookahLead">Chai, qalyān, and evening conversation — the Iranian café as social furniture.</span>
+            </span>
+            <i class="bi bi-chevron-down ir-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="ir-section-panel" id="irHookahPanel" role="region" aria-labelledby="irHookahToggle" hidden>
+          <div class="ir-grid" id="irHookahGrid"></div>
+        </div>
+      </section>
+
+      <section class="ir-section" id="irLiving" data-ir-collapse>
+        <div class="ir-section-head">
+          <button type="button" class="ir-section-toggle" id="irLivingToggle" aria-expanded="false" aria-controls="irLivingPanel">
+            <span class="ir-section-toggle__copy">
+              <span class="ir-section-title" data-i18n="livingHeading">Living cultures</span>
+              <span class="ir-section-lead" data-i18n="livingLead">Nowruz, carpets, taarof, bazaars, calligraphy, and Chaharshanbe Suri fire.</span>
+            </span>
+            <i class="bi bi-chevron-down ir-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="ir-section-panel" id="irLivingPanel" role="region" aria-labelledby="irLivingToggle" hidden>
+          <div class="ir-grid" id="irLivingGrid"></div>
+        </div>
+      </section>
+
+      <section class="ir-section" id="irPhrases" data-ir-collapse>
+        <div class="ir-section-head">
+          <button type="button" class="ir-section-toggle" id="irPhrasesToggle" aria-expanded="false" aria-controls="irPhrasesPanel">
+            <span class="ir-section-toggle__copy">
+              <span class="ir-section-title" data-i18n="phraseHeading">Speak with Iran</span>
+              <span class="ir-section-lead" data-i18n="phraseLead">Everyday Arabic greetings useful across the region. Press any phrase to hear it.</span>
+            </span>
+            <i class="bi bi-chevron-down ir-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="ir-section-panel" id="irPhrasesPanel" role="region" aria-labelledby="irPhrasesToggle" hidden>
+          <ul class="ir-phrase-list" id="irPhraseList"></ul>
+        </div>
+      </section>
+
+      <p class="ir-footer-note">
+        Iran — Plateau of Empires · Guide narration by Google TTS &amp; HeyGen ·
+        Development by David E Lane · <span id="irFooterYear">2026</span>
+      </p>
+    </div>
+  </main>
+
+  <div class="ir-story-overlay" id="irStoryOverlay" hidden aria-hidden="true" aria-live="polite">
+    <div class="ir-story-chip">
+      <img id="irStoryChipImg" src="/iran/assets/nima-guide-portrait-256.png" width="56" height="56" alt=""/>
+      <div class="ir-story-chip-copy">
+        <p class="ir-story-kicker" id="irStoryKicker"></p>
+        <h3 class="ir-story-title" id="irStoryTitle"></h3>
+        <p class="ir-story-body" id="irStoryCopy"></p>
+        <p class="ir-story-progress" id="irStoryProgress"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="ir-sheet" id="irSheet" hidden role="dialog" aria-modal="true" aria-labelledby="irSheetTitle">
+    <div class="ir-sheet-backdrop" id="irSheetBackdrop"></div>
+    <div class="ir-sheet-panel">
+      <header class="ir-sheet-header">
+        <h2 id="irSheetTitle"></h2>
+        <button type="button" class="btn-close btn-close-white" id="irSheetClose" aria-label="Close"></button>
+      </header>
+      <div class="ir-sheet-body" id="irSheetBody"></div>
+      <footer class="ir-sheet-footer">
+        <button type="button" class="ir-btn ir-btn-sand ir-btn-sm ir-listen-btn" id="irSheetListen" aria-pressed="false">
+          <i class="bi bi-volume-up-fill" aria-hidden="true"></i>
+          <span class="ir-listen-label" data-i18n="listen">Listen</span>
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <script src="/shared/tts.js"></script>
+  <script src="/shared/speech-recognition.js"></script>
+  <script src="/family/js/lane-family-google-maps.js"></script>
+  <script src="/shared/google-advanced-markers.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r160/three.min.js"></script>
+  <script src="/iran/js/iran-i18n.js"></script>
+  <script src="/iran/js/iran-sections.js"></script>
+  <script src="/iran/js/iran-content.js"></script>
+  <script src="/iran/js/iran-desert-atmos.js"></script>
+  <script src="/iran/js/iran-timeline-3d.js"></script>
+  <script src="/iran/js/iran-map.js"></script>
+  <script src="/iran/js/iran-heygen.js"></script>
+  <script src="/iran/js/iran-story-reel.js"></script>
+  <script type="module" src="/iran/js/iran-guide-chat.js"></script>
+</body>
+</html>

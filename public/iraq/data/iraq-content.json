@@ -1,0 +1,1371 @@
+{
+  "id": "iraq-atlas",
+  "brand": {
+    "name": {
+      "en": "Iraq — Land Between the Rivers",
+      "ar": "العراق — بلاد ما بين النهرين"
+    },
+    "tagline": {
+      "en": "From Sumer and Babylon to Baghdad’s books — history, table, and song between Tigris and Euphrates.",
+      "ar": "من سومر وبابل إلى كتب بغداد — تاريخ ومائدة وغناء بين دجلة والفرات."
+    }
+  },
+  "guide": {
+    "name": {
+      "en": "Zayd",
+      "ar": "زيد"
+    },
+    "title": {
+      "en": "Iraq history guide",
+      "ar": "دليل تاريخ العراق"
+    },
+    "portrait": "/iraq/assets/zayd-guide-portrait-256.png",
+    "greeting": {
+      "en": "Ahlan wa sahlan. I am Zayd — walk with me from Baghdad to Babylon and Ur.",
+      "ar": "أهلاً وسهلاً. أنا زيد — امشِ معي من بغداد إلى بابل وأور."
+    }
+  },
+  "ui": {
+    "en": {
+      "dir": "ltr",
+      "langLabel": "English",
+      "switchTo": "عربي",
+      "heroKicker": "Mesopotamia",
+      "heroTitle": "Iraq",
+      "heroLine": "A river civilization between Tigris and Euphrates — Sumerian cities, Abbasid books, marsh light, and a living table of masgouf, quzi, and maqam.",
+      "playReel": "Play HyperFrame tour",
+      "pauseReel": "Pause tour",
+      "resumeReel": "Resume tour",
+      "stopReel": "Stop tour",
+      "narration": "Narration",
+      "narrationScope": "Entire page — atlas, tour, and cards",
+      "hearWelcome": "Hear welcome",
+      "askGuide": "Ask Zayd",
+      "stop": "Stop",
+      "listen": "Listen",
+      "exploreMap": "Explore the atlas",
+      "timelineHeading": "Eras of Iraq",
+      "timelineLead": "From Sumer to contemporary Iraq. Select an era to hear it and find it on the map.",
+      "timelineSelectHint": "Select an era on the timeline",
+      "mapHeading": "Atlas of Iraq",
+      "mapLead": "Rivers, marshes, and desert edge. Select a pin or a name to hear its story.",
+      "mapAll": "All",
+      "mapHistory": "History",
+      "mapFood": "Food",
+      "mapMusic": "Music",
+      "mapHookah": "Café",
+      "mapLiving": "Living",
+      "mapReset": "Show all pins",
+      "mapLoading": "Loading the atlas…",
+      "foodHeading": "The Iraqi table",
+      "foodLead": "Masgouf, quzi, dolma, and kleicha — flip a dish for its origin and meaning.",
+      "musicHeading": "Sound of Iraq",
+      "musicLead": "Iraqi maqam, oud of Baghdad, and chalghi ensembles. Flip a card for the history.",
+      "hookahHeading": "Café — tea and slow talk",
+      "hookahLead": "Chai, nargileh, and evening conversation — the Iraqi café as social furniture.",
+      "livingHeading": "Living cultures",
+      "livingLead": "Ashura processions, marsh life, calligraphy, bazaars, and Nowruz in the north.",
+      "phraseHeading": "Speak Iraqi",
+      "phraseLead": "Everyday Arabic greetings heard across Iraq. Press any phrase to hear it.",
+      "flipHint": "Flip for the history",
+      "playMusic": "Play music",
+      "stopMusic": "Stop music",
+      "back": "Back",
+      "loading": "Loading the atlas…",
+      "readMore": "Read the full story",
+      "close": "Close",
+      "unesco": "UNESCO World Heritage",
+      "context": "Context",
+      "evidence": "On the ground",
+      "startTour": "HyperFrame tour",
+      "meetGuide": "Meet Zayd"
+    },
+    "ar": {
+      "dir": "rtl",
+      "langLabel": "العربية",
+      "switchTo": "English",
+      "heroKicker": "بلاد الرافدين",
+      "heroTitle": "العراق",
+      "heroLine": "حضارة نهرية بين دجلة والفرات — مدن سومر، وكتب بغداد، وضوء الأهوار، ومائدة حية من المسگوف والقوزي والمقام.",
+      "playReel": "شغّل الجولة",
+      "pauseReel": "إيقاف مؤقت",
+      "resumeReel": "متابعة الجولة",
+      "stopReel": "إنهاء الجولة",
+      "narration": "السرد الصوتي",
+      "narrationScope": "الصفحة كاملة — الأطلس والجولة والبطاقات",
+      "hearWelcome": "استمع للترحيب",
+      "askGuide": "اسأل زيد",
+      "stop": "إيقاف",
+      "listen": "استمع",
+      "exploreMap": "استكشف الأطلس",
+      "timelineHeading": "عصور العراق",
+      "timelineLead": "من سومر إلى العراق المعاصر. اختر حقبة لتسمعها وتجدها على الخريطة.",
+      "timelineSelectHint": "اختر حقبة من الخط الزمني",
+      "mapHeading": "أطلس العراق",
+      "mapLead": "أنهار وأهوار وحافة صحراء. اختر علامة أو اسماً لتسمع حكايته.",
+      "mapAll": "الكل",
+      "mapHistory": "تاريخ",
+      "mapFood": "طعام",
+      "mapMusic": "موسيقى",
+      "mapHookah": "مقهى",
+      "mapLiving": "حياة",
+      "mapReset": "أظهر كل العلامات",
+      "mapLoading": "جارٍ تحميل الأطلس…",
+      "foodHeading": "المائدة العراقية",
+      "foodLead": "مسگوف وقوزي ودولمة وكليجة — اقلب الطبق لتعرف أصله ومعناه.",
+      "musicHeading": "صوت العراق",
+      "musicLead": "المقام العراقي وعود بغداد وجلسات الجلغي. اقلب البطاقة لتقرأ الحكاية.",
+      "hookahHeading": "المقهى — شاي وحديث بطيء",
+      "hookahLead": "شاي ونرجيلة وحديث المساء — المقهى العراقي كأثاث اجتماعي.",
+      "livingHeading": "ثقافات حيّة",
+      "livingLead": "مواكب عاشوراء وحياة الأهوار والخط والأسواق ونوروز الشمال.",
+      "phraseHeading": "احكِ عراقي",
+      "phraseLead": "تحيات عربية يومية تُسمَع في العراق. اضغط أي عبارة لتسمعها.",
+      "flipHint": "اقلب البطاقة للحكاية",
+      "playMusic": "شغّل المقطع",
+      "stopMusic": "أوقف المقطع",
+      "back": "رجوع",
+      "loading": "جارٍ تحميل الأطلس…",
+      "readMore": "اقرأ الحكاية كاملة",
+      "close": "إغلاق",
+      "unesco": "تراث عالمي — اليونسكو",
+      "context": "السياق",
+      "evidence": "على الأرض",
+      "startTour": "جولة مصوّرة",
+      "meetGuide": "تعرّف على زيد"
+    }
+  },
+  "eras": [
+    {
+      "id": "sumer",
+      "siteId": "ur",
+      "yearCE": -3000,
+      "years": {
+        "en": "c. 3500–2000 BCE",
+        "ar": "نحو ٣٥٠٠–٢٠٠٠ ق.م"
+      },
+      "title": {
+        "en": "Sumer — first cities",
+        "ar": "سومر — المدن الأولى"
+      },
+      "copy": {
+        "en": "Uruk, Ur, and cuneiform invent urban life.",
+        "ar": "أوروك وأور والمسمارية تخترع الحياة الحضرية."
+      },
+      "narration": {
+        "en": "We begin in Sumer. Between the rivers, cities raised ziggurats, wrote on clay, and traded across the Gulf long before later empires borrowed their script.",
+        "ar": "نبدأ بسومر. بين النهرين رفعت المدن الزقورات وكتبت على الطين وتاجرت عبر الخليج قبل أن تستعير الإمبراطوريات اللاحقة خطّها بزمن طويل."
+      },
+      "history": {
+        "en": "Sumerian city-states such as Uruk, Ur, and Lagash developed irrigation, temples, and the earliest known writing. Royal tombs at Ur and temple economies show how religion and surplus organized the first urban south of Mesopotamia.",
+        "ar": "طوّرت دويلات المدن السومرية مثل أوروك وأور ولجش الريّ والمعابد وأقدم كتابة معروفة. وتُظهر مقابر أور الملكية واقتصاد المعبد كيف نظّم الدين والفائض جنوب بلاد الرافدين الحضري الأول."
+      },
+      "image": "/iraq/assets/era/sumer.jpg"
+    },
+    {
+      "id": "babylon",
+      "siteId": "babylon",
+      "yearCE": -1750,
+      "years": {
+        "en": "c. 1894–539 BCE",
+        "ar": "نحو ١٨٩٤–٥٣٩ ق.م"
+      },
+      "title": {
+        "en": "Babylon",
+        "ar": "بابل"
+      },
+      "copy": {
+        "en": "Hammurabi’s law and Nebuchadnezzar’s city.",
+        "ar": "شريعة حمورابي ومدينة نبوخذ نصر."
+      },
+      "narration": {
+        "en": "Next, Babylon. Hammurabi’s stele spoke of justice; later Nebuchadnezzar rebuilt walls and processional ways that made the city a wonder of the ancient world.",
+        "ar": "ثم بابل. تكلّم مسلة حمورابي عن العدل؛ ثم أعاد نبوخذ نصر بناء الأسوار وطرق المواكب التي جعلت المدينة أعجوبة العالم القديم."
+      },
+      "history": {
+        "en": "Old Babylonian and Neo-Babylonian periods made Babylon a political and cultural capital. Law, astronomy, and monumental architecture framed Mesopotamian kingship until the Persian conquest of 539 BCE.",
+        "ar": "جعلت الفترات البابلية القديمة والحديثة بابل عاصمة سياسية وثقافية. شكّل القانون والفلك والعمارة الضخمة الملوكية الرافدينية حتى الفتح الفارسي سنة ٥٣٩ ق.م."
+      },
+      "image": "/iraq/assets/era/babylon.jpg"
+    },
+    {
+      "id": "assyria",
+      "siteId": "mosul",
+      "yearCE": -700,
+      "years": {
+        "en": "c. 900–609 BCE",
+        "ar": "نحو ٩٠٠–٦٠٩ ق.م"
+      },
+      "title": {
+        "en": "Assyria",
+        "ar": "آشور"
+      },
+      "copy": {
+        "en": "Nineveh’s libraries and northern power.",
+        "ar": "مكتبات نينوى وقوة الشمال."
+      },
+      "narration": {
+        "en": "Assyria ruled from Assur, Kalhu, and Nineveh. Reliefs of lion hunts and Ashurbanipal’s library made the north a capital of empire and clay books.",
+        "ar": "حكمت آشور من آشور وكالح ونينوى. جعلت نقوش صيد الأسود ومكتبة آشوربانيبال الشمال عاصمة إمبراطورية وكتب طين."
+      },
+      "history": {
+        "en": "Neo-Assyrian kings built an imperial machine of roads, deportations, and provincial governors. Excavations near Mosul recovered palace reliefs and tens of thousands of tablets — including literary classics copied in Akkadian.",
+        "ar": "بنى ملوك آشور الحديثة آلة إمبراطورية من طرق وترحيل وحكام ولايات. واستعادت حفريات قرب الموصل نقوش القصور وعشرات آلاف الألواح — بما فيها كلاسيكيات أدبية منسوخة بالأكدية."
+      },
+      "image": "/iraq/assets/era/assyria.jpg"
+    },
+    {
+      "id": "abbasid",
+      "siteId": "baghdad",
+      "yearCE": 800,
+      "years": {
+        "en": "750–1258 CE",
+        "ar": "٧٥٠–١٢٥٨ م"
+      },
+      "title": {
+        "en": "Abbasid Baghdad",
+        "ar": "بغداد العباسية"
+      },
+      "copy": {
+        "en": "Round city, House of Wisdom, and poetry.",
+        "ar": "مدينة مدوّرة وبيت الحكمة وشعر."
+      },
+      "narration": {
+        "en": "The Abbasids founded Baghdad as a round capital. Scholars translated Greek and Persian sciences; markets and mosques made the city the heartbeat of a vast caliphate.",
+        "ar": "أسّس العباسيون بغداد عاصمة مدوّرة. ترجم العلماء علوم اليونان وفارس؛ وجعلت الأسواق والمساجد المدينة نبض خلافة واسعة."
+      },
+      "history": {
+        "en": "From al-Mansur’s foundation through Harun al-Rashid and al-Maʾmun, Baghdad was a world city of learning and trade. The Mongol sack of 1258 devastated the capital, but Iraqi urban and literary culture continued under later dynasties.",
+        "ar": "من تأسيس المنصور عبر هارون الرشيد والمأمون كانت بغداد مدينة عالم للعلم والتجارة. دمّر اجتياح المغول سنة ١٢٥٨ العاصمة، لكن الثقافة الحضرية والأدبية العراقية استمرت تحت أسر لاحقة."
+      },
+      "image": "/iraq/assets/era/abbasid.jpg"
+    },
+    {
+      "id": "ottoman",
+      "siteId": "baghdad",
+      "yearCE": 1534,
+      "years": {
+        "en": "16th–early 20th c.",
+        "ar": "القرن ١٦ – أوائل ٢٠"
+      },
+      "title": {
+        "en": "Ottoman Iraq",
+        "ar": "العراق العثماني"
+      },
+      "copy": {
+        "en": "Provinces of Baghdad, Mosul, and Basra.",
+        "ar": "ولايات بغداد والموصل والبصرة."
+      },
+      "narration": {
+        "en": "Ottoman rule organized Iraq as provinces facing Iran and the Gulf. Caravan trade, shrine cities, and tribal politics shaped centuries of layered authority.",
+        "ar": "نظّم الحكم العثماني العراق ولايات تواجه إيران والخليج. شكّلت تجارة القوافل ومدن المقامات والسياسة القبلية قروناً من سلطة متعددة الطبقات."
+      },
+      "history": {
+        "en": "After the Ottoman conquest, Baghdad, Mosul, and Basra were key eyalets. Mamluk governors in Baghdad, Wahhabi raids, and nineteenth-century reforms remade administration before World War I ended Ottoman control.",
+        "ar": "بعد الفتح العثماني كانت بغداد والموصل والبصرة إيالات مفتاحية. أعاد حكّام المماليك في بغداد وغزوات الوهابيين وإصلاحات القرن التاسع عشر صياغة الإدارة قبل أن تنهي الحرب العالمية الأولى السيطرة العثمانية."
+      },
+      "image": "/iraq/assets/era/ottoman.jpg"
+    },
+    {
+      "id": "mandate-kingdom",
+      "siteId": "baghdad",
+      "yearCE": 1921,
+      "years": {
+        "en": "1920–1958",
+        "ar": "١٩٢٠–١٩٥٨"
+      },
+      "title": {
+        "en": "Mandate and Hashemite kingdom",
+        "ar": "الانتداب والمملكة الهاشمية"
+      },
+      "copy": {
+        "en": "British mandate, then a modern monarchy.",
+        "ar": "انتداب بريطاني ثم ملكية حديثة."
+      },
+      "narration": {
+        "en": "After World War I, a British mandate and then the Hashemite kingdom forged a modern Iraqi state — oil, parliament, and restless politics between Baghdad and the provinces.",
+        "ar": "بعد الحرب العالمية الأولى صنع انتداب بريطاني ثم المملكة الهاشمية دولة عراقية حديثة — نفط وبرلمان وسياسة قلقة بين بغداد والولايات."
+      },
+      "history": {
+        "en": "The 1920 revolt, Faisal I’s coronation, and the 1932 independence marked state formation. Oil at Kirkuk and Basra funded development while coups and social movements pressed the monarchy until 1958.",
+        "ar": "علّمت ثورة ١٩٢٠ وتتويج فيصل الأول واستقلال ١٩٣٢ تشكّل الدولة. موّل نفط كركوك والبصرة التنمية بينما ضغطت الانقلابات والحركات الاجتماعية على الملكية حتى ١٩٥٨."
+      },
+      "image": "/iraq/assets/era/mandate-kingdom.jpg"
+    },
+    {
+      "id": "republic",
+      "siteId": "baghdad",
+      "yearCE": 1958,
+      "years": {
+        "en": "1958–2003",
+        "ar": "١٩٥٨–٢٠٠٣"
+      },
+      "title": {
+        "en": "Republic and Baʿath decades",
+        "ar": "الجمهورية وعقود البعث"
+      },
+      "copy": {
+        "en": "Coups, oil wealth, war, and dictatorship.",
+        "ar": "انقلابات وثروة نفط وحرب وديكتاتورية."
+      },
+      "narration": {
+        "en": "The 1958 republic opened a turbulent half-century — Arab nationalism, Baʿath rule, the Iran–Iraq War, and the 1990s sanctions that reshaped daily life.",
+        "ar": "فتحت جمهورية ١٩٥٨ نصف قرن مضطرب — قومية عربية وحكم بعث وحرب إيران والعراق وعقوبات التسعينيات التي أعادت صياغة الحياة اليومية."
+      },
+      "history": {
+        "en": "From Qasim’s republic through Baʿath consolidation under Saddam Hussein, Iraq experienced land reform, oil nationalization, devastating wars, and harsh authoritarianism. The 2003 US-led invasion ended that regime.",
+        "ar": "من جمهورية قاسم عبر توطيد البعث تحت صدام حسين شهد العراق إصلاح أراضٍ وتأميم نفط وحروباً مدمّرة وتسلّطاً قاسياً. أنهى الغزو الأميركي بقيادة ٢٠٠٣ ذلك النظام."
+      },
+      "image": "/iraq/assets/era/republic.jpg"
+    },
+    {
+      "id": "contemporary",
+      "siteId": "baghdad",
+      "yearCE": 2003,
+      "years": {
+        "en": "2003 – today",
+        "ar": "٢٠٠٣ – اليوم"
+      },
+      "title": {
+        "en": "Contemporary Iraq",
+        "ar": "العراق المعاصر"
+      },
+      "copy": {
+        "en": "Federal politics, recovery, and living culture.",
+        "ar": "سياسة اتحادية وتعافٍ وثقافة حية."
+      },
+      "narration": {
+        "en": "Contemporary Iraq is federal and plural — Kurdistan’s north, shrine cities of the south, Baghdad’s cafés, and marsh communities restoring water and song after hard decades.",
+        "ar": "العراق المعاصر اتحادي ومتعدد — شمال كردستان ومدن مقامات الجنوب ومقاهي بغداد ومجتمعات الأهوار تستعيد الماء والغناء بعد عقود قاسية."
+      },
+      "history": {
+        "en": "Post-2003 Iraq wrote a federal constitution, faced civil conflict and ISIS, and continues reconstruction. Cultural life — maqam, cuisine, pilgrimage, and marsh revival — remains a resilient public face of the country.",
+        "ar": "كتب عراق ما بعد ٢٠٠٣ دستوراً اتحادياً وواجه صراعاً أهلياً وداعش ويواصل إعادة الإعمار. تبقى الحياة الثقافية — المقام والمطبخ والحج وإحياء الأهوار — وجهاً عاماً صامداً للبلاد."
+      },
+      "image": "/iraq/assets/era/contemporary.jpg"
+    }
+  ],
+  "sites": [
+    {
+      "id": "baghdad",
+      "category": "history",
+      "emoji": "🏙️",
+      "lat": 33.3152,
+      "lng": 44.3661,
+      "unesco": false,
+      "name": {
+        "en": "Baghdad",
+        "ar": "بغداد"
+      },
+      "place": {
+        "en": "Capital on the Tigris",
+        "ar": "العاصمة على دجلة"
+      },
+      "blurb": {
+        "en": "Abbasid memory and modern Iraqi heart.",
+        "ar": "ذاكرة عباسية وقلب عراقي حديث."
+      }
+    },
+    {
+      "id": "babylon",
+      "category": "history",
+      "emoji": "🏛️",
+      "lat": 32.5421,
+      "lng": 44.4209,
+      "unesco": true,
+      "name": {
+        "en": "Babylon",
+        "ar": "بابل"
+      },
+      "place": {
+        "en": "Babil",
+        "ar": "بابل"
+      },
+      "blurb": {
+        "en": "Processional ways and Ishtar Gate memory.",
+        "ar": "طرق مواكب وذاكرة بوابة عشتار."
+      }
+    },
+    {
+      "id": "ur",
+      "category": "history",
+      "emoji": "🧱",
+      "lat": 30.9627,
+      "lng": 46.1046,
+      "unesco": true,
+      "name": {
+        "en": "Ur",
+        "ar": "أور"
+      },
+      "place": {
+        "en": "Dhi Qar",
+        "ar": "ذي قار"
+      },
+      "blurb": {
+        "en": "Sumerian ziggurat and royal tombs.",
+        "ar": "زقورة سومرية ومقابر ملكية."
+      }
+    },
+    {
+      "id": "mosul",
+      "category": "history",
+      "emoji": "🕌",
+      "lat": 36.3489,
+      "lng": 43.1577,
+      "unesco": false,
+      "name": {
+        "en": "Mosul",
+        "ar": "الموصل"
+      },
+      "place": {
+        "en": "Nineveh plains",
+        "ar": "سهول نينوى"
+      },
+      "blurb": {
+        "en": "Tigris city beside ancient Nineveh.",
+        "ar": "مدينة دجلة إلى جوار نينوى القديمة."
+      }
+    },
+    {
+      "id": "erbil",
+      "category": "living",
+      "emoji": "🏰",
+      "lat": 36.1911,
+      "lng": 44.0093,
+      "unesco": true,
+      "name": {
+        "en": "Erbil",
+        "ar": "أربيل"
+      },
+      "place": {
+        "en": "Kurdistan",
+        "ar": "كردستان"
+      },
+      "blurb": {
+        "en": "Citadel mound and northern capital energy.",
+        "ar": "تلة القلعة وطاقة عاصمة الشمال."
+      }
+    },
+    {
+      "id": "basra",
+      "category": "food",
+      "emoji": "⚓",
+      "lat": 30.5081,
+      "lng": 47.7835,
+      "unesco": false,
+      "name": {
+        "en": "Basra",
+        "ar": "البصرة"
+      },
+      "place": {
+        "en": "Shatt al-Arab",
+        "ar": "شط العرب"
+      },
+      "blurb": {
+        "en": "Gulf gateway of dates, canals, and fish.",
+        "ar": "بوابة خليج للتمر والقنوات والسمك."
+      }
+    },
+    {
+      "id": "samarra",
+      "category": "history",
+      "emoji": "🌀",
+      "lat": 34.1959,
+      "lng": 43.8747,
+      "unesco": true,
+      "name": {
+        "en": "Samarra",
+        "ar": "سامراء"
+      },
+      "place": {
+        "en": "Abbasid north",
+        "ar": "شمال عباسي"
+      },
+      "blurb": {
+        "en": "Spiral minaret of a short-lived capital.",
+        "ar": "مئذنة لولبية لعاصمة قصيرة العمر."
+      }
+    },
+    {
+      "id": "karbala",
+      "category": "living",
+      "emoji": "🕯️",
+      "lat": 32.616,
+      "lng": 44.0243,
+      "unesco": false,
+      "name": {
+        "en": "Karbala",
+        "ar": "كربلاء"
+      },
+      "place": {
+        "en": "Shrine city",
+        "ar": "مدينة مقام"
+      },
+      "blurb": {
+        "en": "Ashura pilgrimage and Imam Husayn shrine.",
+        "ar": "حج عاشوراء ومقام الإمام الحسين."
+      }
+    },
+    {
+      "id": "najaf",
+      "category": "living",
+      "emoji": "📿",
+      "lat": 31.999,
+      "lng": 44.332,
+      "unesco": false,
+      "name": {
+        "en": "Najaf",
+        "ar": "النجف"
+      },
+      "place": {
+        "en": "Shrine city",
+        "ar": "مدينة مقام"
+      },
+      "blurb": {
+        "en": "Imam Ali shrine and scholarly hawza.",
+        "ar": "مقام الإمام علي والحوزة العلمية."
+      }
+    },
+    {
+      "id": "hatra",
+      "category": "history",
+      "emoji": "🏜️",
+      "lat": 35.588,
+      "lng": 42.718,
+      "unesco": true,
+      "name": {
+        "en": "Hatra",
+        "ar": "الحضر"
+      },
+      "place": {
+        "en": "Desert frontier",
+        "ar": "حدود الصحراء"
+      },
+      "blurb": {
+        "en": "Parthian temple city of the steppe edge.",
+        "ar": "مدينة معابد بارثية على حافة السهوب."
+      }
+    },
+    {
+      "id": "ahwar",
+      "category": "living",
+      "emoji": "🛶",
+      "lat": 31.05,
+      "lng": 47.25,
+      "unesco": true,
+      "name": {
+        "en": "Ahwar marshes",
+        "ar": "أهوار العراق"
+      },
+      "place": {
+        "en": "Southern wetlands",
+        "ar": "أراضٍ رطبة جنوبية"
+      },
+      "blurb": {
+        "en": "Reed houses, water buffalo, and UNESCO wetlands.",
+        "ar": "بيوت قصب وجواميس وأراضٍ رطبة في اليونسكو."
+      }
+    },
+    {
+      "id": "ctesiphon",
+      "category": "music",
+      "emoji": "🏟️",
+      "lat": 33.0936,
+      "lng": 44.5808,
+      "unesco": false,
+      "name": {
+        "en": "Ctesiphon",
+        "ar": "قطيسفون"
+      },
+      "place": {
+        "en": "Taq Kasra",
+        "ar": "طاق كسرى"
+      },
+      "blurb": {
+        "en": "Sasanian arch facing the Tigris plain.",
+        "ar": "قوس ساساني يواجه سهل دجلة."
+      }
+    }
+  ],
+  "foods": [
+    {
+      "id": "masgouf",
+      "emoji": "🐟",
+      "siteId": "baghdad",
+      "name": {
+        "en": "Masgouf",
+        "ar": "مسگوف"
+      },
+      "tagline": {
+        "en": "Butterflied carp grilled by the Tigris",
+        "ar": "سمك مشقوق يُشوى على دجلة"
+      },
+      "history": {
+        "en": "Fresh carp opened flat, seasoned, and slow-grilled upright beside open flame. Baghdad’s river restaurants made masgouf a national emblem of outdoor feasting.",
+        "ar": "كارب طازج يُفتح مسطحاً ويُتبَّل ويُشوى ببطء منتصباً إلى جوار اللهب. جعلت مطاعم نهر بغداد المسگوف شعاراً وطنياً للولائم في الهواء الطلق."
+      },
+      "tags": {
+        "en": [
+          "Fish",
+          "Tigris",
+          "Grill"
+        ],
+        "ar": [
+          "سمك",
+          "دجلة",
+          "شواء"
+        ]
+      },
+      "image": "/iraq/assets/food/masgouf.jpg"
+    },
+    {
+      "id": "quzi",
+      "emoji": "🍖",
+      "siteId": "baghdad",
+      "name": {
+        "en": "Quzi",
+        "ar": "قوزي"
+      },
+      "tagline": {
+        "en": "Lamb and spiced rice of celebrations",
+        "ar": "لحم ضأن وأرز متبّل للاحتفال"
+      },
+      "history": {
+        "en": "Whole or large cuts of lamb served over fragrant rice with nuts and raisins. Quzi is wedding and feast food — abundance arranged on one tray.",
+        "ar": "قطع كبيرة من الضأن تُقدَّم فوق أرز عطر بالمكسرات والزبيب. القوزي طعام أعراس وولائم — وفرة مرتّبة على صينية واحدة."
+      },
+      "tags": {
+        "en": [
+          "Lamb",
+          "Rice",
+          "Feast"
+        ],
+        "ar": [
+          "ضأن",
+          "أرز",
+          "عيد"
+        ]
+      },
+      "image": "/iraq/assets/food/quzi.jpg"
+    },
+    {
+      "id": "dolma",
+      "emoji": "🥬",
+      "siteId": "mosul",
+      "name": {
+        "en": "Dolma",
+        "ar": "دولمة"
+      },
+      "tagline": {
+        "en": "Stuffed vegetables of family tables",
+        "ar": "محاشي خضار لمائدة العائلة"
+      },
+      "history": {
+        "en": "Grape leaves, onions, tomatoes, and zucchini filled with rice and meat. Iraqi dolma trays are communal labor — many hands, one pot.",
+        "ar": "ورق عنب وبصل وطماطم وكوسا تُحشى بالأرز واللحم. صواني الدولمة العراقية عمل جماعي — أيدٍ كثيرة وقدر واحدة."
+      },
+      "tags": {
+        "en": [
+          "Stuffed",
+          "Family",
+          "Rice"
+        ],
+        "ar": [
+          "محاشي",
+          "عائلة",
+          "أرز"
+        ]
+      },
+      "image": "/iraq/assets/food/dolma.jpg"
+    },
+    {
+      "id": "kleicha",
+      "emoji": "🍪",
+      "siteId": "baghdad",
+      "name": {
+        "en": "Kleicha",
+        "ar": "كليجة"
+      },
+      "tagline": {
+        "en": "Date-filled cookies of Eid",
+        "ar": "كعك محشو بالتمر للعيد"
+      },
+      "history": {
+        "en": "Spiced dough wrapped around date paste in molded shapes. Kleicha marks Eid trays and neighbor exchanges — sweetness as social glue.",
+        "ar": "عجينة متبّلة تُلف حول معجون تمر بأشكال قوالب. تعلّم الكليجة صواني العيد وتبادل الجيران — حلاوة كغراء اجتماعي."
+      },
+      "tags": {
+        "en": [
+          "Sweet",
+          "Eid",
+          "Dates"
+        ],
+        "ar": [
+          "حلوى",
+          "عيد",
+          "تمر"
+        ]
+      },
+      "image": "/iraq/assets/food/kleicha.jpg"
+    },
+    {
+      "id": "tashreeb",
+      "emoji": "🍲",
+      "siteId": "najaf",
+      "name": {
+        "en": "Tashreeb",
+        "ar": "تشريب"
+      },
+      "tagline": {
+        "en": "Bread soaked in rich broth",
+        "ar": "خبز منقوع في مرق غني"
+      },
+      "history": {
+        "en": "Torn bread absorbs chickpea or meat broth until soft. Tashreeb is humble comfort — pilgrimage cities and home kitchens alike.",
+        "ar": "يمتص الخبز الممزق مرق الحمص أو اللحم حتى يلين. التشريب راحة متواضعة — مدن الحج ومطابخ البيوت معاً."
+      },
+      "tags": {
+        "en": [
+          "Broth",
+          "Bread",
+          "Comfort"
+        ],
+        "ar": [
+          "مرق",
+          "خبز",
+          "راحة"
+        ]
+      },
+      "image": "/iraq/assets/food/tashreeb.jpg"
+    },
+    {
+      "id": "samoon",
+      "emoji": "🥖",
+      "siteId": "baghdad",
+      "name": {
+        "en": "Samoon",
+        "ar": "صمون"
+      },
+      "tagline": {
+        "en": "Diamond-shaped Iraqi bakery bread",
+        "ar": "خبز عراقي معيني من الفرن"
+      },
+      "history": {
+        "en": "Crisp outside, soft inside — samoon is the everyday vehicle for kebabs, eggs, and cheese. Bakeries stamp the city’s morning rhythm.",
+        "ar": "مقرمش من الخارج طري من الداخل — الصمون مركبة يومية للكباب والبيض والجبن. تختم الأفران إيقاع صباح المدينة."
+      },
+      "tags": {
+        "en": [
+          "Bread",
+          "Bakery",
+          "Daily"
+        ],
+        "ar": [
+          "خبز",
+          "فرن",
+          "يومي"
+        ]
+      },
+      "image": "/iraq/assets/food/samoon.jpg"
+    },
+    {
+      "id": "iraqi-tea",
+      "emoji": "🍵",
+      "siteId": "basra",
+      "name": {
+        "en": "Iraqi tea",
+        "ar": "الشاي العراقي"
+      },
+      "tagline": {
+        "en": "Strong sweet chai in slender glasses",
+        "ar": "شاي قوي حلو في كؤوس رفيعة"
+      },
+      "history": {
+        "en": "Black tea boiled dark, heavily sweetened, poured into istikan glasses. Tea stalls organize gossip, deals, and rest across Iraq.",
+        "ar": "شاي أسود يُغلى غامقاً ويُحلّى كثيراً ويُصب في كؤوس الاستكان. تنظّم أكشاك الشاي القيل والقال والصفقات والراحة عبر العراق."
+      },
+      "tags": {
+        "en": [
+          "Tea",
+          "Café",
+          "Sweet"
+        ],
+        "ar": [
+          "شاي",
+          "مقهى",
+          "حلو"
+        ]
+      },
+      "image": "/iraq/assets/food/iraqi-tea.jpg"
+    },
+    {
+      "id": "timman",
+      "emoji": "🍚",
+      "siteId": "basra",
+      "name": {
+        "en": "Timman",
+        "ar": "تمن"
+      },
+      "tagline": {
+        "en": "Iraqi rice — often with vermicelli",
+        "ar": "أرز عراقي — غالباً بالشعيرية"
+      },
+      "history": {
+        "en": "Timman is the rice bed under stews and quzi. Lightly fried vermicelli and oil perfume the grain — the quiet foundation of the Iraqi table.",
+        "ar": "التمن فراش الأرز تحت اليخنات والقوزي. شعيرية مقليّة خفيفة وزيت يعطّران الحبّة — الأساس الهادئ للمائدة العراقية."
+      },
+      "tags": {
+        "en": [
+          "Rice",
+          "Daily",
+          "Tray"
+        ],
+        "ar": [
+          "أرز",
+          "يومي",
+          "صينية"
+        ]
+      },
+      "image": "/iraq/assets/food/timman.jpg"
+    }
+  ],
+  "music": [
+    {
+      "id": "iraqi-maqam",
+      "emoji": "🎶",
+      "siteId": "baghdad",
+      "name": {
+        "en": "Iraqi maqam",
+        "ar": "المقام العراقي"
+      },
+      "tagline": {
+        "en": "Classical vocal art of Baghdad",
+        "ar": "فن غناء كلاسيكي بغدادي"
+      },
+      "history": {
+        "en": "Iraqi maqam is a rigorous vocal tradition with suite forms, poetic texts, and instrumental interludes. UNESCO recognizes it as intangible heritage.",
+        "ar": "المقام العراقي تقليد غنائي صارم بأشكال متتالية ونصوص شعرية وفواصل آلية. تعترف به اليونسكو تراثاً غير مادي."
+      },
+      "tags": {
+        "en": [
+          "Classical",
+          "UNESCO",
+          "Voice"
+        ],
+        "ar": [
+          "كلاسيكي",
+          "يونسكو",
+          "صوت"
+        ]
+      },
+      "image": "/iraq/assets/music/iraqi-maqam.jpg"
+    },
+    {
+      "id": "oud-baghdad",
+      "emoji": "🎸",
+      "siteId": "baghdad",
+      "name": {
+        "en": "Baghdad oud",
+        "ar": "عود بغداد"
+      },
+      "tagline": {
+        "en": "Lute lineage of the capital",
+        "ar": "سلالة العود في العاصمة"
+      },
+      "history": {
+        "en": "Baghdad’s oud schools shaped Arab lute technique for a century. The instrument bridges maqam suites and modern song.",
+        "ar": "شكّلت مدارس عود بغداد تقنية العود العربي قرناً. والجهاز يصل متتاليات المقام بالأغنية الحديثة."
+      },
+      "tags": {
+        "en": [
+          "Oud",
+          "Baghdad",
+          "Instrument"
+        ],
+        "ar": [
+          "عود",
+          "بغداد",
+          "آلة"
+        ]
+      },
+      "image": "/iraq/assets/music/oud-baghdad.jpg"
+    },
+    {
+      "id": "chalghi",
+      "emoji": "🥁",
+      "siteId": "baghdad",
+      "name": {
+        "en": "Chalghi baghdadi",
+        "ar": "الجلغي البغدادي"
+      },
+      "tagline": {
+        "en": "Ensemble that carries the maqam",
+        "ar": "فرقة تحمل المقام"
+      },
+      "history": {
+        "en": "Santur, joza, tabla, and oud form the classic chalghi. The group answers the singer and colors each maqam turn.",
+        "ar": "يشكّل السنطور والجوزة والطبلة والعود الجلغي الكلاسيكي. تجيب الفرقة المغني وتلوّن كل انعطافة مقام."
+      },
+      "tags": {
+        "en": [
+          "Ensemble",
+          "Maqam",
+          "Baghdad"
+        ],
+        "ar": [
+          "فرقة",
+          "مقام",
+          "بغداد"
+        ]
+      },
+      "image": "/iraq/assets/music/chalghi.jpg"
+    },
+    {
+      "id": "folk-south",
+      "emoji": "🛶",
+      "siteId": "ahwar",
+      "name": {
+        "en": "Southern folk song",
+        "ar": "أغنية الجنوب الشعبية"
+      },
+      "tagline": {
+        "en": "Marsh rhythms and Basra voice",
+        "ar": "إيقاعات الأهوار وصوت البصرة"
+      },
+      "history": {
+        "en": "Southern Iraq sings work songs, wedding rhythms, and marsh poetry. Reed landscapes taught tempos that travel to city stages.",
+        "ar": "يغني جنوب العراق أغاني العمل وإيقاعات الأعراس وشعر الأهوار. علّمت مناظر القصب إيقاعات تسافر إلى مسارح المدينة."
+      },
+      "tags": {
+        "en": [
+          "Folk",
+          "South",
+          "Marsh"
+        ],
+        "ar": [
+          "شعبي",
+          "جنوب",
+          "أهوار"
+        ]
+      },
+      "image": "/iraq/assets/music/folk-south.jpg"
+    },
+    {
+      "id": "kurdish-folk",
+      "emoji": "🏞️",
+      "siteId": "erbil",
+      "name": {
+        "en": "Kurdish folk",
+        "ar": "أغنية كردية"
+      },
+      "tagline": {
+        "en": "Mountain dance and ballad of the north",
+        "ar": "رقص جبلي وملحمة الشمال"
+      },
+      "history": {
+        "en": "Kurdish song and dance in Erbil and beyond keep seasonal festivals and epic memory alive — a northern voice within Iraq’s plurality.",
+        "ar": "تبقي الأغنية والرقص الكرديان في أربيل وما بعدها مهرجانات المواسم وذاكرة الملحمة حية — صوتاً شمالياً داخل تعدد العراق."
+      },
+      "tags": {
+        "en": [
+          "Kurdish",
+          "Dance",
+          "North"
+        ],
+        "ar": [
+          "كردي",
+          "رقص",
+          "شمال"
+        ]
+      },
+      "image": "/iraq/assets/music/kurdish-folk.jpg"
+    },
+    {
+      "id": "contemporary",
+      "emoji": "🎧",
+      "siteId": "baghdad",
+      "name": {
+        "en": "Contemporary Iraqi music",
+        "ar": "موسيقى عراقية معاصرة"
+      },
+      "tagline": {
+        "en": "Pop, diaspora stages, and new Baghdad nights",
+        "ar": "بوب ومسارح شتات وليالٍ بغدادية جديدة"
+      },
+      "history": {
+        "en": "From classic mid-century stars to today’s fusion and diaspora artists, Iraqi musicians remix maqam feeling with global forms.",
+        "ar": "من نجوم منتصف القرن إلى فناني الاندماج والشتات اليوم، يعيد الموسيقيون العراقيون مزج إحساس المقام بأشكال عالمية."
+      },
+      "tags": {
+        "en": [
+          "Pop",
+          "Fusion",
+          "Urban"
+        ],
+        "ar": [
+          "بوب",
+          "اندماج",
+          "حضري"
+        ]
+      },
+      "image": "/iraq/assets/music/contemporary.jpg"
+    }
+  ],
+  "hookah": [
+    {
+      "id": "baghdad-chai-khana",
+      "emoji": "☕",
+      "siteId": "baghdad",
+      "name": {
+        "en": "Chai-khana",
+        "ar": "چايخانه"
+      },
+      "tagline": {
+        "en": "Tea house of talk and newspapers",
+        "ar": "بيت شاي للحديث والصحف"
+      },
+      "history": {
+        "en": "Baghdad tea houses pour istikan chai for debate, chess, and poetry. The older grammar is sit long and speak carefully.",
+        "ar": "تصب بيوت شاي بغداد استكان الشاي للنقاش والشطرنج والشعر. القواعد الأقدم: اجلس طويلاً وتكلّم بحذر."
+      },
+      "tags": {
+        "en": [
+          "Tea",
+          "Baghdad",
+          "Talk"
+        ],
+        "ar": [
+          "شاي",
+          "بغداد",
+          "حديث"
+        ]
+      },
+      "image": "/iraq/assets/hookah/baghdad-chai-khana.jpg"
+    },
+    {
+      "id": "nargileh-evening",
+      "emoji": "💨",
+      "siteId": "basra",
+      "name": {
+        "en": "Evening nargileh",
+        "ar": "نرجيلة المساء"
+      },
+      "tagline": {
+        "en": "Water pipe after strong tea",
+        "ar": "نرجيلة بعد شاي قوي"
+      },
+      "history": {
+        "en": "In many cafés, nargileh follows tea rather than replacing it. Coals pace the conversation along Gulf and river nights.",
+        "ar": "في مقاهٍ كثيرة تأتي النرجيلة بعد الشاي لا بديلاً عنه. يضبط الجمر الحديث على ليالي الخليج والنهر."
+      },
+      "tags": {
+        "en": [
+          "Nargileh",
+          "Café",
+          "Evening"
+        ],
+        "ar": [
+          "نرجيلة",
+          "مقهى",
+          "مساء"
+        ]
+      },
+      "image": "/iraq/assets/hookah/nargileh-evening.jpg"
+    },
+    {
+      "id": "erbil-cafe",
+      "emoji": "🌙",
+      "siteId": "erbil",
+      "name": {
+        "en": "Erbil evening café",
+        "ar": "مقهى مساء أربيل"
+      },
+      "tagline": {
+        "en": "Citadel views and slow cups",
+        "ar": "إطلالات القلعة وفناجين بطيئة"
+      },
+      "history": {
+        "en": "Erbil’s cafés mix Kurdish and Iraqi café habits — tea, sweets, and long talk under citadel light.",
+        "ar": "تمزج مقاهي أربيل عادات المقهى الكردية والعراقية — شاي وحلوى وحديث طويل تحت ضوء القلعة."
+      },
+      "tags": {
+        "en": [
+          "Erbil",
+          "Tea",
+          "Night"
+        ],
+        "ar": [
+          "أربيل",
+          "شاي",
+          "ليل"
+        ]
+      },
+      "image": "/iraq/assets/hookah/erbil-cafe.jpg"
+    },
+    {
+      "id": "river-terrace",
+      "emoji": "🌊",
+      "siteId": "baghdad",
+      "name": {
+        "en": "Tigris terrace",
+        "ar": "شرفة دجلة"
+      },
+      "tagline": {
+        "en": "River air, fish grill, and late cups",
+        "ar": "هواء النهر وشواء سمك وفناجين متأخرة"
+      },
+      "history": {
+        "en": "Abu Nuwas street and river terraces pair masgouf smoke with tea. The Tigris remains Baghdad’s evening living room.",
+        "ar": "يزوّج شارع أبو نواس وشرفات النهر دخان المسگوف بالشاي. تبقى دجلة صالة مساء بغداد."
+      },
+      "tags": {
+        "en": [
+          "Tigris",
+          "Terrace",
+          "Baghdad"
+        ],
+        "ar": [
+          "دجلة",
+          "شرفة",
+          "بغداد"
+        ]
+      },
+      "image": "/iraq/assets/hookah/river-terrace.jpg"
+    }
+  ],
+  "living": [
+    {
+      "id": "ashura",
+      "emoji": "🕯️",
+      "siteId": "karbala",
+      "name": {
+        "en": "Ashura and Arbaeen",
+        "ar": "عاشوراء والأربعين"
+      },
+      "tagline": {
+        "en": "Pilgrimage of mourning and devotion",
+        "ar": "حج حزن وولاء"
+      },
+      "history": {
+        "en": "Millions walk to Karbala for Arbaeen. Processions, latmiya chants, and open hospitality tents organize one of the world’s largest annual gatherings.",
+        "ar": "يمشي الملايين إلى كربلاء في الأربعين. تنظّم المواكب واللطميات وخيام الضيافة واحداً من أكبر التجمعات السنوية في العالم."
+      },
+      "tags": {
+        "en": [
+          "Pilgrimage",
+          "Karbala",
+          "Faith"
+        ],
+        "ar": [
+          "حج",
+          "كربلاء",
+          "إيمان"
+        ]
+      },
+      "image": "/iraq/assets/living/ashura.jpg"
+    },
+    {
+      "id": "marsh-life",
+      "emoji": "🛶",
+      "siteId": "ahwar",
+      "name": {
+        "en": "Marsh Arab life",
+        "ar": "حياة عرب الأهوار"
+      },
+      "tagline": {
+        "en": "Reed architecture and water buffalo",
+        "ar": "عمارة قصب وجواميس ماء"
+      },
+      "history": {
+        "en": "The Ahwar wetlands hold mudhif reed halls, fishing economies, and UNESCO recognition. Drainage and war damaged the marshes; restoration continues.",
+        "ar": "تحمل أهوار الأهوار قاعات المضيف القصبية واقتصاد صيد واعتراف اليونسكو. أضرّ التجفيف والحرب بالأهوار؛ ويتواصل الترميم."
+      },
+      "tags": {
+        "en": [
+          "Marshes",
+          "UNESCO",
+          "Reed"
+        ],
+        "ar": [
+          "أهوار",
+          "يونسكو",
+          "قصب"
+        ]
+      },
+      "image": "/iraq/assets/living/marsh-life.jpg"
+    },
+    {
+      "id": "calligraphy-baghdad",
+      "emoji": "✒️",
+      "siteId": "baghdad",
+      "name": {
+        "en": "Baghdad calligraphy",
+        "ar": "خط بغداد"
+      },
+      "tagline": {
+        "en": "Arabic script as living craft",
+        "ar": "الخط العربي كحرفة حية"
+      },
+      "history": {
+        "en": "Iraqi calligraphers carried Abbasid script traditions into modern posters, mosque bands, and school copybooks. The pen remains a public art.",
+        "ar": "حمل الخطاطون العراقيون تقاليد الخط العباسي إلى ملصقات حديثة وأشرطة مساجد وكراسات مدارس. يبقى القلم فناً عاماً."
+      },
+      "tags": {
+        "en": [
+          "Script",
+          "Art",
+          "Baghdad"
+        ],
+        "ar": [
+          "خط",
+          "فن",
+          "بغداد"
+        ]
+      },
+      "image": "/iraq/assets/living/calligraphy-baghdad.jpg"
+    },
+    {
+      "id": "bazaar-souq",
+      "emoji": "🏪",
+      "siteId": "baghdad",
+      "name": {
+        "en": "Souq life",
+        "ar": "حياة السوق"
+      },
+      "tagline": {
+        "en": "Covered markets of spice and copper",
+        "ar": "أسواق مسقوفة للتوابل والنحاس"
+      },
+      "history": {
+        "en": "From Shorja to provincial souqs, markets organize scent, bargaining, and neighborhood news. Trade streets are Iraq’s oldest social media.",
+        "ar": "من الشورجة إلى أسواق المحافظات تنظّم الأسواق الرائحة والمساومة وأخبار الحي. شوارع التجارة أقدم وسائل تواصل العراق."
+      },
+      "tags": {
+        "en": [
+          "Market",
+          "Trade",
+          "City"
+        ],
+        "ar": [
+          "سوق",
+          "تجارة",
+          "مدينة"
+        ]
+      },
+      "image": "/iraq/assets/living/bazaar-souq.jpg"
+    },
+    {
+      "id": "nowruz-north",
+      "emoji": "🔥",
+      "siteId": "erbil",
+      "name": {
+        "en": "Nowruz in the north",
+        "ar": "نوروز في الشمال"
+      },
+      "tagline": {
+        "en": "Spring fire and Kurdish new year",
+        "ar": "نار الربيع ورأس السنة الكردية"
+      },
+      "history": {
+        "en": "In Kurdistan, Nowruz gathers families around fire, dance, and picnic greens. It is seasonal joy shared with wider Iranian-plateau traditions.",
+        "ar": "في كردستان يجمع نوروز العائلات حول النار والرقص ونزهات الخضرة. هو فرح موسمي مشترك مع تقاليد هضبة إيران الأوسع."
+      },
+      "tags": {
+        "en": [
+          "Nowruz",
+          "Kurdish",
+          "Spring"
+        ],
+        "ar": [
+          "نوروز",
+          "كردي",
+          "ربيع"
+        ]
+      },
+      "image": "/iraq/assets/living/nowruz-north.jpg"
+    },
+    {
+      "id": "hospitality",
+      "emoji": "🤝",
+      "siteId": "najaf",
+      "name": {
+        "en": "Diyafa hospitality",
+        "ar": "الضيافة"
+      },
+      "tagline": {
+        "en": "Open tables for guests and pilgrims",
+        "ar": "موائد مفتوحة للضيف والحاج"
+      },
+      "history": {
+        "en": "Offering tea, bread, and rest to strangers is a point of pride — especially along pilgrimage roads. Diyafa is ethics made edible.",
+        "ar": "تقديم الشاي والخبز والراحة للغريب مفخرة — خاصة على طرق الحج. الضيافة أخلاق تؤكل."
+      },
+      "tags": {
+        "en": [
+          "Hospitality",
+          "Guest",
+          "Tea"
+        ],
+        "ar": [
+          "ضيافة",
+          "ضيف",
+          "شاي"
+        ]
+      },
+      "image": "/iraq/assets/living/hospitality.jpg"
+    }
+  ],
+  "phrases": [
+    {
+      "ar": "أهلاً وسهلاً",
+      "translit": "Ahlan wa sahlan",
+      "en": "Welcome / hello"
+    },
+    {
+      "ar": "مرحبا",
+      "translit": "Marhaba",
+      "en": "Hi"
+    },
+    {
+      "ar": "شلونك؟",
+      "translit": "Shlonak?",
+      "en": "How are you? (Iraqi)"
+    },
+    {
+      "ar": "الحمد لله",
+      "translit": "Alhamdulillah",
+      "en": "Praise God / I am well"
+    },
+    {
+      "ar": "تشرفنا",
+      "translit": "Tasharrafna",
+      "en": "Pleased to meet you"
+    },
+    {
+      "ar": "من فضلك",
+      "translit": "Min fadlak",
+      "en": "Please"
+    },
+    {
+      "ar": "شكراً",
+      "translit": "Shukran",
+      "en": "Thank you"
+    },
+    {
+      "ar": "مع السلامة",
+      "translit": "Maʿa salama",
+      "en": "Goodbye"
+    },
+    {
+      "ar": "تعالي",
+      "translit": "Taʿali",
+      "en": "Come here (colloquial)"
+    },
+    {
+      "ar": "تفضل",
+      "translit": "Tafaddal",
+      "en": "Please go ahead / help yourself"
+    }
+  ],
+  "photoCredits": "/iraq/data/iraq-photo-credits.json"
+}

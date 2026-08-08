@@ -1,6 +1,6 @@
 {
-  "version": "1.2.0",
-  "disclaimer": "This tool summarizes publicly published Fannie Mae, Freddie Mac, FHFA, VA, FHA, USDA, and Ginnie Mae (MBS delivery) materials, plus lender/investor overlay examples. It is informational decision support only, not underwriting, not DU/LPA/TOTAL/GUS, not Ginnie Mae pool eligibility, and not a commitment to lend. Always confirm eligibility in current agency guides, AUS findings, investor overlays, issuer requirements, and compliance policy.",
+  "version": "1.3.0",
+  "disclaimer": "This tool summarizes publicly published Fannie Mae, Freddie Mac, FHFA, VA, FHA, USDA, and Ginnie Mae (MBS delivery / pooling) materials, plus lender/investor overlay examples. It is informational decision support only, not underwriting, not DU/LPA/TOTAL/GUS, not Ginnie Mae or GSE pool eligibility, and not a commitment to lend. Always confirm eligibility in current agency guides, AUS findings, investor overlays, issuer requirements, and compliance policy.",
   "sources": [
     {
       "id": "FANNIE_SELLING_GUIDE",
@@ -86,6 +86,41 @@
       "id": "GINNIE_ISSUER",
       "title": "Ginnie Mae — Becoming an Issuer",
       "url": "https://www.ginniemae.gov/about_us/how_to_participate/Pages/becoming_an_issuer.aspx"
+    },
+    {
+      "id": "FANNIE_MBS_BASICS",
+      "title": "Basics of Fannie Mae Single-Family MBS",
+      "url": "https://capitalmarkets.fanniemae.com/media/4271/display"
+    },
+    {
+      "id": "FANNIE_MBS_SECURITIZATION",
+      "title": "Fannie Mae Selling Guide — MBS Securitization Process (C3-2)",
+      "url": "https://selling-guide.fanniemae.com/sel/c3-2/mbs-securitization-process"
+    },
+    {
+      "id": "FANNIE_POOLING_PREP",
+      "title": "Fannie Mae Selling Guide — Preparing to Pool Loans into MBS (C3-1-02)",
+      "url": "https://selling-guide.fanniemae.com/sel/c3-1-02/preparing-pool-loans-mbs"
+    },
+    {
+      "id": "FANNIE_MAJORS",
+      "title": "Fannie Mae Selling Guide — Parameters for Pooling into Fannie Majors (C3-6-01)",
+      "url": "https://selling-guide.fanniemae.com/sel/c3-6-01/parameters-pooling-loans-fannie-majors"
+    },
+    {
+      "id": "FANNIE_FIXED_POOL_PARAMS",
+      "title": "Fannie Mae Selling Guide — Fixed-Rate Mortgage Pooling Parameters (C3-4-01)",
+      "url": "https://selling-guide.fanniemae.com/sel/c3-4-01/term-related-fixed-rate-mortgage-pooling-parameters"
+    },
+    {
+      "id": "FREDDIE_MBS_OVERVIEW",
+      "title": "Freddie Mac — Understanding Mortgage-Backed Securities",
+      "url": "https://capitalmarkets.freddiemac.com/mbs/understanding-mortgage-backed-securities"
+    },
+    {
+      "id": "FHFA_UMBS",
+      "title": "FHFA — Single Security Initiative and Common Securitization Platform (UMBS)",
+      "url": "https://www.fhfa.gov/policy/single-security-initiative-and-common-securitization-platform"
     }
   ],
   "sourceRefs": {
@@ -135,5 +170,16 @@
   },
   "deliveryExhibitLinks": {
     "ginnie": ["GINNIE_MBS_GUIDE", "GINNIE_MBS_CHAPTERS", "GINNIE_ISSUER"]
-  }
+  },
+  "poolingExhibitLinks": [
+    "FANNIE_MBS_BASICS",
+    "FANNIE_MBS_SECURITIZATION",
+    "FANNIE_POOLING_PREP",
+    "FANNIE_MAJORS",
+    "FANNIE_FIXED_POOL_PARAMS",
+    "FREDDIE_MBS_OVERVIEW",
+    "FHFA_UMBS",
+    "GINNIE_MBS_GUIDE",
+    "GINNIE_MBS_CHAPTERS"
+  ]
 }

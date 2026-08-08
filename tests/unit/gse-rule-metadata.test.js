@@ -46,4 +46,20 @@ describe('gse rule-metadata.json', () => {
       expect(source.url).toMatch(/^https:\/\/www\.ginniemae\.gov\//);
     }
   });
+
+  it('exposes mortgage pooling primer references with resolvable source urls', () => {
+    expect(Array.isArray(metadata.poolingExhibitLinks)).toBe(true);
+    expect(metadata.poolingExhibitLinks.length).toBeGreaterThan(0);
+
+    const byId = new Map((metadata.sources || []).map((s) => [s.id, s]));
+    for (const id of metadata.poolingExhibitLinks) {
+      const source = byId.get(id);
+      expect(source).toBeDefined();
+      expect(source.url).toMatch(/^https:\/\//);
+    }
+
+    expect(byId.get('FANNIE_MBS_SECURITIZATION')?.url).toContain('selling-guide.fanniemae.com');
+    expect(byId.get('FREDDIE_MBS_OVERVIEW')?.url).toContain('freddiemac.com');
+    expect(byId.get('FHFA_UMBS')?.url).toContain('fhfa.gov');
+  });
 });

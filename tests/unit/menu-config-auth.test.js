@@ -61,6 +61,7 @@ describe('menu-config auth filtering', () => {
         '/finance/encompass-assistant.html',
         '/finance/condition-manager.html',
         '/finance/enhanced-conditions-expert.html',
+        '/finance/tpo-connect.html',
         '/finance/processor-assignment.html',
         '/finance/unit-tests.html',
         '/finance/fha-streamline-calculator.html',

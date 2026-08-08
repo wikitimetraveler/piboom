@@ -1,0 +1,291 @@
+{
+  "id": "iran-hyperframes-reel",
+  "title": {
+    "en": "Iran HyperFrame Tour",
+    "ar": "جولة إيران المصوّرة"
+  },
+  "portrait": "/iran/assets/nima-guide-portrait-256.png",
+  "voice": {
+    "en": "en-US-Neural2-D",
+    "ar": "ar-XA-Wavenet-B"
+  },
+  "pitch": -1,
+  "speakingRate": 0.98,
+  "scenes": [
+    {
+      "id": "welcome",
+      "anchor": "irHero",
+      "spotlight": "#irHero",
+      "durationMs": 7200,
+      "kicker": {
+        "en": "Welcome",
+        "ar": "أهلاً"
+      },
+      "title": {
+        "en": "Salâm — Iran",
+        "ar": "سلام — إيران"
+      },
+      "copy": {
+        "en": "I am Nima. Plateau, empires, and living tables — told with care.",
+        "ar": "أنا نیما. هضبة وإمبراطوريات ومائدة حية — تُروى بعناية."
+      },
+      "narration": {
+        "en": "Salâm. I am Nima. This atlas is Iran — Elam and Persepolis, Safavid Isfahan, Nowruz fire, and a living table. Give me a few minutes and I will walk you through the map, the eras, and the flavors.",
+        "ar": "سلام. أنا نیما. هذا الأطلس إيران — عيلام وبرسبوليس، وأصفهان الصفوية، ونار نوروز، ومائدة حية. أعطني دقائق وأمشيك عبر الخريطة والعصور والنكهات."
+      }
+    },
+    {
+      "id": "atlas",
+      "anchor": "irMap",
+      "spotlight": "#irMap",
+      "action": "openAtlas",
+      "durationMs": 7000,
+      "kicker": {
+        "en": "Atlas",
+        "ar": "أطلس"
+      },
+      "title": {
+        "en": "The map opens",
+        "ar": "تُفتح الخريطة"
+      },
+      "copy": {
+        "en": "Caspian green, desert brick, Gulf heat — every pin a place you can stand.",
+        "ar": "خضرة قزوين وطوب الصحراء وحر الخليج — كل علامة مكان يمكنك الوقوف فيه."
+      },
+      "narration": {
+        "en": "First, the atlas. From Tehran to Bandar Abbas, from Persepolis stone to Rasht’s rainy kitchens — history pins, food towns, and living places. Select a name and the map leans in.",
+        "ar": "أولاً الأطلس. من طهران إلى بندر عباس، من حجر برسبوليس إلى مطابخ رشت الممطرة — علامات تاريخ وبلدات طعام وأماكن حيّة. اختر اسماً فتميل الخريطة نحوه."
+      }
+    },
+    {
+      "id": "tehran",
+      "anchor": "irMap",
+      "spotlight": "#irMapCanvas",
+      "action": "focusTehran",
+      "durationMs": 8200,
+      "kicker": {
+        "en": "Capital",
+        "ar": "العاصمة"
+      },
+      "title": {
+        "en": "Tehran",
+        "ar": "طهران"
+      },
+      "copy": {
+        "en": "Alborz backdrop and modern Iran’s crowded heart.",
+        "ar": "خلفية البرز وقلب إيران الحديثة المزدحم."
+      },
+      "narration": {
+        "en": "Start in Tehran. Qajar kings made it capital; today it sprawls under the Alborz with museums, traffic, and kitchens that still argue about the best chelo kebab.",
+        "ar": "نبدأ من طهران. جعلها ملوك القاجار عاصمة؛ واليوم تمتد تحت البرز بمتاحف وزحمة ومطابخ ما زالت تتجادل حول أفضل تشيلو كباب."
+      }
+    },
+    {
+      "id": "isfahan",
+      "anchor": "irMap",
+      "spotlight": "#irMapCanvas",
+      "action": "focusIsfahan",
+      "durationMs": 7800,
+      "kicker": {
+        "en": "Safavid jewel",
+        "ar": "جوهرة صفوية"
+      },
+      "title": {
+        "en": "Isfahan",
+        "ar": "أصفهان"
+      },
+      "copy": {
+        "en": "Blue tiles, bridges, and Naqsh-e Jahan.",
+        "ar": "بلاط أزرق وجسور ونقش جهان."
+      },
+      "narration": {
+        "en": "Then Isfahan — half the world, the proverb says. Shah Abbas shaped the square; bridges still hold evening tea and song.",
+        "ar": "ثم أصفهان — نصف العالم كما يقول المثل. شكّل الشاه عباس الساحة؛ وما زالت الجسور تحمل شاي المساء والغناء."
+      }
+    },
+    {
+      "id": "persepolis",
+      "anchor": "irMap",
+      "spotlight": "#irMapCanvas",
+      "action": "focusPersepolis",
+      "durationMs": 8000,
+      "kicker": {
+        "en": "Stone memory",
+        "ar": "ذاكرة حجر"
+      },
+      "title": {
+        "en": "Persepolis",
+        "ar": "برسبوليس"
+      },
+      "copy": {
+        "en": "Achaemenid stairs where nations once climbed.",
+        "ar": "أدراج أخمينية صعدتها الأمم يوماً."
+      },
+      "narration": {
+        "en": "South to Persepolis. Darius built a ceremonial capital of reliefs and columns. The stairs still teach how empire wanted to be seen.",
+        "ar": "جنوباً إلى برسبوليس. بنى داريوس عاصمة احتفالية من نقوش وأعمدة. ما زالت الأدراج تعلّم كيف أرادت الإمبراطورية أن تُرى."
+      }
+    },
+    {
+      "id": "eras",
+      "anchor": "irTimeline",
+      "spotlight": "#irTimeline",
+      "action": "openFirstEra",
+      "durationMs": 7500,
+      "kicker": {
+        "en": "Timeline",
+        "ar": "خط زمني"
+      },
+      "title": {
+        "en": "Eras of Iran",
+        "ar": "عصور إيران"
+      },
+      "copy": {
+        "en": "Elam to today — select a layer to hear it.",
+        "ar": "من عيلام إلى اليوم — اختر طبقة لتسمعها."
+      },
+      "narration": {
+        "en": "Open the timeline. Elam, Achaemenids, Sasanians, Islamic Persian revival, Safavids, Qajars, Pahlavis, and the Islamic Republic — each layer has a place on the map.",
+        "ar": "افتح الخط الزمني. عيلام والأخمينيون والساسانيون والنهضة الفارسية الإسلامية والصفويون والقاجار والبهلويون والجمهورية الإسلامية — لكل طبقة مكان على الخريطة."
+      }
+    },
+    {
+      "id": "food",
+      "anchor": "irFood",
+      "spotlight": "#irFoodGrid",
+      "action": "flipFirstFood",
+      "durationMs": 7200,
+      "kicker": {
+        "en": "Table",
+        "ar": "مائدة"
+      },
+      "title": {
+        "en": "Kebab and tahdig",
+        "ar": "كباب وتهديغ"
+      },
+      "copy": {
+        "en": "Flip a plate — herb stews, jeweled rice, and sangak.",
+        "ar": "اقلب طبقاً — يخنة أعشاب وأرز مرصّع وسنگک."
+      },
+      "narration": {
+        "en": "At the table, chelo kebab meets ghormeh sabzi, fesenjan darkens with walnut, and tahdig cracks like treasure. Flip a card and I will tell you why patience tastes like hospitality here.",
+        "ar": "على المائدة يلتقي تشيلو كباب بقورمه سبزي، ويغمق الفسنجان بالجوز، ويتشقق التهديغ ككنز. اقلب بطاقة وأخبرك لماذا يذوق الصبر كضيافة هنا."
+      }
+    },
+    {
+      "id": "music",
+      "anchor": "irMusic",
+      "spotlight": "#irMusicGrid",
+      "action": "flipFirstMusic",
+      "durationMs": 7000,
+      "kicker": {
+        "en": "Sound",
+        "ar": "صوت"
+      },
+      "title": {
+        "en": "Tar and radif",
+        "ar": "تار ورديف"
+      },
+      "copy": {
+        "en": "Lutes, frame drums, and living modes.",
+        "ar": "أعواد ودفوف ومقامات حية."
+      },
+      "narration": {
+        "en": "Listen for tar and setar, daf circles, Kurdish folk, and the radif that pupils still memorize. Flip a music card for the history behind the mode.",
+        "ar": "اسمع التار والسه‌تار وحلقات الدف والأغنية الكردية والرديف الذي ما زال التلاميذ يحفظونه. اقلب بطاقة موسيقى لتقرأ الحكاية خلف المقام."
+      }
+    },
+    {
+      "id": "majlis",
+      "anchor": "irHookah",
+      "spotlight": "#irHookahGrid",
+      "action": "flipFirstHookah",
+      "durationMs": 6800,
+      "kicker": {
+        "en": "Café",
+        "ar": "مقهى"
+      },
+      "title": {
+        "en": "Chai before smoke",
+        "ar": "شاي قبل الدخان"
+      },
+      "copy": {
+        "en": "Qahveh-khaneh talk — then slow qalyān.",
+        "ar": "حديث القهوه‌خانه — ثم قلیان بطيء."
+      },
+      "narration": {
+        "en": "In the café, chai comes first. Storytellers once filled the qahveh-khaneh; today tea and talk still outlast the coals.",
+        "ar": "في المقهى يأتي الشاي أولاً. ملأ الحكّاؤون القهوه‌خانه يوماً؛ واليوم ما زال الشاي والحديث أطول عمراً من الجمر."
+      }
+    },
+    {
+      "id": "living",
+      "anchor": "irLiving",
+      "spotlight": "#irLivingGrid",
+      "action": "flipFirstLiving",
+      "durationMs": 7200,
+      "kicker": {
+        "en": "Living",
+        "ar": "حياة"
+      },
+      "title": {
+        "en": "Nowruz and carpets",
+        "ar": "نوروز وسجاد"
+      },
+      "copy": {
+        "en": "Fire nights, bazaars, and taarof courtesy.",
+        "ar": "ليالي نار وأسواق وآداب التعارف."
+      },
+      "narration": {
+        "en": "Living culture is Nowruz and Chaharshanbe Suri fire, knotted carpets, bazaar vaults, calligraphy, and taarof. These are not museum labels — they still organize the year.",
+        "ar": "الثقافة الحيّة هي نوروز ونار چهارشنبه‌سوری، والسجاد المعقود، وأقواس البازار، والخط، والتعارف. هذه ليست بطاقات متحف — ما زالت تنظّم السنة."
+      }
+    },
+    {
+      "id": "phrases",
+      "anchor": "irPhrases",
+      "spotlight": "#irPhraseList",
+      "action": "speakFirstPhrase",
+      "durationMs": 6500,
+      "kicker": {
+        "en": "Speak",
+        "ar": "تكلّم"
+      },
+      "title": {
+        "en": "Ahlan wa sahlan",
+        "ar": "أهلاً وسهلاً"
+      },
+      "copy": {
+        "en": "Press a phrase — I will say it aloud.",
+        "ar": "اضغط عبارة — سأقولها بصوت عالٍ."
+      },
+      "narration": {
+        "en": "Before you go, take a greeting. Ahlan wa sahlan. Press any phrase on the page and I will say it for you in everyday Arabic.",
+        "ar": "قبل أن تمضي، خذ تحية. أهلاً وسهلاً. اضغط أي عبارة في الصفحة وسأقولها لك بعربية يومية."
+      }
+    },
+    {
+      "id": "close",
+      "anchor": "irGuide",
+      "spotlight": "#irGuide",
+      "action": "unflipCards",
+      "durationMs": 7000,
+      "kicker": {
+        "en": "Ask me",
+        "ar": "اسألني"
+      },
+      "title": {
+        "en": "I am still here",
+        "ar": "ما زلت هنا"
+      },
+      "copy": {
+        "en": "Ask Nima about Persepolis, tahdig, or Nowruz.",
+        "ar": "اسأل نیما عن برسبوليس أو التهديغ أو نوروز."
+      },
+      "narration": {
+        "en": "That is the tour. Stay on the map, flip more cards, or ask me anything — Persepolis stairs, Isfahan bridges, ghormeh sabzi, or the fires of Nowruz. Khoda hafez for now, and welcome whenever you return.",
+        "ar": "هذه هي الجولة. ابقَ على الخريطة، أو اقلب مزيداً من البطاقات، أو اسألني أي شيء — أدراج برسبوليس، وجسور أصفهان، وقورمه سبزي، أو نيران نوروز. خدا حافظ الآن، وأهلاً بك كلما عدت."
+      }
+    }
+  ]
+}

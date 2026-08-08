@@ -1,0 +1,552 @@
+{
+  "lastIndexed": "2026-08-08T08:21:31.974Z",
+  "vectorReady": false,
+  "vectorUpserted": 0,
+  "embeddingModel": "text-embedding-3-small",
+  "records": [
+    {
+      "id": "local:docs/agency-product-fit.md:0",
+      "title": "Agency Product Fit (1/2)",
+      "category": "products",
+      "sourceType": "local",
+      "url": "",
+      "path": "docs/agency-product-fit.md",
+      "content": "# Agency product fit (decision support)\n\n## Scope\n\nDevConnect Labs GSE scenario analyzer is **decision-support only**. It uses bundled public-rule summaries and sample FHFA limits — not DU/LPA/TOTAL/GUS, not pricing, not approval, not Ginnie pool eligibility.\n\n## Agencies\n\n- **Fannie Mae** — Conventional conforming; Selling Guide; products such as HomeReady.\n- **Freddie Mac** — Conventional conforming; Seller/Servicer Guide; products such as Home Possible.\n- **FHA** — HUD Handbook 4000.1; government-insured; may support Ginnie Mae MBS after issuer pooling.\n- **VA** — VA Pamphlet 26-7; guaranteed; may support Ginnie Mae MBS after issuer pooling.\n- **USDA** — HB-1-3555; rural guaranteed; may support Ginnie Mae MBS after issuer pooling.\n- **Ginnie Mae** — MBS guarantor for government loans; not an underwriting agency.\n\n## Overlays\n\nLender/investor overlays can tighten agency minimums (credit, LTV, reserves, property type). Overlay findings are operational risk signals — always confirm current investor matrices.\n\n## FHFA loan limits\n\nConforming loan limits vary by county and unit count. High-cost areas may have higher ceilings. Bundled limit JSON is a sample year snapshot — verify fhfa",
+      "excerpt": "# Agency product fit (decision support)\n\n## Scope\n\nDevConnect Labs GSE scenario analyzer is **decision-support only**. It uses bundled public-rule summaries and sample FHFA limits — not DU/LPA/TOTAL/GUS, not pricing, not approval, not Ginnie pool eligibility.\n\n## Agencies\n\n- **Fannie Mae** — Conventional conforming; Selling Guide; products such as HomeReady.\n- **Freddie Mac** — Conventional confor",
+      "tags": [
+        "gse",
+        "local",
+        "products",
+        "docs",
+        "agency-product-fit.md"
+      ],
+      "contentHash": "e3dd8b5a669c6712cee7842fe0775469"
+    },
+    {
+      "id": "local:docs/agency-product-fit.md:1",
+      "title": "Agency Product Fit (2/2)",
+      "category": "products",
+      "sourceType": "local",
+      "url": "",
+      "path": "docs/agency-product-fit.md",
+      "content": "orming loan limits vary by county and unit count. High-cost areas may have higher ceilings. Bundled limit JSON is a sample year snapshot — verify fhfa.gov for production.\n\n## Expert modes\n\nUseful questions for the loan-program expert:\n\n- Compare affordable options (HomeReady vs Home Possible)\n- Overlay blockers and ops next steps\n- Required docs upfront\n- Pooling / MBS delivery path after program fit\n- ARM first rate vs payment change timing",
+      "excerpt": "orming loan limits vary by county and unit count. High-cost areas may have higher ceilings. Bundled limit JSON is a sample year snapshot — verify fhfa.gov for production.\n\n## Expert modes\n\nUseful questions for the loan-program expert:\n\n- Compare affordable options (HomeReady vs Home Possible)\n- Overlay blockers and ops next steps\n- Required docs upfront\n- Pooling / MBS delivery path after program ",
+      "tags": [
+        "gse",
+        "local",
+        "products",
+        "docs",
+        "agency-product-fit.md"
+      ],
+      "contentHash": "be67b61582105ec6d5df647df219d07c"
+    },
+    {
+      "id": "local:docs/arm-first-rate-change.md:0",
+      "title": "Arm First Rate Change (1/2)",
+      "category": "arm",
+      "sourceType": "local",
+      "url": "",
+      "path": "docs/arm-first-rate-change.md",
+      "content": "# ARM first rate change date\n\n## Definitions\n\n- **First rate change date** — First date the ARM note interest rate can adjust. Not the first borrower payment after closing, and not the MBS pool issue date.\n- **First payment change date** — First due date of the new principal-and-interest payment after a rate adjustment.\n\n## Usual note math\n\nOn typical agency ARMs, rate and payment do not move on the same day:\n\n**1st interest rate change date ≈ 1st payment change date − 1 month**\n\nExamples:\n\n- Rate change **March 1** → payment change **April 1**\n- Rate change **June 1** → payment change **July 1**\n\nFannie loan-delivery job aids often calculate the interest rate change date as the 1st payment change date minus one month. Initial fixed period (e.g. 60 months on a 5/1) is commonly measured from first payment date to first interest rate change date.\n\nARM Flex MBS pools generally require payment due dates on the first of the month; odd due dates need a negotiated contract.\n\n## Bank / ops cycle cutoff (example)\n\nSome lenders use a calendar cutoff so lookback, rate calculation, Reg Z notices, and boarding still fit before the next payment-change cycle.\n\nExample training pattern:\n\n| Cutoff ",
+      "excerpt": "# ARM first rate change date\n\n## Definitions\n\n- **First rate change date** — First date the ARM note interest rate can adjust. Not the first borrower payment after closing, and not the MBS pool issue date.\n- **First payment change date** — First due date of the new principal-and-interest payment after a rate adjustment.\n\n## Usual note math\n\nOn typical agency ARMs, rate and payment do not move on t",
+      "tags": [
+        "gse",
+        "local",
+        "arm",
+        "docs",
+        "arm-first-rate-change.md"
+      ],
+      "contentHash": "370544eb009a0a21c30b1ef4206ba038"
+    },
+    {
+      "id": "local:docs/arm-first-rate-change.md:1",
+      "title": "Arm First Rate Change (2/2)",
+      "category": "arm",
+      "sourceType": "local",
+      "url": "",
+      "path": "docs/arm-first-rate-change.md",
+      "content": "utoff so lookback, rate calculation, Reg Z notices, and boarding still fit before the next payment-change cycle.\n\nExample training pattern:\n\n| Cutoff date | Allowed cycle |\n|---|---|\n| **March 10** or earlier | **April** OK (rate in March → new payment April 1) |\n| **March 11** or later | Miss April → roll to **July** (rate in June → new payment July 1) |\n\nThe 10th/11th only chooses which cycle the bank books. Inside that cycle, note math (rate month, then payment month) still applies. Cutoffs are investor/servicer-specific — not universal agency guide text.\n\n## Notices (Reg Z)\n\nWhen a rate adjustment changes the payment, servicers must send disclosures timed from the **first payment at the adjusted level**:\n\n- Initial adjustment: typically 210–240 days before that payment (or at consummation if sooner).\n- Subsequent adjustments: typically 60–120 days before (shorter windows for very frequent adjusters).\n\nIndex lookback is plan-specific (often on the order of ~45 days before the rate change).\n\n## Verify\n\nConfirm the note, ARM plan, investor matrix, and servicer calendar before locking first rate / payment change dates.",
+      "excerpt": "utoff so lookback, rate calculation, Reg Z notices, and boarding still fit before the next payment-change cycle.\n\nExample training pattern:\n\n| Cutoff date | Allowed cycle |\n|---|---|\n| **March 10** or earlier | **April** OK (rate in March → new payment April 1) |\n| **March 11** or later | Miss April → roll to **July** (rate in June → new payment July 1) |\n\nThe 10th/11th only chooses which cycle th",
+      "tags": [
+        "gse",
+        "local",
+        "arm",
+        "docs",
+        "arm-first-rate-change.md"
+      ],
+      "contentHash": "b337ce8fc6ef604432a3cf010b828c68"
+    },
+    {
+      "id": "local:docs/mortgage-pooling-mbs.md:0",
+      "title": "Mortgage Pooling Mbs (1/4)",
+      "category": "pooling",
+      "sourceType": "local",
+      "url": "",
+      "path": "docs/mortgage-pooling-mbs.md",
+      "content": "# Mortgage pooling and MBS\n\n## Overview\n\nAfter a loan closes, lenders often sell it into the secondary market. **Pooling** groups loans with similar features; **securitization** turns that pool into a mortgage-backed security (MBS). Cash flows (principal and interest) pass through to investors.\n\n## Who pools what\n\n- **Fannie Mae / Freddie Mac (GSEs)** — Conventional conforming loans meeting Selling Guide / Seller/Servicer Guide rules. Issue Agency MBS / UMBS. Guaranty is the enterprise’s obligation, not full faith and credit of the U.S. government.\n- **Ginnie Mae** — Does not buy loans or underwrite. Guarantees MBS issued by approved issuers that pool government-insured/guaranteed loans (FHA, VA, USDA/RHS). Full faith and credit of the U.S.\n- **Private-label** — Non-agency securitizations; outside typical agency TBA liquidity.\n\n## UMBS, TBA, specified pools\n\n- **UMBS** — Uniform MBS under FHFA Single Security; Fannie and Freddie TBA-eligible fixed-rate pools (10/15/20/30-year) are fungible in one TBA market. Re-securitizations of UMBS are called **Supers**.\n- **TBA** — Trade agrees on term, coupon, face, price, settlement; pool/CUSIP announced ~48 hours before settle (48-Hour Rule)",
+      "excerpt": "# Mortgage pooling and MBS\n\n## Overview\n\nAfter a loan closes, lenders often sell it into the secondary market. **Pooling** groups loans with similar features; **securitization** turns that pool into a mortgage-backed security (MBS). Cash flows (principal and interest) pass through to investors.\n\n## Who pools what\n\n- **Fannie Mae / Freddie Mac (GSEs)** — Conventional conforming loans meeting Sellin",
+      "tags": [
+        "gse",
+        "local",
+        "pooling",
+        "docs",
+        "mortgage-pooling-mbs.md"
+      ],
+      "contentHash": "b5d2599a796c03419013c35e652c5f7e"
+    },
+    {
+      "id": "local:docs/mortgage-pooling-mbs.md:1",
+      "title": "Mortgage Pooling Mbs (2/4)",
+      "category": "pooling",
+      "sourceType": "local",
+      "url": "",
+      "path": "docs/mortgage-pooling-mbs.md",
+      "content": " are called **Supers**.\n- **TBA** — Trade agrees on term, coupon, face, price, settlement; pool/CUSIP announced ~48 hours before settle (48-Hour Rule). SIFMA good-delivery rules define interchangeable collateral.\n- **Specified pools** — CUSIP known at trade; may pay up vs TBA for desirable prepay traits.\n\n## Fannie Mae pooling parameters (summary)\n\nConfirm current Selling Guide Part C3 before delivery.\n\n- **Single-lender pool** — One lender’s loans. Typical minimum aggregate UPB: $1M fixed-rate; $500K ARMs.\n- **Fannie Majors** — Multi-lender; once open, small contributions allowed; often ≤12 months seasoning.\n- **Note-rate band (fixed-rate)** — Note rates generally from 25 bp to 112.5 bp above pool pass-through.\n- **Term buckets** — Common original-term bands: 30-yr 181–360 mo; 20-yr 181–240; 15-yr 85–180; 10-yr 85–120.\n- **Ops** — MBS execution approval, document custodian + Master Custodial Agreement (Form 2017), loan delivery data (often ULDD) with certification before pool close.\n\n## Standard vs same-month pooling (first payment)\n\n- Pool **issue date** is the 1st of the issue month.\n- **Standard pooling** — First payment date no later than the 1st of the month immediately after",
+      "excerpt": " are called **Supers**.\n- **TBA** — Trade agrees on term, coupon, face, price, settlement; pool/CUSIP announced ~48 hours before settle (48-Hour Rule). SIFMA good-delivery rules define interchangeable collateral.\n- **Specified pools** — CUSIP known at trade; may pay up vs TBA for desirable prepay traits.\n\n## Fannie Mae pooling parameters (summary)\n\nConfirm current Selling Guide Part C3 before deli",
+      "tags": [
+        "gse",
+        "local",
+        "pooling",
+        "docs",
+        "mortgage-pooling-mbs.md"
+      ],
+      "contentHash": "1db27c7d911358eee9473db3f2105f8a"
+    },
+    {
+      "id": "local:docs/mortgage-pooling-mbs.md:2",
+      "title": "Mortgage Pooling Mbs (3/4)",
+      "category": "pooling",
+      "sourceType": "local",
+      "url": "",
+      "path": "docs/mortgage-pooling-mbs.md",
+      "content": "\n- Pool **issue date** is the 1st of the issue month.\n- **Standard pooling** — First payment date no later than the 1st of the month immediately after issue (e.g. March 1 issue → first payment on/before April 1).\n- **Same-month pooling** — Pool in the same month as origination; first payment may be the 1st of the month two months after issue (e.g. March issue → May 1), with initial interest-only remittance to Fannie because the borrower has not yet paid.\n- Separately, first payment must be no later than two months from final disbursement.\n\n## Ginnie Mae pooling (summary)\n\n- **Ginnie Mae I** — Single-issuer pools.\n- **Ginnie Mae II** — Custom (single issuer) or multiple-issuer pools from loan packages.\n- Pool types include level payment, buydown, ARM, GPM, GEM, serial notes — each with guide chapters and custodian rules.\n- Issuers must meet net worth / liquidity tests; electronic pooling required for SF.\n\n## Pass-through economics\n\nBorrower note rate → investor pass-through coupon after servicing fee + guaranty fee (g-fee). Investors receive pro-rata scheduled P&I plus unscheduled principal.\n\n## Verify\n\nAlways confirm current Fannie Selling Guide C3, Freddie capital markets / guides",
+      "excerpt": "\n- Pool **issue date** is the 1st of the issue month.\n- **Standard pooling** — First payment date no later than the 1st of the month immediately after issue (e.g. March 1 issue → first payment on/before April 1).\n- **Same-month pooling** — Pool in the same month as origination; first payment may be the 1st of the month two months after issue (e.g. March issue → May 1), with initial interest-only r",
+      "tags": [
+        "gse",
+        "local",
+        "pooling",
+        "docs",
+        "mortgage-pooling-mbs.md"
+      ],
+      "contentHash": "3e062d92dbf265296258e0ee68f6adbe"
+    },
+    {
+      "id": "local:docs/mortgage-pooling-mbs.md:3",
+      "title": "Mortgage Pooling Mbs (4/4)",
+      "category": "pooling",
+      "sourceType": "local",
+      "url": "",
+      "path": "docs/mortgage-pooling-mbs.md",
+      "content": "eceive pro-rata scheduled P&I plus unscheduled principal.\n\n## Verify\n\nAlways confirm current Fannie Selling Guide C3, Freddie capital markets / guides, Ginnie Mae MBS Guide, SIFMA TBA guidelines, and investor overlays. Product analyzers do not score pool eligibility or ULDD readiness.",
+      "excerpt": "eceive pro-rata scheduled P&I plus unscheduled principal.\n\n## Verify\n\nAlways confirm current Fannie Selling Guide C3, Freddie capital markets / guides, Ginnie Mae MBS Guide, SIFMA TBA guidelines, and investor overlays. Product analyzers do not score pool eligibility or ULDD readiness.",
+      "tags": [
+        "gse",
+        "local",
+        "pooling",
+        "docs",
+        "mortgage-pooling-mbs.md"
+      ],
+      "contentHash": "980d9f75b07805ea32b7fb36356442b7"
+    },
+    {
+      "id": "meta:disclaimer:0",
+      "title": "GSE analyzer disclaimer",
+      "category": "policy",
+      "sourceType": "rule_metadata",
+      "url": "",
+      "path": "data/gse/rule-metadata.json",
+      "content": "GSE analyzer disclaimer\n\nThis tool summarizes publicly published Fannie Mae, Freddie Mac, FHFA, VA, FHA, USDA, and Ginnie Mae (MBS delivery / pooling) materials, plus lender/investor overlay examples. It is informational decision support only, not underwriting, not DU/LPA/TOTAL/GUS, not Ginnie Mae or GSE pool eligibility, and not a commitment to lend. Always confirm eligibility in current agency guides, AUS findings, investor overlays, issuer requirements, and compliance policy.",
+      "excerpt": "GSE analyzer disclaimer\n\nThis tool summarizes publicly published Fannie Mae, Freddie Mac, FHFA, VA, FHA, USDA, and Ginnie Mae (MBS delivery / pooling) materials, plus lender/investor overlay examples. It is informational decision support only, not underwriting, not DU/LPA/TOTAL/GUS, not Ginnie Mae or GSE pool eligibility, and not a commitment to lend. Always confirm eligibility in current agency g",
+      "tags": [
+        "gse",
+        "policy",
+        "disclaimer"
+      ],
+      "contentHash": "f389303b542db9865d6a674d0dad7d77"
+    },
+    {
+      "id": "meta:source:FANNIE_SELLING_GUIDE",
+      "title": "Fannie Mae Selling Guide",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://selling-guide.fanniemae.com/",
+      "path": "data/gse/rule-metadata.json",
+      "content": "Fannie Mae Selling Guide\nSource id: FANNIE_SELLING_GUIDE\nURL: https://selling-guide.fanniemae.com/\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "Fannie Mae Selling Guide\nSource id: FANNIE_SELLING_GUIDE\nURL: https://selling-guide.fanniemae.com/\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "FANNIE_SELLING_GUIDE"
+      ],
+      "contentHash": "027afa76bf09df6ed2dbefee11802d18"
+    },
+    {
+      "id": "meta:source:FANNIE_SPC",
+      "title": "Fannie Mae Selling Policy Communications",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://singlefamily.fanniemae.com/selling-guide/selling-policy-communications",
+      "path": "data/gse/rule-metadata.json",
+      "content": "Fannie Mae Selling Policy Communications\nSource id: FANNIE_SPC\nURL: https://singlefamily.fanniemae.com/selling-guide/selling-policy-communications\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "Fannie Mae Selling Policy Communications\nSource id: FANNIE_SPC\nURL: https://singlefamily.fanniemae.com/selling-guide/selling-policy-communications\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "FANNIE_SPC"
+      ],
+      "contentHash": "3848c45627960dda8aa098886bec8c82"
+    },
+    {
+      "id": "meta:source:FANNIE_HOMEREADY",
+      "title": "Fannie Mae HomeReady (public product information)",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://singlefamily.fanniemae.com/our-lending-solutions/single-family-home-ready",
+      "path": "data/gse/rule-metadata.json",
+      "content": "Fannie Mae HomeReady (public product information)\nSource id: FANNIE_HOMEREADY\nURL: https://singlefamily.fanniemae.com/our-lending-solutions/single-family-home-ready\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "Fannie Mae HomeReady (public product information)\nSource id: FANNIE_HOMEREADY\nURL: https://singlefamily.fanniemae.com/our-lending-solutions/single-family-home-ready\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "FANNIE_HOMEREADY"
+      ],
+      "contentHash": "559160cd54cc5a749630e7bd81a3e681"
+    },
+    {
+      "id": "meta:source:FREDDIE_SELLER_GUIDE",
+      "title": "Freddie Mac Seller/Servicer Guide",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://guide.freddiemac.com/app/guide/",
+      "path": "data/gse/rule-metadata.json",
+      "content": "Freddie Mac Seller/Servicer Guide\nSource id: FREDDIE_SELLER_GUIDE\nURL: https://guide.freddiemac.com/app/guide/\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "Freddie Mac Seller/Servicer Guide\nSource id: FREDDIE_SELLER_GUIDE\nURL: https://guide.freddiemac.com/app/guide/\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "FREDDIE_SELLER_GUIDE"
+      ],
+      "contentHash": "fbe451da1c62dafbaaf069137210dc12"
+    },
+    {
+      "id": "meta:source:FREDDIE_BULLETINS",
+      "title": "Freddie Mac Guide Bulletins & Industry Letters",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://guide.freddiemac.com/app/guide/bulletin",
+      "path": "data/gse/rule-metadata.json",
+      "content": "Freddie Mac Guide Bulletins & Industry Letters\nSource id: FREDDIE_BULLETINS\nURL: https://guide.freddiemac.com/app/guide/bulletin\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "Freddie Mac Guide Bulletins & Industry Letters\nSource id: FREDDIE_BULLETINS\nURL: https://guide.freddiemac.com/app/guide/bulletin\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "FREDDIE_BULLETINS"
+      ],
+      "contentHash": "78eaaf084c5f5860c8bc842eaced3dc1"
+    },
+    {
+      "id": "meta:source:FREDDIE_HOME_POSSIBLE",
+      "title": "Freddie Mac Home Possible (public product information)",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://sf.freddiemac.com/working-with-us/origination-underwriting/mortgage-products/home-possible",
+      "path": "data/gse/rule-metadata.json",
+      "content": "Freddie Mac Home Possible (public product information)\nSource id: FREDDIE_HOME_POSSIBLE\nURL: https://sf.freddiemac.com/working-with-us/origination-underwriting/mortgage-products/home-possible\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "Freddie Mac Home Possible (public product information)\nSource id: FREDDIE_HOME_POSSIBLE\nURL: https://sf.freddiemac.com/working-with-us/origination-underwriting/mortgage-products/home-possible\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "FREDDIE_HOME_POSSIBLE"
+      ],
+      "contentHash": "5aeab2cba45035535c26d90b039d6225"
+    },
+    {
+      "id": "meta:source:FHFA_LIMITS",
+      "title": "FHFA Conforming Loan Limits",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://www.fhfa.gov/data/conforming-loan-limits",
+      "path": "data/gse/rule-metadata.json",
+      "content": "FHFA Conforming Loan Limits\nSource id: FHFA_LIMITS\nURL: https://www.fhfa.gov/data/conforming-loan-limits\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "FHFA Conforming Loan Limits\nSource id: FHFA_LIMITS\nURL: https://www.fhfa.gov/data/conforming-loan-limits\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "FHFA_LIMITS"
+      ],
+      "contentHash": "4a3c40b7bc89b34bd78de891ff88e0c3"
+    },
+    {
+      "id": "meta:source:VA_LENDERS_HANDBOOK",
+      "title": "VA Lenders Handbook (VA Pamphlet 26-7)",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://www.benefits.va.gov/WARMS/docs/admin26/m26-7/ah_26-7.pdf",
+      "path": "data/gse/rule-metadata.json",
+      "content": "VA Lenders Handbook (VA Pamphlet 26-7)\nSource id: VA_LENDERS_HANDBOOK\nURL: https://www.benefits.va.gov/WARMS/docs/admin26/m26-7/ah_26-7.pdf\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "VA Lenders Handbook (VA Pamphlet 26-7)\nSource id: VA_LENDERS_HANDBOOK\nURL: https://www.benefits.va.gov/WARMS/docs/admin26/m26-7/ah_26-7.pdf\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "VA_LENDERS_HANDBOOK"
+      ],
+      "contentHash": "ed792b5df9ad4bc6af6b1226e11e5ef2"
+    },
+    {
+      "id": "meta:source:VA_CIRCULARS",
+      "title": "VA Lenders Circulars",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://www.benefits.va.gov/WARMS/lenders_circulars.asp",
+      "path": "data/gse/rule-metadata.json",
+      "content": "VA Lenders Circulars\nSource id: VA_CIRCULARS\nURL: https://www.benefits.va.gov/WARMS/lenders_circulars.asp\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "VA Lenders Circulars\nSource id: VA_CIRCULARS\nURL: https://www.benefits.va.gov/WARMS/lenders_circulars.asp\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "VA_CIRCULARS"
+      ],
+      "contentHash": "d6f5e91f076e56fbe0b5b1879474abbe"
+    },
+    {
+      "id": "meta:source:FHA_4000_1",
+      "title": "HUD FHA Single Family Housing Policy Handbook 4000.1",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://www.hud.gov/program_offices/housing/sfh/handbook_4000-1",
+      "path": "data/gse/rule-metadata.json",
+      "content": "HUD FHA Single Family Housing Policy Handbook 4000.1\nSource id: FHA_4000_1\nURL: https://www.hud.gov/program_offices/housing/sfh/handbook_4000-1\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "HUD FHA Single Family Housing Policy Handbook 4000.1\nSource id: FHA_4000_1\nURL: https://www.hud.gov/program_offices/housing/sfh/handbook_4000-1\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "FHA_4000_1"
+      ],
+      "contentHash": "0558ed7e852168bb8e0b8d369f03982c"
+    },
+    {
+      "id": "meta:source:FHA_MORTGAGEE_LETTERS",
+      "title": "HUD FHA Mortgagee Letters",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://www.hud.gov/program_offices/housing/sfh/lender/mortgagee_letters",
+      "path": "data/gse/rule-metadata.json",
+      "content": "HUD FHA Mortgagee Letters\nSource id: FHA_MORTGAGEE_LETTERS\nURL: https://www.hud.gov/program_offices/housing/sfh/lender/mortgagee_letters\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "HUD FHA Mortgagee Letters\nSource id: FHA_MORTGAGEE_LETTERS\nURL: https://www.hud.gov/program_offices/housing/sfh/lender/mortgagee_letters\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "FHA_MORTGAGEE_LETTERS"
+      ],
+      "contentHash": "b21235e00cd056cfe6ddcc468859599d"
+    },
+    {
+      "id": "meta:source:USDA_HB_3555",
+      "title": "USDA Single Family Housing Guaranteed Loan Program Handbook (HB-1-3555)",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://www.rd.usda.gov/resources/regulations/handbooks",
+      "path": "data/gse/rule-metadata.json",
+      "content": "USDA Single Family Housing Guaranteed Loan Program Handbook (HB-1-3555)\nSource id: USDA_HB_3555\nURL: https://www.rd.usda.gov/resources/regulations/handbooks\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "USDA Single Family Housing Guaranteed Loan Program Handbook (HB-1-3555)\nSource id: USDA_HB_3555\nURL: https://www.rd.usda.gov/resources/regulations/handbooks\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "USDA_HB_3555"
+      ],
+      "contentHash": "852c8b645c37b96a16e85c4e281e10ab"
+    },
+    {
+      "id": "meta:source:USDA_ELIGIBILITY",
+      "title": "USDA Income and Property Eligibility",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://eligibility.sc.egov.usda.gov/eligibility/welcomeAction.do",
+      "path": "data/gse/rule-metadata.json",
+      "content": "USDA Income and Property Eligibility\nSource id: USDA_ELIGIBILITY\nURL: https://eligibility.sc.egov.usda.gov/eligibility/welcomeAction.do\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "USDA Income and Property Eligibility\nSource id: USDA_ELIGIBILITY\nURL: https://eligibility.sc.egov.usda.gov/eligibility/welcomeAction.do\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "USDA_ELIGIBILITY"
+      ],
+      "contentHash": "3bdb4f096409c03c15d928053be9937b"
+    },
+    {
+      "id": "meta:source:INVESTOR_OVERLAYS",
+      "title": "Investor Overlay Operations Reference (internal modeling profile)",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://singlefamily.fanniemae.com/originating-underwriting",
+      "path": "data/gse/rule-metadata.json",
+      "content": "Investor Overlay Operations Reference (internal modeling profile)\nSource id: INVESTOR_OVERLAYS\nURL: https://singlefamily.fanniemae.com/originating-underwriting\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "Investor Overlay Operations Reference (internal modeling profile)\nSource id: INVESTOR_OVERLAYS\nURL: https://singlefamily.fanniemae.com/originating-underwriting\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "INVESTOR_OVERLAYS"
+      ],
+      "contentHash": "184ba87ee70fd8c0ec528d56da76e329"
+    },
+    {
+      "id": "meta:source:GINNIE_MBS_GUIDE",
+      "title": "Ginnie Mae MBS Guide",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://www.ginniemae.gov/issuers/program_guidelines/Pages/mbs_guide.aspx",
+      "path": "data/gse/rule-metadata.json",
+      "content": "Ginnie Mae MBS Guide\nSource id: GINNIE_MBS_GUIDE\nURL: https://www.ginniemae.gov/issuers/program_guidelines/Pages/mbs_guide.aspx\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "Ginnie Mae MBS Guide\nSource id: GINNIE_MBS_GUIDE\nURL: https://www.ginniemae.gov/issuers/program_guidelines/Pages/mbs_guide.aspx\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "GINNIE_MBS_GUIDE"
+      ],
+      "contentHash": "27dbdedea02a14da18989fbf323e0065"
+    },
+    {
+      "id": "meta:source:GINNIE_MBS_CHAPTERS",
+      "title": "Ginnie Mae MBS Guide Chapters (library)",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://www.ginniemae.gov/issuers/program_guidelines/Pages/MBSGuideLib.aspx",
+      "path": "data/gse/rule-metadata.json",
+      "content": "Ginnie Mae MBS Guide Chapters (library)\nSource id: GINNIE_MBS_CHAPTERS\nURL: https://www.ginniemae.gov/issuers/program_guidelines/Pages/MBSGuideLib.aspx\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "Ginnie Mae MBS Guide Chapters (library)\nSource id: GINNIE_MBS_CHAPTERS\nURL: https://www.ginniemae.gov/issuers/program_guidelines/Pages/MBSGuideLib.aspx\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "GINNIE_MBS_CHAPTERS"
+      ],
+      "contentHash": "8d92f407002aae996e18a4070b4f4637"
+    },
+    {
+      "id": "meta:source:GINNIE_ISSUER",
+      "title": "Ginnie Mae — Becoming an Issuer",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://www.ginniemae.gov/about_us/how_to_participate/Pages/becoming_an_issuer.aspx",
+      "path": "data/gse/rule-metadata.json",
+      "content": "Ginnie Mae — Becoming an Issuer\nSource id: GINNIE_ISSUER\nURL: https://www.ginniemae.gov/about_us/how_to_participate/Pages/becoming_an_issuer.aspx\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "Ginnie Mae — Becoming an Issuer\nSource id: GINNIE_ISSUER\nURL: https://www.ginniemae.gov/about_us/how_to_participate/Pages/becoming_an_issuer.aspx\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "GINNIE_ISSUER"
+      ],
+      "contentHash": "f9ac838da79d69dbb3d91007ea9fabc3"
+    },
+    {
+      "id": "meta:source:FANNIE_MBS_BASICS",
+      "title": "Basics of Fannie Mae Single-Family MBS",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://capitalmarkets.fanniemae.com/media/4271/display",
+      "path": "data/gse/rule-metadata.json",
+      "content": "Basics of Fannie Mae Single-Family MBS\nSource id: FANNIE_MBS_BASICS\nURL: https://capitalmarkets.fanniemae.com/media/4271/display\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "Basics of Fannie Mae Single-Family MBS\nSource id: FANNIE_MBS_BASICS\nURL: https://capitalmarkets.fanniemae.com/media/4271/display\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "FANNIE_MBS_BASICS"
+      ],
+      "contentHash": "4128871df8163a4d894e7e88a0fb4441"
+    },
+    {
+      "id": "meta:source:FANNIE_MBS_SECURITIZATION",
+      "title": "Fannie Mae Selling Guide — MBS Securitization Process (C3-2)",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://selling-guide.fanniemae.com/sel/c3-2/mbs-securitization-process",
+      "path": "data/gse/rule-metadata.json",
+      "content": "Fannie Mae Selling Guide — MBS Securitization Process (C3-2)\nSource id: FANNIE_MBS_SECURITIZATION\nURL: https://selling-guide.fanniemae.com/sel/c3-2/mbs-securitization-process\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "Fannie Mae Selling Guide — MBS Securitization Process (C3-2)\nSource id: FANNIE_MBS_SECURITIZATION\nURL: https://selling-guide.fanniemae.com/sel/c3-2/mbs-securitization-process\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "FANNIE_MBS_SECURITIZATION"
+      ],
+      "contentHash": "351d9b930d332098cc2423dc755a6174"
+    },
+    {
+      "id": "meta:source:FANNIE_POOLING_PREP",
+      "title": "Fannie Mae Selling Guide — Preparing to Pool Loans into MBS (C3-1-02)",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://selling-guide.fanniemae.com/sel/c3-1-02/preparing-pool-loans-mbs",
+      "path": "data/gse/rule-metadata.json",
+      "content": "Fannie Mae Selling Guide — Preparing to Pool Loans into MBS (C3-1-02)\nSource id: FANNIE_POOLING_PREP\nURL: https://selling-guide.fanniemae.com/sel/c3-1-02/preparing-pool-loans-mbs\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "Fannie Mae Selling Guide — Preparing to Pool Loans into MBS (C3-1-02)\nSource id: FANNIE_POOLING_PREP\nURL: https://selling-guide.fanniemae.com/sel/c3-1-02/preparing-pool-loans-mbs\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "FANNIE_POOLING_PREP"
+      ],
+      "contentHash": "86b7e8e491a751e83571480a83bc51d1"
+    },
+    {
+      "id": "meta:source:FANNIE_MAJORS",
+      "title": "Fannie Mae Selling Guide — Parameters for Pooling into Fannie Majors (C3-6-01)",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://selling-guide.fanniemae.com/sel/c3-6-01/parameters-pooling-loans-fannie-majors",
+      "path": "data/gse/rule-metadata.json",
+      "content": "Fannie Mae Selling Guide — Parameters for Pooling into Fannie Majors (C3-6-01)\nSource id: FANNIE_MAJORS\nURL: https://selling-guide.fanniemae.com/sel/c3-6-01/parameters-pooling-loans-fannie-majors\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "Fannie Mae Selling Guide — Parameters for Pooling into Fannie Majors (C3-6-01)\nSource id: FANNIE_MAJORS\nURL: https://selling-guide.fanniemae.com/sel/c3-6-01/parameters-pooling-loans-fannie-majors\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "FANNIE_MAJORS"
+      ],
+      "contentHash": "4aa91b1565bdddacd74e6887f8faaf68"
+    },
+    {
+      "id": "meta:source:FANNIE_FIXED_POOL_PARAMS",
+      "title": "Fannie Mae Selling Guide — Fixed-Rate Mortgage Pooling Parameters (C3-4-01)",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://selling-guide.fanniemae.com/sel/c3-4-01/term-related-fixed-rate-mortgage-pooling-parameters",
+      "path": "data/gse/rule-metadata.json",
+      "content": "Fannie Mae Selling Guide — Fixed-Rate Mortgage Pooling Parameters (C3-4-01)\nSource id: FANNIE_FIXED_POOL_PARAMS\nURL: https://selling-guide.fanniemae.com/sel/c3-4-01/term-related-fixed-rate-mortgage-pooling-parameters\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "Fannie Mae Selling Guide — Fixed-Rate Mortgage Pooling Parameters (C3-4-01)\nSource id: FANNIE_FIXED_POOL_PARAMS\nURL: https://selling-guide.fanniemae.com/sel/c3-4-01/term-related-fixed-rate-mortgage-pooling-parameters\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "FANNIE_FIXED_POOL_PARAMS"
+      ],
+      "contentHash": "869b9594b1a69aae2f14a0a8eb5cf5a7"
+    },
+    {
+      "id": "meta:source:FREDDIE_MBS_OVERVIEW",
+      "title": "Freddie Mac — Understanding Mortgage-Backed Securities",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://capitalmarkets.freddiemac.com/mbs/understanding-mortgage-backed-securities",
+      "path": "data/gse/rule-metadata.json",
+      "content": "Freddie Mac — Understanding Mortgage-Backed Securities\nSource id: FREDDIE_MBS_OVERVIEW\nURL: https://capitalmarkets.freddiemac.com/mbs/understanding-mortgage-backed-securities\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "Freddie Mac — Understanding Mortgage-Backed Securities\nSource id: FREDDIE_MBS_OVERVIEW\nURL: https://capitalmarkets.freddiemac.com/mbs/understanding-mortgage-backed-securities\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "FREDDIE_MBS_OVERVIEW"
+      ],
+      "contentHash": "0ec7ffa8ea3e204e209d1beb4885d294"
+    },
+    {
+      "id": "meta:source:FHFA_UMBS",
+      "title": "FHFA — Single Security Initiative and Common Securitization Platform (UMBS)",
+      "category": "official-source",
+      "sourceType": "rule_metadata",
+      "url": "https://www.fhfa.gov/policy/single-security-initiative-and-common-securitization-platform",
+      "path": "data/gse/rule-metadata.json",
+      "content": "FHFA — Single Security Initiative and Common Securitization Platform (UMBS)\nSource id: FHFA_UMBS\nURL: https://www.fhfa.gov/policy/single-security-initiative-and-common-securitization-platform\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "excerpt": "FHFA — Single Security Initiative and Common Securitization Platform (UMBS)\nSource id: FHFA_UMBS\nURL: https://www.fhfa.gov/policy/single-security-initiative-and-common-securitization-platform\nOfficial reference linked from the GSE scenario analyzer and knowledge bank.",
+      "tags": [
+        "gse",
+        "official",
+        "FHFA_UMBS"
+      ],
+      "contentHash": "c1d0daded7491ff6f7aafc6795c741ca"
+    }
+  ]
+}

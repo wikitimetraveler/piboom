@@ -1,0 +1,291 @@
+{
+  "id": "lebanon-hyperframes-reel",
+  "title": {
+    "en": "Lebanon HyperFrame Tour",
+    "ar": "جولة لبنان المصوّرة"
+  },
+  "portrait": "/lebanon/assets/karim-guide-portrait-256.png",
+  "voice": {
+    "en": "en-US-Neural2-D",
+    "ar": "ar-XA-Wavenet-B"
+  },
+  "pitch": -1,
+  "speakingRate": 0.98,
+  "scenes": [
+    {
+      "id": "welcome",
+      "anchor": "lbHero",
+      "spotlight": "#lbHero",
+      "durationMs": 7200,
+      "kicker": {
+        "en": "Welcome",
+        "ar": "أهلاً"
+      },
+      "title": {
+        "en": "Ahlan — Lebanon",
+        "ar": "أهلاً — لبنان"
+      },
+      "copy": {
+        "en": "I am Karim. Cedars, coasts, and living tables — told with care.",
+        "ar": "أنا كريم. أرز وسواحل ومائدة حية — تُروى بعناية."
+      },
+      "narration": {
+        "en": "Ahlan wa sahlan. I am Karim. This atlas is Lebanon — Phoenician harbors, Roman Baalbek, cedar mountains, and a living table of mezze and song. Give me a few minutes and I will walk you through the map, the eras, and the flavors.",
+        "ar": "أهلاً وسهلاً. أنا كريم. هذا الأطلس لبنان — موانئ فينيقية وبعلبك الرومانية وجبال الأرز ومائدة حية من المزة والغناء. أعطني دقائق وأمشيك عبر الخريطة والعصور والنكهات."
+      }
+    },
+    {
+      "id": "atlas",
+      "anchor": "lbMap",
+      "spotlight": "#lbMap",
+      "action": "openAtlas",
+      "durationMs": 7000,
+      "kicker": {
+        "en": "Atlas",
+        "ar": "أطلس"
+      },
+      "title": {
+        "en": "The map opens",
+        "ar": "تُفتح الخريطة"
+      },
+      "copy": {
+        "en": "Coast light, mountain stone, Bekaa plain — every pin a place you can stand.",
+        "ar": "ضوء ساحل وحجر جبل وسهل بقاع — كل علامة مكان يمكنك الوقوف فيه."
+      },
+      "narration": {
+        "en": "First, the atlas. From Beirut to Tyre, from Byblos harbor to Baalbek’s temples — history pins, food towns, and living places. Select a name and the map leans in.",
+        "ar": "أولاً الأطلس. من بيروت إلى صور، من ميناء جبيل إلى معابد بعلبك — علامات تاريخ وبلدات طعام وأماكن حيّة. اختر اسماً فتميل الخريطة نحوه."
+      }
+    },
+    {
+      "id": "beirut",
+      "anchor": "lbMap",
+      "spotlight": "#lbMapCanvas",
+      "action": "focusBeirut",
+      "durationMs": 8200,
+      "kicker": {
+        "en": "Capital",
+        "ar": "العاصمة"
+      },
+      "title": {
+        "en": "Beirut",
+        "ar": "بيروت"
+      },
+      "copy": {
+        "en": "Mediterranean capital of cafés, press, and recovery.",
+        "ar": "عاصمة متوسطية للمقاهي والصحافة والتعافي."
+      },
+      "narration": {
+        "en": "Start in Beirut. Port city, university city, café city — rebuilt more than once, still the loud heart of the republic and the soft landing for diaspora return.",
+        "ar": "نبدأ من بيروت. مدينة ميناء وجامعة ومقهى — أُعيد بناؤها أكثر من مرة، وما زالت القلب الصاخب للجمهورية والمرفأ الهادئ لعودة الشتات."
+      }
+    },
+    {
+      "id": "byblos",
+      "anchor": "lbMap",
+      "spotlight": "#lbMapCanvas",
+      "action": "focusByblos",
+      "durationMs": 7800,
+      "kicker": {
+        "en": "Harbor",
+        "ar": "ميناء"
+      },
+      "title": {
+        "en": "Byblos",
+        "ar": "جبيل"
+      },
+      "copy": {
+        "en": "Phoenician harbor, crusader castle, old souk.",
+        "ar": "ميناء فينيقي وقلعة صليبية وسوق قديم."
+      },
+      "narration": {
+        "en": "Then Byblos — Jbeil. One of the oldest living cities, where Phoenician ships once loaded cedar and letters. The castle and souk still face the same blue sea.",
+        "ar": "ثم جبيل. من أقدم المدن الحيّة، حيث حمّلت السفن الفينيقية يوماً الأرز والحروف. ما زالت القلعة والسوق تواجهان البحر الأزرق نفسه."
+      }
+    },
+    {
+      "id": "baalbek",
+      "anchor": "lbMap",
+      "spotlight": "#lbMapCanvas",
+      "action": "focusBaalbek",
+      "durationMs": 8000,
+      "kicker": {
+        "en": "Stone memory",
+        "ar": "ذاكرة حجر"
+      },
+      "title": {
+        "en": "Baalbek",
+        "ar": "بعلبك"
+      },
+      "copy": {
+        "en": "Roman temples that still stun the Bekaa.",
+        "ar": "معابد رومانية ما زالت تذهل البقاع."
+      },
+      "narration": {
+        "en": "East to Baalbek. Rome raised temples of astonishing scale at Heliopolis. Walk the stones and you feel how empire wanted to be seen in the Levant.",
+        "ar": "شرقاً إلى بعلبك. رفعت روما معابد بمقياس مذهل في هليوبوليس. امشِ على الحجارة فتحس كيف أرادت الإمبراطورية أن تُرى في المشرق."
+      }
+    },
+    {
+      "id": "eras",
+      "anchor": "lbTimeline",
+      "spotlight": "#lbTimeline",
+      "action": "openFirstEra",
+      "durationMs": 7500,
+      "kicker": {
+        "en": "Timeline",
+        "ar": "خط زمني"
+      },
+      "title": {
+        "en": "Eras of Lebanon",
+        "ar": "عصور لبنان"
+      },
+      "copy": {
+        "en": "Phoenician to today — select a layer to hear it.",
+        "ar": "من فينيقيا إلى اليوم — اختر طبقة لتسمعها."
+      },
+      "narration": {
+        "en": "Open the timeline. Phoenician harbors, Roman temples, Byzantine and early Islamic towns, Crusader castles, Ottoman emirates, the French mandate, independence, and contemporary Lebanon — each layer has a place on the map.",
+        "ar": "افتح الخط الزمني. موانئ فينيقية ومعابد رومانية وبلدات بيزنطية وإسلامية مبكرة وقلاع صليبية وإمارات عثمانية والانتداب الفرنسي والاستقلال ولبنان المعاصر — لكل طبقة مكان على الخريطة."
+      }
+    },
+    {
+      "id": "food",
+      "anchor": "lbFood",
+      "spotlight": "#lbFoodGrid",
+      "action": "flipFirstFood",
+      "durationMs": 7200,
+      "kicker": {
+        "en": "Table",
+        "ar": "مائدة"
+      },
+      "title": {
+        "en": "Mezze and tabbouleh",
+        "ar": "مزة وتبولة"
+      },
+      "copy": {
+        "en": "Flip a plate — kibbeh, manakish, knafeh, and arak.",
+        "ar": "اقلب طبقاً — كبة ومناقيش وكنافة وعرق."
+      },
+      "narration": {
+        "en": "At the table, tabbouleh meets kibbeh, manakish leaves the oven, and knafeh arrives with syrup. Flip a card and I will tell you why mezze is hospitality you can taste.",
+        "ar": "على المائدة تلتقي التبولة بالكبة، وتخرج المناقيش من الفرن، وتصل الكنافة بالقطر. اقلب بطاقة وأخبرك لماذا المزة ضيافة تُذاق."
+      }
+    },
+    {
+      "id": "music",
+      "anchor": "lbMusic",
+      "spotlight": "#lbMusicGrid",
+      "action": "flipFirstMusic",
+      "durationMs": 7000,
+      "kicker": {
+        "en": "Sound",
+        "ar": "صوت"
+      },
+      "title": {
+        "en": "Fairuz and dabke",
+        "ar": "فيروز ودبكة"
+      },
+      "copy": {
+        "en": "Radio icons, line dances, and oud nights.",
+        "ar": "أيقونات إذاعة ودبكات وليالي عود."
+      },
+      "narration": {
+        "en": "Listen for Fairuz and the Rahbani stage, dabke lines at weddings, oud in Beirut salons, and new indie rooms. Flip a music card for the history behind the song.",
+        "ar": "اسمع فيروز ومسرح الرحباني وصفوف الدبكة في الأعراس والعود في صالونات بيروت وغرف الإندي الجديدة. اقلب بطاقة موسيقى لتقرأ الحكاية خلف الأغنية."
+      }
+    },
+    {
+      "id": "cafe",
+      "anchor": "lbHookah",
+      "spotlight": "#lbHookahGrid",
+      "action": "flipFirstHookah",
+      "durationMs": 6800,
+      "kicker": {
+        "en": "Café",
+        "ar": "مقهى"
+      },
+      "title": {
+        "en": "Nargileh and talk",
+        "ar": "نرجيلة وحديث"
+      },
+      "copy": {
+        "en": "Corniche coals — then long conversation.",
+        "ar": "جمر الكورنيش — ثم حديث طويل."
+      },
+      "narration": {
+        "en": "In the café, coffee and nargileh come with talk. From Hamra tables to Tripoli souk pauses, the coals last only as long as the friendship.",
+        "ar": "في المقهى تأتي القهوة والنرجيلة مع الحديث. من طاولات الحمرا إلى استراحات سوق طرابلس، لا يدوم الجمر أطول من الصداقة."
+      }
+    },
+    {
+      "id": "living",
+      "anchor": "lbLiving",
+      "spotlight": "#lbLivingGrid",
+      "action": "flipFirstLiving",
+      "durationMs": 7200,
+      "kicker": {
+        "en": "Living",
+        "ar": "حياة"
+      },
+      "title": {
+        "en": "Cedars and diaspora",
+        "ar": "أرز وشتات"
+      },
+      "copy": {
+        "en": "Mountain trees, village stone, and print culture.",
+        "ar": "أشجار جبل وحجر قرية وثقافة طباعة."
+      },
+      "narration": {
+        "en": "Living culture is the cedar on the flag, diaspora kitchens abroad, calligraphy, village Sundays, and the Mediterranean coast. These are not museum labels — they still organize the year.",
+        "ar": "الثقافة الحيّة هي الأرز على العلم، ومطابخ الشتات في الخارج، والخط، وآحاد القرية، والساحل المتوسطي. هذه ليست بطاقات متحف — ما زالت تنظّم السنة."
+      }
+    },
+    {
+      "id": "phrases",
+      "anchor": "lbPhrases",
+      "spotlight": "#lbPhraseList",
+      "action": "speakFirstPhrase",
+      "durationMs": 6500,
+      "kicker": {
+        "en": "Speak",
+        "ar": "تكلّم"
+      },
+      "title": {
+        "en": "Kīfak?",
+        "ar": "كيفك؟"
+      },
+      "copy": {
+        "en": "Press a phrase — I will say it aloud.",
+        "ar": "اضغط عبارة — سأقولها بصوت عالٍ."
+      },
+      "narration": {
+        "en": "Before you go, take a greeting. Kīfak? Press any phrase on the page and I will say it for you in everyday Lebanese Arabic.",
+        "ar": "قبل أن تمضي، خذ تحية. كيفك؟ اضغط أي عبارة في الصفحة وسأقولها لك بلبنانية يومية."
+      }
+    },
+    {
+      "id": "close",
+      "anchor": "lbGuide",
+      "spotlight": "#lbGuide",
+      "action": "unflipCards",
+      "durationMs": 7000,
+      "kicker": {
+        "en": "Ask me",
+        "ar": "اسألني"
+      },
+      "title": {
+        "en": "I am still here",
+        "ar": "ما زلت هنا"
+      },
+      "copy": {
+        "en": "Ask Karim about Byblos, mezze, or Fairuz.",
+        "ar": "اسأل كريم عن جبيل أو المزة أو فيروز."
+      },
+      "narration": {
+        "en": "That is the tour. Stay on the map, flip more cards, or ask me anything — Byblos harbor, Baalbek stones, tabbouleh, or the cedars. Maʿa salame for now, and welcome whenever you return.",
+        "ar": "هذه هي الجولة. ابقَ على الخريطة، أو اقلب مزيداً من البطاقات، أو اسألني أي شيء — ميناء جبيل، وحجارة بعلبك، والتبولة، أو الأرز. مع السلامة الآن، وأهلاً بك كلما عدت."
+      }
+    }
+  ]
+}

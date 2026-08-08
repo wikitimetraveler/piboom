@@ -21,6 +21,11 @@ function isMiddleEastAtlasPage() {
     body.classList.contains('jd-page')
     || body.classList.contains('sy-page')
     || body.classList.contains('hl-page')
+    ||     body.classList.contains('om-page')
+    || body.classList.contains('ir-page')
+    || body.classList.contains('iq-page')
+    || body.classList.contains('lb-page')
+    || body.classList.contains('eg-page')
   );
 }
 

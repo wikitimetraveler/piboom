@@ -662,10 +662,11 @@ export async function createTables() {
       CREATE INDEX IF NOT EXISTS idx_conversations_user ON conversations(user_id)
     `);
 
-    // Knowledge RAG chunk tables (pgvector when available) — HeyGen + Encompass/ICE
+    // Knowledge RAG chunk tables (pgvector when available) — HeyGen + Encompass/ICE + GSE
     await ensureHeygenKnowledgeTable(pool);
     await ensureEncompassDocsTable(pool);
     await ensureIceKnowledgeTable(pool);
+    await ensureGseKnowledgeTable(pool);
 
     // Create grateful_dead_shows table
     await pool.query(`
@@ -1382,7 +1383,8 @@ export async function isPgvectorAvailable() {
 const KNOWLEDGE_VECTOR_TABLE_ALLOWLIST = new Set([
   'encompass_docs_chunks',
   'ice_knowledge_chunks',
-  'heygen_knowledge_chunks'
+  'heygen_knowledge_chunks',
+  'gse_knowledge_chunks'
 ]);
 
 async function ensureKnowledgeVectorTable(dbPool, tableName) {
@@ -1457,6 +1459,15 @@ export async function ensureIceKnowledgeTable(dbPool = pool) {
   return ensureKnowledgeVectorTable(dbPool, 'ice_knowledge_chunks');
 }
 
+/**
+ * Create gse_knowledge_chunks (+ embedding + HNSW when pgvector is present).
+ * @param {import('pg').Pool} [dbPool]
+ * @returns {Promise<{ table: boolean, vector: boolean }>}
+ */
+export async function ensureGseKnowledgeTable(dbPool = pool) {
+  return ensureKnowledgeVectorTable(dbPool, 'gse_knowledge_chunks');
+}
+
 export default {
   initializeDatabase,
   createTables,
@@ -1469,6 +1480,7 @@ export default {
   isPgvectorAvailable,
   ensureHeygenKnowledgeTable,
   ensureEncompassDocsTable,
-  ensureIceKnowledgeTable
+  ensureIceKnowledgeTable,
+  ensureGseKnowledgeTable
 };
 

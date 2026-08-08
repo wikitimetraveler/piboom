@@ -1,0 +1,291 @@
+{
+  "id": "oman-hyperframes-reel",
+  "title": {
+    "en": "Oman HyperFrame Tour",
+    "ar": "جولة عُمان المصوّرة"
+  },
+  "portrait": "/oman/assets/salim-guide-portrait-256.png",
+  "voice": {
+    "en": "en-US-Neural2-D",
+    "ar": "ar-XA-Wavenet-B"
+  },
+  "pitch": -1,
+  "speakingRate": 0.98,
+  "scenes": [
+    {
+      "id": "welcome",
+      "anchor": "omHero",
+      "spotlight": "#omHero",
+      "durationMs": 7200,
+      "kicker": {
+        "en": "Welcome",
+        "ar": "أهلاً"
+      },
+      "title": {
+        "en": "Ahlan — Oman",
+        "ar": "أهلاً — عُمان"
+      },
+      "copy": {
+        "en": "I am Salim. Sea, frankincense, and stone towns — told with care.",
+        "ar": "أنا سليم. بحر ولبان ومدن حجر — تُروى بعناية."
+      },
+      "narration": {
+        "en": "Ahlan wa sahlan. I am Salim. This atlas is the Sultanate of Oman — Magan copper, frankincense roads, Ibadi towns, and a living table. Give me a few minutes and I will walk you through the map, the eras, and the flavors.",
+        "ar": "أهلاً وسهلاً. أنا سليم. هذا الأطلس سلطنة عُمان — نحاس ماجان، وطرق اللبان، ومدن إباضية، ومائدة حية. أعطني دقائق وأمشيك عبر الخريطة والعصور والنكهات."
+      }
+    },
+    {
+      "id": "atlas",
+      "anchor": "omMap",
+      "spotlight": "#omMap",
+      "action": "openAtlas",
+      "durationMs": 7000,
+      "kicker": {
+        "en": "Atlas",
+        "ar": "أطلس"
+      },
+      "title": {
+        "en": "The map opens",
+        "ar": "تُفتح الخريطة"
+      },
+      "copy": {
+        "en": "Coast, Hajar peaks, and Dhofar mist — every pin a place you can stand.",
+        "ar": "ساحل وقمم الحجر وضباب ظفار — كل علامة مكان يمكنك الوقوف فيه."
+      },
+      "narration": {
+        "en": "First, the atlas. From Muscat to Salalah, from Nizwa’s fort to the Wahiba dunes — history pins, food towns, and living places. Select a name and the map leans in.",
+        "ar": "أولاً الأطلس. من مسقط إلى صلالة، من حصن نزوى إلى كثبان وهيبة — علامات تاريخ وبلدات طعام وأماكن حيّة. اختر اسماً فتميل الخريطة نحوه."
+      }
+    },
+    {
+      "id": "muscat",
+      "anchor": "omMap",
+      "spotlight": "#omMapCanvas",
+      "action": "focusMuscat",
+      "durationMs": 8200,
+      "kicker": {
+        "en": "Capital coast",
+        "ar": "ساحل العاصمة"
+      },
+      "title": {
+        "en": "Muscat",
+        "ar": "مسقط"
+      },
+      "copy": {
+        "en": "Harbors and forts facing the Gulf of Oman.",
+        "ar": "موانئ وحصون تطل على خليج عُمان."
+      },
+      "narration": {
+        "en": "Start in Muscat. Portuguese walls once watched this harbor; today the capital still faces the sea. Forts, corniche light, and the modern sultanate share one shoreline.",
+        "ar": "نبدأ من مسقط. راقبت أسوار برتغالية هذا الميناء يوماً؛ واليوم ما زالت العاصمة تواجه البحر. حصون وضوء كورنيش والسلطنة الحديثة تتشارك شاطئاً واحداً."
+      }
+    },
+    {
+      "id": "nizwa",
+      "anchor": "omMap",
+      "spotlight": "#omMapCanvas",
+      "action": "focusNizwa",
+      "durationMs": 7800,
+      "kicker": {
+        "en": "Interior",
+        "ar": "الداخل"
+      },
+      "title": {
+        "en": "Nizwa",
+        "ar": "نزوى"
+      },
+      "copy": {
+        "en": "Round fort, goat market, Ibadi memory.",
+        "ar": "حصن دائري وسوق ماعز وذاكرة إباضية."
+      },
+      "narration": {
+        "en": "Then Nizwa — the interior capital of memory. The round fort, the Friday market, and falaj water explain how oasis towns held law, learning, and trade when the coast looked to the ocean.",
+        "ar": "ثم نزوى — عاصمة الداخل في الذاكرة. الحصن الدائري وسوق الجمعة وماء الفلج تشرح كيف حملت مدن الواحات الفقه والعلم والتجارة حين كان الساحل ينظر إلى المحيط."
+      }
+    },
+    {
+      "id": "salalah",
+      "anchor": "omMap",
+      "spotlight": "#omMapCanvas",
+      "action": "focusSalalah",
+      "durationMs": 8000,
+      "kicker": {
+        "en": "Dhofar",
+        "ar": "ظفار"
+      },
+      "title": {
+        "en": "Salalah and frankincense",
+        "ar": "صلالة واللبان"
+      },
+      "copy": {
+        "en": "Khareef mist and the Land of Frankincense.",
+        "ar": "ضباب الخريف وأرض اللبان."
+      },
+      "narration": {
+        "en": "South to Salalah. In the khareef season mist greens the hills, and frankincense trees still yield resin that once traveled to distant temples. Dhofar is Oman’s other climate — and an older trade.",
+        "ar": "جنوباً إلى صلالة. في موسم الخريف يُخضِر الضباب التلال، وما زالت أشجار اللبان تعطي راتنجاً سافر يوماً إلى معابد بعيدة. ظفار مناخ عُمان الآخر — وتجارة أقدم."
+      }
+    },
+    {
+      "id": "eras",
+      "anchor": "omTimeline",
+      "spotlight": "#omTimeline",
+      "action": "openFirstEra",
+      "durationMs": 7500,
+      "kicker": {
+        "en": "Timeline",
+        "ar": "خط زمني"
+      },
+      "title": {
+        "en": "Eras of Oman",
+        "ar": "عصور عُمان"
+      },
+      "copy": {
+        "en": "Magan to Vision 2040 — select a layer to hear it.",
+        "ar": "من ماجان إلى رؤية ٢٠٤٠ — اختر طبقة لتسمعها."
+      },
+      "narration": {
+        "en": "Open the timeline. Magan copper, frankincense roads, Ibadi imams, Portuguese forts, Yaʿariba ships, Al Bu Saʿid rule, the Renaissance under Qaboos, and today under Sultan Haitham — each layer has a place on the map.",
+        "ar": "افتح الخط الزمني. نحاس ماجان، وطرق اللبان، وأئمة إباضيون، وحصون برتغالية، وسفن يعاربة، وحكم آل بوسعيد، والنهضة مع قابوس، واليوم مع السلطان هيثم — لكل طبقة مكان على الخريطة."
+      }
+    },
+    {
+      "id": "food",
+      "anchor": "omFood",
+      "spotlight": "#omFoodGrid",
+      "action": "flipFirstFood",
+      "durationMs": 7200,
+      "kicker": {
+        "en": "Table",
+        "ar": "مائدة"
+      },
+      "title": {
+        "en": "Shuwa and kahwa",
+        "ar": "شواء وقهوة"
+      },
+      "copy": {
+        "en": "Flip a plate — festive pits, Gulf rice, and welcome sweets.",
+        "ar": "اقلب طبقاً — تنانير العيد وأرز الخليج وحلوى الترحيب."
+      },
+      "narration": {
+        "en": "At the table, shuwa cooks underground for Eid, majboos fills the rice tray, and Omani halwa arrives with cardamom qahwa. Flip a card and I will tell you why patience tastes like hospitality here.",
+        "ar": "على المائدة يُطهى الشواء تحت الأرض في العيد، ويملأ المجبوس صينية الأرز، وتأتي الحلوى العُمانية مع القهوة بالهيل. اقلب بطاقة وأخبرك لماذا يذوق الصبر كضيافة هنا."
+      }
+    },
+    {
+      "id": "music",
+      "anchor": "omMusic",
+      "spotlight": "#omMusicGrid",
+      "action": "flipFirstMusic",
+      "durationMs": 7000,
+      "kicker": {
+        "en": "Sound",
+        "ar": "صوت"
+      },
+      "title": {
+        "en": "Razha and sea song",
+        "ar": "رزحة وأغنية بحر"
+      },
+      "copy": {
+        "en": "Swords, drums, dhow rhythms, and the oud.",
+        "ar": "سيوف وطبول وإيقاعات سفن وعود."
+      },
+      "narration": {
+        "en": "Listen for razha in the interior, barʿah in Dhofar, sea songs from Sur’s dhow yards, and oud maqam in the majlis. Flip a music card for the history behind the beat.",
+        "ar": "اسمع الرزحة في الداخل، والبرعة في ظفار، وأغاني البحر من أحواض صور، ومقام العود في المجلس. اقلب بطاقة موسيقى لتقرأ الحكاية خلف الإيقاع."
+      }
+    },
+    {
+      "id": "majlis",
+      "anchor": "omHookah",
+      "spotlight": "#omHookahGrid",
+      "action": "flipFirstHookah",
+      "durationMs": 6800,
+      "kicker": {
+        "en": "Majlis",
+        "ar": "مجلس"
+      },
+      "title": {
+        "en": "Coffee before smoke",
+        "ar": "قهوة قبل الدخان"
+      },
+      "copy": {
+        "en": "Qahwa, dates, frankincense — then long talk.",
+        "ar": "قهوة وتمر ولبان — ثم حديث طويل."
+      },
+      "narration": {
+        "en": "In the majlis, qahwa and dates come first. Frankincense may scent the room; shisha may appear in modern cafés. The older grammar is still pour, offer, and speak with respect.",
+        "ar": "في المجلس تأتي القهوة والتمر أولاً. قد يعطّر اللبان الغرفة؛ وقد تظهر الشيشة في مقاهي حديثة. القواعد الأقدم ما زالت: صُبّ، وقدّم، وتكلّم باحترام."
+      }
+    },
+    {
+      "id": "living",
+      "anchor": "omLiving",
+      "spotlight": "#omLivingGrid",
+      "action": "flipFirstLiving",
+      "durationMs": 7200,
+      "kicker": {
+        "en": "Living",
+        "ar": "حياة"
+      },
+      "title": {
+        "en": "Khanjar and falaj",
+        "ar": "خنجر وفلج"
+      },
+      "copy": {
+        "en": "Dress, water shares, and monsoon green.",
+        "ar": "زي وحصص ماء وخضرة الموسم."
+      },
+      "narration": {
+        "en": "Living culture is the khanjar and kumma, falaj water timed by shares, frankincense harvest, and the khareef mist that greens Dhofar. These are not museum labels — they still organize the year.",
+        "ar": "الثقافة الحيّة هي الخنجر والكمة، وماء الفلج بحصص موقوتة، وحصاد اللبان، وضباب الخريف الذي يُخضِر ظفار. هذه ليست بطاقات متحف — ما زالت تنظّم السنة."
+      }
+    },
+    {
+      "id": "phrases",
+      "anchor": "omPhrases",
+      "spotlight": "#omPhraseList",
+      "action": "speakFirstPhrase",
+      "durationMs": 6500,
+      "kicker": {
+        "en": "Speak",
+        "ar": "تكلّم"
+      },
+      "title": {
+        "en": "Ahlan wa sahlan",
+        "ar": "أهلاً وسهلاً"
+      },
+      "copy": {
+        "en": "Press a phrase — I will say it aloud.",
+        "ar": "اضغط عبارة — سأقولها بصوت عالٍ."
+      },
+      "narration": {
+        "en": "Before you go, take a Gulf greeting. Ahlan wa sahlan. Press any phrase on the page and I will say it for you in everyday Arabic.",
+        "ar": "قبل أن تمضي، خذ تحية خليجية. أهلاً وسهلاً. اضغط أي عبارة في الصفحة وسأقولها لك بعربية يومية."
+      }
+    },
+    {
+      "id": "close",
+      "anchor": "omGuide",
+      "spotlight": "#omGuide",
+      "action": "unflipCards",
+      "durationMs": 7000,
+      "kicker": {
+        "en": "Ask me",
+        "ar": "اسألني"
+      },
+      "title": {
+        "en": "I am still here",
+        "ar": "ما زلت هنا"
+      },
+      "copy": {
+        "en": "Ask Salim about Muscat, shuwa, or frankincense.",
+        "ar": "اسأل سليم عن مسقط أو الشواء أو اللبان."
+      },
+      "narration": {
+        "en": "That is the tour. Stay on the map, flip more cards, or ask me anything — Muscat forts, Nizwa markets, shuwa pits, or the mist of Salalah. Maʿa salama for now, and welcome whenever you return.",
+        "ar": "هذه هي الجولة. ابقَ على الخريطة، أو اقلب مزيداً من البطاقات، أو اسألني أي شيء — حصون مسقط، وأسواق نزوى، وتنانير الشواء، أو ضباب صلالة. مع السلامة الآن، وأهلاً بك كلما عدت."
+      }
+    }
+  ]
+}

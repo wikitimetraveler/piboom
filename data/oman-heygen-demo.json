@@ -1,0 +1,62 @@
+{
+  "id": "oman-salim-intro",
+  "title": {
+    "en": "Oman — Meet Salim",
+    "ar": "عُمان — تعرّف على سليم"
+  },
+  "ctaLabel": {
+    "en": "Start the tour",
+    "ar": "ابدأ الجولة"
+  },
+  "ctaHref": "/oman/?reel=1",
+  "qrLandingPath": "/oman/?demo=heygen",
+  "brand": {
+    "attribution": {
+      "en": "Avatar narration powered by HeyGen",
+      "ar": "سرد الأفاتار بتقنية HeyGen"
+    },
+    "developmentBy": "David E Lane"
+  },
+  "heygenScriptShort": {
+    "en": "Ahlan wa sahlan — I'm Salim. This atlas walks Oman: Muscat and Nizwa, frankincense and khareef, shuwa and kahwa, razha and sea song. Press play on the HyperFrame tour, or ask me anything on the page.",
+    "ar": "أهلاً وسهلاً — أنا سليم. هذا الأطلس يمشي عُمان: مسقط ونزوى، اللبان والخريف، الشواء والقهوة، الرزحة وأغنية البحر. شغّل جولة HyperFrame، أو اسألني عن أي شيء في الصفحة."
+  },
+  "heygenVoiceLanguage": {
+    "en": "English",
+    "ar": "Arabic"
+  },
+  "heygenMotionPrompt": "calm nod, warm local guide speaking to camera",
+  "heygenExpressiveness": "low",
+  "heygenAvatarId": null,
+  "heygenAvatarGroupId": null,
+  "heygenVoiceId": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVoiceName": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVideoIdShort": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVideoUrlShort": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVideoLocalShort": {
+    "en": null,
+    "ar": null
+  },
+  "generatedAt": {
+    "en": null,
+    "ar": null
+  },
+  "avatar": {
+    "name": "Salim",
+    "file": null,
+    "portrait": "/oman/assets/salim-guide-portrait-256.png",
+    "source": "/oman/assets/salim-guide-portrait.png"
+  }
+}

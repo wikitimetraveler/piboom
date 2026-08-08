@@ -11,6 +11,8 @@
     "build": "npm run build:ice-knowledge",
     "build:ice-knowledge": "node scripts/build-ice-knowledge.js",
     "build:heygen-knowledge": "node scripts/build-heygen-knowledge.js",
+    "build:gse-knowledge": "node scripts/build-gse-knowledge.js",
+    "refresh:gse-knowledge": "node scripts/build-gse-knowledge.js",
     "scrape:encompass-docs": "node scripts/scrape-encompass-docs.js",
     "refresh:encompass-knowledge": "npm run scrape:encompass-docs && npm run build:ice-knowledge",
     "convert:conditions-cdo": "node scripts/tools/convert-conditions-cdo.mjs",

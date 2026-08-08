@@ -323,6 +323,239 @@
         </div>
       </section>
 
+      <section class="gse-pooling-section mb-4" id="gsePoolingSection" aria-label="Mortgage pooling and MBS primer">
+        <article class="gse-pooling-card">
+          <div class="gse-exhibit-kicker">Secondary market · education</div>
+          <h2 class="h5 mb-2">Mortgage pooling &amp; MBS</h2>
+          <p class="small gse-exhibit-context mb-3">
+            After a loan closes, lenders often sell it into the <strong>secondary market</strong> so they can replenish capital and originate more mortgages.
+            <strong>Pooling</strong> groups loans with similar features; <strong>securitization</strong> turns that pool into a mortgage-backed security (MBS) that investors can buy.
+            This page’s product analyzer is about program fit—pooling and delivery come later, under seller/servicer or issuer rules.
+          </p>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6 col-xl-3">
+              <div class="gse-pooling-step">
+                <span class="gse-pooling-step__n" aria-hidden="true">1</span>
+                <h3 class="h6 mb-1">Originate</h3>
+                <p class="small mb-0">Primary market: lender funds a 1–4 unit mortgage (fixed or ARM; terms often 10–30 years) under agency or government program rules.</p>
+              </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+              <div class="gse-pooling-step">
+                <span class="gse-pooling-step__n" aria-hidden="true">2</span>
+                <h3 class="h6 mb-1">Sell / commit</h3>
+                <p class="small mb-0">Lender sells for cash or swaps loans for MBS (lender swap). Needs MBS execution approval, custodial setup, and an MBS commitment where required.</p>
+              </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+              <div class="gse-pooling-step">
+                <span class="gse-pooling-step__n" aria-hidden="true">3</span>
+                <h3 class="h6 mb-1">Pool &amp; certify</h3>
+                <p class="small mb-0">Similar loans are grouped; document custodian certifies collateral; loan delivery data (often ULDD) is transmitted with pool/delivery schedule.</p>
+              </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+              <div class="gse-pooling-step">
+                <span class="gse-pooling-step__n" aria-hidden="true">4</span>
+                <h3 class="h6 mb-1">Issue &amp; trade</h3>
+                <p class="small mb-0">Agency/issuer guarantees timely P&amp;I on the MBS; security settles via TBA or as a specified pool; cash flows pass through to investors.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-lg-4">
+              <h3 class="h6 mb-2">Who pools what</h3>
+              <ul class="small gse-pooling-list mb-0">
+                <li>
+                  <strong>Fannie Mae / Freddie Mac (GSEs)</strong> —
+                  Buy or swap <em>conventional conforming</em> loans that meet Selling Guide / Seller/Servicer Guide rules, then issue Agency MBS (UMBS for TBA-eligible fixed-rate).
+                  Guaranty is the enterprise’s obligation—not the full faith and credit of the U.S. government.
+                </li>
+                <li>
+                  <strong>Ginnie Mae</strong> —
+                  Does not buy loans or underwrite. Guarantees MBS issued by approved issuers that pool
+                  <em>government-insured/guaranteed</em> loans (FHA, VA, USDA/RHS, and certain other HUD programs). Full faith and credit of the U.S.
+                </li>
+                <li>
+                  <strong>Private-label</strong> —
+                  Non-agency securitizations (no TBA market at Agency scale). Outside this tool’s scope.
+                </li>
+              </ul>
+            </div>
+            <div class="col-lg-4">
+              <h3 class="h6 mb-2">UMBS, TBA &amp; specified pools</h3>
+              <ul class="small gse-pooling-list mb-0">
+                <li>
+                  <strong>UMBS</strong> — Uniform MBS: FHFA Single Security so Fannie and Freddie TBA-eligible fixed-rate pools (10/15/20/30-year) are fungible in one TBA market. Re-securitizations of UMBS are called <strong>Supers</strong>.
+                </li>
+                <li>
+                  <strong>TBA</strong> — Trade agrees on term, coupon, face value, price, and settlement; pool number/CUSIP announced ~48 hours before settle (“48-Hour Rule”). SIFMA “good delivery” rules define interchangeable collateral.
+                </li>
+                <li>
+                  <strong>Specified pools</strong> — CUSIP known at trade; may command a “pay-up” vs TBA for desirable prepay traits (e.g., small loan size, investor occupancy, geographic concentration).
+                </li>
+                <li>
+                  <strong>Standard vs special</strong> — TBA-eligible UMBS typically hold “standard” mortgages; loans with special cash-flow/prepay/tax traits usually go into TBA-ineligible MBS (sometimes de minimis in UMBS).
+                </li>
+              </ul>
+            </div>
+            <div class="col-lg-4">
+              <h3 class="h6 mb-2">Pass-through economics</h3>
+              <ul class="small gse-pooling-list mb-0">
+                <li>
+                  Borrowers pay note rate → investors receive a lower <strong>pass-through (coupon)</strong> after <strong>servicing fee</strong> + <strong>guaranty fee (g-fee)</strong>.
+                </li>
+                <li>
+                  Investors get a pro-rata share of scheduled P&amp;I plus unscheduled principal (prepayments, curtailments). Fannie Mae fixed-rate certificates typically distribute around the 25th of the month.
+                </li>
+                <li>
+                  <strong>Pass-through / single-class</strong> securities vs <strong>multiclass</strong> (CMOs/tranches) with different payment priorities—Agency CRT programs separately transfer credit risk.
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-lg-6">
+              <h3 class="h6 mb-2">Fannie Mae pooling parameters (summary)</h3>
+              <p class="small text-muted mb-2">
+                Confirm current
+                <a href="https://selling-guide.fanniemae.com/sel/c3-2/mbs-securitization-process" target="_blank" rel="noopener noreferrer">Selling Guide Part C3</a>
+                before delivery—figures below are commonly published guide/capital-markets summaries.
+              </p>
+              <ul class="small gse-pooling-list mb-2">
+                <li>
+                  <strong>Single-lender pool</strong> — One lender’s loans sharing amortization/term/mortgage type (or ARM plan). Typical minimum aggregate UPB: <strong>$1M</strong> fixed-rate; <strong>$500K</strong> ARMs.
+                </li>
+                <li>
+                  <strong>Fannie Majors</strong> — Multi-lender pool; once open, a lender may contribute as little as ~$1,000 UPB. Current-production fixed-rate; often ≤12 months seasoning; share of MBS proportional to contribution.
+                </li>
+                <li>
+                  <strong>Note-rate band (fixed-rate)</strong> — Loans in a pool generally must have note rates from <strong>25 bp</strong> to <strong>112.5 bp</strong> above the pool pass-through (e.g., 5.0% coupon → ~5.25%–6.125% notes). Buyups/buydowns can manage excess servicing / coupon fit.
+                </li>
+                <li>
+                  <strong>Term buckets (original term)</strong> — Common UMBS-style bands: 30-yr 181–360 mo; 20-yr 181–240; 15-yr 85–180; 10-yr 85–120 (prefixes such as CL/CT/CI/CN; high-balance and high-LTV refi use separate prefixes).
+                </li>
+                <li>
+                  <strong>Ops prerequisites</strong> — MBS execution approval + MBS committing access; eligible document custodian + Master Custodial Agreement (Form 2017); deliver data and docs so custodian can certify before pool close / security issuance.
+                </li>
+                <li>
+                  <strong>Execution paths</strong> — Lender swap (loans → MBS), portfolio/conduit securitization, structured re-securitizations (including Supers).
+                </li>
+              </ul>
+            </div>
+            <div class="col-lg-6">
+              <h3 class="h6 mb-2">Ginnie Mae pooling (summary)</h3>
+              <p class="small text-muted mb-2">
+                Confirm the current
+                <a href="https://www.ginniemae.gov/issuers/program_guidelines/Pages/mbs_guide.aspx" target="_blank" rel="noopener noreferrer">Ginnie Mae MBS Guide</a>
+                and issuer eligibility—not modeled by Analyze.
+              </p>
+              <ul class="small gse-pooling-list mb-2">
+                <li>
+                  <strong>Ginnie Mae I</strong> — Single-issuer pools (custom). Example: single-family level-payment (suffix SF) often requires a large minimum original principal (commonly cited at $1M for Ginnie I SF).
+                </li>
+                <li>
+                  <strong>Ginnie Mae II</strong> — Custom (single issuer) or <strong>multiple-issuer</strong> pools built from loan packages (smaller packages allowed; MIP rules for buydowns / high-balance mixing apply).
+                </li>
+                <li>
+                  <strong>Pool/loan package types</strong> — Level payment, buydown (BD), ARM, graduated payment (GPM), growing equity (GEM), serial notes, and other specialty chapters—each with its own guide chapter and document-custodian rules.
+                </li>
+                <li>
+                  <strong>Issuer bar</strong> — Approval + ongoing net worth / liquidity tests (e.g., single-family program: base net worth plus bps of effective outstanding obligations; liquid assets floor). Electronic pooling (e.g., GinnieNET) is required for SF pools.
+                </li>
+                <li>
+                  <strong>Collateral path</strong> — Issuer submits pool/loan docs; document custodian certifies (forms such as HUD-11706 / 11711 series) before securities issue.
+                </li>
+              </ul>
+              <h3 class="h6 mb-2 mt-3">Ops glossary</h3>
+              <dl class="small gse-pooling-glossary mb-0">
+                <div><dt>ULDD</dt><dd>Uniform Loan Delivery Dataset—loan-level delivery data to GSEs (and related fields such as pooling method on the loan contract).</dd></div>
+                <div><dt>WAC / WAM</dt><dd>Weighted-average coupon / maturity of loans in the pool—key disclosure stats for investors.</dd></div>
+                <div><dt>Servicing retained vs released</dt><dd>Whether the seller keeps servicing or transfers it when selling/pooling—affects remittance cycles and economics.</dd></div>
+                <div><dt>Mandatory commitment</dt><dd>Seller commits to deliver a set amount of loans/MBS by a date; pair with pipeline hedging (often via TBA).</dd></div>
+                <div><dt>Good delivery</dt><dd>SIFMA rules for what may settle a TBA trade (term, coupon, pool characteristics).</dd></div>
+                <div><dt>Pool prefix / subtype</dt><dd>Codes describing product, term, high-balance, ARM plan, etc., used for pooling and trading.</dd></div>
+                <div><dt>First rate change date</dt><dd>First date the ARM note rate can adjust—not the first borrower payment, and usually one month before the first payment change date.</dd></div>
+                <div><dt>First payment change date</dt><dd>First due date of the new P&amp;I after a rate adjustment (often the 1st of the month after the rate change month).</dd></div>
+              </dl>
+            </div>
+          </div>
+
+          <div class="gse-arm-reset-block mt-3 mb-3" id="gseArmResetSection">
+            <h3 class="h6 mb-2">ARM first rate change date</h3>
+            <p class="small gse-exhibit-context mb-2">
+              On typical agency ARMs, <strong>rate</strong> and <strong>payment</strong> do not move on the same day.
+              Delivery math is often: <strong>1st interest rate change date = 1st payment change date − 1 month</strong>
+              (new rate accrues in March → first payment at the new amount due <strong>April 1</strong>).
+              Initial fixed period is commonly measured from first payment date to first interest rate change date
+              (e.g. 5/1 → about 60 months).
+            </p>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <p class="small text-muted mb-1"><strong>Note math (usual)</strong></p>
+                <ul class="small gse-pooling-list mb-0">
+                  <li>Rate change <strong>March 1</strong> → payment change <strong>April 1</strong></li>
+                  <li>Rate change <strong>June 1</strong> → payment change <strong>July 1</strong></li>
+                  <li>Do not confuse with first payment date after closing, next (subsequent) rate adjustment, or MBS pool issue date.</li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <p class="small text-muted mb-1"><strong>Bank / ops cycle cutoff (example)</strong></p>
+                <p class="small mb-2">
+                  Some lenders use a calendar cutoff so lookback, rate calc, Reg&nbsp;Z notices, and boarding still fit before the next payment-change cycle.
+                  Example pattern used in training here:
+                </p>
+                <div class="table-responsive">
+                  <table class="table table-sm gse-arm-cutoff-table mb-2">
+                    <thead>
+                      <tr>
+                        <th scope="col">Cutoff date</th>
+                        <th scope="col">Allowed cycle</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>March 10</strong> or earlier</td>
+                        <td><strong>April</strong> OK (rate in March → new payment April 1)</td>
+                      </tr>
+                      <tr>
+                        <td><strong>March 11</strong> or later</td>
+                        <td>Miss April → roll to <strong>July</strong> (rate in June → new payment July 1)</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p class="small text-muted mb-0">
+                  The 10th/11th only chooses <em>which</em> cycle the bank books; inside that cycle, note math (rate month, then payment month) still applies.
+                  Confirm your investor/servicer matrix—cutoffs are not universal agency guide text.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3 align-items-start">
+            <div class="col-lg-8">
+              <p class="small text-muted mb-1 gse-exhibit-verify-label"><strong>Verify:</strong></p>
+              <p class="small gse-exhibit-verify mb-0">
+                Pool eligibility, prefixes, commitment windows, custodian certification, remittance type, and TBA good-delivery rules change.
+                Always confirm the current Fannie Mae Selling Guide (Part C3), Freddie Mac Seller/Servicer Guide / capital markets docs, Ginnie Mae MBS Guide, SIFMA TBA guidelines, and your investor/issuer overlays.
+                ARM first rate / payment change dates and any bank cycle cutoffs (e.g. March 10 → April vs March 11 → July) must be confirmed on the note and your servicer calendar.
+                This analyzer does <em>not</em> score pool eligibility, ULDD readiness, issuer status, MBS pricing, or ARM reset calendars.
+              </p>
+            </div>
+            <div class="col-lg-4">
+              <p class="small text-muted mb-1 gse-exhibit-links-label">Official pooling references</p>
+              <ul class="list-unstyled small mb-0 gse-exhibit-links" id="gsePoolingLinks" aria-label="Mortgage pooling official references">
+                <li class="text-muted">References loading…</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+      </section>
+
       <section class="gse-delivery-section mb-4" id="gseGinnieSection" aria-label="Ginnie Mae MBS delivery">
         <article class="gse-delivery-card" data-delivery="ginnie">
           <div class="row g-3 align-items-start">
@@ -332,7 +565,8 @@
               <p class="small gse-exhibit-context mb-2">
                 Not a loan product or underwriting agency. Ginnie Mae guarantees
                 <a href="https://www.ginniemae.gov/issuers/program_guidelines/Pages/mbs_guide.aspx" target="_blank" rel="noopener noreferrer">MBS</a>
-                backed by government-insured or guaranteed loans (FHA, VA, USDA) after those programs approve the loan and an approved issuer pools it.
+                backed by government-insured or guaranteed loans (FHA, VA, USDA) after those programs approve the loan and an approved issuer pools it
+                (Ginnie Mae I single-issuer or Ginnie Mae II custom / multiple-issuer structures—see pooling primer above).
               </p>
               <p class="small text-muted mb-1 gse-exhibit-verify-label"><strong>Verify:</strong></p>
               <p class="small gse-exhibit-verify mb-0" id="gseExhibitGinnieVerify">
@@ -376,24 +610,63 @@
         </div>
       </div>
 
-      <section class="card shadow-sm mt-4 gse-ai-card">
+      <section class="card shadow-sm mt-4 gse-ai-card" id="gseKnowledgeBank">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-          <span><i class="bi bi-stars me-1"></i>AI Loan Program Expert</span>
-          <small class="text-muted">Rule-grounded guidance with citations and overlay operations</small>
+          <span><i class="bi bi-diagram-3 me-1"></i>GSE knowledge bank + AI expert</span>
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <span class="badge rounded-pill text-bg-light border" id="gseKnowledgeBadge" aria-live="polite">Knowledge loading…</span>
+            <small class="text-muted">Hybrid RAG → Postgres <code>gse_knowledge_chunks</code></small>
+          </div>
         </div>
         <div class="card-body">
+          <div class="row g-3 mb-3">
+            <div class="col-lg-7">
+              <div class="gse-knowledge-canvas-wrap">
+                <svg id="gseKnowledgeGraph" class="gse-knowledge-graph" viewBox="0 0 640 320" role="img" aria-label="GSE knowledge graph by category"></svg>
+                <p class="small text-muted mb-0 mt-1" id="gseKnowledgeGraphCaption">Category map of indexed pooling, ARM, product, and official-source slips.</p>
+              </div>
+            </div>
+            <div class="col-lg-5">
+              <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                <h3 class="h6 mb-0">Category mix</h3>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="btnRefreshGseKnowledge">Refresh</button>
+              </div>
+              <div id="gseKnowledgeBars" class="gse-knowledge-bars" aria-live="polite"></div>
+              <label class="form-label small text-muted mt-3 mb-1" for="gseKnowledgeSearch">Explore knowledge</label>
+              <div class="input-group input-group-sm mb-2">
+                <input type="search" class="form-control" id="gseKnowledgeSearch" placeholder="pooling, UMBS, first rate change…" />
+                <button type="button" class="btn btn-outline-primary" id="btnGseKnowledgeSearch">Search</button>
+              </div>
+              <ul class="list-unstyled small gse-knowledge-hits mb-0" id="gseKnowledgeHits" aria-live="polite">
+                <li class="text-muted">Search the bank to preview slips before asking the expert.</li>
+              </ul>
+            </div>
+          </div>
+
+          <ul class="nav nav-pills gse-ai-mode-tabs mb-3" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button type="button" class="nav-link active" id="gseModeRag" data-gse-ai-mode="rag">Knowledge RAG chat</button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button type="button" class="nav-link" id="gseModeRules" data-gse-ai-mode="rules">Quick rules only</button>
+            </li>
+          </ul>
+
           <div class="d-flex flex-wrap gap-2 mb-2">
             <button type="button" class="btn btn-sm btn-outline-primary gse-ai-chip" data-prompt="Compare Fannie HomeReady vs Freddie Home Possible for this scenario.">Compare affordable options</button>
             <button type="button" class="btn btn-sm btn-outline-primary gse-ai-chip" data-prompt="What investor overlay issues are most likely to stop this file?">Check overlay blockers</button>
             <button type="button" class="btn btn-sm btn-outline-primary gse-ai-chip" data-prompt="If this loan is denied by overlays, what should operations do next?">Ops next steps</button>
             <button type="button" class="btn btn-sm btn-outline-primary gse-ai-chip" data-prompt="What documents do we need upfront for the best-fit programs?">Required docs upfront</button>
+            <button type="button" class="btn btn-sm btn-outline-primary gse-ai-chip" data-prompt="Explain mortgage pooling and MBS delivery paths for this scenario: Fannie/Freddie UMBS vs Ginnie Mae, and what ops must verify before pooling.">Pooling &amp; MBS paths</button>
+            <button type="button" class="btn btn-sm btn-outline-primary gse-ai-chip" data-prompt="Explain ARM first rate change date vs first payment change date, and a bank cutoff where March 10 allows April but March 11 rolls to July.">ARM rate change dates</button>
           </div>
           <div class="row g-2">
             <div class="col-md-9">
               <label class="form-label">Ask the expert</label>
-              <textarea class="form-control" id="gseAiQuestion" rows="3" aria-describedby="gseAiHelp" placeholder="Ask about product fit, overlays, denials, docs, investor strategy, or USDA/FHA/VA/GSE differences."></textarea>
+              <textarea class="form-control" id="gseAiQuestion" rows="3" aria-describedby="gseAiHelp" placeholder="Ask about product fit, overlays, pooling/MBS, ARM rate-change dates, or how the GSE knowledge RAG works."></textarea>
               <p class="small text-muted mt-2 mb-0" id="gseAiHelp">
-                Best results: ask one scenario-specific question at a time (program compare, overlay blockers, docs, or next-step ops).
+                RAG mode searches the Postgres knowledge bank (keyword + vectors when available), merges scenario rule cues, then answers with citations.
+                Rebuild index: <code>npm run build:gse-knowledge</code>.
               </p>
               <p class="small text-muted mt-2 mb-0">
                 Voice commands: click the mic and say <span class="font-monospace">analyze scenario</span>, <span class="font-monospace">load pipeline loan 42</span>, <span class="font-monospace">show FHA</span>, or <span class="font-monospace">read summary</span>.
@@ -401,9 +674,13 @@
             </div>
             <div class="col-md-3 d-flex flex-column justify-content-end gap-2">
               <button type="button" class="btn btn-primary" id="btnAskLoanExpert">Ask AI Expert</button>
-              <small class="text-muted" id="gseAiStatus" role="status" aria-live="polite" aria-atomic="true">Uses /api/gse/loan-program-expert and /api/finance/loan-program-expert.</small>
+              <button type="button" class="btn btn-outline-secondary btn-sm" id="btnClearGseChat">Clear chat memory</button>
+              <small class="text-muted" id="gseAiStatus" role="status" aria-live="polite" aria-atomic="true">Uses /api/gse-assistant/chat (RAG) with rules fallback.</small>
             </div>
           </div>
+
+          <div class="mt-3 gse-chat-thread d-none" id="gseChatThread" aria-live="polite"></div>
+
           <div class="mt-3 gse-ai-result d-none" id="gseAiResult" tabindex="-1" aria-label="AI recommendation results">
             <h3 class="h6 mb-1" id="gseAiRecommendationTitle">Recommendation</h3>
             <p class="mb-2" id="gseAiRecommendationText"></p>
@@ -428,7 +705,7 @@
               </div>
               <div class="col-md-6">
                 <article class="gse-ai-subcard">
-                  <h4 class="h6">Citations</h4>
+                  <h4 class="h6">Citations / sources</h4>
                   <ul class="small" id="gseAiCitations"></ul>
                 </article>
               </div>

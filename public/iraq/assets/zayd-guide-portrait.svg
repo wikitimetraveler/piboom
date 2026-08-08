@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Zayd — Iraq atlas guide. Flat vector portrait; stands in until a rendered avatar frame exists. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="Zayd, Iraq history guide">
+  <defs>
+    <linearGradient id="nqSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f2e3c4"/>
+      <stop offset="100%" stop-color="#d9bf92"/>
+    </linearGradient>
+    <linearGradient id="nqCoat" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3c4a3a"/>
+      <stop offset="100%" stop-color="#2a352a"/>
+    </linearGradient>
+    <clipPath id="nqClip"><circle cx="128" cy="128" r="128"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#nqClip)">
+    <rect width="256" height="256" fill="url(#nqSky)"/>
+
+    <!-- Damascene arcade behind the shoulder -->
+    <g fill="#c9a86f" opacity="0.55">
+      <path d="M26 168V96q0-26 26-26t26 26v72z"/>
+      <path d="M100 168V86q0-30 28-30t28 30v82z"/>
+      <path d="M178 168V96q0-26 26-26t26 26v72z"/>
+    </g>
+    <g fill="none" stroke="#9c2233" stroke-width="2" opacity="0.35">
+      <path d="M52 96q0-14 0 0"/>
+      <path d="M0 170h256"/>
+    </g>
+
+    <!-- shoulders -->
+    <path d="M18 256c8-46 44-70 110-70s102 24 110 70z" fill="url(#nqCoat)"/>
+    <path d="M104 190h48l-6 66h-36z" fill="#f5f0e6"/>
+    <path d="M128 196l16 12-16 16-16-16z" fill="#9c2233"/>
+
+    <!-- neck + head -->
+    <path d="M110 168h36v34h-36z" fill="#c98d63"/>
+    <ellipse cx="128" cy="118" rx="46" ry="54" fill="#e0a878"/>
+
+    <!-- hair + beard -->
+    <path d="M82 116c-4-40 18-62 46-62s50 22 46 62c-4-16-8-26-14-30-14 8-50 10-64 0-6 6-11 16-14 30z" fill="#2b211c"/>
+    <path d="M84 124c2 34 20 56 44 56s42-22 44-56c4 30-2 52-16 64-10 9-18 12-28 12s-18-3-28-12c-14-12-20-34-16-64z" fill="#37291f"/>
+    <path d="M112 160h32c-3 9-8 13-16 13s-13-4-16-13z" fill="#8c4a3c"/>
+
+    <!-- eyes + brows -->
+    <g fill="#2b211c">
+      <ellipse cx="108" cy="116" rx="6" ry="7"/>
+      <ellipse cx="148" cy="116" rx="6" ry="7"/>
+      <path d="M96 102q12-8 24-2-12-2-24 2z"/>
+      <path d="M160 102q-12-8-24-2 12-2 24 2z"/>
+    </g>
+    <path d="M124 122q4 14 0 18h10" fill="none" stroke="#b9805a" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <circle cx="128" cy="128" r="124" fill="none" stroke="#c9992f" stroke-width="6"/>
+</svg>

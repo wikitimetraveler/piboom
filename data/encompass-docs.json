@@ -134,8 +134,8 @@
       "title": "Encompass TPO Connect",
       "category": "guides",
       "seed": true,
-      "content": "Encompass TPO Connect covers third-party originator (TPO) integration patterns, enabling brokers and correspondents to submit and manage loans through TPO Connect.",
-      "wordCount": 22
+      "content": "Encompass TPO Connect Client Application Integration Guide. Authorized developers host personalized HTTPS client apps inside an iframe in the TPO web application. The ICE Secure Scripting Framework (SSF) guest library (elli.ssf.guest-with-polyfill.js or elli.ssf.guest.js) registers via elli.script.guest.create() and bridges parent TPO context to the child app. Prerequisites: HTTPS and relaxed SAMEORIGIN. Published objects for child apps: tpoApplication (getUserData, getUserProfileData, getExternalOrgDetails, pageRedirect), auth (getAccessToken, getUser), and loan (all, isReadOnly, calculate, merge). pageRedirect supports Loan Summary, Product Pricing & Lock, Documents, Conditions, Enhanced Conditions, Submit Loan, URLA 2020 sections, and more. Custom widgets are not supported. Token exchange (createAuthCode) supports custom tools inside LO Connect and TPO Connect. Loan API model LoanContractTPO includes company/branch/LO/LP/CFC contact data, register/submit dates, fee review, watch list, and purchase stips. Developer Connect Postman covers external organizations TPO APIs under /encompass/v3/settings/externalOrganizations/tpos (list/create/update), DBA and warehouse subresources, tpoSettings (companyStatus, companyRating, PriceGroup), tpoCustomFieldDefinitions, tpoFees, tpoLateFees, externalUsers, Create and Register a TPO Loan via templateSet, correspondent trades at /secondary/v1/trades/correspondent with tpoDetails, and webhook subscriptions for correspondent trades and external orgs. Env vars: tpoOrgId, tpoId, tpoUserId1, tpoCompanyName, OID. Legacy /encompass/v3/externalOrganizations/tpos is slated for deprecation. DevConnect Labs hub: /finance/tpo-connect.html.",
+      "wordCount": 268
     },
     {
       "url": "https://developer.icemortgagetechnology.com/developer-connect/docs/encompass-customization",

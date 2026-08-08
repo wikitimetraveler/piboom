@@ -1,5 +1,5 @@
 /**
- * Inject sibling nav: Home · Jordan · Syria · Palestine · Israel
+ * Inject sibling nav: Home · Jordan · Syria · Palestine · Israel · Oman · Iran · Iraq · Lebanon · Egypt
  * Development work by David Lane
  */
 (function () {
@@ -9,7 +9,12 @@
     { id: 'home', href: '/', label: 'Home', ar: null, home: true },
     { id: 'jordan', href: '/jordan/', label: 'Jordan', ar: 'الأردن' },
     { id: 'syria', href: '/syria/', label: 'Syria', ar: 'سوريا' },
-    { id: 'holy-land', href: '/holy-land/', label: 'Palestine · Israel', ar: 'فلسطين · إسرائيل' }
+    { id: 'holy-land', href: '/holy-land/', label: 'Palestine · Israel', ar: 'فلسطين · إسرائيل' },
+    { id: 'oman', href: '/oman/', label: 'Oman', ar: 'عُمان' },
+    { id: 'iran', href: '/iran/', label: 'Iran', ar: 'إيران' },
+    { id: 'iraq', href: '/iraq/', label: 'Iraq', ar: 'العراق' },
+    { id: 'lebanon', href: '/lebanon/', label: 'Lebanon', ar: 'لبنان' },
+    { id: 'egypt', href: '/egypt/', label: 'Egypt', ar: 'مصر' }
   ];
 
   function activeId() {
@@ -17,6 +22,11 @@
     if (path.startsWith('/jordan')) return 'jordan';
     if (path.startsWith('/syria')) return 'syria';
     if (path.startsWith('/holy-land')) return 'holy-land';
+    if (path.startsWith('/oman')) return 'oman';
+    if (path.startsWith('/iran')) return 'iran';
+    if (path.startsWith('/iraq')) return 'iraq';
+    if (path.startsWith('/lebanon')) return 'lebanon';
+    if (path.startsWith('/egypt')) return 'egypt';
     return 'home';
   }
 

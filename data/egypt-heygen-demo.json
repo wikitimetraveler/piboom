@@ -1,0 +1,62 @@
+{
+  "id": "egypt-omar-intro",
+  "title": {
+    "en": "Egypt — Meet Omar",
+    "ar": "مصر — تعرّف على عمر"
+  },
+  "ctaLabel": {
+    "en": "Start the tour",
+    "ar": "ابدأ الجولة"
+  },
+  "ctaHref": "/egypt/?reel=1",
+  "qrLandingPath": "/egypt/?demo=heygen",
+  "brand": {
+    "attribution": {
+      "en": "Avatar narration powered by HeyGen",
+      "ar": "سرد الأفاتار بتقنية HeyGen"
+    },
+    "developmentBy": "David E Lane"
+  },
+  "heygenScriptShort": {
+    "en": "Ahlan wa sahlan — I'm Omar. This atlas walks Egypt: Giza and Luxor, Islamic Cairo and Al-Azhar, koshari and Umm Kulthum, café talk and Nile light. Press play on the HyperFrame tour, or ask me anything on the page.",
+    "ar": "أهلاً وسهلاً — أنا عمر. هذا الأطلس يمشي مصر: الجيزة والأقصر، القاهرة الإسلامية والأزهر، الكشري وأم كلثوم، حديث المقهى وضوء النيل. شغّل جولة HyperFrame، أو اسألني عن أي شيء في الصفحة."
+  },
+  "heygenVoiceLanguage": {
+    "en": "English",
+    "ar": "Arabic"
+  },
+  "heygenMotionPrompt": "calm nod, warm local guide speaking to camera",
+  "heygenExpressiveness": "low",
+  "heygenAvatarId": null,
+  "heygenAvatarGroupId": null,
+  "heygenVoiceId": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVoiceName": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVideoIdShort": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVideoUrlShort": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVideoLocalShort": {
+    "en": null,
+    "ar": null
+  },
+  "generatedAt": {
+    "en": null,
+    "ar": null
+  },
+  "avatar": {
+    "name": "Omar",
+    "file": null,
+    "portrait": "/egypt/assets/omar-guide-portrait-256.png",
+    "source": "/egypt/assets/omar-guide-portrait.png"
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "id": "iran-nima-intro",
+  "title": {
+    "en": "Iran — Meet Nima",
+    "ar": "عُمان — تعرّف على نیما"
+  },
+  "ctaLabel": {
+    "en": "Start the tour",
+    "ar": "ابدأ الجولة"
+  },
+  "ctaHref": "/iran/?reel=1",
+  "qrLandingPath": "/iran/?demo=heygen",
+  "brand": {
+    "attribution": {
+      "en": "Avatar narration powered by HeyGen",
+      "ar": "سرد الأفاتار بتقنية HeyGen"
+    },
+    "developmentBy": "David E Lane"
+  },
+  "heygenScriptShort": {
+    "en": "Ahlan wa sahlan — I'm Nima. This atlas walks Iran: Persepolis and Isfahan, Nowruz and tahdig, tar and radif. Press play on the HyperFrame tour, or ask me anything on the page.",
+    "ar": "أهلاً وسهلاً — أنا نیما. هذا الأطلس يمشي إيران: برسبوليس وأصفهان، نوروز والتهديغ، الطار والرديف. شغّل جولة HyperFrame، أو اسألني عن أي شيء في الصفحة."
+  },
+  "heygenVoiceLanguage": {
+    "en": "English",
+    "ar": "Arabic"
+  },
+  "heygenMotionPrompt": "calm nod, warm local guide speaking to camera",
+  "heygenExpressiveness": "low",
+  "heygenAvatarId": null,
+  "heygenAvatarGroupId": null,
+  "heygenVoiceId": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVoiceName": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVideoIdShort": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVideoUrlShort": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVideoLocalShort": {
+    "en": null,
+    "ar": null
+  },
+  "generatedAt": {
+    "en": null,
+    "ar": null
+  },
+  "avatar": {
+    "name": "Nima",
+    "file": null,
+    "portrait": "/iran/assets/nima-guide-portrait-256.png",
+    "source": "/iran/assets/nima-guide-portrait.png"
+  }
+}

@@ -1,0 +1,291 @@
+{
+  "id": "iraq-hyperframes-reel",
+  "title": {
+    "en": "Iraq HyperFrame Tour",
+    "ar": "جولة العراق المصوّرة"
+  },
+  "portrait": "/iraq/assets/zayd-guide-portrait-256.png",
+  "voice": {
+    "en": "en-US-Neural2-D",
+    "ar": "ar-XA-Wavenet-B"
+  },
+  "pitch": -1,
+  "speakingRate": 0.98,
+  "scenes": [
+    {
+      "id": "welcome",
+      "anchor": "iqHero",
+      "spotlight": "#iqHero",
+      "durationMs": 7200,
+      "kicker": {
+        "en": "Welcome",
+        "ar": "أهلاً"
+      },
+      "title": {
+        "en": "Ahlan — Iraq",
+        "ar": "أهلاً — العراق"
+      },
+      "copy": {
+        "en": "I am Zayd. Rivers, cities, and living tables — told with care.",
+        "ar": "أنا زيد. أنهار ومدن ومائدة حية — تُروى بعناية."
+      },
+      "narration": {
+        "en": "Ahlan wa sahlan. I am Zayd. This atlas is Iraq — Sumer and Babylon, Abbasid Baghdad, marsh light, and a living table. Give me a few minutes and I will walk you through the map, the eras, and the flavors.",
+        "ar": "أهلاً وسهلاً. أنا زيد. هذا الأطلس العراق — سومر وبابل، وبغداد العباسية، وضوء الأهوار، ومائدة حية. أعطني دقائق وأمشيك عبر الخريطة والعصور والنكهات."
+      }
+    },
+    {
+      "id": "atlas",
+      "anchor": "iqMap",
+      "spotlight": "#iqMap",
+      "action": "openAtlas",
+      "durationMs": 7000,
+      "kicker": {
+        "en": "Atlas",
+        "ar": "أطلس"
+      },
+      "title": {
+        "en": "The map opens",
+        "ar": "تُفتح الخريطة"
+      },
+      "copy": {
+        "en": "Tigris bends, marsh reeds, desert edge — every pin a place.",
+        "ar": "انحناءات دجلة وقصب الأهوار وحافة الصحراء — كل علامة مكان."
+      },
+      "narration": {
+        "en": "First, the atlas. From Baghdad to Basra, from Ur’s ziggurat to Erbil’s citadel — history pins, food towns, and living places. Select a name and the map leans in.",
+        "ar": "أولاً الأطلس. من بغداد إلى البصرة، من زقورة أور إلى قلعة أربيل — علامات تاريخ وبلدات طعام وأماكن حيّة. اختر اسماً فتميل الخريطة نحوه."
+      }
+    },
+    {
+      "id": "baghdad",
+      "anchor": "iqMap",
+      "spotlight": "#iqMapCanvas",
+      "action": "focusBaghdad",
+      "durationMs": 8200,
+      "kicker": {
+        "en": "Capital",
+        "ar": "العاصمة"
+      },
+      "title": {
+        "en": "Baghdad",
+        "ar": "بغداد"
+      },
+      "copy": {
+        "en": "Tigris capital of books and tea houses.",
+        "ar": "عاصمة دجلة للكتب وبيوت الشاي."
+      },
+      "narration": {
+        "en": "Start in Baghdad. Abbasid scholars once filled its libraries; today cafés and river terraces still pace the city’s talk.",
+        "ar": "نبدأ من بغداد. ملأ علماء عباسيون مكتباتها يوماً؛ واليوم ما زالت المقاهي وشرفات النهر تضبط حديث المدينة."
+      }
+    },
+    {
+      "id": "babylon",
+      "anchor": "iqMap",
+      "spotlight": "#iqMapCanvas",
+      "action": "focusBabylon",
+      "durationMs": 7800,
+      "kicker": {
+        "en": "Ancient capital",
+        "ar": "عاصمة قديمة"
+      },
+      "title": {
+        "en": "Babylon",
+        "ar": "بابل"
+      },
+      "copy": {
+        "en": "Processions, law, and legendary walls.",
+        "ar": "مواكب وشريعة وأسوار أسطورية."
+      },
+      "narration": {
+        "en": "Then Babylon — Hammurabi’s justice and Nebuchadnezzar’s processional city. The plain still holds the name that meant wonder.",
+        "ar": "ثم بابل — عدل حمورابي ومدينة نبوخذ نصر المواكبية. ما زال السهل يحمل اسماً عنى العجب."
+      }
+    },
+    {
+      "id": "ur",
+      "anchor": "iqMap",
+      "spotlight": "#iqMapCanvas",
+      "action": "focusUr",
+      "durationMs": 8000,
+      "kicker": {
+        "en": "Sumer",
+        "ar": "سومر"
+      },
+      "title": {
+        "en": "Ur",
+        "ar": "أور"
+      },
+      "copy": {
+        "en": "Ziggurat stairs above the southern plain.",
+        "ar": "أدراج الزقورة فوق السهل الجنوبي."
+      },
+      "narration": {
+        "en": "South to Ur. The ziggurat rises where Sumerian kings buried treasure and prayed to the moon god — a first city still teaching beginnings.",
+        "ar": "جنوباً إلى أور. ترتفع الزقورة حيث دفن ملوك سومر كنوزاً وصلّوا لإله القمر — مدينة أولى ما زالت تعلّم البدايات."
+      }
+    },
+    {
+      "id": "eras",
+      "anchor": "iqTimeline",
+      "spotlight": "#iqTimeline",
+      "action": "openFirstEra",
+      "durationMs": 7500,
+      "kicker": {
+        "en": "Timeline",
+        "ar": "خط زمني"
+      },
+      "title": {
+        "en": "Eras of Iraq",
+        "ar": "عصور العراق"
+      },
+      "copy": {
+        "en": "Sumer to today — select a layer to hear it.",
+        "ar": "من سومر إلى اليوم — اختر طبقة لتسمعها."
+      },
+      "narration": {
+        "en": "Open the timeline. Sumer, Babylon, Assyria, Abbasids, Ottomans, mandate kingdom, republic, and contemporary Iraq — each layer has a place on the map.",
+        "ar": "افتح الخط الزمني. سومر وبابل وآشور والعباسيون والعثمانيون والمملكة الانتدابية والجمهورية والعراق المعاصر — لكل طبقة مكان على الخريطة."
+      }
+    },
+    {
+      "id": "food",
+      "anchor": "iqFood",
+      "spotlight": "#iqFoodGrid",
+      "action": "flipFirstFood",
+      "durationMs": 7200,
+      "kicker": {
+        "en": "Table",
+        "ar": "مائدة"
+      },
+      "title": {
+        "en": "Masgouf and quzi",
+        "ar": "مسگوف وقوزي"
+      },
+      "copy": {
+        "en": "Flip a plate — river fish, feast rice, and kleicha.",
+        "ar": "اقلب طبقاً — سمك نهر وأرز وليمة وكليجة."
+      },
+      "narration": {
+        "en": "At the table, masgouf grills by the river, quzi fills the tray, and kleicha sweetens Eid. Flip a card and I will tell you why patience tastes like hospitality here.",
+        "ar": "على المائدة يُشوى المسگوف على النهر، ويملأ القوزي الصينية، وتحلّي الكليجة العيد. اقلب بطاقة وأخبرك لماذا يذوق الصبر كضيافة هنا."
+      }
+    },
+    {
+      "id": "music",
+      "anchor": "iqMusic",
+      "spotlight": "#iqMusicGrid",
+      "action": "flipFirstMusic",
+      "durationMs": 7000,
+      "kicker": {
+        "en": "Sound",
+        "ar": "صوت"
+      },
+      "title": {
+        "en": "Maqam and oud",
+        "ar": "مقام وعود"
+      },
+      "copy": {
+        "en": "Baghdad suites, chalghi, and southern folk.",
+        "ar": "متتاليات بغداد وجلغي وشعبي الجنوب."
+      },
+      "narration": {
+        "en": "Listen for Iraqi maqam, Baghdad oud, chalghi ensembles, southern marsh song, and Kurdish folk in the north. Flip a music card for the history behind the mode.",
+        "ar": "اسمع المقام العراقي وعود بغداد وفرق الجلغي وأغنية الأهوار الجنوبية والأغنية الكردية في الشمال. اقلب بطاقة موسيقى لتقرأ الحكاية خلف المقام."
+      }
+    },
+    {
+      "id": "majlis",
+      "anchor": "iqHookah",
+      "spotlight": "#iqHookahGrid",
+      "action": "flipFirstHookah",
+      "durationMs": 6800,
+      "kicker": {
+        "en": "Café",
+        "ar": "مقهى"
+      },
+      "title": {
+        "en": "Tea before smoke",
+        "ar": "شاي قبل الدخان"
+      },
+      "copy": {
+        "en": "Chai-khana talk — then slow nargileh.",
+        "ar": "حديث الچايخانه — ثم نرجيلة بطيئة."
+      },
+      "narration": {
+        "en": "In the café, chai comes first. Newspapers, poetry, and river terraces still outlast the coals.",
+        "ar": "في المقهى يأتي الشاي أولاً. ما زالت الصحف والشعر وشرفات النهر أطول عمراً من الجمر."
+      }
+    },
+    {
+      "id": "living",
+      "anchor": "iqLiving",
+      "spotlight": "#iqLivingGrid",
+      "action": "flipFirstLiving",
+      "durationMs": 7200,
+      "kicker": {
+        "en": "Living",
+        "ar": "حياة"
+      },
+      "title": {
+        "en": "Marshes and pilgrimage",
+        "ar": "أهوار وحج"
+      },
+      "copy": {
+        "en": "Ashura roads, reed halls, and northern Nowruz.",
+        "ar": "طرق عاشوراء وقاعات قصب ونوروز الشمال."
+      },
+      "narration": {
+        "en": "Living culture is Arbaeen hospitality, marsh mudhifs, souq bargaining, calligraphy, and Nowruz fires in the north. These are not museum labels — they still organize the year.",
+        "ar": "الثقافة الحيّة هي ضيافة الأربعين ومضيف الأهوار ومساومة السوق والخط ونيران نوروز في الشمال. هذه ليست بطاقات متحف — ما زالت تنظّم السنة."
+      }
+    },
+    {
+      "id": "phrases",
+      "anchor": "iqPhrases",
+      "spotlight": "#iqPhraseList",
+      "action": "speakFirstPhrase",
+      "durationMs": 6500,
+      "kicker": {
+        "en": "Speak",
+        "ar": "تكلّم"
+      },
+      "title": {
+        "en": "Ahlan wa sahlan",
+        "ar": "أهلاً وسهلاً"
+      },
+      "copy": {
+        "en": "Press a phrase — I will say it aloud.",
+        "ar": "اضغط عبارة — سأقولها بصوت عالٍ."
+      },
+      "narration": {
+        "en": "Before you go, take an Iraqi greeting. Shlonak? Press any phrase on the page and I will say it for you in everyday Arabic.",
+        "ar": "قبل أن تمضي، خذ تحية عراقية. شلونك؟ اضغط أي عبارة في الصفحة وسأقولها لك بعربية يومية."
+      }
+    },
+    {
+      "id": "close",
+      "anchor": "iqGuide",
+      "spotlight": "#iqGuide",
+      "action": "unflipCards",
+      "durationMs": 7000,
+      "kicker": {
+        "en": "Ask me",
+        "ar": "اسألني"
+      },
+      "title": {
+        "en": "I am still here",
+        "ar": "ما زلت هنا"
+      },
+      "copy": {
+        "en": "Ask Zayd about Babylon, masgouf, or the marshes.",
+        "ar": "اسأل زيد عن بابل أو المسگوف أو الأهوار."
+      },
+      "narration": {
+        "en": "That is the tour. Stay on the map, flip more cards, or ask me anything — Babylon’s walls, Ur’s ziggurat, masgouf grills, or the reed halls of the Ahwar. Maʿa salama for now, and welcome whenever you return.",
+        "ar": "هذه هي الجولة. ابقَ على الخريطة، أو اقلب مزيداً من البطاقات، أو اسألني أي شيء — أسوار بابل، وزقورة أور، وأفران المسگوف، أو قاعات قصب الأهوار. مع السلامة الآن، وأهلاً بك كلما عدت."
+      }
+    }
+  ]
+}

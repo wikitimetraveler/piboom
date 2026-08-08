@@ -1,0 +1,1411 @@
+{
+  "id": "lebanon-atlas",
+  "brand": {
+    "name": {
+      "en": "Lebanon — Cedars and Coasts",
+      "ar": "لبنان — أرز وسواحل"
+    },
+    "tagline": {
+      "en": "From Phoenician harbors to cedar mountains — history, mezze, and song on the Levantine shore.",
+      "ar": "من الموانئ الفينيقية إلى جبال الأرز — تاريخ ومزة وغناء على الساحل المشرقي."
+    }
+  },
+  "guide": {
+    "name": {
+      "en": "Karim",
+      "ar": "كريم"
+    },
+    "title": {
+      "en": "Lebanon history guide",
+      "ar": "دليل تاريخ لبنان"
+    },
+    "portrait": "/lebanon/assets/karim-guide-portrait-256.png",
+    "greeting": {
+      "en": "Ahlan wa sahlan. I am Karim — walk with me from Beirut to Byblos and Baalbek.",
+      "ar": "أهلاً وسهلاً. أنا كريم — امشِ معي من بيروت إلى جبيل وبعلبك."
+    }
+  },
+  "ui": {
+    "en": {
+      "dir": "ltr",
+      "langLabel": "English",
+      "switchTo": "عربي",
+      "heroKicker": "Cedars and Coasts",
+      "heroTitle": "Lebanon",
+      "heroLine": "A mountain-backed Mediterranean shore — Phoenician harbors, Roman temples, cedar groves, and a living table of mezze, Fairuz, and café talk.",
+      "playReel": "Play HyperFrame tour",
+      "pauseReel": "Pause tour",
+      "resumeReel": "Resume tour",
+      "stopReel": "Stop tour",
+      "narration": "Narration",
+      "narrationScope": "Entire page — atlas, tour, and cards",
+      "hearWelcome": "Hear welcome",
+      "askGuide": "Ask Karim",
+      "stop": "Stop",
+      "listen": "Listen",
+      "exploreMap": "Explore the atlas",
+      "timelineHeading": "Eras of Lebanon",
+      "timelineLead": "From Phoenician Byblos to contemporary Beirut. Select an era to hear it and find it on the map.",
+      "timelineSelectHint": "Select an era on the timeline",
+      "mapHeading": "Atlas of Lebanon",
+      "mapLead": "Coast, mountain, and Bekaa plain. Select a pin or a name to hear its story.",
+      "mapAll": "All",
+      "mapHistory": "History",
+      "mapFood": "Food",
+      "mapMusic": "Music",
+      "mapHookah": "Café",
+      "mapLiving": "Living",
+      "mapReset": "Show all pins",
+      "mapLoading": "Loading the atlas…",
+      "foodHeading": "The Lebanese table",
+      "foodLead": "Tabbouleh, kibbeh, manakish, and knafeh — flip a dish for its origin and meaning.",
+      "musicHeading": "Sound of Lebanon",
+      "musicLead": "Fairuz, dabke, oud, and the Rahbani stage. Flip a card for the history.",
+      "hookahHeading": "Café — tea, coffee, and slow talk",
+      "hookahLead": "Nargileh, café tables, and evening conversation — Beirut and Tripoli as social furniture.",
+      "livingHeading": "Living cultures",
+      "livingLead": "Cedars, diaspora ties, calligraphy, village life, and Mediterranean coasts.",
+      "phraseHeading": "Speak Lebanese",
+      "phraseLead": "Everyday Levantine Arabic greetings heard across Lebanon. Press any phrase to hear it.",
+      "flipHint": "Flip for the history",
+      "playMusic": "Play music",
+      "stopMusic": "Stop music",
+      "back": "Back",
+      "loading": "Loading the atlas…",
+      "readMore": "Read the full story",
+      "close": "Close",
+      "unesco": "UNESCO World Heritage",
+      "context": "Context",
+      "evidence": "On the ground",
+      "startTour": "HyperFrame tour",
+      "meetGuide": "Meet Karim"
+    },
+    "ar": {
+      "dir": "rtl",
+      "langLabel": "العربية",
+      "switchTo": "English",
+      "heroKicker": "أرز وسواحل",
+      "heroTitle": "لبنان",
+      "heroLine": "ساحل متوسطي خلفه جبال — موانئ فينيقية ومعابد رومانية وأرز، ومائدة حية من المزة وفيروز وحديث المقهى.",
+      "playReel": "شغّل الجولة",
+      "pauseReel": "إيقاف مؤقت",
+      "resumeReel": "متابعة الجولة",
+      "stopReel": "إنهاء الجولة",
+      "narration": "السرد الصوتي",
+      "narrationScope": "الصفحة كاملة — الأطلس والجولة والبطاقات",
+      "hearWelcome": "استمع للترحيب",
+      "askGuide": "اسأل كريم",
+      "stop": "إيقاف",
+      "listen": "استمع",
+      "exploreMap": "استكشف الأطلس",
+      "timelineHeading": "عصور لبنان",
+      "timelineLead": "من جبيل الفينيقية إلى بيروت المعاصرة. اختر حقبة لتسمعها وتجدها على الخريطة.",
+      "timelineSelectHint": "اختر حقبة من الخط الزمني",
+      "mapHeading": "أطلس لبنان",
+      "mapLead": "ساحل وجبل وسهل البقاع. اختر علامة أو اسماً لتسمع حكايته.",
+      "mapAll": "الكل",
+      "mapHistory": "تاريخ",
+      "mapFood": "طعام",
+      "mapMusic": "موسيقى",
+      "mapHookah": "مقهى",
+      "mapLiving": "حياة",
+      "mapReset": "أظهر كل العلامات",
+      "mapLoading": "جارٍ تحميل الأطلس…",
+      "foodHeading": "المائدة اللبنانية",
+      "foodLead": "تبولة وكبة ومناقيش وكنافة — اقلب الطبق لتعرف أصله ومعناه.",
+      "musicHeading": "صوت لبنان",
+      "musicLead": "فيروز والدبكة والعود ومسرح الرحباني. اقلب البطاقة لتقرأ الحكاية.",
+      "hookahHeading": "المقهى — شاي وقهوة وحديث بطيء",
+      "hookahLead": "نرجيلة وطاولات مقهى وحديث المساء — بيروت وطرابلس كأثاث اجتماعي.",
+      "livingHeading": "ثقافات حيّة",
+      "livingLead": "أرز وشتات وخط وقرية وسواحل متوسطية.",
+      "phraseHeading": "احكِ لبناني",
+      "phraseLead": "تحيات عربية شامية يومية تُسمَع في لبنان. اضغط أي عبارة لتسمعها.",
+      "flipHint": "اقلب البطاقة للحكاية",
+      "playMusic": "شغّل المقطع",
+      "stopMusic": "أوقف المقطع",
+      "back": "رجوع",
+      "loading": "جارٍ تحميل الأطلس…",
+      "readMore": "اقرأ الحكاية كاملة",
+      "close": "إغلاق",
+      "unesco": "تراث عالمي — اليونسكو",
+      "context": "السياق",
+      "evidence": "على الأرض",
+      "startTour": "جولة مصوّرة",
+      "meetGuide": "تعرّف على كريم"
+    }
+  },
+  "eras": [
+    {
+      "id": "phoenician",
+      "siteId": "byblos",
+      "yearCE": -1200,
+      "years": {
+        "en": "c. 1500–300 BCE",
+        "ar": "نحو ١٥٠٠–٣٠٠ ق.م"
+      },
+      "title": {
+        "en": "Phoenician — cedar and alphabet",
+        "ar": "فينيقيا — أرز وأبجدية"
+      },
+      "copy": {
+        "en": "Harbor cities that sailed cedar and letters across the Mediterranean.",
+        "ar": "مدن موانئ أبحرت بالأرز والحروف عبر المتوسط."
+      },
+      "narration": {
+        "en": "We begin with the Phoenicians. Byblos, Tyre, and Sidon sent cedar, purple dye, and an alphabet that reshaped the Mediterranean. Their ships made this narrow coast a bridge between worlds.",
+        "ar": "نبدأ بالفينيقيين. أرسلت جبيل وصور وصيدا الأرز والأرجوان وأبجدية أعادت تشكيل المتوسط. جعلت سفنهم هذا الساحل الضيق جسراً بين العوالم."
+      },
+      "history": {
+        "en": "Phoenician city-states along the Lebanese coast built maritime trade networks from the Levant to North Africa and Iberia. Cedar timber, glass, and Tyrian purple were signature exports. The linear alphabet associated with Phoenician writing later influenced Greek and Latin scripts. Archaeology at Byblos, Tyre, and Sidon anchors that coastal story.",
+        "ar": "بنت دويلات المدن الفينيقية على الساحل اللبناني شبكات تجارة بحرية من المشرق إلى شمال أفريقيا وإيبيريا. كان خشب الأرز والزجاج والأرجوان الصوري من أبرز الصادرات. وأثّرت الأبجدية المرتبطة بالكتابة الفينيقية لاحقاً في اليونانية واللاتينية. يرسّخ علم الآثار في جبيل وصور وصيدا هذه الحكاية الساحلية."
+      },
+      "image": "/lebanon/assets/era/phoenician.jpg"
+    },
+    {
+      "id": "roman",
+      "siteId": "baalbek",
+      "yearCE": 150,
+      "years": {
+        "en": "64 BCE–395 CE",
+        "ar": "٦٤ ق.م–٣٩٥ م"
+      },
+      "title": {
+        "en": "Roman — temples of Heliopolis",
+        "ar": "روماني — معابد هليوبوليس"
+      },
+      "copy": {
+        "en": "Baalbek’s colossal stones and coastal cities under Rome.",
+        "ar": "حجارة بعلبك الهائلة ومدن الساحل تحت روما."
+      },
+      "narration": {
+        "en": "Next, Rome. At Baalbek the empire raised temples of astonishing scale. Coastal cities became Roman, then late antique, while mountain valleys kept their own rhythms.",
+        "ar": "ثم روما. في بعلبك رفعت الإمبراطورية معابد بمقياس مذهل. صارت مدن الساحل رومانية ثم متأخرة عتيقة، بينما احتفظت أودية الجبل بإيقاعاتها."
+      },
+      "history": {
+        "en": "After Pompey’s settlement of the East, coastal Phoenicia entered the Roman orbit. Heliopolis (Baalbek) received monumental temple building that still defines the Bekaa skyline. Roman roads, law, and urban institutions layered over older harbor traditions without erasing them.",
+        "ar": "بعد تسوية بومبيوس للشرق دخلت فينيقيا الساحلية مدار روما. تلقّت هليوبوليس (بعلبك) بناء معابد ضخماً ما زال يحدّد أفق البقاع. رصفت الطرق الرومانية والقانون والمؤسسات الحضرية فوق تقاليد الموانئ الأقدم دون محوها."
+      },
+      "image": "/lebanon/assets/era/roman.jpg"
+    },
+    {
+      "id": "byzantine-islamic",
+      "siteId": "aanjar",
+      "yearCE": 700,
+      "years": {
+        "en": "c. 395–1100 CE",
+        "ar": "نحو ٣٩٥–١١٠٠ م"
+      },
+      "title": {
+        "en": "Byzantine & early Islamic",
+        "ar": "بيزنطي وإسلامي مبكر"
+      },
+      "copy": {
+        "en": "From Christian Levantine towns to Umayyad Aanjar.",
+        "ar": "من بلدات مسيحية مشرقية إلى عنجر الأموي."
+      },
+      "narration": {
+        "en": "Byzantine churches and monasteries marked the mountains. Then early Islam arrived — Aanjar’s Umayyad plan still shows how a new capital form was set in the Bekaa.",
+        "ar": "وسمت الكنائس والأديرة البيزنطية الجبال. ثم وصل الإسلام المبكر — ما زال مخطط عنجر الأموي يُظهر كيف وُضعت عاصمة جديدة في البقاع."
+      },
+      "history": {
+        "en": "Late antiquity saw Christian communities flourish in the Lebanese mountains and valleys, including the Qadisha region’s monastic landscape. The Arab-Islamic conquests of the seventh century brought new administration; the Umayyad city of Aanjar preserves a planned urban grid from that early Islamic century.",
+        "ar": "شهدت العصور المتأخرة ازدهار جماعات مسيحية في جبال لبنان وأوديته، بما فيها مشهد الرهبنة في قاديشا. جلبت الفتوح العربية الإسلامية في القرن السابع إدارة جديدة؛ وتحفظ عنجر الأموية شبكة حضرية مخططة من ذلك القرن الإسلامي المبكر."
+      },
+      "image": "/lebanon/assets/era/byzantine-islamic.jpg"
+    },
+    {
+      "id": "crusader",
+      "siteId": "tripoli",
+      "yearCE": 1180,
+      "years": {
+        "en": "1099–1291 CE",
+        "ar": "١٠٩٩–١٢٩١ م"
+      },
+      "title": {
+        "en": "Crusader — castles and ports",
+        "ar": "صليبي — قلاع وموانئ"
+      },
+      "copy": {
+        "en": "Frankish counties, coastal castles, and contested harbors.",
+        "ar": "كونتيّات فرنجية وقلاع ساحلية وموانئ متنازع عليها."
+      },
+      "narration": {
+        "en": "Crusader centuries left castles above Tripoli and Byblos. Ports changed hands; mountain communities negotiated survival between Frankish, Ayyubid, and Mamluk powers.",
+        "ar": "تركت القرون الصليبية قلاعاً فوق طرابلس وجبيل. تبدّلت أيدي الموانئ؛ وتفاوضت جماعات الجبل على البقاء بين قوى فرنجية وأيوبية ومملوكية."
+      },
+      "history": {
+        "en": "The County of Tripoli and coastal strongholds formed part of the Crusader states. Castles and harbor works at Tripoli, Sidon, and Byblos record that military-commercial presence. Mamluk reconquest in the late thirteenth century ended Frankish rule on this coast.",
+        "ar": "شكّلت كونتية طرابلس والمعاقل الساحلية جزءاً من الدول الصليبية. تسجّل القلاع وأعمال الموانئ في طرابلس وصيدا وجبيل ذلك الحضور العسكري التجاري. وأنهى الاسترداد المملوكي في أواخر القرن الثالث عشر الحكم الفرنجي على هذا الساحل."
+      },
+      "image": "/lebanon/assets/era/crusader.jpg"
+    },
+    {
+      "id": "ottoman",
+      "siteId": "beiteddine",
+      "yearCE": 1800,
+      "years": {
+        "en": "1516–1918",
+        "ar": "١٥١٦–١٩١٨"
+      },
+      "title": {
+        "en": "Ottoman — emirates and silk",
+        "ar": "عثماني — إمارات وحرير"
+      },
+      "copy": {
+        "en": "Mountain emirates, Beiteddine Palace, and Mediterranean trade.",
+        "ar": "إمارات جبلية وقصر بيت الدين وتجارة المتوسط."
+      },
+      "narration": {
+        "en": "Under the Ottomans, mountain emirates and coastal cities shared one empire. Beiteddine Palace still shows how local power dressed itself in stone and courtyard light.",
+        "ar": "تحت العثمانيين شاركت إمارات الجبل ومدن الساحل إمبراطورية واحدة. ما زال قصر بيت الدين يُظهر كيف ارتدت السلطة المحلية حجراً وضوء باحات."
+      },
+      "history": {
+        "en": "Ottoman rule after 1516 nested local dynasties — notably in Mount Lebanon — within imperial administration. Silk, ports, and mountain agriculture linked the coast to inland valleys. Beiteddine Palace, built under the Chehab emirs, remains a landmark of that layered authority.",
+        "ar": "أعششت الإدارة العثمانية بعد ١٥١٦ سلالات محلية — خصوصاً في جبل لبنان — داخل الإدارة الإمبراطورية. ربط الحرير والموانئ وزراعة الجبل الساحل بأودية الداخل. ويبقى قصر بيت الدين، الذي بُني في عهد الأمراء الشهابيين، معلماً لتلك السلطة المتراكبة."
+      },
+      "image": "/lebanon/assets/era/ottoman.jpg"
+    },
+    {
+      "id": "mandate",
+      "siteId": "beirut",
+      "yearCE": 1925,
+      "years": {
+        "en": "1920–1943",
+        "ar": "١٩٢٠–١٩٤٣"
+      },
+      "title": {
+        "en": "Mandate — Greater Lebanon",
+        "ar": "الانتداب — لبنان الكبير"
+      },
+      "copy": {
+        "en": "French mandate borders and a capital remade as Beirut.",
+        "ar": "حدود الانتداب الفرنسي وعاصمة أُعيد تشكيلها كبيروت."
+      },
+      "narration": {
+        "en": "After World War I the French mandate drew Greater Lebanon. Beirut grew as capital, press, and university city — a modern shoreline with older mountains behind it.",
+        "ar": "بعد الحرب العالمية الأولى رسم الانتداب الفرنسي لبنان الكبير. نمت بيروت كعاصمة وصحافة وجامعة — شاطئ حديث وخلفه جبال أقدم."
+      },
+      "history": {
+        "en": "The State of Greater Lebanon was proclaimed in 1920 under French mandate, assembling coastal cities with Mount Lebanon and the Bekaa. Beirut’s port, schools, and newspapers expanded. Independence movements gathered force through the 1930s and early 1940s.",
+        "ar": "أُعلن دولة لبنان الكبير سنة ١٩٢٠ تحت الانتداب الفرنسي، جامعاً مدن الساحل مع جبل لبنان والبقاع. توسّع ميناء بيروت ومدارسها وصحفها. وتجمّعت حركات الاستقلال عبر الثلاثينيات وأوائل الأربعينيات."
+      },
+      "image": "/lebanon/assets/era/mandate.jpg"
+    },
+    {
+      "id": "independence",
+      "siteId": "beirut",
+      "yearCE": 1943,
+      "years": {
+        "en": "1943–1975",
+        "ar": "١٩٤٣–١٩٧٥"
+      },
+      "title": {
+        "en": "Independence — republic years",
+        "ar": "الاستقلال — سنوات الجمهورية"
+      },
+      "copy": {
+        "en": "A young republic, banking coast, and cultural capital.",
+        "ar": "جمهورية فتية وساحل مصرفي وعاصمة ثقافية."
+      },
+      "narration": {
+        "en": "Independence in 1943 opened republic decades. Beirut became a regional hub of publishing, music, and finance — Fairuz and the Rahbanis among its most famous voices.",
+        "ar": "فتح الاستقلال سنة ١٩٤٣ عقود الجمهورية. صارت بيروت مركزاً إقليمياً للنشر والموسيقى والمال — وفيروز والرحابنة من أشهر أصواتها."
+      },
+      "history": {
+        "en": "Lebanon’s independence is conventionally dated to 1943. Mid-century Beirut attracted regional capital, universities, and arts scenes. Tourism and banking grew alongside village and mountain economies. The civil war that began in 1975 interrupted that chapter.",
+        "ar": "يُؤرَّخ استقلال لبنان عادةً بسنة ١٩٤٣. جذبت بيروت منتصف القرن رأس المال الإقليمي والجامعات ومشاهد الفنون. ونما السياحة والمصارف إلى جانب اقتصاد القرية والجبل. وأوقفت الحرب الأهلية التي بدأت سنة ١٩٧٥ ذلك الفصل."
+      },
+      "image": "/lebanon/assets/era/independence.jpg"
+    },
+    {
+      "id": "contemporary",
+      "siteId": "beirut",
+      "yearCE": 2000,
+      "years": {
+        "en": "1975–today",
+        "ar": "١٩٧٥–اليوم"
+      },
+      "title": {
+        "en": "Contemporary Lebanon",
+        "ar": "لبنان المعاصر"
+      },
+      "copy": {
+        "en": "War, recovery, diaspora, and a living culture that still sings.",
+        "ar": "حرب وتعافٍ وشتات وثقافة حيّة ما زالت تغني."
+      },
+      "narration": {
+        "en": "Contemporary Lebanon carries war memory, rebuilding, and a vast diaspora. Cedars still stand in the mountains; mezze and Fairuz still travel the world with Lebanese names.",
+        "ar": "يحمل لبنان المعاصر ذاكرة الحرب وإعادة البناء وشتاتاً واسعاً. ما زال الأرز في الجبال؛ وما زالت المزة وفيروز تسافران مع الأسماء اللبنانية."
+      },
+      "history": {
+        "en": "Civil war (1975–1990), occupation periods, and later crises reshaped politics and cities. Cultural continuity — cuisine, music, calligraphy, village festivals, and cedar symbolism — remains central to how Lebanon presents itself at home and abroad. This atlas focuses on that cultural ground.",
+        "ar": "أعادت الحرب الأهلية (١٩٧٥–١٩٩٠) وفترات الاحتلال والأزمات اللاحقة تشكيل السياسة والمدن. ويبقى الاستمرار الثقافي — المطبخ والموسيقى والخط ومهرجانات القرية ورمز الأرز — محورياً في صورة لبنان في الداخل والخارج. يركّز هذا الأطلس على تلك الأرضية الثقافية."
+      },
+      "image": "/lebanon/assets/era/contemporary.jpg"
+    }
+  ],
+  "sites": [
+    {
+      "id": "beirut",
+      "category": "history",
+      "emoji": "🏙️",
+      "lat": 33.8938,
+      "lng": 35.5018,
+      "unesco": false,
+      "name": {
+        "en": "Beirut",
+        "ar": "بيروت"
+      },
+      "place": {
+        "en": "Capital on the Mediterranean",
+        "ar": "العاصمة على المتوسط"
+      },
+      "blurb": {
+        "en": "Lebanon’s capital — port, universities, cafés, and layers of recovery and memory.",
+        "ar": "عاصمة لبنان — ميناء وجامعات ومقاهٍ وطبقات تعافٍ وذاكرة."
+      }
+    },
+    {
+      "id": "byblos",
+      "category": "history",
+      "emoji": "⚓",
+      "lat": 34.1211,
+      "lng": 35.6481,
+      "unesco": true,
+      "name": {
+        "en": "Byblos",
+        "ar": "جبيل"
+      },
+      "place": {
+        "en": "UNESCO harbor city",
+        "ar": "مدينة ميناء مدرجة في اليونسكو"
+      },
+      "blurb": {
+        "en": "One of the oldest continuously inhabited cities — Phoenician harbor, crusader castle, and old souk.",
+        "ar": "من أقدم المدن المأهولة باستمرار — ميناء فينيقي وقلعة صليبية وسوق قديم."
+      }
+    },
+    {
+      "id": "baalbek",
+      "category": "history",
+      "emoji": "🏛️",
+      "lat": 34.0069,
+      "lng": 36.2039,
+      "unesco": true,
+      "name": {
+        "en": "Baalbek",
+        "ar": "بعلبك"
+      },
+      "place": {
+        "en": "Bekaa — Roman temples",
+        "ar": "البقاع — معابد رومانية"
+      },
+      "blurb": {
+        "en": "Colossal temple complex of Heliopolis — among the grandest Roman ruins in the Levant.",
+        "ar": "مجمع معابد هليوبوليس الهائل — من أعظم الآثار الرومانية في المشرق."
+      }
+    },
+    {
+      "id": "tyre",
+      "category": "history",
+      "emoji": "🏺",
+      "lat": 33.2704,
+      "lng": 35.2038,
+      "unesco": true,
+      "name": {
+        "en": "Tyre",
+        "ar": "صور"
+      },
+      "place": {
+        "en": "Southern coastal city",
+        "ar": "مدينة ساحلية جنوبية"
+      },
+      "blurb": {
+        "en": "Phoenician island-city later joined to the mainland — purple dye, Roman hippodrome, and sea walls.",
+        "ar": "مدينة فينيقية جزيرية اتصلت لاحقاً بالبر — أرجوان وحلبة رومانية وأسوار بحر."
+      }
+    },
+    {
+      "id": "sidon",
+      "category": "history",
+      "emoji": "🏰",
+      "lat": 33.5631,
+      "lng": 35.3689,
+      "unesco": false,
+      "name": {
+        "en": "Sidon",
+        "ar": "صيدا"
+      },
+      "place": {
+        "en": "Sea Castle and old town",
+        "ar": "قلعة البحر والمدينة القديمة"
+      },
+      "blurb": {
+        "en": "Ancient Sidon — crusader Sea Castle, soap souks, and a working harbor.",
+        "ar": "صيدا القديمة — قلعة البحر الصليبية وأسواق الصابون وميناء عامل."
+      }
+    },
+    {
+      "id": "tripoli",
+      "category": "history",
+      "emoji": "🕌",
+      "lat": 34.4367,
+      "lng": 35.8497,
+      "unesco": false,
+      "name": {
+        "en": "Tripoli",
+        "ar": "طرابلس"
+      },
+      "place": {
+        "en": "Northern capital of memory",
+        "ar": "عاصمة الشمال في الذاكرة"
+      },
+      "blurb": {
+        "en": "Mamluk mosques, crusader citadel, and a dense old city of sweets and souks.",
+        "ar": "مساجد مملوكية وقلعة صليبية ومدينة قديمة كثيفة بالحلويات والأسواق."
+      }
+    },
+    {
+      "id": "beiteddine",
+      "category": "living",
+      "emoji": "🏯",
+      "lat": 33.6961,
+      "lng": 35.5794,
+      "unesco": false,
+      "name": {
+        "en": "Beiteddine",
+        "ar": "بيت الدين"
+      },
+      "place": {
+        "en": "Chouf — palace town",
+        "ar": "الشوف — بلدة القصر"
+      },
+      "blurb": {
+        "en": "Ottoman-era palace of courtyards and carved stone — summer festivals still gather here.",
+        "ar": "قصر عثماني الطابع بباحات وحجر منحوت — ما زالت مهرجانات الصيف تتجمع هنا."
+      }
+    },
+    {
+      "id": "cedars",
+      "category": "living",
+      "emoji": "🌲",
+      "lat": 34.2436,
+      "lng": 36.0408,
+      "unesco": true,
+      "name": {
+        "en": "Cedars of God",
+        "ar": "أرز الرب"
+      },
+      "place": {
+        "en": "Bsharri — mountain grove",
+        "ar": "بشري — حرش جبلي"
+      },
+      "blurb": {
+        "en": "Ancient Cedrus libani grove — national emblem and UNESCO forest landscape.",
+        "ar": "حرش أرز لبناني عتيق — شعار وطني ومشهد غابي مدرج في اليونسكو."
+      }
+    },
+    {
+      "id": "aanjar",
+      "category": "history",
+      "emoji": "🧱",
+      "lat": 33.7339,
+      "lng": 35.9336,
+      "unesco": true,
+      "name": {
+        "en": "Aanjar",
+        "ar": "عنجر"
+      },
+      "place": {
+        "en": "Bekaa — Umayyad city",
+        "ar": "البقاع — مدينة أموية"
+      },
+      "blurb": {
+        "en": "Planned early Islamic city with colonnades and a clear urban grid.",
+        "ar": "مدينة إسلامية مبكرة مخططة بأروقة وشبكة حضرية واضحة."
+      }
+    },
+    {
+      "id": "jeita",
+      "category": "living",
+      "emoji": "🕳️",
+      "lat": 33.9436,
+      "lng": 35.6417,
+      "unesco": false,
+      "name": {
+        "en": "Jeita Grotto",
+        "ar": "مغارة جعيتا"
+      },
+      "place": {
+        "en": "Keserwan — limestone caves",
+        "ar": "كسروان — كهوف كلسية"
+      },
+      "blurb": {
+        "en": "Spectacular karst caves with underground river — one of Lebanon’s natural landmarks.",
+        "ar": "كهوف كارستية مذهلة بنهر جوفي — من معالم لبنان الطبيعية."
+      }
+    },
+    {
+      "id": "qadisha",
+      "category": "living",
+      "emoji": "⛪",
+      "lat": 34.2833,
+      "lng": 35.95,
+      "unesco": true,
+      "name": {
+        "en": "Qadisha Valley",
+        "ar": "وادي قاديشا"
+      },
+      "place": {
+        "en": "North — holy valley",
+        "ar": "الشمال — الوادي المقدس"
+      },
+      "blurb": {
+        "en": "Deep valley of Maronite monasteries carved into cliffs — paired with the Cedars in UNESCO listing.",
+        "ar": "وادٍ عميق لأديرة مارونية محفورة في الجروف — مقترن بالأرز في قائمة اليونسكو."
+      }
+    },
+    {
+      "id": "zahle",
+      "category": "food",
+      "emoji": "🍷",
+      "lat": 33.8467,
+      "lng": 35.9022,
+      "unesco": false,
+      "name": {
+        "en": "Zahle",
+        "ar": "زحلة"
+      },
+      "place": {
+        "en": "Bekaa — city of wine and mezze",
+        "ar": "البقاع — مدينة النبيذ والمزة"
+      },
+      "blurb": {
+        "en": "Riverside restaurants, arak, and vineyard country at the foot of the mountains.",
+        "ar": "مطاعم على النهر وعرق وبلاد كروم عند سفح الجبال."
+      }
+    },
+    {
+      "id": "beirut-music",
+      "category": "music",
+      "emoji": "🎵",
+      "lat": 33.8886,
+      "lng": 35.4955,
+      "unesco": false,
+      "name": {
+        "en": "Beirut stages",
+        "ar": "مسارح بيروت"
+      },
+      "place": {
+        "en": "Hamra & downtown memory",
+        "ar": "حمرا وذاكرة الوسط"
+      },
+      "blurb": {
+        "en": "Where Fairuz, the Rahbanis, and later indie scenes found stages and radio.",
+        "ar": "حيث وجدت فيروز والرحابنة ثم مشاهد الإندي مسارح ومذياعاً."
+      }
+    },
+    {
+      "id": "beirut-cafe",
+      "category": "living",
+      "emoji": "☕",
+      "lat": 33.8992,
+      "lng": 35.4814,
+      "unesco": false,
+      "name": {
+        "en": "Beirut cafés",
+        "ar": "مقاهي بيروت"
+      },
+      "place": {
+        "en": "Corniche & neighborhood tables",
+        "ar": "الكورنيش وطاولات الأحياء"
+      },
+      "blurb": {
+        "en": "Coffee, nargileh, and long talk — the city’s social living room.",
+        "ar": "قهوة ونرجيلة وحديث طويل — غرفة جلوس المدينة الاجتماعية."
+      }
+    }
+  ],
+  "foods": [
+    {
+      "id": "tabbouleh",
+      "emoji": "🥗",
+      "siteId": "zahle",
+      "name": {
+        "en": "Tabbouleh",
+        "ar": "تبولة"
+      },
+      "tagline": {
+        "en": "Parsley salad of lemon and bulgur",
+        "ar": "سلطة بقدونس بليمون وبرغل"
+      },
+      "history": {
+        "en": "Tabbouleh is Lebanon’s green signature — finely chopped parsley with tomato, mint, bulgur, lemon, and olive oil. Villages and city tables alike treat it as mezze pride, not a side afterthought.",
+        "ar": "التبولة توقيع لبنان الأخضر — بقدونس مفروم ناعماً مع بندورة ونعناع وبرغل وليمون وزيت زيتون. تعاملها القرى وموائد المدينة كفخر مزة لا كطبق جانبي."
+      },
+      "tags": {
+        "en": [
+          "Mezze",
+          "Parsley",
+          "Lemon"
+        ],
+        "ar": [
+          "مزة",
+          "بقدونس",
+          "ليمون"
+        ]
+      },
+      "image": "/lebanon/assets/food/tabbouleh.jpg"
+    },
+    {
+      "id": "kibbeh",
+      "emoji": "🥙",
+      "siteId": "zahle",
+      "name": {
+        "en": "Kibbeh",
+        "ar": "كبة"
+      },
+      "tagline": {
+        "en": "Bulgur and meat — raw, fried, or baked",
+        "ar": "برغل ولحم — نيئة أو مقلية أو بالصينية"
+      },
+      "history": {
+        "en": "Kibbeh takes many forms: kibbeh nayyeh as festive raw dish, fried balls, or tray-baked kibbeh bil saniyeh. The blend of bulgur and meat is a mountain-and-Bekaa classic.",
+        "ar": "للكبة صور كثيرة: كبة نيئة في الأعياد، أو كرات مقلية، أو كبة بالصينية. ومزج البرغل واللحم كلاسيكية جبل وبقاع."
+      },
+      "tags": {
+        "en": [
+          "Mezze",
+          "Bulgur",
+          "Meat"
+        ],
+        "ar": [
+          "مزة",
+          "برغل",
+          "لحم"
+        ]
+      },
+      "image": "/lebanon/assets/food/kibbeh.jpg"
+    },
+    {
+      "id": "manakish",
+      "emoji": "🫓",
+      "siteId": "beirut",
+      "name": {
+        "en": "Manakish",
+        "ar": "مناقيش"
+      },
+      "tagline": {
+        "en": "Morning flatbread with zaʿatar or cheese",
+        "ar": "خبز الصباح بزعتر أو جبنة"
+      },
+      "history": {
+        "en": "Bakeries pull manakish from stone ovens at breakfast — zaʿatar oil, cheese, or minced meat. It is street fuel and family ritual from Beirut to mountain towns.",
+        "ar": "تسحب المخابز المناقيش من الأفران الحجرية في الإفطار — زيت زعتر أو جبنة أو لحم مفروم. هي وقود الشارع وطقس العائلة من بيروت إلى بلدات الجبل."
+      },
+      "tags": {
+        "en": [
+          "Breakfast",
+          "Zaatar",
+          "Bakery"
+        ],
+        "ar": [
+          "فطور",
+          "زعتر",
+          "مخبز"
+        ]
+      },
+      "image": "/lebanon/assets/food/manakish.jpg"
+    },
+    {
+      "id": "fattoush",
+      "emoji": "🥬",
+      "siteId": "beirut",
+      "name": {
+        "en": "Fattoush",
+        "ar": "فتوش"
+      },
+      "tagline": {
+        "en": "Bread salad bright with sumac",
+        "ar": "سلطة خبز مشرقة بالسماق"
+      },
+      "history": {
+        "en": "Fattoush tosses garden vegetables with toasted pita and a sharp sumac dressing. It is the crunchy twin of tabbouleh on many mezze spreads.",
+        "ar": "يرمي الفتوش خضار البستان مع خبز محمّص وتتبيلة سماق حادة. هو التوأم المقرمش للتبولة على كثير من موائد المزة."
+      },
+      "tags": {
+        "en": [
+          "Salad",
+          "Sumac",
+          "Pita"
+        ],
+        "ar": [
+          "سلطة",
+          "سماق",
+          "خبز"
+        ]
+      },
+      "image": "/lebanon/assets/food/fattoush.jpg"
+    },
+    {
+      "id": "shawarma",
+      "emoji": "🌯",
+      "siteId": "beirut",
+      "name": {
+        "en": "Shawarma",
+        "ar": "شاورما"
+      },
+      "tagline": {
+        "en": "Spit-roasted street classic",
+        "ar": "كلاسيكية الشارع على السيخ"
+      },
+      "history": {
+        "en": "Vertical spits of seasoned meat carve into sandwiches with garlic sauce, pickles, and fries. Late-night Beirut and every highway stop tell the same story.",
+        "ar": "تُقطع اللحوم المتبلة على السيخ العمودي في سندويشات مع ثوم ومخلل وبطاطا. تروي بيروت المتأخرة وكل موقف على الطريق الحكاية نفسها."
+      },
+      "tags": {
+        "en": [
+          "Street",
+          "Sandwich",
+          "Garlic"
+        ],
+        "ar": [
+          "شارع",
+          "سندويش",
+          "ثوم"
+        ]
+      },
+      "image": "/lebanon/assets/food/shawarma.jpg"
+    },
+    {
+      "id": "knafeh",
+      "emoji": "🍮",
+      "siteId": "tripoli",
+      "name": {
+        "en": "Knafeh",
+        "ar": "كنافة"
+      },
+      "tagline": {
+        "en": "Cheese pastry soaked in syrup",
+        "ar": "معجن جبن يُسقى بالقطر"
+      },
+      "history": {
+        "en": "Golden shredded pastry over soft cheese, finished with syrup and pistachios. Tripoli and coastal sweet shops treat knafeh as breakfast or celebration.",
+        "ar": "عجينة مبشورة ذهبية فوق جبن طري، تُختَم بقطر وفستق. تعاملها طرابلس ومحلات الساحل كفطور أو احتفال."
+      },
+      "tags": {
+        "en": [
+          "Sweet",
+          "Cheese",
+          "Syrup"
+        ],
+        "ar": [
+          "حلوى",
+          "جبن",
+          "قطر"
+        ]
+      },
+      "image": "/lebanon/assets/food/knafeh.jpg"
+    },
+    {
+      "id": "mezze",
+      "emoji": "🍽️",
+      "siteId": "zahle",
+      "name": {
+        "en": "Mezze",
+        "ar": "مزة"
+      },
+      "tagline": {
+        "en": "A table of small plates and talk",
+        "ar": "مائدة صحون صغيرة وحديث"
+      },
+      "history": {
+        "en": "Mezze is hospitality as architecture — hummus, mutabbal, labneh, olives, and grilled meats arriving in waves. Zahle’s riverside tables made the form famous for visitors.",
+        "ar": "المزة ضيافة كعمارة — حمص ومتبل ولبنة وزيتون ولحوم مشوية تصل موجات. جعلت طاولات زحلة على النهر الشكل مشهوراً للزوّار."
+      },
+      "tags": {
+        "en": [
+          "Hospitality",
+          "Share",
+          "Table"
+        ],
+        "ar": [
+          "ضيافة",
+          "مشاركة",
+          "مائدة"
+        ]
+      },
+      "image": "/lebanon/assets/food/mezze.jpg"
+    },
+    {
+      "id": "arak-table",
+      "emoji": "🥃",
+      "siteId": "zahle",
+      "name": {
+        "en": "Arak table",
+        "ar": "طاولة عرق"
+      },
+      "tagline": {
+        "en": "Anise spirit with mezze and grapes",
+        "ar": "روح اليانسون مع المزة والعنب"
+      },
+      "history": {
+        "en": "Arak — anise-flavored grape spirit — turns cloudy with water and ice. In the Bekaa it belongs with grilled meats, raw kibbeh, and long Sunday tables.",
+        "ar": "العرق — روح عنب بيانسون — يتعكّر مع الماء والثلج. في البقاع ينتمي إلى اللحوم المشوية والكبة النيئة وطاولات الأحد الطويلة."
+      },
+      "tags": {
+        "en": [
+          "Arak",
+          "Bekaa",
+          "Mezze"
+        ],
+        "ar": [
+          "عرق",
+          "بقاع",
+          "مزة"
+        ]
+      },
+      "image": "/lebanon/assets/food/arak-table.jpg"
+    }
+  ],
+  "music": [
+    {
+      "id": "fairuz",
+      "emoji": "🎤",
+      "siteId": "beirut-music",
+      "name": {
+        "en": "Fairuz",
+        "ar": "فيروز"
+      },
+      "tagline": {
+        "en": "The voice that carried Lebanon abroad",
+        "ar": "الصوت الذي حمل لبنان إلى الخارج"
+      },
+      "history": {
+        "en": "Fairuz’s songs — many written with the Rahbani brothers — became a shared soundtrack across the Arab world. Morning radio and diaspora kitchens still open with her voice.",
+        "ar": "صارت أغاني فيروز — وكثير منها مع الأخوين رحباني — شريطاً صوتياً مشتركاً في العالم العربي. ما زالت إذاعة الصباح ومطابخ الشتات تُفتح بصوتها."
+      },
+      "tags": {
+        "en": [
+          "Song",
+          "Radio",
+          "Icon"
+        ],
+        "ar": [
+          "أغنية",
+          "إذاعة",
+          "أيقونة"
+        ]
+      },
+      "image": "/lebanon/assets/music/fairuz.jpg"
+    },
+    {
+      "id": "dabke",
+      "emoji": "💃",
+      "siteId": "zahle",
+      "name": {
+        "en": "Dabke",
+        "ar": "دبكة"
+      },
+      "tagline": {
+        "en": "Line dance of stomps and shoulder join",
+        "ar": "رقصة صف بخطوات وكتف متصل"
+      },
+      "history": {
+        "en": "Dabke joins weddings and village festivals — linked hands, stomping steps, and a leader who improvises the line. It is Levantine shared ground with Lebanese local styles.",
+        "ar": "تجمع الدبكة الأعراس ومهرجانات القرية — أيدٍ متشابكة وخطوات دقّ وقائد يرتجل الصف. هي أرض شامية مشتركة بأساليب لبنانية محلية."
+      },
+      "tags": {
+        "en": [
+          "Dance",
+          "Wedding",
+          "Village"
+        ],
+        "ar": [
+          "رقص",
+          "عرس",
+          "قرية"
+        ]
+      },
+      "image": "/lebanon/assets/music/dabke.jpg"
+    },
+    {
+      "id": "oud-beirut",
+      "emoji": "🎶",
+      "siteId": "beirut-music",
+      "name": {
+        "en": "Oud of Beirut",
+        "ar": "عود بيروت"
+      },
+      "tagline": {
+        "en": "Lute nights in café and salon",
+        "ar": "ليالي عود في المقهى والصالون"
+      },
+      "history": {
+        "en": "The oud anchors tarab evenings and quiet salon sets. Beirut’s mid-century cafés and later clubs kept the instrument close to song and improvisation.",
+        "ar": "يرسّخ العود أمسيات الطرب وجلسات الصالون الهادئة. أبقت مقاهي بيروت في منتصف القرن ثم الأندية الآلة قريبة من الغناء والارتجال."
+      },
+      "tags": {
+        "en": [
+          "Oud",
+          "Tarab",
+          "Salon"
+        ],
+        "ar": [
+          "عود",
+          "طرب",
+          "صالون"
+        ]
+      },
+      "image": "/lebanon/assets/music/oud-beirut.jpg"
+    },
+    {
+      "id": "rahbani",
+      "emoji": "🎭",
+      "siteId": "beirut-music",
+      "name": {
+        "en": "Rahbani theater",
+        "ar": "مسرح الرحباني"
+      },
+      "tagline": {
+        "en": "Musical plays that shaped a generation",
+        "ar": "مسرحيات غنائية شكّلت جيلاً"
+      },
+      "history": {
+        "en": "Assi and Mansour Rahbani built musical theater that married folklore, poetry, and modern staging. Their works with Fairuz became national cultural memory.",
+        "ar": "بنى عاصي ومنصور رحباني مسرحاً غنائياً جمع الفولكلور والشعر والإخراج الحديث. صارت أعمالهما مع فيروز ذاكرة ثقافية وطنية."
+      },
+      "tags": {
+        "en": [
+          "Theater",
+          "Folklore",
+          "Stage"
+        ],
+        "ar": [
+          "مسرح",
+          "فولكلور",
+          "خشبة"
+        ]
+      },
+      "image": "/lebanon/assets/music/rahbani.jpg"
+    },
+    {
+      "id": "folk-village",
+      "emoji": "🥁",
+      "siteId": "qadisha",
+      "name": {
+        "en": "Village folk song",
+        "ar": "أغنية القرية"
+      },
+      "tagline": {
+        "en": "Harvest chants and mountain meters",
+        "ar": "أناشيد حصاد وأوزان جبل"
+      },
+      "history": {
+        "en": "Mountain and coastal villages keep work songs, wedding verses, and regional meters. Festivals and family gatherings still teach the next generation by ear.",
+        "ar": "تحفظ قرى الجبل والساحل أغاني العمل وأبيات العرس والأوزان الإقليمية. ما زالت المهرجانات والاجتماعات العائلية تعلّم الجيل التالي بالأذن."
+      },
+      "tags": {
+        "en": [
+          "Folk",
+          "Village",
+          "Oral"
+        ],
+        "ar": [
+          "شعبي",
+          "قرية",
+          "شفهي"
+        ]
+      },
+      "image": "/lebanon/assets/music/folk-village.jpg"
+    },
+    {
+      "id": "contemporary",
+      "emoji": "🎧",
+      "siteId": "beirut-music",
+      "name": {
+        "en": "Contemporary Beirut",
+        "ar": "بيروت المعاصرة"
+      },
+      "tagline": {
+        "en": "Indie, electronic, and diaspora studios",
+        "ar": "إندي وإلكترو واستوديوهات شتات"
+      },
+      "history": {
+        "en": "Younger artists fuse Arabic melody with rock, electronic, and hip-hop. Beirut scenes and diaspora studios carry both protest song and nightclub experiment.",
+        "ar": "يمزج فنانون أصغر اللحن العربي بالروك والإلكترو والهيب هوب. تحمل مشاهد بيروت واستوديوهات الشتات أغنية الاحتجاج وتجربة النادي معاً."
+      },
+      "tags": {
+        "en": [
+          "Indie",
+          "Fusion",
+          "Diaspora"
+        ],
+        "ar": [
+          "إندي",
+          "مزج",
+          "شتات"
+        ]
+      },
+      "image": "/lebanon/assets/music/contemporary.jpg"
+    }
+  ],
+  "hookah": [
+    {
+      "id": "beirut-corniche",
+      "emoji": "🌊",
+      "siteId": "beirut-cafe",
+      "name": {
+        "en": "Corniche evening",
+        "ar": "مساء الكورنيش"
+      },
+      "tagline": {
+        "en": "Sea breeze, café tables, slow coals",
+        "ar": "نسيم بحر وطاولات مقهى وجمر بطيء"
+      },
+      "history": {
+        "en": "Beirut’s corniche fills after heat eases — walkers, coffee, and nargileh at shoreline cafés. The ritual is conversation as much as smoke.",
+        "ar": "يمتلئ كورنيش بيروت بعد خفة الحر — مشاة وقهوة ونرجيلة في مقاهي الشاطئ. الطقس حديث بقدر ما هو دخان."
+      },
+      "tags": {
+        "en": [
+          "Corniche",
+          "Café",
+          "Evening"
+        ],
+        "ar": [
+          "كورنيش",
+          "مقهى",
+          "مساء"
+        ]
+      },
+      "image": "/lebanon/assets/hookah/beirut-corniche.jpg"
+    },
+    {
+      "id": "tripoli-nargileh",
+      "emoji": "🫖",
+      "siteId": "tripoli",
+      "name": {
+        "en": "Tripoli nargileh",
+        "ar": "نرجيلة طرابلس"
+      },
+      "tagline": {
+        "en": "Old-city pause after the souk",
+        "ar": "استراحة المدينة القديمة بعد السوق"
+      },
+      "history": {
+        "en": "Near Tripoli’s souks, cafés pour tea and set nargileh for friends who came to buy sweets or soap. Time stretches between the citadel and the river.",
+        "ar": "قرب أسواق طرابلس تصب المقاهي الشاي وتُعد النرجيلة لأصدقاء جاؤوا لشراء الحلوى أو الصابون. يمتد الوقت بين القلعة والنهر."
+      },
+      "tags": {
+        "en": [
+          "Souk",
+          "Tea",
+          "Nargileh"
+        ],
+        "ar": [
+          "سوق",
+          "شاي",
+          "نرجيلة"
+        ]
+      },
+      "image": "/lebanon/assets/hookah/tripoli-nargileh.jpg"
+    },
+    {
+      "id": "hamra-cafe",
+      "emoji": "📚",
+      "siteId": "beirut-cafe",
+      "name": {
+        "en": "Hamra café talk",
+        "ar": "حديث مقاهي الحمرا"
+      },
+      "tagline": {
+        "en": "Books, politics, and long tables",
+        "ar": "كتب وسياسة وطاولات طويلة"
+      },
+      "history": {
+        "en": "Hamra’s café culture mixed students, journalists, and artists. Argileh and coffee fueled debates that outlasted any single menu.",
+        "ar": "مزجت ثقافة مقاهي الحمرا الطلاب والصحافيين والفنانين. غذّت الأرجيلة والقهوة نقاشات أطول عمراً من أي قائمة طعام."
+      },
+      "tags": {
+        "en": [
+          "Hamra",
+          "Talk",
+          "Coffee"
+        ],
+        "ar": [
+          "حمرا",
+          "حديث",
+          "قهوة"
+        ]
+      },
+      "image": "/lebanon/assets/hookah/hamra-cafe.jpg"
+    },
+    {
+      "id": "mountain-argileh",
+      "emoji": "🏔️",
+      "siteId": "beiteddine",
+      "name": {
+        "en": "Mountain argileh",
+        "ar": "أرجيلة الجبل"
+      },
+      "tagline": {
+        "en": "Cool air and courtyard coals",
+        "ar": "هواء بارد وجمر الباحات"
+      },
+      "history": {
+        "en": "Above the coast, mountain restaurants set argileh in stone courtyards. Summer nights smell of apple tobacco and pine.",
+        "ar": "فوق الساحل تضع مطاعم الجبل الأرجيلة في باحات حجرية. تفوح ليالي الصيف بتبغ التفاح والصنوبر."
+      },
+      "tags": {
+        "en": [
+          "Mountain",
+          "Courtyard",
+          "Summer"
+        ],
+        "ar": [
+          "جبل",
+          "باحة",
+          "صيف"
+        ]
+      },
+      "image": "/lebanon/assets/hookah/mountain-argileh.jpg"
+    }
+  ],
+  "living": [
+    {
+      "id": "cedars",
+      "emoji": "🌲",
+      "siteId": "cedars",
+      "name": {
+        "en": "Cedars",
+        "ar": "الأرز"
+      },
+      "tagline": {
+        "en": "National tree of mountain and flag",
+        "ar": "شجرة الوطن في الجبل والعلم"
+      },
+      "history": {
+        "en": "Cedrus libani groves — especially the Cedars of God near Bsharri — symbolize endurance. The green cedar sits at the center of the national flag.",
+        "ar": "حرش الأرز اللبناني — خصوصاً أرز الرب قرب بشري — يرمز للصمود. ويجلس الأرز الأخضر في وسط العلم الوطني."
+      },
+      "tags": {
+        "en": [
+          "Tree",
+          "Flag",
+          "UNESCO"
+        ],
+        "ar": [
+          "شجرة",
+          "علم",
+          "يونسكو"
+        ]
+      },
+      "image": "/lebanon/assets/living/cedars.jpg"
+    },
+    {
+      "id": "diaspora",
+      "emoji": "🌍",
+      "siteId": "beirut",
+      "name": {
+        "en": "Diaspora",
+        "ar": "الشتات"
+      },
+      "tagline": {
+        "en": "Lebanese communities across the world",
+        "ar": "جاليات لبنانية عبر العالم"
+      },
+      "history": {
+        "en": "Waves of emigration tied villages to São Paulo, Paris, West Africa, and the Gulf. Remittances, return visits, and food shops keep the map elastic.",
+        "ar": "ربطت موجات الهجرة القرى بساو باولو وباريس وغرب أفريقيا والخليج. تُبقي التحويلات وزيارات العودة ومحلات الطعام الخريطة مرنة."
+      },
+      "tags": {
+        "en": [
+          "Migration",
+          "Family",
+          "World"
+        ],
+        "ar": [
+          "هجرة",
+          "عائلة",
+          "عالم"
+        ]
+      },
+      "image": "/lebanon/assets/living/diaspora.jpg"
+    },
+    {
+      "id": "calligraphy",
+      "emoji": "✒️",
+      "siteId": "tripoli",
+      "name": {
+        "en": "Arabic calligraphy",
+        "ar": "الخط العربي"
+      },
+      "tagline": {
+        "en": "Script as art on wall and page",
+        "ar": "الخط فن على الجدار والصفحة"
+      },
+      "history": {
+        "en": "Calligraphy schools and mosque inscriptions keep Arabic script as visual music. Beirut galleries and Tripoli mosques show living hands still training the pen.",
+        "ar": "تحفظ مدارس الخط ونقوش المساجد الحرف العربي كموسيقى بصرية. تُظهر معارض بيروت ومساجد طرابلس أيادياً حية ما زالت تدرّب القلم."
+      },
+      "tags": {
+        "en": [
+          "Script",
+          "Art",
+          "Mosque"
+        ],
+        "ar": [
+          "خط",
+          "فن",
+          "مسجد"
+        ]
+      },
+      "image": "/lebanon/assets/living/calligraphy.jpg"
+    },
+    {
+      "id": "village",
+      "emoji": "🏡",
+      "siteId": "qadisha",
+      "name": {
+        "en": "Mountain village",
+        "ar": "قرية الجبل"
+      },
+      "tagline": {
+        "en": "Stone houses and Sunday tables",
+        "ar": "بيوت حجر وطاولات الأحد"
+      },
+      "history": {
+        "en": "Village life organizes festivals, olive harvests, and family houses that fill in summer. Many city stories still begin with a mountain surname.",
+        "ar": "تنظّم حياة القرية المهرجانات وقطاف الزيتون وبيوت العائلة التي تمتلئ صيفاً. ما زالت حكايات كثيرة في المدينة تبدأ بلقب جبلي."
+      },
+      "tags": {
+        "en": [
+          "Village",
+          "Stone",
+          "Family"
+        ],
+        "ar": [
+          "قرية",
+          "حجر",
+          "عائلة"
+        ]
+      },
+      "image": "/lebanon/assets/living/village.jpg"
+    },
+    {
+      "id": "mediterranean-coast",
+      "emoji": "🏖️",
+      "siteId": "byblos",
+      "name": {
+        "en": "Mediterranean coast",
+        "ar": "الساحل المتوسطي"
+      },
+      "tagline": {
+        "en": "Harbors, corniche walks, salt air",
+        "ar": "موانئ ومشي كورنيش وهواء ملح"
+      },
+      "history": {
+        "en": "From Tyre to Tripoli the coast is Lebanon’s open edge — fishing boats, beach clubs, and Phoenician memory under the same blue water.",
+        "ar": "من صور إلى طرابلس الساحل حافة لبنان المفتوحة — قوارب صيد ونوادي شاطئ وذاكرة فينيقية تحت الماء الأزرق نفسه."
+      },
+      "tags": {
+        "en": [
+          "Coast",
+          "Harbor",
+          "Sea"
+        ],
+        "ar": [
+          "ساحل",
+          "ميناء",
+          "بحر"
+        ]
+      },
+      "image": "/lebanon/assets/living/mediterranean-coast.jpg"
+    },
+    {
+      "id": "arabic-print",
+      "emoji": "📰",
+      "siteId": "beirut",
+      "name": {
+        "en": "Arabic print culture",
+        "ar": "ثقافة الطباعة العربية"
+      },
+      "tagline": {
+        "en": "Press, books, and Beirut publishing",
+        "ar": "صحافة وكتب ونشر بيروت"
+      },
+      "history": {
+        "en": "Beirut long served as a regional capital of Arabic publishing and newspapers. Print shops and bookstores remain part of the city’s self-image even after crises.",
+        "ar": "طالما خدمت بيروت كعاصمة إقليمية للنشر والصحافة العربية. ما زالت المطابع والمكتبات جزءاً من صورة المدينة لنفسها حتى بعد الأزمات."
+      },
+      "tags": {
+        "en": [
+          "Press",
+          "Books",
+          "Beirut"
+        ],
+        "ar": [
+          "صحافة",
+          "كتب",
+          "بيروت"
+        ]
+      },
+      "image": "/lebanon/assets/living/arabic-print.jpg"
+    }
+  ],
+  "phrases": [
+    {
+      "ar": "أهلاً وسهلاً",
+      "translit": "Ahlan wa sahlan",
+      "en": "Welcome / hello"
+    },
+    {
+      "ar": "مرحبا",
+      "translit": "Marḥaba",
+      "en": "Hi"
+    },
+    {
+      "ar": "كيفك؟",
+      "translit": "Kīfak? / Kīfik?",
+      "en": "How are you?"
+    },
+    {
+      "ar": "منيح",
+      "translit": "Mnīḥ",
+      "en": "Good / fine"
+    },
+    {
+      "ar": "يسلمو",
+      "translit": "Yislamu",
+      "en": "Thanks (Levantine)"
+    },
+    {
+      "ar": "عن جد؟",
+      "translit": "ʿAn jadd?",
+      "en": "Really?"
+    },
+    {
+      "ar": "خلّينا نروح",
+      "translit": "Khallīnā nrūḥ",
+      "en": "Let's go"
+    },
+    {
+      "ar": "صحة وهنا",
+      "translit": "Ṣaḥa w hana",
+      "en": "Bon appétit / to your health"
+    },
+    {
+      "ar": "شو الأخبار؟",
+      "translit": "Shū l-akhbār?",
+      "en": "What's new?"
+    },
+    {
+      "ar": "مع السلامة",
+      "translit": "Maʿa salāme",
+      "en": "Goodbye"
+    }
+  ],
+  "photoCredits": "/lebanon/data/lebanon-photo-credits.json"
+}

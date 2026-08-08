@@ -1,0 +1,1369 @@
+{
+  "id": "oman-atlas",
+  "brand": {
+    "name": {
+      "en": "Oman — Sultanate of the Sea and Frankincense",
+      "ar": "عُمان — سلطنة البحر واللبان"
+    },
+    "tagline": {
+      "en": "From Magan copper to monsoon Dhofar — history, table, and song on the Arabian Sea.",
+      "ar": "من نحاس ماجان إلى خريف ظفار — تاريخ ومائدة وغناء على بحر العرب."
+    }
+  },
+  "guide": {
+    "name": {
+      "en": "Salim",
+      "ar": "سليم"
+    },
+    "title": {
+      "en": "Oman history guide",
+      "ar": "دليل تاريخ عُمان"
+    },
+    "portrait": "/oman/assets/salim-guide-portrait-256.png",
+    "greeting": {
+      "en": "Ahlan wa sahlan. I am Salim — walk with me from Muscat to Salalah.",
+      "ar": "أهلاً وسهلاً. أنا سليم — امشِ معي من مسقط إلى صلالة."
+    }
+  },
+  "ui": {
+    "en": {
+      "dir": "ltr",
+      "langLabel": "English",
+      "switchTo": "عربي",
+      "heroKicker": "The Sultanate of Oman",
+      "heroTitle": "Oman",
+      "heroLine": "A seafaring sultanate between desert and monsoon — Magan copper, frankincense roads, Ibadi stone towns, and a living table of shuwa, kahwa, and song.",
+      "playReel": "Play HyperFrame tour",
+      "pauseReel": "Pause tour",
+      "resumeReel": "Resume tour",
+      "stopReel": "Stop tour",
+      "narration": "Narration",
+      "narrationScope": "Entire page — atlas, tour, and cards",
+      "hearWelcome": "Hear welcome",
+      "askGuide": "Ask Salim",
+      "stop": "Stop",
+      "listen": "Listen",
+      "exploreMap": "Explore the atlas",
+      "timelineHeading": "Eras of Oman",
+      "timelineLead": "From Bronze Age Magan to the modern sultanate. Select an era to hear it and find it on the map.",
+      "timelineSelectHint": "Select an era on the timeline",
+      "mapHeading": "Atlas of Oman",
+      "mapLead": "Coast, mountains, and Empty Quarter edge. Select a pin or a name to hear its story.",
+      "mapAll": "All",
+      "mapHistory": "History",
+      "mapFood": "Food",
+      "mapMusic": "Music",
+      "mapHookah": "Café",
+      "mapLiving": "Living",
+      "mapReset": "Show all pins",
+      "mapLoading": "Loading the atlas…",
+      "foodHeading": "The Omani table",
+      "foodLead": "Shuwa, majboos, halwa, and cardamom kahwa — flip a dish for its origin and meaning.",
+      "musicHeading": "Sound of Oman",
+      "musicLead": "Razha swords, barʿah steps, sea songs of Sur, and the oud. Flip a card for the history.",
+      "hookahHeading": "Majlis — coffee and slow talk",
+      "hookahLead": "Qahwa, dates, frankincense, and evening conversation — the Omani majlis as social furniture.",
+      "livingHeading": "Living cultures",
+      "livingLead": "Khanjar, kumma, falaj water, frankincense harvest, and the khareef mist of Dhofar.",
+      "phraseHeading": "Speak Omani",
+      "phraseLead": "Everyday Gulf Arabic heard in Oman. Press any phrase to hear it.",
+      "flipHint": "Flip for the history",
+      "playMusic": "Play music",
+      "stopMusic": "Stop music",
+      "back": "Back",
+      "loading": "Loading the atlas…",
+      "readMore": "Read the full story",
+      "close": "Close",
+      "unesco": "UNESCO World Heritage",
+      "context": "Context",
+      "evidence": "On the ground",
+      "startTour": "HyperFrame tour",
+      "meetGuide": "Meet Salim"
+    },
+    "ar": {
+      "dir": "rtl",
+      "langLabel": "العربية",
+      "switchTo": "English",
+      "heroKicker": "سلطنة عُمان",
+      "heroTitle": "عُمان",
+      "heroLine": "سلطنة بحرية بين الصحراء والخريف — نحاس ماجان، وطرق اللبان، ومدن إباضية حجرية، ومائدة حية من الشواء والقهوة والغناء.",
+      "playReel": "شغّل الجولة",
+      "pauseReel": "إيقاف مؤقت",
+      "resumeReel": "متابعة الجولة",
+      "stopReel": "إنهاء الجولة",
+      "narration": "السرد الصوتي",
+      "narrationScope": "الصفحة كاملة — الأطلس والجولة والبطاقات",
+      "hearWelcome": "استمع للترحيب",
+      "askGuide": "اسأل سليم",
+      "stop": "إيقاف",
+      "listen": "استمع",
+      "exploreMap": "استكشف الأطلس",
+      "timelineHeading": "عصور عُمان",
+      "timelineLead": "من ماجان في العصر البرونزي إلى السلطنة الحديثة. اختر حقبة لتسمعها وتجدها على الخريطة.",
+      "timelineSelectHint": "اختر حقبة من الخط الزمني",
+      "mapHeading": "أطلس عُمان",
+      "mapLead": "ساحل وجبال وحافة الربع الخالي. اختر علامة أو اسماً لتسمع حكايته.",
+      "mapAll": "الكل",
+      "mapHistory": "تاريخ",
+      "mapFood": "طعام",
+      "mapMusic": "موسيقى",
+      "mapHookah": "مجلس",
+      "mapLiving": "حياة",
+      "mapReset": "أظهر كل العلامات",
+      "mapLoading": "جارٍ تحميل الأطلس…",
+      "foodHeading": "المائدة العُمانية",
+      "foodLead": "شواء ومجبوس وحلوى وقهوة بالهيل — اقلب الطبق لتعرف أصله ومعناه.",
+      "musicHeading": "صوت عُمان",
+      "musicLead": "رزحة وسيوف، وبرعة وخطوات، وأغاني بحر صور، وعود. اقلب البطاقة لتقرأ الحكاية.",
+      "hookahHeading": "المجلس — قهوة وحديث بطيء",
+      "hookahLead": "قهوة وتمور ولبان وحديث المساء — المجلس العُماني كأثاث اجتماعي.",
+      "livingHeading": "ثقافات حيّة",
+      "livingLead": "الخنجر والكمة والأفلاج وحصاد اللبان وخريف ظفار.",
+      "phraseHeading": "احكِ عُماني",
+      "phraseLead": "عربية خليجية يومية تُسمَع في عُمان. اضغط أي عبارة لتسمعها.",
+      "flipHint": "اقلب البطاقة للحكاية",
+      "playMusic": "شغّل المقطع",
+      "stopMusic": "أوقف المقطع",
+      "back": "رجوع",
+      "loading": "جارٍ تحميل الأطلس…",
+      "readMore": "اقرأ الحكاية كاملة",
+      "close": "إغلاق",
+      "unesco": "تراث عالمي — اليونسكو",
+      "context": "السياق",
+      "evidence": "على الأرض",
+      "startTour": "جولة مصوّرة",
+      "meetGuide": "تعرّف على سليم"
+    }
+  },
+  "eras": [
+    {
+      "id": "magan",
+      "siteId": "sur",
+      "yearCE": -2000,
+      "years": {
+        "en": "c. 3000–1300 BCE",
+        "ar": "نحو ٣٠٠٠–١٣٠٠ ق.م"
+      },
+      "title": {
+        "en": "Magan — copper and sea",
+        "ar": "ماجان — نحاس وبحر"
+      },
+      "copy": {
+        "en": "Mesopotamian texts name Magan as a copper land reached by Gulf ships.",
+        "ar": "تسمّي النصوص الرافدية ماجان أرض نحاس تصلها سفن الخليج."
+      },
+      "narration": {
+        "en": "We begin with Magan — the Bronze Age name linked to Oman’s copper and harbors. Merchants sailed the Gulf long before Islam, carrying metal and stories.",
+        "ar": "نبدأ بماجان — الاسم البرونزي المرتبط بنحاس عُمان ومرافئها. أبحر التجار في الخليج قبل الإسلام بزمن طويل، حاملين المعدن والحكايات."
+      },
+      "history": {
+        "en": "Cuneiform sources from Sumer and Akkad refer to Magan as a source of copper and diorite reached by maritime trade across the Arabian Gulf. Archaeology in northern Oman shows Magan-period settlements, tombs, and copper working that tied the peninsula to Mesopotamia and the Indus corridor. The name is a trade identity more than a single capital — a reminder that Oman’s story opens on the water.",
+        "ar": "تشير المصادر المسمارية من سومر وأكد إلى ماجان كمصدر للنحاس والديوريت عبر تجارة بحرية في الخليج العربي. وتُظهر آثار شمال عُمان مستوطنات وقبوراً وتشغيل نحاس من فترة ماجان ربطت الجزيرة ببلاد الرافدين وممر السند. الاسم هوية تجارية أكثر منه عاصمة واحدة — تذكير بأن حكاية عُمان تبدأ من الماء."
+      },
+      "image": "/oman/assets/era/magan.jpg"
+    },
+    {
+      "id": "frankincense",
+      "siteId": "salalah",
+      "yearCE": -300,
+      "years": {
+        "en": "c. 1st millennium BCE – early CE",
+        "ar": "نحو الألف الأول ق.م – بدايات الميلاد"
+      },
+      "title": {
+        "en": "Frankincense roads",
+        "ar": "طرق اللبان"
+      },
+      "copy": {
+        "en": "Dhofar’s resin fed temples from South Arabia to the Mediterranean.",
+        "ar": "راتنج ظفار غذّى معابد من جنوب الجزيرة إلى المتوسط."
+      },
+      "narration": {
+        "en": "Next, the frankincense roads. In Dhofar the trees still bleed fragrant resin. Caravans and ships carried it north — a luxury that made this southern coast famous before modern borders.",
+        "ar": "ثم طرق اللبان. في ظفار ما زالت الأشجار تسيل راتنجاً عطراً. حملته القوافل والسفن شمالاً — ترفاً جعل هذا الساحل الجنوبي مشهوراً قبل الحدود الحديثة."
+      },
+      "history": {
+        "en": "Boswellia sacra groves in Dhofar supplied frankincense prized in South Arabian kingdoms and Mediterranean ritual economies. Archaeological landscapes around the UNESCO Land of Frankincense sites document ports, caravan routes, and oasis settlements that tied monsoon trade to inland Arabia.",
+        "ar": "زوّدت غابات اللبان في ظفار راتنجاً ثميناً في ممالك جنوب الجزيرة واقتصاد الطقوس المتوسطي. وتوثّق المناظر الأثرية حول مواقع أرض اللبان في اليونسكو موانئ وطرق قوافل ومستوطنات واحات ربطت تجارة الموسم بداخل الجزيرة."
+      },
+      "image": "/oman/assets/era/frankincense.jpg"
+    },
+    {
+      "id": "ibadi",
+      "siteId": "nizwa",
+      "yearCE": 750,
+      "years": {
+        "en": "7th–9th centuries CE",
+        "ar": "القرون ٧–٩ م"
+      },
+      "title": {
+        "en": "Islam and the Ibadi imamate",
+        "ar": "الإسلام والإمامة الإباضية"
+      },
+      "copy": {
+        "en": "Early Islam reached Oman; Ibadi communities shaped interior politics and law.",
+        "ar": "وصل الإسلام مبكراً إلى عُمان؛ وشكّلت الجماعات الإباضية سياسة الداخل وفقهه."
+      },
+      "narration": {
+        "en": "Islam arrived early by sea and by desert road. In the interior, Ibadi imams governed from stone towns like Nizwa — a distinct Omani path within the wider Muslim world.",
+        "ar": "وصل الإسلام مبكراً عبر البحر وطريق الصحراء. وفي الداخل حكم أئمة إباضيون من مدن حجرية مثل نزوى — مساراً عُمانياً مميزاً داخل العالم الإسلامي الأوسع."
+      },
+      "history": {
+        "en": "Omani tradition and early Islamic historiography place conversion and tribal politics in the first Islamic centuries. Ibadi Islam became a durable feature of interior Oman, with imams exercising religious and political authority from oasis centers. Coastal towns remained tied to Indian Ocean commerce.",
+        "ar": "تضع الرواية العُمانية والتاريخ الإسلامي المبكر الإسلام والسياسة القبلية في القرون الأولى. وأصبح المذهب الإباضي سمة دائمة في داخل عُمان، حيث مارس الأئمة سلطة دينية وسياسية من مراكز الواحات. وبقيت المدن الساحلية مرتبطة بتجارة المحيط الهندي."
+      },
+      "image": "/oman/assets/era/ibadi.jpg"
+    },
+    {
+      "id": "portuguese",
+      "siteId": "muscat",
+      "yearCE": 1507,
+      "years": {
+        "en": "1507–1650",
+        "ar": "١٥٠٧–١٦٥٠"
+      },
+      "title": {
+        "en": "Portuguese on the coast",
+        "ar": "البرتغاليون على الساحل"
+      },
+      "copy": {
+        "en": "Fortified harbors at Muscat marked a century of contested Indian Ocean control.",
+        "ar": "حصون مسقط علّمت قرناً من التنافس على المحيط الهندي."
+      },
+      "narration": {
+        "en": "In 1507 Portuguese ships took Muscat’s harbor. For more than a century European forts watched the Gulf and Arabian Sea — until Omani forces expelled them and rebuilt sea power from the coast.",
+        "ar": "في ١٥٠٧ أخذت السفن البرتغالية ميناء مسقط. أكثر من قرن راقبت الحصون الأوروبية الخليج وبحر العرب — حتى طردتهم القوات العُمانية وأعادت بناء القوة البحرية من الساحل."
+      },
+      "history": {
+        "en": "Afonso de Albuquerque’s capture of Muscat in 1507 opened a Portuguese coastal presence aimed at controlling Indian Ocean trade. Fortifications at Muscat anchored that claim until Yaʿariba forces drove the Portuguese out in the mid-seventeenth century. The episode is remembered in stone still facing the harbor.",
+        "ar": "فتح احتلال ألفونسو دي البوكيرك لمسقط سنة ١٥٠٧ وجوداً برتغالياً ساحلياً يهدف للسيطرة على تجارة المحيط الهندي. ورسّخت تحصينات مسقط ذلك الادعاء حتى طردت قوات اليعاربة البرتغاليين في منتصف القرن السابع عشر. تُحفظ الحادثة في الحجر الذي ما زال يواجه الميناء."
+      },
+      "image": "/oman/assets/era/portuguese.jpg"
+    },
+    {
+      "id": "yarubid",
+      "siteId": "nizwa",
+      "yearCE": 1650,
+      "years": {
+        "en": "c. 1624–1744",
+        "ar": "نحو ١٦٢٤–١٧٤٤"
+      },
+      "title": {
+        "en": "Yaʿariba dynasty",
+        "ar": "دولة اليعاربة"
+      },
+      "copy": {
+        "en": "Imams expelled the Portuguese and projected power across the Indian Ocean.",
+        "ar": "أئمة طردوا البرتغاليين ومدّوا نفوذهم عبر المحيط الهندي."
+      },
+      "narration": {
+        "en": "The Yaʿariba imams turned victory on the coast into a maritime age. Omani ships and forts appeared from the Gulf to East African shores — a sultanate memory that still shapes Muscat’s sea identity.",
+        "ar": "حوّل أئمة اليعاربة النصر على الساحل إلى عصر بحري. ظهرت سفن وحصون عُمانية من الخليج إلى سواحل شرق أفريقيا — ذاكرة سلطنة ما زالت تشكّل هوية مسقط البحرية."
+      },
+      "history": {
+        "en": "The Yaʿariba dynasty consolidated interior and coastal authority after Portuguese expulsion, investing in fleet and fort networks. Omani influence reached parts of the East African coast. Dynastic conflict in the eighteenth century opened the way for the Al Bu Saʿid line.",
+        "ar": "وطّدت دولة اليعاربة السلطة في الداخل والساحل بعد طرد البرتغاليين، واستثمرت في الأسطول وشبكات الحصون. وبلغ النفوذ العُماني أجزاء من ساحل شرق أفريقيا. والصراع الأسري في القرن الثامن عشر مهّد لآل بوسعيد."
+      },
+      "image": "/oman/assets/era/yarubid.jpg"
+    },
+    {
+      "id": "busaid",
+      "siteId": "muscat",
+      "yearCE": 1744,
+      "years": {
+        "en": "1744–19th century",
+        "ar": "١٧٤٤–القرن ١٩"
+      },
+      "title": {
+        "en": "Al Bu Saʿid and the dual coasts",
+        "ar": "آل بوسعيد والساحلان"
+      },
+      "copy": {
+        "en": "A new dynasty ruled Muscat and, for a time, Zanzibar’s clove islands.",
+        "ar": "سلالة جديدة حكمت مسقط، ولبعض الوقت جزر القرنفل في زنجبار."
+      },
+      "narration": {
+        "en": "Ahmad bin Said founded the Al Bu Saʿid line that still rules Oman. In the nineteenth century Said bin Sultan linked Muscat and Zanzibar — one family looking both to Arabia and to Africa.",
+        "ar": "أسّس أحمد بن سعيد آل بوسعيد الذين ما زالوا يحكمون عُمان. وفي القرن التاسع عشر ربط سعيد بن سلطان مسقط وزنجبار — عائلة واحدة تنظر إلى الجزيرة وإلى أفريقيا."
+      },
+      "history": {
+        "en": "The Al Bu Saʿid dynasty began with Ahmad bin Said in the mid-eighteenth century. Under Said bin Sultan Muscat’s maritime reach peaked, with Zanzibar as a major Indian Ocean seat. After his death the African and Arabian domains separated. Treaties with Britain later shaped coastal politics while the interior retained Ibadi imamate traditions.",
+        "ar": "بدأت دولة آل بوسعيد مع أحمد بن سعيد في منتصف القرن الثامن عشر. وفي عهد سعيد بن سلطان بلغ الامتداد البحري لمسقط ذروته، وكانت زنجبار مقعداً رئيسياً في المحيط الهندي. وبعد وفاته انفصل المجالان الأفريقي والعربي. وشكّلت معاهدات مع بريطانيا لاحقاً سياسة الساحل بينما احتفظ الداخل بتقاليد الإمامة الإباضية."
+      },
+      "image": "/oman/assets/era/busaid.jpg"
+    },
+    {
+      "id": "renaissance",
+      "siteId": "muscat",
+      "yearCE": 1970,
+      "years": {
+        "en": "1970–2020",
+        "ar": "١٩٧٠–٢٠٢٠"
+      },
+      "title": {
+        "en": "Renaissance under Qaboos",
+        "ar": "النهضة في عهد قابوس"
+      },
+      "copy": {
+        "en": "Schools, roads, and clinics remade daily life after 1970.",
+        "ar": "مدارس وطرق وعيادات أعادت تشكيل الحياة اليومية بعد ١٩٧٠."
+      },
+      "narration": {
+        "en": "In 1970 Sultan Qaboos opened what Omanis call the Renaissance — schools, clinics, and roads across a once-isolated land. Modern Oman was built without erasing fort, falaj, or frankincense.",
+        "ar": "في ١٩٧٠ فتح السلطان قابوس ما يسميه العُمانيون النهضة — مدارس وعيادات وطرق عبر أرض كانت معزولة. بُنيت عُمان الحديثة دون محو الحصن أو الفلج أو اللبان."
+      },
+      "history": {
+        "en": "Sultan Qaboos bin Said’s accession in 1970 followed decades of limited infrastructure and interior–coastal political tension. His reign expanded education, health, and transport while pursuing a distinctive foreign policy. The Renaissance is living memory — measured in asphalt, electricity, and heritage kept visible in the capital.",
+        "ar": "جاء تولي السلطان قابوس بن سعيد سنة ١٩٧٠ بعد عقود من بنى تحتية محدودة وتوتر بين الداخل والساحل. وسّع عهده التعليم والصحة والنقل مع سياسة خارجية مميزة. النهضة ذاكرة حية — تُقاس بالإسفلت والكهرباء وبالتراث الذي بقي ظاهراً في العاصمة."
+      },
+      "image": "/oman/assets/era/renaissance.jpg"
+    },
+    {
+      "id": "contemporary",
+      "siteId": "muscat",
+      "yearCE": 2020,
+      "years": {
+        "en": "2020–today",
+        "ar": "٢٠٢٠–اليوم"
+      },
+      "title": {
+        "en": "Sultan Haitham’s Oman",
+        "ar": "عُمان في عهد السلطان هيثم"
+      },
+      "copy": {
+        "en": "Succession, Vision 2040, and a young population looking outward.",
+        "ar": "خلافة ورؤية ٢٠٤٠ وشباب ينظر إلى الخارج."
+      },
+      "narration": {
+        "en": "Today Sultan Haitham guides a young country balancing heritage and Vision 2040. The atlas still starts with stone and sea — then asks what Omanis cook, sing, and plant next.",
+        "ar": "اليوم يقود السلطان هيثم بلداً شاباً يوازن التراث ورؤية ٢٠٤٠. ما زال الأطلس يبدأ بالحجر والبحر — ثم يسأل ماذا يطبخ العُمانيون ويغنون ويزرعون بعد ذلك."
+      },
+      "history": {
+        "en": "Sultan Haitham bin Tariq succeeded in 2020 and continued modernization under Oman Vision 2040 while preserving national symbols such as the khanjar and the white dishdasha. Tourism, logistics, and renewable energy sit beside falaj agriculture and Dhofar’s khareef season as living economic layers.",
+        "ar": "خلف السلطان هيثم بن طارق سنة ٢٠٢٠ وواصل التحديث ضمن رؤية عُمان ٢٠٤٠ مع الحفاظ على رموز وطنية مثل الخنجر والثوب الأبيض. وتجلس السياحة واللوجستيات والطاقة المتجددة إلى جانب زراعة الأفلاج وموسم خريف ظفار كطبقات اقتصادية حية."
+      },
+      "image": "/oman/assets/era/contemporary.jpg"
+    }
+  ],
+  "sites": [
+    {
+      "id": "muscat",
+      "category": "history",
+      "emoji": "🏰",
+      "lat": 23.588,
+      "lng": 58.3829,
+      "unesco": false,
+      "name": {
+        "en": "Muscat",
+        "ar": "مسقط"
+      },
+      "place": {
+        "en": "Capital coast",
+        "ar": "ساحل العاصمة"
+      },
+      "blurb": {
+        "en": "Harbors, forts, and the modern capital facing the Gulf of Oman.",
+        "ar": "موانئ وحصون وعاصمة حديثة تطل على خليج عُمان."
+      }
+    },
+    {
+      "id": "mutrah",
+      "category": "living",
+      "emoji": "🚢",
+      "lat": 23.6165,
+      "lng": 58.5665,
+      "unesco": false,
+      "name": {
+        "en": "Mutrah",
+        "ar": "مطرح"
+      },
+      "place": {
+        "en": "Muscat waterfront",
+        "ar": "واجهة مسقط البحرية"
+      },
+      "blurb": {
+        "en": "Corniche, souq lanes, and evening walkers along the old port.",
+        "ar": "كورنيش وأزقة سوق ومشاة المساء على الميناء القديم."
+      }
+    },
+    {
+      "id": "nizwa",
+      "category": "history",
+      "emoji": "🕌",
+      "lat": 22.9333,
+      "lng": 57.5333,
+      "unesco": false,
+      "name": {
+        "en": "Nizwa",
+        "ar": "نزوى"
+      },
+      "place": {
+        "en": "Interior capital of memory",
+        "ar": "عاصمة الداخل في الذاكرة"
+      },
+      "blurb": {
+        "en": "Round fort, Friday goat market, and Ibadi learning town.",
+        "ar": "حصن دائري وسوق الماعز يوم الجمعة ومدينة علم إباضية."
+      }
+    },
+    {
+      "id": "bahla",
+      "category": "history",
+      "emoji": "🧱",
+      "lat": 22.9667,
+      "lng": 57.3,
+      "unesco": true,
+      "name": {
+        "en": "Bahla Fort",
+        "ar": "قلعة بهلا"
+      },
+      "place": {
+        "en": "Ad Dakhiliyah",
+        "ar": "الداخلية"
+      },
+      "blurb": {
+        "en": "UNESCO mud-brick fortress and oasis town of potters.",
+        "ar": "حصن طيني مدرج في اليونسكو وواحة خزّافين."
+      }
+    },
+    {
+      "id": "jebel-shams",
+      "category": "living",
+      "emoji": "⛰️",
+      "lat": 23.2367,
+      "lng": 57.2633,
+      "unesco": false,
+      "name": {
+        "en": "Jebel Shams",
+        "ar": "جبل شمس"
+      },
+      "place": {
+        "en": "Al Hajar peaks",
+        "ar": "قمم الحجر"
+      },
+      "blurb": {
+        "en": "Oman’s highest ridge — grand canyon light and cool air.",
+        "ar": "أعلى قمم عُمان — ضوء الأخدود الكبير وهواء بارد."
+      }
+    },
+    {
+      "id": "wahiba",
+      "category": "living",
+      "emoji": "🏜️",
+      "lat": 21.9,
+      "lng": 58.85,
+      "unesco": false,
+      "name": {
+        "en": "Wahiba Sands",
+        "ar": "رمال وهيبة"
+      },
+      "place": {
+        "en": "Ash Sharqiyah",
+        "ar": "الشرقية"
+      },
+      "blurb": {
+        "en": "Red dunes, Bedouin camps, and night skies over the Sharqiya.",
+        "ar": "كثبان حمراء ومخيمات بدو وسماء ليل فوق الشرقية."
+      }
+    },
+    {
+      "id": "sur",
+      "category": "history",
+      "emoji": "⛵",
+      "lat": 22.5667,
+      "lng": 59.5289,
+      "unesco": false,
+      "name": {
+        "en": "Sur",
+        "ar": "صور"
+      },
+      "place": {
+        "en": "Eastern coast",
+        "ar": "الساحل الشرقي"
+      },
+      "blurb": {
+        "en": "Dhow yards and sea memory on the way to Ras al Hadd.",
+        "ar": "أحواض سفن وذاكرة بحر في الطريق إلى رأس الحد."
+      }
+    },
+    {
+      "id": "ras-al-jinz",
+      "category": "living",
+      "emoji": "🐢",
+      "lat": 22.4167,
+      "lng": 59.8333,
+      "unesco": false,
+      "name": {
+        "en": "Ras al Jinz",
+        "ar": "رأس الجنز"
+      },
+      "place": {
+        "en": "Turtle coast",
+        "ar": "ساحل السلاحف"
+      },
+      "blurb": {
+        "en": "Green turtles nesting on the Arabian Sea shore.",
+        "ar": "سلاحف خضراء تعشّش على شاطئ بحر العرب."
+      }
+    },
+    {
+      "id": "wadi-shab",
+      "category": "living",
+      "emoji": "💧",
+      "lat": 22.833,
+      "lng": 59.25,
+      "unesco": false,
+      "name": {
+        "en": "Wadi Shab",
+        "ar": "وادي شاب"
+      },
+      "place": {
+        "en": "Eastern Hajar",
+        "ar": "الحجر الشرقي"
+      },
+      "blurb": {
+        "en": "Emerald pools reached by boat and cliff path.",
+        "ar": "برك زمردية تُبلَغ بالقارب ومسار الجرف."
+      }
+    },
+    {
+      "id": "salalah",
+      "category": "food",
+      "emoji": "🌫️",
+      "lat": 17.0151,
+      "lng": 54.0924,
+      "unesco": false,
+      "name": {
+        "en": "Salalah",
+        "ar": "صلالة"
+      },
+      "place": {
+        "en": "Dhofar",
+        "ar": "ظفار"
+      },
+      "blurb": {
+        "en": "Khareef mist, coconut groves, and frankincense hinterland.",
+        "ar": "ضباب الخريف وبساتين جوز الهند وداخلية اللبان."
+      }
+    },
+    {
+      "id": "khasab",
+      "category": "history",
+      "emoji": "🧭",
+      "lat": 26.1833,
+      "lng": 56.25,
+      "unesco": false,
+      "name": {
+        "en": "Khasab",
+        "ar": "خصب"
+      },
+      "place": {
+        "en": "Musandam",
+        "ar": "مسندم"
+      },
+      "blurb": {
+        "en": "Fjords of the Ruʾus al Jibal — Oman’s northern exclave.",
+        "ar": "فيوردات رؤوس الجبال — جيب عُمان الشمالي."
+      }
+    },
+    {
+      "id": "nakhal",
+      "category": "music",
+      "emoji": "🏰",
+      "lat": 23.395,
+      "lng": 57.8289,
+      "unesco": false,
+      "name": {
+        "en": "Nakhal Fort",
+        "ar": "حصن نخل"
+      },
+      "place": {
+        "en": "Al Batinah",
+        "ar": "الباطنة"
+      },
+      "blurb": {
+        "en": "Fort above warm springs on the Batinah plain.",
+        "ar": "حصن فوق عيون دافئة في سهل الباطنة."
+      }
+    }
+  ],
+  "foods": [
+    {
+      "id": "shuwa",
+      "emoji": "🍖",
+      "siteId": "nizwa",
+      "name": {
+        "en": "Shuwa",
+        "ar": "الشواء"
+      },
+      "tagline": {
+        "en": "Meat slow-cooked underground for Eid",
+        "ar": "لحم يُطهى ببطء تحت الأرض في العيد"
+      },
+      "history": {
+        "en": "Marinated meat wrapped in banana or palm leaves and sealed in an underground tannour for a day or more. Shuwa is festive Omani cooking — patience as hospitality, shared from one pit across many households.",
+        "ar": "لحم متبّل يُلف بأوراق الموز أو النخيل ويُغلق في تنور تحت الأرض يوماً أو أكثر. الشواء طبخ عُماني احتفالي — الصبر كضيافة، يُوزَّع من حفرة واحدة على بيوت كثيرة."
+      },
+      "tags": {
+        "en": [
+          "Eid",
+          "Underground oven",
+          "Celebration"
+        ],
+        "ar": [
+          "عيد",
+          "تنور",
+          "احتفال"
+        ]
+      },
+      "image": "/oman/assets/food/shuwa.jpg"
+    },
+    {
+      "id": "majboos",
+      "emoji": "🍚",
+      "siteId": "muscat",
+      "name": {
+        "en": "Majboos / Machboos",
+        "ar": "مجبوس / مكبوس"
+      },
+      "tagline": {
+        "en": "Spiced rice with meat or fish",
+        "ar": "أرز متبّل باللحم أو السمك"
+      },
+      "history": {
+        "en": "Gulf rice cooked in the stock of meat or fish with loomi, cinnamon, and cardamom. Oman’s majboos sits in the same family as Kuwaiti and Emirati machboos — local spice balances mark each coast.",
+        "ar": "أرز خليجي يُطهى في مرق اللحم أو السمك مع اللومي والقرفة والهيل. مجبوس عُمان من عائلة المكبوس الكويتي والإماراتي — توازن التوابل المحلي يميّز كل ساحل."
+      },
+      "tags": {
+        "en": [
+          "Rice",
+          "Gulf",
+          "Daily table"
+        ],
+        "ar": [
+          "أرز",
+          "خليج",
+          "مائدة يومية"
+        ]
+      },
+      "image": "/oman/assets/food/majboos.jpg"
+    },
+    {
+      "id": "halwa",
+      "emoji": "🍮",
+      "siteId": "muscat",
+      "name": {
+        "en": "Omani halwa",
+        "ar": "الحلوى العُمانية"
+      },
+      "tagline": {
+        "en": "Gelatinous rosewater sweet of welcome",
+        "ar": "حلوى هلامية بماء الورد للترحيب"
+      },
+      "history": {
+        "en": "Starch, ghee, sugar, rosewater, saffron, and nuts stirred for hours into a translucent sweet offered to guests. Halwa is diplomatic dessert — served before talk begins.",
+        "ar": "نشا وسمن وسكر وماء ورد وزعفران ومكسرات تُحرَّك ساعات حتى تصير حلوى شفافة تُقدَّم للضيف. الحلوى حلوى دبلوماسية — تُقدَّم قبل أن يبدأ الحديث."
+      },
+      "tags": {
+        "en": [
+          "Sweet",
+          "Hospitality",
+          "Saffron"
+        ],
+        "ar": [
+          "حلوى",
+          "ضيافة",
+          "زعفران"
+        ]
+      },
+      "image": "/oman/assets/food/halwa.jpg"
+    },
+    {
+      "id": "kahwa",
+      "emoji": "☕",
+      "siteId": "mutrah",
+      "name": {
+        "en": "Qahwa with cardamom",
+        "ar": "قهوة بالهيل"
+      },
+      "tagline": {
+        "en": "Light golden coffee of the majlis",
+        "ar": "قهوة ذهبية خفيفة في المجلس"
+      },
+      "history": {
+        "en": "Omani qahwa is lightly roasted, fragrant with cardamom, and poured into small finjan cups with dates. Refusing a second cup has etiquette — hospitality is measured in rounds.",
+        "ar": "القهوة العُمانية محمّصة بخفة، معطرة بالهيل، وتُصب في فناجين صغيرة مع التمر. لرفض الفنجان الثاني آداب — والضيافة تُقاس بالدورات."
+      },
+      "tags": {
+        "en": [
+          "Coffee",
+          "Majlis",
+          "Dates"
+        ],
+        "ar": [
+          "قهوة",
+          "مجلس",
+          "تمر"
+        ]
+      },
+      "image": "/oman/assets/food/kahwa.jpg"
+    },
+    {
+      "id": "mashuai",
+      "emoji": "🐟",
+      "siteId": "sur",
+      "name": {
+        "en": "Mashuai",
+        "ar": "مشوي"
+      },
+      "tagline": {
+        "en": "Spit-roasted kingfish with lemon rice",
+        "ar": "كنعد مشوي مع أرز بالليمون"
+      },
+      "history": {
+        "en": "Whole kingfish roasted and served with lemony rice — a coastal celebration dish. Fish markets from Sur to Mutrah still set the day’s table.",
+        "ar": "كنعد كامل يُشوى ويُقدَّم مع أرز ليموني — طبق احتفال ساحلي. ما زالت أسواق السمك من صور إلى مطرح تحدّد مائدة اليوم."
+      },
+      "tags": {
+        "en": [
+          "Fish",
+          "Coast",
+          "Celebration"
+        ],
+        "ar": [
+          "سمك",
+          "ساحل",
+          "احتفال"
+        ]
+      },
+      "image": "/oman/assets/food/mashuai.jpg"
+    },
+    {
+      "id": "harees",
+      "emoji": "🥣",
+      "siteId": "salalah",
+      "name": {
+        "en": "Harees",
+        "ar": "الهريس"
+      },
+      "tagline": {
+        "en": "Wheat and meat porridge of feast days",
+        "ar": "عصيدة قمح ولحم لأيام العيد"
+      },
+      "history": {
+        "en": "Cracked wheat slow-cooked with meat into a smooth porridge, known across the Gulf and especially welcome in Dhofar’s cooler season. Harees is labor food — stirred until the grains surrender.",
+        "ar": "قمح مجروش يُطهى ببطء مع اللحم حتى يصير عصيدة ناعمة، معروفة في الخليج ومرحب بها خاصة في موسم ظفار الأبرد. الهريس طعام جهد — يُحرَّك حتى تستسلم الحبوب."
+      },
+      "tags": {
+        "en": [
+          "Wheat",
+          "Feast",
+          "Gulf"
+        ],
+        "ar": [
+          "قمح",
+          "عيد",
+          "خليج"
+        ]
+      },
+      "image": "/oman/assets/food/harees.jpg"
+    },
+    {
+      "id": "dates",
+      "emoji": "🌴",
+      "siteId": "nizwa",
+      "name": {
+        "en": "Omani dates",
+        "ar": "التمر العُماني"
+      },
+      "tagline": {
+        "en": "Khalas, Fardh, and the daily sweet",
+        "ar": "خلاص وفرض والحلاوة اليومية"
+      },
+      "history": {
+        "en": "Date palms and falaj irrigation made oasis towns possible. Varieties such as Khalas and Fardh travel from interior farms to airport gift boxes — agriculture as national greeting.",
+        "ar": "النخيل والأفلاج جعلت مدن الواحات ممكنة. أصناف مثل الخلاص والفرض تنتقل من مزارع الداخل إلى علب المطارات — زراعة كتحية وطنية."
+      },
+      "tags": {
+        "en": [
+          "Palm",
+          "Falaj",
+          "Gift"
+        ],
+        "ar": [
+          "نخيل",
+          "فلج",
+          "هدية"
+        ]
+      },
+      "image": "/oman/assets/food/dates.jpg"
+    },
+    {
+      "id": "lokhemat",
+      "emoji": "🍩",
+      "siteId": "muscat",
+      "name": {
+        "en": "Lokhemat",
+        "ar": "اللخيمات"
+      },
+      "tagline": {
+        "en": "Honey-soaked dumplings",
+        "ar": "كرات عجينة مغموسة بالعسل"
+      },
+      "history": {
+        "en": "Fried dough balls soaked in syrup or honey, often with sesame. A sweet shared at gatherings — simple, sticky, and communal.",
+        "ar": "كرات عجينة مقلية تُغمس في الشيرة أو العسل، غالباً مع سمسم. حلوى اللقاءات — بسيطة ولزجة وجماعية."
+      },
+      "tags": {
+        "en": [
+          "Sweet",
+          "Gathering"
+        ],
+        "ar": [
+          "حلوى",
+          "لقاء"
+        ]
+      },
+      "image": "/oman/assets/food/lokhemat.jpg"
+    }
+  ],
+  "music": [
+    {
+      "id": "razha",
+      "emoji": "⚔️",
+      "siteId": "nizwa",
+      "name": {
+        "en": "Razha",
+        "ar": "الرزحة"
+      },
+      "tagline": {
+        "en": "Sword dance and poetic chant of the interior",
+        "ar": "رقصة سيوف وإنشاد شعري في الداخل"
+      },
+      "history": {
+        "en": "Men chant poetry while handling swords or sticks in coordinated lines. Razha is martial hospitality — skill displayed without turning celebration into combat.",
+        "ar": "ينشد الرجال الشعر وهم يتعاملون مع السيوف أو العصي في صفوف منسّقة. الرزحة ضيافة قتالية — مهارة تُعرض دون أن يصير الاحتفال قتالاً."
+      },
+      "tags": {
+        "en": [
+          "Sword",
+          "Poetry",
+          "Interior"
+        ],
+        "ar": [
+          "سيف",
+          "شعر",
+          "داخل"
+        ]
+      },
+      "image": "/oman/assets/music/razha.jpg"
+    },
+    {
+      "id": "barah",
+      "emoji": "💃",
+      "siteId": "salalah",
+      "name": {
+        "en": "Barʿah",
+        "ar": "البرعة"
+      },
+      "tagline": {
+        "en": "Dhofari dance with dagger and drum",
+        "ar": "رقصة ظفارية بالخنجر والطبل"
+      },
+      "history": {
+        "en": "A lively Dhofari performance with rhythmic steps, drums, and often the khanjar. Barʿah belongs to southern celebration cycles distinct from northern interior forms.",
+        "ar": "عرض ظفاري حيوي بخطوات إيقاعية وطبول وغالباً الخنجر. البرعة تنتمي لدورات احتفال الجنوب المتميزة عن أشكال الداخل الشمالي."
+      },
+      "tags": {
+        "en": [
+          "Dhofar",
+          "Dance",
+          "Drum"
+        ],
+        "ar": [
+          "ظفار",
+          "رقص",
+          "طبل"
+        ]
+      },
+      "image": "/oman/assets/music/barah.jpg"
+    },
+    {
+      "id": "sea-song",
+      "emoji": "🌊",
+      "siteId": "sur",
+      "name": {
+        "en": "Sea songs of Sur",
+        "ar": "أغاني بحر صور"
+      },
+      "tagline": {
+        "en": "Work rhythms of dhow builders and sailors",
+        "ar": "إيقاعات عمل صنّاع السفن والبحّارة"
+      },
+      "history": {
+        "en": "Coastal work songs paced hauling, sailing, and shipyard labor. Sur’s dhow heritage keeps those rhythms audible even when engines replaced sail.",
+        "ar": "أغاني عمل ساحلية وقّعت السحب والإبحار وعمل الحوض. تراث سفن صور يبقي تلك الإيقاعات مسموعة حتى بعد أن حلّ المحرك محل الشراع."
+      },
+      "tags": {
+        "en": [
+          "Dhow",
+          "Coast",
+          "Work song"
+        ],
+        "ar": [
+          "سفينة",
+          "ساحل",
+          "أغنية عمل"
+        ]
+      },
+      "image": "/oman/assets/music/sea-song.jpg"
+    },
+    {
+      "id": "oud",
+      "emoji": "🎼",
+      "siteId": "muscat",
+      "name": {
+        "en": "Oud and maqam",
+        "ar": "العود والمقام"
+      },
+      "tagline": {
+        "en": "Shared Arab lute tradition in Omani salons",
+        "ar": "تراث العود العربي في المجالس العُمانية"
+      },
+      "history": {
+        "en": "The oud carries maqam melodies familiar across the Arab world; Omani players and composers place local poetic taste inside that wider school.",
+        "ar": "يحمل العود ألحان المقام المألوفة عبر العالم العربي؛ ويضع العازفون والملحنون العُمانيون الذوق الشعري المحلي داخل تلك المدرسة الأوسع."
+      },
+      "tags": {
+        "en": [
+          "Oud",
+          "Maqam",
+          "Salon"
+        ],
+        "ar": [
+          "عود",
+          "مقام",
+          "مجلس"
+        ]
+      },
+      "image": "/oman/assets/music/oud.jpg"
+    },
+    {
+      "id": "women-song",
+      "emoji": "🎙️",
+      "siteId": "mutrah",
+      "name": {
+        "en": "Women’s celebration song",
+        "ar": "غناء نساء الأفراح"
+      },
+      "tagline": {
+        "en": "Wedding voices that carry the night",
+        "ar": "أصوات الأعراس التي تحمل الليل"
+      },
+      "history": {
+        "en": "Women’s ensembles sing at weddings and family rites with handclaps and drums. These repertoires are local knowledge — often less recorded than male public dances, equally central.",
+        "ar": "تغني فرق النساء في الأعراس والطقوس العائلية بالتصفيق والطبول. هذه الذخائر معرفة محلية — أقل تسجيلاً غالباً من رقصات الرجال العلنية، ومساوية في المركزية."
+      },
+      "tags": {
+        "en": [
+          "Wedding",
+          "Women",
+          "Drum"
+        ],
+        "ar": [
+          "عرس",
+          "نساء",
+          "طبل"
+        ]
+      },
+      "image": "/oman/assets/music/women-song.jpg"
+    },
+    {
+      "id": "contemporary-music",
+      "emoji": "🎧",
+      "siteId": "muscat",
+      "name": {
+        "en": "Contemporary Omani voices",
+        "ar": "أصوات عُمانية معاصرة"
+      },
+      "tagline": {
+        "en": "Pop, heritage fusion, and studio craft",
+        "ar": "بوب ومزج تراث وحرفة استوديو"
+      },
+      "history": {
+        "en": "Younger artists fuse Gulf pop production with Omani melodic memory. Radio and streaming carry both heritage ensembles and new singles from Muscat studios.",
+        "ar": "يمزج فنانون أصغر إنتاج البوب الخليجي بذاكرة اللحن العُماني. يحمل الراديو والبث فرق التراث والأغاني الجديدة من استوديوهات مسقط."
+      },
+      "tags": {
+        "en": [
+          "Pop",
+          "Fusion",
+          "Muscat"
+        ],
+        "ar": [
+          "بوب",
+          "مزج",
+          "مسقط"
+        ]
+      },
+      "image": "/oman/assets/music/contemporary-music.jpg"
+    }
+  ],
+  "hookah": [
+    {
+      "id": "majlis-qahwa",
+      "emoji": "☕",
+      "siteId": "mutrah",
+      "name": {
+        "en": "Majlis qahwa",
+        "ar": "قهوة المجلس"
+      },
+      "tagline": {
+        "en": "Coffee rounds before any smoke or news",
+        "ar": "دورات القهوة قبل أي دخان أو خبر"
+      },
+      "history": {
+        "en": "The Omani majlis is organized around qahwa and dates first. Conversation — not the pipe — is the main instrument. Guests learn the pour etiquette as social grammar.",
+        "ar": "يُنظَّم المجلس العُماني حول القهوة والتمر أولاً. الحديث — لا الغليون — هو الآلة الرئيسية. يتعلم الضيف آداب الصب كقواعد اجتماعية."
+      },
+      "tags": {
+        "en": [
+          "Coffee",
+          "Etiquette",
+          "Majlis"
+        ],
+        "ar": [
+          "قهوة",
+          "آداب",
+          "مجلس"
+        ]
+      },
+      "image": "/oman/assets/hookah/majlis-qahwa.jpg"
+    },
+    {
+      "id": "frankincense-scent",
+      "emoji": "🌫️",
+      "siteId": "salalah",
+      "name": {
+        "en": "Frankincense in the room",
+        "ar": "اللبان في المجلس"
+      },
+      "tagline": {
+        "en": "Luban smoke as welcome, not only export",
+        "ar": "دخان اللبان ترحيب لا تصدير فقط"
+      },
+      "history": {
+        "en": "Burning frankincense scents homes and gathering rooms. What once left Dhofar for distant temples still marks local hospitality indoors.",
+        "ar": "يحرق اللبان في البيوت وغرف اللقاء. ما كان يغادر ظفار إلى معابد بعيدة ما زال يعلّم الضيافة المحلية في الداخل."
+      },
+      "tags": {
+        "en": [
+          "Luban",
+          "Scent",
+          "Welcome"
+        ],
+        "ar": [
+          "لبان",
+          "رائحة",
+          "ترحيب"
+        ]
+      },
+      "image": "/oman/assets/hookah/frankincense-scent.jpg"
+    },
+    {
+      "id": "mutrah-evening",
+      "emoji": "🌙",
+      "siteId": "mutrah",
+      "name": {
+        "en": "Mutrah evening pause",
+        "ar": "استراحة مطرح المسائية"
+      },
+      "tagline": {
+        "en": "Corniche air, café seats, slow talk",
+        "ar": "هواء الكورنيش ومقاعد المقهى وحديث بطيء"
+      },
+      "history": {
+        "en": "After heat eases, Mutrah’s waterfront fills with walkers and café tables. Shisha appears in some venues, but the coastal evening itself is the ritual — breeze, sugarcane juice, and neighbors.",
+        "ar": "بعد أن يخفّ الحر تمتلئ واجهة مطرح بالمشاة وطاولات المقاهي. تظهر الشيشة في بعض الأماكن، لكن طقس المساء الساحلي نفسه هو الطقس — نسيم وعصير قصب وجيران."
+      },
+      "tags": {
+        "en": [
+          "Corniche",
+          "Café",
+          "Evening"
+        ],
+        "ar": [
+          "كورنيش",
+          "مقهى",
+          "مساء"
+        ]
+      },
+      "image": "/oman/assets/hookah/mutrah-evening.jpg"
+    },
+    {
+      "id": "shisha-gulf",
+      "emoji": "🫧",
+      "siteId": "muscat",
+      "name": {
+        "en": "Gulf shisha nights",
+        "ar": "أمسيات الشيشة الخليجية"
+      },
+      "tagline": {
+        "en": "Shared water-pipe evenings in modern cafés",
+        "ar": "أمسيات الأرجيلة المشتركة في مقاهي حديثة"
+      },
+      "history": {
+        "en": "Like elsewhere in the Gulf, water pipes pace long café nights among friends. In Oman they sit beside — never replace — the older grammar of qahwa and majlis respect.",
+        "ar": "كغير عُمان في الخليج، توقّع الأرجيلة ليالي المقهى الطويلة بين الأصدقاء. وفي عُمان تجلس إلى جانب — لا تحل محل — قواعد القهوة واحترام المجلس الأقدم."
+      },
+      "tags": {
+        "en": [
+          "Shisha",
+          "Café",
+          "Friends"
+        ],
+        "ar": [
+          "شيشة",
+          "مقهى",
+          "أصحاب"
+        ]
+      },
+      "image": "/oman/assets/hookah/shisha-gulf.jpg"
+    }
+  ],
+  "living": [
+    {
+      "id": "khanjar",
+      "emoji": "🗡️",
+      "siteId": "muscat",
+      "name": {
+        "en": "Khanjar",
+        "ar": "الخنجر"
+      },
+      "tagline": {
+        "en": "Curved dagger of dress and identity",
+        "ar": "خنجر منحني للزي والهوية"
+      },
+      "history": {
+        "en": "The silver-sheathed khanjar is worn on formal occasions and appears on the national emblem. It is craft, inheritance, and signal of Omani dress — not a tourist prop.",
+        "ar": "يُلبس الخنجر ذو الغمد الفضي في المناسبات الرسمية ويظهر على الشعار الوطني. هو حرفة وإرث وإشارة زي عُماني — لا دعاية سياحية."
+      },
+      "tags": {
+        "en": [
+          "Dress",
+          "Silver",
+          "Emblem"
+        ],
+        "ar": [
+          "زي",
+          "فضة",
+          "شعار"
+        ]
+      },
+      "image": "/oman/assets/living/khanjar.jpg"
+    },
+    {
+      "id": "dishdasha",
+      "emoji": "👔",
+      "siteId": "muscat",
+      "name": {
+        "en": "Dishdasha and kumma",
+        "ar": "الثوب والكمة"
+      },
+      "tagline": {
+        "en": "White robe and embroidered cap of daily pride",
+        "ar": "ثوب أبيض وكمة مطرّزة لكرامة يومية"
+      },
+      "history": {
+        "en": "Men’s white dishdasha and embroidered kumma cap mark everyday public dress. Women’s garments and regional styles vary — coastal and Dhofari aesthetics are not identical.",
+        "ar": "ثوب الرجال الأبيض والكمة المطرّزة يعلّمان الزي العام اليومي. وتختلف ملابس النساء والأساليب الإقليمية — جماليات الساحل وظفار ليست واحدة."
+      },
+      "tags": {
+        "en": [
+          "Dress",
+          "Kumma",
+          "Daily"
+        ],
+        "ar": [
+          "زي",
+          "كمة",
+          "يومي"
+        ]
+      },
+      "image": "/oman/assets/living/dishdasha.jpg"
+    },
+    {
+      "id": "falaj",
+      "emoji": "💦",
+      "siteId": "nizwa",
+      "name": {
+        "en": "Falaj irrigation",
+        "ar": "الأفلاج"
+      },
+      "tagline": {
+        "en": "Shared water channels that made oases possible",
+        "ar": "قنوات ماء مشتركة جعلت الواحات ممكنة"
+      },
+      "history": {
+        "en": "Aflaj are gravity-fed channels distributing spring or underground water by timed shares. UNESCO lists Omani falaj systems as living heritage — engineering as social contract.",
+        "ar": "الأفلاج قنوات بالجاذبية توزّع ماء العين أو الجوف بحصص موقوتة. وتدرج اليونسكو أنظمة الأفلاج العُمانية تراثاً حياً — هندسة كعقد اجتماعي."
+      },
+      "tags": {
+        "en": [
+          "Water",
+          "UNESCO",
+          "Oasis"
+        ],
+        "ar": [
+          "ماء",
+          "يونسكو",
+          "واحة"
+        ]
+      },
+      "image": "/oman/assets/living/falaj.jpg"
+    },
+    {
+      "id": "frankincense-living",
+      "emoji": "🌳",
+      "siteId": "salalah",
+      "name": {
+        "en": "Frankincense harvest",
+        "ar": "حصاد اللبان"
+      },
+      "tagline": {
+        "en": "Tapping Boswellia in Dhofar’s dry hills",
+        "ar": "جرح أشجار اللبان في تلال ظفار الجافة"
+      },
+      "history": {
+        "en": "Harvesters still tap Boswellia trees for resin that scents homes and travels as gifts. The landscape of the Land of Frankincense remains a working ecology, not only a museum label.",
+        "ar": "ما زال الحصّادون يجرحون أشجار اللبان لراتنج يعطّر البيوت ويسافر هدايا. مشهد أرض اللبان ما زال بيئة عمل لا بطاقة متحف فقط."
+      },
+      "tags": {
+        "en": [
+          "Dhofar",
+          "Resin",
+          "Harvest"
+        ],
+        "ar": [
+          "ظفار",
+          "راتنج",
+          "حصاد"
+        ]
+      },
+      "image": "/oman/assets/living/frankincense-living.jpg"
+    },
+    {
+      "id": "khareef",
+      "emoji": "🌦️",
+      "siteId": "salalah",
+      "name": {
+        "en": "Khareef season",
+        "ar": "موسم الخريف"
+      },
+      "tagline": {
+        "en": "Monsoon mist that greens Dhofar",
+        "ar": "ضباب الموسم الذي يُخضِر ظفار"
+      },
+      "history": {
+        "en": "From roughly June to September the southwest monsoon wraps Salalah in cool mist and temporary green. Families travel south for the season — climate as national festival.",
+        "ar": "من نحو يونيو إلى سبتمبر يلفّ الموسم الجنوبي الغربي صلالة بضباب بارد وخضرة مؤقتة. تسافر العائلات جنوباً للموسم — مناخ كمهرجان وطني."
+      },
+      "tags": {
+        "en": [
+          "Monsoon",
+          "Salalah",
+          "Travel"
+        ],
+        "ar": [
+          "موسم",
+          "صلالة",
+          "سفر"
+        ]
+      },
+      "image": "/oman/assets/living/khareef.jpg"
+    },
+    {
+      "id": "bedouin-sharqiya",
+      "emoji": "🐪",
+      "siteId": "wahiba",
+      "name": {
+        "en": "Sharqiya desert life",
+        "ar": "حياة صحراء الشرقية"
+      },
+      "tagline": {
+        "en": "Dune camps, camel culture, and night hospitality",
+        "ar": "مخيمات كثبان وثقافة إبل وضيافة الليل"
+      },
+      "history": {
+        "en": "Bedouin and settled families of the Sharqiya share dune tourism, camel knowledge, and desert etiquette with visitors. Hospitality rules still organize coffee, seating, and speech.",
+        "ar": "تتشارك عائلات بدوية ومستقرة في الشرقية سياحة الكثبان ومعرفة الإبل وآداب الصحراء مع الزوار. وما زالت قواعد الضيافة تنظّم القهوة والجلوس والكلام."
+      },
+      "tags": {
+        "en": [
+          "Desert",
+          "Camel",
+          "Hospitality"
+        ],
+        "ar": [
+          "صحراء",
+          "إبل",
+          "ضيافة"
+        ]
+      },
+      "image": "/oman/assets/living/bedouin-sharqiya.jpg"
+    }
+  ],
+  "phrases": [
+    {
+      "ar": "أهلاً وسهلاً",
+      "translit": "Ahlan wa sahlan",
+      "en": "Welcome / hello"
+    },
+    {
+      "ar": "مرحبا",
+      "translit": "Marhaba",
+      "en": "Hi"
+    },
+    {
+      "ar": "كيف حالك؟",
+      "translit": "Kayf halak?",
+      "en": "How are you?"
+    },
+    {
+      "ar": "الحمد لله",
+      "translit": "Alhamdulillah",
+      "en": "Praise God / I am well"
+    },
+    {
+      "ar": "تشرفنا",
+      "translit": "Tasharrafna",
+      "en": "Pleased to meet you"
+    },
+    {
+      "ar": "من فضلك",
+      "translit": "Min fadlak",
+      "en": "Please"
+    },
+    {
+      "ar": "شكراً",
+      "translit": "Shukran",
+      "en": "Thank you"
+    },
+    {
+      "ar": "مع السلامة",
+      "translit": "Maʿa salama",
+      "en": "Goodbye"
+    },
+    {
+      "ar": "يا زين",
+      "translit": "Ya zayn",
+      "en": "How lovely / well said (Gulf)"
+    },
+    {
+      "ar": "تفضل",
+      "translit": "Tafaddal",
+      "en": "Please go ahead / help yourself"
+    }
+  ],
+  "photoCredits": "/oman/data/oman-photo-credits.json"
+}

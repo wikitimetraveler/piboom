@@ -209,6 +209,125 @@
   text-align: right;
 }
 
+.gse-pooling-section {
+  margin-top: 0.25rem;
+}
+
+.gse-pooling-card {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(13, 148, 136, 0.28);
+  background: linear-gradient(165deg, #f0fdfa 0%, #f8fafc 50%, #f1f5f9 100%);
+  padding: 1rem 1.15rem 1.2rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+.gse-pooling-card .gse-exhibit-kicker {
+  color: #0d9488;
+}
+
+.gse-pooling-card .gse-exhibit-verify {
+  color: #0f766e;
+}
+
+.gse-pooling-card .gse-exhibit-link {
+  color: #0f766e;
+}
+
+.gse-pooling-card .gse-exhibit-link:hover {
+  color: #115e59;
+}
+
+.gse-pooling-card .gse-exhibit-context a,
+.gse-pooling-card .gse-pooling-list a {
+  color: #0f766e;
+}
+
+.gse-pooling-step {
+  height: 100%;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 0.75rem 0.85rem;
+}
+
+.gse-pooling-step__n {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  margin-bottom: 0.35rem;
+  border-radius: 999px;
+  background: #0d9488;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.gse-pooling-list {
+  padding-left: 1.1rem;
+  margin-bottom: 0;
+  line-height: 1.45;
+}
+
+.gse-pooling-list li + li {
+  margin-top: 0.45rem;
+}
+
+.gse-pooling-glossary > div {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr;
+  gap: 0.35rem 0.65rem;
+  padding: 0.28rem 0;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.gse-pooling-glossary dt {
+  font-weight: 700;
+  color: #334155;
+  margin: 0;
+}
+
+.gse-pooling-glossary dd {
+  margin: 0;
+  color: #475569;
+}
+
+.gse-arm-reset-block {
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.78);
+  padding: 0.85rem 1rem;
+}
+
+.gse-arm-cutoff-table {
+  margin-bottom: 0;
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.gse-arm-cutoff-table th,
+.gse-arm-cutoff-table td {
+  padding: 0.45rem 0.65rem;
+  vertical-align: middle;
+}
+
+.gse-arm-cutoff-table thead th {
+  background: #f1f5f9;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #334155;
+  border-bottom-color: rgba(15, 23, 42, 0.1);
+}
+
+@media (max-width: 576px) {
+  .gse-pooling-glossary > div {
+    grid-template-columns: 1fr;
+  }
+}
+
 .gse-delivery-section {
   margin-top: 0.25rem;
 }
@@ -239,6 +358,111 @@
 
 .gse-delivery-card .gse-exhibit-context a {
   color: #2563eb;
+}
+
+.gse-knowledge-canvas-wrap {
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  border-radius: 0.75rem;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(13, 148, 136, 0.12), transparent 45%),
+    radial-gradient(circle at 80% 70%, rgba(37, 99, 235, 0.1), transparent 40%),
+    #f8fafc;
+  padding: 0.55rem;
+}
+
+.gse-knowledge-graph {
+  width: 100%;
+  height: auto;
+  display: block;
+  min-height: 220px;
+}
+
+.gse-knowledge-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.gse-knowledge-bar-row {
+  display: grid;
+  grid-template-columns: 7rem 1fr auto;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.gse-knowledge-bar-row span {
+  font-size: 0.78rem;
+  color: #475569;
+}
+
+.gse-knowledge-bar-track {
+  height: 0.55rem;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.gse-knowledge-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #0d9488, #2563eb);
+}
+
+.gse-knowledge-hits li {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 0.55rem;
+  background: #fff;
+  padding: 0.55rem 0.65rem;
+  margin-bottom: 0.45rem;
+}
+
+.gse-knowledge-hits .gse-hit-meta {
+  color: #64748b;
+  font-size: 0.72rem;
+}
+
+.gse-ai-mode-tabs .nav-link {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.gse-ai-mode-tabs .nav-link.active {
+  background: #0f766e;
+}
+
+.gse-chat-thread {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 0.75rem;
+  background: #f8fafc;
+  padding: 0.75rem;
+  max-height: 280px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.gse-chat-bubble {
+  max-width: 92%;
+  border-radius: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+.gse-chat-bubble--user {
+  align-self: flex-end;
+  background: #0f766e;
+  color: #fff;
+}
+
+.gse-chat-bubble--assistant {
+  align-self: flex-start;
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  color: #0f172a;
 }
 
 .gse-ai-chip {

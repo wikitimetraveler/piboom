@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Oman — Sultanate of the Sea and Frankincense | History, Food &amp; Music</title>
+  <meta name="description" content="A bilingual cultural atlas of Oman: Magan copper, frankincense roads, Ibadi towns, shuwa and kahwa, razha and sea song — narrated in English or Arabic by Salim."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/shared/css/levant-atlas-nav.css"/>
+  <link rel="stylesheet" href="/oman/css/oman.css"/>
+  <script src="/shared/menu-config.js"></script>
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/js/levant-atlas-nav.js" defer></script>
+  <script src="/shared/demo-users.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <script src="/shared/dark-mode.js" defer></script>
+  <script src="/oman/js/oman-splash.js" defer></script>
+</head>
+<body class="om-page om-splash-open">
+  <div
+    id="omSplash"
+    class="om-splash is-ready"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="omSplashTitle"
+    aria-hidden="false"
+  >
+    <button type="button" class="om-splash__skip" id="omSplashSkip">Skip</button>
+    <div class="om-splash__veil" aria-hidden="true"></div>
+    <div class="om-splash__grain" aria-hidden="true"></div>
+    <div class="om-splash__stage">
+      <div class="om-splash__flag-wrap" aria-hidden="true">
+        <svg class="om-splash__flag" viewBox="0 0 1200 600" focusable="false" role="img" aria-label="Flag of Oman">
+          <defs>
+            <linearGradient id="omFlagSheen" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.22"/>
+              <stop offset="45%" stop-color="#ffffff" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#ffffff" stop-opacity="0.08"/>
+            </linearGradient>
+            <filter id="omFlagSoft" x="-5%" y="-5%" width="110%" height="110%">
+              <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000" flood-opacity="0.45"/>
+            </filter>
+          </defs>
+          <g filter="url(#omFlagSoft)">
+            <rect class="om-splash__stripe om-splash__stripe--white" x="300" width="900" height="200" fill="#ffffff"/>
+            <rect class="om-splash__stripe om-splash__stripe--red" x="300" y="200" width="900" height="200" fill="#c8102e"/>
+            <rect class="om-splash__stripe om-splash__stripe--green" x="300" y="400" width="900" height="200" fill="#008c45"/>
+            <rect class="om-splash__hoist" width="300" height="600" fill="#c8102e"/>
+            <g class="om-splash__khanjar" transform="translate(150 300)" fill="#ffffff">
+              <path d="M-18 -70 L18 -70 L22 -40 L8 -28 L8 55 L-8 55 L-8 -28 L-22 -40 Z"/>
+              <rect x="-42" y="-8" width="84" height="14" rx="3"/>
+              <path d="M-36 10 Q-20 48 0 70 Q20 48 36 10 L22 10 Q10 36 0 52 Q-10 36 -22 10 Z"/>
+            </g>
+          </g>
+          <rect width="1200" height="600" fill="url(#omFlagSheen)" pointer-events="none"/>
+        </svg>
+      </div>
+      <p class="om-splash__kicker" lang="ar">سلطنة عُمان</p>
+      <h1 class="om-splash__title" id="omSplashTitle">Oman</h1>
+      <p class="om-splash__line">Sea · frankincense · stone</p>
+      <div class="om-splash__rule" aria-hidden="true"></div>
+      <p class="om-splash__enter" id="omSplashEnterHint">Enter the atlas</p>
+    </div>
+  </div>
+
+  <modern-navbar></modern-navbar>
+
+  <main class="om-main">
+    <section class="om-hero" id="omHero">
+      <div class="om-hero-atmos om-hero-atmos--storm" id="omHeroAtmos" aria-hidden="true">
+        <div class="om-hero-sky"></div>
+        <div class="om-hero-horizon-glow"></div>
+        <canvas class="om-hero-sparkle" id="omSkySparkle" width="1200" height="600"></canvas>
+        <div class="om-hero-heat"></div>
+        <svg class="om-hero-silhouettes" viewBox="0 0 1200 100" preserveAspectRatio="xMidYMax meet" focusable="false">
+          <g class="om-hero-city om-hero-city--far" fill="currentColor">
+            <rect x="20" y="58" width="22" height="42"/>
+            <rect x="46" y="48" width="16" height="52"/>
+            <rect x="68" y="62" width="28" height="38"/>
+            <rect x="102" y="52" width="14" height="48"/>
+            <rect x="122" y="58" width="30" height="42"/>
+            <rect x="200" y="55" width="24" height="45"/>
+            <rect x="230" y="45" width="14" height="55"/>
+            <rect x="250" y="60" width="26" height="40"/>
+            <rect x="360" y="50" width="20" height="50"/>
+            <rect x="386" y="42" width="12" height="58"/>
+            <rect x="404" y="56" width="28" height="44"/>
+            <rect x="520" y="54" width="22" height="46"/>
+            <rect x="548" y="44" width="14" height="56"/>
+            <rect x="568" y="58" width="24" height="42"/>
+            <rect x="700" y="52" width="18" height="48"/>
+            <rect x="724" y="46" width="12" height="54"/>
+            <rect x="742" y="58" width="26" height="42"/>
+            <rect x="920" y="50" width="20" height="50"/>
+            <rect x="946" y="56" width="28" height="44"/>
+            <rect x="1100" y="48" width="16" height="52"/>
+            <rect x="1122" y="58" width="24" height="42"/>
+            <rect x="1152" y="44" width="14" height="56"/>
+          </g>
+          <path class="om-hero-arch" d="M140 100 V55 Q140 28 168 28 Q196 28 196 55 V100 Z"/>
+          <path class="om-hero-arch om-hero-arch--mid" d="M280 100 V62 Q280 42 302 42 Q324 42 324 62 V100 Z"/>
+          <path class="om-hero-arch om-hero-arch--far" d="M780 100 V50 Q780 26 812 26 Q844 26 844 50 V100 Z"/>
+          <path class="om-hero-arch om-hero-arch--far" d="M860 100 V64 Q860 48 882 48 Q904 48 904 64 V100 Z"/>
+          <path class="om-hero-dune" d="M0 78 C140 68 260 74 400 66 C540 58 680 72 820 64 C960 56 1100 70 1200 62 L1200 100 L0 100 Z"/>
+        </svg>
+        <div class="om-hero-sand"></div>
+        <canvas class="om-hero-storm" id="omSandstorm" width="1200" height="400"></canvas>
+        <div class="om-hero-motes" id="omHeroMotes"></div>
+      </div>
+      <div class="container">
+        <div class="om-hero-layout">
+          <div class="om-hero-inner" id="omHeroInner">
+            <p class="om-kicker" data-i18n="heroKicker">The Sultanate of Oman</p>
+            <h1 class="om-hero-title" data-i18n="heroTitle">Oman</h1>
+            <p class="om-hero-line" data-i18n="heroLine">A seafaring sultanate between desert and monsoon — Magan copper, frankincense roads, Ibadi stone towns, and a living table of shuwa, kahwa, and song.</p>
+
+            <div class="om-hero-cta">
+              <a class="om-btn om-btn-primary" href="#omMap">
+                <i class="bi bi-geo-alt-fill"></i> <span data-i18n="exploreMap">Explore the atlas</span>
+              </a>
+              <button type="button" class="om-btn om-btn-lang" id="omLangToggle" aria-label="Switch language">
+                <i class="bi bi-translate"></i> <span id="omLangToggleLabel">عربي</span>
+              </button>
+            </div>
+
+            <dl class="om-facts" id="omFacts">
+              <div><dt>Magan</dt><dd data-i18n-fact="magan">Bronze Age copper on the Gulf</dd></div>
+              <div><dt>1507</dt><dd data-i18n-fact="portuguese">Portuguese take Muscat harbor</dd></div>
+              <div><dt>Luban</dt><dd data-i18n-fact="frankincense">Frankincense still harvested in Dhofar</dd></div>
+              <div><dt>1970</dt><dd data-i18n-fact="renaissance">Renaissance opens modern Oman</dd></div>
+            </dl>
+          </div>
+
+          <aside class="om-guide" id="omGuide" aria-label="Oman guide Salim">
+            <div class="om-guide-card">
+              <img class="om-guide-portrait" id="omGuidePortrait" src="/oman/assets/salim-guide-portrait-256.png" width="72" height="72" alt="Salim — Oman history guide"/>
+              <div class="om-guide-meta">
+                <h2 id="omGuideName">Salim</h2>
+                <p id="omGuideTitle">Oman history guide</p>
+                <p class="om-guide-status" id="omGuideStatus">Ahlan wa sahlan.</p>
+              </div>
+            </div>
+
+            <label class="om-narrate om-narrate--global" for="omNarrate">
+              <input type="checkbox" id="omNarrate" data-om-narrate checked/>
+              <span class="om-narrate__copy">
+                <span class="om-narrate__title" data-i18n="narration">Narration</span>
+                <span class="om-narrate__scope" data-i18n="narrationScope">Entire page — atlas, tour, and cards</span>
+              </span>
+            </label>
+
+            <div class="om-guide-actions">
+              <button type="button" class="om-btn om-btn-primary om-btn-sm" id="omStoryPlay" aria-pressed="false">
+                <i class="bi bi-film"></i> <span data-i18n="startTour">Start tour</span>
+              </button>
+              <button type="button" class="om-btn om-btn-sand om-btn-sm" id="omMeetGuide">
+                <i class="bi bi-person-video3"></i> <span data-i18n="meetGuide">Meet Salim</span>
+              </button>
+              <button type="button" class="om-btn om-btn-sand om-btn-sm" id="omAskGuide">
+                <i class="bi bi-chat-dots-fill"></i> <span data-i18n="askGuide">Ask Salim</span>
+              </button>
+              <button type="button" class="om-btn om-btn-ghost om-btn-sm" id="omStopAudio">
+                <i class="bi bi-stop-fill"></i> <span data-i18n="stop">Stop</span>
+              </button>
+            </div>
+
+            <div class="om-story-panel" id="omStoryPanel">
+              <div class="om-story-status" id="omStoryStatus" hidden aria-live="polite">
+                <span id="omStoryStatusText"></span>
+                <div class="om-story-dots" id="omStoryDots" aria-hidden="true"></div>
+              </div>
+              <p class="om-story-error" id="omStoryError" hidden></p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <div class="container om-sections">
+      <section class="om-section is-open" id="omMap" data-om-collapse data-om-default-open="1">
+        <div class="om-section-head">
+          <button type="button" class="om-section-toggle" id="omMapToggle" aria-expanded="true" aria-controls="omMapPanel">
+            <span class="om-section-toggle__copy">
+              <span class="om-section-title" data-i18n="mapHeading">Atlas of shared ground</span>
+              <span class="om-section-lead" data-i18n="mapLead">Hills, coast, and rift valley. Select a pin or a name to hear its story.</span>
+            </span>
+            <i class="bi bi-chevron-down om-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="om-section-panel" id="omMapPanel" role="region" aria-labelledby="omMapToggle">
+          <div class="om-map-toolbar">
+            <div class="om-map-filters" id="omMapFilters" role="group" aria-label="Filter map pins">
+              <button type="button" class="om-chip is-active" data-filter="all" data-i18n="mapAll">All</button>
+              <button type="button" class="om-chip" data-filter="history" data-i18n="mapHistory">History</button>
+              <button type="button" class="om-chip" data-filter="food" data-i18n="mapFood">Food</button>
+              <button type="button" class="om-chip" data-filter="music" data-i18n="mapMusic">Music</button>
+              <button type="button" class="om-chip" data-filter="living" data-i18n="mapLiving">Living</button>
+            </div>
+            <label class="om-narrate om-narrate--section" for="omNarrateMap">
+              <input type="checkbox" id="omNarrateMap" data-om-narrate checked/>
+              <span data-i18n="narration">Narration</span>
+            </label>
+          </div>
+          <div class="om-map-layout">
+            <ul class="om-site-list" id="omSiteList"></ul>
+            <div class="om-map-wrap">
+              <div id="omMapCanvas" class="om-map-canvas" role="img" aria-label="Map of historic sites across Oman"></div>
+              <p class="om-map-status" id="omMapStatus" data-i18n="mapLoading">Loading the atlas…</p>
+              <button type="button" class="om-btn om-btn-ghost om-btn-sm om-map-reset" id="omMapReset" hidden>
+                <i class="bi bi-arrow-clockwise"></i> <span data-i18n="mapReset">Show all pins</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="om-section" id="omTimeline" data-om-collapse>
+        <div class="om-section-head">
+          <button type="button" class="om-section-toggle" id="omTimelineToggle" aria-expanded="false" aria-controls="omTimelinePanel">
+            <span class="om-section-toggle__copy">
+              <span class="om-section-title" data-i18n="timelineHeading">Eras of Oman</span>
+              <span class="om-section-lead" data-i18n="timelineLead">From Bronze Age Magan to the modern sultanate. Select an era to hear it and find it on the map.</span>
+            </span>
+            <i class="bi bi-chevron-down om-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="om-section-panel" id="omTimelinePanel" role="region" aria-labelledby="omTimelineToggle" hidden>
+          <div class="om-timeline-stage">
+            <aside class="om-timeline-selected" id="omTimelineSelected" aria-live="polite">
+              <div class="om-timeline-selected__empty" id="omTimelineSelectedEmpty">
+                <div class="om-timeline-3d" id="omTimeline3d" aria-hidden="true"></div>
+                <p class="om-timeline-selected__prompt" data-i18n="timelineSelectHint">Select an era on the timeline</p>
+              </div>
+              <div class="om-timeline-selected__card" id="omTimelineSelectedCard" hidden>
+                <div class="om-timeline-selected__media" id="omTimelineSelectedMedia"></div>
+                <p class="om-timeline-selected__date" id="omTimelineSelectedDate"></p>
+                <h3 class="om-timeline-selected__title" id="omTimelineSelectedTitle"></h3>
+              </div>
+            </aside>
+            <div class="om-calendar" aria-label="Chronological scale">
+              <div class="om-calendar__head">
+                <span class="om-calendar__head-label">Chronology</span>
+                <span class="om-calendar__head-range" id="omCalendarHeadRange">3500 BCE → today</span>
+              </div>
+              <div class="om-calendar__track">
+                <div class="om-calendar__rail"></div>
+                <div class="om-calendar__fill" id="omCalendarFill"></div>
+                <div class="om-calendar__centuries" id="omCalendarCenturies" aria-hidden="true"></div>
+                <div class="om-calendar__ticks" id="omCalendarTicks"></div>
+                <div class="om-calendar__now" id="omCalendarNow" title="Present"></div>
+              </div>
+              <div class="om-calendar__scale" id="omCalendarScale"></div>
+            </div>
+          </div>
+          <ol class="om-era-list" id="omEraList">
+            <li class="om-loading" data-i18n="loading">Loading the atlas…</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="om-section" id="omFood" data-om-collapse>
+        <div class="om-section-head">
+          <button type="button" class="om-section-toggle" id="omFoodToggle" aria-expanded="false" aria-controls="omFoodPanel">
+            <span class="om-section-toggle__copy">
+              <span class="om-section-title" data-i18n="foodHeading">The Omani table</span>
+              <span class="om-section-lead" data-i18n="foodLead">Shuwa, majboos, halwa, and cardamom kahwa — flip a dish for its origin and meaning.</span>
+            </span>
+            <i class="bi bi-chevron-down om-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="om-section-panel" id="omFoodPanel" role="region" aria-labelledby="omFoodToggle" hidden>
+          <div class="om-grid" id="omFoodGrid"></div>
+        </div>
+      </section>
+
+      <section class="om-section" id="omMusic" data-om-collapse>
+        <div class="om-section-head">
+          <button type="button" class="om-section-toggle" id="omMusicToggle" aria-expanded="false" aria-controls="omMusicPanel">
+            <span class="om-section-toggle__copy">
+              <span class="om-section-title" data-i18n="musicHeading">Sound of Oman</span>
+              <span class="om-section-lead" data-i18n="musicLead">Razha swords, barʿah steps, sea songs of Sur, and the oud. Flip a card for the history.</span>
+            </span>
+            <i class="bi bi-chevron-down om-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="om-section-panel" id="omMusicPanel" role="region" aria-labelledby="omMusicToggle" hidden>
+          <div class="om-grid" id="omMusicGrid"></div>
+        </div>
+      </section>
+
+      <section class="om-section" id="omHookah" data-om-collapse>
+        <div class="om-section-head">
+          <button type="button" class="om-section-toggle" id="omHookahToggle" aria-expanded="false" aria-controls="omHookahPanel">
+            <span class="om-section-toggle__copy">
+              <span class="om-section-title" data-i18n="hookahHeading">Majlis — coffee and slow talk</span>
+              <span class="om-section-lead" data-i18n="hookahLead">Qahwa, dates, frankincense, and evening conversation — the Omani majlis as social furniture.</span>
+            </span>
+            <i class="bi bi-chevron-down om-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="om-section-panel" id="omHookahPanel" role="region" aria-labelledby="omHookahToggle" hidden>
+          <div class="om-grid" id="omHookahGrid"></div>
+        </div>
+      </section>
+
+      <section class="om-section" id="omLiving" data-om-collapse>
+        <div class="om-section-head">
+          <button type="button" class="om-section-toggle" id="omLivingToggle" aria-expanded="false" aria-controls="omLivingPanel">
+            <span class="om-section-toggle__copy">
+              <span class="om-section-title" data-i18n="livingHeading">Living cultures</span>
+              <span class="om-section-lead" data-i18n="livingLead">Khanjar, kumma, falaj water, frankincense harvest, and the khareef mist of Dhofar.</span>
+            </span>
+            <i class="bi bi-chevron-down om-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="om-section-panel" id="omLivingPanel" role="region" aria-labelledby="omLivingToggle" hidden>
+          <div class="om-grid" id="omLivingGrid"></div>
+        </div>
+      </section>
+
+      <section class="om-section" id="omPhrases" data-om-collapse>
+        <div class="om-section-head">
+          <button type="button" class="om-section-toggle" id="omPhrasesToggle" aria-expanded="false" aria-controls="omPhrasesPanel">
+            <span class="om-section-toggle__copy">
+              <span class="om-section-title" data-i18n="phraseHeading">Speak Omani</span>
+              <span class="om-section-lead" data-i18n="phraseLead">Everyday Gulf Arabic heard in Oman. Press any phrase to hear it.</span>
+            </span>
+            <i class="bi bi-chevron-down om-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="om-section-panel" id="omPhrasesPanel" role="region" aria-labelledby="omPhrasesToggle" hidden>
+          <ul class="om-phrase-list" id="omPhraseList"></ul>
+        </div>
+      </section>
+
+      <p class="om-footer-note">
+        Oman — Sultanate of the Sea and Frankincense · Guide narration by Google TTS &amp; HeyGen ·
+        Development by David E Lane · <span id="omFooterYear">2026</span>
+      </p>
+    </div>
+  </main>
+
+  <div class="om-story-overlay" id="omStoryOverlay" hidden aria-hidden="true" aria-live="polite">
+    <div class="om-story-chip">
+      <img id="omStoryChipImg" src="/oman/assets/salim-guide-portrait-256.png" width="56" height="56" alt=""/>
+      <div class="om-story-chip-copy">
+        <p class="om-story-kicker" id="omStoryKicker"></p>
+        <h3 class="om-story-title" id="omStoryTitle"></h3>
+        <p class="om-story-body" id="omStoryCopy"></p>
+        <p class="om-story-progress" id="omStoryProgress"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="om-sheet" id="omSheet" hidden role="dialog" aria-modal="true" aria-labelledby="omSheetTitle">
+    <div class="om-sheet-backdrop" id="omSheetBackdrop"></div>
+    <div class="om-sheet-panel">
+      <header class="om-sheet-header">
+        <h2 id="omSheetTitle"></h2>
+        <button type="button" class="btn-close btn-close-white" id="omSheetClose" aria-label="Close"></button>
+      </header>
+      <div class="om-sheet-body" id="omSheetBody"></div>
+      <footer class="om-sheet-footer">
+        <button type="button" class="om-btn om-btn-sand om-btn-sm om-listen-btn" id="omSheetListen" aria-pressed="false">
+          <i class="bi bi-volume-up-fill" aria-hidden="true"></i>
+          <span class="om-listen-label" data-i18n="listen">Listen</span>
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <script src="/shared/tts.js"></script>
+  <script src="/shared/speech-recognition.js"></script>
+  <script src="/family/js/lane-family-google-maps.js"></script>
+  <script src="/shared/google-advanced-markers.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r160/three.min.js"></script>
+  <script src="/oman/js/oman-i18n.js"></script>
+  <script src="/oman/js/oman-sections.js"></script>
+  <script src="/oman/js/oman-content.js"></script>
+  <script src="/oman/js/oman-desert-atmos.js"></script>
+  <script src="/oman/js/oman-timeline-3d.js"></script>
+  <script src="/oman/js/oman-map.js"></script>
+  <script src="/oman/js/oman-heygen.js"></script>
+  <script src="/oman/js/oman-story-reel.js"></script>
+  <script type="module" src="/oman/js/oman-guide-chat.js"></script>
+</body>
+</html>

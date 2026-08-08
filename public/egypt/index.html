@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Egypt — Nile and Eternal Stone | History, Food &amp; Music</title>
+  <meta name="description" content="A bilingual cultural atlas of Egypt: pyramids, Nile temples, Islamic Cairo, koshari and Umm Kulthum — narrated in English or Arabic by Omar."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/shared/css/levant-atlas-nav.css"/>
+  <link rel="stylesheet" href="/egypt/css/egypt.css"/>
+  <script src="/shared/menu-config.js"></script>
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/js/levant-atlas-nav.js" defer></script>
+  <script src="/shared/demo-users.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <script src="/shared/dark-mode.js" defer></script>
+  <script src="/egypt/js/egypt-splash.js" defer></script>
+</head>
+<body class="eg-page eg-splash-open">
+  <div
+    id="egSplash"
+    class="eg-splash is-ready"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="egSplashTitle"
+    aria-hidden="false"
+  >
+    <button type="button" class="eg-splash__skip" id="egSplashSkip">Skip</button>
+    <div class="eg-splash__veil" aria-hidden="true"></div>
+    <div class="eg-splash__grain" aria-hidden="true"></div>
+    <div class="eg-splash__stage">
+      <div class="eg-splash__flag-wrap" aria-hidden="true">
+        <svg class="eg-splash__flag" viewBox="0 0 1200 600" focusable="false" role="img" aria-label="Flag of Egypt">
+          <defs>
+            <linearGradient id="egFlagSheen" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.22"/>
+              <stop offset="45%" stop-color="#ffffff" stop-opacity="0"/>
+              <stop offset="100%" stop-color="#ffffff" stop-opacity="0.08"/>
+            </linearGradient>
+            <filter id="egFlagSoft" x="-5%" y="-5%" width="110%" height="110%">
+              <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000" flood-opacity="0.45"/>
+            </filter>
+          </defs>
+          <g filter="url(#egFlagSoft)">
+            <rect class="eg-splash__stripe eg-splash__stripe--red" width="1200" height="200" fill="#CE1126"/>
+            <rect class="eg-splash__stripe eg-splash__stripe--white" y="200" width="1200" height="200" fill="#ffffff"/>
+            <rect class="eg-splash__stripe eg-splash__stripe--black" y="400" width="1200" height="200" fill="#000000"/>
+            <g class="eg-splash__eagle" transform="translate(600 300)" fill="#C09300">
+              <ellipse cx="0" cy="-8" rx="28" ry="36"/>
+              <path d="M-42 8 L-18 -4 L-10 20 Z"/>
+              <path d="M42 8 L18 -4 L10 20 Z"/>
+              <path d="M-16 28 L0 18 L16 28 L8 48 L-8 48 Z"/>
+              <rect x="-10" y="-22" width="20" height="10" rx="2" fill="#CE1126"/>
+            </g>
+          </g>
+          <rect width="1200" height="600" fill="url(#egFlagSheen)" pointer-events="none"/>
+        </svg>
+      </div>
+      <p class="eg-splash__kicker" lang="ar">مصر</p>
+      <h1 class="eg-splash__title" id="egSplashTitle">Egypt</h1>
+      <p class="eg-splash__line">Nile · stone · song</p>
+      <div class="eg-splash__rule" aria-hidden="true"></div>
+      <p class="eg-splash__enter" id="egSplashEnterHint">Enter the atlas</p>
+    </div>
+  </div>
+
+  <modern-navbar></modern-navbar>
+
+  <main class="eg-main">
+    <section class="eg-hero" id="egHero">
+      <div class="eg-hero-atmos eg-hero-atmos--storm" id="egHeroAtmos" aria-hidden="true">
+        <div class="eg-hero-sky"></div>
+        <div class="eg-hero-horizon-glow"></div>
+        <canvas class="eg-hero-sparkle" id="egSkySparkle" width="1200" height="600"></canvas>
+        <div class="eg-hero-heat"></div>
+        <svg class="eg-hero-silhouettes" viewBox="0 0 1200 100" preserveAspectRatio="xMidYMax meet" focusable="false">
+          <g class="eg-hero-city eg-hero-city--far" fill="currentColor">
+            <rect x="20" y="58" width="22" height="42"/>
+            <rect x="46" y="48" width="16" height="52"/>
+            <rect x="68" y="62" width="28" height="38"/>
+            <rect x="102" y="52" width="14" height="48"/>
+            <rect x="122" y="58" width="30" height="42"/>
+            <rect x="200" y="55" width="24" height="45"/>
+            <rect x="230" y="45" width="14" height="55"/>
+            <rect x="250" y="60" width="26" height="40"/>
+            <rect x="360" y="50" width="20" height="50"/>
+            <rect x="386" y="42" width="12" height="58"/>
+            <rect x="404" y="56" width="28" height="44"/>
+            <rect x="520" y="54" width="22" height="46"/>
+            <rect x="548" y="44" width="14" height="56"/>
+            <rect x="568" y="58" width="24" height="42"/>
+            <rect x="700" y="52" width="18" height="48"/>
+            <rect x="724" y="46" width="12" height="54"/>
+            <rect x="742" y="58" width="26" height="42"/>
+            <rect x="920" y="50" width="20" height="50"/>
+            <rect x="946" y="56" width="28" height="44"/>
+            <rect x="1100" y="48" width="16" height="52"/>
+            <rect x="1122" y="58" width="24" height="42"/>
+            <rect x="1152" y="44" width="14" height="56"/>
+          </g>
+          <path class="eg-hero-arch" d="M140 100 V55 Q140 28 168 28 Q196 28 196 55 V100 Z"/>
+          <path class="eg-hero-arch eg-hero-arch--mid" d="M280 100 V62 Q280 42 302 42 Q324 42 324 62 V100 Z"/>
+          <path class="eg-hero-arch eg-hero-arch--far" d="M780 100 V50 Q780 26 812 26 Q844 26 844 50 V100 Z"/>
+          <path class="eg-hero-arch eg-hero-arch--far" d="M860 100 V64 Q860 48 882 48 Q904 48 904 64 V100 Z"/>
+          <path class="eg-hero-dune" d="M0 78 C140 68 260 74 400 66 C540 58 680 72 820 64 C960 56 1100 70 1200 62 L1200 100 L0 100 Z"/>
+        </svg>
+        <div class="eg-hero-sand"></div>
+        <canvas class="eg-hero-storm" id="egSandstorm" width="1200" height="400"></canvas>
+        <div class="eg-hero-motes" id="egHeroMotes"></div>
+      </div>
+      <div class="container">
+        <div class="eg-hero-layout">
+          <div class="eg-hero-inner" id="egHeroInner">
+            <p class="eg-kicker" data-i18n="heroKicker">Nile and Eternal Stone</p>
+            <h1 class="eg-hero-title" data-i18n="heroTitle">Egypt</h1>
+            <p class="eg-hero-line" data-i18n="heroLine">A river civilization of pyramids, temples, and living cities — koshari steam, Umm Kulthum song, and café talk from Cairo to Aswan.</p>
+
+            <div class="eg-hero-cta">
+              <a class="eg-btn eg-btn-primary" href="#egMap">
+                <i class="bi bi-geo-alt-fill"></i> <span data-i18n="exploreMap">Explore the atlas</span>
+              </a>
+              <button type="button" class="eg-btn eg-btn-lang" id="egLangToggle" aria-label="Switch language">
+                <i class="bi bi-translate"></i> <span id="egLangToggleLabel">عربي</span>
+              </button>
+            </div>
+
+            <dl class="eg-facts" id="egFacts">
+              <div><dt>Pyramids</dt><dd data-i18n-fact="pyramids">Old Kingdom pyramids crown the desert edge</dd></div>
+              <div><dt>Nile</dt><dd data-i18n-fact="nile">The Nile organizes farms, cities, and song</dd></div>
+              <div><dt>Al-Azhar</dt><dd data-i18n-fact="azhar">Al-Azhar still teaches in Historic Cairo</dd></div>
+              <div><dt>Today</dt><dd data-i18n-fact="contemporary">The republic shapes modern Egyptian life</dd></div>
+            </dl>
+          </div>
+
+          <aside class="eg-guide" id="egGuide" aria-label="Egypt guide Omar">
+            <div class="eg-guide-card">
+              <img class="eg-guide-portrait" id="egGuidePortrait" src="/egypt/assets/omar-guide-portrait-256.png" width="72" height="72" alt="Omar — Egypt history guide"/>
+              <div class="eg-guide-meta">
+                <h2 id="egGuideName">Omar</h2>
+                <p id="egGuideTitle">Egypt history guide</p>
+                <p class="eg-guide-status" id="egGuideStatus">Ahlan wa sahlan.</p>
+              </div>
+            </div>
+
+            <label class="eg-narrate eg-narrate--global" for="egNarrate">
+              <input type="checkbox" id="egNarrate" data-eg-narrate checked/>
+              <span class="eg-narrate__copy">
+                <span class="eg-narrate__title" data-i18n="narration">Narration</span>
+                <span class="eg-narrate__scope" data-i18n="narrationScope">Entire page — atlas, tour, and cards</span>
+              </span>
+            </label>
+
+            <div class="eg-guide-actions">
+              <button type="button" class="eg-btn eg-btn-primary eg-btn-sm" id="egStoryPlay" aria-pressed="false">
+                <i class="bi bi-film"></i> <span data-i18n="startTour">Start tour</span>
+              </button>
+              <button type="button" class="eg-btn eg-btn-sand eg-btn-sm" id="egMeetGuide">
+                <i class="bi bi-person-video3"></i> <span data-i18n="meetGuide">Meet Omar</span>
+              </button>
+              <button type="button" class="eg-btn eg-btn-sand eg-btn-sm" id="egAskGuide">
+                <i class="bi bi-chat-dots-fill"></i> <span data-i18n="askGuide">Ask Omar</span>
+              </button>
+              <button type="button" class="eg-btn eg-btn-ghost eg-btn-sm" id="egStopAudio">
+                <i class="bi bi-stop-fill"></i> <span data-i18n="stop">Stop</span>
+              </button>
+            </div>
+
+            <div class="eg-story-panel" id="egStoryPanel">
+              <div class="eg-story-status" id="egStoryStatus" hidden aria-live="polite">
+                <span id="egStoryStatusText"></span>
+                <div class="eg-story-dots" id="egStoryDots" aria-hidden="true"></div>
+              </div>
+              <p class="eg-story-error" id="egStoryError" hidden></p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <div class="container eg-sections">
+      <section class="eg-section is-open" id="egMap" data-eg-collapse data-eg-default-open="1">
+        <div class="eg-section-head">
+          <button type="button" class="eg-section-toggle" id="egMapToggle" aria-expanded="true" aria-controls="egMapPanel">
+            <span class="eg-section-toggle__copy">
+              <span class="eg-section-title" data-i18n="mapHeading">Atlas of Egypt</span>
+              <span class="eg-section-lead" data-i18n="mapLead">Nile bends, desert edge, and Red Sea coast. Select a pin or a name to hear its story.</span>
+            </span>
+            <i class="bi bi-chevron-down eg-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="eg-section-panel" id="egMapPanel" role="region" aria-labelledby="egMapToggle">
+          <div class="eg-map-toolbar">
+            <div class="eg-map-filters" id="egMapFilters" role="group" aria-label="Filter map pins">
+              <button type="button" class="eg-chip is-active" data-filter="all" data-i18n="mapAll">All</button>
+              <button type="button" class="eg-chip" data-filter="history" data-i18n="mapHistory">History</button>
+              <button type="button" class="eg-chip" data-filter="food" data-i18n="mapFood">Food</button>
+              <button type="button" class="eg-chip" data-filter="music" data-i18n="mapMusic">Music</button>
+              <button type="button" class="eg-chip" data-filter="living" data-i18n="mapLiving">Living</button>
+            </div>
+            <label class="eg-narrate eg-narrate--section" for="egNarrateMap">
+              <input type="checkbox" id="egNarrateMap" data-eg-narrate checked/>
+              <span data-i18n="narration">Narration</span>
+            </label>
+          </div>
+          <div class="eg-map-layout">
+            <ul class="eg-site-list" id="egSiteList"></ul>
+            <div class="eg-map-wrap">
+              <div id="egMapCanvas" class="eg-map-canvas" role="img" aria-label="Map of historic sites across Egypt"></div>
+              <p class="eg-map-status" id="egMapStatus" data-i18n="mapLoading">Loading the atlas…</p>
+              <button type="button" class="eg-btn eg-btn-ghost eg-btn-sm eg-map-reset" id="egMapReset" hidden>
+                <i class="bi bi-arrow-clockwise"></i> <span data-i18n="mapReset">Show all pins</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="eg-section" id="egTimeline" data-eg-collapse>
+        <div class="eg-section-head">
+          <button type="button" class="eg-section-toggle" id="egTimelineToggle" aria-expanded="false" aria-controls="egTimelinePanel">
+            <span class="eg-section-toggle__copy">
+              <span class="eg-section-title" data-i18n="timelineHeading">Eras of Egypt</span>
+              <span class="eg-section-lead" data-i18n="timelineLead">From Predynastic beginnings to the contemporary republic. Select an era to hear it and find it on the map.</span>
+            </span>
+            <i class="bi bi-chevron-down eg-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="eg-section-panel" id="egTimelinePanel" role="region" aria-labelledby="egTimelineToggle" hidden>
+          <div class="eg-timeline-stage">
+            <aside class="eg-timeline-selected" id="egTimelineSelected" aria-live="polite">
+              <div class="eg-timeline-selected__empty" id="egTimelineSelectedEmpty">
+                <div class="eg-timeline-3d" id="egTimeline3d" aria-hidden="true"></div>
+                <p class="eg-timeline-selected__prompt" data-i18n="timelineSelectHint">Select an era on the timeline</p>
+              </div>
+              <div class="eg-timeline-selected__card" id="egTimelineSelectedCard" hidden>
+                <div class="eg-timeline-selected__media" id="egTimelineSelectedMedia"></div>
+                <p class="eg-timeline-selected__date" id="egTimelineSelectedDate"></p>
+                <h3 class="eg-timeline-selected__title" id="egTimelineSelectedTitle"></h3>
+              </div>
+            </aside>
+            <div class="eg-calendar" aria-label="Chronological scale">
+              <div class="eg-calendar__head">
+                <span class="eg-calendar__head-label">Chronology</span>
+                <span class="eg-calendar__head-range" id="egCalendarHeadRange">3200 BCE → today</span>
+              </div>
+              <div class="eg-calendar__track">
+                <div class="eg-calendar__rail"></div>
+                <div class="eg-calendar__fill" id="egCalendarFill"></div>
+                <div class="eg-calendar__centuries" id="egCalendarCenturies" aria-hidden="true"></div>
+                <div class="eg-calendar__ticks" id="egCalendarTicks"></div>
+                <div class="eg-calendar__now" id="egCalendarNow" title="Present"></div>
+              </div>
+              <div class="eg-calendar__scale" id="egCalendarScale"></div>
+            </div>
+          </div>
+          <ol class="eg-era-list" id="egEraList">
+            <li class="eg-loading" data-i18n="loading">Loading the atlas…</li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="eg-section" id="egFood" data-eg-collapse>
+        <div class="eg-section-head">
+          <button type="button" class="eg-section-toggle" id="egFoodToggle" aria-expanded="false" aria-controls="egFoodPanel">
+            <span class="eg-section-toggle__copy">
+              <span class="eg-section-title" data-i18n="foodHeading">The Egyptian table</span>
+              <span class="eg-section-lead" data-i18n="foodLead">Koshari, ful, taameya, and konafa — flip a dish for its origin and meaning.</span>
+            </span>
+            <i class="bi bi-chevron-down eg-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="eg-section-panel" id="egFoodPanel" role="region" aria-labelledby="egFoodToggle" hidden>
+          <div class="eg-grid" id="egFoodGrid"></div>
+        </div>
+      </section>
+
+      <section class="eg-section" id="egMusic" data-eg-collapse>
+        <div class="eg-section-head">
+          <button type="button" class="eg-section-toggle" id="egMusicToggle" aria-expanded="false" aria-controls="egMusicPanel">
+            <span class="eg-section-toggle__copy">
+              <span class="eg-section-title" data-i18n="musicHeading">Sound of Egypt</span>
+              <span class="eg-section-lead" data-i18n="musicLead">Umm Kulthum, tarab, Saʿidi folk, and Cairo nights. Flip a card for the history.</span>
+            </span>
+            <i class="bi bi-chevron-down eg-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="eg-section-panel" id="egMusicPanel" role="region" aria-labelledby="egMusicToggle" hidden>
+          <div class="eg-grid" id="egMusicGrid"></div>
+        </div>
+      </section>
+
+      <section class="eg-section" id="egHookah" data-eg-collapse>
+        <div class="eg-section-head">
+          <button type="button" class="eg-section-toggle" id="egHookahToggle" aria-expanded="false" aria-controls="egHookahPanel">
+            <span class="eg-section-toggle__copy">
+              <span class="eg-section-title" data-i18n="hookahHeading">Café — tea, coffee, and slow talk</span>
+              <span class="eg-section-lead" data-i18n="hookahLead">Ahwa tables, shisha coals, and evening conversation — Cairo and Alexandria as social furniture.</span>
+            </span>
+            <i class="bi bi-chevron-down eg-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="eg-section-panel" id="egHookahPanel" role="region" aria-labelledby="egHookahToggle" hidden>
+          <div class="eg-grid" id="egHookahGrid"></div>
+        </div>
+      </section>
+
+      <section
+        class="eg-section eg-section--secret"
+        id="egRaqs"
+        data-eg-collapse
+        data-eg-secret="raqs"
+        hidden
+        aria-hidden="true"
+      >
+        <div class="eg-section-head">
+          <button type="button" class="eg-section-toggle" id="egRaqsToggle" aria-expanded="false" aria-controls="egRaqsPanel">
+            <span class="eg-section-toggle__copy">
+              <span class="eg-section-title" data-i18n="raqsHeading">Raqs · Baladi</span>
+              <span class="eg-section-lead" data-i18n="raqsLead">A quiet room for Egyptian dance — baladi, sharqi, and wedding lines. Flip a card for the history.</span>
+            </span>
+            <i class="bi bi-chevron-down eg-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="eg-section-panel" id="egRaqsPanel" role="region" aria-labelledby="egRaqsToggle" hidden>
+          <div class="eg-grid" id="egRaqsGrid"></div>
+        </div>
+      </section>
+
+      <section class="eg-section" id="egLiving" data-eg-collapse>
+        <div class="eg-section-head">
+          <button type="button" class="eg-section-toggle" id="egLivingToggle" aria-expanded="false" aria-controls="egLivingPanel">
+            <span class="eg-section-toggle__copy">
+              <span class="eg-section-title" data-i18n="livingHeading">Living cultures</span>
+              <span class="eg-section-lead" data-i18n="livingLead">Nile memory, calligraphy, souqs, feluccas, Coptic communities, and Sinai hospitality.</span>
+            </span>
+            <i class="bi bi-chevron-down eg-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="eg-section-panel" id="egLivingPanel" role="region" aria-labelledby="egLivingToggle" hidden>
+          <div class="eg-grid" id="egLivingGrid"></div>
+        </div>
+      </section>
+
+      <section class="eg-section" id="egPhrases" data-eg-collapse>
+        <div class="eg-section-head">
+          <button type="button" class="eg-section-toggle" id="egPhrasesToggle" aria-expanded="false" aria-controls="egPhrasesPanel">
+            <span class="eg-section-toggle__copy">
+              <span class="eg-section-title" data-i18n="phraseHeading">Speak Egyptian</span>
+              <span class="eg-section-lead" data-i18n="phraseLead">Everyday Egyptian Arabic greetings heard across Egypt. Press any phrase to hear it.</span>
+            </span>
+            <i class="bi bi-chevron-down eg-section-chevron" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="eg-section-panel" id="egPhrasesPanel" role="region" aria-labelledby="egPhrasesToggle" hidden>
+          <ul class="eg-phrase-list" id="egPhraseList"></ul>
+        </div>
+      </section>
+
+      <p class="eg-footer-note">
+        Egypt — Nile and Eternal Stone · Guide narration by Google TTS &amp; HeyGen ·
+        Development by David E Lane · <span id="egFooterYear">2026</span>
+      </p>
+    </div>
+  </main>
+
+  <div class="eg-raqs-toast" id="egRaqsToast" hidden role="status" aria-live="polite"></div>
+
+  <div class="eg-story-overlay" id="egStoryOverlay" hidden aria-hidden="true" aria-live="polite">
+    <div class="eg-story-chip">
+      <img id="egStoryChipImg" src="/egypt/assets/omar-guide-portrait-256.png" width="56" height="56" alt=""/>
+      <div class="eg-story-chip-copy">
+        <p class="eg-story-kicker" id="egStoryKicker"></p>
+        <h3 class="eg-story-title" id="egStoryTitle"></h3>
+        <p class="eg-story-body" id="egStoryCopy"></p>
+        <p class="eg-story-progress" id="egStoryProgress"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="eg-sheet" id="egSheet" hidden role="dialog" aria-modal="true" aria-labelledby="egSheetTitle">
+    <div class="eg-sheet-backdrop" id="egSheetBackdrop"></div>
+    <div class="eg-sheet-panel">
+      <header class="eg-sheet-header">
+        <h2 id="egSheetTitle"></h2>
+        <button type="button" class="btn-close btn-close-white" id="egSheetClose" aria-label="Close"></button>
+      </header>
+      <div class="eg-sheet-body" id="egSheetBody"></div>
+      <footer class="eg-sheet-footer">
+        <button type="button" class="eg-btn eg-btn-sand eg-btn-sm eg-listen-btn" id="egSheetListen" aria-pressed="false">
+          <i class="bi bi-volume-up-fill" aria-hidden="true"></i>
+          <span class="eg-listen-label" data-i18n="listen">Listen</span>
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <script src="/shared/tts.js"></script>
+  <script src="/shared/speech-recognition.js"></script>
+  <script src="/family/js/lane-family-google-maps.js"></script>
+  <script src="/shared/google-advanced-markers.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r160/three.min.js"></script>
+  <script src="/egypt/js/egypt-i18n.js"></script>
+  <script src="/egypt/js/egypt-sections.js"></script>
+  <script src="/egypt/js/egypt-raqs-unlock.js"></script>
+  <script src="/egypt/js/egypt-content.js"></script>
+  <script src="/egypt/js/egypt-desert-atmos.js"></script>
+  <script src="/egypt/js/egypt-timeline-3d.js"></script>
+  <script src="/egypt/js/egypt-map.js"></script>
+  <script src="/egypt/js/egypt-heygen.js"></script>
+  <script src="/egypt/js/egypt-story-reel.js"></script>
+  <script type="module" src="/egypt/js/egypt-guide-chat.js"></script>
+</body>
+</html>

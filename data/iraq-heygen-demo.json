@@ -1,0 +1,62 @@
+{
+  "id": "iraq-zayd-intro",
+  "title": {
+    "en": "Iraq — Meet Zayd",
+    "ar": "عُمان — تعرّف على زيد"
+  },
+  "ctaLabel": {
+    "en": "Start the tour",
+    "ar": "ابدأ الجولة"
+  },
+  "ctaHref": "/iraq/?reel=1",
+  "qrLandingPath": "/iraq/?demo=heygen",
+  "brand": {
+    "attribution": {
+      "en": "Avatar narration powered by HeyGen",
+      "ar": "سرد الأفاتار بتقنية HeyGen"
+    },
+    "developmentBy": "David E Lane"
+  },
+  "heygenScriptShort": {
+    "en": "Ahlan wa sahlan — I'm Zayd. This atlas walks Iraq: Baghdad and Babylon, masgouf and maqam, marshes and rivers. Press play on the HyperFrame tour, or ask me anything on the page.",
+    "ar": "أهلاً وسهلاً — أنا زيد. هذا الأطلس يمشي العراق: بغداد وبابل، المسگوف والمقام، الأهوار والأنهار. شغّل جولة HyperFrame، أو اسألني عن أي شيء في الصفحة."
+  },
+  "heygenVoiceLanguage": {
+    "en": "English",
+    "ar": "Arabic"
+  },
+  "heygenMotionPrompt": "calm nod, warm local guide speaking to camera",
+  "heygenExpressiveness": "low",
+  "heygenAvatarId": null,
+  "heygenAvatarGroupId": null,
+  "heygenVoiceId": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVoiceName": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVideoIdShort": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVideoUrlShort": {
+    "en": null,
+    "ar": null
+  },
+  "heygenVideoLocalShort": {
+    "en": null,
+    "ar": null
+  },
+  "generatedAt": {
+    "en": null,
+    "ar": null
+  },
+  "avatar": {
+    "name": "Zayd",
+    "file": null,
+    "portrait": "/iraq/assets/zayd-guide-portrait-256.png",
+    "source": "/iraq/assets/zayd-guide-portrait.png"
+  }
+}

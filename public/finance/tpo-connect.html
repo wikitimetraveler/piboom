@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TPO Connect — DevConnect Labs</title>
+    <meta
+      name="description"
+      content="Encompass TPO Connect knowledge hub — iframe guest apps, SSF objects, LoanContractTPO fields, token exchange, and DevConnect Labs touchpoints."
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="/shared/design-tokens.css" />
+    <link rel="stylesheet" href="/shared/styles.css" />
+    <link rel="stylesheet" href="/shared/encompass-dark-mode.css" />
+    <script src="/shared/modern-navbar.js"></script>
+    <style>
+      :root {
+        --tpo-ink: color-mix(in srgb, var(--zen-dark) 88%, #1a2f4a);
+        --tpo-sand: color-mix(in srgb, #eef3f7 70%, var(--zen-surface));
+        --tpo-teal: color-mix(in srgb, var(--zen-primary) 45%, #1f5f8b);
+        --tpo-accent: #c45c26;
+      }
+
+      body {
+        min-height: 100vh;
+        color: var(--tpo-ink);
+        background:
+          radial-gradient(ellipse 70% 45% at 8% 0%, rgba(31, 95, 139, 0.14), transparent 55%),
+          radial-gradient(ellipse 50% 35% at 92% 8%, rgba(196, 92, 38, 0.1), transparent 50%),
+          linear-gradient(165deg, var(--tpo-sand) 0%, #fff 48%, color-mix(in srgb, var(--zen-surface) 80%, #dce6ec) 100%);
+        font-family: "Segoe UI", "Source Sans 3", system-ui, sans-serif;
+      }
+
+      .tpo-hero {
+        padding: 2.25rem 0 1.25rem;
+      }
+
+      .tpo-hero h1 {
+        font-family: Georgia, "Iowan Old Style", serif;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        font-size: clamp(1.8rem, 3vw, 2.45rem);
+        margin-bottom: 0.35rem;
+      }
+
+      .tpo-hero .lead {
+        max-width: 44rem;
+        color: color-mix(in srgb, var(--tpo-ink) 72%, transparent);
+        font-size: 1.05rem;
+      }
+
+      .tpo-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--tpo-teal);
+        margin-bottom: 0.5rem;
+      }
+
+      .tpo-toc {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+        margin: 1.1rem 0 0.25rem;
+      }
+
+      .tpo-toc a {
+        text-decoration: none;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--tpo-ink);
+        background: color-mix(in srgb, #fff 88%, var(--tpo-teal));
+        border: 1px solid color-mix(in srgb, var(--tpo-teal) 28%, #fff);
+        border-radius: 999px;
+        padding: 0.35rem 0.75rem;
+      }
+
+      .tpo-toc a:hover {
+        background: color-mix(in srgb, var(--tpo-teal) 14%, #fff);
+        color: var(--tpo-teal);
+      }
+
+      .tpo-card {
+        background: color-mix(in srgb, #fff 94%, var(--zen-surface));
+        border: 1px solid color-mix(in srgb, var(--zen-border) 70%, #c9d5d8);
+        border-radius: 18px;
+        box-shadow: 0 10px 28px rgba(26, 58, 74, 0.07);
+        padding: 1.25rem 1.35rem;
+        margin-bottom: 1.1rem;
+      }
+
+      .tpo-card h2 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 0.65rem;
+      }
+
+      .tpo-card h3 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--tpo-teal);
+        margin-top: 1rem;
+        margin-bottom: 0.45rem;
+      }
+
+      .tpo-muted {
+        color: color-mix(in srgb, var(--tpo-ink) 62%, transparent);
+        font-size: 0.9rem;
+      }
+
+      .tpo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 0.75rem;
+      }
+
+      .tpo-stat {
+        border-radius: 14px;
+        border: 1px solid color-mix(in srgb, var(--tpo-teal) 22%, #fff);
+        background: color-mix(in srgb, var(--tpo-teal) 7%, #fff);
+        padding: 0.85rem 1rem;
+      }
+
+      .tpo-stat strong {
+        display: block;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--tpo-teal);
+        margin-bottom: 0.25rem;
+      }
+
+      .tpo-code {
+        position: relative;
+        background: #0f1c28;
+        color: #e8f0f5;
+        border-radius: 12px;
+        padding: 0.9rem 1rem;
+        font-size: 0.82rem;
+        overflow-x: auto;
+        margin: 0.6rem 0 0.2rem;
+      }
+
+      .tpo-code + .btn,
+      .tpo-code-wrap .btn {
+        margin-top: 0.4rem;
+      }
+
+      .tpo-pill {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 0.2rem 0.55rem;
+        background: color-mix(in srgb, var(--tpo-accent) 14%, #fff);
+        color: color-mix(in srgb, var(--tpo-accent) 80%, #2a1408);
+        margin-right: 0.35rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .tpo-method {
+        display: inline-block;
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        border-radius: 6px;
+        padding: 0.15rem 0.4rem;
+        min-width: 3.2rem;
+        text-align: center;
+        background: #e8eef2;
+        color: #1a2f4a;
+      }
+
+      .tpo-method--get { background: #d9f0e4; color: #145c3a; }
+      .tpo-method--post { background: #dde8fb; color: #1a3f8a; }
+      .tpo-method--patch { background: #f5e8cf; color: #7a4a10; }
+      .tpo-method--put { background: #e7ddf5; color: #4a2878; }
+      .tpo-method--delete { background: #f6dede; color: #8a2424; }
+
+      .tpo-table-wrap {
+        max-height: 28rem;
+        overflow: auto;
+        border: 1px solid var(--zen-border);
+        border-radius: 12px;
+      }
+
+      .tpo-table-wrap table {
+        margin: 0;
+        font-size: 0.86rem;
+      }
+
+      .tpo-table-wrap thead th {
+        position: sticky;
+        top: 0;
+        background: #f4f7f9;
+        z-index: 1;
+      }
+
+      #tpoFieldIdsList {
+        columns: 1;
+        margin: 0;
+        padding-left: 1.1rem;
+      }
+
+      @media (min-width: 768px) {
+        #tpoFieldIdsList {
+          columns: 2;
+        }
+      }
+
+      #tpoFieldIdsList li {
+        margin-bottom: 0.4rem;
+        break-inside: avoid;
+      }
+
+      .tpo-link-list a {
+        display: block;
+        text-decoration: none;
+        color: var(--tpo-ink);
+        padding: 0.35rem 0;
+        border-bottom: 1px solid color-mix(in srgb, var(--zen-border) 70%, transparent);
+        font-size: 0.92rem;
+      }
+
+      .tpo-link-list a:hover {
+        color: var(--tpo-teal);
+      }
+
+      .tpo-footer-note {
+        font-size: 0.82rem;
+        color: color-mix(in srgb, var(--tpo-ink) 58%, transparent);
+        margin: 0.5rem 0 2.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <modern-navbar></modern-navbar>
+
+    <main class="container pb-4">
+      <section class="tpo-hero">
+        <div class="tpo-kicker"><i class="bi bi-people" aria-hidden="true"></i> Encompass · Partner workflows</div>
+        <h1>TPO Connect</h1>
+        <p class="lead">
+          Third-Party Originator Connect — ICE’s web portal for brokers and correspondents.
+          This page gathers integration patterns, guest-app APIs, loan model fields, and how
+          DevConnect Labs already touches TPO data.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <a class="btn btn-sm btn-outline-secondary" href="/finance/encompass-assistant.html">
+            <i class="bi bi-robot"></i> Ask Assistant
+          </a>
+          <a
+            class="btn btn-sm btn-outline-secondary"
+            href="https://developer.icemortgagetechnology.com/developer-connect/docs/encompass-tpo-connect"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <i class="bi bi-book"></i> ICE TPO guide
+          </a>
+          <a class="btn btn-sm btn-outline-secondary" href="/finance/condition-manager.html">
+            <i class="bi bi-clipboard-check"></i> Condition Manager
+          </a>
+        </div>
+        <nav class="tpo-toc" aria-label="On this page">
+          <a href="#overview">Overview</a>
+          <a href="#guest-app">Guest app</a>
+          <a href="#objects">SSF objects</a>
+          <a href="#redirects">Page redirects</a>
+          <a href="#token">Token exchange</a>
+          <a href="#loan-model">LoanContractTPO</a>
+          <a href="#fields">Field IDs</a>
+          <a href="#postman">Postman / APIs</a>
+          <a href="#labs">Labs touchpoints</a>
+          <a href="#links">Links</a>
+        </nav>
+      </section>
+
+      <section class="tpo-card" id="overview">
+        <h2>What it is</h2>
+        <p>
+          <strong>TPO Connect</strong> (Third-Party Originator Connect) is ICE Mortgage Technology’s
+          correspondent / wholesale portal. Brokers and correspondents submit and manage loans;
+          lenders host customized web apps inside TPO Connect via a sandboxed iframe.
+        </p>
+        <div class="tpo-grid mt-3">
+          <div class="tpo-stat">
+            <strong>Product family</strong>
+            Alongside LO Connect and Developer Connect — see glossary.
+          </div>
+          <div class="tpo-stat">
+            <strong>Integration model</strong>
+            Parent (TPO) ↔ child (your HTTPS guest app) via ICE Secure Scripting Framework (SSF).
+          </div>
+          <div class="tpo-stat">
+            <strong>Loan API shape</strong>
+            <code>loan.tpo</code> → <code>LoanContractTPO</code> (company, branch, LO, LP, fees, dates).
+          </div>
+          <div class="tpo-stat">
+            <strong>Conditions recipient</strong>
+            External recipient label in Labs: <code>Borrower / TPO</code>.
+          </div>
+        </div>
+      </section>
+
+      <section class="tpo-card" id="guest-app">
+        <h2>Client application (iframe guest)</h2>
+        <p class="tpo-muted">
+          From ICE’s
+          <em>Encompass TPO Connect Client Application Integration Guide</em>.
+          Your app loads inside the TPO web application and receives user / loan context from the parent.
+        </p>
+        <h3>Prerequisites</h3>
+        <ul>
+          <li>Serve the client application over <strong>HTTPS</strong>.</li>
+          <li>Relax <strong>SAMEORIGIN</strong> so the guest can load in an iframe.</li>
+        </ul>
+        <h3>Guest library</h3>
+        <p>
+          Default: <code>elli.ssf.guest-with-polyfill.js</code> (includes IE-friendly polyfills).
+          Use <code>elli.ssf.guest.js</code> only if you already ship your own polyfill
+          <em>before</em> the guest script.
+        </p>
+        <div class="tpo-code-wrap">
+          <pre class="tpo-code" id="tpoGuestHtml"><code>&lt;script src="https://cdn.elliemae.io/elliemae/core/ssf/1.0/elli.ssf.guest-with-polyfill.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  window.addEventListener("load", function () {
+    elli.script.guest.create();
+  });
+&lt;/script&gt;</code></pre>
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-copy-target="#tpoGuestHtml">
+            <i class="bi bi-clipboard" aria-hidden="true"></i> Copy
+          </button>
+        </div>
+        <p class="tpo-muted mt-2 mb-0">
+          <code>elli.script.guest.create()</code> registers the guest, opens parent↔child messaging,
+          and exposes the TPO context object to your page.
+        </p>
+      </section>
+
+      <section class="tpo-card" id="objects">
+        <h2>Published SSF objects</h2>
+        <p class="tpo-muted">
+          Access with <code>await elli.script.getObject('…')</code>. Documented for TPO child apps:
+        </p>
+        <span class="tpo-pill">tpoApplication</span>
+        <span class="tpo-pill">auth</span>
+        <span class="tpo-pill">loan</span>
+
+        <h3>tpoApplication</h3>
+        <ul>
+          <li><code>getUserData()</code> — FullName, email, contactID, externalOrgID, roles, personas</li>
+          <li><code>getUserProfileData()</code> — full user profile</li>
+          <li><code>getExternalOrgDetails()</code> — siteId, company/branch org IDs &amp; names</li>
+          <li><code>pageRedirect(pageName, { id: loanGuid })</code> — navigate TPO standard pages</li>
+        </ul>
+
+        <h3>auth</h3>
+        <ul>
+          <li><code>getAccessToken()</code> — <code>{ access_token, host_name, token_type }</code></li>
+          <li><code>getUser()</code> — id, realm, firstName, lastName</li>
+        </ul>
+
+        <h3>loan</h3>
+        <ul>
+          <li><code>all()</code> — complete loan data object</li>
+          <li><code>isReadOnly()</code> — boolean</li>
+          <li><code>calculate()</code> — calculated loan snapshot</li>
+          <li>
+            <code>merge()</code> — refresh workspace loan from Encompass before returning to TPO
+            <span class="tpo-muted">(ICE marks this as important)</span>
+          </li>
+        </ul>
+
+        <div class="tpo-code-wrap">
+          <pre class="tpo-code" id="tpoAuthSample"><code>async function printAccessToken() {
+  const auth = await elli.script.getObject('auth');
+  const http = await elli.script.getObject('http');
+  const respAccessToken = await auth.getAccessToken();
+  const authToken = respAccessToken.token_type + ' ' + respAccessToken.access_token;
+  const api = respAccessToken.host_name + '/encompass/v3/system/info';
+  const resp = await http.get(api, {
+    'Content-Type': 'application/json',
+    Authorization: authToken,
+  });
+  console.log('Encompass Version : ', resp);
+}</code></pre>
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-copy-target="#tpoAuthSample">
+            <i class="bi bi-clipboard" aria-hidden="true"></i> Copy
+          </button>
+        </div>
+      </section>
+
+      <section class="tpo-card" id="redirects">
+        <h2>Standard pageRedirect destinations</h2>
+        <p class="tpo-muted">Case-sensitive page names (ICE docs). Custom widgets are not supported.</p>
+        <div class="tpo-grid">
+          <div>
+            <h3 class="mt-0">Loan &amp; workflow</h3>
+            <ul class="small mb-0">
+              <li>Loan Summary</li>
+              <li>Product Pricing &amp; Lock</li>
+              <li>Loan Estimate Fee Management</li>
+              <li>Documents / Conditions / Enhanced Conditions</li>
+              <li>Service Orders · esign · Purchase Advice · Fees</li>
+              <li>Disclosure Tracking · Disclosures · Generate Disclosures</li>
+              <li>Import Additional Data · DUAL AUS</li>
+              <li>Order Credit · Order DU · Order LPA</li>
+              <li>Submit Loan · Re-Submit Loan · Withdraw Loan</li>
+              <li>Change of circumstance</li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="mt-0">URLA 2020 sections</h3>
+            <p class="small tpo-muted">
+              <code>pageRedirect('urla', { id, section })</code> — if the section is hidden in TPO Admin, navigation stays put.
+            </p>
+            <ul class="small mb-0">
+              <li>Additional Information</li>
+              <li>Lender Loan Information</li>
+              <li>Borrower Information</li>
+              <li>Loan and Property Information</li>
+              <li>Assets and Liabilities</li>
+              <li>Real Estate</li>
+              <li>Employment and Income</li>
+              <li>Information for Government Monitoring</li>
+              <li>URLA Continuation</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="tpo-card" id="token">
+        <h2>Token exchange (custom tools / plugins)</h2>
+        <p>
+          Inside LO Connect <em>or</em> TPO Connect, a guest can create an auth code and exchange it
+          for a Developer Connect access token (see ICE sample
+          <code>imt-exp20-token-exchange</code>).
+        </p>
+        <div class="tpo-code-wrap">
+          <pre class="tpo-code" id="tpoTokenSample"><code>const http = await elli.script.getObject('http');
+const auth = await elli.script.getObject('auth');
+const authCode = await auth.createAuthCode();
+const tokenResp = await http.post(
+  'http://localhost:8081/api/token',
+  { 'Content-Type': 'application/json' },
+  { authCode }
+);
+const accessToken = tokenResp.body.access_token;</code></pre>
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-copy-target="#tpoTokenSample">
+            <i class="bi bi-clipboard" aria-hidden="true"></i> Copy
+          </button>
+        </div>
+        <p class="tpo-muted mb-0 mt-2">
+          Sample service listens on port <strong>8081</strong>; configure <code>oauth.js</code> with
+          host, clientId, and secret for the target Encompass environment.
+        </p>
+      </section>
+
+      <section class="tpo-card" id="loan-model">
+        <h2>LoanContractTPO (API model)</h2>
+        <p class="tpo-muted">
+          From ICE .NET bindings <code>Elli.Api.Loans.Model.LoanContractTPO</code> — nested under
+          loan as <code>TPO</code>. Filter locally; no network call.
+        </p>
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+          <label class="form-label mb-0 small" for="tpoLoanFieldSearch">Filter</label>
+          <input
+            type="search"
+            class="form-control form-control-sm"
+            id="tpoLoanFieldSearch"
+            placeholder="Company, LOEmail, FeeReview…"
+            style="max-width: 18rem"
+            autocomplete="off"
+          />
+          <span class="tpo-muted" id="tpoLoanFieldsCount"></span>
+        </div>
+        <div class="tpo-table-wrap">
+          <table class="table table-sm table-striped mb-0">
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>Type</th>
+                <th>Group</th>
+              </tr>
+            </thead>
+            <tbody id="tpoLoanFieldsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="tpo-card" id="fields">
+        <h2>Encompass field IDs in Labs</h2>
+        <p class="tpo-muted">
+          From <code>public/finance/data/dropdownFields.txt</code> and Unit Tests formulas.
+          Milestone / misc also expose <code>TPOConnectStatus</code> and
+          <code>TPOConnectStatusUpdated</code> on loan contract models.
+        </p>
+        <ul id="tpoFieldIdsList"></ul>
+      </section>
+
+      <section class="tpo-card" id="postman">
+        <h2>Postman / Developer Connect APIs</h2>
+        <p class="tpo-muted">
+          Extracted from the ICE collection in
+          <code>knowledge-sources/ice/postman/</code>
+          (<em>Encompass_Developer_Connect_postman_collection</em> +
+          env <em>ENV_Developer_Sharing_EDC_25.1</em>).
+          Prefer the <code>/settings/externalOrganizations/…</code> routes — the older
+          <code>/externalOrganizations/tpos</code> calls are labeled
+          <strong>slated for deprecation</strong> in Postman.
+        </p>
+
+        <h3>Environment variables</h3>
+        <ul id="tpoPostmanEnvList" class="mb-3"></ul>
+
+        <h3>Notable request patterns</h3>
+        <ul>
+          <li>
+            <strong>Create and Register a TPO Loan</strong> —
+            <code>POST /encompass/v3/loans</code> with
+            <code>templateType=templateSet</code> + <code>templatePath=…</code>
+            (sample body is empty <code>{}</code>; loan comes from the template). Test script
+            stores <code>loanId</code> / <code>applicationId</code> from the 201 Location header.
+          </li>
+          <li>
+            <strong>Correspondent trades</strong> —
+            <code>/secondary/v1/trades/correspondent</code> payloads include
+            <code>tpoDetails.tpoCompanyName</code>, <code>tpoId</code>, and
+            <code>externalOriginatorManagementId</code> (<code>{{OID}}</code>).
+          </li>
+          <li>
+            <strong>Documents</strong> — eFolder samples include
+            <code>tpoAllowed</code> / <code>thirdPartyAllowed</code> flags.
+          </li>
+          <li>
+            <strong>Partner services</strong> — Freddie Affordable Check credentials may include
+            <code>tpoAccountIdentifier</code>.
+          </li>
+        </ul>
+
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-2 mt-3">
+          <label class="form-label mb-0 small" for="tpoPostmanSearch">Filter APIs</label>
+          <input
+            type="search"
+            class="form-control form-control-sm"
+            id="tpoPostmanSearch"
+            placeholder="externalUsers, tpoFees, webhook…"
+            style="max-width: 18rem"
+            autocomplete="off"
+          />
+          <span class="tpo-muted" id="tpoPostmanCount"></span>
+        </div>
+        <div class="tpo-table-wrap">
+          <table class="table table-sm table-striped mb-0">
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>Group</th>
+                <th>Request</th>
+                <th>Path</th>
+              </tr>
+            </thead>
+            <tbody id="tpoPostmanBody"></tbody>
+          </table>
+        </div>
+        <p class="tpo-muted mb-0 mt-2">
+          Local files:
+          <code>knowledge-sources/ice/postman/Encompass_Developer_Connect_postman_collection (1).json</code>
+          and
+          <code>Encompass_Developer_Connect_postman_environment (1).json</code>.
+        </p>
+      </section>
+
+      <section class="tpo-card" id="labs">
+        <h2>DevConnect Labs touchpoints</h2>
+        <ul>
+          <li>
+            <strong>Encompass Assistant</strong> —
+            quick action “What is TPO Connect?” and system-prompt expertise on TPO workflows
+            (<a href="/finance/encompass-assistant.html">open</a>
+          </li>
+          <li>
+            <strong>Docs scrape seed</strong> —
+            <code>/encompass-tpo-connect</code> in <code>encompass-docs.service.js</code> /
+            <code>data/encompass-docs.json</code>
+          </li>
+          <li>
+            <strong>Condition Manager</strong> —
+            external recipient constant <code>Borrower / TPO</code>
+          </li>
+          <li>
+            <strong>Unit Tests / IIf parser</strong> —
+            NQM formulas use <code>[TPO.X88] &lt;&gt; "Y"</code>
+          </li>
+          <li>
+            <strong>ICE knowledge index</strong> —
+            <code>LoanContractTPO</code> (+ Tools/Schema variants) via
+            <code>npm run build:ice-knowledge</code>
+          </li>
+          <li>
+            <strong>Postman</strong> —
+            External Orgs / TPO Settings / External Users / Correspondent Trades APIs —
+            see <a href="#postman">Postman / APIs</a> above
+          </li>
+        </ul>
+      </section>
+
+      <section class="tpo-card" id="links">
+        <h2>External &amp; related docs</h2>
+        <div class="tpo-link-list">
+          <a
+            href="https://developer.icemortgagetechnology.com/developer-connect/docs/encompass-tpo-connect"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            ICE — Encompass TPO Connect client integration
+          </a>
+          <a
+            href="https://developer.icemortgagetechnology.com/developer-connect/docs/published-objects-accessible-to-childclient-application"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            ICE — Published objects for child/client apps
+          </a>
+          <a
+            href="https://developer.icemortgagetechnology.com/developer-connect/docs/the-ellie-mae-scripting-framework"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            ICE — Secure Scripting Framework (SSF)
+          </a>
+          <a
+            href="https://developer.icemortgagetechnology.com/developer-connect/docs/ellie-mae-scripting-objects-reference"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            ICE — Scripting objects reference
+          </a>
+          <a href="/finance/encompass-assistant.html">Encompass Assistant</a>
+          <a href="/finance/enhanced-conditions-expert.html">Enhanced Conditions Expert</a>
+        </div>
+      </section>
+
+      <p class="tpo-footer-note">
+        Sourced from ICE Developer Connect public guides, local ICE SDK bindings
+        (<code>LoanContractTPO</code>), Postman env vars, and DevConnect Labs code references.
+        Product behavior can change — prefer the live ICE docs for production work.
+      </p>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/shared/encompass-dark-mode.js"></script>
+    <script src="/finance/js/tpo-connect.js"></script>
+    <script src="/shared/finance-auth-guard.js"></script>
+  </body>
+</html>

@@ -11,7 +11,7 @@ Short definitions for AI agents and developers working with Encompass and mortga
 | Developer Connect | ICE Mortgage Technology developer portal and API docs |
 | LO Connect | Loan Officer Connect – Encompass web app for LOs; supports custom tools and Web-IFB forms |
 | Web-IFB / IFB | Web Input Form Builder – WYSIWYG form builder for Encompass; scripts run in form context |
-| TPO Connect | Third-Party Originator Connect – workflows for correspondent/wholesale lending |
+| TPO Connect | Third-Party Originator Connect – ICE web portal for correspondent/wholesale lending; guest apps embed via SSF iframe (`tpoApplication` / `auth` / `loan`). Labs knowledge page: `/finance/tpo-connect.html` |
 | Encompass | ICE Mortgage Technology loan origination system (LOS) |
 | ice-sources.json | Generated index of ICE repos, Postman, docs; built by `npm run build:ice-knowledge` |
 | The Screen Test | AI tool (tool9) for reviewing Encompass manifest XML form code; extracts field IDs, checks calculations, flags syntax/type/deprecated issues |

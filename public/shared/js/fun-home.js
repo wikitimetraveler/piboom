@@ -272,9 +272,6 @@
           localStorage.setItem(WORK_REVEAL_KEY, 'true');
         } catch (_) {}
 
-        // The featured work chips ride on the same reveal
-        window.dispatchEvent(new CustomEvent('work-tools-revealed'));
-
         // Console message
         console.log('🔓 Secret mortgage work link revealed!');
         
@@ -604,85 +601,9 @@
     });
   }
 
-  // Little QRs next to featured chips — absolute URLs for phone scan
-  function absoluteSiteUrl(path) {
-    try {
-      return new URL(path, window.location.origin).href;
-    } catch (_) {
-      return path;
-    }
-  }
-
-  function mountQr(el, url, size) {
-    if (!el || !url || typeof window.QRCode !== 'function') return false;
-    el.innerHTML = '';
-    try {
-      // eslint-disable-next-line no-new
-      new window.QRCode(el, {
-        text: url,
-        width: size,
-        height: size,
-        correctLevel: window.QRCode.CorrectLevel ? window.QRCode.CorrectLevel.M : undefined,
-      });
-      return true;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  function initFeaturedQrCodes() {
-    const tiles = document.querySelectorAll('.fun-featured-qr[data-scan-path]');
-    if (!tiles.length) return;
-
-    const paint = () => {
-      tiles.forEach((tile) => {
-        const path = tile.getAttribute('data-scan-path');
-        const mount = tile.querySelector('[data-fun-qr]');
-        if (!path || !mount) return;
-        const url = absoluteSiteUrl(path);
-        tile.setAttribute('href', url);
-        const ok = mountQr(mount, url, 44);
-        if (!ok) {
-          mount.innerHTML =
-            '<span class="fun-featured-qr__fallback"><i class="bi bi-qr-code" aria-hidden="true"></i></span>';
-        }
-      });
-    };
-
-    if (typeof window.QRCode === 'function') {
-      paint();
-      return;
-    }
-
-    let tries = 0;
-    const timer = setInterval(() => {
-      tries += 1;
-      if (typeof window.QRCode === 'function' || tries > 40) {
-        clearInterval(timer);
-        paint();
-      }
-    }, 50);
-  }
-
-  /**
-   * Work tools stay off the home page until the visitor has found the sparkle, or has
-   * already entered the finance password. `loggedInUserId` is the same signal
-   * finance-auth-guard.js gates the tools themselves on, so the chips and the pages
-   * agree on who is let in.
-   */
-  function workToolsUnlocked() {
-    try {
-      return (
-        localStorage.getItem(WORK_REVEAL_KEY) === 'true' ||
-        localStorage.getItem('loggedInUserId') !== null
-      );
-    } catch (_) {
-      return false;
-    }
-  }
-
+  /** Unit Tests / Condition Manager chips — only when logged in. */
   function syncGatedFeatured() {
-    const show = workToolsUnlocked();
+    const show = isFunHomeLoggedIn();
     document.querySelectorAll('[data-gated-featured]').forEach((el) => {
       el.hidden = !show;
     });
@@ -693,7 +614,7 @@
     syncGatedFeatured();
     window.addEventListener('storage', syncGatedFeatured);
     window.addEventListener('user-logged-in', syncGatedFeatured);
-    window.addEventListener('work-tools-revealed', syncGatedFeatured);
+    window.addEventListener('user-logged-out', syncGatedFeatured);
     window.addEventListener('pageshow', syncGatedFeatured);
     window.addEventListener('focus', syncGatedFeatured);
   }
@@ -711,8 +632,7 @@
     initFunAuthButton();
     initSecretMortgageLink();
     initGatedFeatured();
-    initFeaturedQrCodes();
-    
+
     // Wait for libraries to load
     if (typeof THREE !== 'undefined') {
       initHeroScene();

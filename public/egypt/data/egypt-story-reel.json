@@ -1,0 +1,314 @@
+{
+  "id": "egypt-hyperframes-reel",
+  "title": {
+    "en": "Egypt HyperFrame Tour",
+    "ar": "جولة مصر المصوّرة"
+  },
+  "portrait": "/egypt/assets/omar-guide-portrait-256.png",
+  "voice": {
+    "en": "en-US-Neural2-D",
+    "ar": "ar-XA-Wavenet-B"
+  },
+  "pitch": -1,
+  "speakingRate": 0.98,
+  "scenes": [
+    {
+      "id": "welcome",
+      "anchor": "egHero",
+      "spotlight": "#egHero",
+      "durationMs": 7200,
+      "kicker": {
+        "en": "Welcome",
+        "ar": "أهلاً"
+      },
+      "title": {
+        "en": "Ahlan — Egypt",
+        "ar": "أهلاً — مصر"
+      },
+      "copy": {
+        "en": "I am Omar. Nile, stone, and living tables — told with care.",
+        "ar": "أنا عمر. نيل وحجر ومائدة حية — تُروى بعناية."
+      },
+      "narration": {
+        "en": "Ahlan wa sahlan. I am Omar. This atlas is Egypt — pyramids and temples, Fatimid Cairo, Nile light, and a living table of koshari and song. Give me a few minutes and I will walk you through the map, the eras, and the flavors.",
+        "ar": "أهلاً وسهلاً. أنا عمر. هذا الأطلس مصر — أهرام ومعابد، والقاهرة الفاطمية، وضوء النيل، ومائدة حية من الكشري والغناء. أعطني دقائق وأمشيك عبر الخريطة والعصور والنكهات."
+      }
+    },
+    {
+      "id": "atlas",
+      "anchor": "egMap",
+      "spotlight": "#egMap",
+      "action": "openAtlas",
+      "durationMs": 7000,
+      "kicker": {
+        "en": "Atlas",
+        "ar": "أطلس"
+      },
+      "title": {
+        "en": "The map opens",
+        "ar": "تُفتح الخريطة"
+      },
+      "copy": {
+        "en": "Nile bends, desert edge, Red Sea — every pin a place.",
+        "ar": "انحناءات النيل وحافة الصحراء والبحر الأحمر — كل علامة مكان."
+      },
+      "narration": {
+        "en": "First, the atlas. From Cairo to Aswan, from Giza’s plateau to Luxor’s temples — history pins, food towns, and living places. Select a name and the map leans in.",
+        "ar": "أولاً الأطلس. من القاهرة إلى أسوان، من هضبة الجيزة إلى معابد الأقصر — علامات تاريخ وبلدات طعام وأماكن حيّة. اختر اسماً فتميل الخريطة نحوه."
+      }
+    },
+    {
+      "id": "cairo",
+      "anchor": "egMap",
+      "spotlight": "#egMapCanvas",
+      "action": "focusCairo",
+      "durationMs": 8200,
+      "kicker": {
+        "en": "Capital",
+        "ar": "العاصمة"
+      },
+      "title": {
+        "en": "Cairo",
+        "ar": "القاهرة"
+      },
+      "copy": {
+        "en": "Nile capital of mosques, film, and ahwa talk.",
+        "ar": "عاصمة النيل للمساجد والسينما وحديث القهوة."
+      },
+      "narration": {
+        "en": "Start in Cairo. Fatimid and Mamluk streets still hold Al-Azhar; today the megacity sings, films, and pours shai from dawn to late night.",
+        "ar": "نبدأ من القاهرة. ما زالت شوارع فاطمية ومملوكية تحمل الأزهر؛ واليوم تغني المدينة العملاقة وتصوّر وتصب الشاي من الفجر إلى الليل المتأخر."
+      }
+    },
+    {
+      "id": "giza",
+      "anchor": "egMap",
+      "spotlight": "#egMapCanvas",
+      "action": "focusGiza",
+      "durationMs": 8000,
+      "kicker": {
+        "en": "Pyramids",
+        "ar": "أهرام"
+      },
+      "title": {
+        "en": "Giza",
+        "ar": "الجيزة"
+      },
+      "copy": {
+        "en": "Eternal stone on the desert edge.",
+        "ar": "حجر خالد على حافة الصحراء."
+      },
+      "narration": {
+        "en": "Then Giza — the Great Pyramid, its companions, and the Sphinx. Old Kingdom kings built mountains of stone so the horizon would remember them.",
+        "ar": "ثم الجيزة — الهرم الأكبر ورفقاؤه وأبو الهول. بنى ملوك الدولة القديمة جبالاً من حجر حتى يتذكّرهم الأفق."
+      }
+    },
+    {
+      "id": "luxor",
+      "anchor": "egMap",
+      "spotlight": "#egMapCanvas",
+      "action": "focusLuxor",
+      "durationMs": 8000,
+      "kicker": {
+        "en": "Thebes",
+        "ar": "طيبة"
+      },
+      "title": {
+        "en": "Luxor",
+        "ar": "الأقصر"
+      },
+      "copy": {
+        "en": "Temples on both banks of the Nile.",
+        "ar": "معابد على ضفتي النيل."
+      },
+      "narration": {
+        "en": "South to Luxor — ancient Thebes. Karnak’s pylons, Luxor Temple, and the Valley of the Kings still hold New Kingdom glory in stone and painted tombs.",
+        "ar": "جنوباً إلى الأقصر — طيبة القديمة. ما زالت أبراج الكرنك ومعبد الأقصر ووادي الملوك تحمل مجد الدولة الحديثة في الحجر والمقابر الملونة."
+      }
+    },
+    {
+      "id": "alexandria",
+      "anchor": "egMap",
+      "spotlight": "#egMapCanvas",
+      "action": "focusAlexandria",
+      "durationMs": 7800,
+      "kicker": {
+        "en": "Sea",
+        "ar": "بحر"
+      },
+      "title": {
+        "en": "Alexandria",
+        "ar": "الإسكندرية"
+      },
+      "copy": {
+        "en": "Mediterranean wind and Ptolemaic memory.",
+        "ar": "ريح المتوسط وذاكرة بطلمية."
+      },
+      "narration": {
+        "en": "North to Alexandria. Ptolemaic capital of libraries and lighthouse legend — today a corniche city where the sea still sets the mood.",
+        "ar": "شمالاً إلى الإسكندرية. عاصمة بطلمية للمكتبات وأسطورة المنارة — اليوم مدينة كورنيش ما زال البحر يضبط مزاجها."
+      }
+    },
+    {
+      "id": "eras",
+      "anchor": "egTimeline",
+      "spotlight": "#egTimeline",
+      "action": "openFirstEra",
+      "durationMs": 7500,
+      "kicker": {
+        "en": "Timeline",
+        "ar": "خط زمني"
+      },
+      "title": {
+        "en": "Eras of Egypt",
+        "ar": "عصور مصر"
+      },
+      "copy": {
+        "en": "Predynastic to today — select a layer to hear it.",
+        "ar": "من ما قبل الأسرات إلى اليوم — اختر طبقة لتسمعها."
+      },
+      "narration": {
+        "en": "Open the timeline. Predynastic kingdoms, Old Kingdom pyramids, New Kingdom temples, Ptolemaic Alexandria, Roman and Islamic Cairo, Mamluks, Ottomans, Muhammad Ali, and the contemporary republic — each layer has a place on the map.",
+        "ar": "افتح الخط الزمني. ممالك ما قبل الأسرات وأهرام الدولة القديمة ومعابد الدولة الحديثة وإسكندرية البطالمة والقاهرة الرومانية والإسلامية والمماليك والعثمانيون ومحمد علي والجمهورية المعاصرة — لكل طبقة مكان على الخريطة."
+      }
+    },
+    {
+      "id": "food",
+      "anchor": "egFood",
+      "spotlight": "#egFoodGrid",
+      "action": "flipFirstFood",
+      "durationMs": 7200,
+      "kicker": {
+        "en": "Table",
+        "ar": "مائدة"
+      },
+      "title": {
+        "en": "Koshari and ful",
+        "ar": "كشري وفول"
+      },
+      "copy": {
+        "en": "Flip a plate — street bowls, mahshi trays, and konafa.",
+        "ar": "اقلب طبقاً — أطباق شارع وصواني محشي وكنافة."
+      },
+      "narration": {
+        "en": "At the table, koshari stacks the street bowl, ful steams at dawn, and konafa sweetens the night. Flip a card and I will tell you why patience tastes like hospitality here.",
+        "ar": "على المائدة يرصّ الكشري طبق الشارع، ويبخّر الفول عند الفجر، وتحلّي الكنافة الليل. اقلب بطاقة وأخبرك لماذا يذوق الصبر كضيافة هنا."
+      }
+    },
+    {
+      "id": "music",
+      "anchor": "egMusic",
+      "spotlight": "#egMusicGrid",
+      "action": "flipFirstMusic",
+      "durationMs": 7000,
+      "kicker": {
+        "en": "Sound",
+        "ar": "صوت"
+      },
+      "title": {
+        "en": "Umm Kulthum and tarab",
+        "ar": "أم كلثوم والطرب"
+      },
+      "copy": {
+        "en": "Cairo suites, Saʿidi folk, and Nile song.",
+        "ar": "متتاليات القاهرة وشعبي الصعيد وأغنية النيل."
+      },
+      "narration": {
+        "en": "Listen for Umm Kulthum, Egyptian oud, tabla rhythms, Saʿidi folk, classical tarab, and new Cairo nights. Flip a music card for the history behind the mode.",
+        "ar": "اسمع أم كلثوم والعود المصري وإيقاعات الطبلة والشعبي الصعيدي والطرب الكلاسيكي وليالي القاهرة الجديدة. اقلب بطاقة موسيقى لتقرأ الحكاية خلف المقام."
+      }
+    },
+    {
+      "id": "majlis",
+      "anchor": "egHookah",
+      "spotlight": "#egHookahGrid",
+      "action": "flipFirstHookah",
+      "durationMs": 6800,
+      "kicker": {
+        "en": "Café",
+        "ar": "مقهى"
+      },
+      "title": {
+        "en": "Tea before smoke",
+        "ar": "شاي قبل الدخان"
+      },
+      "copy": {
+        "en": "Ahwa talk — then slow shisha.",
+        "ar": "حديث القهوة — ثم شيشة بطيئة."
+      },
+      "narration": {
+        "en": "In the café, shai comes first. Newspapers, backgammon, and Nile terraces still outlast the coals.",
+        "ar": "في المقهى يأتي الشاي أولاً. ما زالت الصحف والطاولة وشرفات النيل أطول عمراً من الجمر."
+      }
+    },
+    {
+      "id": "living",
+      "anchor": "egLiving",
+      "spotlight": "#egLivingGrid",
+      "action": "flipFirstLiving",
+      "durationMs": 7200,
+      "kicker": {
+        "en": "Living",
+        "ar": "حياة"
+      },
+      "title": {
+        "en": "Nile and souq",
+        "ar": "نيل وسوق"
+      },
+      "copy": {
+        "en": "Flood memory, feluccas, Coptic feasts, and Sinai paths.",
+        "ar": "ذاكرة فيضان وفلكات وأعياد قبطية ودروب سيناء."
+      },
+      "narration": {
+        "en": "Living culture is Nile flood memory, calligraphy, souq bargaining, felucca sails, Coptic communities, and Bedouin Sinai hospitality. These are not museum labels — they still organize the year.",
+        "ar": "الثقافة الحيّة هي ذاكرة فيضان النيل والخط ومساومة السوق وأشرعة الفلكة والأقباط وضيافة بدو سيناء. هذه ليست بطاقات متحف — ما زالت تنظّم السنة."
+      }
+    },
+    {
+      "id": "phrases",
+      "anchor": "egPhrases",
+      "spotlight": "#egPhraseList",
+      "action": "speakFirstPhrase",
+      "durationMs": 6500,
+      "kicker": {
+        "en": "Speak",
+        "ar": "تكلّم"
+      },
+      "title": {
+        "en": "Ahlan wa sahlan",
+        "ar": "أهلاً وسهلاً"
+      },
+      "copy": {
+        "en": "Press a phrase — I will say it aloud.",
+        "ar": "اضغط عبارة — سأقولها بصوت عالٍ."
+      },
+      "narration": {
+        "en": "Before you go, take an Egyptian greeting. Izzayyak? Press any phrase on the page and I will say it for you in everyday Egyptian Arabic.",
+        "ar": "قبل أن تمضي، خذ تحية مصرية. إزيك؟ اضغط أي عبارة في الصفحة وسأقولها لك بعربية مصرية يومية."
+      }
+    },
+    {
+      "id": "close",
+      "anchor": "egGuide",
+      "spotlight": "#egGuide",
+      "action": "unflipCards",
+      "durationMs": 7000,
+      "kicker": {
+        "en": "Ask me",
+        "ar": "اسألني"
+      },
+      "title": {
+        "en": "I am still here",
+        "ar": "ما زلت هنا"
+      },
+      "copy": {
+        "en": "Ask Omar about Giza, koshari, or Umm Kulthum.",
+        "ar": "اسأل عمر عن الجيزة أو الكشري أو أم كلثوم."
+      },
+      "narration": {
+        "en": "That is the tour. Stay on the map, flip more cards, or ask me anything — Giza’s stones, Luxor’s temples, koshari bowls, or the voice of Umm Kulthum. Maʿa salama for now, and welcome whenever you return.",
+        "ar": "هذه هي الجولة. ابقَ على الخريطة، أو اقلب مزيداً من البطاقات، أو اسألني أي شيء — حجارة الجيزة، ومعابد الأقصر، وأطباق الكشري، أو صوت أم كلثوم. مع السلامة الآن، وأهلاً بك كلما عدت."
+      }
+    }
+  ]
+}

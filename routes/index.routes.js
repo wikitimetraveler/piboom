@@ -46,6 +46,7 @@ import appUserAuthRoutes from './app-user-auth.routes.js';
 import coffeeDreamsAuthRoutes from './coffee-dreams-auth.routes.js';
 import cannabisOriginsAuthRoutes from './cannabis-origins-auth.routes.js';
 import gseRoutes from './gse.routes.js';
+import gseAssistantRoutes from './gse-assistant.routes.js';
 import financeRoutes from './finance.routes.js';
 import disasterImpactGraphRoutes from './disaster-impact-graph.routes.js';
 import musicGraphRoutes from './music-graph.routes.js';
@@ -55,6 +56,11 @@ import donutsRoutes from './donuts.routes.js';
 import jordanRoutes from './jordan.routes.js';
 import syriaRoutes from './syria.routes.js';
 import holyLandRoutes from './holy-land.routes.js';
+import omanRoutes from './oman.routes.js';
+import iranRoutes from './iran.routes.js';
+import iraqRoutes from './iraq.routes.js';
+import lebanonRoutes from './lebanon.routes.js';
+import egyptRoutes from './egypt.routes.js';
 import shenangoRoutes from './shenango.routes.js';
 import newportPierRoutes from './newport-pier.routes.js';
 
@@ -103,6 +109,7 @@ export default function buildRoutes(io) {
   api.use('/auth', coffeeDreamsAuthRoutes);
   api.use('/auth', cannabisOriginsAuthRoutes);
   api.use('/gse', gseRoutes);
+  api.use('/gse-assistant', gseAssistantRoutes);
   api.use('/finance', financeRoutes);
   api.use('/disaster-impact-graph', disasterImpactGraphRoutes);
   api.use('/music-graph', musicGraphRoutes);
@@ -112,6 +119,11 @@ export default function buildRoutes(io) {
   api.use('/jordan', jordanRoutes);
   api.use('/syria', syriaRoutes);
   api.use('/holy-land', holyLandRoutes);
+  api.use('/oman', omanRoutes);
+  api.use('/iran', iranRoutes);
+  api.use('/iraq', iraqRoutes);
+  api.use('/lebanon', lebanonRoutes);
+  api.use('/egypt', egyptRoutes);
   api.use('/shenango', shenangoRoutes);
   api.use('/newport-pier', newportPierRoutes);
   api.use('/', musicHistoryRoutes); // Music history and concert finder
