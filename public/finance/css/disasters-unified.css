@@ -964,6 +964,12 @@ body.du-page {
 }
 
 #disastersGrid .ag-row { cursor: pointer; }
+/* AG Grid positions rows with inline transform; never animate those or clicks miss rows. */
+#disastersGrid .ag-row,
+#disastersGrid .ag-row-animation,
+#disastersGrid .ag-row-animate-position {
+  transition: none !important;
+}
 #disastersGrid .ag-row.ag-row-selected {
   background-color: color-mix(in srgb, var(--zen-primary, #4a90a4) 15%, #fff) !important;
   box-shadow: inset 4px 0 0 var(--zen-primary, #4a90a4);
@@ -1989,9 +1995,12 @@ body.du-pull-sheet-open .du-bottom-dock {
   }
 }
 
-/* Inline loading (filter reload — no full-screen overlay) */
+/* Inline loading (filter reload — no full-screen overlay).
+   Keep the grid clickable: shimmer only. pointer-events:none made rows look disabled. */
 .du-inline-loading {
   position: relative;
+}
+.du-inline-loading:not(#disastersGrid):not(.du-grid-shell) {
   pointer-events: none;
 }
 
@@ -2154,5 +2163,186 @@ body.du-pull-sheet-open .du-bottom-dock {
 .du-time-range-pills .btn-check:focus + .btn,
 .du-time-range-pills .btn:hover {
   box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--zen-primary, #4a90a4) 25%, transparent);
+}
+
+/* —— Hazard lens overlays (live /near + graph NEAR) —— */
+.du-overlay-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.du-overlay-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #334155;
+  border-radius: 999px;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.3;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.du-overlay-chip:hover {
+  border-color: #94a3b8;
+  background: #f8fafc;
+}
+
+.du-overlay-chip--active {
+  border-color: #b45309;
+  background: #fffbeb;
+  color: #78350f;
+}
+
+.du-overlay-swatch {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.du-overlay-swatch--live {
+  background: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.du-overlay-swatch--near {
+  background: #d97706;
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.2);
+}
+
+.du-overlay-asof {
+  font-weight: 600;
+  color: #92400e;
+}
+
+/* —— Graph DB force panel —— */
+.du-graph-db-card .du-section-heading {
+  letter-spacing: -0.01em;
+}
+
+.du-graph-force-host {
+  width: 100%;
+  min-height: 280px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(180, 83, 9, 0.08), transparent 55%),
+    radial-gradient(ellipse at 80% 100%, rgba(15, 118, 110, 0.07), transparent 50%),
+    linear-gradient(165deg, #f8fafc 0%, #eef2ff 100%);
+  overflow: hidden;
+}
+
+.du-graph-force-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 280px;
+}
+
+.du-graph-node-label {
+  font-size: 10px;
+  fill: #334155;
+  pointer-events: none;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+.du-graph-node {
+  cursor: grab;
+}
+
+.du-graph-node:active {
+  cursor: grabbing;
+}
+
+.du-graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+  list-style: none;
+  padding: 0;
+}
+
+.du-graph-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.du-graph-legend-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+/* —— Schema sheet mini diagram —— */
+.du-schema-mini {
+  margin: 0;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid #e7e5e4;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fffbeb 0%, #fff 70%);
+}
+
+.du-schema-mini-svg {
+  width: 100%;
+  max-width: 560px;
+  height: auto;
+  display: block;
+}
+
+.du-schema-mini-svg text {
+  font-size: 11px;
+  font-family: ui-monospace, Consolas, monospace;
+  fill: #1c1917;
+}
+
+.du-schema-mini-box {
+  fill: #fff;
+  stroke: #a8a29e;
+  stroke-width: 1.25;
+}
+
+.du-schema-mini-box--graph {
+  fill: #fff7ed;
+  stroke: #b45309;
+}
+
+.du-schema-mini-arrow {
+  stroke: #92400e;
+  stroke-width: 2;
+  fill: none;
+}
+
+.du-schema-mini-label {
+  font-size: 10px !important;
+  fill: #78716c !important;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .du-schema-mini-box--graph {
+    animation: du-schema-graph-pulse 3.2s ease-in-out infinite;
+  }
+}
+
+@keyframes du-schema-graph-pulse {
+  0%,
+  100% {
+    fill: #fff7ed;
+  }
+  50% {
+    fill: #ffedd5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .du-graph-node {
+    transition: none !important;
+  }
 }
 

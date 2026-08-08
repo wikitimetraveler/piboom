@@ -149,14 +149,34 @@ function highlightSelectedDisasterInGrid(disasterObj) {
   if (typeof disastersGridApi.deselectAll === 'function') {
     disastersGridApi.deselectAll();
   }
+  // Prefer visible/page nodes first — avoid scanning tens of thousands of USA rows sync.
+  const pageSize = typeof disastersGridApi.paginationGetPageSize === 'function'
+    ? disastersGridApi.paginationGetPageSize()
+    : 25;
+  const currentPage = typeof disastersGridApi.paginationGetCurrentPage === 'function'
+    ? disastersGridApi.paginationGetCurrentPage()
+    : 0;
+  const start = currentPage * pageSize;
+  const end = start + pageSize;
+  for (let i = start; i < end; i += 1) {
+    const node = disastersGridApi.getDisplayedRowAtIndex?.(i);
+    if (node?.data?.disasterObj && disasterMatchKey(node.data.disasterObj) === key) {
+      node.setSelected?.(true);
+      return;
+    }
+  }
+  // Fallback: only scan until first match (still stop early).
+  let matched = false;
   disastersGridApi.forEachNode?.((node) => {
+    if (matched) return;
     if (node.data?.disasterObj && disasterMatchKey(node.data.disasterObj) === key) {
       node.setSelected?.(true);
+      matched = true;
     }
   });
 }
 
-function buildDisasterGridRow(r, allRows, idx) {
+function buildDisasterGridRow(r, allRows, idx, relatedLookup) {
   const eventType = String(r.event_type || '').trim();
   const source = String(r.source || '').trim().toLowerCase();
   const county = String(r.county_name || '').trim();
@@ -168,7 +188,7 @@ function buildDisasterGridRow(r, allRows, idx) {
   const eventLabel = icon && eventType
     ? `<span class="event-icon">${icon}</span>${eventType}`
     : (eventType || '');
-  const riskScore = calculateDisasterRiskScore(r, allRows);
+  const riskScore = calculateDisasterRiskScore(r, allRows, relatedLookup);
   const isCamera = eventType === 'camera' || source === 'alertcalifornia'
     || (title && title.toLowerCase().includes('camera'));
   let cameraDataKey = '';
@@ -271,7 +291,9 @@ function initDisastersGrid() {
     pagination: true,
     paginationPageSize: 25,
     paginationPageSizeSelector: [10, 25, 50, 100],
-    animateRows: true,
+    // animateRows adds transform transitions; during USA setRowData + section reveal those
+    // transitions can stick and pile every row at the wrong Y so clicks miss the grid.
+    animateRows: false,
     rowSelection: {
       mode: 'singleRow',
       enableClickSelection: true,
@@ -440,11 +462,19 @@ function setEncompassLoansGridRows(rows) {
 function setDisastersGridRows(rows) {
   if (!disastersGridApi) initDisastersGrid();
   if (!disastersGridApi) return;
+  // Clear any stuck row transform transitions before swapping large USA datasets.
+  document.querySelectorAll('#disastersGrid .ag-row').forEach((rowEl) => {
+    rowEl.style.transition = 'none';
+  });
   if (typeof disastersGridApi.setGridOption === 'function') {
     disastersGridApi.setGridOption('rowData', rows);
   } else if (typeof disastersGridApi.setRowData === 'function') {
     disastersGridApi.setRowData(rows);
   }
+  // After heavy setRowData, force layout so row translateY matches hit-testing.
+  window.requestAnimationFrame(() => {
+    refreshDisastersGridLayout();
+  });
 }
 
 function refreshDisastersGridLayout() {
@@ -492,21 +522,50 @@ function bindEncompassLoansGridEvents(api, gridEl) {
   document.getElementById('collapseLoans')?.addEventListener('shown.bs.collapse', refreshEncompassLoansGridLayout);
 }
 
-function calculateDisasterRiskScore(disaster, allDisasters) {
+/**
+ * O(n) lookup for related-event counts used by risk scoring.
+ * Avoids O(n²) Array.filter-per-row freezes on USA loads (thousands of rows).
+ */
+function buildRelatedDisasterCountLookup(allDisasters) {
+  const byCounty = Object.create(null);
+  const stateNoCounty = Object.create(null);
+  const rows = allDisasters || [];
+  for (let i = 0; i < rows.length; i += 1) {
+    const d = rows[i];
+    const state = d.state_abbr || '';
+    if (!state) continue;
+    const county = d.county_name || '';
+    if (!county) {
+      stateNoCounty[state] = (stateNoCounty[state] || 0) + 1;
+    } else {
+      const key = `${state}|${String(county).toLowerCase()}`;
+      byCounty[key] = (byCounty[key] || 0) + 1;
+    }
+  }
+  return { byCounty, stateNoCounty };
+}
+
+function getRelatedDisasterCount(disaster, lookup) {
+  const state = disaster?.state_abbr || '';
+  const county = disaster?.county_name || '';
+  if (!state || !lookup) return 0;
+  const noCounty = lookup.stateNoCounty[state] || 0;
+  if (!county) return noCounty;
+  return (lookup.byCounty[`${state}|${String(county).toLowerCase()}`] || 0) + noCounty;
+}
+
+function calculateDisasterRiskScore(disaster, allDisasters, relatedLookup) {
   let score = 0;
   const state = disaster.state_abbr || '';
   const county = disaster.county_name || '';
   
   if (!state && !county) return 0;
-  
-  // Count disasters in same county/state from all sources
-  const relatedDisasters = allDisasters.filter(d => 
-    (d.state_abbr === state && d.county_name === county) ||
-    (d.state_abbr === state && !d.county_name)
-  );
+
+  const lookup = relatedLookup || buildRelatedDisasterCountLookup(allDisasters || []);
+  const relatedCount = getRelatedDisasterCount(disaster, lookup);
   
   // Base score: number of disasters in area
-  score += Math.min(relatedDisasters.length * 0.5, 5);
+  score += Math.min(relatedCount * 0.5, 5);
   
   // Source-specific risk weights
   const sourceWeights = {
@@ -817,7 +876,9 @@ function renderTable(rows) {
     return true;
   });
 
-  const gridRows = uniqueRows.map((r, idx) => buildDisasterGridRow(r, uniqueRows, idx));
+  // One O(n) pass for related counts — never filter the full set per row.
+  const relatedLookup = buildRelatedDisasterCountLookup(uniqueRows);
+  const gridRows = uniqueRows.map((r, idx) => buildDisasterGridRow(r, uniqueRows, idx, relatedLookup));
   lastGridRows = gridRows;
   setDisastersGridRows(gridRows);
   updateStats(rows);

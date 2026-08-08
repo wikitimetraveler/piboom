@@ -74,7 +74,7 @@
           <div class="du-hero-brand">
             <p class="du-hero-kicker mb-1">90-day window · Multi-source hazard intelligence</p>
             <h1 class="mb-1"><i class="bi-shield-exclamation me-2"></i>Unified Disasters</h1>
-            <p class="du-hero-lead small text-white-50 mb-0">Pick a place, review events, then triage nearby loans — live map proximity, not a loss probability.</p>
+            <p class="du-hero-lead small text-white-50 mb-0">Pick a place, review events, then triage nearby loans — live map proximity plus a persisted impact graph in Postgres (not a loss probability).</p>
             <nav class="du-workflow-strip" id="workflowStripDesktop" aria-label="Workflow: Place, Events, Loans, Tools">
               <button type="button" class="du-workflow-strip-btn" data-du-section-target="duGeoStage" data-du-section-step="1"><span class="step-num">1</span> Place</button>
               <button type="button" class="du-workflow-strip-btn du-workflow-strip-active" data-du-section-target="collapseDisasters" data-du-section-step="2" aria-current="step"><span class="step-num">2</span> Events</button>
@@ -187,6 +187,7 @@
             <li><a href="#" data-bs-target="#collapseRiskIntel" data-heading="headingRiskIntel" data-du-section-step="2"><i class="bi bi-speedometer2"></i> Risk intel</a></li>
             <li><a href="#" data-bs-target="#collapseMapYouTube" data-heading="headingMapYouTube" data-du-section-step="2"><i class="bi bi-geo-alt"></i> Map &amp; videos</a></li>
             <li><a href="#" data-bs-target="#collapseLoans" data-heading="headingLoans" data-du-section-step="3"><i class="bi bi-bank"></i> Loans</a></li>
+            <li><a href="#" data-bs-target="#collapseGraphDb" data-heading="headingGraphDb" data-du-section-step="3"><i class="bi bi-diagram-3"></i> Graph DB</a></li>
             <li class="mt-2"><span class="small text-uppercase text-muted px-2 d-block">Tools</span></li>
             <li><a href="#" data-du-section-target="duBottomDock" data-du-section-step="4"><i class="bi bi-box-arrow-up"></i> KML &amp; AI</a></li>
             <li>
@@ -203,10 +204,11 @@
         <div class="card-header du-geo-stage-header d-flex flex-wrap justify-content-between align-items-center gap-2">
           <div>
             <strong><i class="bi bi-binoculars me-1"></i> Hazard lens</strong>
-            <span class="text-muted small d-block">Pick a state for the county overlay — click a county to load (or load entire state / USA)</span>
+            <span class="text-muted small d-block">Pick a state for the county overlay — click a county to load (or load entire state / USA). Toggle live /near rings and graph NEAR rays after selecting an event.</span>
           </div>
           <div class="d-flex align-items-center gap-2 flex-wrap">
             <span class="badge text-bg-primary du-geo-active-crumb" id="duGeoActiveCrumb" hidden></span>
+            <span class="badge text-bg-warning-subtle border du-overlay-asof" id="duOverlayGraphAsOf" hidden></span>
             <button type="button" class="btn btn-sm btn-outline-secondary" id="duGeoChangeCountyBtn" hidden>
               <i class="bi bi-arrow-repeat"></i> Change area
             </button>
@@ -215,6 +217,14 @@
         <div class="card-body du-geo-stage-body">
           <nav class="du-geo-breadcrumb mb-2" id="duGeoBreadcrumb" aria-label="Location"></nav>
           <p class="du-geo-picker-status small mb-2 text-muted" id="duGeoPickerStatus" role="status"></p>
+          <div class="du-overlay-chips mb-2" role="group" aria-label="Map overlays">
+            <button type="button" class="du-overlay-chip du-overlay-chip--active" data-du-overlay="live" aria-pressed="true" title="Live GET /api/disasters/near radius — operational truth">
+              <span class="du-overlay-swatch du-overlay-swatch--live"></span> Live /near ring
+            </button>
+            <button type="button" class="du-overlay-chip du-overlay-chip--active" data-du-overlay="graphNear" aria-pressed="true" title="Persisted graph NEAR edges — as-of last reseed (seeded_at)">
+              <span class="du-overlay-swatch du-overlay-swatch--near"></span> Graph NEAR
+            </button>
+          </div>
           <div class="row g-3">
             <div class="col-lg-8">
               <div id="duGeoPickerMap" class="du-geo-picker-map" role="application" aria-label="United States map"></div>
@@ -587,6 +597,7 @@
                     <div class="card-header">
                       <strong><i class="bi-geo-alt"></i> Hazard map</strong>
                       <small class="text-muted d-block">Markers colored by risk tier · click to select event</small>
+                      <small id="duMapMarkerStatus" class="text-muted d-block mt-1" hidden></small>
                     </div>
                     <div class="card-body">
                       <div id="map"></div>
@@ -737,6 +748,63 @@
             <p class="small text-muted mb-0" id="duMockedLoansIdle">Select a disaster in the grid to load mocked loan data, nearby fire cameras, and weather alerts.</p>
           </div>
         </div>
+
+        <div class="du-section-card du-graph-db-card du-section-card-hidden" id="duGraphDbSection" data-du-collapse-target="collapseGraphDb">
+          <div
+            class="du-section-card-header collapsed"
+            tabindex="0"
+            id="headingGraphDb"
+            role="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseGraphDb"
+            aria-expanded="false"
+            aria-controls="collapseGraphDb"
+          >
+            <span class="du-section-title">
+              <span class="du-section-step-pill" aria-hidden="true">3</span>
+              <i class="bi bi-diagram-3" aria-hidden="true"></i>
+              <h2 class="du-section-heading mb-0">Graphical database</h2>
+            </span>
+            <i class="bi bi-chevron-down du-section-chevron" aria-hidden="true"></i>
+          </div>
+          <div id="collapseGraphDb" class="collapse du-section-card-body" aria-labelledby="headingGraphDb">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
+              <div>
+                <p class="small text-muted mb-1">
+                  Persisted <code>graph_nodes</code> / <code>graph_edges</code> ego-network for the selected event.
+                  Graph <code>NEAR</code> is as-of reseed — not live <code>/near</code>.
+                </p>
+                <p class="du-graph-panel-status small mb-0 text-muted" id="duGraphPanelStatus" role="status">
+                  Select a disaster in the grid to explore the graphical database.
+                </p>
+              </div>
+              <div class="d-flex flex-wrap align-items-center gap-2">
+                <span class="badge text-bg-warning-subtle border" id="duGraphAsOfBadge" hidden></span>
+                <span class="small text-muted" id="duGraphPanelStats"></span>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-warning"
+                  id="duGraphReseedBtn"
+                  title="Rebuild graph_nodes / graph_edges from current disasters + loans (as-of reseed; not live /near)"
+                >
+                  <i class="bi bi-arrow-repeat me-1"></i>Reseed graph
+                </button>
+                <a class="btn btn-sm btn-outline-secondary" id="duGraphPrototypeLink" href="/disaster-impact-graph.html">
+                  <i class="bi bi-box-arrow-up-right me-1"></i>Prototype
+                </a>
+              </div>
+            </div>
+            <div id="duGraphForceHost" class="du-graph-force-host" aria-live="polite"></div>
+            <ul class="du-graph-legend small text-muted mt-2 mb-0" aria-label="Node type colors">
+              <li><span class="du-graph-legend-dot" style="background:#b45309"></span> Disaster</li>
+              <li><span class="du-graph-legend-dot" style="background:#0f766e"></span> County</li>
+              <li><span class="du-graph-legend-dot" style="background:#0369a1"></span> ZIP</li>
+              <li><span class="du-graph-legend-dot" style="background:#4338ca"></span> Loan</li>
+              <li><span class="du-graph-legend-dot" style="background:#64748b"></span> Milestone</li>
+              <li><span class="du-graph-legend-dot" style="background:#9a3412"></span> Processor</li>
+            </ul>
+          </div>
+        </div>
       </div>
 
       </div><!-- /duIntelStage -->
@@ -809,8 +877,34 @@
         <div class="du-schema-sheet-body">
           <p class="small text-muted mb-3">
             Unified Disasters reads shared Postgres tables—no page-specific schema. Events refresh on a
-            <strong>90-day</strong> window.
+            <strong>90-day</strong> window. The impact graph is a derived graphical database on top of the same facts.
           </p>
+          <figure class="du-schema-mini mb-3" aria-label="Postgres fact tables seed the impact graph">
+            <svg class="du-schema-mini-svg" viewBox="0 0 560 120" role="img" aria-labelledby="duSchemaMiniTitle">
+              <title id="duSchemaMiniTitle">Fact tables seed graph_nodes and graph_edges</title>
+              <rect class="du-schema-mini-box" x="8" y="28" width="96" height="44" rx="6"></rect>
+              <text x="56" y="54" text-anchor="middle">disasters</text>
+              <rect class="du-schema-mini-box" x="118" y="28" width="72" height="44" rx="6"></rect>
+              <text x="154" y="54" text-anchor="middle">loans</text>
+              <rect class="du-schema-mini-box" x="204" y="28" width="100" height="44" rx="6"></rect>
+              <text x="254" y="54" text-anchor="middle">fire_cameras</text>
+              <path class="du-schema-mini-arrow" d="M320 50 H360" marker-end="url(#duSchemaArrow)"></path>
+              <text class="du-schema-mini-label" x="340" y="38" text-anchor="middle">seed</text>
+              <rect class="du-schema-mini-box du-schema-mini-box--graph" x="368" y="16" width="88" height="36" rx="6"></rect>
+              <text x="412" y="38" text-anchor="middle">graph_nodes</text>
+              <rect class="du-schema-mini-box du-schema-mini-box--graph" x="368" y="60" width="88" height="36" rx="6"></rect>
+              <text x="412" y="82" text-anchor="middle">graph_edges</text>
+              <path class="du-schema-mini-arrow" d="M468 50 H508" marker-end="url(#duSchemaArrow)"></path>
+              <text class="du-schema-mini-label" x="530" y="46" text-anchor="middle">walk</text>
+              <text class="du-schema-mini-label" x="530" y="62" text-anchor="middle">CTE</text>
+              <defs>
+                <marker id="duSchemaArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                  <path d="M0,0 L6,3 L0,6 Z" fill="#92400e"></path>
+                </marker>
+              </defs>
+            </svg>
+            <figcaption class="small text-muted">Live <code>/near</code> queries facts directly; graph <code>NEAR</code> is persisted with <code>seeded_at</code>.</figcaption>
+          </figure>
           <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
             <button
               type="button"
@@ -1041,13 +1135,16 @@
     <script src="/finance/js/hazard-webcam-viewer.js"></script>
     <script type="module" src="/shared/disaster-kml-export.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
+    <script src="https://d3js.org/d3.v7.min.js" crossorigin="anonymous"></script>
     <script src="/shared/vendor/topojson-client.min.js"></script>
     <script src="/finance/js/disasters-unified/core.js"></script>
     <script src="/finance/js/disasters-unified/geo-data.js"></script>
+    <script src="/finance/js/disasters-unified/map-overlays.js"></script>
     <script src="/finance/js/disasters-unified/geo-picker.js"></script>
     <script src="/finance/js/disasters-unified/ingest.js"></script>
     <script src="/finance/js/disasters-unified/grid.js"></script>
     <script src="/finance/js/disasters-unified/map.js"></script>
+    <script src="/finance/js/disasters-unified/graph-panel.js"></script>
     <script src="/finance/js/disasters-unified/app.js"></script>
     
     <!-- Camera Viewer Modal -->

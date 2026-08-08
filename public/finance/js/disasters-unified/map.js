@@ -98,8 +98,53 @@ function getDisasterMarkerIconForRisk(r, allRows, riskScore) {
   };
 }
 
+function setMapMarkerStatus(message) {
+  const el = document.getElementById('duMapMarkerStatus');
+  if (!el) return;
+  el.textContent = message || '';
+  el.hidden = !message;
+}
+
+/**
+ * Cap Advanced Markers for national loads; keep highest-risk / newest pins.
+ * Selected disaster is always retained when it has coordinates.
+ */
+function selectRowsForMapMarkers(mapRows, allRows, relatedLookup) {
+  const cap = typeof DU_MAP_MARKER_HARD_CAP === 'number' ? DU_MAP_MARKER_HARD_CAP : 500;
+  const total = mapRows.length;
+  if (total <= cap) {
+    return { renderRows: mapRows, total, shown: total, capped: false };
+  }
+
+  const scored = mapRows.map((item) => {
+    const startMs = item.row.start_time ? new Date(item.row.start_time).getTime() : 0;
+    return {
+      item,
+      risk: calculateDisasterRiskScore(item.row, allRows, relatedLookup),
+      startMs: Number.isFinite(startMs) ? startMs : 0,
+    };
+  });
+  scored.sort((a, b) => b.risk - a.risk || b.startMs - a.startMs);
+
+  let picked = scored.slice(0, cap).map((s) => s.item);
+  if (selectedDisasterObj) {
+    const key = disasterMatchKey(selectedDisasterObj);
+    const already = picked.some((p) => disasterMatchKey(p.row) === key);
+    if (!already) {
+      const missing = mapRows.find((p) => disasterMatchKey(p.row) === key);
+      if (missing) {
+        picked = [missing, ...picked.slice(0, cap - 1)];
+      }
+    }
+  }
+
+  return { renderRows: picked, total, shown: picked.length, capped: true };
+}
+
 function renderMap(rows) {
   if (!map) return;
+  const gen = ++duMapRenderGeneration;
+
   if (activeDisasterInfoWindow) {
     activeDisasterInfoWindow.close();
     activeDisasterInfoWindow = null;
@@ -110,9 +155,9 @@ function renderMap(rows) {
   const bounds = new google.maps.LatLngBounds();
   let any = false;
   cameraIndex = 0; // Reset camera index
-  const mapRows = [];
   const allRows = rows || lastLoadedDisasterRows || [];
-  rows.forEach(r => {
+  const mapRows = [];
+  allRows.forEach((r) => {
     // Support lat/lng, latitude/longitude, avg_latitude/avg_longitude
     const lat = r.lat ?? r.latitude ?? r.avg_latitude;
     const lng = r.lng ?? r.longitude ?? r.avg_longitude;
@@ -120,16 +165,32 @@ function renderMap(rows) {
       mapRows.push({ row: r, lat: parseFloat(lat), lng: parseFloat(lng) });
     }
   });
-  const chunkSize = 120;
+
+  const relatedLookup = typeof buildRelatedDisasterCountLookup === 'function'
+    ? buildRelatedDisasterCountLookup(allRows)
+    : null;
+  const { renderRows, total, shown, capped } = selectRowsForMapMarkers(mapRows, allRows, relatedLookup);
+
+  if (capped) {
+    setMapMarkerStatus(`Showing ${shown.toLocaleString()} of ${total.toLocaleString()} map pins (highest intensity). Narrow by state/county for full coverage.`);
+  } else if (total > 0) {
+    setMapMarkerStatus(`${total.toLocaleString()} map pin${total === 1 ? '' : 's'}`);
+  } else {
+    setMapMarkerStatus('');
+  }
+
+  const chunkSize = typeof DU_MAP_MARKER_CHUNK_SIZE === 'number' ? DU_MAP_MARKER_CHUNK_SIZE : 40;
+
   function renderChunk(startIndex = 0) {
-    const endIndex = Math.min(startIndex + chunkSize, mapRows.length);
+    if (gen !== duMapRenderGeneration) return;
+    const endIndex = Math.min(startIndex + chunkSize, renderRows.length);
     for (let i = startIndex; i < endIndex; i += 1) {
-      const item = mapRows[i];
+      const item = renderRows[i];
       const r = item.row;
       const pos = { lat: item.lat, lng: item.lng };
       const isCameraMarker = r.event_type === 'camera' || r.source === 'alertcalifornia' ||
         (r.title && r.title.toLowerCase().includes('camera'));
-      const riskScore = calculateDisasterRiskScore(r, allRows);
+      const riskScore = calculateDisasterRiskScore(r, allRows, relatedLookup);
       const disasterIcon = isCameraMarker && window.mapIcons?.getDisasterIconForMarker
         ? window.mapIcons.getDisasterIconForMarker('camera', r.source)
         : getDisasterMarkerIconForRisk(r, allRows, riskScore);
@@ -172,10 +233,12 @@ function renderMap(rows) {
       bounds.extend(pos);
       any = true;
     }
-    if (endIndex < mapRows.length) {
-      window.requestAnimationFrame(() => renderChunk(endIndex));
+    if (endIndex < renderRows.length) {
+      // Yield to the browser between chunks so Leaflet / UI stay responsive.
+      window.setTimeout(() => renderChunk(endIndex), 0);
       return;
     }
+    if (gen !== duMapRenderGeneration) return;
     if (selectedDisasterObj) {
       focusMapOnDisaster(selectedDisasterObj);
       highlightSelectedDisasterInGrid(selectedDisasterObj);

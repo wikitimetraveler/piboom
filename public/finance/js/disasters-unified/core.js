@@ -45,8 +45,15 @@ var duSelectedGeoCounty = null;
 var duStateDisasterRows = [];
 var duMultiPanelMode = false;
 var duLoadDisastersGeneration = 0;
+/** Cancels stale loadLoansForDisaster responses when place/disaster changes quickly */
+var duLoadLoansGeneration = 0;
+/** Cancels in-flight Google Maps marker chunk renders when a newer load starts */
+var duMapRenderGeneration = 0;
 var duFilterApplyTimer = null;
 var DU_FILTER_APPLY_DEBOUNCE_MS = 400;
+/** Hard cap for Google Maps Advanced Markers (USA/national loads freeze without this) */
+var DU_MAP_MARKER_HARD_CAP = 500;
+var DU_MAP_MARKER_CHUNK_SIZE = 40;
 
 function duEscapeHtml(str) {
   return String(str ?? '')
@@ -95,6 +102,7 @@ var DU_SIDEBAR_SECTION_IDS = [
   'collapseDisasters',
   'collapseMapYouTube',
   'collapseLoans',
+  'collapseGraphDb',
 ];
 
 var cameraIndex = 0;

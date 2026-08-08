@@ -15,8 +15,34 @@
   let selectedState = null;
   let selectedCounty = null;
   let countySummary = {};
+  /** Cached max event_count for county heat styling (avoid Math.max per feature). */
+  let countySummaryMax = 1;
+  const COUNTY_PERMANENT_TOOLTIP_MAX = 60;
 
   function $(sel) { return document.querySelector(sel); }
+
+  function refreshCountySummaryMax() {
+    let max = 1;
+    Object.keys(countySummary).forEach((k) => {
+      const n = Number(countySummary[k]?.event_count) || 0;
+      if (n > max) max = n;
+    });
+    countySummaryMax = max;
+  }
+
+  function bindFeatureTooltip(layer, { name, count, preferPermanent }) {
+    if (preferPermanent && count > 0) {
+      layer.bindTooltip(String(count), {
+        permanent: true,
+        direction: 'center',
+        className: 'du-geo-tooltip du-geo-count-label',
+        opacity: 0.95,
+      });
+      return;
+    }
+    const label = count > 0 ? `${name}: ${count}` : (name || '');
+    layer.bindTooltip(label, { sticky: true, className: 'du-geo-tooltip' });
+  }
 
   function setBreadcrumb(parts) {
     const el = $('#duGeoBreadcrumb');
@@ -59,12 +85,11 @@
     const name = duGeoData.normalizeCountyName(feature?.properties?.name);
     const summary = countySummary[name.toLowerCase()] || {};
     const count = Number(summary.event_count) || 0;
-    const max = Math.max(1, ...Object.values(countySummary).map((r) => Number(r.event_count) || 0));
     const selected = selectedCounty && name.toLowerCase() === selectedCounty.toLowerCase();
     return {
       color: selected ? '#1d4ed8' : '#475569',
       weight: selected ? 2.5 : 1,
-      fillColor: duGeoData.heatColor(count, max),
+      fillColor: duGeoData.heatColor(count, countySummaryMax),
       fillOpacity: selected ? 0.78 : 0.5,
     };
   }
@@ -169,26 +194,21 @@
         duGeoData.loadCountySummary(st),
       ]);
       cachedCountyGeo = geojson;
-      countySummary = summary;
+      countySummary = summary || {};
+      refreshCountySummaryMax();
       renderCountyList(st, geojson);
 
       if (countiesLayer) countiesLayer.remove();
+      const featureCount = (geojson.features || []).length;
+      // Permanent count labels are cheap for small states; sticky-only for dense county layers.
+      const preferPermanentCounts = featureCount <= COUNTY_PERMANENT_TOOLTIP_MAX;
       countiesLayer = L.geoJSON(geojson, {
         style: styleCountyLayer,
         onEachFeature: (feature, layer) => {
           const name = duGeoData.normalizeCountyName(feature.properties?.name);
           const summary = countySummary[name.toLowerCase()] || {};
           const count = Number(summary.event_count) || 0;
-          if (count > 0) {
-            layer.bindTooltip(String(count), {
-              permanent: true,
-              direction: 'center',
-              className: 'du-geo-tooltip du-geo-count-label',
-              opacity: 0.95,
-            });
-          } else {
-            layer.bindTooltip(name, { sticky: true, className: 'du-geo-tooltip' });
-          }
+          bindFeatureTooltip(layer, { name, count, preferPermanent: preferPermanentCounts });
           layer.on({
             mouseover: (e) => e.target.setStyle({ weight: 2, fillOpacity: 0.75 }),
             mouseout: (e) => countiesLayer.resetStyle(e.target),
@@ -214,6 +234,7 @@
     selectedCounty = null;
     cachedCountyGeo = null;
     countySummary = {};
+    countySummaryMax = 1;
     duStateDisasterRows = [];
     duGeoLoadScope = null;
     if (countiesLayer) {
@@ -243,19 +264,8 @@
         const abbr = feature.properties?.state_abbr;
         const name = feature.properties?.state_name || abbr;
         const count = Number(feature.properties?.event_count) || 0;
-        if (count > 0) {
-          layer.bindTooltip(String(count), {
-            permanent: true,
-            direction: 'center',
-            className: 'du-geo-tooltip du-geo-count-label',
-            opacity: 0.95,
-          });
-        } else {
-          layer.bindTooltip(name || abbr || '', {
-            sticky: true,
-            className: 'du-geo-tooltip',
-          });
-        }
+        // US zoom: sticky hover labels only — permanent tooltips on all states fight the main thread.
+        bindFeatureTooltip(layer, { name: name || abbr || '', count, preferPermanent: false });
         layer.on({
           mouseover: (e) => e.target.setStyle({ weight: 2, fillOpacity: 0.72 }),
           mouseout: (e) => statesLayer.resetStyle(e.target),
@@ -268,7 +278,7 @@
     const totalEvents = (geojson.features || []).reduce((sum, f) => sum + (Number(f.properties?.event_count) || 0), 0);
     if (totalEvents > 0) {
       setPickerStatus(
-        `${totalEvents.toLocaleString()} events across ${withEvents} state${withEvents === 1 ? '' : 's'} — numbers shown on the map. Click a state to drill in.`,
+        `${totalEvents.toLocaleString()} events across ${withEvents} state${withEvents === 1 ? '' : 's'} — hover a state for counts, click to drill in.`,
         'success'
       );
     }
@@ -333,6 +343,13 @@
       maxZoom: 19,
     }).addTo(pickerMap);
 
+    if (typeof global.duGeoOverlays?.bindPickerMap === 'function') {
+      global.duGeoOverlays.bindPickerMap(pickerMap);
+    }
+    if (typeof global.duGeoOverlays?.initChips === 'function') {
+      global.duGeoOverlays.initChips();
+    }
+
     populateStateSelect();
     setBreadcrumb([{ label: 'United States' }, { label: 'Select a state' }]);
     setPickerStatus('Nationwide monitoring on standby. Click a state or choose from the list.', 'muted');
@@ -376,15 +393,16 @@
     const params = new URLSearchParams(window.location.search);
     const urlState = params.get('state')?.toUpperCase();
     const urlCounty = params.get('county');
-    if (params.get('scope') === 'usa' && typeof global.onDuUsaConfirmed === 'function') {
-      global.onDuUsaConfirmed();
-    } else if (urlState && duGeoData.ST_TO_FIPS[urlState]) {
+    // Prefer explicit state/county over leftover scope=usa from a prior USA view.
+    if (urlState && duGeoData.ST_TO_FIPS[urlState]) {
       await selectState(urlState);
       if (urlCounty) {
         pickCounty(urlCounty);
       } else if (params.get('load') === '1') {
         confirmStateLoad();
       }
+    } else if (params.get('scope') === 'usa' && typeof global.onDuUsaConfirmed === 'function') {
+      global.onDuUsaConfirmed();
     } else if (!urlState && !urlCounty && typeof global.onDuUsaConfirmed === 'function') {
       global.onDuUsaConfirmed();
     }

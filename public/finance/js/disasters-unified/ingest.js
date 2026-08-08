@@ -210,6 +210,7 @@ function applyCountyDisasterFilter(county) {
   const url = new URL(window.location.href);
   url.searchParams.set('state', state);
   url.searchParams.set('county', county);
+  url.searchParams.delete('scope');
   url.searchParams.set('load', '1');
   window.history.replaceState({}, '', url);
 }
@@ -235,6 +236,7 @@ function clearCountyDisasterFilter() {
   const url = new URL(window.location.href);
   url.searchParams.set('state', state);
   url.searchParams.delete('county');
+  url.searchParams.delete('scope');
   url.searchParams.set('load', '1');
   window.history.replaceState({}, '', url);
 }
@@ -258,15 +260,29 @@ function finishDisastersLoad(allRows) {
     console.warn('   - Source/event filters');
     setDashboardStatus('No disaster rows matched current filters. Try broadening source, state, or date criteria.', 'info');
   }
+  // Never leave the intel stage in pending (pointer-events:none / greyed-out) after a load.
+  document.getElementById('duIntelStage')?.classList.remove('du-intel-stage--pending');
+  // Clear loading chrome before painting rows so the grid is never non-interactive while visible.
+  setDuInlineLoading(false);
+  // Progressive: paint grid/stats first, then chunk Google markers so Leaflet stays interactive.
+  ++duMapRenderGeneration;
   renderTable(allRows);
-  renderMap(allRows);
   updateStats(allRows);
   updateFirmsDeferredAlert();
-  setDuInlineLoading(false);
+  const mapGen = duMapRenderGeneration;
+  const rowsForMap = allRows;
+  window.requestAnimationFrame(() => {
+    window.setTimeout(() => {
+      if (mapGen !== duMapRenderGeneration) return;
+      renderMap(rowsForMap);
+    }, 0);
+  });
 }
 
 async function loadDisasters() {
   const gen = ++duLoadDisastersGeneration;
+  // Invalidate any in-flight marker chunks immediately (before await).
+  ++duMapRenderGeneration;
   setDuInlineLoading(true);
   setDashboardStatus('');
   activeHotspotKey = null;

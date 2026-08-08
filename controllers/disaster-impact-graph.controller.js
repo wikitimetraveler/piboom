@@ -77,6 +77,26 @@ export async function getLoansByDisaster(req, res) {
   }
 }
 
+export async function getDisasterEgoGraph(req, res) {
+  try {
+    await ensureGraphReady();
+    const disasterId = String(req.params.disasterId || '').trim();
+    if (!disasterId) {
+      return res.status(400).json({ success: false, error: 'disasterId is required' });
+    }
+    const depth = parseDepth(req.query.depth ?? 2);
+    const payload = await disasterImpactGraphService.getDisasterEgoGraph(disasterId, depth);
+    return res.json({ success: true, data: payload });
+  } catch (error) {
+    console.error('❌ Error getting disaster ego graph:', error.message);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to fetch disaster ego graph',
+      details: error.message
+    });
+  }
+}
+
 export async function getImpactSummary(req, res) {
   try {
     await ensureGraphReady();
@@ -96,9 +116,30 @@ export async function getImpactSummary(req, res) {
   }
 }
 
+/** Force-reseed graph_nodes / graph_edges from current disasters + loans (not live /near). */
+export async function refreshImpactGraph(req, res) {
+  try {
+    const payload = await disasterImpactGraphService.refreshDisasterImpactGraphFromCurrentData();
+    return res.json({
+      success: true,
+      message: 'Impact graph reseeded from current disasters and loans',
+      data: payload
+    });
+  } catch (error) {
+    console.error('❌ Error refreshing impact graph:', error.message);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to refresh impact graph',
+      details: error.message
+    });
+  }
+}
+
 export default {
   getImpactGraph,
   getLoansByCounty,
   getLoansByDisaster,
-  getImpactSummary
+  getDisasterEgoGraph,
+  getImpactSummary,
+  refreshImpactGraph
 };

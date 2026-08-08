@@ -212,6 +212,8 @@ function duBsCollapseHide(el, onHidden) {
   if (onHidden) {
     el.addEventListener('hidden.bs.collapse', function handler() {
       el.removeEventListener('hidden.bs.collapse', handler);
+      // Section may have been re-shown before this hide animation finished.
+      if (el.classList.contains('show')) return;
       onHidden();
     });
   }
@@ -223,6 +225,7 @@ function getDuNavSectionForCollapse(sectionId) {
   const el = document.getElementById(id);
   if (!el) return null;
   if (id === 'collapseLoans') return document.getElementById('duMockedLoansSection');
+  if (id === 'collapseGraphDb') return document.getElementById('duGraphDbSection');
   if (id === 'collapseRiskIntel') return document.getElementById('duRiskIntelCard');
   const navSection = el.closest('.du-nav-section');
   if (navSection) return navSection;
@@ -268,12 +271,14 @@ function updateDuSectionSidebarActiveState(sectionId, isExpanded) {
 function showDuDashboardSectionCard(sectionId) {
   const id = String(sectionId || '').replace(/^#/, '').trim();
   const section = document.getElementById(id);
-  if (!section || section.classList.contains('show')) return;
+  if (!section) return;
   const card = getDuNavSectionForCollapse(id);
+  // Always unhide the card — a pending hide callback can re-add the class after show.
   if (card) card.classList.remove('du-section-card-hidden');
   updateDuSectionHeaderState(id, true);
-  duBsCollapseShow(section);
   setDuSectionPillActive(id);
+  if (section.classList.contains('show')) return;
+  duBsCollapseShow(section);
 }
 
 function hideDuDashboardSectionCard(sectionId) {
@@ -397,6 +402,8 @@ function revealDuStateIntelPanels(state) {
   });
 
   loadDisasters().then(() => {
+    // Stale USA/state loads must not overwrite a newer county/disaster loan filter.
+    if (duGeoLoadScope !== 'state' || duSelectedGeoState !== st) return;
     setDashboardStatus(
       `Loaded statewide data for ${stateLabel}. Click a county to narrow, or keep browsing the map.`,
       'success'
@@ -410,6 +417,7 @@ function revealDuStateIntelPanels(state) {
     const url = new URL(window.location.href);
     url.searchParams.set('state', st);
     url.searchParams.delete('county');
+    url.searchParams.delete('scope');
     url.searchParams.set('load', '1');
     window.history.replaceState({}, '', url);
     openDuDashboardSection('collapseDisasters', 2);
@@ -427,7 +435,11 @@ function revealDuUsaIntelPanels() {
   $('#stateInput').val('');
   $('#countyInput').val('');
   loadDisasters().then(() => {
+    // Auto USA load resolves even when superseded — never wipe place/disaster loans.
+    if (duGeoLoadScope !== 'usa') return;
     setEncompassLoansGridRows([]);
+    lastAffectedLoans = [];
+    lastLoanFilterMeta = null;
     $('#encompassLoansSubtitle').text('Nationwide view — select a disaster for loan context.');
     const url = new URL(window.location.href);
     url.searchParams.delete('state');
@@ -467,6 +479,7 @@ window.onDuCountyFiltered = function onDuCountyFiltered(state, county) {
   });
 
   loadDisasters().then(() => {
+    if (duGeoLoadScope !== 'county' || duSelectedGeoState !== st || duSelectedGeoCounty !== co) return;
     $('#duLoanScopeMode').val('county');
     syncDuLoanRadiusControls();
     loadLoansForDisaster(
@@ -476,6 +489,7 @@ window.onDuCountyFiltered = function onDuCountyFiltered(state, county) {
     const url = new URL(window.location.href);
     url.searchParams.set('state', st);
     url.searchParams.set('county', co);
+    url.searchParams.delete('scope');
     url.searchParams.set('load', '1');
     window.history.replaceState({}, '', url);
     openDuDashboardSection('collapseDisasters', 2);
@@ -501,24 +515,37 @@ function revealDuCountyIntelPanels(state, county) {
 function revealDisasterSelectionPanels() {
   showDuDashboardSectionCard('collapseDisasters');
   showDuDashboardSectionCard('collapseMapYouTube');
+  showDuDashboardSectionCard('collapseGraphDb');
+  // Loans last so Graph DB show cannot leave the loans card hidden / inactive.
   expandDuLoansSection();
-  setDuSectionPillActive('collapseMapYouTube');
-  syncDuWorkflowPill(2);
+  setDuSectionPillActive('collapseLoans');
+  syncDuWorkflowPill(3);
   setTimeout(() => {
     refreshDisastersGridLayout();
     refreshEncompassLoansGridLayout();
-    document.querySelector('.du-youtube-panel')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    document.getElementById('headingLoans')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, 200);
+}
+
+function syncDuSelectionOverlays() {
+  const radiusMiles = DisasterLoanFilters.getSelectedRadiusMiles('duLoanRadiusMiles', 'duLoanRadiusCustom');
+  const mode = $('#duLoanScopeMode').val() || 'distance';
+  if (mode === 'distance' && selectedDisasterObj) {
+    window.duGeoOverlays?.setLiveRingFromSelection?.(selectedDisasterObj, radiusMiles);
+  } else {
+    window.duGeoOverlays?.setLiveRing?.(null, null, null);
+  }
 }
 
 function openDuDashboardSection(targetId, stepNum) {
   if (!targetId) return;
   const accordionIds = ['collapseFilters', 'collapseDisasters', 'collapseMapYouTube'];
-  const sectionCardIds = ['collapseCommandDeck', 'collapseRiskIntel', 'collapseLoans'];
+  const sectionCardIds = ['collapseCommandDeck', 'collapseRiskIntel', 'collapseLoans', 'collapseGraphDb'];
   const sectionHeadingIds = {
     collapseCommandDeck: 'headingCommandDeck',
     collapseRiskIntel: 'headingRiskIntel',
     collapseLoans: 'headingLoans',
+    collapseGraphDb: 'headingGraphDb',
     collapseFilters: 'headingFilters',
     collapseDisasters: 'headingDisasters',
     collapseMapYouTube: 'headingMapYouTube',
@@ -729,6 +756,7 @@ function applyDuLoanFilterIfReady() {
     loadLoansForDisaster(selectedDisasterObj, selectedDisasterRow);
     refreshNearbyCameras();
     refreshNearbyWeatherAlerts();
+    syncDuSelectionOverlays();
     return;
   }
   if (cameraLoadContext === 'loan' && selectedLoan) {
@@ -766,15 +794,15 @@ function selectDisaster(disasterData, disasterObj) {
   selectedDisaster = disasterObj || disasterData;
   selectedDisasterObj = disasterObj || null;
   selectedDisasterRow = Array.isArray(disasterData) ? disasterData : null;
-  const title = disasterObj?.title || disasterData[6] || '';
-  const state = disasterObj?.state_abbr || disasterData[3] || '';
-  const county = disasterObj?.county_name || disasterData[2] || '';
+  const row = Array.isArray(disasterData) ? disasterData : null;
+  const title = disasterObj?.title || row?.[6] || '';
+  const state = disasterObj?.state_abbr || row?.[3] || '';
+  const county = disasterObj?.county_name || row?.[2] || '';
   const riskScore = disasterObj?.risk_score || 0;
-  
-  const eventType = disasterObj?.event_type || disasterData?.[1] || '';
-  
+  const eventType = disasterObj?.event_type || row?.[1] || '';
+
   console.log('Selecting disaster:', title, state, county, 'Risk:', riskScore);
-  
+
   if (riskScore > 0) {
     console.log(`⚠️  Risk Score: ${riskScore.toFixed(1)}`);
   }
@@ -786,18 +814,30 @@ function selectDisaster(disasterData, disasterObj) {
   $('#duLoanScopeMode').val(defaultMode);
   syncDuLoanRadiusControls();
 
+  // Highlight immediately so the row doesn't feel "dead"; defer heavier panel work.
+  highlightSelectedDisasterInGrid(disasterObj);
+  focusMapOnDisaster(disasterObj);
+
+  // Loans first (and before Graph DB panel work) so selection always refreshes mocked loans.
   loadLoansForDisaster(disasterObj, selectedDisasterRow);
   loadNearbyCamerasForDisaster(disasterObj, selectedDisasterRow);
   loadNearbyWeatherAlertsForDisaster(disasterObj, selectedDisasterRow);
   applyNwsGridFilterFromSelection(disasterObj, selectedDisasterRow);
   searchYouTubeForDisaster(title, state, county, eventType, disasterObj);
   revealDisasterSelectionPanels();
-  highlightSelectedDisasterInGrid(disasterObj);
-  focusMapOnDisaster(disasterObj);
+  syncDuSelectionOverlays();
+  // D3 force graph is expensive — never block the grid click turn.
+  window.setTimeout(() => {
+    if (selectedDisasterObj !== disasterObj) return;
+    if (window.DuGraphPanel?.loadForDisaster) {
+      window.DuGraphPanel.loadForDisaster(disasterObj, { depth: 2 });
+    }
+  }, 0);
   refreshAIOnSelection();
 }
 
 async function loadLoansForDisaster(disasterObj, disasterData) {
+  const gen = ++duLoadLoansGeneration;
   expandDuLoansSection();
   $('#encompassLoansSubtitle').text('Loading loans via live /near…');
 
@@ -818,7 +858,10 @@ async function loadLoansForDisaster(disasterObj, disasterData) {
   });
 
   if (!built.state) {
+    if (gen !== duLoadLoansGeneration) return;
     setEncompassLoansGridRows([]);
+    lastAffectedLoans = [];
+    lastLoanFilterMeta = null;
     $('#encompassLoansSubtitle').text('Selected disaster has no state — cannot match mocked loans.');
     setDashboardStatus('Selected disaster has no state — cannot load loans.', 'warning');
     return;
@@ -829,11 +872,17 @@ async function loadLoansForDisaster(disasterObj, disasterData) {
     console.log('📍 Loading loans:', loanUrl, { mode: built.mode, radiusMiles });
     const response = await fetch(loanUrl);
     const data = await response.json();
+    if (gen !== duLoadLoansGeneration) return;
 
     if (data.success) {
       const loans = data.data.loans || [];
       populateEncompassLoansTable(loans);
-      updateMapWithLoans(loans);
+      try {
+        updateMapWithLoans(loans);
+      } catch (mapErr) {
+        // Map marker failures must not wipe the loans grid (was clearing via outer catch).
+        console.warn('Loan map markers skipped:', mapErr);
+      }
       const meta = {
         mode: built.mode,
         state: built.state,
@@ -854,10 +903,12 @@ async function loadLoansForDisaster(disasterObj, disasterData) {
       setEncompassLoansGridRows([]);
       lastAffectedLoans = [];
       lastLoanFilterMeta = null;
+      $('#encompassLoansSubtitle').text('Failed to load mocked loans — try again.');
     }
     updateSelectionContextStrip();
     refreshAIContext();
   } catch (error) {
+    if (gen !== duLoadLoansGeneration) return;
     console.error('Error loading Encompass loans:', error);
     setEncompassLoansGridRows([]);
     lastAffectedLoans = [];

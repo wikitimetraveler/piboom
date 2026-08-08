@@ -521,23 +521,249 @@ export async function findLoansImpactedByCounty(countyFips) {
   return { countyFips: countyExternalId, startNodeId: countyNode.rows[0].id, loans };
 }
 
+/**
+ * Resolve a disaster_event graph node from a client key.
+ * Tries external_id direct match, then disasters.source_id / disasters.id fallbacks
+ * (grid may send DB id while seed used source_id, or vice versa).
+ */
+export async function resolveDisasterEventNode(disasterId) {
+  const pool = ensurePool();
+  const requestedId = String(disasterId || '').trim();
+  if (!requestedId) return null;
+
+  const tried = new Set();
+  const tryExternalId = async (externalId) => {
+    const key = String(externalId || '').trim();
+    if (!key || tried.has(key)) return null;
+    tried.add(key);
+    const result = await pool.query(
+      `SELECT * FROM graph_nodes
+       WHERE node_type = 'disaster_event' AND external_id = $1
+       ORDER BY id LIMIT 1`,
+      [key]
+    );
+    if (!result.rows.length) return null;
+    return { node: result.rows[0], resolvedExternalId: key, requestedId };
+  };
+
+  const direct = await tryExternalId(requestedId);
+  if (direct) return direct;
+
+  const disasterRow = await pool.query(
+    `SELECT id, source_id, source
+     FROM disasters
+     WHERE source_id = $1 OR id::text = $1
+     ORDER BY id DESC
+     LIMIT 1`,
+    [requestedId]
+  );
+  if (!disasterRow.rows.length) return null;
+
+  const row = disasterRow.rows[0];
+  const candidates = [
+    String(row.source_id || '').trim(),
+    String(row.id),
+    row.source && row.source_id ? `${row.source}|${row.source_id}` : ''
+  ];
+  for (const candidate of candidates) {
+    const hit = await tryExternalId(candidate);
+    if (hit) return hit;
+  }
+  return null;
+}
+
 export async function findLoansImpactedByDisaster(disasterId) {
+  await ensureDisasterImpactGraphReady();
+  const externalId = String(disasterId || '').trim();
+  if (!externalId) throw new Error('disasterId is required');
+
+  const resolved = await resolveDisasterEventNode(externalId);
+  if (!resolved) {
+    return { disasterId: externalId, loans: [] };
+  }
+
+  const impactedLoans = await findImpactedLoansFromNode(resolved.node.id, DEFAULT_MAX_DEPTH + 3);
+  const loans = await attachLoanDetails(impactedLoans);
+  return {
+    disasterId: resolved.resolvedExternalId,
+    requestedDisasterId: externalId,
+    startNodeId: resolved.node.id,
+    loans
+  };
+}
+
+function hasFiniteCoordPair(lat, lng) {
+  return Number.isFinite(lat) && Number.isFinite(lng);
+}
+
+function parseNodeMetadata(raw) {
+  if (!raw) return {};
+  if (typeof raw === 'object') return raw;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Ego-network for Unified Disasters Graph DB panel + map NEAR rays.
+ * Live /near remains operational truth; returned NEAR edges are as-of seeded_at.
+ */
+export async function getDisasterEgoGraph(disasterId, depth = 2) {
   await ensureDisasterImpactGraphReady();
   const pool = ensurePool();
   const externalId = String(disasterId || '').trim();
   if (!externalId) throw new Error('disasterId is required');
 
-  const disasterNode = await pool.query(
-    `SELECT * FROM graph_nodes WHERE node_type = 'disaster_event' AND external_id = $1 ORDER BY id LIMIT 1`,
-    [externalId]
-  );
-  if (!disasterNode.rows.length) {
-    return { disasterId: externalId, loans: [] };
+  const resolved = await resolveDisasterEventNode(externalId);
+  if (!resolved) {
+    return {
+      disasterId: externalId,
+      startNodeId: null,
+      depth: clampDepth(depth),
+      nodes: [],
+      edges: [],
+      nearLinks: [],
+      seededAtMax: null,
+      found: false
+    };
   }
 
-  const impactedLoans = await findImpactedLoansFromNode(disasterNode.rows[0].id, DEFAULT_MAX_DEPTH + 3);
-  const loans = await attachLoanDetails(impactedLoans);
-  return { disasterId: externalId, startNodeId: disasterNode.rows[0].id, loans };
+  const resolvedExternalId = resolved.resolvedExternalId;
+  const startNodeId = Number(resolved.node.id);
+  const graph = await getImpactGraph(startNodeId, depth);
+
+  const disasterCoordsResult = await pool.query(
+    `SELECT lat, lng
+     FROM disasters
+     WHERE source_id = $1 OR id::text = $1 OR source_id = $2 OR id::text = $2
+     ORDER BY id DESC
+     LIMIT 1`,
+    [resolvedExternalId, externalId]
+  );
+  const dRow = disasterCoordsResult.rows[0] || {};
+  const disasterLat = Number(dRow.lat);
+  const disasterLng = Number(dRow.lng);
+  const disasterCoords = hasFiniteCoordPair(disasterLat, disasterLng)
+    ? { lat: disasterLat, lng: disasterLng }
+    : null;
+
+  const loanExternalIds = graph.nodes
+    .filter((n) => n.node_type === 'loan')
+    .map((n) => String(n.external_id || ''))
+    .filter(Boolean);
+
+  const loanCoordByKey = new Map();
+  if (loanExternalIds.length) {
+    const { rows: loanRows } = await pool.query(
+      `SELECT loan_number, id, latitude, longitude, disaster_risk_score
+       FROM loans
+       WHERE loan_number = ANY($1::text[]) OR id::text = ANY($1::text[])`,
+      [loanExternalIds]
+    );
+    for (const row of loanRows) {
+      const lat = Number(row.latitude);
+      const lng = Number(row.longitude);
+      const coords = hasFiniteCoordPair(lat, lng) ? { lat, lng } : null;
+      const payload = {
+        lat: coords?.lat ?? null,
+        lng: coords?.lng ?? null,
+        disaster_risk_score: row.disaster_risk_score
+      };
+      loanCoordByKey.set(String(row.loan_number), payload);
+      loanCoordByKey.set(String(row.id), payload);
+    }
+  }
+
+  const nodes = graph.nodes.map((node) => {
+    const metadata = parseNodeMetadata(node.metadata_json);
+    let lat = null;
+    let lng = null;
+    if (node.node_type === 'disaster_event' && disasterCoords) {
+      lat = disasterCoords.lat;
+      lng = disasterCoords.lng;
+    } else if (node.node_type === 'loan') {
+      const coords = loanCoordByKey.get(String(node.external_id));
+      if (coords) {
+        lat = coords.lat;
+        lng = coords.lng;
+      }
+    }
+    return {
+      id: Number(node.id),
+      node_type: node.node_type,
+      external_id: node.external_id,
+      label: node.label,
+      source: node.source,
+      metadata,
+      lat,
+      lng,
+      disaster_risk_score:
+        node.node_type === 'loan'
+          ? loanCoordByKey.get(String(node.external_id))?.disaster_risk_score ??
+            metadata.disaster_risk_score ??
+            null
+          : null
+    };
+  });
+
+  const nodeById = new Map(nodes.map((n) => [n.id, n]));
+  const edges = graph.edges.map((edge) => {
+    const metadata = parseNodeMetadata(edge.metadata_json);
+    const confidence =
+      edge.confidence === null || edge.confidence === undefined
+        ? 0.5
+        : Number(edge.confidence);
+    return {
+      id: Number(edge.id),
+      from_node_id: Number(edge.from_node_id),
+      to_node_id: Number(edge.to_node_id),
+      edge_type: edge.edge_type,
+      confidence: Number.isFinite(confidence) ? confidence : 0.5,
+      source: edge.source,
+      metadata
+    };
+  });
+
+  let seededAtMax = null;
+  const nearLinks = [];
+  for (const edge of edges) {
+    if (edge.edge_type !== 'NEAR') continue;
+    const seededAt = edge.metadata?.seeded_at || null;
+    if (seededAt && (!seededAtMax || String(seededAt) > String(seededAtMax))) {
+      seededAtMax = seededAt;
+    }
+    const from = nodeById.get(edge.from_node_id);
+    const to = nodeById.get(edge.to_node_id);
+    if (!from || !to) continue;
+    if (!hasFiniteCoordPair(from.lat, from.lng) || !hasFiniteCoordPair(to.lat, to.lng)) continue;
+    nearLinks.push({
+      edgeId: edge.id,
+      fromNodeId: from.id,
+      toNodeId: to.id,
+      confidence: edge.confidence,
+      seededAt,
+      distanceMeters: Number(edge.metadata?.distance_meters) || null,
+      from: { lat: from.lat, lng: from.lng, label: from.label, node_type: from.node_type },
+      to: { lat: to.lat, lng: to.lng, label: to.label, node_type: to.node_type }
+    });
+  }
+
+  return {
+    disasterId: resolvedExternalId,
+    requestedDisasterId: externalId,
+    startNodeId,
+    depth: graph.depth,
+    found: true,
+    nodes,
+    edges,
+    nearLinks,
+    seededAtMax,
+    nodeCount: nodes.length,
+    edgeCount: edges.length,
+    nearLinkCount: nearLinks.length
+  };
 }
 
 export async function calculateRiskPath(startNodeId) {
@@ -698,22 +924,27 @@ export async function seedGraphFromExistingDisasterData(options = {}) {
   for (const row of disastersResult.rows) {
     const countyFips = String(row.county_fips || '').trim();
     const countyLabel = row.county_name ? `${row.county_name}, ${row.state_abbr || ''}`.trim() : countyFips;
-    if (!countyFips || countyFips === '00000') continue;
+    // Placeholder / missing FIPS (common for FIRMS/USGS before geocode) — still seed the
+    // disaster_event node so ego lookup works; only skip county linking.
+    const hasValidCounty = Boolean(countyFips && countyFips !== '00000');
 
-    let countyNodeId = countyNodeByFips.get(countyFips);
-    if (!countyNodeId) {
-      const countyNode = await upsertNode({
-        node_type: 'county',
-        external_id: countyFips,
-        label: countyLabel || `County ${countyFips}`,
-        source: 'disasters',
-        metadata_json: {
-          county_name: row.county_name || null,
-          state_abbr: row.state_abbr || null
-        }
-      });
-      countyNodeId = countyNode.id;
-      countyNodeByFips.set(countyFips, countyNodeId);
+    let countyNodeId = null;
+    if (hasValidCounty) {
+      countyNodeId = countyNodeByFips.get(countyFips);
+      if (!countyNodeId) {
+        const countyNode = await upsertNode({
+          node_type: 'county',
+          external_id: countyFips,
+          label: countyLabel || `County ${countyFips}`,
+          source: 'disasters',
+          metadata_json: {
+            county_name: row.county_name || null,
+            state_abbr: row.state_abbr || null
+          }
+        });
+        countyNodeId = countyNode.id;
+        countyNodeByFips.set(countyFips, countyNodeId);
+      }
     }
 
     const disasterExternalId = String(row.source_id || row.id);
@@ -726,27 +957,31 @@ export async function seedGraphFromExistingDisasterData(options = {}) {
         source: row.source || 'disasters',
         metadata_json: {
           event_type: row.event_type,
-          county_fips: countyFips,
-          started_at: row.start_time
+          county_fips: hasValidCounty ? countyFips : null,
+          started_at: row.start_time,
+          disaster_row_id: row.id
         }
       });
       disasterNodeId = disasterNode.id;
       disasterNodeByKey.set(disasterExternalId, disasterNodeId);
     }
-    if (!disasterNodeIdsByCountyFips.has(countyFips)) {
-      disasterNodeIdsByCountyFips.set(countyFips, []);
-    }
-    disasterNodeIdsByCountyFips.get(countyFips).push(disasterNodeId);
 
-    await upsertEdge({
-      from_node_id: countyNodeId,
-      to_node_id: disasterNodeId,
-      edge_type: 'HAS_DECLARATION',
-      confidence: 0.9,
-      source: 'disasters-seed',
-      metadata_json: { source: row.source }
-    });
-    edgeCount += 1;
+    if (hasValidCounty && countyNodeId) {
+      if (!disasterNodeIdsByCountyFips.has(countyFips)) {
+        disasterNodeIdsByCountyFips.set(countyFips, []);
+      }
+      disasterNodeIdsByCountyFips.get(countyFips).push(disasterNodeId);
+
+      await upsertEdge({
+        from_node_id: countyNodeId,
+        to_node_id: disasterNodeId,
+        edge_type: 'HAS_DECLARATION',
+        confidence: 0.9,
+        source: 'disasters-seed',
+        metadata_json: { source: row.source }
+      });
+      edgeCount += 1;
+    }
   }
 
   for (const loan of loansResult.rows) {
@@ -964,6 +1199,8 @@ export default {
   getImpactGraph,
   findLoansImpactedByCounty,
   findLoansImpactedByDisaster,
+  resolveDisasterEventNode,
+  getDisasterEgoGraph,
   calculateRiskPath,
   summarizeImpact
 };
