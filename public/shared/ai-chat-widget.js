@@ -25,6 +25,7 @@ class AIChatWidget {
         this.onOpen = config.onOpen || null;
         this.onClose = config.onClose || null;
         this.showMusicMute = config.showMusicMute === true;
+        this.avatarUrl = typeof config.avatarUrl === 'string' ? config.avatarUrl.trim() : '';
         
         this.isOpen = false;
         this.messages = [];
@@ -37,12 +38,25 @@ class AIChatWidget {
     }
 
     createWidget() {
+        const escapeAttr = (value) => String(value || '')
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+        const avatar = this.avatarUrl;
+        const headerTitle = avatar
+            ? `<h5 class="mb-0 ai-chat-header-guide"><img src="${escapeAttr(avatar)}" alt="" width="36" height="36"/> ${this.title}</h5>`
+            : `<h5 class="mb-0"><i class="bi bi-robot"></i> ${this.title}</h5>`;
+
         // Create floating chat button
         const chatButton = document.createElement('button');
         chatButton.id = 'aiChatButton';
-        chatButton.className = 'ai-chat-button';
-        chatButton.innerHTML = '<i class="bi bi-chat-dots-fill"></i>';
+        chatButton.className = avatar ? 'ai-chat-button ai-chat-button--avatar' : 'ai-chat-button';
+        chatButton.innerHTML = avatar
+            ? `<img src="${escapeAttr(avatar)}" alt="" width="60" height="60"/>`
+            : '<i class="bi bi-chat-dots-fill"></i>';
         chatButton.title = this.buttonTitle;
+        chatButton.setAttribute('aria-label', this.buttonTitle);
         chatButton.onclick = () => this.toggle();
         document.body.appendChild(chatButton);
 
@@ -52,7 +66,7 @@ class AIChatWidget {
         chatPanel.className = 'ai-chat-panel';
         chatPanel.innerHTML = `
             <div class="ai-chat-header">
-                <h5 class="mb-0"><i class="bi bi-robot"></i> ${this.title}</h5>
+                ${headerTitle}
                 <div class="ai-chat-header-actions">
                     ${this.showMusicMute ? `<button type="button" id="aiChatMusicMuteBtn" class="ai-chat-music-mute-btn" title="Toggle disaster mood music" aria-label="Toggle disaster mood music"><i class="bi bi-music-note-beamed"></i></button>` : ''}
                     <button type="button" class="btn-close btn-close-white" onclick="window.aiChatWidget?.close()" aria-label="Close"></button>
@@ -104,6 +118,28 @@ class AIChatWidget {
                 }
                 .ai-chat-button:hover {
                     transform: scale(1.1);
+                }
+                .ai-chat-button--avatar {
+                    padding: 0;
+                    overflow: hidden;
+                }
+                .ai-chat-button--avatar img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    display: block;
+                    border-radius: 50%;
+                }
+                .ai-chat-header-guide {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.55rem;
+                }
+                .ai-chat-header-guide img {
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 50%;
+                    object-fit: cover;
                 }
                 .ai-chat-panel {
                     position: fixed;

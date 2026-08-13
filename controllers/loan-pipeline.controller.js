@@ -377,6 +377,52 @@ export async function getRiskSummary(req, res) {
 }
 
 /**
+ * Per-county ops triage rollup for hazard-lens choropleth.
+ * GET /api/loan-pipeline/county-risk-summary?state=CA
+ * Scores are ops triage ranks (0–15), not loss probabilities.
+ */
+export async function countyRiskSummaryByState(req, res) {
+  try {
+    const state = String(req.query.state || '').trim().toUpperCase();
+    if (!state) {
+      return res.status(400).json({ success: false, error: 'state query parameter is required' });
+    }
+    const pool = getPool();
+    if (!pool) throw new Error('Database not initialized');
+
+    const { rows } = await pool.query(
+      `SELECT county AS county_name,
+              COUNT(*)::int AS loan_count,
+              COALESCE(AVG(disaster_risk_score), 0)::float AS avg_ops_triage,
+              COALESCE(MAX(disaster_risk_score), 0)::float AS max_ops_triage
+       FROM loans
+       WHERE UPPER(TRIM(COALESCE(state, ''))) = $1
+         AND COALESCE(TRIM(county), '') <> ''
+       GROUP BY county
+       ORDER BY county`,
+      [state]
+    );
+
+    res.json({
+      success: true,
+      data: {
+        state,
+        metric: 'ops_triage',
+        note: 'Ops triage rank (FEMA + flood weights) — not a loss probability',
+        counties: rows
+      }
+    });
+  } catch (error) {
+    console.error('❌ Error getting county risk summary:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get county risk summary',
+      details: error.message
+    });
+  }
+}
+
+/**
  * Geocode existing loans that don't have coordinates
  * POST /api/loan-pipeline/geocode-loans?limit=100
  */
@@ -1043,6 +1089,7 @@ export default {
   getPipelineStats,
   getLoansByMilestone,
   getRiskSummary,
+  countyRiskSummaryByState,
   getFEMADisasters,
   queryFEMADirect,
   geocodeLoans,

@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Shenango Valley — Local Atlas | Nature</title>
-  <meta name="description" content="Shenango Valley local atlas: Buhl Park, New Wilmington Amish countryside, Quaker Steak &amp; Lube, and Luigi's Pizza — guided by David with HeyGen and AI chat."/>
+  <title>Shenango Valley — PA History Atlas | Buhl Park Center</title>
+  <meta name="description" content="Pennsylvania history concentrated on the Shenango Valley: Buhl Park at the map center, steel, Amish neighbors, sports, The Lettermen, Trent Reznor, photos and film."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet"/>
@@ -35,13 +35,13 @@
           <div class="sv-hero-inner">
             <p class="sv-kicker" id="svHeroKicker">Mercer &amp; Lawrence Counties · Western Pennsylvania</p>
             <h1 class="sv-hero-title" id="svHeroTitle">Shenango Valley</h1>
-            <p class="sv-hero-line" id="svHeroLine">Buhl Park at the center — Amish countryside nearby, and the local plates that taste like home.</p>
+            <p class="sv-hero-line" id="svHeroLine">Buhl Park at the center — steel, Amish neighbors, sports, and music from The Lettermen to Trent Reznor.</p>
             <div class="sv-hero-cta">
               <a class="sv-btn sv-btn-primary" href="#svMap">
-                <i class="bi bi-geo-alt-fill"></i> <span id="svExploreLabel">Explore the atlas</span>
+                <i class="bi bi-geo-alt-fill"></i> <span id="svExploreLabel">Explore from Buhl Park</span>
               </a>
-              <a class="sv-btn sv-btn-ghost" href="/nature/nature-hub.html">
-                <i class="bi bi-tree"></i> Nature hub
+              <a class="sv-btn sv-btn-ghost" href="#svVideo">
+                <i class="bi bi-play-circle"></i> Watch film
               </a>
             </div>
           </div>
@@ -51,7 +51,7 @@
               <img class="sv-guide-portrait" id="svGuidePortrait" src="/family/assets/david-lane-time-traveler-scene.png" width="72" height="72" alt="David — Shenango Valley guide"/>
               <div class="sv-guide-meta">
                 <h2 id="svGuideName">David</h2>
-                <p id="svGuideTitle">Shenango Valley guide</p>
+                <p id="svGuideTitle">Shenango Valley history guide</p>
                 <p class="sv-guide-status" id="svGuideStatus">Welcome home.</p>
               </div>
             </div>
@@ -72,57 +72,109 @@
     </section>
 
     <div class="container">
+      <section class="sv-section sv-section--map-first" id="svMap">
+        <div class="sv-section-head">
+          <h2 id="svMapHeading">Atlas from Buhl Park</h2>
+          <p id="svMapLead">Every spoke radiates from Buhl Park. Select a pin to hear its story.</p>
+          <p class="sv-hub-badge" id="svHubBadge"><i class="bi bi-bullseye"></i> Hub: Buhl Park</p>
+        </div>
+        <div class="sv-map-filters" id="svMapFilters" role="group" aria-label="Filter map pins">
+          <button type="button" class="sv-chip is-active" data-filter="all">All</button>
+          <button type="button" class="sv-chip" data-filter="park">Park</button>
+          <button type="button" class="sv-chip" data-filter="steel">Steel</button>
+          <button type="button" class="sv-chip" data-filter="amish">Amish</button>
+          <button type="button" class="sv-chip" data-filter="sports">Sports</button>
+          <button type="button" class="sv-chip" data-filter="music">Music</button>
+          <button type="button" class="sv-chip" data-filter="food">Food</button>
+        </div>
+        <div class="sv-map-layout">
+          <ul class="sv-site-list" id="svSiteList"></ul>
+          <div class="sv-map-wrap">
+            <div id="svMapCanvas" class="sv-map-canvas" role="img" aria-label="Satellite map of Shenango Valley with Buhl Park at center"></div>
+            <p class="sv-map-status" id="svMapStatus">Loading the atlas…</p>
+            <button type="button" class="sv-btn sv-btn-ghost sv-btn-sm sv-map-reset" id="svMapReset" hidden>
+              <i class="bi bi-arrow-clockwise"></i> Return to Buhl hub
+            </button>
+          </div>
+        </div>
+      </section>
+
       <section class="sv-section" id="svTimeline">
         <div class="sv-section-head">
-          <h2 id="svTimelineHeading">Layers of the valley</h2>
-          <p id="svTimelineLead">Three short chapters. Select one to open the story and find it on the map.</p>
+          <h2 id="svTimelineHeading">Chapters of the valley</h2>
+          <p id="svTimelineLead">Canal iron, steel boom, Buhl's gift, Amish neighbors, sports, and music.</p>
         </div>
         <ol class="sv-era-list" id="svEraList">
           <li class="sv-loading">Loading Shenango Valley…</li>
         </ol>
       </section>
 
-      <section class="sv-section" id="svMap">
+      <section class="sv-section" id="svMedia">
         <div class="sv-section-head">
-          <h2 id="svMapHeading">Atlas of Shenango Valley</h2>
-          <p id="svMapLead">Each pin is a place you can visit. Select a site to hear its story.</p>
+          <h2 id="svMediaHeading">Photos &amp; film</h2>
+          <p id="svMediaLead">Commons photos on the cards — Lettermen, Reznor, and steel documentaries below.</p>
         </div>
-        <div class="sv-map-filters" id="svMapFilters" role="group" aria-label="Filter map pins">
-          <button type="button" class="sv-chip is-active" data-filter="all">All</button>
-          <button type="button" class="sv-chip" data-filter="park">Park</button>
-          <button type="button" class="sv-chip" data-filter="amish">Amish</button>
-          <button type="button" class="sv-chip" data-filter="food">Food</button>
+        <div class="sv-gallery" id="svGallery"></div>
+      </section>
+
+      <section class="sv-section" id="svVideo">
+        <div class="sv-section-head">
+          <h2 id="svVideoHeading">Watch</h2>
+          <p id="svVideoLead">Verified embeds and archive films. Search links open more local clips.</p>
         </div>
-        <div class="sv-map-layout">
-          <ul class="sv-site-list" id="svSiteList"></ul>
-          <div class="sv-map-wrap">
-            <div id="svMapCanvas" class="sv-map-canvas" role="img" aria-label="Map of Shenango Valley places"></div>
-            <p class="sv-map-status" id="svMapStatus">Loading the atlas…</p>
-            <button type="button" class="sv-btn sv-btn-ghost sv-btn-sm sv-map-reset" id="svMapReset" hidden>
-              <i class="bi bi-arrow-clockwise"></i> Show all pins
-            </button>
-          </div>
+        <div class="sv-video-grid" id="svVideoGrid"></div>
+      </section>
+
+      <section class="sv-section" id="svSteel">
+        <div class="sv-section-head">
+          <h2 id="svSteelHeading">Steel business</h2>
+          <p id="svSteelLead">Sharon Iron Works to Farrell's mill — Frank H. Buhl's fortune and the valley that worked the heat.</p>
         </div>
+        <div class="sv-grid" id="svSteelGrid"></div>
+      </section>
+
+      <section class="sv-section" id="svAmish">
+        <div class="sv-section-head">
+          <h2 id="svAmishHeading">Amish neighbors</h2>
+          <p id="svAmishLead">New Wilmington / Volant since 1847 — drive with courtesy.</p>
+        </div>
+        <div class="sv-grid" id="svAmishGrid"></div>
+      </section>
+
+      <section class="sv-section" id="svSports">
+        <div class="sv-section-head">
+          <h2 id="svSportsHeading">Sports</h2>
+          <p id="svSportsLead">Buhl's free fields, Sharon Tigers, Farrell Steelers, Steel Bowl.</p>
+        </div>
+        <div class="sv-grid" id="svSportsGrid"></div>
+      </section>
+
+      <section class="sv-section" id="svMusic">
+        <div class="sv-section-head">
+          <h2 id="svMusicHeading">Music</h2>
+          <p id="svMusicLead">The Lettermen, Trent Reznor, Maennerchor, Marjon, WPIC, Buhl concerts.</p>
+        </div>
+        <div class="sv-grid" id="svMusicGrid"></div>
       </section>
 
       <section class="sv-section" id="svFood">
         <div class="sv-section-head">
           <h2 id="svFoodHeading">The valley table</h2>
-          <p id="svFoodLead">Featured for now — Quaker Steak &amp; Lube and Luigi's Pizza. Flip a card for the story.</p>
+          <p id="svFoodLead">Quaker Steak &amp; Lube and Luigi's Pizza.</p>
         </div>
         <div class="sv-grid" id="svFoodGrid"></div>
       </section>
 
       <section class="sv-section" id="svLiving">
         <div class="sv-section-head">
-          <h2 id="svLivingHeading">Living neighbors</h2>
-          <p id="svLivingLead">The New Wilmington Amish countryside — drive respectfully, no photos of people without permission.</p>
+          <h2 id="svLivingHeading">Living etiquette</h2>
+          <p id="svLivingLead">How to share Amish roads and keep Buhl free.</p>
         </div>
         <div class="sv-grid" id="svLivingGrid"></div>
       </section>
 
       <p class="sv-footer-note">
-        Shenango Valley Local Atlas · Guide narration by HeyGen &amp; TTS ·
+        Shenango Valley PA History Atlas · Photos via Wikimedia Commons · Film via YouTube &amp; Internet Archive ·
         Development by David E Lane · <span id="svFooterYear">2026</span>
       </p>
     </div>

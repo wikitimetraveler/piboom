@@ -39,6 +39,9 @@ router.get('/milestones/:milestone', loanPipelineController.getLoansByMilestone)
 // Get risk analysis summary
 router.get('/risk-summary', loanPipelineController.getRiskSummary);
 
+// Per-county ops triage for hazard-lens choropleth
+router.get('/county-risk-summary', loanPipelineController.countyRiskSummaryByState);
+
 // Get FEMA disasters from stored loan data
 router.get('/fema-disasters', loanPipelineController.getFEMADisasters);
 

@@ -422,6 +422,7 @@ function initEncompassLoansGrid() {
       if (event.node?.setSelected) event.node.setSelected(true);
       loadNearbyCamerasForLoan(loan);
       refreshAIOnSelection();
+      window.duGeoOverlays?.setFloodHalo?.(loan);
       if (loan.latitude && loan.longitude && map) {
         const pos = { lat: parseFloat(loan.latitude), lng: parseFloat(loan.longitude) };
         map.setCenter(pos);
@@ -498,6 +499,7 @@ function bindEncompassLoansGridEvents(api, gridEl) {
     if (event.node?.setSelected) event.node.setSelected(true);
     loadNearbyCamerasForLoan(loan);
     refreshAIOnSelection();
+    window.duGeoOverlays?.setFloodHalo?.(loan);
     if (loan.latitude && loan.longitude && map) {
       map.setCenter({ lat: parseFloat(loan.latitude), lng: parseFloat(loan.longitude) });
       map.setZoom(10);
@@ -520,6 +522,7 @@ function bindEncompassLoansGridEvents(api, gridEl) {
     }
   });
   document.getElementById('collapseLoans')?.addEventListener('shown.bs.collapse', refreshEncompassLoansGridLayout);
+  document.getElementById('collapseEncompassMap')?.addEventListener('shown.bs.collapse', refreshEncompassLoansGridLayout);
 }
 
 /**
@@ -868,6 +871,7 @@ function applyHotspotSelection(hotspot) {
 
 function renderTable(rows) {
   lastLoadedDisasterRows = rows || [];
+  window.duGeoOverlays?.setDisasterRows?.(lastLoadedDisasterRows);
   const seen = new Set();
   const uniqueRows = rows.filter((r) => {
     const key = `${r.source || ''}_${r.source_id || ''}_${r.start_time || ''}`;

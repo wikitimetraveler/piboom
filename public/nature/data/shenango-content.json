@@ -1,84 +1,248 @@
 {
   "id": "shenango-valley-atlas",
   "brand": {
-    "name": { "en": "Shenango Valley" },
-    "tagline": { "en": "Home park, Amish neighbors, and the valley table — mapped from Buhl Park." }
+    "name": {
+      "en": "Shenango Valley"
+    },
+    "tagline": {
+      "en": "Pennsylvania history from Buhl Park — steel, Amish neighbors, sports, and music."
+    }
   },
   "guide": {
-    "name": { "en": "David" },
-    "title": { "en": "Shenango Valley guide" },
+    "name": {
+      "en": "David"
+    },
+    "title": {
+      "en": "Shenango Valley history guide"
+    },
     "portrait": "/family/assets/david-lane-time-traveler-scene.png",
-    "greeting": { "en": "Welcome home. I'm David — walk with me from Buhl Park to the Amish roads and the valley's favorite tables." }
+    "greeting": {
+      "en": "Welcome home. I'm David — start at Buhl Park, then walk steel, Amish roads, Friday-night lights, and the music that left this valley."
+    }
   },
   "ui": {
     "en": {
       "dir": "ltr",
       "heroKicker": "Mercer & Lawrence Counties · Western Pennsylvania",
       "heroTitle": "Shenango Valley",
-      "heroLine": "Buhl Park at the center — Amish countryside nearby, and the local plates that taste like home.",
-      "exploreMap": "Explore the atlas",
+      "heroLine": "Buhl Park at the center — steel wealth that gifted a free green, Amish neighbors nearby, rival sports, and music from The Lettermen to Mercer County's Trent Reznor.",
+      "exploreMap": "Explore from Buhl Park",
       "askGuide": "Ask David",
       "meetGuide": "Meet David",
       "stop": "Stop",
       "listen": "Listen",
-      "timelineHeading": "Layers of the valley",
-      "timelineLead": "Three short chapters. Select one to open the story and find it on the map.",
-      "mapHeading": "Atlas of Shenango Valley",
-      "mapLead": "Each pin is a place you can visit. Select a site to hear its story.",
+      "timelineHeading": "Chapters of the valley",
+      "timelineLead": "Canal iron, steel boom, Buhl's gift, Amish neighbors, sports rivalries, and music. Select a chapter to hear it and find it on the map.",
+      "mapHeading": "Atlas from Buhl Park",
+      "mapLead": "Every spoke radiates from Buhl Park — Hermitage's 270-acre heart. Select a pin to hear its story.",
       "mapAll": "All",
       "mapPark": "Park",
+      "mapSteel": "Steel",
       "mapAmish": "Amish",
+      "mapSports": "Sports",
+      "mapMusic": "Music",
       "mapFood": "Food",
-      "mapReset": "Show all pins",
+      "mapReset": "Return to Buhl hub",
       "mapLoading": "Loading the atlas…",
+      "mapHubNote": "Hub: Buhl Park",
+      "steelHeading": "Steel business",
+      "steelLead": "Sharon Iron Works to Farrell's mill — Frank H. Buhl's fortune and the valley that worked the heat.",
+      "amishHeading": "Amish neighbors",
+      "amishLead": "New Wilmington / Volant Old Order settlement since 1847 — drive with courtesy; neighbors, not a theme park.",
+      "sportsHeading": "Sports",
+      "sportsLead": "Buhl's free fields and golf, Sharon Tigers football, Farrell Steelers basketball, and the Steel Bowl rivalry.",
+      "musicHeading": "Music",
+      "musicLead": "The Lettermen's Tony Butala from Sharon, Trent Reznor from Mercer, Maennerchor, Marjon Records, WPIC hops, and free concerts at Buhl.",
       "foodHeading": "The valley table",
-      "foodLead": "Featured for now — Quaker Steak & Lube and Luigi's Pizza. Flip a card for the story.",
-      "livingHeading": "Living neighbors",
-      "livingLead": "The New Wilmington Amish countryside — drive respectfully, no photos of people without permission.",
+      "foodLead": "After the mills — Quaker Steak & Lube and Luigi's Pizza. Flip a card for the story.",
+      "livingHeading": "Living etiquette",
+      "livingLead": "How to share Amish roads and honor what the valley still is.",
       "flipHint": "Flip for the story",
       "back": "Back",
       "loading": "Loading Shenango Valley…",
       "close": "Close",
       "context": "Context",
-      "mapShow": "Show on map"
+      "evidence": "On the ground",
+      "mapShow": "Show on map",
+      "mediaHeading": "Photos & film",
+      "mediaLead": "Commons photos on the cards — plus Lettermen, Reznor, and public-domain steel documentaries below.",
+      "videoHeading": "Watch",
+      "videoLead": "Verified embeds and archive films. Search links open more local clips."
     }
   },
   "eras": [
     {
-      "id": "home-park",
-      "siteId": "buhl-park",
-      "years": { "en": "1915 → today" },
-      "title": { "en": "Buhl Park — the living green" },
-      "copy": { "en": "In the heart of the Shenango Valley, Buhl Park's 270 acres hold trails, Lake Julia, free nine-hole golf, and the gatherings that stitch Hermitage and Sharon together." },
-      "narration": { "en": "Start at Buhl Park — the valley's shared front yard since nineteen fifteen." }
+      "id": "canal-iron",
+      "siteId": "sharpsville-lock-10",
+      "years": {
+        "en": "c. 1844–1890"
+      },
+      "title": {
+        "en": "Canal iron along the Shenango"
+      },
+      "copy": {
+        "en": "The Erie Extension Canal linked Pittsburgh to Lake Erie. Sharpsville's Lock 10 — the only surviving lock — marks the iron corridor before railroads remade the valley."
+      },
+      "narration": {
+        "en": "Before Sharon Steel, canal boats and blast furnaces shaped the Shenango. Start at Sharpsville Lock Ten — the last lock standing."
+      },
+      "image": "/nature/assets/shenango/steel/sharpsville-lock.jpg"
     },
     {
-      "id": "valley-table",
-      "siteId": "quaker-steak-lube",
-      "years": { "en": "1955 → 1974" },
-      "title": { "en": "Tables that taste like home" },
-      "copy": { "en": "Luigi's has been serving pie in Hermitage since 1955. Quaker Steak & Lube opened the original motor-themed wing house in Sharon in 1974 — both still define the valley table." },
-      "narration": { "en": "Two tables for now — Luigi's pizza and the original Quaker Steak and Lube." }
+      "id": "steel-boom",
+      "siteId": "farrell-steel",
+      "years": {
+        "en": "1896–1970s"
+      },
+      "title": {
+        "en": "Steel boom — Buhl to Farrell"
+      },
+      "copy": {
+        "en": "Frank H. Buhl led Buhl Steel and helped build the Sharon Steel Works in South Sharon — today's Farrell. At peak, valley plants employed roughly ten thousand. The mill was the Magic City's lifeblood until late-century closures."
+      },
+      "narration": {
+        "en": "Steel money built this valley. Frank Buhl's plants and Farrell's mill put thousands to work — and later funded the park at the center of our map."
+      },
+      "image": "/nature/assets/shenango/steel/farrell-steel.jpg"
+    },
+    {
+      "id": "buhl-gift",
+      "siteId": "buhl-park",
+      "years": {
+        "en": "1911–1916 → today"
+      },
+      "title": {
+        "en": "Buhl Park — the free green"
+      },
+      "copy": {
+        "en": "Steel industrialist Frank and Julia Buhl deeded their farm as a free public park — Lake Julia, Casino ballroom, bandstand, athletic field, and the nation's only free nine-hole golf course. About two hundred seventy acres still hold the valley together."
+      },
+      "narration": {
+        "en": "Everything on this atlas radiates from Buhl Park — Frank Buhl's gift so working families could recreate without a price."
+      },
+      "image": "/nature/assets/shenango/park/buhl-park.jpg"
     },
     {
       "id": "amish-neighbors",
       "siteId": "new-wilmington-amish",
-      "years": { "en": "1847 → today" },
-      "title": { "en": "Amish countryside nearby" },
-      "copy": { "en": "Around New Wilmington, Old Order Amish farms stretch across Lawrence and Mercer counties — brown-topped buggies, quiet roads, and markets that ask for courtesy over spectacle." },
-      "narration": { "en": "Just south-east of Buhl Park, New Wilmington anchors the local Amish countryside — not Lancaster." }
+      "years": {
+        "en": "1847 → today"
+      },
+      "title": {
+        "en": "Amish countryside nearby"
+      },
+      "copy": {
+        "en": "Old Order families from Mifflin County settled around New Wilmington about eighteen forty-seven. Brown-topped buggies and living farms — Lawrence and Mercer counties, not Lancaster."
+      },
+      "narration": {
+        "en": "Southeast of Buhl Park, New Wilmington anchors western Pennsylvania Amish country. Share the road and keep cameras off people."
+      },
+      "image": "/nature/assets/shenango/amish/new-wilmington.jpg"
+    },
+    {
+      "id": "friday-lights",
+      "siteId": "sharon-tiger-stadium",
+      "years": {
+        "en": "1899 → today"
+      },
+      "title": {
+        "en": "Friday-night lights & Steelers basketball"
+      },
+      "copy": {
+        "en": "Sharon Tigers football dates to eighteen ninety-nine; Tiger Stadium rose as a WPA project. Farrell Steelers basketball built a District Ten powerhouse. The Steel Bowl and gym rivalries still define valley Friday nights."
+      },
+      "narration": {
+        "en": "Sports stitch Sharon and Farrell together — Tiger Stadium, Steelers basketball, and the Steel Bowl. Buhl Park itself began with fields and free golf."
+      },
+      "image": "/nature/assets/shenango/sports/football-stadium.jpg"
+    },
+    {
+      "id": "music-valley",
+      "siteId": "vocal-group-hof",
+      "years": {
+        "en": "1938 → today"
+      },
+      "title": {
+        "en": "Music from harmony to industrial"
+      },
+      "copy": {
+        "en": "Sharon's Tony Butala founded The Lettermen and dreamed a Vocal Group Hall of Fame downtown. Mercer County's Trent Reznor took another path — Nine Inch Nails. Between them: WPIC radio, Angel's Casino hops, Marjon Records, Maennerchor, and free summer nights at Buhl."
+      },
+      "narration": {
+        "en": "Two national careers from this county — The Lettermen from Sharon, Trent Reznor from Mercer — plus the stages and airwaves that kept the valley dancing."
+      },
+      "image": "/nature/assets/shenango/music/lettermen.jpg"
     }
   ],
   "sites": [
     {
       "id": "buhl-park",
       "category": "park",
+      "hub": true,
       "emoji": "🌳",
       "lat": 41.245889,
       "lng": -80.477848,
-      "name": { "en": "Buhl Park" },
-      "place": { "en": "715 Hazen Rd, Hermitage, PA" },
-      "blurb": { "en": "270-acre heart of the Shenango Valley — trails, Lake Julia, recreation, and free nine-hole golf since 1915." }
+      "name": {
+        "en": "Buhl Park"
+      },
+      "place": {
+        "en": "715 Hazen Rd, Hermitage, PA"
+      },
+      "blurb": {
+        "en": "Map hub — ~270 acres gifted by Frank & Julia Buhl. Lake Julia, Casino, free nine-hole golf, trails, and summer concerts. Steel money made free recreation."
+      },
+      "image": "/nature/assets/shenango/park/buhl-park.jpg"
+    },
+    {
+      "id": "sharpsville-lock-10",
+      "category": "steel",
+      "emoji": "🔒",
+      "lat": 41.2678,
+      "lng": -80.4711,
+      "name": {
+        "en": "Sharpsville Lock 10"
+      },
+      "place": {
+        "en": "Sharpsville, PA — Erie Extension Canal"
+      },
+      "blurb": {
+        "en": "Only surviving lock of the Erie Extension Canal. Pre-rail iron corridor from the Ohio River toward Lake Erie."
+      },
+      "image": "/nature/assets/shenango/steel/sharpsville-lock.jpg"
+    },
+    {
+      "id": "farrell-steel",
+      "category": "steel",
+      "emoji": "⚙️",
+      "lat": 41.2123,
+      "lng": -80.4967,
+      "name": {
+        "en": "Farrell — Sharon Steel works"
+      },
+      "place": {
+        "en": "Farrell, PA (South Sharon)"
+      },
+      "blurb": {
+        "en": "Sharon Steel Works broke ground ~1900; Farrell grew overnight as the Magic City. Mill closed 1992 after bankruptcies; NLMK later continued steel operations on the site."
+      },
+      "image": "/nature/assets/shenango/steel/farrell-steel.jpg"
+    },
+    {
+      "id": "buhl-mansion",
+      "category": "steel",
+      "emoji": "🏛️",
+      "lat": 41.2335,
+      "lng": -80.5025,
+      "name": {
+        "en": "Buhl Mansion"
+      },
+      "place": {
+        "en": "E State St, Sharon, PA"
+      },
+      "blurb": {
+        "en": "1891 Richardsonian Romanesque home of Frank H. Buhl — Gilded Age steel wealth on the National Register."
+      },
+      "image": "/nature/assets/shenango/steel/buhl-mansion.jpg"
     },
     {
       "id": "new-wilmington-amish",
@@ -86,9 +250,135 @@
       "emoji": "🌾",
       "lat": 41.12083,
       "lng": -80.33278,
-      "name": { "en": "New Wilmington Amish countryside" },
-      "place": { "en": "New Wilmington / Volant, PA" },
-      "blurb": { "en": "Western Pennsylvania's Old Order Amish settlement — farms around New Wilmington and Volant, roughly ten miles from Buhl Park." }
+      "name": {
+        "en": "New Wilmington Amish countryside"
+      },
+      "place": {
+        "en": "New Wilmington / Volant, PA"
+      },
+      "blurb": {
+        "en": "Old Order settlement from 1847 — brown-topped buggies, living farms. Roughly ten miles from Buhl Park. Not Lancaster."
+      },
+      "image": "/nature/assets/shenango/amish/new-wilmington.jpg"
+    },
+    {
+      "id": "volant-market",
+      "category": "amish",
+      "emoji": "🧺",
+      "lat": 41.1136,
+      "lng": -80.2584,
+      "name": {
+        "en": "Volant market corridor"
+      },
+      "place": {
+        "en": "Volant, PA"
+      },
+      "blurb": {
+        "en": "Small-town gateway to Amish-country shops and roadside stands — buy when open, photograph fields not people."
+      },
+      "image": "/nature/assets/shenango/amish/volant.jpg"
+    },
+    {
+      "id": "sharon-tiger-stadium",
+      "category": "sports",
+      "emoji": "🏈",
+      "lat": 41.2308,
+      "lng": -80.4962,
+      "name": {
+        "en": "Sharon Tiger Stadium"
+      },
+      "place": {
+        "en": "Sharon, PA"
+      },
+      "blurb": {
+        "en": "Home of Sharon Tigers football since the WPA era. Tradition from 1899; site of Steel Bowl clashes with Farrell."
+      },
+      "image": "/nature/assets/shenango/sports/football-stadium.jpg"
+    },
+    {
+      "id": "farrell-steelers",
+      "category": "sports",
+      "emoji": "🏀",
+      "lat": 41.2105,
+      "lng": -80.496,
+      "name": {
+        "en": "Farrell Steelers athletics"
+      },
+      "place": {
+        "en": "Farrell High School, Farrell, PA"
+      },
+      "blurb": {
+        "en": "Farrell Steelers boys basketball — District 10 powerhouse nicknamed for the mill town. Rivalry nights with Sharon still pack the gym."
+      },
+      "image": "/nature/assets/shenango/sports/basketball.jpg"
+    },
+    {
+      "id": "vocal-group-hof",
+      "category": "music",
+      "emoji": "🎤",
+      "lat": 41.2331,
+      "lng": -80.5089,
+      "name": {
+        "en": "Vocal Group Hall of Fame story"
+      },
+      "place": {
+        "en": "Downtown Sharon / Columbia Theatre area"
+      },
+      "blurb": {
+        "en": "Tony Butala of The Lettermen founded a Vocal Group Hall of Fame in his hometown. Museum chapters and Columbia Theatre dreams marked Sharon's bid to honor harmony groups."
+      },
+      "image": "/nature/assets/shenango/music/lettermen.jpg"
+    },
+    {
+      "id": "apollo-maennerchor",
+      "category": "music",
+      "emoji": "🎶",
+      "lat": 41.2285,
+      "lng": -80.5105,
+      "name": {
+        "en": "Apollo Maennerchor"
+      },
+      "place": {
+        "en": "391 S Dock St, Sharon, PA"
+      },
+      "blurb": {
+        "en": "German singing club founded 1870 — Festhalle still hosts concerts. Last German culture club of its kind left in the valley."
+      },
+      "image": "/nature/assets/shenango/music/maennerchor.jpg"
+    },
+    {
+      "id": "mercer-reznor",
+      "category": "music",
+      "emoji": "🎸",
+      "lat": 41.227,
+      "lng": -80.2395,
+      "name": {
+        "en": "Mercer — Trent Reznor hometown"
+      },
+      "place": {
+        "en": "Mercer, PA (county seat)"
+      },
+      "blurb": {
+        "en": "County neighbor, not Shenango mill-town — Trent Reznor grew up here, Mercer HS 1983, then Cleveland and Nine Inch Nails. Same county orbit from Buhl Park."
+      },
+      "image": "/nature/assets/shenango/music/trent-reznor.jpg"
+    },
+    {
+      "id": "rockin-river",
+      "category": "music",
+      "emoji": "🎸",
+      "lat": 41.2338,
+      "lng": -80.5082,
+      "name": {
+        "en": "Rockin' on the River"
+      },
+      "place": {
+        "en": "State & Shenango St, Sharon, PA"
+      },
+      "blurb": {
+        "en": "Downtown Sharon summer concert series — living outdoor stage a short spoke from Buhl."
+      },
+      "image": "/nature/assets/shenango/music/outdoor-concert.jpg"
     },
     {
       "id": "quaker-steak-lube",
@@ -96,9 +386,16 @@
       "emoji": "🍗",
       "lat": 41.231344,
       "lng": -80.507806,
-      "name": { "en": "Quaker Steak & Lube — The Original" },
-      "place": { "en": "101 Chestnut St, Sharon, PA" },
-      "blurb": { "en": "The original Quaker Steak & Lube opened in 1974 in a former service station — motor-themed wings and a Sharon landmark." }
+      "name": {
+        "en": "Quaker Steak & Lube — The Original"
+      },
+      "place": {
+        "en": "101 Chestnut St, Sharon, PA"
+      },
+      "blurb": {
+        "en": "Opened March 1974 in a former service station — motor-themed wings and a Sharon landmark after the steel peak."
+      },
+      "image": "/nature/assets/shenango/food/quaker-steak.jpg"
     },
     {
       "id": "luigis-pizza",
@@ -106,9 +403,352 @@
       "emoji": "🍕",
       "lat": 41.2332,
       "lng": -80.4475,
-      "name": { "en": "Luigi's Pizza" },
-      "place": { "en": "2918 E State St, Hermitage, PA" },
-      "blurb": { "en": "Shenango Valley pizza institution since 1955 — often voted Best of the Best by local readers." }
+      "name": {
+        "en": "Luigi's Pizza"
+      },
+      "place": {
+        "en": "2918 E State St, Hermitage, PA"
+      },
+      "blurb": {
+        "en": "Shenango Valley pizza institution since 1955 — neighborhood loyalty near Buhl Park."
+      },
+      "image": "/nature/assets/shenango/food/pizza.jpg"
+    }
+  ],
+  "steel": [
+    {
+      "id": "frank-buhl-steel",
+      "siteId": "buhl-mansion",
+      "emoji": "🏭",
+      "name": {
+        "en": "Frank H. Buhl — steel & gift"
+      },
+      "tagline": {
+        "en": "Sharon Iron → Buhl Steel → park endowment"
+      },
+      "history": {
+        "en": "Yale-trained Frank H. Buhl rose through Sharon Iron Works, led Buhl Steel (1896), and helped build Sharon Steel Works in South Sharon (Farrell). After selling into the National/Carnegie orbit he poured fortune into Sharon — hospital, club, armory — and with Julia deeded Buhl Farm as free public recreation so mill families could gather without a ticket price."
+      },
+      "tags": {
+        "en": [
+          "Sharon",
+          "Philanthropy",
+          "1915"
+        ]
+      },
+      "image": "/nature/assets/shenango/steel/frank-buhl.jpg"
+    },
+    {
+      "id": "farrell-magic-city",
+      "siteId": "farrell-steel",
+      "emoji": "⚙️",
+      "name": {
+        "en": "Farrell — the Magic City"
+      },
+      "tagline": {
+        "en": "Mill town born overnight ~1901"
+      },
+      "history": {
+        "en": "South Sharon became Farrell when the steel works drew workers to the Shenango plain. Late-1920s valley plants employed around ten thousand. Sharon Steel's 1987 and 1992 bankruptcies closed the big mill; Caparo, Duferco, and later NLMK kept steel alive on the footprint. The town's nickname still echoes industrial speed."
+      },
+      "tags": {
+        "en": [
+          "Farrell",
+          "Sharon Steel",
+          "NLMK"
+        ]
+      },
+      "image": "/nature/assets/shenango/steel/farrell-steel.jpg"
+    },
+    {
+      "id": "canal-lock",
+      "siteId": "sharpsville-lock-10",
+      "emoji": "🛶",
+      "name": {
+        "en": "Erie Extension Canal"
+      },
+      "tagline": {
+        "en": "Iron before the railroad peak"
+      },
+      "history": {
+        "en": "Completed in the 1840s, the canal moved coal and pig iron between the Ohio River and Lake Erie. Sharpsville Lock 10 is the sole surviving lock — a stone reminder that the Shenango was an industrial waterway before Sharon Steel's smoke."
+      },
+      "tags": {
+        "en": [
+          "Sharpsville",
+          "Canal",
+          "1844"
+        ]
+      },
+      "image": "/nature/assets/shenango/steel/sharpsville-lock.jpg"
+    }
+  ],
+  "amish": [
+    {
+      "id": "nw-settlement",
+      "siteId": "new-wilmington-amish",
+      "emoji": "🌾",
+      "name": {
+        "en": "New Wilmington settlement"
+      },
+      "tagline": {
+        "en": "Old Order since ~1847"
+      },
+      "history": {
+        "en": "Families from Mifflin County — Zook, Byler, and others — settled farms around New Wilmington in the late 1840s. GAMEO and county histories place this among Pennsylvania's major western settlements. Distinctive brown or burnt-orange buggy tops mark the roads. Treat it as a living community, not Lancaster tourism copy."
+      },
+      "tags": {
+        "en": [
+          "1847",
+          "Lawrence County",
+          "Courtesy"
+        ]
+      },
+      "image": "/nature/assets/shenango/amish/new-wilmington.jpg"
+    },
+    {
+      "id": "amish-etiquette",
+      "siteId": "new-wilmington-amish",
+      "emoji": "🤝",
+      "name": {
+        "en": "Drive with courtesy"
+      },
+      "tagline": {
+        "en": "Neighbors, not a theme park"
+      },
+      "history": {
+        "en": "Share the road with buggies, keep cameras on barns and fields — never people without clear permission — and buy from roadside stands when open. Sacred singing (Ausbund slow-tunes) is worship, not a soundtrack for visitors."
+      },
+      "tags": {
+        "en": [
+          "Etiquette",
+          "Respect"
+        ]
+      },
+      "image": "/nature/assets/shenango/amish/new-wilmington.jpg"
+    },
+    {
+      "id": "volant-card",
+      "siteId": "volant-market",
+      "emoji": "🧺",
+      "name": {
+        "en": "Volant corridor"
+      },
+      "tagline": {
+        "en": "Small-town edge of Amish country"
+      },
+      "history": {
+        "en": "Volant sits on the approach to Amish farmland — shops, markets, and quiet roads. Use it as a respectful gateway from the Shenango Valley map, not as a private-farm pin drop."
+      },
+      "tags": {
+        "en": [
+          "Volant",
+          "Markets"
+        ]
+      },
+      "image": "/nature/assets/shenango/amish/volant.jpg"
+    }
+  ],
+  "sports": [
+    {
+      "id": "buhl-sports",
+      "siteId": "buhl-park",
+      "emoji": "⛳",
+      "name": {
+        "en": "Buhl Park athletics"
+      },
+      "tagline": {
+        "en": "Free golf, fields, and bandstand"
+      },
+      "history": {
+        "en": "The original farm park included a football field with a thousand-seat grandstand, tennis courts, and a nine-hole course laid out so anyone could play free. That free golf course still claims uniqueness in the United States. Recreation was Buhl's answer to steel-town life."
+      },
+      "tags": {
+        "en": [
+          "Golf",
+          "Free",
+          "Hermitage"
+        ]
+      },
+      "image": "/nature/assets/shenango/sports/golf.jpg"
+    },
+    {
+      "id": "sharon-tigers",
+      "siteId": "sharon-tiger-stadium",
+      "emoji": "🏈",
+      "name": {
+        "en": "Sharon Tigers football"
+      },
+      "tagline": {
+        "en": "Since 1899 — Pads of Glory"
+      },
+      "history": {
+        "en": "Sharon High football began as the Yellow Jackets before becoming the Tigers. Tiger Stadium, built with WPA labor, hosted legendary crowds — including nearly ten thousand for a 1956 Sharon–Farrell game. The Steel Bowl still names the rivalry."
+      },
+      "tags": {
+        "en": [
+          "Football",
+          "WPA",
+          "Steel Bowl"
+        ]
+      },
+      "image": "/nature/assets/shenango/sports/football-stadium.jpg"
+    },
+    {
+      "id": "farrell-bball",
+      "siteId": "farrell-steelers",
+      "emoji": "🏀",
+      "name": {
+        "en": "Farrell Steelers basketball"
+      },
+      "tagline": {
+        "en": "District 10 powerhouse"
+      },
+      "history": {
+        "en": "Named for the mill town, Farrell Steelers boys basketball has stacked District 10 titles and deep playoff runs. Gym nights against Sharon remain among the valley's fiercest winter traditions."
+      },
+      "tags": {
+        "en": [
+          "Basketball",
+          "Farrell",
+          "D10"
+        ]
+      },
+      "image": "/nature/assets/shenango/sports/basketball.jpg"
+    }
+  ],
+  "music": [
+    {
+      "id": "lettermen-butala",
+      "siteId": "vocal-group-hof",
+      "emoji": "🎤",
+      "name": {
+        "en": "Tony Butala & The Lettermen"
+      },
+      "tagline": {
+        "en": "Sharon harmony on the national charts"
+      },
+      "history": {
+        "en": "Tony Butala, born in Sharon in 1940, founded The Lettermen — close-harmony hits like The Way You Look Tonight and When I Fall in Love. He later opened a Vocal Group Hall of Fame in his hometown to honor ensembles from doo-wop to Motown, and fought for years to keep that dream on State Street and the Columbia Theatre."
+      },
+      "tags": {
+        "en": [
+          "Sharon",
+          "Lettermen",
+          "Hall of Fame"
+        ]
+      },
+      "image": "/nature/assets/shenango/music/lettermen.jpg"
+    },
+    {
+      "id": "trent-reznor",
+      "siteId": "mercer-reznor",
+      "emoji": "🎸",
+      "name": {
+        "en": "Trent Reznor"
+      },
+      "tagline": {
+        "en": "Mercer County → Nine Inch Nails"
+      },
+      "history": {
+        "en": "Raised in Mercer — the county seat east of the Shenango mill towns — Reznor graduated Mercer High in 1983 after jazz band, marching band, and musical theater. He left Allegheny College for Cleveland and built Nine Inch Nails. Same county as Buhl Park; different town. Frame him as Mercer County orbit, not a Sharon childhood claim."
+      },
+      "tags": {
+        "en": [
+          "Mercer",
+          "NIN",
+          "County"
+        ]
+      },
+      "image": "/nature/assets/shenango/music/trent-reznor.jpg"
+    },
+    {
+      "id": "buhl-concerts",
+      "siteId": "buhl-park",
+      "emoji": "☀️",
+      "name": {
+        "en": "Buhl summer concerts"
+      },
+      "tagline": {
+        "en": "Free music at the Performing Arts Center"
+      },
+      "history": {
+        "en": "Frank Buhl put a bandstand in the original farm. Today free Wednesday and Sunday concerts fill the Performing Arts Center — community bands, tributes, and Buhl Day on Labor Day. Steel endowment still buys summer nights under the trees."
+      },
+      "tags": {
+        "en": [
+          "Free",
+          "PAC",
+          "Tradition"
+        ]
+      },
+      "image": "/nature/assets/shenango/music/outdoor-concert.jpg"
+    },
+    {
+      "id": "maennerchor",
+      "siteId": "apollo-maennerchor",
+      "emoji": "🍺",
+      "name": {
+        "en": "Apollo Maennerchor"
+      },
+      "tagline": {
+        "en": "German song since 1870"
+      },
+      "history": {
+        "en": "Immigrant steel culture needed singing clubs. Sharon's Apollo Maennerchor survives with Festhalle concerts while most valley ethnic clubs faded. Blues, rock, and German programs still share the room."
+      },
+      "tags": {
+        "en": [
+          "1870",
+          "German",
+          "Sharon"
+        ]
+      },
+      "image": "/nature/assets/shenango/music/maennerchor.jpg"
+    },
+    {
+      "id": "marjon-wpic",
+      "siteId": "rockin-river",
+      "emoji": "📻",
+      "name": {
+        "en": "WPIC, hops & Marjon"
+      },
+      "tagline": {
+        "en": "Airwaves, Angel's Casino, polka vinyl"
+      },
+      "history": {
+        "en": "WPIC signed on in 1938. 1950s Sharpsville record hops at Angel's Casino rode DJ promotion from the station. In 1960 Johnny and Martha Krizancic founded Marjon Records in the Sharon–Hermitage area — hundreds of polka, tamburitza, and local country/garage sides. Downtown Rockin' on the River continues the outdoor habit."
+      },
+      "tags": {
+        "en": [
+          "WPIC",
+          "Marjon",
+          "1938"
+        ]
+      },
+      "image": "/nature/assets/shenango/music/radio.jpg"
+    },
+    {
+      "id": "menagerie",
+      "siteId": "buhl-park",
+      "emoji": "🎺",
+      "name": {
+        "en": "Menagerie"
+      },
+      "tagline": {
+        "en": "Hermitage horn-rock, 1971–79"
+      },
+      "history": {
+        "en": "Menagerie formed in Hermitage in the Blood, Sweat & Tears vein — horns, funk, and hard rock for valley youth when live music was central. They ran Club Menagerie and a boutique; reunion shows decades later still drew thousands of locals who remembered the peak mill-town nightlife."
+      },
+      "tags": {
+        "en": [
+          "Hermitage",
+          "1970s",
+          "Horn rock"
+        ]
+      },
+      "image": "/nature/assets/shenango/music/outdoor-concert.jpg"
     }
   ],
   "foods": [
@@ -116,30 +756,175 @@
       "id": "qsl-card",
       "siteId": "quaker-steak-lube",
       "emoji": "🍗",
-      "name": { "en": "Quaker Steak & Lube" },
-      "tagline": { "en": "The original — Sharon, 1974" },
-      "history": { "en": "Born in a vacant auto service station on Chestnut Street, the Sharon Lube invented the motor-garage dining vibe and put Shenango Valley wings on the national map. Bike Night, sauces by the dozen, and the original address still matter." },
-      "tags": { "en": ["Sharon", "Wings", "Original"] }
+      "name": {
+        "en": "Quaker Steak & Lube"
+      },
+      "tagline": {
+        "en": "The original — Sharon, 1974"
+      },
+      "history": {
+        "en": "George Jig Warren and Gary Moe Meszaros opened in a vacant auto service station in March 1974 — cook-your-own steak first, then wings that put Sharon on the national map. Bike Night and the original Chestnut Street address still matter."
+      },
+      "tags": {
+        "en": [
+          "Sharon",
+          "Wings",
+          "1974"
+        ]
+      },
+      "image": "/nature/assets/shenango/food/quaker-steak.jpg"
     },
     {
       "id": "luigis-card",
       "siteId": "luigis-pizza",
       "emoji": "🍕",
-      "name": { "en": "Luigi's Pizza" },
-      "tagline": { "en": "Hermitage pie since 1955" },
-      "history": { "en": "A neighborhood pizzeria on East State Street that has fed the valley for generations. Classic pies, local loyalty, and the kind of counter where everyone already knows your order." },
-      "tags": { "en": ["Hermitage", "Pizza", "Since 1955"] }
+      "name": {
+        "en": "Luigi's Pizza"
+      },
+      "tagline": {
+        "en": "Hermitage pie since 1955"
+      },
+      "history": {
+        "en": "East State Street neighborhood pizza that has fed the valley for generations — the kind of counter where everyone already knows your order."
+      },
+      "tags": {
+        "en": [
+          "Hermitage",
+          "Pizza",
+          "1955"
+        ]
+      },
+      "image": "/nature/assets/shenango/food/pizza.jpg"
     }
   ],
   "living": [
     {
-      "id": "amish-etiquette",
+      "id": "amish-etiquette-living",
       "siteId": "new-wilmington-amish",
       "emoji": "🌾",
-      "name": { "en": "Drive with courtesy" },
-      "tagline": { "en": "Neighbors, not a theme park" },
-      "history": { "en": "Share the road with buggies, keep cameras pointed at barns and fields — never at people without clear permission — and buy from roadside stands when they are open. The countryside around New Wilmington is a living community." },
-      "tags": { "en": ["Etiquette", "New Wilmington"] }
+      "name": {
+        "en": "Share the Amish road"
+      },
+      "tagline": {
+        "en": "Courtesy over spectacle"
+      },
+      "history": {
+        "en": "Slow for buggies, buy local when stands are open, and leave people out of your photos. New Wilmington is a living settlement — the map pin is geography, not an invitation to trespass."
+      },
+      "tags": {
+        "en": [
+          "Etiquette",
+          "New Wilmington"
+        ]
+      },
+      "image": "/nature/assets/shenango/amish/new-wilmington.jpg"
+    },
+    {
+      "id": "buhl-legacy",
+      "siteId": "buhl-park",
+      "emoji": "💚",
+      "name": {
+        "en": "Keep Buhl free"
+      },
+      "tagline": {
+        "en": "Endowment + community partners"
+      },
+      "history": {
+        "en": "Frank Buhl said every activity should be free so working people could bring families. The trust, donations, and partners still fund golf, concerts, and trails. The map stays centered here because the valley still meets here."
+      },
+      "tags": {
+        "en": [
+          "Trust",
+          "Community"
+        ]
+      },
+      "image": "/nature/assets/shenango/park/buhl-park.jpg"
+    }
+  ],
+  "gallery": [
+    {
+      "id": "g-buhl",
+      "image": "/nature/assets/shenango/park/buhl-park.jpg",
+      "caption": {
+        "en": "Valley green — map hub at Buhl Park"
+      }
+    },
+    {
+      "id": "g-mansion",
+      "image": "/nature/assets/shenango/steel/buhl-mansion.jpg",
+      "caption": {
+        "en": "Buhl Mansion, Sharon — steel wealth"
+      }
+    },
+    {
+      "id": "g-downtown",
+      "image": "/nature/assets/shenango/steel/sharon-downtown.jpg",
+      "caption": {
+        "en": "Downtown Sharon"
+      }
+    },
+    {
+      "id": "g-steel",
+      "image": "/nature/assets/shenango/steel/farrell-steel.jpg",
+      "caption": {
+        "en": "Steel mill atmosphere (historic industrial imagery)"
+      }
+    },
+    {
+      "id": "g-lock",
+      "image": "/nature/assets/shenango/steel/sharpsville-lock.jpg",
+      "caption": {
+        "en": "Canal lock stonework — Erie Extension era"
+      }
+    },
+    {
+      "id": "g-amish",
+      "image": "/nature/assets/shenango/amish/new-wilmington.jpg",
+      "caption": {
+        "en": "New Wilmington"
+      }
+    },
+    {
+      "id": "g-volant",
+      "image": "/nature/assets/shenango/amish/volant.jpg",
+      "caption": {
+        "en": "Volant corridor"
+      }
+    },
+    {
+      "id": "g-lettermen",
+      "image": "/nature/assets/shenango/music/lettermen.jpg",
+      "caption": {
+        "en": "The Lettermen (1964)"
+      }
+    },
+    {
+      "id": "g-reznor",
+      "image": "/nature/assets/shenango/music/trent-reznor.jpg",
+      "caption": {
+        "en": "Trent Reznor"
+      }
+    },
+    {
+      "id": "g-football",
+      "image": "/nature/assets/shenango/sports/football-stadium.jpg",
+      "caption": {
+        "en": "Friday-night lights"
+      }
+    },
+    {
+      "id": "g-qsl",
+      "image": "/nature/assets/shenango/food/quaker-steak.jpg",
+      "caption": {
+        "en": "Quaker Steak & Lube culture"
+      }
+    },
+    {
+      "id": "g-river",
+      "image": "/nature/assets/shenango/park/shenango-river.jpg",
+      "caption": {
+        "en": "Shenango River country"
+      }
     }
   ]
 }

@@ -92,6 +92,7 @@
           <div class="du-hero-actions d-flex flex-wrap gap-2 align-items-center">
             <a class="btn btn-outline-light btn-sm" href="/finance/index.html"><i class="bi-arrow-left"></i> Hub</a>
             <a class="btn btn-outline-light btn-sm" href="disasters-webcams.html"><i class="bi-camera-video"></i> Webcams</a>
+            <a class="btn btn-outline-light btn-sm" href="disasters-encompass-map.html" title="Optional fullscreen Google map · live proximity loan pins"><i class="bi-fullscreen"></i> Fullscreen map</a>
             <button type="button" class="btn btn-warning btn-sm" id="refreshBtnHero" title="Fetch FEMA, FIRMS, USGS, NWS, NHC live APIs and upsert into Postgres (1–3 min)">
               <i class="bi bi-cloud-download"></i> Pull all sources
             </button>
@@ -185,7 +186,12 @@
             <li><a href="#" data-bs-target="#collapseCommandDeck" data-heading="headingCommandDeck" data-du-section-step="2"><i class="bi bi-sliders"></i> Sources</a></li>
             <li><a href="#" data-bs-target="#collapseFilters" data-heading="headingFilters" data-du-section-step="2"><i class="bi bi-funnel"></i> Filters</a></li>
             <li><a href="#" data-bs-target="#collapseRiskIntel" data-heading="headingRiskIntel" data-du-section-step="2"><i class="bi bi-speedometer2"></i> Risk intel</a></li>
-            <li><a href="#" data-bs-target="#collapseMapYouTube" data-heading="headingMapYouTube" data-du-section-step="2"><i class="bi bi-geo-alt"></i> Map &amp; videos</a></li>
+            <li><a href="#" data-bs-target="#collapseMapYouTube" data-heading="headingMapYouTube" data-du-section-step="2"><i class="bi bi-youtube"></i> Disaster videos</a></li>
+            <li>
+              <a href="#" data-bs-target="#collapseEncompassMap" data-heading="headingEncompassMap" data-du-section-step="3" data-du-scroll-target="duEncompassLoansMapCard" title="Google Encompass map · live proximity — not graph NEAR">
+                <i class="bi bi-geo-alt"></i> Encompass map
+              </a>
+            </li>
             <li><a href="#" data-bs-target="#collapseLoans" data-heading="headingLoans" data-du-section-step="3"><i class="bi bi-bank"></i> Loans</a></li>
             <li><a href="#" data-bs-target="#collapseGraphDb" data-heading="headingGraphDb" data-du-section-step="3"><i class="bi bi-diagram-3"></i> Graph DB</a></li>
             <li class="mt-2"><span class="small text-uppercase text-muted px-2 d-block">Tools</span></li>
@@ -204,7 +210,7 @@
         <div class="card-header du-geo-stage-header d-flex flex-wrap justify-content-between align-items-center gap-2">
           <div>
             <strong><i class="bi bi-binoculars me-1"></i> Hazard lens</strong>
-            <span class="text-muted small d-block">Pick a state for the county overlay — click a county to load (or load entire state / USA). Toggle live /near rings and graph NEAR rays after selecting an event.</span>
+            <span class="text-muted small d-block">Pick a state for the county overlay — click a county to load (or load entire state / USA). Toggle live /near, source layers, FIRMS heat, and graph NEAR after selecting an event.</span>
           </div>
           <div class="d-flex align-items-center gap-2 flex-wrap">
             <span class="badge text-bg-primary du-geo-active-crumb" id="duGeoActiveCrumb" hidden></span>
@@ -217,6 +223,14 @@
         <div class="card-body du-geo-stage-body">
           <nav class="du-geo-breadcrumb mb-2" id="duGeoBreadcrumb" aria-label="Location"></nav>
           <p class="du-geo-picker-status small mb-2 text-muted" id="duGeoPickerStatus" role="status"></p>
+          <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+            <label class="form-label small fw-semibold mb-0 me-1" for="duGeoChoroplethMode">County heat</label>
+            <select id="duGeoChoroplethMode" class="form-select form-select-sm w-auto" aria-label="County choropleth metric">
+              <option value="events" selected>Event density</option>
+              <option value="opsTriage">Ops triage (loans)</option>
+              <option value="cameras">Camera sightedness</option>
+            </select>
+          </div>
           <div class="du-overlay-chips mb-2" role="group" aria-label="Map overlays">
             <button type="button" class="du-overlay-chip du-overlay-chip--active" data-du-overlay="live" aria-pressed="true" title="Live GET /api/disasters/near radius — operational truth">
               <span class="du-overlay-swatch du-overlay-swatch--live"></span> Live /near ring
@@ -224,11 +238,32 @@
             <button type="button" class="du-overlay-chip du-overlay-chip--active" data-du-overlay="graphNear" aria-pressed="true" title="Persisted graph NEAR edges — as-of last reseed (seeded_at)">
               <span class="du-overlay-swatch du-overlay-swatch--near"></span> Graph NEAR
             </button>
+            <button type="button" class="du-overlay-chip" data-du-overlay="firmsHeat" aria-pressed="false" title="FIRMS intensity weighted by FRP / brightness">
+              <span class="du-overlay-swatch du-overlay-swatch--firms-heat"></span> FIRMS heat
+            </button>
+            <button type="button" class="du-overlay-chip du-overlay-chip--active" data-du-overlay="floodHalo" aria-pressed="true" title="Visual flood-zone halo around selected loan (not NFHL polygon)">
+              <span class="du-overlay-swatch du-overlay-swatch--flood"></span> Flood halo
+            </button>
+            <button type="button" class="du-overlay-chip du-overlay-chip--active" data-du-overlay="fema" aria-pressed="true" title="FEMA markers">
+              <span class="du-overlay-swatch" style="background:#7c3aed"></span> FEMA
+            </button>
+            <button type="button" class="du-overlay-chip du-overlay-chip--active" data-du-overlay="firms" aria-pressed="true" title="FIRMS markers">
+              <span class="du-overlay-swatch" style="background:#ea580c"></span> FIRMS
+            </button>
+            <button type="button" class="du-overlay-chip du-overlay-chip--active" data-du-overlay="usgs" aria-pressed="true" title="USGS markers">
+              <span class="du-overlay-swatch" style="background:#0d9488"></span> USGS
+            </button>
+            <button type="button" class="du-overlay-chip du-overlay-chip--active" data-du-overlay="nws" aria-pressed="true" title="NWS markers">
+              <span class="du-overlay-swatch" style="background:#0284c7"></span> NWS
+            </button>
+            <button type="button" class="du-overlay-chip du-overlay-chip--active" data-du-overlay="nhc" aria-pressed="true" title="NHC markers">
+              <span class="du-overlay-swatch" style="background:#c026d3"></span> NHC
+            </button>
           </div>
           <div class="row g-3">
             <div class="col-lg-8">
               <div id="duGeoPickerMap" class="du-geo-picker-map" role="application" aria-label="United States map"></div>
-              <div class="du-geo-legend small text-muted mt-2" aria-label="Event density legend">
+              <div class="du-geo-legend small text-muted mt-2" id="duGeoChoroplethLegend" aria-label="Choropleth legend">
                 <span class="du-geo-legend-item"><span class="du-geo-legend-swatch du-geo-legend--none"></span> None</span>
                 <span class="du-geo-legend-item"><span class="du-geo-legend-swatch du-geo-legend--low"></span> Low</span>
                 <span class="du-geo-legend-item"><span class="du-geo-legend-swatch du-geo-legend--medium"></span> Moderate</span>
@@ -581,43 +616,35 @@
         </div>
         </div>
 
-        <!-- Accordion Item 3: Map & YouTube -->
+        <!-- Accordion Item 3: Disaster videos (Google Encompass map sits between Disasters and Loans) -->
         <div class="du-nav-section du-section-card-hidden" data-du-collapse-target="collapseMapYouTube">
         <div class="accordion-item">
           <h2 class="accordion-header" id="headingMapYouTube">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMapYouTube" aria-expanded="false" aria-controls="collapseMapYouTube">
-              <i class="bi bi-geo-alt me-2"></i> Map & Disaster Videos
+              <i class="bi bi-youtube me-2"></i> Disaster Videos
             </button>
           </h2>
           <div id="collapseMapYouTube" class="accordion-collapse collapse" aria-labelledby="headingMapYouTube">
             <div class="accordion-body">
-              <div class="row g-3">
-                <div class="col-md-6">
-                  <div class="card du-data-panel du-map-panel">
-                    <div class="card-header">
-                      <strong><i class="bi-geo-alt"></i> Hazard map</strong>
-                      <small class="text-muted d-block">Markers colored by risk tier · click to select event</small>
-                      <small id="duMapMarkerStatus" class="text-muted d-block mt-1" hidden></small>
-                    </div>
-                    <div class="card-body">
-                      <div id="map"></div>
-                    </div>
+              <div class="alert alert-light border py-2 small mb-3" role="note">
+                <i class="bi bi-geo-alt me-1"></i>
+                Hazard + loan pins render on the
+                <a href="#" data-bs-target="#collapseEncompassMap" data-heading="headingEncompassMap" data-du-section-step="3" data-du-scroll-target="duEncompassLoansMapCard">Encompass map</a>
+                between Disasters and Loans (live proximity · ops triage — not graph NEAR). Optional
+                <a href="disasters-encompass-map.html" id="duVideosEncompassMapLink">fullscreen map</a>.
+                Leaflet place lens stays above.
+              </div>
+              <div class="card du-data-panel du-youtube-panel">
+                <div class="card-header"><strong><i class="bi-youtube"></i> Disaster videos</strong></div>
+                <div class="card-body">
+                  <div class="du-youtube-skeleton" id="youtubeSkeleton">
+                    <div class="placeholder col-12" style="height: 120px;"></div>
+                    <div class="placeholder col-10" style="height: 1rem;"></div>
                   </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="card du-data-panel du-youtube-panel">
-                    <div class="card-header"><strong><i class="bi-youtube"></i> Disaster videos</strong></div>
-                    <div class="card-body">
-                      <div class="du-youtube-skeleton" id="youtubeSkeleton">
-                        <div class="placeholder col-12" style="height: 120px;"></div>
-                        <div class="placeholder col-10" style="height: 1rem;"></div>
-                      </div>
-                      <div id="youtubeResults">
-                        <div class="du-youtube-empty" id="youtubeEmptyState">
-                          <i class="bi-youtube"></i>
-                          <p class="mb-0">Select a disaster row to search related videos</p>
-                        </div>
-                      </div>
+                  <div id="youtubeResults">
+                    <div class="du-youtube-empty" id="youtubeEmptyState">
+                      <i class="bi-youtube"></i>
+                      <p class="mb-0">Select a disaster row to search related videos</p>
                     </div>
                   </div>
                 </div>
@@ -630,6 +657,46 @@
       </div>
 
       <div class="du-section-cards mb-4">
+        <!-- Encompass Google map — between Disasters grid and Loans grid -->
+        <div class="du-section-card du-encompass-map-section du-section-card-hidden" id="duEncompassMapSection" data-du-collapse-target="collapseEncompassMap">
+          <div
+            class="du-section-card-header collapsed"
+            tabindex="0"
+            id="headingEncompassMap"
+            role="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseEncompassMap"
+            aria-expanded="false"
+            aria-controls="collapseEncompassMap"
+          >
+            <span class="du-section-title">
+              <span class="du-section-step-pill" aria-hidden="true">3</span>
+              <i class="bi bi-geo-alt" aria-hidden="true"></i>
+              <h2 class="du-section-heading mb-0">Encompass map · live proximity</h2>
+            </span>
+            <i class="bi bi-chevron-down du-section-chevron" aria-hidden="true"></i>
+          </div>
+          <div id="collapseEncompassMap" class="collapse du-section-card-body" aria-labelledby="headingEncompassMap">
+            <div class="card du-data-panel du-map-panel mb-0" id="duEncompassLoansMapCard">
+              <div class="card-header d-flex flex-wrap justify-content-between align-items-start gap-2">
+                <div>
+                  <strong><i class="bi-geo-alt"></i> Encompass map · live proximity (not graph NEAR)</strong>
+                  <small class="text-muted d-block">Selected event + nearby mocked loan pins · ops triage rank — not a loss probability</small>
+                </div>
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                  <small id="duMapMarkerStatus" class="text-muted" hidden></small>
+                  <button type="button" class="btn btn-sm btn-outline-secondary" id="duOpenEncompassMapLoansBtn" onclick="openEncompassMapFromUnified()" hidden title="Optional fullscreen satellite map with live proximity loan pins">
+                    <i class="bi bi-fullscreen"></i> Open fullscreen map
+                  </button>
+                </div>
+              </div>
+              <div class="card-body">
+                <div id="map" role="application" aria-label="Encompass hazard and loan map"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="du-section-card du-mocked-loans du-section-card-hidden" id="duMockedLoansSection" data-du-collapse-target="collapseLoans">
           <div
             class="du-section-card-header collapsed"
@@ -702,9 +769,11 @@
                   <strong><i class="bi-bank"></i> Nearby mocked loan data</strong>
                   <small class="text-muted d-block" id="encompassLoansSubtitle">Live proximity (<code>/near</code>) · demo loans · ops triage rank (0–15), not a loss probability</small>
                 </div>
-                <button type="button" class="btn btn-sm btn-outline-warning" id="duExportCinematicKmlLoansBtn" onclick="exportCinematicDisasterKml()" disabled title="Select a disaster in the grid first">
-                  <i class="bi bi-globe-americas"></i> Google Earth KML
-                </button>
+                <div class="d-flex flex-wrap gap-2">
+                  <button type="button" class="btn btn-sm btn-outline-warning" id="duExportCinematicKmlLoansBtn" onclick="exportCinematicDisasterKml()" disabled title="Select a disaster in the grid first">
+                    <i class="bi bi-globe-americas"></i> Google Earth KML
+                  </button>
+                </div>
               </div>
               <div class="card-body">
                 <div id="duLoanRadiusCustomBar" class="du-loan-custom-radius mb-3" hidden>
@@ -716,7 +785,7 @@
                 </div>
                 <div id="duLoanPanelLoans" class="du-loan-panel" role="tabpanel" aria-labelledby="duLoanPanelLoansTab">
                   <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
-                    <small class="text-muted mb-0">Sort and filter mocked loans like the disasters grid. Click a row to focus the map.</small>
+                    <small class="text-muted mb-0">Sort and filter mocked loans like the disasters grid. Click a row for cameras; pins also appear on the Encompass map above.</small>
                     <input type="text" id="loansQuickFilter" class="form-control form-control-sm" style="max-width: 240px;" placeholder="Quick filter loans…" aria-label="Quick filter loans">
                   </div>
                   <div id="encompassLoansGrid" class="ag-theme-alpine"></div>
@@ -940,7 +1009,7 @@
                 </tbody>
               </table>
               <p class="small mb-0">
-                Radius search powers the grid selection strip, loan map pins, and hazard webcam panel on this page.
+                Radius search powers the grid selection strip, Encompass map loan pins, and hazard webcam panel.
                 Do <strong>not</strong> equate this with graph <code>NEAR</code> edges (those are as-of last reseed only).
               </p>
             </div>
@@ -1130,6 +1199,7 @@
     <script src="/shared/map-icons.js"></script>
     <script src="/shared/google-advanced-markers.js"></script>
     <script src="/finance/js/disaster-loan-filters.js"></script>
+    <script src="/finance/js/du-encompass-map-handoff.js"></script>
     <script src="/finance/js/disaster-camera-filters.js"></script>
     <script src="/finance/js/disaster-weather-alert-filters.js"></script>
     <script src="/finance/js/hazard-webcam-viewer.js"></script>

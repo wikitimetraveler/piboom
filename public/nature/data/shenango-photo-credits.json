@@ -1,0 +1,187 @@
+{
+  "updatedAt": "2026-08-12T06:11:22.183Z",
+  "credits": {
+    "buhl-park": {
+      "image": "/nature/assets/shenango/park/buhl-park.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:VIEW_OF_NORTHERN_APPROACH_TO_BRIDGE_-_College_Avenue_Bridge,_Pennsylvania_Route_58-_Legislative_Route_82_spanning_Little_Shenango_River,_Greenville,_Mercer_County,_PA_HAER_PA,43-GRENV,4-2.tif",
+      "title": "File:VIEW OF NORTHERN APPROACH TO BRIDGE - College Avenue Bridge, Pennsylvania Route 58- Legislative Route 82 spanning Little Shenango River, Greenville, Mercer County, PA HAER PA,43-GRENV,4-2.tif",
+      "artist": " \nMcHugh, William P., creator ",
+      "license": "Public domain",
+      "query": "Shenango River Pennsylvania landscape"
+    },
+    "sharon-downtown": {
+      "image": "/nature/assets/shenango/steel/sharon-downtown.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Downtown_Sharon,_Pennsylvania,_2021.jpg",
+      "title": "File:Downtown Sharon, Pennsylvania, 2021.jpg",
+      "artist": "Dreajc10",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "query": "Sharon Pennsylvania downtown",
+      "caption": "Downtown"
+    },
+    "farrell-steel": {
+      "image": "/nature/assets/shenango/steel/farrell-steel.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Machine_Hall,_Old_Bethlehem_Steel_Mill,_Bethlehem,_PA.jpg",
+      "title": "File:Machine Hall, Old Bethlehem Steel Mill, Bethlehem, PA.jpg",
+      "artist": "w_lemay",
+      "license": "CC BY-SA 2.0",
+      "query": "Bethlehem Steel mill exterior"
+    },
+    "sharpsville-lock": {
+      "image": "/nature/assets/shenango/steel/sharpsville-lock.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:GENERAL_VIEW_LOOKING_SOUTH_FROM_FOOTBRIDGE_-_Ohio_and_Erie_Canal,_Lock_No._39,_West_side_of_Canal_Road,_3400_feet_north_of_Stone_Road,_Valley_View,_Cuyahoga_County,_OH_HAER_OHIO,18-VAVI,4-1.tif",
+      "title": "File:GENERAL VIEW LOOKING SOUTH FROM FOOTBRIDGE - Ohio and Erie Canal, Lock No. 39, West side of Canal Road, 3400 feet north of Stone Road, Valley View, Cuyahoga County, OH HAER OHIO,18-VAVI,4-1.tif",
+      "artist": "",
+      "license": "Public domain",
+      "query": "Ohio and Erie Canal lock stone"
+    },
+    "buhl-mansion": {
+      "image": "/nature/assets/shenango/steel/buhl-mansion.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Buhl_Mansion,_Sharon,_2026-02-23.jpg",
+      "title": "File:Buhl Mansion, Sharon, 2026-02-23.jpg",
+      "artist": "Cbaile19",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "query": "Buhl Mansion Sharon",
+      "caption": "The Frank H. Buhl Mansion in Sharon, Pennsylvania, on a snowy evening"
+    },
+    "new-wilmington": {
+      "image": "/nature/assets/shenango/amish/new-wilmington.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:New_Wilmington,_Pennsylvania.jpg",
+      "title": "File:New Wilmington, Pennsylvania.jpg",
+      "artist": "Doug Kerr",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "query": "New Wilmington Pennsylvania",
+      "caption": "New Wilmington, Pennsylvania"
+    },
+    "volant": {
+      "image": "/nature/assets/shenango/amish/volant.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Volant,_Pennsylvania.jpg",
+      "title": "File:Volant, Pennsylvania.jpg",
+      "artist": "Doug Kerr",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "query": "Volant Pennsylvania",
+      "caption": "Volant, Pennsylvania"
+    },
+    "football": {
+      "image": "/nature/assets/shenango/sports/football-stadium.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Johns_Hopkins_Takes_Down_Army_In_Physical_Season_Finale_(8711299520).jpg",
+      "title": "File:Johns Hopkins Takes Down Army In Physical Season Finale (8711299520).jpg",
+      "artist": "U.S. Army Photo by Tommy Gilligan/USMA PAO",
+      "license": "Public domain",
+      "query": "American football stadium night lights"
+    },
+    "basketball": {
+      "image": "/nature/assets/shenango/sports/basketball.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Central_Catholic_High_School_gymnasium,_Bloomington_Illinois.JPG",
+      "title": "File:Central Catholic High School gymnasium, Bloomington Illinois.JPG",
+      "artist": "EyeTripleE",
+      "license": "CC0",
+      "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+      "query": "high school basketball gymnasium",
+      "caption": "Central Catholic High School gymnasium, Bloomington Illinois."
+    },
+    "golf": {
+      "image": "/nature/assets/shenango/sports/golf.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Hersheypark_golf_club_1948.JPG",
+      "title": "File:Hersheypark golf club 1948.JPG",
+      "artist": "Hershey Department Store, Hershey, PA.",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "query": "public golf course Pennsylvania",
+      "caption": "Postcard depiction of the golf club at Hersheypark."
+    },
+    "lettermen": {
+      "image": "/nature/assets/shenango/music/lettermen.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:The_Lettermen_1964.JPG",
+      "title": "File:The Lettermen 1964.JPG",
+      "artist": "William Morris Agency (management); photographer: Maurice Seymour (barely visible at lower left)",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "query": "The Lettermen 1964",
+      "caption": "Promotional photo of the singing group The Lettermen."
+    },
+    "reznor": {
+      "image": "/nature/assets/shenango/music/trent-reznor.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Reznor_Ross_G5_setup.jpg",
+      "title": "File:Reznor Ross G5 setup.jpg",
+      "artist": "Aaron Tait from Oshawa, Canada",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "query": "Trent Reznor 2008",
+      "caption": "Trent in Toronto, recording with Atticus Ross on a G5 setup."
+    },
+    "maennerchor": {
+      "image": "/nature/assets/shenango/music/maennerchor.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:La_MaMa_building.jpg",
+      "title": "File:La MaMa building.jpg",
+      "artist": "Beyond My Ken",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "query": "German singing society hall",
+      "caption": "The building, at 74A East 4th Street between 2nd Avenue and the Bowery in the East Village nieghborhood of lower Manhattan, New York City, which houses the administrative offices and three of the theatres of La MaMa Experimental Theatre Clu"
+    },
+    "radio": {
+      "image": "/nature/assets/shenango/music/radio.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Nbc_studio_tour_bookmark_1935.JPG",
+      "title": "File:Nbc studio tour bookmark 1935.JPG",
+      "artist": "National Broadcasting Company Uploaded by We hope at en.wikipedia",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "query": "vintage radio studio microphone",
+      "caption": "Promotional give-away bookmark die cut in the shape of a microphone given to those taking the NBC Radio City New York tour of the NBC broadcast facility, 1935."
+    },
+    "concert": {
+      "image": "/nature/assets/shenango/music/outdoor-concert.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Quex_Park_Outdoor_Stage_-_geograph.org.uk_-_1101808.jpg",
+      "title": "File:Quex Park Outdoor Stage - geograph.org.uk - 1101808.jpg",
+      "artist": "David Anstiss",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "query": "outdoor summer concert park",
+      "caption": "Quex Park Outdoor Stage During Summer, Park has various concerts in its grounds, this time it was Katherine Jenkins (Welsh singing soprano), supported by Blake (male choral group)."
+    },
+    "quaker-steak": {
+      "image": "/nature/assets/shenango/food/quaker-steak.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Lube_01.JPG",
+      "title": "File:Lube 01.JPG",
+      "artist": "Prasopestilence",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "query": "Quaker Steak and Lube Sharon",
+      "caption": "Lubě - vrba u potoka a bazén"
+    },
+    "pizza": {
+      "image": "/nature/assets/shenango/food/pizza.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Pizza_parlor_and_computer_shop,_Felton,_PA,_Feb._2026.jpg",
+      "title": "File:Pizza parlor and computer shop, Felton, PA, Feb. 2026.jpg",
+      "artist": "Mr. Matté (if there is an issue with this image, contact me using this image's Commons talk page , my Commons user talk page , or my English Wikipedia user talk page ; I'll know about it a lot faster)",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "query": "pizza parlor Pennsylvania",
+      "caption": "Photo of a pizza parlor and computer shop in Felton , Pennsylvania . Photo taken from Red Lion Avenue (SR 2079) looking northwest."
+    },
+    "shenango-river": {
+      "image": "/nature/assets/shenango/park/shenango-river.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Shenango_River.jpg",
+      "title": "File:Shenango River.jpg",
+      "artist": "Margaret Luzier, U.S. Army Corps of Engineers",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "query": "Shenango River Pennsylvania",
+      "caption": "Shenango River Lake on the Shenango River near Hermitage, Mercer County, Pennsylvania, USA. The dam was constructed in 1965 by the U.S. Army Corps of Engineers for flood control on the Shenango and Mahoning Rivers"
+    },
+    "frank-buhl": {
+      "image": "/nature/assets/shenango/steel/frank-buhl.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Frank_H._Buhl_Mansion.jpg",
+      "title": "File:Frank H. Buhl Mansion.jpg",
+      "artist": "Nyttend",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "query": "Frank H Buhl",
+      "caption": "Eastern side and front of the Frank H. Buhl Mansion , located at 422 E. State Street ( Route 518 ) in Sharon , Pennsylvania , United States . Built in 1891, it is listed on the National Register of Historic Places ."
+    }
+  }
+}

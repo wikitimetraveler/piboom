@@ -19,6 +19,7 @@
     '/finance/va-irrrl-calculator.html',
     '/finance/disasters-unified.html',
     '/finance/disasters-webcams.html',
+    '/finance/disasters-encompass-map.html',
   ]);
 
   const financePath = window.location.pathname.toLowerCase();

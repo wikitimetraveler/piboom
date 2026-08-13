@@ -101,6 +101,7 @@ var DU_SIDEBAR_SECTION_IDS = [
   'collapseFilters',
   'collapseDisasters',
   'collapseMapYouTube',
+  'collapseEncompassMap',
   'collapseLoans',
   'collapseGraphDb',
 ];

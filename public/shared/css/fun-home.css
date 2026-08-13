@@ -27,6 +27,7 @@
   /* Project accents — scoped; avoid purple AI default */
   --fun-music: #3d7a8a;
   --fun-nature: #10b981;
+  --fun-valley: #2f5d46;
   --fun-family: #c9852a;
   --fun-glazed: #e85a7a;
   --fun-heygen: #2a9bb0;
@@ -748,6 +749,10 @@ body[data-theme="dark"] .fun-hero__title {
   grid-column: span 2;
 }
 
+.fun-card--valley {
+  grid-column: span 2;
+}
+
 .fun-card--family {
   grid-column: span 2;
 }
@@ -829,6 +834,12 @@ body[data-theme="dark"] .fun-card:hover {
   filter: blur(14px);
 }
 
+.fun-card--valley:hover .fun-card__glow {
+  opacity: 0.7;
+  background: radial-gradient(circle at 50% 0%, rgba(47, 93, 70, 0.25), rgba(196, 138, 58, 0.1) 45%, transparent 70%);
+  filter: blur(14px);
+}
+
 .fun-card--family:hover .fun-card__glow {
   opacity: 0.7;
   background: radial-gradient(circle at 50% 0%, rgba(201, 133, 42, 0.2), rgba(201, 133, 42, 0.08) 40%, transparent 70%);
@@ -886,6 +897,11 @@ body[data-theme="dark"] .fun-card:hover {
 .fun-card--nature .fun-card__icon {
   background: rgba(16, 185, 129, 0.1);
   color: var(--fun-nature);
+}
+
+.fun-card--valley .fun-card__icon {
+  background: rgba(47, 93, 70, 0.12);
+  color: var(--fun-valley);
 }
 
 .fun-card--family .fun-card__icon {
@@ -1177,6 +1193,7 @@ body[data-theme="dark"] .fun-card:hover {
 
   .fun-card--music,
   .fun-card--nature,
+  .fun-card--valley,
   .fun-card--family,
   .fun-card--glazed,
   .fun-card--middle-east,
@@ -1210,6 +1227,7 @@ body[data-theme="dark"] .fun-card:hover {
   .fun-card,
   .fun-card--music,
   .fun-card--nature,
+  .fun-card--valley,
   .fun-card--family,
   .fun-card--glazed,
   .fun-card--middle-east,

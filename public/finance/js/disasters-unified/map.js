@@ -2,10 +2,11 @@
  * Development work by David Lane
  */
 /**
- * Unified Disasters — Google Maps markers + YouTube
+ * Unified Disasters — YouTube + Google Encompass map between Disasters and Loans (#map).
  * Loaded in global scope after prior scripts (see disasters-unified.html).
  */
 
+/** Google Maps focus on selected disaster (no-op until #map boots). */
 function focusMapOnDisaster(disasterObj) {
   if (!map || !disasterObj) return;
   const key = disasterMatchKey(disasterObj);
@@ -35,6 +36,9 @@ function focusMapOnDisaster(disasterObj) {
   }
 }
 
+/**
+ * Google Maps boot — returns immediately when #map is absent.
+ */
 function initDisastersMap() {
   const mapEl = document.getElementById('map');
   if (!mapEl) return;
@@ -141,6 +145,7 @@ function selectRowsForMapMarkers(mapRows, allRows, relatedLookup) {
   return { renderRows: picked, total, shown: picked.length, capped: true };
 }
 
+/** Disaster markers on #map (no-op until Google map boots). */
 function renderMap(rows) {
   if (!map) return;
   const gen = ++duMapRenderGeneration;
@@ -252,7 +257,6 @@ function renderMap(rows) {
 async function loadAllLoansOnMap() {
   try {
     if (!map) {
-      setTimeout(loadAllLoansOnMap, 500);
       return;
     }
 
@@ -287,6 +291,7 @@ async function loadAllLoansOnMap() {
   }
 }
 
+/** Loan markers on #map (no-op until Google map boots). */
 function updateMapWithLoans(loans) {
   if (!map) return;
   loanMarkers.forEach((m) => googleAdvancedMarkers.removeMapMarker(m.marker));

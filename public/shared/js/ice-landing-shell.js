@@ -283,6 +283,7 @@
       '/finance/va-irrrl-calculator.html': true,
       '/finance/disasters-unified.html': true,
       '/finance/disasters-webcams.html': true,
+      '/finance/disasters-encompass-map.html': true,
     };
 
     const isPublicFinancePath = (pathOnly) => {

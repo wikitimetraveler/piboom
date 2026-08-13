@@ -22,6 +22,7 @@
     '/finance/va-irrrl-calculator.html': true,
     '/finance/disasters-unified.html': true,
     '/finance/disasters-webcams.html': true,
+    '/finance/disasters-encompass-map.html': true,
   };
 
   function pathRequiresAuth(url) {
@@ -62,6 +63,7 @@
     { name: 'LTV Calculator', url: '/finance/ltv-calculator.html', category: 'Worksheets', keywords: 'loan to value', requiresAuth: false },
     { name: 'VA IRRRL', url: '/finance/va-irrrl-calculator.html', category: 'Worksheets', keywords: 'VA refinance', requiresAuth: false },
     { name: 'Disasters Unified', url: '/finance/disasters-unified.html', category: 'Worksheets', keywords: 'FEMA disaster', requiresAuth: false },
+    { name: 'Encompass map', url: '/finance/disasters-encompass-map.html', category: 'Worksheets', keywords: 'disaster encompass map loans proximity', requiresAuth: false },
     { name: 'The Parser', url: '/finance/tool2.html', category: 'Encompass', keywords: 'JSON parser', requiresAuth: true },
     { name: 'The Mashup', url: '/finance/tool3.html', category: 'Encompass', keywords: 'FEMA disaster data', requiresAuth: true },
     { name: 'The Automator', url: '/finance/tool4.html', category: 'Encompass', keywords: 'automation workflow', requiresAuth: true },
@@ -104,7 +106,7 @@
     { name: 'Tree Collection', url: '/nature/tree-collection.html', category: 'Nature', keywords: 'trees forest' },
     { name: 'Critter Discovery', url: '/nature/critter-discovery.html', category: 'Nature', keywords: 'animal wildlife identify photo' },
     { name: 'Critter Collection', url: '/nature/critter-collection.html', category: 'Nature', keywords: 'critters wildlife collection' },
-    { name: 'Shenango Valley', url: '/nature/shenango-valley.html', category: 'Nature', keywords: 'shenango buhl park hermitage sharon amish new wilmington quaker steak lube luigi pizza david heygen atlas' },
+    { name: 'The Valley', url: '/nature/shenango-valley.html', category: 'Nature', keywords: 'shenango valley buhl park hermitage sharon farrell steel amish new wilmington sports lettermen tony butala trent reznor nine inch nails music quaker steak lube luigi pizza david heygen atlas photos video' },
     { name: 'Local Spots', url: '/local/local-spots.html', category: 'Local', keywords: 'thrift spots map' },
     { name: 'Finds', url: '/finds/index.html', category: 'Local', keywords: 'thrift flea vintage collection AI' },
     { name: 'Home', url: '/', category: 'Hub', keywords: 'hub index' },

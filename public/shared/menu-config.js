@@ -21,6 +21,7 @@
     { href: '/finance/index.html', icon: 'bi-calculator', label: 'Worksheets Hub' },
     { href: '/finance/encompass-hub.html', icon: 'bi-columns-gap', label: 'Encompass Hub' },
     { href: '/finance/disasters-unified.html', icon: 'bi-globe', label: 'Unified Disasters' },
+    { href: '/finance/disasters-encompass-map.html', icon: 'bi-geo-alt', label: 'Encompass map' },
     { href: '/finance/loan-batch-update.html', icon: 'bi-layers-half', label: 'Loan batch update' },
     { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant' },
     { href: '/finance/unit-tests.html', icon: 'bi-check2-circle', label: 'Unit Tests' },
@@ -115,7 +116,7 @@
     { href: '/iraq/', icon: 'bi-globe-central-south-asia', label: 'Iraq', title: 'Iraq — bilingual history, food, music, café and living culture atlas with Zayd (no login)' },
     { href: '/lebanon/', icon: 'bi-globe-central-south-asia', label: 'Lebanon', title: 'Lebanon — bilingual history, food, music, café and living culture atlas with Karim (no login)' },
     { href: '/egypt/', icon: 'bi-globe-central-south-asia', label: 'Egypt', title: 'Egypt — bilingual history, food, music, café and living culture atlas with Omar (no login)' },
-    { href: '/nature/shenango-valley.html', icon: 'bi-geo-alt', label: 'Shenango Valley', title: 'Shenango Valley local atlas — Buhl Park, Amish country, Quaker Steak & Lube, Luigi\'s (David HeyGen + AI)' },
+    { href: '/nature/shenango-valley.html', icon: 'bi-geo-alt', label: 'The Valley', title: 'PA history atlas — Buhl Park hub, steel, Amish, sports, Lettermen, Reznor, photos & film' },
     { href: '/gse-analyzer.html', icon: 'bi-graph-up-arrow', label: 'GSE scenario analyzer' },
     { href: '/bike-store-home.html', icon: 'bi-bicycle', label: 'Bike Store' },
     { href: '/ai/voice-dj.html', icon: 'bi-mic', label: 'Wolfman Dave' },
@@ -146,6 +147,7 @@
     { href: '/finance/ltv-calculator.html', icon: 'bi-house-door', label: 'LTV', title: 'Loan-to-Value Calculator' },
     { href: '/finance/va-irrrl-calculator.html', icon: 'bi-calculator', label: 'VA IRRRL', title: 'VA IRRRL Calculator' },
     { href: '/finance/disasters-unified.html', icon: 'bi-globe', label: 'Unified Disasters', title: 'Unified Disasters (90-day)' },
+    { href: '/finance/disasters-encompass-map.html', icon: 'bi-geo-alt', label: 'Encompass map', title: 'Encompass map — live proximity loan pins' },
   ];
 
   /** Encompass hub / AI Assistant tool grid — full catalog when logged in. */
@@ -156,6 +158,7 @@
     { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant', title: 'Encompass AI Assistant' },
     { href: '/finance/encompass-analytics.html', icon: 'bi-bar-chart-line', label: 'Analytics', title: 'Encompass Analytics' },
     { href: '/finance/disasters-unified.html', icon: 'bi-globe', label: 'Unified Disasters', title: 'Unified Disasters (90-day)' },
+    { href: '/finance/disasters-encompass-map.html', icon: 'bi-geo-alt', label: 'Encompass map', title: 'Encompass map — live proximity loan pins' },
     { href: '/finance/loan-batch-update.html', icon: 'bi-layers-half', label: 'Loan batch update', title: 'Encompass loanBatch/updateRequests' },
     { href: '/finance/processor-assignment.html', icon: 'bi-people-fill', label: 'Processor assignment', title: 'Live processor assignment against Encompass pipeline' },
     { href: '/finance/processor-assignment-mock.html', icon: 'bi-people', label: 'Processor assignment (demo)', title: 'Processor assignment demo with synthetic loans' },
@@ -238,7 +241,7 @@
     { href: '/nature/rock-discovery.html', icon: 'bi-gem', label: 'Rocky The Rock Star', title: 'Rubies, gems & meteorites — Rocky The Rock Star' },
     { href: '/nature/rock-collection.html', icon: 'bi-circle', label: 'Rock Collection', title: 'Your rock specimens' },
     { href: '/nature/share-collection.html', icon: 'bi-share', label: 'Share Collection', title: 'Share your collection' },
-    { href: '/nature/shenango-valley.html', icon: 'bi-geo-alt', label: 'Shenango Valley', title: 'Local atlas — Buhl Park center, Amish country, Quaker Steak & Lube, Luigi\'s Pizza' },
+    { href: '/nature/shenango-valley.html', icon: 'bi-geo-alt', label: 'The Valley', title: 'PA history — Buhl Park center, steel, Amish, sports, music, photos & film' },
   ];
 
   /** Bike hub tool grid */
@@ -280,6 +283,7 @@
     '/finance/va-irrrl-calculator.html',
     '/finance/disasters-unified.html',
     '/finance/disasters-webcams.html',
+    '/finance/disasters-encompass-map.html',
   ];
 
   /** Get home domain tiles, optionally filtered for demo mode */

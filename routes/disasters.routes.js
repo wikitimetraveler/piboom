@@ -24,6 +24,7 @@ router.get('/near', disastersController.listNear);
 
 // List camera records (fixed hazard webcams)
 router.get('/cameras/stats', disastersController.cameraStats);
+router.get('/cameras/county-summary', disastersController.cameraCountySummaryByState);
 router.get('/cameras/:id/snapshot', disastersController.cameraSnapshot);
 router.get('/cameras', disastersController.listCameras);
 

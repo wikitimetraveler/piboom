@@ -15,22 +15,106 @@
   let selectedState = null;
   let selectedCounty = null;
   let countySummary = {};
-  /** Cached max event_count for county heat styling (avoid Math.max per feature). */
+  let countyRiskSummary = {};
+  let countyCameraSummary = {};
+  /** Cached max metric for county heat styling (avoid Math.max per feature). */
   let countySummaryMax = 1;
+  /** @type {'events'|'opsTriage'|'cameras'} */
+  let choroplethMode = 'events';
   const COUNTY_PERMANENT_TOOLTIP_MAX = 60;
 
   function $(sel) { return document.querySelector(sel); }
 
+  function countyMetric(summaryKey) {
+    const key = String(summaryKey || '').toLowerCase();
+    if (choroplethMode === 'opsTriage') {
+      const row = countyRiskSummary[key] || {};
+      const avg = Number(row.avg_ops_triage) || 0;
+      const n = Number(row.loan_count) || 0;
+      return {
+        value: avg,
+        display: n ? avg.toFixed(1) : '',
+        label: n
+          ? `ops triage avg ${avg.toFixed(1)} · ${n} loan${n === 1 ? '' : 's'} (not probability)`
+          : 'No loans',
+        meta: n ? `${avg.toFixed(1)} triage` : 'No loans',
+      };
+    }
+    if (choroplethMode === 'cameras') {
+      const row = countyCameraSummary[key] || {};
+      const n = Number(row.camera_count) || 0;
+      return {
+        value: n,
+        display: n ? String(n) : '',
+        label: n ? `${n} camera${n === 1 ? '' : 's'}` : 'No cameras',
+        meta: n ? `${n} cam${n === 1 ? '' : 's'}` : 'No cameras',
+      };
+    }
+    const row = countySummary[key] || {};
+    const n = Number(row.event_count) || 0;
+    return {
+      value: n,
+      display: n ? String(n) : '',
+      label: n ? `${n} event${n === 1 ? '' : 's'}` : 'No events',
+      meta: n ? `${n} event${n === 1 ? '' : 's'}` : 'No events',
+    };
+  }
+
   function refreshCountySummaryMax() {
     let max = 1;
-    Object.keys(countySummary).forEach((k) => {
-      const n = Number(countySummary[k]?.event_count) || 0;
-      if (n > max) max = n;
-    });
+    if (choroplethMode === 'opsTriage') {
+      Object.keys(countyRiskSummary).forEach((k) => {
+        const n = Number(countyRiskSummary[k]?.avg_ops_triage) || 0;
+        if (n > max) max = n;
+      });
+    } else if (choroplethMode === 'cameras') {
+      Object.keys(countyCameraSummary).forEach((k) => {
+        const n = Number(countyCameraSummary[k]?.camera_count) || 0;
+        if (n > max) max = n;
+      });
+    } else {
+      Object.keys(countySummary).forEach((k) => {
+        const n = Number(countySummary[k]?.event_count) || 0;
+        if (n > max) max = n;
+      });
+    }
     countySummaryMax = max;
   }
 
-  function bindFeatureTooltip(layer, { name, count, preferPermanent }) {
+  function countyFillColor(value) {
+    if (choroplethMode === 'opsTriage') return duGeoData.opsTriageHeatColor(value, countySummaryMax);
+    if (choroplethMode === 'cameras') return duGeoData.cameraHeatColor(value, countySummaryMax);
+    return duGeoData.heatColor(value, countySummaryMax);
+  }
+
+  function updateChoroplethLegend() {
+    const el = document.getElementById('duGeoChoroplethLegend');
+    if (!el) return;
+    if (choroplethMode === 'opsTriage') {
+      el.innerHTML = `
+        <span class="du-geo-legend-item"><span class="du-geo-legend-swatch" style="background:#e2e8f0"></span> None</span>
+        <span class="du-geo-legend-item"><span class="du-geo-legend-swatch" style="background:#fde68a"></span> Low triage</span>
+        <span class="du-geo-legend-item"><span class="du-geo-legend-swatch" style="background:#f59e0b"></span> Moderate</span>
+        <span class="du-geo-legend-item"><span class="du-geo-legend-swatch" style="background:#b45309"></span> High ops triage</span>
+        <span class="text-muted ms-1">(rank, not probability)</span>`;
+      return;
+    }
+    if (choroplethMode === 'cameras') {
+      el.innerHTML = `
+        <span class="du-geo-legend-item"><span class="du-geo-legend-swatch" style="background:#e2e8f0"></span> None</span>
+        <span class="du-geo-legend-item"><span class="du-geo-legend-swatch" style="background:#99f6e4"></span> Sparse</span>
+        <span class="du-geo-legend-item"><span class="du-geo-legend-swatch" style="background:#2dd4bf"></span> Moderate</span>
+        <span class="du-geo-legend-item"><span class="du-geo-legend-swatch" style="background:#0f766e"></span> Dense cameras</span>`;
+      return;
+    }
+    el.innerHTML = `
+      <span class="du-geo-legend-item"><span class="du-geo-legend-swatch du-geo-legend--none"></span> None</span>
+      <span class="du-geo-legend-item"><span class="du-geo-legend-swatch du-geo-legend--low"></span> Low</span>
+      <span class="du-geo-legend-item"><span class="du-geo-legend-swatch du-geo-legend--medium"></span> Moderate</span>
+      <span class="du-geo-legend-item"><span class="du-geo-legend-swatch du-geo-legend--high"></span> High</span>`;
+  }
+
+  function bindFeatureTooltip(layer, { name, count, preferPermanent, tipLabel }) {
     if (preferPermanent && count > 0) {
       layer.bindTooltip(String(count), {
         permanent: true,
@@ -40,7 +124,7 @@
       });
       return;
     }
-    const label = count > 0 ? `${name}: ${count}` : (name || '');
+    const label = tipLabel || (count > 0 ? `${name}: ${count}` : (name || ''));
     layer.bindTooltip(label, { sticky: true, className: 'du-geo-tooltip' });
   }
 
@@ -83,13 +167,12 @@
 
   function styleCountyLayer(feature) {
     const name = duGeoData.normalizeCountyName(feature?.properties?.name);
-    const summary = countySummary[name.toLowerCase()] || {};
-    const count = Number(summary.event_count) || 0;
+    const metric = countyMetric(name);
     const selected = selectedCounty && name.toLowerCase() === selectedCounty.toLowerCase();
     return {
       color: selected ? '#1d4ed8' : '#475569',
       weight: selected ? 2.5 : 1,
-      fillColor: duGeoData.heatColor(count, countySummaryMax),
+      fillColor: countyFillColor(metric.value),
       fillOpacity: selected ? 0.78 : 0.5,
     };
   }
@@ -97,16 +180,14 @@
   function renderCountyList(stateAbbr, geojson) {
     const list = $('#duGeoCountyList');
     if (!list) return;
-    const st = stateAbbr.toUpperCase();
     const features = geojson.features || [];
     const q = ($('#duGeoCountySearch')?.value || '').trim().toLowerCase();
 
     const rows = features
       .map((f) => {
         const name = duGeoData.normalizeCountyName(f.properties?.name);
-        const summary = countySummary[name.toLowerCase()] || {};
-        const count = Number(summary.event_count) || 0;
-        return { name, fips: f.properties?.county_fips, count };
+        const metric = countyMetric(name);
+        return { name, fips: f.properties?.county_fips, count: metric.value, meta: metric.meta };
       })
       .filter((r) => r.name && (!q || r.name.toLowerCase().includes(q)))
       .sort((a, b) => a.name.localeCompare(b.name));
@@ -120,7 +201,7 @@
       const active = selectedCounty && r.name.toLowerCase() === selectedCounty.toLowerCase();
       return `<button type="button" class="du-geo-county-row${active ? ' du-geo-county-row--active' : ''}" data-county="${r.name.replace(/"/g, '&quot;')}">
         <span class="du-geo-county-name">${r.name}</span>
-        <span class="du-geo-county-meta">${r.count ? `${r.count} event${r.count === 1 ? '' : 's'}` : 'No events'}</span>
+        <span class="du-geo-county-meta">${r.meta}</span>
       </button>`;
     }).join('');
 
@@ -189,13 +270,18 @@
     if (statesLayer) statesLayer.setStyle(styleStateLayer);
 
     try {
-      const [geojson, summary] = await Promise.all([
+      const [geojson, summary, riskSummary, cameraSummary] = await Promise.all([
         duGeoData.loadStateCounties(st),
         duGeoData.loadCountySummary(st),
+        duGeoData.loadCountyRiskSummary(st),
+        duGeoData.loadCountyCameraSummary(st),
       ]);
       cachedCountyGeo = geojson;
       countySummary = summary || {};
+      countyRiskSummary = riskSummary || {};
+      countyCameraSummary = cameraSummary || {};
       refreshCountySummaryMax();
+      updateChoroplethLegend();
       renderCountyList(st, geojson);
 
       if (countiesLayer) countiesLayer.remove();
@@ -206,9 +292,13 @@
         style: styleCountyLayer,
         onEachFeature: (feature, layer) => {
           const name = duGeoData.normalizeCountyName(feature.properties?.name);
-          const summary = countySummary[name.toLowerCase()] || {};
-          const count = Number(summary.event_count) || 0;
-          bindFeatureTooltip(layer, { name, count, preferPermanent: preferPermanentCounts });
+          const metric = countyMetric(name);
+          bindFeatureTooltip(layer, {
+            name,
+            count: metric.display || metric.value,
+            preferPermanent: preferPermanentCounts && metric.value > 0,
+            tipLabel: `${name}: ${metric.label}`,
+          });
           layer.on({
             mouseover: (e) => e.target.setStyle({ weight: 2, fillOpacity: 0.75 }),
             mouseout: (e) => countiesLayer.resetStyle(e.target),
@@ -220,7 +310,16 @@
       if (!opts.skipFit) {
         pickerMap.fitBounds(countiesLayer.getBounds(), { padding: [20, 20], maxZoom: 8 });
       }
-      setPickerStatus(`${geojson.features.length} counties — click a county to load hazards, or load entire state.`, 'success');
+      const modeHint =
+        choroplethMode === 'opsTriage'
+          ? 'ops triage heat'
+          : choroplethMode === 'cameras'
+            ? 'camera sightedness'
+            : 'event density';
+      setPickerStatus(
+        `${geojson.features.length} counties · ${modeHint} — click a county to load hazards, or load entire state.`,
+        'success'
+      );
     } catch (e) {
       console.error(e);
       setPickerStatus(`Could not load counties for ${st}. Run npm run build:us-geo.`, 'danger');
@@ -234,6 +333,8 @@
     selectedCounty = null;
     cachedCountyGeo = null;
     countySummary = {};
+    countyRiskSummary = {};
+    countyCameraSummary = {};
     countySummaryMax = 1;
     duStateDisasterRows = [];
     duGeoLoadScope = null;
@@ -354,6 +455,42 @@
     setBreadcrumb([{ label: 'United States' }, { label: 'Select a state' }]);
     setPickerStatus('Nationwide monitoring on standby. Click a state or choose from the list.', 'muted');
     updateLoadButton();
+    updateChoroplethLegend();
+
+    const modeSel = $('#duGeoChoroplethMode');
+    if (modeSel) {
+      choroplethMode = modeSel.value || 'events';
+      modeSel.addEventListener('change', async () => {
+        choroplethMode = modeSel.value || 'events';
+        updateChoroplethLegend();
+        if (!selectedState || !cachedCountyGeo) return;
+        refreshCountySummaryMax();
+        if (countiesLayer) {
+          countiesLayer.setStyle(styleCountyLayer);
+          countiesLayer.eachLayer((layer) => {
+            const name = duGeoData.normalizeCountyName(layer.feature?.properties?.name);
+            const metric = countyMetric(name);
+            layer.unbindTooltip();
+            const preferPermanent =
+              (cachedCountyGeo.features || []).length <= COUNTY_PERMANENT_TOOLTIP_MAX && metric.value > 0;
+            bindFeatureTooltip(layer, {
+              name,
+              count: metric.display || metric.value,
+              preferPermanent,
+              tipLabel: `${name}: ${metric.label}`,
+            });
+          });
+        }
+        renderCountyList(selectedState, cachedCountyGeo);
+        const modeHint =
+          choroplethMode === 'opsTriage'
+            ? 'ops triage heat'
+            : choroplethMode === 'cameras'
+              ? 'camera sightedness'
+              : 'event density';
+        setPickerStatus(`Choropleth: ${modeHint}`, 'info');
+      });
+    }
 
     $('#duGeoCountySearch')?.addEventListener('input', () => {
       if (selectedState && cachedCountyGeo) renderCountyList(selectedState, cachedCountyGeo);

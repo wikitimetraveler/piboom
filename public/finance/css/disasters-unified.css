@@ -2215,6 +2215,16 @@ body.du-pull-sheet-open .du-bottom-dock {
   box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.2);
 }
 
+.du-overlay-swatch--firms-heat {
+  background: linear-gradient(135deg, #fbbf24, #dc2626);
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
+}
+
+.du-overlay-swatch--flood {
+  background: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(3, 105, 161, 0.25);
+}
+
 .du-overlay-asof {
   font-weight: 600;
   color: #92400e;

@@ -1,15 +1,17 @@
 /**
- * Shenango Valley — load content, render eras/cards, speak helper.
+ * Shenango Valley — load content, render eras/cards/gallery/videos, speak helper.
  * Development work by David Lane
  */
 (function () {
   'use strict';
 
   const CONTENT_URL = '/nature/data/shenango-content.json';
+  const VIDEOS_URL = '/nature/data/shenango-videos.json';
   const BUHL_CENTER = { lat: 41.245889, lng: -80.477848 };
 
   const state = {
     data: null,
+    videos: null,
     activeEra: null,
     sheetSpeech: ''
   };
@@ -43,7 +45,7 @@
     stopSpeech();
     if (typeof window.speakWithGoogle === 'function') {
       try {
-        await window.speakWithGoogle(line, { lang: 'en-US' });
+        await window.speakWithGoogle(line, { lang: 'en-US', gender: 'male' });
         return;
       } catch (_) {
         /* fall through */
@@ -82,6 +84,18 @@
       ['svTimelineLead', 'timelineLead'],
       ['svMapHeading', 'mapHeading'],
       ['svMapLead', 'mapLead'],
+      ['svMediaHeading', 'mediaHeading'],
+      ['svMediaLead', 'mediaLead'],
+      ['svVideoHeading', 'videoHeading'],
+      ['svVideoLead', 'videoLead'],
+      ['svSteelHeading', 'steelHeading'],
+      ['svSteelLead', 'steelLead'],
+      ['svAmishHeading', 'amishHeading'],
+      ['svAmishLead', 'amishLead'],
+      ['svSportsHeading', 'sportsHeading'],
+      ['svSportsLead', 'sportsLead'],
+      ['svMusicHeading', 'musicHeading'],
+      ['svMusicLead', 'musicLead'],
       ['svFoodHeading', 'foodHeading'],
       ['svFoodLead', 'foodLead'],
       ['svLivingHeading', 'livingHeading'],
@@ -91,6 +105,8 @@
       const el = document.getElementById(id);
       if (el && ui[key]) el.textContent = ui[key];
     });
+    const hub = document.getElementById('svHubBadge');
+    if (hub && ui.mapHubNote) hub.innerHTML = `<i class="bi bi-bullseye"></i> ${esc(ui.mapHubNote)}`;
     const year = document.getElementById('svFooterYear');
     if (year) year.textContent = String(new Date().getFullYear());
   }
@@ -101,23 +117,29 @@
     list.innerHTML = state.data.eras
       .map((era) => {
         const active = state.activeEra === era.id ? ' is-active' : '';
+        const media = era.image
+          ? `<div class="sv-era-media"><img src="${esc(era.image)}" alt="" loading="lazy" decoding="async"/></div>`
+          : '';
         return `<li class="sv-era${active}" data-era-id="${esc(era.id)}">
-          <span class="sv-era-years">${esc(pick(era.years))}</span>
-          <h3 class="sv-era-title">
-            <button type="button" class="sv-era-open">${esc(pick(era.title))}</button>
-          </h3>
-          <p class="sv-era-copy">${esc(pick(era.copy))}</p>
-          <div class="sv-era-tools">
-            <button type="button" class="sv-btn sv-btn-sand sv-btn-sm" data-era-listen="${esc(era.id)}">
-              <i class="bi bi-volume-up-fill"></i> ${esc(t('listen'))}
-            </button>
-            ${
-              era.siteId
-                ? `<button type="button" class="sv-btn sv-btn-ghost sv-btn-sm" data-era-map="${esc(era.siteId)}">
-                    <i class="bi bi-geo-alt"></i> ${esc(t('mapShow'))}
-                  </button>`
-                : ''
-            }
+          ${media}
+          <div class="sv-era-body">
+            <span class="sv-era-years">${esc(pick(era.years))}</span>
+            <h3 class="sv-era-title">
+              <button type="button" class="sv-era-open">${esc(pick(era.title))}</button>
+            </h3>
+            <p class="sv-era-copy">${esc(pick(era.copy))}</p>
+            <div class="sv-era-tools">
+              <button type="button" class="sv-btn sv-btn-sand sv-btn-sm" data-era-listen="${esc(era.id)}">
+                <i class="bi bi-volume-up-fill"></i> ${esc(t('listen'))}
+              </button>
+              ${
+                era.siteId
+                  ? `<button type="button" class="sv-btn sv-btn-ghost sv-btn-sm" data-era-map="${esc(era.siteId)}">
+                      <i class="bi bi-geo-alt"></i> ${esc(t('mapShow'))}
+                    </button>`
+                  : ''
+              }
+            </div>
           </div>
         </li>`;
       })
@@ -129,11 +151,14 @@
     const tagHtml = (Array.isArray(tags) ? tags : [])
       .map((tag) => `<span class="sv-tag">${esc(tag)}</span>`)
       .join('');
-    return `<article class="sv-card" data-kind="${esc(kind)}" data-id="${esc(item.id)}">
+    const img = item.image
+      ? `<img class="sv-card-img" src="${esc(item.image)}" alt="" loading="lazy" decoding="async"/>`
+      : `<span class="sv-card-emoji" aria-hidden="true">${esc(item.emoji || '')}</span>`;
+    return `<article class="sv-card${item.image ? ' has-image' : ''}" data-kind="${esc(kind)}" data-id="${esc(item.id)}">
       <div class="sv-card-inner">
         <button type="button" class="sv-card-face sv-card-front sv-card-flip" aria-expanded="false"
           aria-label="${esc(pick(item.name))} — ${esc(t('flipHint'))}">
-          <span class="sv-card-emoji" aria-hidden="true">${esc(item.emoji || '')}</span>
+          ${img}
           <h3 class="sv-card-name">${esc(pick(item.name))}</h3>
           <p class="sv-card-tagline">${esc(pick(item.tagline))}</p>
           <div class="sv-card-tags">${tagHtml}</div>
@@ -162,15 +187,74 @@
     </article>`;
   }
 
+  function fillGrid(id, items, kind) {
+    const grid = document.getElementById(id);
+    if (!grid) return;
+    grid.innerHTML = (items || []).map((item) => cardMarkup(item, kind)).join('');
+  }
+
   function renderCards() {
-    const foodGrid = document.getElementById('svFoodGrid');
-    const livingGrid = document.getElementById('svLivingGrid');
-    if (foodGrid) {
-      foodGrid.innerHTML = (state.data.foods || []).map((f) => cardMarkup(f, 'food')).join('');
+    const d = state.data;
+    if (!d) return;
+    fillGrid('svSteelGrid', d.steel, 'steel');
+    fillGrid('svAmishGrid', d.amish, 'amish');
+    fillGrid('svSportsGrid', d.sports, 'sports');
+    fillGrid('svMusicGrid', d.music, 'music');
+    fillGrid('svFoodGrid', d.foods, 'food');
+    fillGrid('svLivingGrid', d.living, 'living');
+  }
+
+  function renderGallery() {
+    const host = document.getElementById('svGallery');
+    if (!host) return;
+    const items = state.data?.gallery || [];
+    host.innerHTML = items
+      .map(
+        (g) => `<figure class="sv-gallery-item">
+          <img src="${esc(g.image)}" alt="${esc(pick(g.caption))}" loading="lazy" decoding="async"/>
+          <figcaption>${esc(pick(g.caption))}</figcaption>
+        </figure>`
+      )
+      .join('');
+  }
+
+  function videoCard(clip) {
+    const title = esc(clip.title || '');
+    const blurb = esc(clip.blurb || '');
+    let media = '';
+    if (clip.youtubeId) {
+      media = `<div class="sv-video-frame">
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/${esc(clip.youtubeId)}"
+          title="${title}"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          referrerpolicy="strict-origin-when-cross-origin"
+        ></iframe>
+      </div>`;
+    } else if (clip.embedUrl) {
+      media = `<div class="sv-video-frame">
+        <iframe src="${esc(clip.embedUrl)}" title="${title}" loading="lazy" allowfullscreen></iframe>
+      </div>`;
+    } else {
+      media = `<a class="sv-video-search" href="${esc(clip.url)}" target="_blank" rel="noopener noreferrer">
+        <i class="bi bi-youtube"></i> Open search / watch
+      </a>`;
     }
-    if (livingGrid) {
-      livingGrid.innerHTML = (state.data.living || []).map((item) => cardMarkup(item, 'living')).join('');
-    }
+    return `<article class="sv-video-card" data-theme="${esc(clip.theme || '')}">
+      <h3>${title}</h3>
+      <p class="sv-video-blurb">${blurb}</p>
+      ${media}
+      <p class="sv-video-source">${esc(clip.source || '')}</p>
+    </article>`;
+  }
+
+  function renderVideos() {
+    const host = document.getElementById('svVideoGrid');
+    if (!host) return;
+    const clips = state.videos?.clips || [];
+    host.innerHTML = clips.map(videoCard).join('');
   }
 
   function openSheet({ title, label, body, speech }) {
@@ -209,8 +293,34 @@
   }
 
   function findItem(kind, id) {
-    const source = kind === 'living' ? state.data?.living : state.data?.foods;
-    return (source || []).find((item) => item.id === id) || null;
+    const sources = {
+      steel: state.data?.steel,
+      amish: state.data?.amish,
+      sports: state.data?.sports,
+      music: state.data?.music,
+      food: state.data?.foods,
+      living: state.data?.living
+    };
+    return (sources[kind] || []).find((item) => item.id === id) || null;
+  }
+
+  function onCardClick(event) {
+    const flip = event.target.closest('.sv-card-flip');
+    if (flip) {
+      flip.closest('.sv-card')?.classList.toggle('is-flipped');
+      return;
+    }
+    const listen = event.target.closest('[data-card-listen]');
+    if (listen) {
+      const item = findItem(listen.getAttribute('data-card-kind'), listen.getAttribute('data-card-listen'));
+      if (item) speak(`${pick(item.name)}. ${pick(item.history)}`);
+      return;
+    }
+    const mapBtn = event.target.closest('[data-card-map]');
+    if (mapBtn) {
+      document.getElementById('svMap')?.scrollIntoView({ behavior: 'smooth' });
+      window.ShenangoMap?.focusSite(mapBtn.getAttribute('data-card-map'), { speak: true });
+    }
   }
 
   function bind() {
@@ -234,8 +344,9 @@
       }
     });
 
-    document.getElementById('svFoodGrid')?.addEventListener('click', onCardClick);
-    document.getElementById('svLivingGrid')?.addEventListener('click', onCardClick);
+    ['svSteelGrid', 'svAmishGrid', 'svSportsGrid', 'svMusicGrid', 'svFoodGrid', 'svLivingGrid'].forEach((id) => {
+      document.getElementById(id)?.addEventListener('click', onCardClick);
+    });
 
     document.getElementById('svSheetClose')?.addEventListener('click', closeSheet);
     document.getElementById('svSheetBackdrop')?.addEventListener('click', closeSheet);
@@ -247,41 +358,26 @@
     document.getElementById('svMeetGuide')?.addEventListener('click', () => {
       window.ShenangoHeygen?.playIntro?.();
     });
-
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') closeSheet();
     });
   }
 
-  function onCardClick(event) {
-    const flip = event.target.closest('.sv-card-flip');
-    if (flip) {
-      const card = flip.closest('.sv-card');
-      card?.classList.toggle('is-flipped');
-      return;
-    }
-    const listen = event.target.closest('[data-card-listen]');
-    if (listen) {
-      const item = findItem(listen.getAttribute('data-card-kind'), listen.getAttribute('data-card-listen'));
-      if (item) speak(`${pick(item.name)}. ${pick(item.history)}`);
-      return;
-    }
-    const mapBtn = event.target.closest('[data-card-map]');
-    if (mapBtn) {
-      document.getElementById('svMap')?.scrollIntoView({ behavior: 'smooth' });
-      window.ShenangoMap?.focusSite(mapBtn.getAttribute('data-card-map'), { speak: true });
-    }
-  }
-
   async function boot() {
     try {
-      const res = await fetch(CONTENT_URL, { credentials: 'same-origin' });
-      if (!res.ok) throw new Error('Failed to load Shenango content');
-      state.data = await res.json();
+      const [contentRes, videoRes] = await Promise.all([
+        fetch(CONTENT_URL, { credentials: 'same-origin' }),
+        fetch(VIDEOS_URL, { credentials: 'same-origin' })
+      ]);
+      if (!contentRes.ok) throw new Error('Failed to load Shenango content');
+      state.data = await contentRes.json();
+      state.videos = videoRes.ok ? await videoRes.json() : { clips: [] };
       renderStaticUi();
       renderGuide();
       renderEras();
       renderCards();
+      renderGallery();
+      renderVideos();
       bind();
       document.dispatchEvent(
         new CustomEvent('shenango:content-ready', {
@@ -292,6 +388,9 @@
       const params = new URLSearchParams(window.location.search);
       if (params.get('demo') === 'heygen') {
         window.setTimeout(() => window.ShenangoHeygen?.playIntro?.(), 400);
+      }
+      if (params.get('video') === '1') {
+        document.getElementById('svVideo')?.scrollIntoView({ behavior: 'smooth' });
       }
     } catch (err) {
       console.error('shenango-content:', err);

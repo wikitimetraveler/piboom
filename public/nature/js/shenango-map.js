@@ -1,5 +1,5 @@
 /**
- * Shenango Valley atlas map — Google Maps pins (park / amish / food).
+ * Shenango Valley atlas map — Buhl Park hub with spokes to steel / amish / sports / music / food.
  * Development work by David Lane
  */
 (function () {
@@ -7,7 +7,10 @@
 
   const CATEGORY_COLOR = {
     park: '#2f5d46',
+    steel: '#5c6570',
     amish: '#c48a3a',
+    sports: '#2a5f9e',
+    music: '#8b3a62',
     food: '#b5301f'
   };
 
@@ -19,8 +22,10 @@
     map: null,
     info: null,
     markers: {},
+    spokes: [],
     activeId: null,
-    center: DEFAULT_CENTER
+    center: DEFAULT_CENTER,
+    hubId: 'buhl-park'
   };
 
   function pick(value) {
@@ -59,26 +64,31 @@
     return false;
   }
 
+  function hubSite() {
+    return state.sites.find((s) => s.hub || s.id === state.hubId) || state.sites[0] || null;
+  }
+
   function visibleSites() {
     if (state.filter === 'all') return state.sites;
-    return state.sites.filter((site) => site.category === state.filter);
+    return state.sites.filter((site) => site.category === state.filter || site.hub);
   }
 
   function renderList() {
     const list = document.getElementById('svSiteList');
     if (!list) return;
     list.innerHTML = visibleSites()
-      .map(
-        (site) => `<li>
-          <button type="button" class="sv-site-btn${state.activeId === site.id ? ' is-active' : ''}" data-site-id="${esc(site.id)}">
-            <span class="sv-site-emoji" aria-hidden="true">${esc(site.emoji || '📍')}</span>
+      .map((site) => {
+        const hub = site.hub || site.id === state.hubId;
+        return `<li>
+          <button type="button" class="sv-site-btn${state.activeId === site.id ? ' is-active' : ''}${hub ? ' is-hub' : ''}" data-site-id="${esc(site.id)}">
+            <span class="sv-site-emoji" aria-hidden="true">${hub ? '◎' : esc(site.emoji || '📍')}</span>
             <span class="sv-site-copy">
-              <strong>${esc(pick(site.name))}</strong>
+              <strong>${esc(pick(site.name))}${hub ? ' · hub' : ''}</strong>
               <span>${esc(pick(site.place))}</span>
             </span>
           </button>
-        </li>`
-      )
+        </li>`;
+      })
       .join('');
   }
 
@@ -94,32 +104,69 @@
     const gam = window.googleAdvancedMarkers;
     const position = { lat: site.lat, lng: site.lng };
     const title = `${pick(site.name)} — ${pick(site.place)}`;
+    const hub = site.hub || site.id === state.hubId;
 
     if (gam?.createMapMarker) {
       const content = document.createElement('div');
-      content.innerHTML = `<div style="font-size:26px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.35))">${site.emoji || '📍'}</div>`;
-      return gam.createMapMarker({ map: state.map, position, title, content });
+      content.className = hub ? 'sv-map-pin sv-map-pin--hub' : 'sv-map-pin';
+      content.innerHTML = hub
+        ? `<div style="width:36px;height:36px;border-radius:50%;background:#2f5d46;border:3px solid #f4f8f5;box-shadow:0 2px 8px rgba(0,0,0,.4);display:grid;place-items:center;font-size:16px;line-height:1">◎</div>`
+        : `<div style="font-size:26px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.35))">${site.emoji || '📍'}</div>`;
+      return gam.createMapMarker({ map: state.map, position, title, content, zIndex: hub ? 1000 : 1 });
     }
 
     return new google.maps.Marker({
       position,
       map: state.map,
       title,
+      zIndex: hub ? 1000 : 1,
       icon: {
         path: google.maps.SymbolPath.CIRCLE,
-        scale: 8,
+        scale: hub ? 12 : 8,
         fillColor: CATEGORY_COLOR[site.category] || '#2f5d46',
         fillOpacity: 1,
         strokeColor: '#fff',
-        strokeWeight: 2
+        strokeWeight: hub ? 3 : 2
       }
+    });
+  }
+
+  function clearSpokes() {
+    state.spokes.forEach((line) => line.setMap?.(null));
+    state.spokes = [];
+  }
+
+  function drawSpokes() {
+    clearSpokes();
+    if (!state.map || !window.google?.maps) return;
+    const hub = hubSite();
+    if (!hub) return;
+    const shown = visibleSites().filter((s) => s.id !== hub.id);
+    shown.forEach((site) => {
+      const line = new google.maps.Polyline({
+        path: [
+          { lat: hub.lat, lng: hub.lng },
+          { lat: site.lat, lng: site.lng }
+        ],
+        geodesic: true,
+        strokeColor: CATEGORY_COLOR[site.category] || '#2f5d46',
+        strokeOpacity: 0.45,
+        strokeWeight: 2,
+        map: state.map,
+        zIndex: 0
+      });
+      state.spokes.push(line);
     });
   }
 
   function openInfo(site) {
     const entry = state.markers[site.id];
     if (!entry || !state.info) return;
+    const img = site.image
+      ? `<img src="${esc(site.image)}" alt="" style="width:100%;max-height:120px;object-fit:cover;border-radius:6px;margin:0 0 8px" loading="lazy"/>`
+      : '';
     state.info.setContent(`<div style="color:#1a2420;max-width:280px;font-family:system-ui,sans-serif">
+      ${img}
       <strong style="font-size:16px;line-height:1.3">${esc(pick(site.name))}</strong><br/>
       <span style="font-size:13px;color:#3a4a52;font-weight:600">${esc(pick(site.place))}</span>
       <p style="font-size:13px;margin:8px 0 0;line-height:1.55">${esc(pick(site.blurb))}</p>
@@ -135,7 +182,7 @@
     const site = state.sites.find((s) => s.id === siteId);
     if (!site) return;
 
-    if (state.filter !== 'all' && site.category !== state.filter) {
+    if (state.filter !== 'all' && site.category !== state.filter && !site.hub) {
       state.filter = 'all';
       renderFilters();
       applyFilter();
@@ -170,6 +217,7 @@
       if ('map' in entry.marker) entry.marker.map = visible ? state.map : null;
       else entry.marker.setMap?.(visible ? state.map : null);
     });
+    drawSpokes();
     resetView();
   }
 
@@ -177,6 +225,7 @@
     if (!state.map) return;
     state.info?.close();
     const shown = visibleSites();
+    const hub = hubSite();
     if (!shown.length) {
       state.map.setCenter(state.center);
       state.map.setZoom(11);
@@ -189,6 +238,7 @@
     }
     const bounds = new google.maps.LatLngBounds();
     shown.forEach((site) => bounds.extend({ lat: site.lat, lng: site.lng }));
+    if (hub) bounds.extend({ lat: hub.lat, lng: hub.lng });
     try {
       state.map.fitBounds(bounds, 60);
     } catch (_) {
@@ -214,10 +264,18 @@
     const mapOptions = {
       center: state.center,
       zoom: 11,
-      mapTypeId: google.maps.MapTypeId.TERRAIN,
+      mapTypeId: google.maps.MapTypeId.HYBRID,
       streetViewControl: false,
       fullscreenControl: true,
-      mapTypeControl: true
+      mapTypeControl: true,
+      mapTypeControlOptions: {
+        mapTypeIds: [
+          google.maps.MapTypeId.HYBRID,
+          google.maps.MapTypeId.SATELLITE,
+          google.maps.MapTypeId.ROADMAP,
+          google.maps.MapTypeId.TERRAIN
+        ]
+      }
     };
     if (gam?.DEFAULT_MAP_ID) mapOptions.mapId = gam.DEFAULT_MAP_ID;
 
@@ -230,6 +288,7 @@
       marker.addListener('click', () => focusSite(site.id, { speak: false }));
     });
 
+    drawSpokes();
     resetView();
 
     const reset = document.getElementById('svMapReset');
@@ -237,8 +296,17 @@
       reset.hidden = false;
       reset.onclick = () => {
         state.activeId = null;
-        renderList();
-        resetView();
+        state.filter = 'all';
+        renderFilters();
+        applyFilter();
+        const hub = hubSite();
+        if (hub) {
+          state.map.setCenter({ lat: hub.lat, lng: hub.lng });
+          state.map.setZoom(11);
+          openInfo(hub);
+        } else {
+          resetView();
+        }
       };
     }
   }

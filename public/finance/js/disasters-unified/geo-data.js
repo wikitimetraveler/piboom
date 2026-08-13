@@ -126,6 +126,56 @@
     return geoCache.countySummary[st];
   }
 
+  /** Ops triage by county (loan pipeline) — not a loss probability. */
+  async function loadCountyRiskSummary(stateAbbr) {
+    const st = String(stateAbbr || '').toUpperCase();
+    if (geoCache.countyRiskSummary?.[st]) return geoCache.countyRiskSummary[st];
+    if (!geoCache.countyRiskSummary) geoCache.countyRiskSummary = {};
+    try {
+      const res = await fetch(`/api/loan-pipeline/county-risk-summary?state=${encodeURIComponent(st)}`);
+      const json = await res.json();
+      const map = {};
+      (json.data?.counties || []).forEach((row) => {
+        const name = normalizeCountyName(row.county_name);
+        if (!name) return;
+        map[name.toLowerCase()] = {
+          loan_count: Number(row.loan_count) || 0,
+          avg_ops_triage: Number(row.avg_ops_triage) || 0,
+          max_ops_triage: Number(row.max_ops_triage) || 0,
+        };
+      });
+      geoCache.countyRiskSummary[st] = map;
+    } catch (e) {
+      console.warn('County ops-triage summary unavailable:', e.message);
+      geoCache.countyRiskSummary[st] = {};
+    }
+    return geoCache.countyRiskSummary[st];
+  }
+
+  /** fire_cameras density by county — sightedness choropleth. */
+  async function loadCountyCameraSummary(stateAbbr) {
+    const st = String(stateAbbr || '').toUpperCase();
+    if (geoCache.countyCameraSummary?.[st]) return geoCache.countyCameraSummary[st];
+    if (!geoCache.countyCameraSummary) geoCache.countyCameraSummary = {};
+    try {
+      const res = await fetch(`/api/disasters/cameras/county-summary?state=${encodeURIComponent(st)}`);
+      const json = await res.json();
+      const map = {};
+      (json.data?.counties || []).forEach((row) => {
+        const name = normalizeCountyName(row.county_name);
+        if (!name) return;
+        map[name.toLowerCase()] = {
+          camera_count: Number(row.camera_count) || 0,
+        };
+      });
+      geoCache.countyCameraSummary[st] = map;
+    } catch (e) {
+      console.warn('County camera summary unavailable:', e.message);
+      geoCache.countyCameraSummary[st] = {};
+    }
+    return geoCache.countyCameraSummary[st];
+  }
+
   /** Choropleth fill by event count (states or counties). */
   function heatColor(count, max) {
     if (!count || count <= 0) return '#e2e8f0';
@@ -133,6 +183,24 @@
     if (t < 0.33) return '#93c5fd';
     if (t < 0.66) return '#fbbf24';
     return '#ef4444';
+  }
+
+  /** Teal scale for camera sightedness. */
+  function cameraHeatColor(count, max) {
+    if (!count || count <= 0) return '#e2e8f0';
+    const t = Math.min(1, count / Math.max(max, 1));
+    if (t < 0.33) return '#99f6e4';
+    if (t < 0.66) return '#2dd4bf';
+    return '#0f766e';
+  }
+
+  /** Amber→red scale for ops triage avg (0–15). */
+  function opsTriageHeatColor(avg, max) {
+    if (!avg || avg <= 0) return '#e2e8f0';
+    const t = Math.min(1, avg / Math.max(max, 1));
+    if (t < 0.33) return '#fde68a';
+    if (t < 0.66) return '#f59e0b';
+    return '#b45309';
   }
 
   function decorateStatesGeoJson(fc, stateStats) {
@@ -177,7 +245,11 @@
     loadStateCounties,
     loadStateEventStats,
     loadCountySummary,
+    loadCountyRiskSummary,
+    loadCountyCameraSummary,
     heatColor,
+    cameraHeatColor,
+    opsTriageHeatColor,
     decorateStatesGeoJson,
     statesGeoJson,
   };

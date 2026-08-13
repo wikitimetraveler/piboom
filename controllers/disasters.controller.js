@@ -653,6 +653,35 @@ export async function countySummaryByState(req, res) {
   }
 }
 
+/** Per-county fire_cameras counts — hazard-lens “sightedness” choropleth. */
+export async function cameraCountySummaryByState(req, res) {
+  try {
+    const state = String(req.query.state || '').trim().toUpperCase();
+    if (!state) {
+      return res.status(400).json({ success: false, error: 'state query parameter is required' });
+    }
+    const pool = getPool();
+    if (!pool) throw new Error('Database not initialized');
+    const { rows } = await pool.query(
+      `SELECT county_name,
+              COUNT(*)::int AS camera_count
+       FROM fire_cameras
+       WHERE UPPER(TRIM(COALESCE(state_abbr, ''))) = $1
+         AND COALESCE(TRIM(county_name), '') <> ''
+       GROUP BY county_name
+       ORDER BY county_name`,
+      [state]
+    );
+    res.json({ success: true, data: { state, counties: rows } });
+  } catch (e) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get camera county summary',
+      details: e.message
+    });
+  }
+}
+
 export async function exportCsv(req, res) {
   try {
     const pool = getPool();
@@ -715,6 +744,7 @@ export default {
   webCrawl,
   statsDisasters,
   countySummaryByState,
+  cameraCountySummaryByState,
   exportCsv,
   geocodeAddress,
 };

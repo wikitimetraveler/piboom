@@ -47,28 +47,34 @@ function factSheet(content) {
     );
   }
 
-  lines.push('', '### Food');
-  for (const food of content.foods || []) {
-    lines.push(`- ${pickEn(food.name)}: ${pickEn(food.tagline)}. ${pickEn(food.history)}`);
-  }
-
-  lines.push('', '### Living neighbors');
-  for (const entry of content.living || []) {
-    lines.push(`- ${pickEn(entry.name)}: ${pickEn(entry.tagline)}. ${pickEn(entry.history)}`);
+  for (const [label, key] of [
+    ['Steel', 'steel'],
+    ['Amish', 'amish'],
+    ['Sports', 'sports'],
+    ['Music', 'music'],
+    ['Food', 'foods'],
+    ['Living', 'living']
+  ]) {
+    lines.push('', `### ${label}`);
+    for (const entry of content[key] || []) {
+      lines.push(`- ${pickEn(entry.name)}: ${pickEn(entry.tagline)}. ${pickEn(entry.history)}`);
+    }
   }
 
   lines.push(
     '',
     '### Geography note',
-    '- Home center is Buhl Park in Hermitage / Shenango Valley, Pennsylvania.',
-    '- Local Amish country is New Wilmington / Volant (Lawrence–Mercer), not Lancaster County.'
+    '- Map hub is Buhl Park in Hermitage / Shenango Valley, Pennsylvania — every story radiates from there.',
+    '- Local Amish country is New Wilmington / Volant (Lawrence–Mercer), not Lancaster County.',
+    '- Tony Butala / The Lettermen are from Sharon; Trent Reznor grew up in Mercer (same county, not the mill towns).',
+    '- Be respectful about Amish neighbors and do not invent private addresses.'
   );
 
   return lines.join('\n');
 }
 
 function buildSystemPrompt(content) {
-  return `You are ${pickEn(content.guide?.name) || 'David'}, local guide for the "Shenango Valley" Nature atlas page on DevConnect Labs.
+  return `You are ${pickEn(content.guide?.name) || 'David'}, local history guide for the Shenango Valley PA atlas on DevConnect Labs — Buhl Park at the center of steel, Amish neighbors, sports, and music.
 
 ## Personality
 - Warm, precise, and proud of the Shenango Valley without sounding like a brochure.
@@ -86,7 +92,8 @@ ${factSheet(content)}
 2. You may add well-established local geography beyond this list, but say plainly when something is uncertain.
 3. Do not invent prices, opening hours, phone numbers, or private addresses. If unsure, say so.
 4. Be respectful about Amish neighbors — describe community geography and etiquette, never treat people as tourist props.
-5. When a place is mentioned, name the town (Hermitage, Sharon, New Wilmington) so the visitor can find it on the map.`;
+5. When a place is mentioned, name the town (Hermitage, Sharon, Farrell, New Wilmington, Mercer) so the visitor can find it on the map.
+6. Distinguish Sharon (Lettermen / Butala) from Mercer borough (Reznor) — same county, different towns.`;
 }
 
 /**

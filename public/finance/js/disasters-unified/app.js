@@ -178,10 +178,10 @@ function initDuSectionCards() {
     });
   });
 
-  ['collapseCommandDeck', 'collapseRiskIntel', 'collapseLoans'].forEach((sectionId) => {
+  ['collapseCommandDeck', 'collapseRiskIntel', 'collapseEncompassMap', 'collapseLoans'].forEach((sectionId) => {
     const el = document.getElementById(sectionId);
     if (!el) return;
-    const step = sectionId === 'collapseLoans' ? 3 : 2;
+    const step = (sectionId === 'collapseLoans' || sectionId === 'collapseEncompassMap') ? 3 : 2;
     updateDuSectionHeaderState(sectionId, el.classList.contains('show'));
     el.addEventListener('shown.bs.collapse', () => {
       updateDuSectionHeaderState(sectionId, true);
@@ -189,6 +189,12 @@ function initDuSectionCards() {
       if (sectionId === 'collapseLoans') {
         setDuSectionPillActive('collapseLoans');
         // AG Grid needs a layout pass after Bootstrap expand (was collapsed / 0-height)
+        setTimeout(refreshEncompassLoansGridLayout, 50);
+        setTimeout(refreshEncompassLoansGridLayout, 200);
+      }
+      if (sectionId === 'collapseEncompassMap') {
+        setDuSectionPillActive('collapseEncompassMap');
+        if (typeof initDisastersMap === 'function' && !map) initDisastersMap();
         setTimeout(refreshEncompassLoansGridLayout, 50);
         setTimeout(refreshEncompassLoansGridLayout, 200);
       }
@@ -225,6 +231,7 @@ function getDuNavSectionForCollapse(sectionId) {
   const el = document.getElementById(id);
   if (!el) return null;
   if (id === 'collapseLoans') return document.getElementById('duMockedLoansSection');
+  if (id === 'collapseEncompassMap') return document.getElementById('duEncompassMapSection');
   if (id === 'collapseGraphDb') return document.getElementById('duGraphDbSection');
   if (id === 'collapseRiskIntel') return document.getElementById('duRiskIntelCard');
   const navSection = el.closest('.du-nav-section');
@@ -377,11 +384,14 @@ function revealDuIntelShell({ scope, state, county, statusMsg, keepGeoExpanded =
   showDuDashboardSectionCard('collapseFilters');
   showDuDashboardSectionCard('collapseDisasters');
   showDuDashboardSectionCard('collapseMapYouTube');
+  showDuDashboardSectionCard('collapseEncompassMap');
 
-  initDisastersMap();
+  // Google Encompass map between Disasters and Loans (#map) — Leaflet place lens stays separate.
+  if (typeof initDisastersMap === 'function') initDisastersMap();
   syncSourceChipsFromSelect();
   setTimeout(() => {
     if (typeof window.duGeoPickerInvalidate === 'function') window.duGeoPickerInvalidate();
+    refreshEncompassLoansGridLayout();
   }, 350);
 }
 
@@ -540,10 +550,11 @@ function syncDuSelectionOverlays() {
 function openDuDashboardSection(targetId, stepNum) {
   if (!targetId) return;
   const accordionIds = ['collapseFilters', 'collapseDisasters', 'collapseMapYouTube'];
-  const sectionCardIds = ['collapseCommandDeck', 'collapseRiskIntel', 'collapseLoans', 'collapseGraphDb'];
+  const sectionCardIds = ['collapseCommandDeck', 'collapseRiskIntel', 'collapseEncompassMap', 'collapseLoans', 'collapseGraphDb'];
   const sectionHeadingIds = {
     collapseCommandDeck: 'headingCommandDeck',
     collapseRiskIntel: 'headingRiskIntel',
+    collapseEncompassMap: 'headingEncompassMap',
     collapseLoans: 'headingLoans',
     collapseGraphDb: 'headingGraphDb',
     collapseFilters: 'headingFilters',
@@ -609,6 +620,10 @@ function initDuSectionSidebar() {
     const link = e.target.closest('a[data-bs-target], a[data-du-section-target]');
     if (!link) return;
     e.preventDefault();
+    if (link.getAttribute('data-du-scroll-target') === 'duEncompassLoansMapCard') {
+      openDuEncompassLoansMapSection(link.getAttribute('data-du-section-step') || 3);
+      return;
+    }
     const sectionTarget = link.getAttribute('data-du-section-target');
     if (sectionTarget === 'duBottomDock' || sectionTarget === 'duGeoStage') {
       openDuDashboardSection(sectionTarget, link.getAttribute('data-du-section-step'));
@@ -662,6 +677,8 @@ function setDuLoanPanel(panel) {
   });
   if (!isLoans && camerasPanel) {
     camerasPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else if (isLoans) {
+    setTimeout(refreshEncompassLoansGridLayout, 50);
   }
 }
 
@@ -725,23 +742,44 @@ function showMockedLoansWorkspace() {
 }
 
 function refreshEncompassLoansGridLayout() {
-  if (!encompassLoansGridApi) return;
-  if (typeof encompassLoansGridApi.sizeColumnsToFit === 'function') {
-    encompassLoansGridApi.sizeColumnsToFit();
+  if (encompassLoansGridApi) {
+    if (typeof encompassLoansGridApi.sizeColumnsToFit === 'function') {
+      encompassLoansGridApi.sizeColumnsToFit();
+    }
+    if (typeof encompassLoansGridApi.resetRowHeights === 'function') {
+      encompassLoansGridApi.resetRowHeights();
+    }
   }
-  if (typeof encompassLoansGridApi.resetRowHeights === 'function') {
-    encompassLoansGridApi.resetRowHeights();
-  }
+  // Google #map between disasters and loans — resize after panel expand / tab show.
   if (map && typeof google !== 'undefined' && google.maps?.event) {
     google.maps.event.trigger(map, 'resize');
   }
+}
+
+function expandDuEncompassMapSection() {
+  showDuDashboardSectionCard('collapseEncompassMap');
+  if (typeof initDisastersMap === 'function' && !map) initDisastersMap();
+  setTimeout(refreshEncompassLoansGridLayout, 150);
 }
 
 function expandDuLoansSection() {
   showMockedLoansWorkspace();
   setDuLoanPanel('loans');
   showDuDashboardSectionCard('collapseLoans');
+  expandDuEncompassMapSection();
   setTimeout(refreshEncompassLoansGridLayout, 150);
+}
+
+/** Open Encompass map section (between Disasters and Loans) and scroll to #map. */
+function openDuEncompassLoansMapSection(stepNum) {
+  expandDuEncompassMapSection();
+  setDuSectionPillActive('collapseEncompassMap');
+  if (stepNum) syncDuWorkflowPill(Number(stepNum));
+  const scrollEl = document.getElementById('duEncompassLoansMapCard') || document.getElementById('map');
+  setTimeout(() => {
+    refreshEncompassLoansGridLayout();
+    scrollEl?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 200);
 }
 
 function syncDuLoanRadiusControls() {
@@ -816,7 +854,7 @@ function selectDisaster(disasterData, disasterObj) {
 
   // Highlight immediately so the row doesn't feel "dead"; defer heavier panel work.
   highlightSelectedDisasterInGrid(disasterObj);
-  focusMapOnDisaster(disasterObj);
+  if (typeof focusMapOnDisaster === 'function') focusMapOnDisaster(disasterObj);
 
   // Loans first (and before Graph DB panel work) so selection always refreshes mocked loans.
   loadLoansForDisaster(disasterObj, selectedDisasterRow);
@@ -826,6 +864,7 @@ function selectDisaster(disasterData, disasterObj) {
   searchYouTubeForDisaster(title, state, county, eventType, disasterObj);
   revealDisasterSelectionPanels();
   syncDuSelectionOverlays();
+  window.duGeoOverlays?.setFloodHalo?.(null);
   // D3 force graph is expensive — never block the grid click turn.
   window.setTimeout(() => {
     if (selectedDisasterObj !== disasterObj) return;
@@ -878,7 +917,14 @@ async function loadLoansForDisaster(disasterObj, disasterData) {
       const loans = data.data.loans || [];
       populateEncompassLoansTable(loans);
       try {
-        updateMapWithLoans(loans);
+        if (typeof updateMapWithLoans === 'function') updateMapWithLoans(loans);
+        // Card may have been display:none when Google Maps first booted.
+        if (map && typeof google !== 'undefined' && google.maps?.event) {
+          google.maps.event.trigger(map, 'resize');
+          if (selectedDisasterObj && typeof focusMapOnDisaster === 'function') {
+            focusMapOnDisaster(selectedDisasterObj);
+          }
+        }
       } catch (mapErr) {
         // Map marker failures must not wipe the loans grid (was clearing via outer catch).
         console.warn('Loan map markers skipped:', mapErr);
@@ -1001,11 +1047,74 @@ function showInsightsIdlePlaceholder() {
     </div>`;
 }
 
+function openEncompassMapFromUnified() {
+  if (!selectedDisasterObj) {
+    setDashboardStatus('Select a disaster in the grid first, then open fullscreen map.', 'info');
+    return false;
+  }
+  if (!window.DuEncompassMapHandoff?.openEncompassMap) {
+    setDashboardStatus('Fullscreen map handoff helper missing.', 'warning');
+    return false;
+  }
+  const ok = window.DuEncompassMapHandoff.openEncompassMap(
+    selectedDisasterObj,
+    selectedDisasterRow,
+    window.DuEncompassMapHandoff.collectUnifiedOpenOptions?.() || {}
+  );
+  if (!ok) {
+    setDashboardStatus('Need place or coordinates on the selected disaster to open fullscreen map.', 'warning');
+  }
+  return ok;
+}
+
+function updateEncompassMapCtaVisibility() {
+  const ready = !!selectedDisasterObj;
+  const loansBtn = document.getElementById('duOpenEncompassMapLoansBtn');
+  if (loansBtn) {
+    loansBtn.hidden = !ready;
+    loansBtn.disabled = !ready;
+  }
+  const videosLink = document.getElementById('duVideosEncompassMapLink');
+  if (!videosLink) return;
+  if (ready && window.DuEncompassMapHandoff) {
+    const payload = window.DuEncompassMapHandoff.buildHandoffFromSelection(
+      selectedDisasterObj,
+      selectedDisasterRow,
+      window.DuEncompassMapHandoff.collectUnifiedOpenOptions()
+    );
+    videosLink.href = window.DuEncompassMapHandoff.buildMapPageUrl(payload);
+  } else {
+    videosLink.href = 'disasters-encompass-map.html';
+  }
+}
+
+function bindEncompassMapCtaLinks() {
+  const videosLink = document.getElementById('duVideosEncompassMapLink');
+  if (videosLink && videosLink.dataset.demBound !== '1') {
+    videosLink.dataset.demBound = '1';
+    videosLink.addEventListener('click', (ev) => {
+      if (!selectedDisasterObj) return;
+      ev.preventDefault();
+      openEncompassMapFromUnified();
+    });
+  }
+  document.querySelectorAll('[data-du-scroll-target="duEncompassLoansMapCard"]').forEach((link) => {
+    if (link.dataset.duMapScrollBound === '1') return;
+    link.dataset.duMapScrollBound = '1';
+    link.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      openDuEncompassLoansMapSection(link.getAttribute('data-du-section-step') || 3);
+    });
+  });
+}
+
 function updateSelectionContextStrip() {
   const el = document.getElementById('selectionContextStrip');
   if (!el || !selectedDisasterObj) {
     if (el) el.hidden = true;
     updateKmlExportButtons();
+    updateEncompassMapCtaVisibility();
     return;
   }
   const title = selectedDisasterObj.title || selectedDisasterObj.declarationTitle || 'Selected disaster';
@@ -1038,6 +1147,7 @@ function updateSelectionContextStrip() {
   actions.setAttribute('aria-label', 'Selection actions');
 
   const primaryActions = [
+    { label: 'Show Encompass map', icon: 'bi-geo-alt', className: 'btn-outline-primary', onclick: 'openDuEncompassLoansMapSection()' },
     { label: 'AI video briefing', icon: 'bi-camera-reels', className: 'btn-info text-white', onclick: 'openDisasterHeygenBriefing()' },
     { label: 'Google Earth KML', icon: 'bi-globe-americas', className: 'btn-warning', onclick: 'exportCinematicDisasterKml()' },
     { label: 'Processor expert', icon: 'bi-robot', className: 'btn-light', onclick: 'openProcessorExpert()' },
@@ -1050,7 +1160,8 @@ function updateSelectionContextStrip() {
     btn.setAttribute('aria-label', act.label);
     btn.innerHTML = `<i class="bi ${act.icon}" aria-hidden="true"></i><span class="du-selection-strip-btn-label">${act.label}</span>`;
     btn.addEventListener('click', () => {
-      if (act.onclick === 'openDisasterHeygenBriefing()') openDisasterHeygenBriefing();
+      if (act.onclick === 'openDuEncompassLoansMapSection()') openDuEncompassLoansMapSection(3);
+      else if (act.onclick === 'openDisasterHeygenBriefing()') openDisasterHeygenBriefing();
       else if (act.onclick === 'exportCinematicDisasterKml()') exportCinematicDisasterKml();
       else openProcessorExpert();
     });
@@ -1063,15 +1174,18 @@ function updateSelectionContextStrip() {
     <i class="bi bi-three-dots" aria-hidden="true"></i><span class="du-selection-strip-btn-label">More</span>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item" id="duStripFullscreenMapBtn"><i class="bi bi-fullscreen me-1"></i>Open fullscreen map</button></li>
     <li><a class="dropdown-item" href="disasters-webcams.html"><i class="bi bi-camera-video me-1"></i>Hazard webcams</a></li>
     <li><a class="dropdown-item" href="pipeline-risk-dashboard.html"><i class="bi bi-graph-up me-1"></i>FEMA pipeline ops triage</a></li>
     <li><a class="dropdown-item" href="/disaster-impact-graph.html" title="Persisted graph NEAR — as-of reseed (seeded_at), not live distance"><i class="bi bi-diagram-3 me-1"></i>Impact Graph <span class="text-muted small">(as-of reseed)</span></a></li>
   </ul>`;
   actions.appendChild(overflow);
+  overflow.querySelector('#duStripFullscreenMapBtn')?.addEventListener('click', () => openEncompassMapFromUnified());
 
   el.appendChild(summary);
   el.appendChild(actions);
   updateKmlExportButtons();
+  updateEncompassMapCtaVisibility();
 }
 
 function updateKmlExportButtons() {
@@ -1408,6 +1522,8 @@ $(function init() {
   initDisastersGrid();
   initEncompassLoansGrid();
   initializeDuLoanFilterControls();
+  bindEncompassMapCtaLinks();
+  updateEncompassMapCtaVisibility();
   syncSourceChipsFromSelect();
   $('#sourceInput').on('change', () => {
     syncSourceChipsFromSelect();
