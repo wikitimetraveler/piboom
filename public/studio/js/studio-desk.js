@@ -79,17 +79,18 @@
     return state.audioCtx;
   }
 
-  function addTrack(name) {
+  function addTrack(name, opts = {}) {
     const track = {
       id: `t${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`,
       name: name || `Track ${state.tracks.length + 1}`,
+      kind: opts.kind || 'audio',
       clips: [],
-      gain: 1,
-      pan: 0,
+      gain: Number.isFinite(opts.gain) ? opts.gain : 1,
+      pan: Number.isFinite(opts.pan) ? opts.pan : 0,
       muted: false,
     };
     state.tracks.push(track);
-    if (!state.armedId) state.armedId = track.id;
+    if (!state.armedId || opts.arm) state.armedId = track.id;
     renderTracks();
     drawTimeline();
     return track;
@@ -100,11 +101,12 @@
     els.tracks.innerHTML = '';
     state.tracks.forEach((track) => {
       const row = document.createElement('div');
-      row.className = `st-track${track.id === state.armedId ? ' is-armed' : ''}`;
+      const kindLabel = track.kind === 'acoustic-guitar' ? 'Acoustic guitar · ' : '';
+      row.className = `st-track${track.id === state.armedId ? ' is-armed' : ''}${track.kind === 'acoustic-guitar' ? ' st-track--guitar' : ''}`;
       row.innerHTML = `
         <div>
           <strong>${escapeHtml(track.name)}</strong>
-          <div class="st-status">${track.clips.length} clip${track.clips.length === 1 ? '' : 's'}</div>
+          <div class="st-status">${kindLabel}${track.clips.length} clip${track.clips.length === 1 ? '' : 's'}</div>
         </div>
         <div>
           <button type="button" data-arm="${track.id}">Arm</button>
@@ -617,8 +619,11 @@
   }
 
   async function boot() {
+    addTrack('Acoustic Guitar Neck', { kind: 'acoustic-guitar', pan: -0.28, arm: true });
+    addTrack('Acoustic Guitar Body', { kind: 'acoustic-guitar', pan: 0.28 });
     addTrack('Vocal');
     addTrack('Harmony');
+    if (els.musicMode) els.musicMode.checked = true;
     if (!state.reel) {
       try {
         const res = await fetch('/api/studio/sessions', {
@@ -645,7 +650,7 @@
         else els.livekitStatus.textContent = 'LiveKit ready';
       })
       .catch(() => {});
-    appendReed('Reed: StarBand console is up. Join LiveKit and I come into the room. Record stays in the tab.');
+    appendReed('Reed: Two acoustic guitar lanes are up — Neck and Body. Music input is on. Arm Neck, point a mic at the twelfth fret, then stack Body on the soundhole.');
   }
 
   els.addTrack?.addEventListener('click', () => addTrack());

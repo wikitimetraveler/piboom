@@ -166,11 +166,15 @@
     const img = site.image
       ? `<img src="${esc(site.image)}" alt="" style="width:100%;max-height:120px;object-fit:cover;border-radius:6px;margin:0 0 8px" loading="lazy"/>`
       : '';
+    const link = site.website
+      ? `<p style="margin:10px 0 0"><a href="${esc(site.website)}" target="_blank" rel="noopener noreferrer" style="color:#1e5c3a;font-weight:700;font-size:13px">Official site ↗</a></p>`
+      : '';
     state.info.setContent(`<div style="color:#1a2420;max-width:280px;font-family:system-ui,sans-serif">
       ${img}
       <strong style="font-size:16px;line-height:1.3">${esc(pick(site.name))}</strong><br/>
       <span style="font-size:13px;color:#3a4a52;font-weight:600">${esc(pick(site.place))}</span>
       <p style="font-size:13px;margin:8px 0 0;line-height:1.55">${esc(pick(site.blurb))}</p>
+      ${link}
     </div>`);
     if (window.googleAdvancedMarkers?.openMapInfoWindow) {
       window.googleAdvancedMarkers.openMapInfoWindow(state.info, state.map, entry.marker);

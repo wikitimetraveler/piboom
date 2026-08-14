@@ -16,6 +16,12 @@ describe('studio-assistant.service', () => {
     expect(reply.toLowerCase()).toContain('reel1');
   });
 
+  test('groundedReply describes the acoustic guitar lanes', () => {
+    const reply = groundedReply('how do I track acoustic guitar');
+    expect(reply.toLowerCase()).toMatch(/neck/);
+    expect(reply.toLowerCase()).toMatch(/body/);
+  });
+
   test('chatWithReed falls back when OpenAI is unset', async () => {
     delete process.env.OPENAI_API_KEY;
     const result = await chatWithReed({ message: 'how do I record' });

@@ -52,9 +52,9 @@
       "sportsHeading": "Sports",
       "sportsLead": "Sharon Tigers vs Farrell Steelers — District 10 Steel Bowl football and gym rivalry on the same mill labor market that filled Buhl’s free fields.",
       "musicHeading": "Music",
-      "musicLead": "Tony Butala (Sharon) / The Lettermen; Trent Reznor (Mercer borough); WPIC, Marjon, Maennerchor, free Buhl concerts — keep the towns straight.",
+      "musicLead": "Tony Butala (Sharon) / The Lettermen; Trent Reznor (Mercer borough); Cedars Lounge + Tomorrow Club/Agora (Youngstown downtown); WPIC, Marjon, Maennerchor, free Buhl concerts — keep the towns straight.",
       "foodHeading": "The valley table",
-      "foodLead": "After the mills — Quaker Steak & Lube and Luigi's Pizza. Flip a card for the story.",
+      "foodLead": "After the mills — Sharon, PA tables: Quaker Steak & Lube and Tony's Pizza & Pub, plus Luigi's in Hermitage. Flip a card for the story.",
       "livingHeading": "Living etiquette",
       "livingLead": "Keep Buhl free, share Amish roads, read Youngstown from published record. The hub remains Buhl Farm because the valley still meets there.",
       "flipHint": "Flip for the story",
@@ -64,6 +64,7 @@
       "context": "Context",
       "evidence": "On the ground",
       "mapShow": "Show on map",
+      "visitWebsite": "Official site",
       "mediaHeading": "Photos & film",
       "mediaLead": "Real Commons photos from Sharon, Farrell, Hermitage, Sharpsville, New Wilmington, Mercer, and Youngstown — plus Lettermen and period industrial film below.",
       "videoHeading": "Watch",
@@ -176,10 +177,10 @@
         "en": "Music — Lettermen to Mercer County"
       },
       "copy": {
-        "en": "Context: Local airwaves and stages plus two national careers from Mercer County geography — different towns. Evidence: WPIC signed on in 1938; mid-century hops, Marjon Records (polka and local sides), Apollo Maennerchor (German singing society tradition from 1870), Hermitage’s Menagerie, and free Buhl summer concerts fill the middle register. Sharon’s Anthony “Tony” Butala (born 20 November 1940) co-founded The Lettermen (1958); first Top Forty hit “The Way You Look Tonight” (1961); retired performing about 2019; group Walk of Fame star 2020. He opened a Vocal Group Hall of Fame museum in Sharon about 1998 (98 East State) — treat later foundation/relocation struggles as hometown project history, not a permanent tourist claim. Mercer borough’s Trent Reznor — Mercer High jazz band, circulating 1982 sax solo — founded Nine Inch Nails after leaving for Cleveland: same county, not a Sharon childhood claim. Keep the towns straight on the map."
+        "en": "Context: Local airwaves and stages plus two national careers from Mercer County geography — different towns — and a related live-music corridor across the Ohio line in Youngstown. Evidence: WPIC signed on in 1938; mid-century hops, Marjon Records (polka and local sides), Apollo Maennerchor (German singing society tradition from 1870), Hermitage’s Menagerie, and free Buhl summer concerts fill the middle register. Sharon’s Anthony “Tony” Butala (born 20 November 1940) co-founded The Lettermen (1958); first Top Forty hit “The Way You Look Tonight” (1961); retired performing about 2019; group Walk of Fame star 2020. He opened a Vocal Group Hall of Fame museum in Sharon about 1998 (98 East State) — treat later foundation/relocation struggles as hometown project history, not a permanent tourist claim. Mercer borough’s Trent Reznor — Mercer High jazz band, circulating 1982 sax solo — founded Nine Inch Nails after leaving for Cleveland: same county, not a Sharon childhood claim. Related across the line: Cedars Lounge became a downtown Youngstown rock room in 1975 at 23 North Hazel under Tommy Simon; after a 2012 eviction the family reopened as Cedars West End at 706 Steel Street (2013). On the same downtown block, the State Theater ran as the Tomorrow Club (~1973) then Youngstown Agora (1978–82) — the big Federal Street rock hall a short walk from Cedars. Keep the towns straight on the map."
       },
       "narration": {
-        "en": "Chapter six — music. Tony Butala took Sharon harmony to the nation with The Lettermen. Trent Reznor took Mercer High jazz band to industrial rock. Between them: WPIC, Marjon, Maennerchor, and free nights at Buhl. Two towns, one county — keep the geography honest."
+        "en": "Chapter six — music. Tony Butala took Sharon harmony to the nation with The Lettermen. Trent Reznor took Mercer High jazz band to industrial rock. Across the line, Cedars on Hazel and the Tomorrow Club — later the Agora — kept Youngstown rock alive downtown. Keep the geography honest."
       },
       "image": "/nature/assets/shenango/music/lettermen.jpg"
     },
@@ -425,6 +426,40 @@
       "image": "/nature/assets/shenango/music/outdoor-concert.jpg"
     },
     {
+      "id": "cedars-lounge",
+      "category": "music",
+      "emoji": "🎸",
+      "lat": 41.1101498,
+      "lng": -80.6830887,
+      "name": {
+        "en": "Cedars Lounge / Cedars West End"
+      },
+      "place": {
+        "en": "706 Steel St, Youngstown, OH (since 2013)"
+      },
+      "blurb": {
+        "en": "Related music spoke: original Cedars Lounge at 23 N. Hazel St (Gallagher Building) from 1975 under Tommy Simon. Evicted 2012; reopened 2013 as Cedars West End at 706 Steel St — Mara Simon & Billy Danielson. Same downtown block as the old State Theater rock hall."
+      },
+      "image": "/nature/assets/shenango/mob/youngstown-skyline.jpg"
+    },
+    {
+      "id": "tomorrow-club-agora",
+      "category": "music",
+      "emoji": "🎤",
+      "lat": 41.1011802,
+      "lng": -80.652136,
+      "name": {
+        "en": "Tomorrow Club / Youngstown Agora"
+      },
+      "place": {
+        "en": "213 W Federal St (State Theater) — near N. Hazel"
+      },
+      "blurb": {
+        "en": "State Theater hall near Cedars. Muddy Waters 1978 & Agora 9 Mar 1980; Spyro Gyra Star 20 Oct 1985; Outlaws Tomorrow Club 1976–77 + Star; The Godz Tomorrow Club 21 May 1978."
+      },
+      "image": "/nature/assets/shenango/mob/youngstown-skyline.jpg"
+    },
+    {
       "id": "quaker-steak-lube",
       "category": "food",
       "emoji": "🍗",
@@ -440,6 +475,25 @@
         "en": "Opened March 1974 in a former service station — motor-themed wings and a Sharon landmark after the steel peak."
       },
       "image": "/nature/assets/shenango/food/quaker-steak.jpg"
+    },
+    {
+      "id": "tonys-pizza",
+      "category": "food",
+      "emoji": "🍕",
+      "lat": 41.2241863,
+      "lng": -80.4934744,
+      "name": {
+        "en": "Tony's Pizza & Pub — Sharon, PA"
+      },
+      "place": {
+        "en": "628 Stambaugh Ave, Sharon, PA 16146"
+      },
+      "blurb": {
+        "en": "Official site: serving the Shenango Valley from Stambaugh Avenue — authentic pizza, sandwiches, wings, and a casual pub. Claims over 70 years as one of America's older pizza shops. Call 724-347-3323."
+      },
+      "website": "https://www.tonyspizzaandpub.com/",
+      "phone": "724-347-3323",
+      "image": "/nature/assets/shenango/food/pizza.jpg"
     },
     {
       "id": "luigis-pizza",
@@ -878,6 +932,50 @@
         ]
       },
       "image": "/nature/assets/shenango/music/outdoor-concert.jpg"
+    },
+    {
+      "id": "cedars-lounge-card",
+      "siteId": "cedars-lounge",
+      "emoji": "🎸",
+      "name": {
+        "en": "Cedars Lounge → West End"
+      },
+      "tagline": {
+        "en": "Youngstown original music since 1975"
+      },
+      "history": {
+        "en": "Evidence: Local press (Business Journal Daily; Tribune Chronicle / Vindicator) dates Cedars Lounge as a downtown Youngstown rock venue from 1975 at 23 North Hazel Street (Gallagher Building) after Tommy Simon took over the family bar. Primary legacy: original local and regional bands (Infidels and peers). After a 2012 eviction, Mara Simon and Billy Danielson reopened as Cedars West End at 706 Steel Street in 2013; fifty-year lineage marked in June 2025. Context: on the same downtown corner system as the State Theater’s Tomorrow Club / Agora — after big shows on Federal, crowds finished the night at Cedars on Hazel."
+      },
+      "tags": {
+        "en": [
+          "Youngstown",
+          "1975",
+          "Original rock"
+        ]
+      },
+      "image": "/nature/assets/shenango/mob/youngstown-skyline.jpg"
+    },
+    {
+      "id": "tomorrow-club-card",
+      "siteId": "tomorrow-club-agora",
+      "emoji": "🎤",
+      "name": {
+        "en": "Tomorrow Club → Agora"
+      },
+      "tagline": {
+        "en": "Muddy Waters · Outlaws · The Godz · Spyro Gyra"
+      },
+      "history": {
+        "en": "Evidence: The State Theater at 213 West Federal Street ran as Tomorrow Club, Youngstown Agora (31 Dec 1978–23 July 1982), then Star Theatre / later names; demolished 2008 (facade retained). Blues/jazz: Muddy Waters at Tomorrow Club 25 June 1978 and Agora 9 March 1980; Spyro Gyra at Star Theatre 20 October 1985. Southern rock: the Outlaws at Tomorrow Club three times (1976–77) and again at Star Theatre. Ohio hard rock: rock-tour databases list The Godz — Columbus “biker metal,” often called Ohio’s rock ’n’ roll machines — at Tomorrow, Youngstown, on 21 May 1978 (same hall; also documented at Cleveland Agora). Cedars sat a block away at 23 North Hazel."
+      },
+      "tags": {
+        "en": [
+          "The Godz",
+          "Outlaws",
+          "Muddy Waters"
+        ]
+      },
+      "image": "/nature/assets/shenango/mob/youngstown-skyline.jpg"
     }
   ],
   "foods": [
@@ -902,6 +1000,29 @@
         ]
       },
       "image": "/nature/assets/shenango/food/quaker-steak.jpg"
+    },
+    {
+      "id": "tonys-card",
+      "siteId": "tonys-pizza",
+      "emoji": "🍕",
+      "name": {
+        "en": "Tony's Pizza & Pub"
+      },
+      "tagline": {
+        "en": "Sharon, PA — 70+ years on Stambaugh"
+      },
+      "history": {
+        "en": "Evidence: Official site tonyspizzaandpub.com places Tony's Pizza & Pub at 628 Stambaugh Avenue, Sharon, PA 16146 (724-347-3323), serving the Shenango Valley with pizza, sandwiches, wings, and a casual pub — and claims over 70 years as one of America's older pizza shops. Context: after the mills, Sharon neighborhood counters kept the valley table going; this pin is Sharon, not Hermitage."
+      },
+      "tags": {
+        "en": [
+          "Sharon, PA",
+          "Pizza",
+          "70+ years"
+        ]
+      },
+      "website": "https://www.tonyspizzaandpub.com/",
+      "image": "/nature/assets/shenango/food/pizza.jpg"
     },
     {
       "id": "luigis-card",

@@ -8,6 +8,7 @@ import {
   getWatchTogetherStatus,
   handleWatchIntent,
   mintWatchTogetherLivekitToken,
+  searchWatchTogetherYouTube,
   MAX_VIEWERS,
 } from '../services/watch-together.service.js';
 
@@ -98,6 +99,25 @@ export async function postWatchTogetherLivekitToken(req, res) {
   }
 }
 
+export async function postWatchTogetherYoutubeSearch(req, res) {
+  try {
+    const result = await searchWatchTogetherYouTube(req.body?.query);
+    if (!result.ok && result.reason === 'empty') {
+      return res.status(400).json({ ok: false, error: 'empty' });
+    }
+    if (!result.ok && result.reason === 'no-key') {
+      return res.status(503).json({ ok: false, error: 'no-key' });
+    }
+    if (!result.ok) {
+      return res.status(502).json({ ok: false, error: result.reason || 'search-failed' });
+    }
+    return res.json({ ok: true, query: result.query, videos: result.videos });
+  } catch (e) {
+    console.error('watch-together youtube-search:', e.message);
+    return res.status(500).json({ ok: false, error: 'Server error' });
+  }
+}
+
 export default {
   postVerifyWatchTogether,
   getWatchTogetherGoogleApiKey,
@@ -105,4 +125,5 @@ export default {
   getWatchTogetherState,
   postWatchTogetherIntent,
   postWatchTogetherLivekitToken,
+  postWatchTogetherYoutubeSearch,
 };

@@ -9,6 +9,7 @@ import {
   getWatchTogetherState,
   postWatchTogetherIntent,
   postWatchTogetherLivekitToken,
+  postWatchTogetherYoutubeSearch,
 } from '../controllers/watch-together.controller.js';
 import { attachWatchTogetherSockets } from '../services/watch-together.service.js';
 
@@ -21,5 +22,6 @@ export default function buildWatchTogetherRoutes(io) {
   router.get('/state', getWatchTogetherState);
   router.post('/intent', postWatchTogetherIntent);
   router.post('/livekit-token', postWatchTogetherLivekitToken);
+  router.post('/youtube-search', postWatchTogetherYoutubeSearch);
   return router;
 }

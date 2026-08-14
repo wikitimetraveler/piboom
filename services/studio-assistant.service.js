@@ -16,18 +16,19 @@ function buildSystemPrompt() {
     ? `LiveKit is configured at ${livekit.url}. Voice, camera, and screen share join the same reel room.`
     : 'LiveKit env vars are not set yet (LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET). Local recording still works in the tab; remote A/V waits on those keys.';
 
-  return `You are ${GUIDE_NAME}, house engineer for DevConnect Labs Studio — a pro desk that runs in the browser tab.
+  return `You are ${GUIDE_NAME}, house engineer for StarBand, a browser recording studio.
 
 ## Personality
 - Dry, precise, tape-room calm. Short sentences. No hype.
 - Every reply may be read aloud, so keep answers to two short paragraphs. No markdown lists unless asked.
 
 ## How the desk actually works
+- The session opens with two acoustic-guitar tracks: Acoustic Guitar Neck (twelfth-fret mic, panned a little left) and Acoustic Guitar Body (soundhole / body mic, panned a little right). Vocal and Harmony sit under those.
+- Music input is on by default for guitar — echo cancellation and noise suppression stay off so the acoustic is not chewed up.
 - Recording, stacking, mixing, and WAV bounce happen client-side in the tab (Web Audio). Nothing is rendered on a server.
 - Takes are Opus in the browser; bounces are WAV. Indexed in the listening room behind one password (default reel1, override STUDIO_LISTEN_PASSWORD).
 - Socket.IO namespace /studio is the control plane: who is in the reel, transport (play/record), take-filed, booth chat.
-- LiveKit is the media plane: microphone talkback or music input, camera, and screen share of the desk.
-- Music input should disable echo cancellation / noise suppression. Talkback should leave them on.
+- LiveKit is the media plane: microphone talkback or music input, camera, and screen share of the desk. Reed the StarBand agent can join the same room.
 - Latency compensation: clips land at the playhead where the player actually hit record.
 - Engineer chat is you. Cover art for a release can be a still from screen share or a bounced title card.
 
@@ -53,6 +54,9 @@ export function groundedReply(message) {
     return livekit.configured
       ? 'LiveKit is on. Join the reel, then toggle mic, camera, or screen share. Socket.IO only moves transport and presence — the audio/video path is WebRTC.'
       : 'LiveKit keys are not on this server yet. You can still record in the tab. Set LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET to open voice, camera, and screen share.';
+  }
+  if (q.includes('guitar') || q.includes('acoustic')) {
+    return 'Two acoustic guitar tracks are already on the desk. Neck is the twelfth-fret mic, panned a little left. Body is the soundhole mic, panned a little right. Music input is on so the acoustic is not echo-cancelled. Arm Neck first, then stack Body.';
   }
   if (q.includes('record') || q.includes('mic') || q.includes('arm')) {
     return 'Add a track, arm it, pick music input if you are tracking a performance. Hit record. The waveform draws on the timeline. Remote friends file takes over LiveKit; the bounce still renders here.';

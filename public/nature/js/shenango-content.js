@@ -192,6 +192,13 @@
                   </button>`
                 : ''
             }
+            ${
+              item.website
+                ? `<a class="sv-btn sv-btn-ghost sv-btn-sm" href="${esc(item.website)}" target="_blank" rel="noopener noreferrer">
+                    <i class="bi bi-box-arrow-up-right"></i> ${esc(t('visitWebsite'))}
+                  </a>`
+                : ''
+            }
             <button type="button" class="sv-btn sv-btn-ghost sv-btn-sm sv-card-flip">
               <i class="bi bi-arrow-counterclockwise"></i> ${esc(t('back'))}
             </button>

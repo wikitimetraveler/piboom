@@ -3,6 +3,7 @@
  */
 import { verifyWatchTogetherAccess } from '../lib/watch-together-auth.js';
 import { getLivekitConfig } from './studio.service.js';
+import { getGoogleServerApiKey } from '../lib/google-api-key.js';
 
 export const DRIFT_PLAYING_S = 1.0;
 export const DRIFT_PAUSED_S = 0.35;
@@ -76,6 +77,51 @@ export function youtubeThumbnailUrl(id, size = 'hqdefault') {
   const allowed = new Set(['maxresdefault', 'sddefault', 'hqdefault', 'mqdefault']);
   const file = allowed.has(size) ? size : 'hqdefault';
   return `https://i.ytimg.com/vi/${videoId}/${file}.jpg`;
+}
+
+export function sanitizeYoutubeSearchQuery(raw) {
+  return String(raw || '').replace(/\s+/g, ' ').trim().slice(0, 80);
+}
+
+export function mapYouTubeSearchHits(items) {
+  if (!Array.isArray(items)) return [];
+  return items
+    .map((item) => {
+      const videoId = item?.id?.videoId;
+      const title = String(item?.snippet?.title || '').trim();
+      if (!videoId || !/^[\w-]{11}$/.test(videoId) || !title) return null;
+      const thumbs = item.snippet?.thumbnails || {};
+      const thumbnail =
+        thumbs.medium?.url || thumbs.high?.url || thumbs.default?.url || youtubeThumbnailUrl(videoId);
+      return {
+        videoId,
+        title: title.slice(0, 120),
+        channel: String(item.snippet?.channelTitle || '').trim().slice(0, 80),
+        thumbnail: thumbnail || '',
+        url: `https://www.youtube.com/watch?v=${videoId}`,
+      };
+    })
+    .filter(Boolean)
+    .slice(0, 8);
+}
+
+export async function searchWatchTogetherYouTube(rawQuery, fetcher = fetch) {
+  const query = sanitizeYoutubeSearchQuery(rawQuery);
+  if (query.length < 2) return { ok: false, reason: 'empty' };
+  const apiKey = getGoogleServerApiKey();
+  if (!apiKey) return { ok: false, reason: 'no-key' };
+  const params = new URLSearchParams({
+    part: 'snippet',
+    type: 'video',
+    videoEmbeddable: 'true',
+    maxResults: '8',
+    q: query,
+    key: apiKey,
+  });
+  const res = await fetcher(`https://www.googleapis.com/youtube/v3/search?${params}`);
+  if (!res?.ok) return { ok: false, reason: 'search-failed' };
+  const data = await res.json().catch(() => ({}));
+  return { ok: true, query, videos: mapYouTubeSearchHits(data.items) };
 }
 
 /**
@@ -590,6 +636,9 @@ export default {
   extractYouTubeId,
   parseMediaUrl,
   youtubeThumbnailUrl,
+  sanitizeYoutubeSearchQuery,
+  mapYouTubeSearchHits,
+  searchWatchTogetherYouTube,
   createRoomState,
   expectedMediaTime,
   needsDriftCorrection,

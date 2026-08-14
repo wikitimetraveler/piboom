@@ -5,6 +5,9 @@ import {
   extractYouTubeId,
   parseMediaUrl,
   youtubeThumbnailUrl,
+  sanitizeYoutubeSearchQuery,
+  mapYouTubeSearchHits,
+  searchWatchTogetherYouTube,
   createRoomState,
   expectedMediaTime,
   needsDriftCorrection,
@@ -43,6 +46,28 @@ describe('watch-together.service', () => {
       'https://i.ytimg.com/vi/dQw4w9wgGcQ/maxresdefault.jpg'
     );
     expect(youtubeThumbnailUrl('nope')).toBeNull();
+  });
+
+  test('sanitizeYoutubeSearchQuery trims and caps length', () => {
+    expect(sanitizeYoutubeSearchQuery('  Casablanca  ')).toBe('Casablanca');
+    expect(sanitizeYoutubeSearchQuery('x')).toBe('x');
+    expect(sanitizeYoutubeSearchQuery('a'.repeat(90)).length).toBe(80);
+  });
+
+  test('mapYouTubeSearchHits keeps embeddable videos and drops junk', () => {
+    const hits = mapYouTubeSearchHits([
+      { id: { videoId: 'dQw4w9wgGcQ' }, snippet: { title: 'Never Gonna', channelTitle: 'Rick' } },
+      { id: {}, snippet: { title: 'Missing id' } },
+      { id: { videoId: 'abcdefghijk' }, snippet: { title: '' } },
+    ]);
+    expect(hits).toHaveLength(1);
+    expect(hits[0].url).toBe('https://www.youtube.com/watch?v=dQw4w9wgGcQ');
+    expect(hits[0].title).toBe('Never Gonna');
+  });
+
+  test('searchWatchTogetherYouTube rejects a tiny query without hitting YouTube', async () => {
+    const result = await searchWatchTogetherYouTube('a');
+    expect(result).toEqual({ ok: false, reason: 'empty' });
   });
 
   test('parseMediaUrl prefers YouTube over a generic file URL', () => {

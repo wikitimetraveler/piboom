@@ -388,6 +388,10 @@ body.st-page modern-navbar {
   border-color: var(--st-amber);
 }
 
+.st-track--guitar {
+  border-color: rgba(255, 157, 77, 0.35);
+}
+
 .st-track button {
   background: #1a1a1a;
   color: var(--st-ink);

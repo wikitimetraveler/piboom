@@ -1,8 +1,44 @@
 {
   "id": "shenango-valley-videos",
-  "updatedAt": "2026-08-13",
+  "updatedAt": "2026-08-14",
   "note": "Embed verified YouTube / Internet Archive clips. Prefer official or archival. Amish: landscapes only.",
   "clips": [
+    {
+      "id": "muddy-waters-mannish-boy-1981",
+      "theme": "music",
+      "title": "Muddy Waters — Mannish Boy (Checkerboard Lounge, 1981)",
+      "youtubeId": "32YQYJuxyn0",
+      "url": "https://www.youtube.com/watch?v=32YQYJuxyn0",
+      "source": "The Rolling Stones / Eagle Rock",
+      "blurb": "Same touring era as his Youngstown Agora date (9 Mar 1980). State Theater hall — Tomorrow Club / Agora."
+    },
+    {
+      "id": "outlaws-green-grass-1978",
+      "theme": "music",
+      "title": "Outlaws — Green Grass And High Tides (live, Capitol Theatre 1978)",
+      "youtubeId": "WEkJFR69IXw",
+      "url": "https://www.youtube.com/watch?v=WEkJFR69IXw",
+      "source": "Wolfgang's Classic Rock / Bill Graham Archives",
+      "blurb": "Southern rock staples who played Youngstown Tomorrow Club (1976–77, three listed) and later the Star Theatre in the same hall."
+    },
+    {
+      "id": "godz-gotta-keep-runnin",
+      "theme": "music",
+      "title": "The Godz — Gotta Keep a Runnin'",
+      "youtubeId": "o2CzVlvdeXk",
+      "url": "https://www.youtube.com/watch?v=o2CzVlvdeXk",
+      "source": "The Godz (Ohio) — Casablanca-era cut",
+      "blurb": "Ohio hard rock / rock 'n' roll machines — Tomorrow Club, Youngstown, 21 May 1978."
+    },
+    {
+      "id": "spyro-gyra-morning-dance",
+      "theme": "music",
+      "title": "Spyro Gyra — Morning Dance (official audio)",
+      "youtubeId": "bVDZ5UY_oDw",
+      "url": "https://www.youtube.com/watch?v=bVDZ5UY_oDw",
+      "source": "SpyroGyraVEVO",
+      "blurb": "Jazz/fusion hit — Star Theatre (same State Theater hall), Youngstown, 20 Oct 1985."
+    },
     {
       "id": "lettermen-way-you-look",
       "theme": "music",
@@ -121,6 +157,33 @@
       "youtubeId": null,
       "source": "YouTube search",
       "blurb": "Local news on the 1974 Sharon original."
+    },
+    {
+      "id": "tonys-pizza-site",
+      "theme": "food",
+      "title": "Tony's Pizza & Pub — official site",
+      "url": "https://www.tonyspizzaandpub.com/",
+      "youtubeId": null,
+      "source": "tonyspizzaandpub.com",
+      "blurb": "Sharon, PA — 628 Stambaugh Ave. Menu, hours, and contact from the shop’s own site."
+    },
+    {
+      "id": "cedars-search",
+      "theme": "music",
+      "title": "Cedars Lounge / Cedars West End (search)",
+      "url": "https://www.youtube.com/results?search_query=Cedars+Lounge+Youngstown+music",
+      "youtubeId": null,
+      "source": "YouTube search",
+      "blurb": "Youngstown original-music room since 1975 — North Hazel lineage, Steel Street West End. Cross-check with Tribune Chronicle / Business Journal coverage."
+    },
+    {
+      "id": "tomorrow-club-search",
+      "theme": "music",
+      "title": "Tomorrow Club / Youngstown Agora (search)",
+      "url": "https://www.youtube.com/results?search_query=Youngstown+Tomorrow+Club+Agora+State+Theater",
+      "youtubeId": null,
+      "source": "YouTube search",
+      "blurb": "State Theater rock hall on West Federal — same downtown block as Cedars on North Hazel. Cross-check Belt Magazine / Wikipedia venue history."
     },
     {
       "id": "youngstown-history-search",

@@ -69,10 +69,11 @@ function factSheet(content) {
     '- Erie Extension (Beaver & Erie) Canal: ~136 miles Beaver→Erie, ~137 locks, opened 1844, abandoned early 1870s; Sharpsville Lock 10 = surviving lock remnant (~7 ft lift).',
     '- Frank H. Buhl (1848–1918): Buhl Steel 1896; Sharon Steel Works South Sharon Feb 1900; sold ~1902; Magic City → Farrell 1912; late-1920s ~10,000 mill workers; Sharon Steel bankruptcies 1987/1992; later NLMK on footprint.',
     '- Amish: New Wilmington / Volant Lawrence–Mercer settlement from Mifflin County ~1847 (Yoder/Zook land buys); not Lancaster; burnt-orange/brown buggy tops; etiquette — no photographing people.',
+    '- Music: Tony Butala b. Sharon 20 Nov 1940 — Lettermen 1958, “Way You Look Tonight” 1961; Vocal Group HoF museum Sharon ~1998. Trent Reznor = Mercer borough / Mercer HS jazz, then NIN — same county, not Sharon childhood. Related OH: Cedars Lounge at 23 N. Hazel (1975, Tommy Simon) → Cedars West End 706 Steel St (2013); same downtown block — State Theater Tomorrow Club (~1973) → Youngstown Agora (31 Dec 1978–23 July 1982) → Star Theatre mid-1980s at 213 W Federal; Muddy Waters Tomorrow Club 25 June 1978 and Agora 9 March 1980; Spyro Gyra Star Theatre 20 Oct 1985; Outlaws Tomorrow Club 1976–77 (three) + Star Theatre; The Godz (Ohio) Tomorrow Youngstown 21 May 1978; demolished 2008, facade remains.',
     '- Sports: Sharon Tigers vs Farrell Steelers District 10; Steel Bowl football rivalry (multi-decade; gap ~2014–2021); Buhl original athletic field + free golf.',
-    '- Music: Tony Butala b. Sharon 20 Nov 1940 — Lettermen 1958, “Way You Look Tonight” 1961; Vocal Group HoF museum Sharon ~1998. Trent Reznor = Mercer borough / Mercer HS jazz, then NIN — same county, not Sharon childhood.',
     '- Youngstown: no resident LCN family; Cleveland (Carabbias) vs Pittsburgh (Prato/Naples/Strollo); SEP Mar 1963 Crime Town U.S.A.; Greene bomb 6 Oct 1977; Charlie Carabbia missing Dec 1980 (Strollo testimony); Black Monday 19 Sept 1977 Campbell Works ~5,000 jobs; ~50,000 valley jobs lost within ~5 years.',
     '- Organized-crime gallery: Context vs Evidence; published record and courts — never rumor, never private addresses, never true-crime tourism.',
+    '- Food landmarks: Quaker Steak & Lube original (Chestnut St, Sharon, PA, 1974); Tony’s Pizza & Pub (628 Stambaugh Ave, Sharon, PA 16146; tonyspizzaandpub.com; 724-347-3323; official site claims 70+ years serving Shenango Valley); Luigi’s Pizza (Hermitage / E State).',
     '- Be respectful about Amish neighbors and do not invent private addresses.'
   );
 
@@ -90,7 +91,7 @@ function buildSystemPrompt(content) {
 
 ## Expertise scope
 - Western Pennsylvania: Shenango Valley steel (Sharon, Farrell, Sharpsville), Buhl philanthropy, New Wilmington / Volant Amish geography, Sharon–Farrell sports, Lettermen / Butala, Mercer County music (Reznor), WPIC / local music institutions, valley food landmarks.
-- Eastern Ohio: Youngstown and the Mahoning Valley industrial belt, cross-border labor markets, and the public history of organized crime — especially the 1970s Cleveland–Pittsburgh war over Valley rackets — as Context and Evidence, not spectacle.
+- Eastern Ohio: Youngstown and the Mahoning Valley industrial belt, Cedars Lounge / Cedars West End and the Tomorrow Club / Youngstown Agora (State Theater) downtown music lineage, cross-border labor markets, and the public history of organized crime — especially the 1970s Cleveland–Pittsburgh war over Valley rackets — as Context and Evidence, not spectacle.
 - You may add well-established regional geography (Pittsburgh orbit, Cleveland family histories as published secondary sources, canal / steel corridor) when it helps the visitor, and say plainly when uncertain.
 
 ## Language

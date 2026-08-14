@@ -538,6 +538,101 @@ body.wt-cinema-on {
   font: inherit;
 }
 
+.wt-picker {
+  margin: -0.35rem 0 0.85rem;
+  padding: 0.7rem;
+  border: 1px solid var(--wt-card-border);
+  border-radius: 14px;
+  background: #101218;
+}
+
+.wt-picker-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.wt-picker-row input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--wt-card-border);
+  border-radius: 12px;
+  padding: 0.65rem 0.8rem;
+  background: #0b0c10;
+  color: var(--wt-ink);
+  font: inherit;
+}
+
+.wt-picker-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.55rem;
+}
+
+.wt-picker-chips button {
+  appearance: none;
+  border: 1px solid var(--wt-card-border);
+  border-radius: 99px;
+  padding: 0.25rem 0.7rem;
+  background: transparent;
+  color: var(--wt-muted);
+  font: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.wt-picker-chips button:hover,
+.wt-picker-chips button[aria-pressed="true"] {
+  border-color: var(--wt-accent);
+  color: var(--wt-ink);
+}
+
+.wt-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.55rem;
+  margin-top: 0.7rem;
+}
+
+.wt-pick-card {
+  appearance: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--wt-card-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0b0c10;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.wt-pick-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #050608;
+}
+
+.wt-pick-card span {
+  display: block;
+  padding: 0 0.5rem 0.5rem;
+  color: var(--wt-ink);
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.wt-pick-empty {
+  margin: 0.55rem 0 0;
+  color: var(--wt-dim);
+  font-size: 0.82rem;
+}
+
 .wt-stage-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.7fr) minmax(260px, 34%);

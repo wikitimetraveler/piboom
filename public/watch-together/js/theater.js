@@ -15,6 +15,12 @@
     gateHost: () => document.getElementById('wtGateHost'),
     url: () => document.getElementById('wtUrl'),
     load: () => document.getElementById('wtLoad'),
+    pick: () => document.getElementById('wtPick'),
+    picker: () => document.getElementById('wtPicker'),
+    pickQ: () => document.getElementById('wtPickQ'),
+    pickGo: () => document.getElementById('wtPickGo'),
+    pickChips: () => document.getElementById('wtPickChips'),
+    pickGrid: () => document.getElementById('wtPickGrid'),
     yt: () => document.getElementById('wtYt'),
     file: () => document.getElementById('wtFile'),
     empty: () => document.getElementById('wtEmpty'),
@@ -182,19 +188,30 @@
     emitIntent(payload);
   }
 
-  async function loadFromInput() {
-    const url = String(els.url()?.value || '').trim();
+  async function loadUrl(raw) {
+    const url = String(raw || '').trim();
     if (!url) {
-      setStatus('Paste a YouTube link first.');
+      setStatus('Paste a YouTube link or a video URL.');
       return;
     }
     const youtubeId = extractYouTubeId(url);
-    if (!youtubeId) {
-      setStatus('That does not look like a YouTube link.');
-      return;
+    let media;
+    if (youtubeId) {
+      media = { kind: 'youtube', youtubeId, url };
+    } else {
+      try {
+        const href = /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(url) ? url : 'https://' + url;
+        const parsed = new URL(href);
+        if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+          throw new Error('unsupported');
+        }
+        media = { kind: 'file', src: parsed.href, url: parsed.href };
+      } catch {
+        setStatus('That does not look like a YouTube link or video URL.');
+        return;
+      }
     }
     setStatus('Loading…');
-    const media = { kind: 'youtube', youtubeId, url };
     room = {
       ...room,
       media,
@@ -207,10 +224,86 @@
       applyPlayback(room, true);
       setStatus('Loaded. Press play.');
     } catch (err) {
-      setStatus(err?.message || 'YouTube player did not start.');
+      setStatus(err?.message || 'Player did not start.');
       return;
     }
-    emitClock({ type: 'load', url });
+    emitClock({ type: 'load', url: media.url });
+  }
+
+  async function loadFromInput() {
+    await loadUrl(els.url()?.value);
+  }
+
+  function setPickerOpen(on) {
+    const picker = els.picker();
+    const btn = els.pick();
+    if (picker) picker.hidden = !on;
+    btn?.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+
+  function renderPicker(videos, message) {
+    const grid = els.pickGrid();
+    if (!grid) return;
+    grid.replaceChildren();
+    if (message) {
+      const note = document.createElement('p');
+      note.className = 'wt-pick-empty';
+      note.textContent = message;
+      grid.appendChild(note);
+      return;
+    }
+    (videos || []).forEach((video) => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'wt-pick-card';
+      const img = document.createElement('img');
+      img.alt = '';
+      img.loading = 'lazy';
+      img.src = video.thumbnail || youtubeThumb(video.videoId);
+      const cap = document.createElement('span');
+      cap.textContent = video.title;
+      card.append(img, cap);
+      card.addEventListener('click', () => {
+        const input = els.url();
+        if (input) input.value = video.url;
+        setPickerOpen(false);
+        loadUrl(video.url).catch((err) => setStatus(err.message));
+      });
+      grid.appendChild(card);
+    });
+  }
+
+  async function searchPicker(query) {
+    const typed = String(query || els.pickQ()?.value || '').trim();
+    if (els.pickQ() && query) els.pickQ().value = typed;
+    if (typed.length < 2) {
+      renderPicker([], 'Type a title, or tap Full movie.');
+      return;
+    }
+    renderPicker([], 'Searching YouTube…');
+    try {
+      const res = await fetch('/api/watch-together/youtube-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: typed }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (data.error === 'no-key' || res.status === 503) {
+        renderPicker([], 'YouTube search is not configured. Paste a link instead.');
+        return;
+      }
+      if (!data.ok) {
+        renderPicker([], 'Search failed. Paste a link instead.');
+        return;
+      }
+      if (!data.videos || !data.videos.length) {
+        renderPicker([], 'Nothing embeddable for that. Try another title or paste a link.');
+        return;
+      }
+      renderPicker(data.videos);
+    } catch {
+      renderPicker([], 'Search failed. Paste a link instead.');
+    }
   }
 
   function youtubeThumb(id, size) {
@@ -890,6 +983,26 @@
   function bindControls() {
     els.load()?.addEventListener('click', () => {
       loadFromInput().catch((err) => setStatus(err.message));
+    });
+    els.pick()?.addEventListener('click', () => {
+      const next = Boolean(els.picker()?.hidden);
+      setPickerOpen(next);
+    });
+    els.pickGo()?.addEventListener('click', () => {
+      searchPicker().catch((err) => setStatus(err.message));
+    });
+    els.pickQ()?.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        searchPicker().catch((err) => setStatus(err.message));
+      }
+    });
+    els.pickChips()?.addEventListener('click', (event) => {
+      const chip = event.target?.closest?.('button[data-q]');
+      if (!chip) return;
+      const q = chip.getAttribute('data-q') || '';
+      if (els.pickQ()) els.pickQ().value = q;
+      searchPicker(q).catch((err) => setStatus(err.message));
     });
     els.url()?.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') {
