@@ -667,8 +667,11 @@
       media.muted = Boolean(isLocal);
       media.autoplay = true;
       media.playsInline = true;
+      media.setAttribute('playsinline', 'true');
       tile.querySelectorAll('video').forEach((el) => el.remove());
       tile.prepend(media);
+      const play = media.play?.();
+      if (play && typeof play.catch === 'function') play.catch(() => {});
     }
     syncFacesEmpty();
   }

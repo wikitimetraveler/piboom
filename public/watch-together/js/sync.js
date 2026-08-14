@@ -14,11 +14,11 @@
   function readBlurPref() {
     try {
       const raw = localStorage.getItem(BLUR_KEY);
-      if (raw === '0' || raw === 'false') return false;
+      if (raw === '1' || raw === 'true') return true;
     } catch {
       /* ignore */
     }
-    return true;
+    return false;
   }
 
   function persistBlurPref(on) {
@@ -254,6 +254,10 @@
         noiseSuppression: true,
         autoGainControl: true,
       },
+      videoCaptureDefaults: {
+        facingMode: 'user',
+        resolution: LK.VideoPresets?.h360?.resolution,
+      },
     });
     room.on(LK.RoomEvent.DataReceived, handleData);
     room.on(LK.RoomEvent.ParticipantConnected, publishViewers);
@@ -445,9 +449,6 @@
               state.blurOn = false;
               persistBlurPref(false);
               emit('blur', { on: false, error: 'unavailable' });
-              if (typeof track.stopProcessor === 'function') {
-                track.stopProcessor().catch(() => {});
-              }
             },
           })
         );
@@ -533,47 +534,33 @@
   }
 
   async function startCamera() {
-    const LK = global.LivekitClient;
     const lp = state.room.localParticipant;
     let track = cameraTrack();
     if (trackIsLive(track)) {
       state.camOn = true;
       emitLocalVideo(track);
-      if (state.blurOn) void applyBlurLater(track);
       return true;
     }
     try {
-      track = await createCameraTrack();
-      state.localVideoTrack = track;
-      await lp.publishTrack(track);
-    } catch {
       await lp.setCameraEnabled(true);
       track = cameraTrack();
+    } catch (err) {
+      console.warn('Watch together setCameraEnabled failed', err);
+    }
+    if (!trackIsLive(track)) {
+      try {
+        track = await createCameraTrack();
+        state.localVideoTrack = track;
+        await lp.publishTrack(track);
+      } catch (err) {
+        console.warn('Watch together cam publish failed', err);
+        return false;
+      }
     }
     if (!trackIsLive(track)) return false;
     state.camOn = true;
     emitLocalVideo(track);
-    if (state.blurOn) void applyBlurLater(track);
     return true;
-  }
-
-  async function applyBlurLater(track) {
-    try {
-      const ok = await Promise.race([
-        syncBlurProcessor(track),
-        new Promise((resolve) => setTimeout(() => resolve(false), 4000)),
-      ]);
-      if (state.blurOn && !ok) {
-        state.blurOn = false;
-        persistBlurPref(false);
-        emit('blur', { on: false, error: 'unavailable' });
-      }
-    } catch (err) {
-      console.warn('Watch together blur failed', err);
-      state.blurOn = false;
-      persistBlurPref(false);
-      emit('blur', { on: false, error: 'unavailable' });
-    }
   }
 
   async function setCamera(on) {
