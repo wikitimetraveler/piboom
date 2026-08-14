@@ -45,6 +45,16 @@ describe('livekit.service', () => {
     expect(getLivekitConfig().configured).toBe(true);
   });
 
+  test('getLivekitConfig strips wrapping quotes from env values', () => {
+    process.env.LIVEKIT_URL = '"wss://example.livekit.cloud"';
+    process.env.LIVEKIT_API_KEY = "'key'";
+    process.env.LIVEKIT_API_SECRET = 'secret';
+    const config = getLivekitConfig();
+    expect(config.configured).toBe(true);
+    expect(config.url).toBe('wss://example.livekit.cloud');
+    expect(config.apiKey).toBe('key');
+  });
+
   test('sanitizeParticipantName strips markup', () => {
     expect(sanitizeParticipantName('  <Ada>  ')).toBe('Ada');
     expect(sanitizeParticipantName('')).toBe('Guest');

@@ -244,6 +244,10 @@
       err.max = Number(data.max) || 10;
       throw err;
     }
+    if (res.status === 503 || data.error === 'LIVEKIT_NOT_CONFIGURED') {
+      emit('error', { reason: 'livekit-missing' });
+      return false;
+    }
     if (!res.ok || !data.token || !data.url) return false;
 
     const room = new LK.Room({

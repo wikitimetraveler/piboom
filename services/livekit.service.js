@@ -26,9 +26,10 @@ export function setLivekitOccupancyFactory(factory) {
 }
 
 export function getLivekitConfig() {
-  const url = String(process.env.LIVEKIT_URL || '').trim();
-  const apiKey = String(process.env.LIVEKIT_API_KEY || '').trim();
-  const apiSecret = String(process.env.LIVEKIT_API_SECRET || '').trim();
+  const clean = (value) => String(value || '').trim().replace(/^["']|["']$/g, '').trim();
+  const url = clean(process.env.LIVEKIT_URL);
+  const apiKey = clean(process.env.LIVEKIT_API_KEY);
+  const apiSecret = clean(process.env.LIVEKIT_API_SECRET);
   return {
     url,
     apiKey,

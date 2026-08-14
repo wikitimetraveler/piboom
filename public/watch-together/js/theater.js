@@ -882,6 +882,10 @@
             setStatus('Theater is full — 10 people already here.');
             return;
           }
+          if (err?.reason === 'livekit-missing') {
+            setStatus('Camera needs LiveKit keys on the server. Set LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET on Render, then redeploy.');
+            return;
+          }
           if (err?.reason === 'unsupported' || err?.reason === 'empty') {
             setStatus('That does not look like a YouTube link.');
             return;
@@ -934,7 +938,7 @@
     } else if (result?.transport === 'full') {
       setStatus('Theater is full — 10 people already here.');
     } else {
-      setStatus('On the shared clock. Typed chat only — they cannot hear you.');
+      setStatus('On the shared clock. Typed chat only — add LiveKit keys on Render for camera and voice.');
     }
     getLocation().then((loc) => {
       if (loc?.lat != null && loc?.lng != null) {
