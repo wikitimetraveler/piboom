@@ -45,8 +45,10 @@
           <button class="wt-ghost" id="wtCinema" type="button" aria-pressed="true">Exit chat left</button>
           <button class="wt-icon-btn" id="wtDrawBtn" type="button" aria-pressed="false" aria-label="Draw">✎</button>
           <button class="wt-ghost" id="wtClearDraw" type="button">Clear draw</button>
-          <button class="wt-ghost" id="wtMic" type="button" aria-pressed="false" hidden>Mic</button>
+          <button class="wt-ghost" id="wtMic" type="button" aria-pressed="false" hidden aria-label="Let the other couches hear you">Mic</button>
           <button class="wt-ghost" id="wtCam" type="button" aria-pressed="false" hidden>Cam</button>
+          <button class="wt-ghost" id="wtBlur" type="button" aria-pressed="true" hidden aria-label="Blur camera background">Blur on</button>
+          <button class="wt-ghost" id="wtRecord" type="button" aria-pressed="false" hidden aria-label="Record the couches">Record</button>
           <span class="wt-status" id="wtStatus"></span>
         </div>
       </div>
@@ -57,9 +59,11 @@
         </section>
         <section class="wt-chat">
           <h2>Chat</h2>
+          <p class="wt-chat-hint">Talk is live voice. Type to send a line.</p>
           <div class="wt-log" id="wtLog"></div>
           <form id="wtChatForm">
-            <input id="wtChatText" maxlength="280" placeholder="Say something to the couch" autocomplete="off">
+            <input id="wtChatText" maxlength="280" placeholder="Type a line" autocomplete="off">
+            <button class="wt-icon-btn" id="wtChatMic" type="button" aria-pressed="false" hidden aria-label="Let the other couches hear you">Talk</button>
             <button class="wt-enter" type="submit">Send</button>
           </form>
         </section>
@@ -75,7 +79,7 @@
     </div>
   </main>
 
-  <div id="wtRemoteAudio" class="wt-remote-audio" hidden></div>
+  <div id="wtRemoteAudio" class="wt-remote-audio" aria-hidden="true"></div>
   <div id="wtGateHost"></div>
   <script src="https://cdn.jsdelivr.net/npm/livekit-client@2.15.8/dist/livekit-client.umd.min.js"></script>
   <script src="https://cdn.socket.io/4.8.1/socket.io.min.js" crossorigin="anonymous"></script>
@@ -86,6 +90,8 @@
   <script src="/shared/google-advanced-markers.js"></script>
   <script src="/watch-together/js/gate.js"></script>
   <script src="/watch-together/js/map.js"></script>
+  <script src="/watch-together/js/cam-blur.js"></script>
+  <script src="/watch-together/js/booth-record.js"></script>
   <script src="/watch-together/js/sync.js"></script>
   <script src="/watch-together/js/theater.js"></script>
 </body>

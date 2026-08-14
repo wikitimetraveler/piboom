@@ -408,6 +408,12 @@ body.wt-body {
   cursor: pointer;
 }
 
+.wt-controls .wt-ghost[aria-pressed="true"] {
+  border-color: var(--wt-accent);
+  color: var(--wt-ink);
+  background: var(--wt-accent-soft);
+}
+
 /* Theater */
 .wt-theater {
   max-width: 1440px;
@@ -735,9 +741,15 @@ body.wt-cinema-on {
 
 .wt-remote-audio {
   position: absolute;
-  width: 0;
-  height: 0;
+  width: 1px;
+  height: 1px;
   overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.wt-remote-audio audio {
+  width: 1px;
+  height: 1px;
 }
 
 .wt-draw {
@@ -808,11 +820,18 @@ input[type="range"] {
 
 .wt-chat h2 {
   margin: 0;
-  padding: 0.8rem 0.9rem 0.5rem;
+  padding: 0.8rem 0.9rem 0.15rem;
   font-size: 0.72rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--wt-dim);
+}
+
+.wt-chat-hint {
+  margin: 0;
+  padding: 0 0.9rem 0.45rem;
+  color: var(--wt-dim);
+  font-size: 0.78rem;
 }
 
 .wt-log {
@@ -853,6 +872,16 @@ input[type="range"] {
   background: #0b0c10;
   color: var(--wt-ink);
   font: inherit;
+}
+
+.wt-chat #wtChatMic {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 40px;
+  padding: 0 0.7rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .wt-tap {

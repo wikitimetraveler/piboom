@@ -32,10 +32,13 @@
     log: () => document.getElementById('wtLog'),
     chatForm: () => document.getElementById('wtChatForm'),
     chatText: () => document.getElementById('wtChatText'),
+    chatMic: () => document.getElementById('wtChatMic'),
     tap: () => document.getElementById('wtTap'),
     status: () => document.getElementById('wtStatus'),
     mic: () => document.getElementById('wtMic'),
     cam: () => document.getElementById('wtCam'),
+    blur: () => document.getElementById('wtBlur'),
+    record: () => document.getElementById('wtRecord'),
     faces: () => document.getElementById('wtFaces'),
     facesEmpty: () => document.getElementById('wtFacesEmpty'),
   };
@@ -497,6 +500,7 @@
   }
 
   function handleMediaTrack(payload) {
+    window.WatchTogetherBooth?.handleTrack?.(payload);
     const track = payload?.track;
     const participant = payload?.participant;
     if (!track || track.kind !== 'video') return;
@@ -519,6 +523,50 @@
     row.append(who, body);
     log.appendChild(row);
     log.scrollTop = log.scrollHeight;
+  }
+
+  function syncCamButton(on) {
+    const cam = els.cam();
+    if (!cam) return;
+    cam.setAttribute('aria-pressed', on ? 'true' : 'false');
+    cam.textContent = on ? 'Cam on' : 'Cam';
+  }
+
+  function syncBlurButton(on) {
+    const blur = els.blur();
+    if (!blur) return;
+    blur.setAttribute('aria-pressed', on ? 'true' : 'false');
+    blur.textContent = on ? 'Blur on' : 'Blur';
+  }
+
+  function syncRecordButton(on) {
+    const rec = els.record();
+    if (!rec) return;
+    rec.setAttribute('aria-pressed', on ? 'true' : 'false');
+    rec.textContent = on ? 'Stop' : 'Record';
+  }
+
+  function syncMicButtons(on) {
+    const pressed = on ? 'true' : 'false';
+    const mic = els.mic();
+    const chatMic = els.chatMic();
+    if (mic) {
+      mic.setAttribute('aria-pressed', pressed);
+      mic.textContent = on ? 'Mic on' : 'Mic';
+    }
+    if (chatMic) {
+      chatMic.setAttribute('aria-pressed', pressed);
+      chatMic.textContent = on ? 'Live' : 'Talk';
+    }
+  }
+
+  async function toggleMic() {
+    const next = !window.WatchTogetherSync?.micOn();
+    const on = await window.WatchTogetherSync?.setMic(next);
+    syncMicButtons(Boolean(on));
+    if (on) setStatus('Mic on · they can hear you.');
+    else setStatus('Mic off · type in chat instead.');
+    return on;
   }
 
   function canvasPoint(event) {
@@ -639,6 +687,12 @@
         clearDraw: () => replayDraw([]),
         'clear-draw': () => replayDraw([]),
         track: handleMediaTrack,
+        blur: (payload) => {
+          syncBlurButton(Boolean(payload?.on));
+          if (payload?.error) {
+            setStatus('Background blur could not start. Try Chrome or Edge.');
+          }
+        },
         error: (err) => {
           if (err?.reason === 'theater-full') {
             setStatus('Theater is full — 10 people already here.');
@@ -654,24 +708,37 @@
     });
     const live = result?.transport === 'livekit';
     const mic = els.mic();
+    const chatMic = els.chatMic();
     const cam = els.cam();
+    const blur = els.blur();
+    const rec = els.record();
     if (mic) mic.hidden = !live;
+    if (chatMic) chatMic.hidden = !live;
     if (cam) cam.hidden = !live;
+    if (blur) blur.hidden = !live;
+    if (rec) rec.hidden = !live;
     if (live) {
       try {
-        const on = await window.WatchTogetherSync.setCamera(true);
-        els.cam()?.setAttribute('aria-pressed', on ? 'true' : 'false');
-        if (cam) cam.textContent = on ? 'Cam on' : 'Cam';
+        syncBlurButton(window.WatchTogetherSync.blurOn());
+        const camOn = await window.WatchTogetherSync.setCamera(true);
+        syncCamButton(camOn);
+        syncBlurButton(window.WatchTogetherSync.blurOn());
+        const micOn = await window.WatchTogetherSync.setMic(true);
+        syncMicButtons(micOn);
         if (!hasMedia(room.media)) {
-          setStatus(on ? 'Camera on · load a movie when you want.' : 'Click Cam to show your face.');
+          if (micOn) {
+            setStatus('Mic on · they can hear you. Load a movie when you want.');
+          } else {
+            setStatus('Click Talk in chat so the other couches can hear you.');
+          }
         }
       } catch (err) {
-        setStatus(err?.message || 'Click Cam to show your face.');
+        setStatus(err?.message || 'Click Talk in chat so they can hear you.');
       }
     } else if (result?.transport === 'full') {
       setStatus('Theater is full — 10 people already here.');
     } else {
-      setStatus('On the shared clock.');
+      setStatus('On the shared clock. Typed chat only — they cannot hear you.');
     }
     getLocation().then((loc) => {
       if (loc?.lat != null && loc?.lng != null) {
@@ -802,17 +869,37 @@
       els.drawBtn()?.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
     els.clearDraw()?.addEventListener('click', () => emitIntent({ type: 'clear-draw' }));
-    els.mic()?.addEventListener('click', async () => {
-      const next = !window.WatchTogetherSync?.micOn();
-      const on = await window.WatchTogetherSync?.setMic(next);
-      els.mic()?.setAttribute('aria-pressed', on ? 'true' : 'false');
-      els.mic() && (els.mic().textContent = on ? 'Mic on' : 'Mic');
-    });
+    els.mic()?.addEventListener('click', () => toggleMic());
+    els.chatMic()?.addEventListener('click', () => toggleMic());
     els.cam()?.addEventListener('click', async () => {
       const next = !window.WatchTogetherSync?.camOn();
       const on = await window.WatchTogetherSync?.setCamera(next);
-      els.cam()?.setAttribute('aria-pressed', on ? 'true' : 'false');
-      els.cam() && (els.cam().textContent = on ? 'Cam on' : 'Cam');
+      syncCamButton(Boolean(on));
+    });
+    els.blur()?.addEventListener('click', async () => {
+      const next = !window.WatchTogetherSync?.blurOn();
+      const on = await window.WatchTogetherSync?.setBlur(next);
+      syncBlurButton(Boolean(on));
+      if (on) setStatus('Background blur on.');
+      else setStatus('Background blur off.');
+    });
+    els.record()?.addEventListener('click', async () => {
+      const booth = window.WatchTogetherBooth;
+      if (!booth) return;
+      try {
+        if (booth.recording()) {
+          await booth.stop();
+          syncRecordButton(false);
+          setStatus('Take saved.');
+          return;
+        }
+        await booth.start();
+        syncRecordButton(true);
+        setStatus('Recording couches · movie is not in the file.');
+      } catch (err) {
+        syncRecordButton(false);
+        setStatus(err?.message || 'Could not record.');
+      }
     });
     els.chatForm()?.addEventListener('submit', (event) => {
       event.preventDefault();
@@ -824,8 +911,14 @@
     });
     els.tap()?.addEventListener('click', () => {
       els.tap().hidden = true;
+      window.WatchTogetherSync?.resumeRemoteAudio?.();
       applyPlayback(room, true);
     });
+    document.addEventListener(
+      'click',
+      () => window.WatchTogetherSync?.resumeRemoteAudio?.(),
+      { once: true }
+    );
     const video = els.file();
     if (video) {
       video.addEventListener('play', () => {

@@ -62,22 +62,17 @@ function factSheet(content) {
     }
   }
 
-  lines.push(
+    lines.push(
     '',
     '### Geography & museum notes',
-    '- Map hub is Buhl Park in Hermitage / Shenango Valley, Pennsylvania — every story radiates from there.',
-    '- Local Amish country is New Wilmington / Volant (Lawrence–Mercer), not Lancaster County.',
-    '- Tony Butala / The Lettermen are from Sharon; Trent Reznor grew up in Mercer borough (same county, not the mill towns).',
-    '- Youngstown, Ohio, sits roughly 60 miles from both Cleveland and Pittsburgh, and about 15–20 minutes from Sharon–Farrell; the Mahoning Valley shared the industrial belt.',
-    '- Youngstown had no resident Cosa Nostra family; Cleveland and Pittsburgh contested local gambling (“the bug” = numbers/policy), vending, and related rackets.',
-    '- March 1963 Saturday Evening Post (“Crime Town U.S.A.” / Crimetown label) is Context (period journalism). Decisive faction violence and power shift: mid-to-late 1970s into ~1981.',
-    '- Mid-1970s split: Cleveland-aligned Carabbia brothers (“the Crabs”) vs Pittsburgh-aligned Jimmy Prato with Joey Naples and Lenny Strollo.',
-    '- 1976 Cleveland boss John Scalish dies; late-1970s Cleveland war (Danny Greene car-bombed 6 Oct 1977; Ronnie Carabbia among those convicted in that case) weakens Cleveland’s Youngstown position.',
-    '- Published histories describe Youngstown faction war peaking ~1978–1981; Charlie Carabbia disappears Dec 1980; Strollo later testified Prato/Naples ordered the killing (1990s court Evidence).',
-    '- Same decade: Youngstown steel collapse — Youngstown Sheet & Tube Campbell Works shutdown 19 Sept 1977 (“Black Monday”); thousands of jobs lost; further mill losses followed. 1990s FBI/RICO sweep and Strollo cooperation are the legal coda, not the 1970s climax.',
-    '- Buhl Farm Park: parcels assembled c.1907–1911 (~270 acres), opened as free “farm” recreation (Frank & Julia Buhl; architect Charles W. Hopkinson); free nine-hole golf; Buhl Mansion 1891 Sharon NRHP.',
-    '- Erie Extension / Beaver & Erie Canal corridor; Sharpsville Lock 10 cited as surviving Erie Extension lock remnant.',
-    '- Organized-crime gallery is scholastic: Context vs Evidence; published record and courts — never rumor, never private addresses, never true-crime tourism.',
+    '- Map hub is Buhl Farm Park, Hermitage / Shenango Valley, PA — deeded 1 Nov 1915 to F.H. Buhl Trustees for $1 + endowment; free nine-hole golf; Lake Julia; Casino; ~270 acres.',
+    '- Erie Extension (Beaver & Erie) Canal: ~136 miles Beaver→Erie, ~137 locks, opened 1844, abandoned early 1870s; Sharpsville Lock 10 = surviving lock remnant (~7 ft lift).',
+    '- Frank H. Buhl (1848–1918): Buhl Steel 1896; Sharon Steel Works South Sharon Feb 1900; sold ~1902; Magic City → Farrell 1912; late-1920s ~10,000 mill workers; Sharon Steel bankruptcies 1987/1992; later NLMK on footprint.',
+    '- Amish: New Wilmington / Volant Lawrence–Mercer settlement from Mifflin County ~1847 (Yoder/Zook land buys); not Lancaster; burnt-orange/brown buggy tops; etiquette — no photographing people.',
+    '- Sports: Sharon Tigers vs Farrell Steelers District 10; Steel Bowl football rivalry (multi-decade; gap ~2014–2021); Buhl original athletic field + free golf.',
+    '- Music: Tony Butala b. Sharon 20 Nov 1940 — Lettermen 1958, “Way You Look Tonight” 1961; Vocal Group HoF museum Sharon ~1998. Trent Reznor = Mercer borough / Mercer HS jazz, then NIN — same county, not Sharon childhood.',
+    '- Youngstown: no resident LCN family; Cleveland (Carabbias) vs Pittsburgh (Prato/Naples/Strollo); SEP Mar 1963 Crime Town U.S.A.; Greene bomb 6 Oct 1977; Charlie Carabbia missing Dec 1980 (Strollo testimony); Black Monday 19 Sept 1977 Campbell Works ~5,000 jobs; ~50,000 valley jobs lost within ~5 years.',
+    '- Organized-crime gallery: Context vs Evidence; published record and courts — never rumor, never private addresses, never true-crime tourism.',
     '- Be respectful about Amish neighbors and do not invent private addresses.'
   );
 

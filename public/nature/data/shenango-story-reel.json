@@ -10,76 +10,96 @@
       "id": "open",
       "anchor": "svHero",
       "spotlight": "#svHeroInner",
-      "durationMs": 8200,
+      "durationMs": 8000,
       "kicker": "HyperFrame · 01 · Gallery",
-      "title": "Names, places, and record",
-      "copy": "A memorial-wall tone for western Pennsylvania — Context for the region, Evidence for what you can stand beside on the map.",
-      "narration": "Welcome. I am David, your regional historian for western Pennsylvania and eastern Ohio. Tonight we walk The Valley as a HyperFrame gallery — scholastic wall text, not a brochure. Context means background. Evidence means places and published record. We begin at Buhl Park."
+      "title": "Eight chapters on the wall",
+      "copy": "Canal iron → steel → Buhl gift → Amish neighbors → Friday lights → music → Youngstown 1970s → living valley.",
+      "narration": "Welcome. I am David, regional historian for western Pennsylvania and eastern Ohio. Tonight we walk eight museum chapters — Context labeled, Evidence preferred. We begin at Buhl Farm Park."
     },
     {
       "id": "atlas",
       "anchor": "svMap",
       "spotlight": "#svMap",
       "action": "openAtlas",
-      "durationMs": 7800,
+      "durationMs": 7200,
       "kicker": "HyperFrame · 02 · Atlas",
       "title": "Satellite from the hub",
-      "copy": "Every pin radiates from Hermitage’s free green. Ohio sites sit just across the state line.",
-      "narration": "Open the atlas on satellite view. Buhl Park is the hub — Frank H. Buhl’s gift so working families could gather without a ticket. Select a pin for on-the-ground notes. The Youngstown corridor appears because the border is minutes away."
+      "copy": "Every pin radiates from Hermitage’s free green. Ohio sites sit minutes across the line.",
+      "narration": "Open the satellite atlas. Buhl Farm is the hub — deeded in nineteen fifteen for one dollar, forever free. Youngstown appears because the border is a short drive."
+    },
+    {
+      "id": "canal",
+      "anchor": "svTimeline",
+      "spotlight": "#svEraList .sv-era:first-child",
+      "durationMs": 8500,
+      "kicker": "HyperFrame · 03 · Canal",
+      "title": "Erie Extension — Lock Ten",
+      "copy": "One hundred thirty-six miles, more than a hundred locks. Sharpsville keeps the surviving stone.",
+      "narration": "Chapter one — canal iron. The Erie Extension climbed from the Ohio River to Lake Erie. Sharpsville’s Lock Ten is the remnant. Rail killed the boats; the lock remains."
     },
     {
       "id": "steel",
       "anchor": "svSteel",
       "spotlight": "#svSteelGrid .sv-card:first-child",
       "action": "flipFirstSteel",
-      "durationMs": 8000,
-      "kicker": "HyperFrame · 03 · Steel",
-      "title": "Fortune that funded a park",
-      "copy": "Sharon Iron to Farrell’s mill — wealth, labor, and the endowment that still keeps golf free.",
-      "narration": "Steel built this valley. Frank Buhl’s fortune rose with the mills; his philanthropy returned as Buhl Farm Park. Flip the first steel card — wall text, not romance. The Magic City of Farrell and the long mill closures are part of the same gallery."
+      "durationMs": 8500,
+      "kicker": "HyperFrame · 04 · Steel",
+      "title": "Magic City — Farrell",
+      "copy": "Buhl Steel eighteen ninety-six; South Sharon nineteen hundred; ten thousand jobs at the peak.",
+      "narration": "Chapter two — steel. Frank Buhl’s plants and Farrell’s Magic City put the valley on the industrial map. Flip the first steel card — wall text, not romance."
+    },
+    {
+      "id": "buhl",
+      "anchor": "svMap",
+      "spotlight": "#svHubBadge",
+      "durationMs": 7800,
+      "kicker": "HyperFrame · 05 · Gift",
+      "title": "Forever free",
+      "copy": "Lake Julia, Casino, free nine-hole golf — still claimed unique in the United States.",
+      "narration": "Chapter three — the gift. Frank and Julia preferred farm to park. No tickets. No midway. The endowment still keeps the green open."
     },
     {
       "id": "amish",
       "anchor": "svAmish",
       "spotlight": "#svAmish",
       "action": "flipFirstAmish",
-      "durationMs": 7600,
-      "kicker": "HyperFrame · 04 · Neighbors",
-      "title": "New Wilmington, not Lancaster",
-      "copy": "Old Order roads since eighteen forty-seven — courtesy first; people are not exhibits.",
-      "narration": "Ten miles from the hub lies New Wilmington and Volant Amish country. This is a living settlement, not Lancaster tourism. Drive slowly for buggies. Photograph fields, not faces. Museum etiquette applies on the road as well as in the gallery."
+      "durationMs": 7800,
+      "kicker": "HyperFrame · 06 · Neighbors",
+      "title": "Since eighteen forty-seven",
+      "copy": "New Wilmington and Volant — Mifflin County roots, western Pennsylvania roads.",
+      "narration": "Chapter four — neighbors. Old Order districts since eighteen forty-seven. Share the lane. Photograph fields, not faces."
+    },
+    {
+      "id": "sports",
+      "anchor": "svSports",
+      "spotlight": "#svSports",
+      "durationMs": 7200,
+      "kicker": "HyperFrame · 07 · Lights",
+      "title": "Steel Bowl nights",
+      "copy": "Sharon Tigers, Farrell Steelers — District 10 rivalry on a mill-town map.",
+      "narration": "Chapter five — Friday lights. The Steel Bowl and the gyms stitch Sharon and Farrell. Buhl’s free fields came first."
     },
     {
       "id": "music",
       "anchor": "svMusic",
       "spotlight": "#svMusicGrid .sv-card:first-child",
       "action": "flipFirstMusic",
-      "durationMs": 8000,
-      "kicker": "HyperFrame · 05 · Music",
-      "title": "Lettermen and Mercer County",
-      "copy": "Tony Butala from Sharon; Trent Reznor from Mercer borough — same county, careful geography.",
-      "narration": "Music leaves inscriptions too. Tony Butala of The Lettermen is Sharon’s harmony story. Trent Reznor grew up in Mercer — the county seat, not the mill towns. Keep the towns straight, the way a wall keeps dates straight."
+      "durationMs": 8200,
+      "kicker": "HyperFrame · 08 · Music",
+      "title": "Sharon harmony, Mercer County rock",
+      "copy": "Butala / Lettermen; Reznor / Mercer High — same county, careful geography.",
+      "narration": "Chapter six — music. Tony Butala from Sharon. Trent Reznor from Mercer borough. Keep the towns straight."
     },
     {
       "id": "mob",
       "anchor": "svMob",
       "spotlight": "#svMob",
       "action": "openMob",
-      "durationMs": 9800,
-      "kicker": "HyperFrame · 06 · 1970s",
-      "title": "Youngstown’s decisive decade",
-      "copy": "Cleveland vs Pittsburgh for the bug and the tables — 1970s war while steel fell. Context vs Evidence on the wall.",
-      "narration": "Now the Youngstown corridor — and the big chapter is the nineteen-seventies. No resident Mafia family; Cleveland and Pittsburgh fought for the Mahoning Valley. The Saturday Evening Post had already named Crime Town U.S.A. Then came the late-decade faction war, the Cleveland bombing that pulled in the Carabbias, and Charlie Carabbia’s nineteen-eighty disappearance — later sworn in court. Same decade, the mills died. Read the cards as a museum room. No romance. No rumor."
-    },
-    {
-      "id": "black-monday",
-      "anchor": "svVideo",
-      "spotlight": "#svVideo",
-      "durationMs": 8200,
-      "kicker": "HyperFrame · 07 · Black Monday",
-      "title": "1977 — mills and rackets, same decade",
-      "copy": "Youngstown Sheet & Tube’s Campbell Works fell on 19 September 1977. Watch the archival mini-doc beside the mob gallery.",
-      "narration": "Same decade as the faction war: Black Monday — September nineteenth, nineteen seventy-seven — when Youngstown Sheet and Tube closed Campbell Works and thousands lost work overnight. Scroll to Watch for the period mini-documentary. Steel collapse and contested rackets share one map."
+      "durationMs": 9500,
+      "kicker": "HyperFrame · 09 · 1970s",
+      "title": "War and Black Monday",
+      "copy": "Cleveland vs Pittsburgh for the bug; Sheet & Tube falls 19 September 1977.",
+      "narration": "Chapter seven — Youngstown. Crime Town label, faction war, Charlie Carabbia vanishing, and Black Monday at Campbell Works. Same decade. Museum reading only."
     },
     {
       "id": "close",
@@ -87,10 +107,10 @@
       "spotlight": "#svGuide",
       "action": "unflipCards",
       "durationMs": 7200,
-      "kicker": "HyperFrame · 08 · Ask",
-      "title": "Continue with the expert",
-      "copy": "Eight gallery chapters await. Ask David about West Pennsylvania, East Ohio, or any pin on the satellite atlas.",
-      "narration": "The reel stops here — once through, like a memorial highlight pass. Eight chapters on the wall. Ask me anything about western Pennsylvania or eastern Ohio. Facts first. Context labeled. Evidence preferred."
+      "kicker": "HyperFrame · 10 · Ask",
+      "title": "Living valley",
+      "copy": "Keep Buhl free. Ask David about any chapter on the wall.",
+      "narration": "Closing chapter — living valley. The reel stops once through. Ask me anything about western Pennsylvania or eastern Ohio. Facts first."
     }
   ]
 }
