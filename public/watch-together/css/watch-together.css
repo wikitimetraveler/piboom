@@ -415,6 +415,64 @@ body.wt-body {
   padding: 1.1rem clamp(0.9rem, 3vw, 1.6rem) 1.25rem;
 }
 
+body.wt-cinema-on {
+  overflow: hidden;
+}
+
+.wt-theater.is-cinema {
+  max-width: none;
+  height: 100vh;
+  height: 100dvh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding: 0.55rem 0.7rem 0.65rem;
+}
+
+.wt-theater.is-cinema .wt-theater-top {
+  margin-bottom: 0.45rem;
+}
+
+.wt-theater.is-cinema .wt-load {
+  margin-bottom: 0.45rem;
+}
+
+.wt-theater.is-cinema .wt-stage-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  grid-template-columns: minmax(240px, 22rem) minmax(0, 1fr);
+}
+
+.wt-theater.is-cinema .wt-side {
+  order: -1;
+}
+
+.wt-theater.is-cinema .wt-stage-main {
+  min-height: 0;
+  height: 100%;
+}
+
+.wt-theater.is-cinema .wt-player-shell {
+  flex: 1 1 auto;
+  aspect-ratio: auto;
+  min-height: 0;
+  height: auto;
+}
+
+.wt-theater.is-cinema .wt-map-panel {
+  display: none;
+}
+
+.wt-theater.is-cinema .wt-faces {
+  max-height: 7.5rem;
+  overflow: auto;
+}
+
+.wt-theater.is-cinema .wt-chat {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .wt-theater-top {
   display: flex;
   flex-wrap: wrap;
@@ -924,6 +982,20 @@ input[type="range"] {
   .wt-chat {
     min-height: 220px;
     max-height: 280px;
+  }
+
+  .wt-theater.is-cinema .wt-stage-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wt-theater.is-cinema .wt-side {
+    order: 0;
+    max-height: 42vh;
+  }
+
+  .wt-theater.is-cinema .wt-chat {
+    min-height: 140px;
+    max-height: none;
   }
 
   .wt-map {

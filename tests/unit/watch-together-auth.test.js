@@ -3,6 +3,7 @@
  */
 import {
   verifyWatchTogetherCode,
+  verifyWatchTogetherAccess,
   getConfiguredCode,
   ENV_KEY,
   DEFAULT_CODE,
@@ -44,5 +45,12 @@ describe('watch-together-auth', () => {
       valid: false,
       reason: 'invalid',
     });
+  });
+
+  test('verifyWatchTogetherAccess lets anyone enter without a code', () => {
+    process.env[ENV_KEY] = 'karti';
+    expect(verifyWatchTogetherAccess('')).toEqual({ valid: true, reason: 'open' });
+    expect(verifyWatchTogetherAccess('couch')).toEqual({ valid: true, reason: 'open' });
+    expect(verifyWatchTogetherAccess('karti')).toEqual({ valid: true, reason: 'open' });
   });
 });

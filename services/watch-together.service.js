@@ -1,7 +1,7 @@
 /**
  * Development work by David Lane
  */
-import { verifyWatchTogetherCode } from '../lib/watch-together-auth.js';
+import { verifyWatchTogetherAccess } from '../lib/watch-together-auth.js';
 import { getLivekitConfig } from './studio.service.js';
 
 export const DRIFT_PLAYING_S = 1.0;
@@ -23,9 +23,17 @@ export function extractYouTubeId(raw) {
   if (!value) return null;
   if (/^[\w-]{11}$/.test(value)) return value;
 
+  const fromBlob = value.match(/(?:v=|youtu\.be\/|\/embed\/|\/shorts\/|\/live\/|\/v\/)([\w-]{11})/);
+  if (fromBlob) return fromBlob[1];
+
+  let candidate = value;
+  if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(candidate)) {
+    candidate = `https://${candidate.replace(/^\/\//, '')}`;
+  }
+
   let url;
   try {
-    url = new URL(value);
+    url = new URL(candidate);
   } catch {
     return null;
   }
@@ -401,7 +409,7 @@ export function attachWatchTogetherSockets(io) {
   nsp.on('connection', (socket) => {
     socket.on('watch:join', (payload = {}) => {
       const code = typeof payload.code === 'string' ? payload.code : '';
-      if (!verifyWatchTogetherCode(code).valid) {
+      if (!verifyWatchTogetherAccess(code).valid) {
         socket.emit('watch:error', { reason: 'invalid-code' });
         socket.disconnect(true);
         return;

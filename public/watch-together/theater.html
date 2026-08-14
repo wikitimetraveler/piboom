@@ -21,7 +21,7 @@
     </header>
 
     <div class="wt-load">
-      <input id="wtUrl" type="url" placeholder="Paste a YouTube link or a video URL" autocomplete="off">
+      <input id="wtUrl" type="text" inputmode="url" placeholder="Paste a YouTube link or a video URL" autocomplete="off">
       <button class="wt-enter" id="wtLoad" type="button">Load</button>
     </div>
 
@@ -42,6 +42,7 @@
           <label class="wt-status" for="wtVolume">Vol</label>
           <input class="wt-volume" id="wtVolume" type="range" min="0" max="100" value="80" aria-label="Your volume (never synced)">
           <button class="wt-ghost" id="wtFill" type="button" aria-pressed="false">Fill screen</button>
+          <button class="wt-ghost" id="wtCinema" type="button" aria-pressed="false">Chat left</button>
           <button class="wt-icon-btn" id="wtDrawBtn" type="button" aria-pressed="false" aria-label="Draw">✎</button>
           <button class="wt-ghost" id="wtClearDraw" type="button">Clear draw</button>
           <button class="wt-ghost" id="wtMic" type="button" aria-pressed="false" hidden>Mic</button>

@@ -23,10 +23,12 @@ import {
 
 describe('watch-together.service', () => {
   test('extractYouTubeId reads watch, short, embed, and raw ids', () => {
-    expect(extractYouTubeId('https://www.youtube.com/watch?v=dQw4w9wgGcQ')).toBe('dQw4w9wgGcQ');
+    expect(extractYouTubeId('https://www.youtube.com/watch?v=GAKZMVzXGBA')).toBe('GAKZMVzXGBA');
     expect(extractYouTubeId('https://youtu.be/dQw4w9wgGcQ')).toBe('dQw4w9wgGcQ');
     expect(extractYouTubeId('https://www.youtube.com/embed/dQw4w9wgGcQ')).toBe('dQw4w9wgGcQ');
     expect(extractYouTubeId('dQw4w9wgGcQ')).toBe('dQw4w9wgGcQ');
+    expect(extractYouTubeId('www.youtube.com/watch?v=dQw4w9wgGcQ')).toBe('dQw4w9wgGcQ');
+    expect(extractYouTubeId('youtu.be/dQw4w9wgGcQ?si=abc')).toBe('dQw4w9wgGcQ');
   });
 
   test('parseMediaUrl prefers YouTube over a generic file URL', () => {

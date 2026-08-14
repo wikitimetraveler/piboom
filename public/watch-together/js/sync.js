@@ -78,17 +78,24 @@
 
   async function persistIntent(payload) {
     if (payload.type === 'draw') return null;
-    const res = await fetch('/api/watch-together/intent', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...payload,
-        code: state.code,
-        name: state.name,
-        identity: state.identity,
-      }),
-    });
-    return res.json().catch(() => null);
+    const code = state.code || global.WatchTogetherGate?.getStoredCode?.() || '';
+    try {
+      const res = await fetch('/api/watch-together/intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...payload,
+          code,
+          name: state.name,
+          identity: state.identity,
+        }),
+      });
+      const data = await res.json().catch(() => null);
+      if (data && typeof data === 'object') return data;
+      return { ok: false, error: res.ok ? 'bad-intent' : 'server-error' };
+    } catch {
+      return { ok: false, error: 'network' };
+    }
   }
 
   async function publishData(payload, reliable) {
@@ -275,6 +282,10 @@
       if (snapshot) {
         await publishData({ type: 'playback', snapshot }, true);
         emit('playback', snapshot);
+        return;
+      }
+      if (saved && saved.ok === false) {
+        emit('error', { reason: saved.error || saved.reason || 'bad-intent' });
       }
       return;
     }

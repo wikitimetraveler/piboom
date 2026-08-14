@@ -1,7 +1,7 @@
 /**
  * Development work by David Lane
  */
-import { verifyWatchTogetherCode } from '../lib/watch-together-auth.js';
+import { verifyWatchTogetherAccess } from '../lib/watch-together-auth.js';
 import { getGoogleBrowserApiKey } from '../lib/google-api-key.js';
 import {
   getWatchTogetherSnapshot,
@@ -13,7 +13,7 @@ import {
 export async function postVerifyWatchTogether(req, res) {
   try {
     const code = typeof req.body?.code === 'string' ? req.body.code : '';
-    const result = verifyWatchTogetherCode(code);
+    const result = verifyWatchTogetherAccess(code);
     if (!result.valid) {
       return res.status(401).json({ valid: false });
     }
@@ -41,7 +41,7 @@ export async function getWatchTogetherHealth(_req, res) {
 
 export async function getWatchTogetherState(req, res) {
   const code = typeof req.query?.code === 'string' ? req.query.code : '';
-  if (!verifyWatchTogetherCode(code).valid) {
+  if (!verifyWatchTogetherAccess(code).valid) {
     return res.status(401).json({ ok: false, error: 'invalid-code' });
   }
   res.json({ ok: true, ...getWatchTogetherSnapshot() });
@@ -50,7 +50,7 @@ export async function getWatchTogetherState(req, res) {
 export async function postWatchTogetherIntent(req, res) {
   try {
     const code = typeof req.body?.code === 'string' ? req.body.code : '';
-    if (!verifyWatchTogetherCode(code).valid) {
+    if (!verifyWatchTogetherAccess(code).valid) {
       return res.status(401).json({ ok: false, error: 'invalid-code' });
     }
     const result = handleWatchIntent(req.body, {
@@ -70,7 +70,7 @@ export async function postWatchTogetherIntent(req, res) {
 export async function postWatchTogetherLivekitToken(req, res) {
   try {
     const code = typeof req.body?.code === 'string' ? req.body.code : '';
-    if (!verifyWatchTogetherCode(code).valid) {
+    if (!verifyWatchTogetherAccess(code).valid) {
       return res.status(401).json({ ok: false, error: 'invalid-code' });
     }
     const minted = await mintWatchTogetherLivekitToken({

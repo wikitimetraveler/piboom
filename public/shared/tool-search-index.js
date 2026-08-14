@@ -86,7 +86,7 @@
     { name: 'Google Earth KML Files', url: '/music/musical-google-earth-files.html', category: 'Music', keywords: 'kml google earth network link download beatles dylan dead venues' },
     // Entertainment
     { name: 'Entertainment Hub', url: '/entertainment/index.html', category: 'Entertainment', keywords: 'hub entertainment boombox visualizer gallery posters' },
-    { name: 'Watch together', url: '/watch-together/', category: 'Entertainment', keywords: 'youtube watch together sync theater chat draw map couches dave' },
+    { name: 'Watch together', url: '/watch-together/', category: 'Entertainment', keywords: 'youtube watch together sync theater chat draw map couches open no code' },
     { name: 'Coffee Dreams', url: '/entertainment/coffee-dreams.html', category: 'Entertainment', keywords: 'coffee cafe gallery password vietnamese coffee shop girls glam' },
     { name: 'The Boombox', url: '/entertainment/player.html', category: 'Entertainment', keywords: 'player audio' },
     { name: 'Psychedelic Visualizer', url: '/entertainment/visualizer.html', category: 'Entertainment', keywords: 'visualizer trippy' },

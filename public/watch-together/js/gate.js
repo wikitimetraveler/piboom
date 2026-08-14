@@ -86,8 +86,8 @@
     overlay.id = 'wtGate';
     overlay.innerHTML =
       '<form class="wt-gate-card" id="wtGateForm">' +
-      '<h2>Private theater</h2>' +
-      '<p>Ask Dave for the code. Volume stays yours. The clock is shared.</p>' +
+      '<h2>Watch together</h2>' +
+      '<p>Open to everyone. No code. Volume stays yours. The clock is shared.</p>' +
       (requireName
         ? '<div class="wt-field"><label for="wtGateName">Your name</label><input id="wtGateName" name="name" autocomplete="nickname" maxlength="24" value=""></div>'
         : '') +
