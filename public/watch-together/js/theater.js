@@ -18,12 +18,14 @@
     yt: () => document.getElementById('wtYt'),
     file: () => document.getElementById('wtFile'),
     empty: () => document.getElementById('wtEmpty'),
+    poster: () => document.getElementById('wtPoster'),
     draw: () => document.getElementById('wtDraw'),
     play: () => document.getElementById('wtPlay'),
     seek: () => document.getElementById('wtSeek'),
     volume: () => document.getElementById('wtVolume'),
     fill: () => document.getElementById('wtFill'),
     cinema: () => document.getElementById('wtCinema'),
+    host: () => document.getElementById('wtHost'),
     theater: () => document.querySelector('.wt-theater'),
     stageMain: () => document.querySelector('.wt-stage-main'),
     drawBtn: () => document.getElementById('wtDrawBtn'),
@@ -147,6 +149,39 @@
     window.WatchTogetherSync?.send(payload);
   }
 
+  function myHostKey() {
+    const uid = userId();
+    if (uid) return String(uid);
+    const identity = window.WatchTogetherSync?.identity?.() || '';
+    if (identity) return String(identity).replace(/[^\w.-]/g, '-').slice(0, 64);
+    return displayName();
+  }
+
+  function canDriveClock() {
+    const key = room.host?.key;
+    if (!key) return true;
+    return key === myHostKey();
+  }
+
+  function syncHostButton() {
+    const btn = els.host();
+    if (!btn) return;
+    const host = room.host;
+    const mine = Boolean(host?.key && host.key === myHostKey());
+    btn.setAttribute('aria-pressed', mine ? 'true' : 'false');
+    if (!host?.key) btn.textContent = 'Projector';
+    else if (mine) btn.textContent = 'Projector on';
+    else btn.textContent = 'Projector: ' + (host.name || 'taken');
+  }
+
+  function emitClock(payload) {
+    if (!canDriveClock()) {
+      setStatus((room.host?.name || 'Someone') + ' is running the projector.');
+      return;
+    }
+    emitIntent(payload);
+  }
+
   async function loadFromInput() {
     const url = String(els.url()?.value || '').trim();
     if (!url) {
@@ -175,16 +210,46 @@
       setStatus(err?.message || 'YouTube player did not start.');
       return;
     }
-    emitIntent({ type: 'load', url });
+    emitClock({ type: 'load', url });
+  }
+
+  function youtubeThumb(id, size) {
+    const videoId = String(id || '').trim();
+    if (!/^[\w-]{11}$/.test(videoId)) return '';
+    const file = size || 'hqdefault';
+    return 'https://i.ytimg.com/vi/' + videoId + '/' + file + '.jpg';
+  }
+
+  function setPoster(youtubeId) {
+    const img = els.poster();
+    if (!img) return;
+    const id = String(youtubeId || '').trim();
+    if (!/^[\w-]{11}$/.test(id)) {
+      img.hidden = true;
+      img.removeAttribute('src');
+      delete img.dataset.size;
+      return;
+    }
+    img.hidden = false;
+    img.alt = '';
+    delete img.dataset.size;
+    img.onerror = function () {
+      if (img.dataset.size === 'hq') return;
+      img.dataset.size = 'hq';
+      img.src = youtubeThumb(id, 'hqdefault');
+    };
+    img.src = youtubeThumb(id, 'maxresdefault');
   }
 
   function showMedia(kind) {
     const yt = els.yt();
     const file = els.file();
     const empty = els.empty();
-    if (yt) yt.hidden = kind !== 'youtube';
+    const ytReady = kind === 'youtube' && youtubeIframeReady();
+    if (yt) yt.hidden = kind !== 'youtube' || !ytReady;
     if (file) file.hidden = kind !== 'file';
     if (empty) empty.hidden = Boolean(kind);
+    setPoster(kind === 'youtube' ? room.media?.youtubeId : '');
   }
 
   function applyLocalVolume() {
@@ -306,9 +371,9 @@
           if (applyingRemote || Date.now() < ignoreStateUntil || !window.YT) return;
           const YT = window.YT;
           if (event.data === YT.PlayerState.PLAYING) {
-            emitIntent({ type: 'play', position: localTime() });
+            emitClock({ type: 'play', position: localTime() });
           } else if (event.data === YT.PlayerState.PAUSED) {
-            emitIntent({ type: 'pause', position: localTime() });
+            emitClock({ type: 'pause', position: localTime() });
           }
         },
       },
@@ -367,7 +432,9 @@
       playing: Boolean(incoming.playing),
       position: Number(incoming.position) || 0,
       updatedAt: Number(incoming.updatedAt) || Date.now(),
+      host: incoming.host === undefined ? room.host || null : incoming.host,
     };
+    syncHostButton();
     return ensureMedia(room.media).then(() => applyPlayback(room, forceSeek));
   }
 
@@ -698,6 +765,12 @@
             setStatus('Theater is full — 10 people already here.');
             return;
           }
+          if (err?.reason === 'host-lock' || err?.reason === 'host-held') {
+            setStatus(
+              (room.host?.name || 'Someone') + ' is running the projector.'
+            );
+            return;
+          }
           if (err?.reason === 'unsupported' || err?.reason === 'empty') {
             setStatus('That does not look like a YouTube link.');
             return;
@@ -825,10 +898,10 @@
       }
     });
     els.play()?.addEventListener('click', () => {
-      emitIntent({ type: room.playing ? 'pause' : 'play', position: localTime() });
+      emitClock({ type: room.playing ? 'pause' : 'play', position: localTime() });
     });
     const seekNow = (event) => {
-      emitIntent({
+      emitClock({
         type: 'seek',
         position: Number(event.target.value) || 0,
         playing: room.playing,
@@ -845,6 +918,17 @@
     });
     els.cinema()?.addEventListener('click', () => {
       setCinema(!isCinema());
+    });
+    els.host()?.addEventListener('click', () => {
+      if (room.host?.key && room.host.key === myHostKey()) {
+        emitIntent({ type: 'host-release' });
+        return;
+      }
+      if (room.host?.key) {
+        setStatus((room.host.name || 'Someone') + ' is running the projector.');
+        return;
+      }
+      emitIntent({ type: 'host-claim' });
     });
     setCinema(readCinema());
     document.addEventListener('fullscreenchange', syncFillButton);
@@ -922,14 +1006,14 @@
     const video = els.file();
     if (video) {
       video.addEventListener('play', () => {
-        if (!applyingRemote && Date.now() >= ignoreStateUntil) emitIntent({ type: 'play', position: localTime() });
+        if (!applyingRemote && Date.now() >= ignoreStateUntil) emitClock({ type: 'play', position: localTime() });
       });
       video.addEventListener('pause', () => {
-        if (!applyingRemote && Date.now() >= ignoreStateUntil) emitIntent({ type: 'pause', position: localTime() });
+        if (!applyingRemote && Date.now() >= ignoreStateUntil) emitClock({ type: 'pause', position: localTime() });
       });
       video.addEventListener('seeked', () => {
         if (!applyingRemote && Date.now() >= ignoreStateUntil) {
-          emitIntent({ type: 'seek', position: localTime(), playing: !video.paused });
+          emitClock({ type: 'seek', position: localTime(), playing: !video.paused });
         }
       });
     }
@@ -970,6 +1054,7 @@
     window.WatchTogetherGate.setName(selfName);
     await window.WatchTogetherMap?.init();
     connect();
+    syncHostButton();
   }
 
   start();

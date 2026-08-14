@@ -110,6 +110,7 @@
           code,
           name: state.name,
           identity: state.identity,
+          userId: state.userId,
         }),
       });
       const data = await res.json().catch(() => null);
@@ -583,6 +584,10 @@
     return out;
   }
 
+  function identity() {
+    return state.identity;
+  }
+
   global.WatchTogetherSync = {
     connect,
     send,
@@ -596,5 +601,6 @@
     micOn,
     camOn,
     blurOn,
+    identity,
   };
 })(window);

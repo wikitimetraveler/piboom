@@ -57,6 +57,7 @@ export async function postWatchTogetherIntent(req, res) {
     const result = handleWatchIntent(req.body, {
       name: req.body?.name,
       id: req.body?.identity,
+      userId: req.body?.userId,
     });
     if (!result.ok) {
       return res.status(400).json({ ok: false, error: result.reason || 'bad-intent' });

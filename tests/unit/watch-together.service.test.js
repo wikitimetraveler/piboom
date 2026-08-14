@@ -4,6 +4,7 @@
 import {
   extractYouTubeId,
   parseMediaUrl,
+  youtubeThumbnailUrl,
   createRoomState,
   expectedMediaTime,
   needsDriftCorrection,
@@ -17,6 +18,7 @@ import {
   mintWatchTogetherLivekitToken,
   setWatchTogetherLivekitTokenFactory,
   setWatchTogetherOccupancyReader,
+  hostKeyFromActor,
   LIVEKIT_ROOM_NAME,
   MAX_VIEWERS,
   DRIFT_PLAYING_S,
@@ -31,6 +33,16 @@ describe('watch-together.service', () => {
     expect(extractYouTubeId('dQw4w9wgGcQ')).toBe('dQw4w9wgGcQ');
     expect(extractYouTubeId('www.youtube.com/watch?v=dQw4w9wgGcQ')).toBe('dQw4w9wgGcQ');
     expect(extractYouTubeId('youtu.be/dQw4w9wgGcQ?si=abc')).toBe('dQw4w9wgGcQ');
+  });
+
+  test('youtubeThumbnailUrl builds a public still and rejects junk ids', () => {
+    expect(youtubeThumbnailUrl('dQw4w9wgGcQ')).toBe(
+      'https://i.ytimg.com/vi/dQw4w9wgGcQ/hqdefault.jpg'
+    );
+    expect(youtubeThumbnailUrl('dQw4w9wgGcQ', 'maxresdefault')).toBe(
+      'https://i.ytimg.com/vi/dQw4w9wgGcQ/maxresdefault.jpg'
+    );
+    expect(youtubeThumbnailUrl('nope')).toBeNull();
   });
 
   test('parseMediaUrl prefers YouTube over a generic file URL', () => {
@@ -117,6 +129,46 @@ describe('watch-together.service', () => {
     expect(result.snapshot.playing).toBe(false);
     expect(result.snapshot.volume).toBeUndefined();
     expect(getWatchTogetherSnapshot().media.youtubeId).toBe('dQw4w9wgGcQ');
+    expect(getWatchTogetherSnapshot().host).toBeNull();
+  });
+
+  test('hostKeyFromActor prefers login id then identity then name', () => {
+    expect(hostKeyFromActor({ userId: 'demo-1', id: 'lk-x', name: 'Karti' })).toBe('demo-1');
+    expect(hostKeyFromActor({ id: 'lk-x', name: 'Karti' })).toBe('lk-x');
+    expect(hostKeyFromActor({ name: 'Karti' })).toBe('Karti');
+  });
+
+  test('projector baton is off by default and anyone can load', () => {
+    resetWatchTogetherRoom(1_000);
+    const first = handleWatchIntent(
+      { type: 'load', url: 'https://youtu.be/dQw4w9wgGcQ' },
+      { name: 'Ada', id: 'a1' }
+    );
+    expect(first.ok).toBe(true);
+    const second = handleWatchIntent(
+      { type: 'play', position: 3 },
+      { name: 'Bo', id: 'b1' }
+    );
+    expect(second.ok).toBe(true);
+    expect(second.snapshot.playing).toBe(true);
+  });
+
+  test('projector baton blocks other couches from seek until released', () => {
+    resetWatchTogetherRoom(1_000);
+    const claimed = handleWatchIntent({ type: 'host-claim' }, { name: 'Ada', id: 'a1' });
+    expect(claimed.ok).toBe(true);
+    expect(claimed.snapshot.host).toEqual({ key: 'a1', name: 'Ada' });
+    const blocked = handleWatchIntent({ type: 'seek', position: 40 }, { name: 'Bo', id: 'b1' });
+    expect(blocked).toEqual({ ok: false, reason: 'host-lock' });
+    const held = handleWatchIntent({ type: 'host-claim' }, { name: 'Bo', id: 'b1' });
+    expect(held).toEqual({ ok: false, reason: 'host-held' });
+    const allowed = handleWatchIntent({ type: 'pause', position: 2 }, { name: 'Ada', id: 'a1' });
+    expect(allowed.ok).toBe(true);
+    const released = handleWatchIntent({ type: 'host-release' }, { name: 'Ada', id: 'a1' });
+    expect(released.ok).toBe(true);
+    expect(released.snapshot.host).toBeNull();
+    const after = handleWatchIntent({ type: 'play', position: 2 }, { name: 'Bo', id: 'b1' });
+    expect(after.ok).toBe(true);
   });
 
   test('LiveKit room name is dedicated to the theater', () => {

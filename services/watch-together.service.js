@@ -66,6 +66,19 @@ export function extractYouTubeId(raw) {
 }
 
 /**
+ * Public YouTube still. hqdefault always exists; maxresdefault can 404.
+ * @param {string} id
+ * @param {'maxresdefault' | 'sddefault' | 'hqdefault' | 'mqdefault'} [size]
+ */
+export function youtubeThumbnailUrl(id, size = 'hqdefault') {
+  const videoId = String(id || '').trim();
+  if (!/^[\w-]{11}$/.test(videoId)) return null;
+  const allowed = new Set(['maxresdefault', 'sddefault', 'hqdefault', 'mqdefault']);
+  const file = allowed.has(size) ? size : 'hqdefault';
+  return `https://i.ytimg.com/vi/${videoId}/${file}.jpg`;
+}
+
+/**
  * @param {string} raw
  * @returns {{ ok: true, kind: 'youtube' | 'file', youtubeId?: string, src?: string, url: string } | { ok: false, reason: string }}
  */
@@ -97,7 +110,16 @@ export function createRoomState(now = Date.now()) {
     updatedAt: now,
     chat: [],
     draw: [],
+    host: null,
   };
+}
+
+export function hostKeyFromActor(actor = {}) {
+  const userId = String(actor.userId || '').trim().slice(0, 40);
+  if (userId) return userId;
+  const identity = String(actor.id || '').trim().slice(0, 64);
+  if (identity) return identity.replace(/[^\w.-]/g, '-').slice(0, 64);
+  return sanitizeName(actor.name);
 }
 
 export function expectedMediaTime(state, now = Date.now()) {
@@ -135,8 +157,19 @@ export function applyIntent(state, intent, now = Date.now()) {
     updatedAt: Number(state?.updatedAt) || now,
     chat: Array.isArray(state?.chat) ? state.chat : [],
     draw: Array.isArray(state?.draw) ? state.draw : [],
+    host: state?.host && typeof state.host === 'object' ? state.host : null,
   };
   const type = intent?.type;
+
+  if (type === 'host-claim') {
+    next.host = intent.host || null;
+    return next;
+  }
+
+  if (type === 'host-release') {
+    next.host = null;
+    return next;
+  }
 
   if (type === 'load') {
     next.media = intent.media || null;
@@ -181,6 +214,7 @@ export function publicPlaybackState(state) {
     playing: Boolean(state?.playing),
     position: clampPosition(state?.position),
     updatedAt: Number(state?.updatedAt) || Date.now(),
+    host: state?.host && typeof state.host === 'object' ? state.host : null,
   };
 }
 
@@ -372,9 +406,35 @@ export async function mintWatchTogetherLivekitToken({ identity, name, userId } =
  * Apply a client intent to the shared clock. Volume is ignored.
  * @returns {{ ok: boolean, reason?: string, kind?: string, snapshot?: object, message?: object, stroke?: object }}
  */
+const CLOCK_TYPES = new Set(['load', 'play', 'pause', 'seek']);
+
 export function handleWatchIntent(intent, actor = {}) {
   const type = intent?.type;
   const name = sanitizeName(actor.name);
+  const actorKey = hostKeyFromActor({ ...actor, name });
+
+  if (type === 'host-claim') {
+    if (room.host?.key && room.host.key !== actorKey) {
+      return { ok: false, reason: 'host-held' };
+    }
+    room = applyIntent(room, {
+      type: 'host-claim',
+      host: { key: actorKey, name },
+    });
+    return { ok: true, kind: 'playback', snapshot: getWatchTogetherSnapshot() };
+  }
+
+  if (type === 'host-release') {
+    if (room.host?.key && room.host.key !== actorKey) {
+      return { ok: false, reason: 'host-held' };
+    }
+    room = applyIntent(room, { type: 'host-release' });
+    return { ok: true, kind: 'playback', snapshot: getWatchTogetherSnapshot() };
+  }
+
+  if (CLOCK_TYPES.has(type) && room.host?.key && room.host.key !== actorKey) {
+    return { ok: false, reason: 'host-lock' };
+  }
 
   if (type === 'load') {
     const parsed = parseMediaUrl(intent.url);
@@ -470,6 +530,7 @@ export function attachWatchTogetherSockets(io) {
       socketViewers.set(socket.id, viewer);
       socket.data.joined = true;
       socket.data.name = viewer.name;
+      socket.data.userId = viewer.userId;
       socket.join(ROOM_NAME);
       emitRoom(socket);
       nsp.to(ROOM_NAME).emit('watch:viewers', viewerList());
@@ -490,6 +551,7 @@ export function attachWatchTogetherSockets(io) {
       const result = handleWatchIntent(intent, {
         name: socket.data.name,
         id: socket.id,
+        userId: socket.data.userId,
       });
       if (!result.ok) {
         if (result.reason && result.reason !== 'empty' && result.reason !== 'unknown') {
@@ -527,10 +589,12 @@ export default {
   DRIFT_PAUSED_S,
   extractYouTubeId,
   parseMediaUrl,
+  youtubeThumbnailUrl,
   createRoomState,
   expectedMediaTime,
   needsDriftCorrection,
   applyIntent,
+  hostKeyFromActor,
   publicPlaybackState,
   sanitizeLocation,
   publicViewer,

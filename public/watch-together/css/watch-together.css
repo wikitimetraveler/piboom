@@ -563,6 +563,17 @@ body.wt-cinema-on {
   min-height: 0;
 }
 
+.wt-poster {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
 .wt-player-shell .yt,
 .wt-player-shell video {
   position: absolute;
