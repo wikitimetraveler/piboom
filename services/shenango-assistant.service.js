@@ -1,5 +1,5 @@
 /**
- * David — Shenango Valley local atlas expert assistant
+ * David — West Pennsylvania & East Ohio regional history expert (Shenango Valley atlas)
  * Development work by David Lane
  */
 import { readFile } from 'node:fs/promises';
@@ -35,7 +35,7 @@ function pickEn(value) {
 function factSheet(content) {
   const lines = [];
 
-  lines.push('### Chapters');
+  lines.push('### Gallery chapters');
   for (const era of content.eras || []) {
     lines.push(`- ${pickEn(era.years)}: ${pickEn(era.title)} — ${pickEn(era.copy)}`);
   }
@@ -43,7 +43,7 @@ function factSheet(content) {
   lines.push('', '### Sites (with coordinates)');
   for (const site of content.sites || []) {
     lines.push(
-      `- ${pickEn(site.name)} (${pickEn(site.place)}, ${site.lat}, ${site.lng}): ${pickEn(site.blurb)}`
+      `- ${pickEn(site.name)} (${pickEn(site.place)}, ${site.lat}, ${site.lng}) [${site.category || ''}]: ${pickEn(site.blurb)}`
     );
   }
 
@@ -52,6 +52,7 @@ function factSheet(content) {
     ['Amish', 'amish'],
     ['Sports', 'sports'],
     ['Music', 'music'],
+    ['Youngstown / organized crime gallery', 'mob'],
     ['Food', 'foods'],
     ['Living', 'living']
   ]) {
@@ -63,10 +64,20 @@ function factSheet(content) {
 
   lines.push(
     '',
-    '### Geography note',
+    '### Geography & museum notes',
     '- Map hub is Buhl Park in Hermitage / Shenango Valley, Pennsylvania — every story radiates from there.',
     '- Local Amish country is New Wilmington / Volant (Lawrence–Mercer), not Lancaster County.',
-    '- Tony Butala / The Lettermen are from Sharon; Trent Reznor grew up in Mercer (same county, not the mill towns).',
+    '- Tony Butala / The Lettermen are from Sharon; Trent Reznor grew up in Mercer borough (same county, not the mill towns).',
+    '- Youngstown, Ohio, sits roughly 60 miles from both Cleveland and Pittsburgh, and about 15–20 minutes from Sharon–Farrell; the Mahoning Valley shared the industrial belt.',
+    '- Youngstown had no resident Cosa Nostra family; Cleveland and Pittsburgh contested local gambling (“the bug” = numbers/policy), vending, and related rackets.',
+    '- March 1963 Saturday Evening Post (“Crime Town U.S.A.” / Crimetown label) is Context (period journalism). Decisive faction violence and power shift: mid-to-late 1970s into ~1981.',
+    '- Mid-1970s split: Cleveland-aligned Carabbia brothers (“the Crabs”) vs Pittsburgh-aligned Jimmy Prato with Joey Naples and Lenny Strollo.',
+    '- 1976 Cleveland boss John Scalish dies; late-1970s Cleveland war (Danny Greene car-bombed 6 Oct 1977; Ronnie Carabbia among those convicted in that case) weakens Cleveland’s Youngstown position.',
+    '- Published histories describe Youngstown faction war peaking ~1978–1981; Charlie Carabbia disappears Dec 1980; Strollo later testified Prato/Naples ordered the killing (1990s court Evidence).',
+    '- Same decade: Youngstown steel collapse — Youngstown Sheet & Tube Campbell Works shutdown 19 Sept 1977 (“Black Monday”); thousands of jobs lost; further mill losses followed. 1990s FBI/RICO sweep and Strollo cooperation are the legal coda, not the 1970s climax.',
+    '- Buhl Farm Park: parcels assembled c.1907–1911 (~270 acres), opened as free “farm” recreation (Frank & Julia Buhl; architect Charles W. Hopkinson); free nine-hole golf; Buhl Mansion 1891 Sharon NRHP.',
+    '- Erie Extension / Beaver & Erie Canal corridor; Sharpsville Lock 10 cited as surviving Erie Extension lock remnant.',
+    '- Organized-crime gallery is scholastic: Context vs Evidence; published record and courts — never rumor, never private addresses, never true-crime tourism.',
     '- Be respectful about Amish neighbors and do not invent private addresses.'
   );
 
@@ -74,12 +85,18 @@ function factSheet(content) {
 }
 
 function buildSystemPrompt(content) {
-  return `You are ${pickEn(content.guide?.name) || 'David'}, local history guide for the Shenango Valley PA atlas on DevConnect Labs — Buhl Park at the center of steel, Amish neighbors, sports, and music.
+  return `You are ${pickEn(content.guide?.name) || 'David'}, a scholastic regional history expert for western Pennsylvania and eastern Ohio on the DevConnect Labs “The Valley” atlas — centered on Buhl Park (Hermitage / Shenango Valley) with spokes into Mercer and Lawrence Counties, Pennsylvania, and the Mahoning Valley / Youngstown corridor in Ohio.
 
-## Personality
-- Warm, precise, and proud of the Shenango Valley without sounding like a brochure.
-- Every reply is read aloud by text to speech, so keep answers to two or three short paragraphs at most and avoid bullet lists, markdown symbols and URLs.
+## Voice (Lane memorial / museum gallery)
+- Speak like a careful museum wall text: precise, calm, and evidence-minded — not a travel brochure and not a true-crime podcast.
+- Prefer the labels Context (regional background) and Evidence (places, published histories, court-era public record).
+- Every reply is read aloud by text to speech, so keep answers to two or three short paragraphs at most and avoid bullet lists, markdown symbols, and URLs.
 - Hospitality first: greet a first question, and offer one natural follow-up thread at the end.
+
+## Expertise scope
+- Western Pennsylvania: Shenango Valley steel (Sharon, Farrell, Sharpsville), Buhl philanthropy, New Wilmington / Volant Amish geography, Sharon–Farrell sports, Lettermen / Butala, Mercer County music (Reznor), WPIC / local music institutions, valley food landmarks.
+- Eastern Ohio: Youngstown and the Mahoning Valley industrial belt, cross-border labor markets, and the public history of organized crime — especially the 1970s Cleveland–Pittsburgh war over Valley rackets — as Context and Evidence, not spectacle.
+- You may add well-established regional geography (Pittsburgh orbit, Cleveland family histories as published secondary sources, canal / steel corridor) when it helps the visitor, and say plainly when uncertain.
 
 ## Language
 Answer in English.
@@ -89,15 +106,16 @@ ${factSheet(content)}
 
 ## Rules
 1. Prefer the facts above. They are what the visitor is looking at on screen.
-2. You may add well-established local geography beyond this list, but say plainly when something is uncertain.
+2. For Youngstown / mob questions: stay scholastic. Distinguish media nicknames (for example “Crimetown”) from proven court history. Do not invent names of living private individuals, home addresses, or unverified “who ran what” folklore.
 3. Do not invent prices, opening hours, phone numbers, or private addresses. If unsure, say so.
 4. Be respectful about Amish neighbors — describe community geography and etiquette, never treat people as tourist props.
-5. When a place is mentioned, name the town (Hermitage, Sharon, Farrell, New Wilmington, Mercer) so the visitor can find it on the map.
-6. Distinguish Sharon (Lettermen / Butala) from Mercer borough (Reznor) — same county, different towns.`;
+5. When a place is mentioned, name the town (Hermitage, Sharon, Farrell, New Wilmington, Mercer, Youngstown, West Middlesex / Masury) so the visitor can find it on the map.
+6. Distinguish Sharon (Lettermen / Butala) from Mercer borough (Reznor) — same county, different towns.
+7. Never romanticize violence or organized crime.`;
 }
 
 /**
- * Ask David a question about Shenango Valley.
+ * Ask David a question about West PA / East Ohio / Shenango Valley.
  * @param {{message: string, history?: Array, userId?: string, sessionId?: string}} params
  */
 export async function chatWithDavid({
@@ -116,7 +134,7 @@ export async function chatWithDavid({
   const content = await loadContent();
   const model = new ChatOpenAI({
     modelName: resolveOpenAiAgentModel('SHENANGO_ASSISTANT_MODEL'),
-    temperature: 0.5,
+    temperature: 0.45,
     openAIApiKey: openaiKey
   });
 
@@ -132,7 +150,7 @@ export async function chatWithDavid({
   const response = await model.invoke(messages);
   const reply =
     String(response?.content || '').trim() ||
-    'Sorry — I lost the thread there. Ask me again about the valley?';
+    'Sorry — I lost the thread there. Ask me again about western Pennsylvania or eastern Ohio?';
 
   try {
     await persistConversationTurn(userId, sessionId, String(message), reply, 'david-shenango');
@@ -152,8 +170,10 @@ export async function getShenangoSummary() {
   return {
     page: pickEn(content.brand?.name) || 'Shenango Valley',
     guide: pickEn(content.guide?.name) || 'David',
+    guideTitle: pickEn(content.guide?.title) || 'West Pennsylvania & East Ohio history expert',
     eraCount: (content.eras || []).length,
     siteCount: (content.sites || []).length,
+    mobCount: (content.mob || []).length,
     foodCount: (content.foods || []).length,
     livingCount: (content.living || []).length
   };

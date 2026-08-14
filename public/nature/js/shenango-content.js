@@ -96,17 +96,31 @@
       ['svSportsLead', 'sportsLead'],
       ['svMusicHeading', 'musicHeading'],
       ['svMusicLead', 'musicLead'],
+      ['svMobHeading', 'mobHeading'],
+      ['svMobLead', 'mobLead'],
       ['svFoodHeading', 'foodHeading'],
       ['svFoodLead', 'foodLead'],
       ['svLivingHeading', 'livingHeading'],
-      ['svLivingLead', 'livingLead']
+      ['svLivingLead', 'livingLead'],
+      ['svStoryModeKicker', 'storyModeKicker'],
+      ['svStoryModeCopy', 'storyModeCopy'],
+      ['svNarrateLabel', 'narrateScenes'],
+      ['svOnboardingHow', 'onboardingHow']
     ];
     map.forEach(([id, key]) => {
       const el = document.getElementById(id);
-      if (el && ui[key]) el.textContent = ui[key];
+      if (el && ui[key]) {
+        if (id === 'svOnboardingHow') {
+          el.innerHTML = `<strong>How to read this gallery:</strong> ${esc(ui[key]).replace(/^How to read this gallery:\s*/i, '')}`;
+        } else {
+          el.textContent = ui[key];
+        }
+      }
     });
     const hub = document.getElementById('svHubBadge');
     if (hub && ui.mapHubNote) hub.innerHTML = `<i class="bi bi-bullseye"></i> ${esc(ui.mapHubNote)}`;
+    const mobChip = document.querySelector('#svMapFilters [data-filter="mob"]');
+    if (mobChip && ui.mapMob) mobChip.textContent = ui.mapMob;
     const year = document.getElementById('svFooterYear');
     if (year) year.textContent = String(new Date().getFullYear());
   }
@@ -200,8 +214,23 @@
     fillGrid('svAmishGrid', d.amish, 'amish');
     fillGrid('svSportsGrid', d.sports, 'sports');
     fillGrid('svMusicGrid', d.music, 'music');
+    fillGrid('svMobGrid', d.mob, 'mob');
     fillGrid('svFoodGrid', d.foods, 'food');
     fillGrid('svLivingGrid', d.living, 'living');
+  }
+
+  function flipFirst(gridId) {
+    const card = document.querySelector(`#${gridId} .sv-card`);
+    if (!card) return;
+    document.querySelectorAll(`#${gridId} .sv-card.is-flipped`).forEach((el) => {
+      if (el !== card) el.classList.remove('is-flipped');
+    });
+    card.classList.add('is-flipped');
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function unflipAll() {
+    document.querySelectorAll('.sv-card.is-flipped').forEach((el) => el.classList.remove('is-flipped'));
   }
 
   function renderGallery() {
@@ -298,6 +327,7 @@
       amish: state.data?.amish,
       sports: state.data?.sports,
       music: state.data?.music,
+      mob: state.data?.mob,
       food: state.data?.foods,
       living: state.data?.living
     };
@@ -344,7 +374,15 @@
       }
     });
 
-    ['svSteelGrid', 'svAmishGrid', 'svSportsGrid', 'svMusicGrid', 'svFoodGrid', 'svLivingGrid'].forEach((id) => {
+    [
+      'svSteelGrid',
+      'svAmishGrid',
+      'svSportsGrid',
+      'svMusicGrid',
+      'svMobGrid',
+      'svFoodGrid',
+      'svLivingGrid'
+    ].forEach((id) => {
       document.getElementById(id)?.addEventListener('click', onCardClick);
     });
 
@@ -392,6 +430,10 @@
       if (params.get('video') === '1') {
         document.getElementById('svVideo')?.scrollIntoView({ behavior: 'smooth' });
       }
+      if (params.get('mob') === '1') {
+        document.getElementById('svMob')?.scrollIntoView({ behavior: 'smooth' });
+        window.ShenangoMap?.setFilter?.('mob');
+      }
     } catch (err) {
       console.error('shenango-content:', err);
       const list = document.getElementById('svEraList');
@@ -404,6 +446,10 @@
     t,
     speak,
     stopSpeech,
+    closeSheet,
+    openEra,
+    flipFirst,
+    unflipAll,
     getData: () => state.data,
     BUHL_CENTER
   };

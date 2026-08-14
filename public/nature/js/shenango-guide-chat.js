@@ -1,5 +1,5 @@
 /**
- * David — Shenango Valley expert chat (avatar + Google TTS).
+ * David — West PA / East Ohio expert chat (avatar + Google TTS).
  * Development work by David Lane
  */
 import AIChatWidget from '/shared/ai-chat-widget.js';
@@ -7,8 +7,8 @@ import AIChatWidget from '/shared/ai-chat-widget.js';
 const AVATAR = '/family/assets/david-lane-time-traveler-scene.png';
 
 const WELCOME = `<img src="${AVATAR}" alt="" style="width:64px;height:64px;border-radius:50%;margin-bottom:8px;border:2px solid #c48a3a;object-fit:cover"/>
-  <p>Welcome home — I'm <strong>David</strong>. Ask about Buhl Park at the center, Sharon Steel / Farrell, New Wilmington Amish roads, Steel Bowl sports, The Lettermen, or Trent Reznor from Mercer.</p>
-  <small class="text-muted">Try: "Why is Buhl Park the hub?" or "Tell me about Tony Butala." · Replies speak with Google TTS.</small>`;
+  <p>Welcome — I'm <strong>David</strong>, your scholastic expert for <strong>western Pennsylvania</strong> and <strong>eastern Ohio</strong>. Ask about Buhl Park, steel, Amish roads, sports, music, or Youngstown’s <strong>1970s</strong> Cleveland–Pittsburgh rackets war.</p>
+  <small class="text-muted">Try: "What happened in Youngstown in the 1970s?" or "What was the bug?" · Replies speak with Google TTS.</small>`;
 
 function forSpeech(text) {
   return String(text || '')
@@ -61,17 +61,18 @@ function initChat() {
     apiEndpoint: '/api/shenango/assistant/chat',
     userId: 'shenango-guest',
     sessionId: 'shenango-david',
-    title: 'David',
-    buttonTitle: 'Ask David — Shenango Valley guide',
-    inputPlaceholder: 'Ask about Buhl Park, steel, Lettermen, Reznor…',
+    title: 'David · West PA & East Ohio',
+    buttonTitle: 'Ask David — West PA & East Ohio history',
+    inputPlaceholder: 'Ask about Buhl Park, Youngstown, steel, Lettermen…',
     welcomeHtml: WELCOME,
     avatarUrl: AVATAR,
-    getContext: () => ({ lang: 'en' }),
+    getContext: () => ({ lang: 'en', region: 'west-pa-east-ohio' }),
     onOpen: () => unlockTts(),
     onMessageReceived: (response) => {
-      const text = typeof response === 'string'
-        ? response
-        : (response?.response || response?.reply || response?.message || '');
+      const text =
+        typeof response === 'string'
+          ? response
+          : response?.response || response?.reply || response?.message || '';
       speakReply(text);
     }
   });

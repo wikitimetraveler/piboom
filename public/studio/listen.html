@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Listening room — Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="/shared/design-tokens.css"/>
+  <link rel="stylesheet" href="/studio/css/studio.css"/>
+  <script src="/shared/menu-config.js"></script>
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/demo-users.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body class="st-page encompass-dark-mode">
+  <modern-navbar></modern-navbar>
+  <main class="st-listen">
+    <p class="st-kicker">One password</p>
+    <h1>What's out</h1>
+    <p class="st-lead">Bounces from the desk land here. Same password for everyone on the reel.</p>
+
+    <form id="stUnlock" class="st-panel" style="min-height:auto;margin-bottom:1.25rem">
+      <label class="st-status" for="stPassword">Listening password</label>
+      <input id="stPassword" type="password" autocomplete="current-password" placeholder="reel1"/>
+      <div class="st-transport" style="margin-top:0.75rem">
+        <button type="submit" class="st-btn st-btn--primary">Unlock</button>
+        <a class="st-btn st-btn--ghost" href="/studio/desk.html">Back to desk</a>
+      </div>
+      <p class="st-status" id="stUnlockMsg"></p>
+    </form>
+
+    <div id="stReleases" hidden></div>
+  </main>
+  <script src="/studio/js/studio-listen.js"></script>
+</body>
+</html>

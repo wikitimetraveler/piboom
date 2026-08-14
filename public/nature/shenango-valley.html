@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Shenango Valley — PA History Atlas | Buhl Park Center</title>
-  <meta name="description" content="Pennsylvania history concentrated on the Shenango Valley: Buhl Park at the map center, steel, Amish neighbors, sports, The Lettermen, Trent Reznor, photos and film."/>
+  <title>The Valley — West PA &amp; East Ohio History Gallery | Buhl Park</title>
+  <meta name="description" content="Museum-style atlas of western Pennsylvania and the Mahoning Valley edge: Buhl Park hub, steel, Amish neighbors, sports, music, Youngstown corridor history, HyperFrames reel, and AI expert David."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet"/>
@@ -32,27 +32,49 @@
       </div>
       <div class="container">
         <div class="sv-hero-layout">
-          <div class="sv-hero-inner">
-            <p class="sv-kicker" id="svHeroKicker">Mercer &amp; Lawrence Counties · Western Pennsylvania</p>
+          <div class="sv-hero-inner" id="svHeroInner">
+            <p class="sv-kicker" id="svHeroKicker">Regional history gallery · Mercer, Lawrence &amp; Mahoning</p>
             <h1 class="sv-hero-title" id="svHeroTitle">Shenango Valley</h1>
-            <p class="sv-hero-line" id="svHeroLine">Buhl Park at the center — steel, Amish neighbors, sports, and music from The Lettermen to Trent Reznor.</p>
+            <p class="sv-hero-line" id="svHeroLine">A scholastic atlas centered on Buhl Park — steel philanthropy, Amish neighbors, sports, music, and the Youngstown–Mahoning story just across the Ohio line.</p>
             <div class="sv-hero-cta">
               <a class="sv-btn sv-btn-primary" href="#svMap">
                 <i class="bi bi-geo-alt-fill"></i> <span id="svExploreLabel">Explore from Buhl Park</span>
               </a>
-              <a class="sv-btn sv-btn-ghost" href="#svVideo">
-                <i class="bi bi-play-circle"></i> Watch film
+              <button type="button" class="sv-btn sv-btn-sand" id="svStoryPlay" aria-pressed="false">
+                <i class="bi bi-film"></i> Play highlight reel
+              </button>
+              <a class="sv-btn sv-btn-ghost" href="#svMob">
+                <i class="bi bi-building"></i> Youngstown gallery
               </a>
             </div>
+            <section class="sv-story-mode" aria-label="Story Mode HyperFrames reel">
+              <div class="sv-story-mode-header">
+                <p class="sv-story-mode-kicker" id="svStoryModeKicker">Story Mode</p>
+                <label class="sv-story-narrate">
+                  <input type="checkbox" id="svStoryNarrate" checked />
+                  <span id="svNarrateLabel">Narrate scenes</span>
+                </label>
+              </div>
+              <p class="sv-story-mode-copy" id="svStoryModeCopy">
+                Guided HyperFrames reel in a memorial-wall tone — timed scenes, optional narration (Google TTS). Runs once; Escape stops.
+              </p>
+              <div class="sv-story-panel" id="svStoryPanel">
+                <div class="sv-story-status" id="svStoryStatus" hidden aria-live="polite">
+                  <span id="svStoryStatusText"></span>
+                  <div class="sv-story-dots" id="svStoryDots" aria-hidden="true"></div>
+                </div>
+                <p class="sv-story-error" id="svStoryError" hidden></p>
+              </div>
+            </section>
           </div>
 
-          <aside class="sv-guide" id="svGuide" aria-label="Shenango Valley guide David">
+          <aside class="sv-guide" id="svGuide" aria-label="West Pennsylvania and East Ohio history expert David">
             <div class="sv-guide-card">
-              <img class="sv-guide-portrait" id="svGuidePortrait" src="/family/assets/david-lane-time-traveler-scene.png" width="72" height="72" alt="David — Shenango Valley guide"/>
+              <img class="sv-guide-portrait" id="svGuidePortrait" src="/family/assets/david-lane-time-traveler-scene.png" width="72" height="72" alt="David — regional history expert"/>
               <div class="sv-guide-meta">
                 <h2 id="svGuideName">David</h2>
-                <p id="svGuideTitle">Shenango Valley history guide</p>
-                <p class="sv-guide-status" id="svGuideStatus">Welcome home.</p>
+                <p id="svGuideTitle">West Pennsylvania &amp; East Ohio history expert</p>
+                <p class="sv-guide-status" id="svGuideStatus">Welcome.</p>
               </div>
             </div>
             <div class="sv-guide-actions">
@@ -60,7 +82,7 @@
                 <i class="bi bi-camera-reels"></i> <span id="svMeetLabel">Meet David</span>
               </button>
               <button type="button" class="sv-btn sv-btn-sand sv-btn-sm" id="svAskGuide">
-                <i class="bi bi-chat-dots-fill"></i> <span id="svAskLabel">Ask David</span>
+                <i class="bi bi-chat-dots-fill"></i> <span id="svAskLabel">Ask the expert</span>
               </button>
               <button type="button" class="sv-btn sv-btn-ghost sv-btn-sm" id="svStopAudio">
                 <i class="bi bi-stop-fill"></i> <span>Stop</span>
@@ -72,6 +94,12 @@
     </section>
 
     <div class="container">
+      <section class="sv-onboarding" aria-label="How to read this gallery">
+        <p class="mb-0" id="svOnboardingHow">
+          <strong>How to read this gallery:</strong> Context = regional background. Evidence / On the ground = places and published record you can locate. Story Mode is a HyperFrames reel that walks the wall.
+        </p>
+      </section>
+
       <section class="sv-section sv-section--map-first" id="svMap">
         <div class="sv-section-head">
           <h2 id="svMapHeading">Atlas from Buhl Park</h2>
@@ -86,6 +114,7 @@
           <button type="button" class="sv-chip" data-filter="sports">Sports</button>
           <button type="button" class="sv-chip" data-filter="music">Music</button>
           <button type="button" class="sv-chip" data-filter="food">Food</button>
+          <button type="button" class="sv-chip" data-filter="mob">Mob / Youngstown</button>
         </div>
         <div class="sv-map-layout">
           <ul class="sv-site-list" id="svSiteList"></ul>
@@ -157,6 +186,18 @@
         <div class="sv-grid" id="svMusicGrid"></div>
       </section>
 
+      <section class="sv-section" id="svMob">
+        <div class="sv-section-head">
+          <h2 id="svMobHeading">Youngstown corridor — the 1970s war (gallery)</h2>
+          <p id="svMobLead">Big chapter: the 1970s. Cleveland and Pittsburgh factions fought for Mahoning Valley rackets while steel collapsed. Context vs Evidence — press nicknames, FBI reporting, later court testimony.</p>
+          <p class="sv-context-evidence-note">
+            <strong>Context:</strong> regional / press background.
+            <strong>Evidence:</strong> published reporting, public histories, and court-era summaries — not rumor.
+          </p>
+        </div>
+        <div class="sv-grid" id="svMobGrid"></div>
+      </section>
+
       <section class="sv-section" id="svFood">
         <div class="sv-section-head">
           <h2 id="svFoodHeading">The valley table</h2>
@@ -196,6 +237,18 @@
     </div>
   </div>
 
+  <div class="sv-story-overlay" id="svStoryOverlay" hidden aria-hidden="true" aria-live="polite">
+    <div class="sv-story-chip" id="svStoryChip">
+      <img id="svStoryChipImg" src="/family/assets/david-lane-time-traveler-scene.png" width="56" height="56" alt=""/>
+      <div>
+        <p class="sv-story-kicker" id="svStoryKicker"></p>
+        <h3 class="sv-story-title" id="svStoryTitle"></h3>
+        <p class="sv-story-body" id="svStoryCopy"></p>
+        <p class="sv-story-progress" id="svStoryProgress"></p>
+      </div>
+    </div>
+  </div>
+
   <script src="/shared/tts.js"></script>
   <script src="/shared/speech-recognition.js"></script>
   <script src="/family/js/lane-family-google-maps.js"></script>
@@ -203,6 +256,7 @@
   <script src="/nature/js/shenango-content.js"></script>
   <script src="/nature/js/shenango-map.js"></script>
   <script src="/nature/js/shenango-heygen.js"></script>
+  <script src="/nature/js/shenango-story-reel.js"></script>
   <script type="module" src="/nature/js/shenango-guide-chat.js"></script>
 </body>
 </html>

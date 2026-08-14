@@ -5,7 +5,7 @@
       "en": "Shenango Valley"
     },
     "tagline": {
-      "en": "Pennsylvania history from Buhl Park — steel, Amish neighbors, sports, and music."
+      "en": "A museum-style atlas of western Pennsylvania and the Mahoning Valley edge — steel, neighbors, sports, music, and cross-border history from Buhl Park."
     }
   },
   "guide": {
@@ -13,28 +13,28 @@
       "en": "David"
     },
     "title": {
-      "en": "Shenango Valley history guide"
+      "en": "West Pennsylvania & East Ohio history expert"
     },
     "portrait": "/family/assets/david-lane-time-traveler-scene.png",
     "greeting": {
-      "en": "Welcome home. I'm David — start at Buhl Park, then walk steel, Amish roads, Friday-night lights, and the music that left this valley."
+      "en": "Welcome. I am David — a regional historian for western Pennsylvania and eastern Ohio. We begin at Buhl Park, then read steel, Amish roads, Friday-night lights, music, and the Youngstown corridor just across the state line."
     }
   },
   "ui": {
     "en": {
       "dir": "ltr",
-      "heroKicker": "Mercer & Lawrence Counties · Western Pennsylvania",
+      "heroKicker": "Regional history gallery · Mercer, Lawrence & Mahoning",
       "heroTitle": "Shenango Valley",
-      "heroLine": "Buhl Park at the center — steel wealth that gifted a free green, Amish neighbors nearby, rival sports, and music from The Lettermen to Mercer County's Trent Reznor.",
+      "heroLine": "A scholastic atlas centered on Buhl Park — steel philanthropy, Amish neighbors, sports, music, and the Youngstown–Mahoning story just across the Ohio line.",
       "exploreMap": "Explore from Buhl Park",
-      "askGuide": "Ask David",
+      "askGuide": "Ask the expert",
       "meetGuide": "Meet David",
       "stop": "Stop",
       "listen": "Listen",
-      "timelineHeading": "Chapters of the valley",
-      "timelineLead": "Canal iron, steel boom, Buhl's gift, Amish neighbors, sports rivalries, and music. Select a chapter to hear it and find it on the map.",
+      "timelineHeading": "Gallery chapters",
+      "timelineLead": "Eight wall chapters: canal iron, steel boom, Buhl’s gift, Amish neighbors, Friday lights, music, Youngstown’s 1970s corridor, and living etiquette. Select a chapter for Context, then Listen.",
       "mapHeading": "Atlas from Buhl Park",
-      "mapLead": "Every spoke radiates from Buhl Park — Hermitage's 270-acre heart. Select a pin to hear its story.",
+      "mapLead": "Every spoke radiates from Buhl Park. Pins include Ohio sites just across the border. Select a pin for On-the-ground notes.",
       "mapAll": "All",
       "mapPark": "Park",
       "mapSteel": "Steel",
@@ -46,13 +46,13 @@
       "mapLoading": "Loading the atlas…",
       "mapHubNote": "Hub: Buhl Park",
       "steelHeading": "Steel business",
-      "steelLead": "Sharon Iron Works to Farrell's mill — Frank H. Buhl's fortune and the valley that worked the heat.",
+      "steelLead": "Sharon Works to Farrell’s Magic City — Frank H. Buhl’s fortune, immigrant labor, and the mill footprint that still shapes Mercer County’s Ohio border.",
       "amishHeading": "Amish neighbors",
-      "amishLead": "New Wilmington / Volant Old Order settlement since 1847 — drive with courtesy; neighbors, not a theme park.",
+      "amishLead": "New Wilmington / Volant Old Order settlement since 1847 — western PA Amish country. Courtesy first; neighbors, not a theme park.",
       "sportsHeading": "Sports",
-      "sportsLead": "Buhl's free fields and golf, Sharon Tigers football, Farrell Steelers basketball, and the Steel Bowl rivalry.",
+      "sportsLead": "Buhl’s free fields and golf, Sharon Tigers football, Farrell Steelers basketball, and the Steel Bowl rivalry.",
       "musicHeading": "Music",
-      "musicLead": "The Lettermen's Tony Butala from Sharon, Trent Reznor from Mercer, Maennerchor, Marjon Records, WPIC hops, and free concerts at Buhl.",
+      "musicLead": "Tony Butala / The Lettermen (Sharon), Trent Reznor (Mercer borough), WPIC, Marjon, Maennerchor, and free Buhl concerts.",
       "foodHeading": "The valley table",
       "foodLead": "After the mills — Quaker Steak & Lube and Luigi's Pizza. Flip a card for the story.",
       "livingHeading": "Living etiquette",
@@ -65,9 +65,19 @@
       "evidence": "On the ground",
       "mapShow": "Show on map",
       "mediaHeading": "Photos & film",
-      "mediaLead": "Commons photos on the cards — plus Lettermen, Reznor, and public-domain steel documentaries below.",
+      "mediaLead": "Real Commons photos from Sharon, Farrell, Hermitage, Sharpsville, New Wilmington, Mercer, and Youngstown — plus Lettermen and period industrial film below.",
       "videoHeading": "Watch",
-      "videoLead": "Verified embeds and archive films. Search links open more local clips."
+      "videoLead": "Verified embeds and archive films. Search links open more local clips.",
+      "mapMob": "Mob / Youngstown",
+      "mobHeading": "Youngstown corridor — the 1970s war (gallery)",
+      "mobLead": "Big chapter: the 1970s. Cleveland vs Pittsburgh for the bug; Black Monday at Sheet & Tube the same decade. Context vs Evidence — press, FBI, court testimony.",
+      "onboardingHow": "How to read this gallery: Context = regional background. Evidence / On the ground = places and published record you can locate. Story Mode is a HyperFrames reel that walks the wall.",
+      "storyModeKicker": "Story Mode",
+      "storyModeCopy": "Guided HyperFrames reel in a memorial-wall tone — timed scenes, optional narration (Google TTS). Runs once; Escape stops.",
+      "playReel": "Play highlight reel",
+      "pauseReel": "Pause reel",
+      "resumeReel": "Resume reel",
+      "narrateScenes": "Narrate scenes"
     }
   },
   "eras": [
@@ -75,16 +85,16 @@
       "id": "canal-iron",
       "siteId": "sharpsville-lock-10",
       "years": {
-        "en": "c. 1844–1890"
+        "en": "c. 1838–1871 → remnant"
       },
       "title": {
-        "en": "Canal iron along the Shenango"
+        "en": "Erie Extension Canal & early iron"
       },
       "copy": {
-        "en": "The Erie Extension Canal linked Pittsburgh to Lake Erie. Sharpsville's Lock 10 — the only surviving lock — marks the iron corridor before railroads remade the valley."
+        "en": "Context: The Beaver and Erie Canal system — including the Erie Extension Canal — aimed to join the Ohio River country to Lake Erie. Along the Shenango, iron furnaces and foundries grew before railroads took the freight. Evidence on the ground: Sharpsville’s Lock 10 is widely cited as the only surviving lock of that Erie Extension line in Pennsylvania — stone that outlived the boats. By the 1870s rail had remade the corridor; the lock remains a rare canal footprint for the valley atlas."
       },
       "narration": {
-        "en": "Before Sharon Steel, canal boats and blast furnaces shaped the Shenango. Start at Sharpsville Lock Ten — the last lock standing."
+        "en": "Chapter one — canal iron. Before Farrell’s mill and Buhl’s park, the Shenango carried boats toward Lake Erie. Sharpsville’s Lock Ten is the stone that survived. Stand there and you are reading the valley before steel was king."
       },
       "image": "/nature/assets/shenango/steel/sharpsville-lock.jpg"
     },
@@ -92,16 +102,16 @@
       "id": "steel-boom",
       "siteId": "farrell-steel",
       "years": {
-        "en": "1896–1970s"
+        "en": "c. 1890–1970s"
       },
       "title": {
-        "en": "Steel boom — Buhl to Farrell"
+        "en": "Steel boom — Sharon Works to Farrell"
       },
       "copy": {
-        "en": "Frank H. Buhl led Buhl Steel and helped build the Sharon Steel Works in South Sharon — today's Farrell. At peak, valley plants employed roughly ten thousand. The mill was the Magic City's lifeblood until late-century closures."
+        "en": "Context: Frank H. Buhl rose with Buhl Steel and the Sharon industrial complex; South Sharon’s mill town became Farrell as Sharon Steel Works drew immigrant labor into the “Magic City.” At mid-century peaks, Shenango Valley plants employed on the order of ten thousand. Evidence: Carnegie Steel “Sharon Works” rail equipment appears in period industrial photography; Farrell’s street grid and mill footprint still mark Mercer County’s Ohio-border steel belt. Closures and bankruptcies in the late twentieth century ended the big-mill era even as later operators kept steel on parts of the site."
       },
       "narration": {
-        "en": "Steel money built this valley. Frank Buhl's plants and Farrell's mill put thousands to work — and later funded the park at the center of our map."
+        "en": "Chapter two — steel. Frank Buhl’s fortune and Farrell’s mill put this valley on the industrial map. Hopper cars for Sharon Works, immigrant neighborhoods, and a skyline of heat. The Magic City rose fast. Remember it when you open the Youngstown chapter — the same belt, the same decade of loss."
       },
       "image": "/nature/assets/shenango/steel/farrell-steel.jpg"
     },
@@ -109,16 +119,16 @@
       "id": "buhl-gift",
       "siteId": "buhl-park",
       "years": {
-        "en": "1911–1916 → today"
+        "en": "1907–1915 → today"
       },
       "title": {
-        "en": "Buhl Park — the free green"
+        "en": "Buhl Farm Park — the free green"
       },
       "copy": {
-        "en": "Steel industrialist Frank and Julia Buhl deeded their farm as a free public park — Lake Julia, Casino ballroom, bandstand, athletic field, and the nation's only free nine-hole golf course. About two hundred seventy acres still hold the valley together."
+        "en": "Context: Between about 1907 and 1911 Frank H. Buhl assembled roughly two hundred sixty to two hundred seventy acres in Hickory Township — today’s Hermitage — preferring the word “farm” to “park” so no one would expect ticket booths and midway rides. With Julia Buhl and Cleveland architect Charles W. Hopkinson, the gift opened as free recreation: Lake Julia, Casino, bandstand, athletic fields, and a nine-hole golf course kept free for the public. Evidence: Buhl Mansion on East State Street in Sharon (1891, National Register) shows the Gilded Age wealth; Buhl Farm Drive still names the Hermitage approach. The atlas hub sits here because the valley still gathers here."
       },
       "narration": {
-        "en": "Everything on this atlas radiates from Buhl Park — Frank Buhl's gift so working families could recreate without a price."
+        "en": "Chapter three — the gift. Frank and Julia Buhl turned steel money into a free green. Lake Julia, the Casino, free golf — working families without a gate fee. Every pin on this map radiates from Buhl Farm Park."
       },
       "image": "/nature/assets/shenango/park/buhl-park.jpg"
     },
@@ -129,13 +139,13 @@
         "en": "1847 → today"
       },
       "title": {
-        "en": "Amish countryside nearby"
+        "en": "New Wilmington & Volant — Amish neighbors"
       },
       "copy": {
-        "en": "Old Order families from Mifflin County settled around New Wilmington about eighteen forty-seven. Brown-topped buggies and living farms — Lawrence and Mercer counties, not Lancaster."
+        "en": "Context: Old Order families with roots in Mifflin County settled the New Wilmington area around 1847 — western Pennsylvania Amish country in Lawrence and Mercer counties, not Lancaster. Brown-topped buggies, working farms, and the Volant market corridor remain living geography roughly ten miles from Buhl Park. Evidence / etiquette: treat people as neighbors, not exhibits — slow for buggies, buy when stands are open, photograph fields and towns, not faces or private yards without permission."
       },
       "narration": {
-        "en": "Southeast of Buhl Park, New Wilmington anchors western Pennsylvania Amish country. Share the road and keep cameras off people."
+        "en": "Chapter four — neighbors. New Wilmington and Volant keep Old Order roads alive southeast of the hub. Share the lane. Keep cameras off people. This is a living settlement, not a theme park."
       },
       "image": "/nature/assets/shenango/amish/new-wilmington.jpg"
     },
@@ -146,13 +156,13 @@
         "en": "1899 → today"
       },
       "title": {
-        "en": "Friday-night lights & Steelers basketball"
+        "en": "Friday lights — Tigers, Steelers, Steel Bowl"
       },
       "copy": {
-        "en": "Sharon Tigers football dates to eighteen ninety-nine; Tiger Stadium rose as a WPA project. Farrell Steelers basketball built a District Ten powerhouse. The Steel Bowl and gym rivalries still define valley Friday nights."
+        "en": "Context: Sharon Tigers football tradition reaches back to 1899; Tiger Stadium is remembered as a WPA-era home field. Farrell Steelers boys basketball became a District 10 powerhouse nicknamed for the mill town. The Sharon–Farrell Steel Bowl and packed gym nights still stitch the twin cities. Evidence of Buhl’s recreation ideal: the farm park itself opened with grandstand fields and free golf — sport as civic gift, not only Friday night scoreboard."
       },
       "narration": {
-        "en": "Sports stitch Sharon and Farrell together — Tiger Stadium, Steelers basketball, and the Steel Bowl. Buhl Park itself began with fields and free golf."
+        "en": "Chapter five — Friday lights. Sharon Tigers, Farrell Steelers, the Steel Bowl. Rival towns, shared valley. Buhl’s free fields came first — then the stadium nights that still fill the calendar."
       },
       "image": "/nature/assets/shenango/sports/football-stadium.jpg"
     },
@@ -163,15 +173,49 @@
         "en": "1938 → today"
       },
       "title": {
-        "en": "Music from harmony to industrial"
+        "en": "Music — Lettermen, airwaves, Mercer County"
       },
       "copy": {
-        "en": "Sharon's Tony Butala founded The Lettermen and dreamed a Vocal Group Hall of Fame downtown. Mercer County's Trent Reznor took another path — Nine Inch Nails. Between them: WPIC radio, Angel's Casino hops, Marjon Records, Maennerchor, and free summer nights at Buhl."
+        "en": "Context: WPIC signed on in 1938; mid-century hops, Marjon Records polka and local sides, Apollo Maennerchor (from 1870), Hermitage’s Menagerie, and free Buhl concerts fill the middle register. National careers: Sharon’s Tony Butala co-founded The Lettermen and pursued a Vocal Group Hall of Fame downtown; Mercer borough’s Trent Reznor — Mercer High jazz band, then Nine Inch Nails — is county orbit, not a Sharon childhood claim. Evidence: keep the towns straight on the map; listen to the Lettermen and the 1982 Mercer HS sax tape as primary sound, not rumor."
       },
       "narration": {
-        "en": "Two national careers from this county — The Lettermen from Sharon, Trent Reznor from Mercer — plus the stages and airwaves that kept the valley dancing."
+        "en": "Chapter six — music. Tony Butala took Sharon harmony to the nation. Trent Reznor took Mercer County jazz band to industrial rock. Between them: WPIC, Marjon, Maennerchor, and summer nights at Buhl. Two towns, one county — keep the geography honest."
       },
       "image": "/nature/assets/shenango/music/lettermen.jpg"
+    },
+    {
+      "id": "youngstown-corridor",
+      "siteId": "youngstown-federal-plaza",
+      "years": {
+        "en": "esp. 1970s (1963–1981)"
+      },
+      "title": {
+        "en": "Across the line — Youngstown 1970s"
+      },
+      "copy": {
+        "en": "Context: Youngstown sits between Cleveland and Pittsburgh, minutes from Sharon–Farrell, with no resident Cosa Nostra family — so both cities’ factions contested “the bug” (numbers), vending, and related rackets. The Saturday Evening Post’s March 1963 “Crime Town U.S.A.” fixed a media label. Evidence: mid-to-late 1970s Cleveland–Pittsburgh war (Carabbia / “Crabs” vs Prato–Naples–Strollo), the 6 Oct 1977 Danny Greene bombing case tying Ronnie Carabbia into Cleveland’s civil war, Charlie Carabbia’s Dec 1980 disappearance (later Strollo court testimony), and the same decade’s steel collapse — Youngstown Sheet & Tube’s Campbell Works shutdown of 19 Sept 1977, remembered as Black Monday. Museum rules: Context vs Evidence; no true-crime tourism."
+      },
+      "narration": {
+        "en": "Chapter seven — across the line. Youngstown’s big decade is the nineteen-seventies: Crime Town reputation already printed, then faction war, car bombs, Charlie Carabbia vanishing, and Black Monday at Sheet and Tube. Same commute belt as Sharon and Farrell. Read the cards as a museum wall."
+      },
+      "image": "/nature/assets/shenango/mob/youngstown-skyline.jpg"
+    },
+    {
+      "id": "living-valley",
+      "siteId": "buhl-park",
+      "years": {
+        "en": "Today"
+      },
+      "title": {
+        "en": "Living valley — etiquette & endowment"
+      },
+      "copy": {
+        "en": "Context: The atlas is not only past tense. Buhl Park’s trust and partners still fund free golf, concerts, and trails; Amish roads still need courtesy; steel footprints at Farrell and Youngstown still shape work and memory. Evidence of care: slow for buggies, support local tables when you can, and treat organized-crime history as published record — never private addresses or romanticized violence. The hub remains Buhl Farm Park because the valley still meets there."
+      },
+      "narration": {
+        "en": "Closing chapter — living valley. Keep Buhl free. Share Amish roads. Read Youngstown with Evidence, not rumor. The map still centers on the green Frank Buhl gave away."
+      },
+      "image": "/nature/assets/shenango/park/buhl-farm-drive.jpg"
     }
   ],
   "sites": [
@@ -361,7 +405,7 @@
       "blurb": {
         "en": "County neighbor, not Shenango mill-town — Trent Reznor grew up here, Mercer HS 1983, then Cleveland and Nine Inch Nails. Same county orbit from Buhl Park."
       },
-      "image": "/nature/assets/shenango/music/trent-reznor.jpg"
+      "image": "/nature/assets/shenango/music/mercer-courthouse.jpg"
     },
     {
       "id": "rockin-river",
@@ -413,6 +457,91 @@
         "en": "Shenango Valley pizza institution since 1955 — neighborhood loyalty near Buhl Park."
       },
       "image": "/nature/assets/shenango/food/pizza.jpg"
+    },
+    {
+      "id": "youngstown-federal-plaza",
+      "category": "mob",
+      "emoji": "🏛️",
+      "lat": 41.0997,
+      "lng": -80.6495,
+      "name": {
+        "en": "Youngstown Federal Plaza / downtown"
+      },
+      "place": {
+        "en": "Youngstown, OH"
+      },
+      "blurb": {
+        "en": "Mahoning County seat — civic core of the Ohio mill city just across from the Shenango Valley. About fifteen to twenty minutes from Sharon."
+      },
+      "image": "/nature/assets/shenango/mob/youngstown-federal.jpg"
+    },
+    {
+      "id": "mahoning-river-mills",
+      "category": "mob",
+      "emoji": "🏭",
+      "lat": 41.0935,
+      "lng": -80.648,
+      "name": {
+        "en": "Mahoning River mill corridor"
+      },
+      "place": {
+        "en": "Youngstown, OH"
+      },
+      "blurb": {
+        "en": "Steel, coke, and river logistics — the industrial geography that tied Youngstown to Farrell and Sharon. Context for both legitimate industry and the underground economy that fed on it."
+      },
+      "image": "/nature/assets/shenango/mob/yst-1915.jpg"
+    },
+    {
+      "id": "pa-oh-border-west-middlesex",
+      "category": "mob",
+      "emoji": "🛤️",
+      "lat": 41.174,
+      "lng": -80.466,
+      "name": {
+        "en": "PA–OH border approach"
+      },
+      "place": {
+        "en": "West Middlesex / Masury corridor"
+      },
+      "blurb": {
+        "en": "The state line between Mercer County, Pennsylvania, and Trumbull–Mahoning, Ohio. Same commute belt; different courts and newspapers — and historically different vice markets."
+      },
+      "image": "/nature/assets/shenango/park/shenango-river.jpg"
+    },
+    {
+      "id": "struthers-campbell-belt",
+      "category": "mob",
+      "emoji": "🎲",
+      "lat": 41.0523,
+      "lng": -80.5981,
+      "name": {
+        "en": "Struthers–Campbell mill towns"
+      },
+      "place": {
+        "en": "Struthers / Campbell, OH"
+      },
+      "blurb": {
+        "en": "Working-class Mahoning suburbs southeast of Youngstown where period reporting placed Cleveland-aligned card and dice games. Minutes from the PA line — same commute belt as Sharon–Farrell."
+      },
+      "image": "/nature/assets/shenango/mob/yst-ore-yard.jpg"
+    },
+    {
+      "id": "campbell-ohio",
+      "category": "mob",
+      "emoji": "♣️",
+      "lat": 41.0787,
+      "lng": -80.5754,
+      "name": {
+        "en": "Campbell, Ohio"
+      },
+      "place": {
+        "en": "Campbell, OH"
+      },
+      "blurb": {
+        "en": "Mahoning County mill suburb later tied in federal cases to large illegal gambling operations. Geography for the Pittsburgh-aligned Youngstown faction’s later cash businesses — Evidence belongs to the court record, not rumor."
+      },
+      "image": "/nature/assets/shenango/steel/sharon-downtown.jpg"
     }
   ],
   "steel": [
@@ -427,7 +556,7 @@
         "en": "Sharon Iron → Buhl Steel → park endowment"
       },
       "history": {
-        "en": "Yale-trained Frank H. Buhl rose through Sharon Iron Works, led Buhl Steel (1896), and helped build Sharon Steel Works in South Sharon (Farrell). After selling into the National/Carnegie orbit he poured fortune into Sharon — hospital, club, armory — and with Julia deeded Buhl Farm as free public recreation so mill families could gather without a ticket price."
+        "en": "Evidence: Frank H. Buhl (1848–1918) led Buhl Steel into the Sharon industrial complex and helped establish the Sharon Steel Works that remade South Sharon into Farrell. His 1891 Richardsonian Romanesque mansion on East State Street is on the National Register. Context: Gilded Age steel wealth returned as Buhl Farm Park — free recreation for the families who worked the heat."
       },
       "tags": {
         "en": [
@@ -449,7 +578,7 @@
         "en": "Mill town born overnight ~1901"
       },
       "history": {
-        "en": "South Sharon became Farrell when the steel works drew workers to the Shenango plain. Late-1920s valley plants employed around ten thousand. Sharon Steel's 1987 and 1992 bankruptcies closed the big mill; Caparo, Duferco, and later NLMK kept steel alive on the footprint. The town's nickname still echoes industrial speed."
+        "en": "Evidence: South Sharon became Farrell as the steel works drew workers almost overnight — the Magic City nickname. Late-1920s valley plants employed around ten thousand. Sharon Steel’s late-century bankruptcies closed the big mill; Caparo, Duferco, and later NLMK kept steel operations on parts of the footprint. Context: mill town identity outlived the furnaces."
       },
       "tags": {
         "en": [
@@ -458,7 +587,7 @@
           "NLMK"
         ]
       },
-      "image": "/nature/assets/shenango/steel/farrell-steel.jpg"
+      "image": "/nature/assets/shenango/steel/farrell-street.jpg"
     },
     {
       "id": "canal-lock",
@@ -480,7 +609,7 @@
           "1844"
         ]
       },
-      "image": "/nature/assets/shenango/steel/sharpsville-lock.jpg"
+      "image": "/nature/assets/shenango/steel/sharpsville-1901.jpg"
     }
   ],
   "amish": [
@@ -583,7 +712,7 @@
         "en": "Since 1899 — Pads of Glory"
       },
       "history": {
-        "en": "Sharon High football began as the Yellow Jackets before becoming the Tigers. Tiger Stadium, built with WPA labor, hosted legendary crowds — including nearly ten thousand for a 1956 Sharon–Farrell game. The Steel Bowl still names the rivalry."
+        "en": "Evidence: Sharon Tigers football tradition dates to 1899; Tiger Stadium is remembered as a WPA-era home. Context: Friday nights and Steel Bowl clashes with Farrell still define the twin-city calendar."
       },
       "tags": {
         "en": [
@@ -605,7 +734,7 @@
         "en": "District 10 powerhouse"
       },
       "history": {
-        "en": "Named for the mill town, Farrell Steelers boys basketball has stacked District 10 titles and deep playoff runs. Gym nights against Sharon remain among the valley's fiercest winter traditions."
+        "en": "Evidence: Farrell Steelers boys basketball built a District 10 reputation nicknamed for the mill town. Context: gym rivalries with Sharon pack the same shared labor market that filled the mills."
       },
       "tags": {
         "en": [
@@ -660,7 +789,7 @@
           "County"
         ]
       },
-      "image": "/nature/assets/shenango/music/trent-reznor.jpg"
+      "image": "/nature/assets/shenango/music/mercer-courthouse.jpg"
     },
     {
       "id": "buhl-concerts",
@@ -809,7 +938,7 @@
         "en": "Courtesy over spectacle"
       },
       "history": {
-        "en": "Slow for buggies, buy local when stands are open, and leave people out of your photos. New Wilmington is a living settlement — the map pin is geography, not an invitation to trespass."
+        "en": "Context & etiquette: New Wilmington / Volant Old Order roads are a living settlement since about 1847. Slow for buggies, buy when stands are open, leave people out of photos. The map pin is geography — not an invitation to trespass."
       },
       "tags": {
         "en": [
@@ -830,7 +959,7 @@
         "en": "Endowment + community partners"
       },
       "history": {
-        "en": "Frank Buhl said every activity should be free so working people could bring families. The trust, donations, and partners still fund golf, concerts, and trails. The map stays centered here because the valley still meets here."
+        "en": "Evidence: Frank Buhl insisted activities stay free so working people could bring families. The trust, donations, and community partners still fund golf, concerts, and trails on roughly 270 acres. Context: the atlas hub remains here because the valley still meets here."
       },
       "tags": {
         "en": [
@@ -846,85 +975,349 @@
       "id": "g-buhl",
       "image": "/nature/assets/shenango/park/buhl-park.jpg",
       "caption": {
-        "en": "Valley green — map hub at Buhl Park"
+        "en": "Hermitage civic green — Avenue of Flags (near Buhl Farm)"
+      }
+    },
+    {
+      "id": "g-buhl-drive",
+      "image": "/nature/assets/shenango/park/buhl-farm-drive.jpg",
+      "caption": {
+        "en": "Buhl Farm Drive at Mercer Avenue, Hermitage"
       }
     },
     {
       "id": "g-mansion",
       "image": "/nature/assets/shenango/steel/buhl-mansion.jpg",
       "caption": {
-        "en": "Buhl Mansion, Sharon — steel wealth"
+        "en": "Buhl Mansion, Sharon — National Register"
       }
     },
     {
       "id": "g-downtown",
       "image": "/nature/assets/shenango/steel/sharon-downtown.jpg",
       "caption": {
-        "en": "Downtown Sharon"
+        "en": "Downtown Sharon, Pennsylvania"
       }
     },
     {
-      "id": "g-steel",
+      "id": "g-sharon-works",
       "image": "/nature/assets/shenango/steel/farrell-steel.jpg",
       "caption": {
-        "en": "Steel mill atmosphere (historic industrial imagery)"
+        "en": "Carnegie Steel Sharon Works hopper car (period industrial)"
       }
     },
     {
-      "id": "g-lock",
+      "id": "g-farrell",
+      "image": "/nature/assets/shenango/steel/farrell-street.jpg",
+      "caption": {
+        "en": "PA 718 in Farrell, Pennsylvania"
+      }
+    },
+    {
+      "id": "g-canal",
       "image": "/nature/assets/shenango/steel/sharpsville-lock.jpg",
       "caption": {
-        "en": "Canal lock stonework — Erie Extension era"
+        "en": "Erie Extension Canal remnant"
+      }
+    },
+    {
+      "id": "g-sharpsville",
+      "image": "/nature/assets/shenango/steel/sharpsville-1901.jpg",
+      "caption": {
+        "en": "Sharpsville bird’s-eye, 1901"
       }
     },
     {
       "id": "g-amish",
       "image": "/nature/assets/shenango/amish/new-wilmington.jpg",
       "caption": {
-        "en": "New Wilmington"
+        "en": "New Wilmington, Pennsylvania"
       }
     },
     {
       "id": "g-volant",
       "image": "/nature/assets/shenango/amish/volant.jpg",
       "caption": {
-        "en": "Volant corridor"
+        "en": "Volant, Pennsylvania"
       }
     },
     {
       "id": "g-lettermen",
       "image": "/nature/assets/shenango/music/lettermen.jpg",
       "caption": {
-        "en": "The Lettermen (1964)"
+        "en": "The Lettermen, 1964"
       }
     },
     {
-      "id": "g-reznor",
-      "image": "/nature/assets/shenango/music/trent-reznor.jpg",
+      "id": "g-mercer",
+      "image": "/nature/assets/shenango/music/mercer-courthouse.jpg",
       "caption": {
-        "en": "Trent Reznor"
+        "en": "Mercer County Courthouse — Reznor’s county seat"
       }
     },
     {
-      "id": "g-football",
-      "image": "/nature/assets/shenango/sports/football-stadium.jpg",
+      "id": "g-youngstown",
+      "image": "/nature/assets/shenango/mob/youngstown-skyline.jpg",
       "caption": {
-        "en": "Friday-night lights"
+        "en": "Downtown Youngstown skyline"
       }
     },
     {
-      "id": "g-qsl",
-      "image": "/nature/assets/shenango/food/quaker-steak.jpg",
+      "id": "g-federal",
+      "image": "/nature/assets/shenango/mob/youngstown-federal.jpg",
       "caption": {
-        "en": "Quaker Steak & Lube culture"
+        "en": "Youngstown Central Square / West Federal"
+      }
+    },
+    {
+      "id": "g-yst",
+      "image": "/nature/assets/shenango/mob/yst-1915.jpg",
+      "caption": {
+        "en": "Youngstown Sheet & Tube Company, 1915"
+      }
+    },
+    {
+      "id": "g-ore",
+      "image": "/nature/assets/shenango/mob/yst-ore-yard.jpg",
+      "caption": {
+        "en": "YST ore yard, 1930"
       }
     },
     {
       "id": "g-river",
       "image": "/nature/assets/shenango/park/shenango-river.jpg",
       "caption": {
-        "en": "Shenango River country"
+        "en": "Shenango River Lake near Hermitage"
       }
+    },
+    {
+      "id": "g-wings",
+      "image": "/nature/assets/shenango/food/quaker-steak.jpg",
+      "caption": {
+        "en": "Chicken wings — Quaker Steak & Lube table signature"
+      }
+    }
+  ],
+  "mob": [
+    {
+      "id": "cross-border-belt",
+      "siteId": "pa-oh-border-west-middlesex",
+      "emoji": "🗺️",
+      "name": {
+        "en": "One industrial belt, two states"
+      },
+      "tagline": {
+        "en": "Context · geography first"
+      },
+      "history": {
+        "en": "Context: Youngstown sits roughly sixty miles from both Cleveland and Pittsburgh, and about fifteen to twenty minutes from Sharon–Farrell. The Shenango and Mahoning valleys were one labor market — mills, leagues, and nightlife crossed the line. Contested rackets followed the same map."
+      },
+      "tags": {
+        "en": [
+          "Context",
+          "Geography",
+          "Border"
+        ]
+      },
+      "image": "/nature/assets/shenango/park/shenango-river.jpg"
+    },
+    {
+      "id": "no-resident-family",
+      "siteId": "youngstown-federal-plaza",
+      "emoji": "⚔️",
+      "name": {
+        "en": "No home family — two claimants"
+      },
+      "tagline": {
+        "en": "Context · Cleveland vs Pittsburgh"
+      },
+      "history": {
+        "en": "Context: Historians note Youngstown was too small for a resident Cosa Nostra family, so Cleveland and Pittsburgh split — then fought over — local gambling, vending, and related rackets. That structural fact explains why the Valley saw repeated turf wars instead of one stable “home” outfit."
+      },
+      "tags": {
+        "en": [
+          "Context",
+          "Cleveland",
+          "Pittsburgh"
+        ]
+      },
+      "image": "/nature/assets/shenango/mob/youngstown-skyline.jpg"
+    },
+    {
+      "id": "crimetown-label",
+      "siteId": "youngstown-federal-plaza",
+      "emoji": "📰",
+      "name": {
+        "en": "1963 — “Crime Town U.S.A.”"
+      },
+      "tagline": {
+        "en": "Context · Saturday Evening Post"
+      },
+      "history": {
+        "en": "Context: In March 1963 the Saturday Evening Post ran John Kobler’s “Crime Town U.S.A.,” citing a decade of bombings and killings and open hobnobbing between officials and racketeers. The nickname stuck. Treat it as period journalism — then ask what later courts and FBI files proved."
+      },
+      "tags": {
+        "en": [
+          "Context",
+          "1963",
+          "Press"
+        ]
+      },
+      "image": "/nature/assets/shenango/mob/youngstown-skyline.jpg"
+    },
+    {
+      "id": "the-bug",
+      "siteId": "struthers-campbell-belt",
+      "emoji": "🔢",
+      "name": {
+        "en": "“The bug” — numbers gambling"
+      },
+      "tagline": {
+        "en": "Evidence · local racket vocabulary"
+      },
+      "history": {
+        "en": "Evidence (public history): Locals called the numbers or policy game “the bug.” Mid-century bombing wars over bug territories helped earn Youngstown the “Bomb Town” reputation before the 1970s climax. Cash from mill paydays fed the underground economy — Context for why the stakes stayed high."
+      },
+      "tags": {
+        "en": [
+          "Evidence",
+          "The bug",
+          "Gambling"
+        ]
+      },
+      "image": "/nature/assets/shenango/mob/yst-ore-yard.jpg"
+    },
+    {
+      "id": "seventies-peak",
+      "siteId": "struthers-campbell-belt",
+      "emoji": "💥",
+      "name": {
+        "en": "The 1970s — decisive decade"
+      },
+      "tagline": {
+        "en": "Evidence · mid-to-late 1970s war"
+      },
+      "history": {
+        "en": "Evidence: Through the mid-1970s the Valley remained split — Cleveland interests tied to the Carabbia brothers (“the Crabs”) and Pittsburgh interests around James “Jimmy” Prato with Joseph “Joey” Naples and Lenine “Lenny” Strollo. After Cleveland boss John Scalish died in 1976 and local leadership shook, published histories describe a Youngstown faction war peaking about 1978–1981, with a cluster of murders as Pittsburgh pressed for monopoly. Same decade: Youngstown’s steel collapse."
+      },
+      "tags": {
+        "en": [
+          "Evidence",
+          "1970s",
+          "War"
+        ]
+      },
+      "image": "/nature/assets/shenango/mob/yst-ore-yard.jpg"
+    },
+    {
+      "id": "carabbia-greene",
+      "siteId": "struthers-campbell-belt",
+      "emoji": "🔗",
+      "name": {
+        "en": "1977 — Cleveland war spills south"
+      },
+      "tagline": {
+        "en": "Evidence · Greene bombing & Carabbia"
+      },
+      "history": {
+        "en": "Evidence: On 6 October 1977 Irish labor figure Danny Greene was killed by car bomb in Cleveland. Ronald “Ronnie the Crab” Carabbia of the Youngstown–Struthers Cleveland faction was among those convicted in connection with that murder. The Cleveland family’s late-1970s civil war weakened its hold; Youngstown’s balance of power shifted in those same years."
+      },
+      "tags": {
+        "en": [
+          "Evidence",
+          "1977",
+          "Carabbia"
+        ]
+      },
+      "image": "/nature/assets/shenango/mob/yst-ore-yard.jpg"
+    },
+    {
+      "id": "charlie-crab-1980",
+      "siteId": "youngstown-federal-plaza",
+      "emoji": "🍩",
+      "name": {
+        "en": "1980 — Charlie Carabbia vanishes"
+      },
+      "tagline": {
+        "en": "Evidence · later court testimony"
+      },
+      "history": {
+        "en": "Evidence: Charles “Charlie the Crab” Carabbia disappeared in December 1980 after being lured to a meeting; his car was later found in Cleveland. In 1990s federal proceedings, Lenny Strollo testified that Prato and Naples ordered the killing to cement Pittsburgh control of Youngstown, and that he placed the summoning call. That testimony is court Evidence — museum reading states what was sworn, not street legend."
+      },
+      "tags": {
+        "en": [
+          "Evidence",
+          "1980",
+          "Strollo"
+        ]
+      },
+      "image": "/nature/assets/shenango/mob/youngstown-federal.jpg"
+    },
+    {
+      "id": "steel-and-rackets",
+      "siteId": "mahoning-river-mills",
+      "emoji": "🏭",
+      "name": {
+        "en": "Steel collapse, same decade"
+      },
+      "tagline": {
+        "en": "Context · 1970s Mahoning economy"
+      },
+      "history": {
+        "en": "Context: The United States steel industry’s deep 1970s decline hit Youngstown hard — Black Monday plant shutdowns became regional memory. Organized crime did not “cause” deindustrialization, but historians note rackets thrived where cash economies, patronage, and weak civic trust overlapped with mill-town decline. Read both stories on one map."
+      },
+      "tags": {
+        "en": [
+          "Context",
+          "Steel",
+          "1970s"
+        ]
+      },
+      "image": "/nature/assets/shenango/mob/yst-1915.jpg"
+    },
+    {
+      "id": "federal-era",
+      "siteId": "youngstown-federal-plaza",
+      "emoji": "📜",
+      "name": {
+        "en": "Aftermath — 1990s federal sweep"
+      },
+      "tagline": {
+        "en": "Evidence · FBI / RICO era"
+      },
+      "history": {
+        "en": "Evidence: The violent 1970s climax left Pittsburgh dominant into the Naples–Strollo years. A major late-1990s FBI investigation produced dozens of indictments; Strollo cooperated and testified. That cleanup is the legal coda — the gallery’s center of gravity remains the 1970s war that decided who ran the Valley."
+      },
+      "tags": {
+        "en": [
+          "Evidence",
+          "1990s",
+          "Courts"
+        ]
+      },
+      "image": "/nature/assets/shenango/mob/youngstown-federal.jpg"
+    },
+    {
+      "id": "how-to-read-mob",
+      "siteId": "youngstown-federal-plaza",
+      "emoji": "🎓",
+      "name": {
+        "en": "How to read this room"
+      },
+      "tagline": {
+        "en": "Museum etiquette"
+      },
+      "history": {
+        "en": "Scholastic rules: Context = geography and press reputation. Evidence = contemporary reporting, FBI affidavits entered in public hearings, and sworn court testimony. Do not romanticize bombings. Do not invent private addresses. Neighboring Shenango towns appear because the border is porous — not because every mill worker was involved."
+      },
+      "tags": {
+        "en": [
+          "Museum",
+          "Ethics",
+          "Context"
+        ]
+      },
+      "image": "/nature/assets/shenango/park/buhl-park.jpg"
     }
   ]
 }

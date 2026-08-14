@@ -1,13 +1,16 @@
 {
-  "updatedAt": "2026-08-12T06:11:22.183Z",
+  "updatedAt": "2026-08-13T02:45:41.087Z",
   "credits": {
     "buhl-park": {
       "image": "/nature/assets/shenango/park/buhl-park.jpg",
-      "source": "https://commons.wikimedia.org/wiki/File:VIEW_OF_NORTHERN_APPROACH_TO_BRIDGE_-_College_Avenue_Bridge,_Pennsylvania_Route_58-_Legislative_Route_82_spanning_Little_Shenango_River,_Greenville,_Mercer_County,_PA_HAER_PA,43-GRENV,4-2.tif",
-      "title": "File:VIEW OF NORTHERN APPROACH TO BRIDGE - College Avenue Bridge, Pennsylvania Route 58- Legislative Route 82 spanning Little Shenango River, Greenville, Mercer County, PA HAER PA,43-GRENV,4-2.tif",
-      "artist": " \nMcHugh, William P., creator ",
-      "license": "Public domain",
-      "query": "Shenango River Pennsylvania landscape"
+      "source": "https://commons.wikimedia.org/wiki/File:Hermitage_Avenue_of_Flags.jpg",
+      "title": "File:Hermitage Avenue of Flags.jpg",
+      "artist": "Muryat Tanyel",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "caption": "Looking north from State Street along the Avenue of Flags in Hermitage , Pennsylvania , United States .",
+      "note": "Hermitage, PA — park-city civic green near Buhl Farm Drive",
+      "commonsFile": "Hermitage Avenue of Flags.jpg"
     },
     "sharon-downtown": {
       "image": "/nature/assets/shenango/steel/sharon-downtown.jpg",
@@ -21,19 +24,25 @@
     },
     "farrell-steel": {
       "image": "/nature/assets/shenango/steel/farrell-steel.jpg",
-      "source": "https://commons.wikimedia.org/wiki/File:Machine_Hall,_Old_Bethlehem_Steel_Mill,_Bethlehem,_PA.jpg",
-      "title": "File:Machine Hall, Old Bethlehem Steel Mill, Bethlehem, PA.jpg",
-      "artist": "w_lemay",
-      "license": "CC BY-SA 2.0",
-      "query": "Bethlehem Steel mill exterior"
+      "source": "https://commons.wikimedia.org/wiki/File:Hopper_car_belonging_to_the_Carnegie_Steel_Company,_Sharon_Works_at_the_Ralston_Steel_Car_Company_-_DPLA_-_2eed2d23b7e170faddb4101fdf31cf88.jpg",
+      "title": "File:Hopper car belonging to the Carnegie Steel Company, Sharon Works at the Ralston Steel Car Company - DPLA - 2eed2d23b7e170faddb4101fdf31cf88.jpg",
+      "artist": "Unknown",
+      "license": "No restrictions",
+      "licenseUrl": "//commons.wikimedia.org/wiki/File:Hopper_car_belonging_to_the_Carnegie_Steel_Company,_Sharon_Works_at_the_Ralston_Steel_Car_Company_-_DPLA_-_2eed2d23b7e170faddb4101fdf31cf88.jpg",
+      "caption": "A photograph of a steel, two-bay, hopper car belonging to the Carnegie Steel Company, Sharon Works at the Ralston Steel Car Company. The car was built in September 1917, but the date of the image is not known. For forty-eight years the Ralston Steel Car Co. was a fixture on the e",
+      "note": "Carnegie Steel Sharon Works hopper — actual Sharon steel rail traffic",
+      "commonsFile": "Hopper car belonging to the Carnegie Steel Company, Sharon Works at the Ralston Steel Car Company - DPLA - 2eed2d23b7e170faddb4101fdf31cf88.jpg"
     },
     "sharpsville-lock": {
       "image": "/nature/assets/shenango/steel/sharpsville-lock.jpg",
-      "source": "https://commons.wikimedia.org/wiki/File:GENERAL_VIEW_LOOKING_SOUTH_FROM_FOOTBRIDGE_-_Ohio_and_Erie_Canal,_Lock_No._39,_West_side_of_Canal_Road,_3400_feet_north_of_Stone_Road,_Valley_View,_Cuyahoga_County,_OH_HAER_OHIO,18-VAVI,4-1.tif",
-      "title": "File:GENERAL VIEW LOOKING SOUTH FROM FOOTBRIDGE - Ohio and Erie Canal, Lock No. 39, West side of Canal Road, 3400 feet north of Stone Road, Valley View, Cuyahoga County, OH HAER OHIO,18-VAVI,4-1.tif",
-      "artist": "",
+      "source": "https://commons.wikimedia.org/wiki/File:Erie_Extension_Canal_in_Sadsbury_Township.jpg",
+      "title": "File:Erie Extension Canal in Sadsbury Township.jpg",
+      "artist": "Nyttend",
       "license": "Public domain",
-      "query": "Ohio and Erie Canal lock stone"
+      "licenseUrl": "",
+      "caption": "Looking northwest from Pennsylvania Route 618 along the old route of the Erie Extension Canal in Sadsbury Township , Crawford County , Pennsylvania , United States .",
+      "note": "Erie Extension Canal remnant (correct canal system)",
+      "commonsFile": "Erie Extension Canal in Sadsbury Township.jpg"
     },
     "buhl-mansion": {
       "image": "/nature/assets/shenango/steel/buhl-mansion.jpg",
@@ -67,11 +76,14 @@
     },
     "football": {
       "image": "/nature/assets/shenango/sports/football-stadium.jpg",
-      "source": "https://commons.wikimedia.org/wiki/File:Johns_Hopkins_Takes_Down_Army_In_Physical_Season_Finale_(8711299520).jpg",
-      "title": "File:Johns Hopkins Takes Down Army In Physical Season Finale (8711299520).jpg",
-      "artist": "U.S. Army Photo by Tommy Gilligan/USMA PAO",
-      "license": "Public domain",
-      "query": "American football stadium night lights"
+      "source": "https://commons.wikimedia.org/wiki/File:Celina_High_School,_Friday_Night_Football.jpg",
+      "title": "File:Celina High School, Friday Night Football.jpg",
+      "artist": "Heidi Knapp",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "Image of the Celina (TX) High School football field at night, with lights above and five flags waved by the dance team that spell out \"Celina\".",
+      "note": "Midwest Friday-night lights (atmosphere closer than college Army game)",
+      "commonsFile": "Celina High School, Friday Night Football.jpg"
     },
     "basketball": {
       "image": "/nature/assets/shenango/sports/basketball.jpg",
@@ -130,8 +142,9 @@
       "artist": "National Broadcasting Company Uploaded by We hope at en.wikipedia",
       "license": "Public domain",
       "licenseUrl": "",
-      "query": "vintage radio studio microphone",
-      "caption": "Promotional give-away bookmark die cut in the shape of a microphone given to those taking the NBC Radio City New York tour of the NBC broadcast facility, 1935."
+      "caption": "Promotional give-away bookmark die cut in the shape of a microphone given to those taking the NBC Radio City New York tour of the NBC broadcast facility, 1935.",
+      "note": "Radio tower fallback",
+      "commonsFile": "Nbc studio tour bookmark 1935.JPG"
     },
     "concert": {
       "image": "/nature/assets/shenango/music/outdoor-concert.jpg",
@@ -145,23 +158,25 @@
     },
     "quaker-steak": {
       "image": "/nature/assets/shenango/food/quaker-steak.jpg",
-      "source": "https://commons.wikimedia.org/wiki/File:Lube_01.JPG",
-      "title": "File:Lube 01.JPG",
-      "artist": "Prasopestilence",
-      "license": "CC BY-SA 3.0",
-      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
-      "query": "Quaker Steak and Lube Sharon",
-      "caption": "Lubě - vrba u potoka a bazén"
+      "source": "https://commons.wikimedia.org/wiki/File:Buffalo_wings-01.jpg",
+      "title": "File:Buffalo wings-01.jpg",
+      "artist": "Clotee Pridgen Allochuku",
+      "license": "CC BY 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "caption": "Buffalo Wings mit Dip-Sauce und Staudensellerie.",
+      "note": "Buffalo / chicken wings plate — QSL signature food (no Commons Sharon storefront)",
+      "commonsFile": "Buffalo wings-01.jpg"
     },
     "pizza": {
       "image": "/nature/assets/shenango/food/pizza.jpg",
-      "source": "https://commons.wikimedia.org/wiki/File:Pizza_parlor_and_computer_shop,_Felton,_PA,_Feb._2026.jpg",
-      "title": "File:Pizza parlor and computer shop, Felton, PA, Feb. 2026.jpg",
-      "artist": "Mr. Matté (if there is an issue with this image, contact me using this image's Commons talk page , my Commons user talk page , or my English Wikipedia user talk page ; I'll know about it a lot faster)",
+      "source": "https://commons.wikimedia.org/wiki/File:Cheese_pizza.jpg",
+      "title": "File:Cheese pizza.jpg",
+      "artist": "Hiba Umair",
       "license": "CC BY-SA 4.0",
       "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
-      "query": "pizza parlor Pennsylvania",
-      "caption": "Photo of a pizza parlor and computer shop in Felton , Pennsylvania . Photo taken from Red Lion Avenue (SR 2079) looking northwest."
+      "caption": "Was made on cousin's birthday :D",
+      "note": "Cheese pizza — valley table stand-in if file exists; fallback below",
+      "commonsFile": "Cheese pizza.jpg"
     },
     "shenango-river": {
       "image": "/nature/assets/shenango/park/shenango-river.jpg",
@@ -182,6 +197,105 @@
       "licenseUrl": "",
       "query": "Frank H Buhl",
       "caption": "Eastern side and front of the Frank H. Buhl Mansion , located at 422 E. State Street ( Route 518 ) in Sharon , Pennsylvania , United States . Built in 1891, it is listed on the National Register of Historic Places ."
+    },
+    "buhl-farm-drive": {
+      "image": "/nature/assets/shenango/park/buhl-farm-drive.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:2022-06-05_16_12_36_View_north_along_Pennsylvania_State_Route_418_(Mercer_Avenue)_at_Buhl_Farm_Drive_in_Hermitage,_Mercer_County,_Pennsylvania.jpg",
+      "title": "File:2022-06-05 16 12 36 View north along Pennsylvania State Route 418 (Mercer Avenue) at Buhl Farm Drive in Hermitage, Mercer County, Pennsylvania.jpg",
+      "artist": "Famartin",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "View north along Pennsylvania State Route 418 (Mercer Avenue) at Buhl Farm Drive in Hermitage, Mercer County, Pennsylvania",
+      "note": "Buhl Farm Drive / Mercer Ave, Hermitage",
+      "commonsFile": "2022-06-05 16 12 36 View north along Pennsylvania State Route 418 (Mercer Avenue) at Buhl Farm Drive in Hermitage, Mercer County, Pennsylvania.jpg"
+    },
+    "farrell-street": {
+      "image": "/nature/assets/shenango/steel/farrell-street.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:PA_718_sb_in_Farrell,_June_2024.jpg",
+      "title": "File:PA 718 sb in Farrell, June 2024.jpg",
+      "artist": "Mr. Matté (if there is an issue with this image, contact me using this image's Commons talk page , my Commons user talk page , or my English Wikipedia user talk page ; I'll know about it a lot faster)",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "Photo of southbound Pennsylvania Route 718 (Martin Luther King Boulevard; unsigned PA 760 ) in Farrell , Pennsylvania . Photo taken looking south-southeast between Federal Street and Roemer Boulevard.",
+      "note": "PA 718 in Farrell, PA (2024)",
+      "commonsFile": "PA 718 sb in Farrell, June 2024.jpg"
+    },
+    "farrell-industry": {
+      "image": "/nature/assets/shenango/steel/farrell-industry.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Independent_Draft_Gear_and_its_neighbors,_Farrell.jpg",
+      "title": "File:Independent Draft Gear and its neighbors, Farrell.jpg",
+      "artist": "Nyttend",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "caption": "An industrial complex in Farrell , Pennsylvania , United States , seen looking south from Pennsylvania Routes 718 / 760 north of the Staunton Street intersection.",
+      "note": "Industrial Farrell neighbors",
+      "commonsFile": "Independent Draft Gear and its neighbors, Farrell.jpg"
+    },
+    "sharpsville-1901": {
+      "image": "/nature/assets/shenango/steel/sharpsville-1901.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Sharpsville,_Mercer_County_Pennsylvania,_1901_LCCN2003681828.jpg",
+      "title": "File:Sharpsville, Mercer County Pennsylvania, 1901 LCCN2003681828.jpg",
+      "artist": "Popular Graphic Arts",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "caption": "Title: Sharpsville, Mercer County Pennsylvania, 1901 Physical description: 1 print. Notes: This record contains unverified data from PGA shelflist card.; Associated name on shelflist card: Fowler, T.M.",
+      "note": "Sharpsville bird’s-eye 1901",
+      "commonsFile": "Sharpsville, Mercer County Pennsylvania, 1901 LCCN2003681828.jpg"
+    },
+    "youngstown-skyline": {
+      "image": "/nature/assets/shenango/mob/youngstown-skyline.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Downtown_Youngstown_Skyline.JPG",
+      "title": "File:Downtown Youngstown Skyline.JPG",
+      "artist": "Kasamias9",
+      "license": "CC BY-SA 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "caption": "A picture of the skyline of Downtown Youngstown.",
+      "note": "Downtown Youngstown skyline",
+      "commonsFile": "Downtown Youngstown Skyline.JPG"
+    },
+    "youngstown-federal": {
+      "image": "/nature/assets/shenango/mob/youngstown-federal.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Youngstown,_Ohio_Central_Square_West_Federal_Street.jpg",
+      "title": "File:Youngstown, Ohio Central Square West Federal Street.jpg",
+      "artist": "Jack Pearce from Boardman, OH, USA",
+      "license": "CC BY-SA 2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "caption": "Youngstown Downtown's Central Square (Federal Plaza). A view from the Square west on Federal Street.",
+      "note": "Central Square / West Federal Street, Youngstown",
+      "commonsFile": "Youngstown, Ohio Central Square West Federal Street.jpg"
+    },
+    "yst-1915": {
+      "image": "/nature/assets/shenango/mob/yst-1915.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Youngstown_Sheet_and_Tube_Company_1915.jpg",
+      "title": "File:Youngstown Sheet and Tube Company 1915.jpg",
+      "artist": "Youngstown Vindicator",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "caption": "View of the Youngstown Sheet and Tube Company steel mill in 1915",
+      "note": "Youngstown Sheet & Tube 1915",
+      "commonsFile": "Youngstown Sheet and Tube Company 1915.jpg"
+    },
+    "yst-ore": {
+      "image": "/nature/assets/shenango/mob/yst-ore-yard.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Ore_yard_-_Youngstown_Sheet_and_Tube_1930.jpg",
+      "title": "File:Ore yard - Youngstown Sheet and Tube 1930.jpg",
+      "artist": "Ewing Galloway, photograph. Crowther, Samuel. \"Ohio Versus Wall Street\", The World's Work , June 1930, p. 24",
+      "license": "Public domain",
+      "licenseUrl": "",
+      "caption": "Ore yard at Youngstown Sheet and Tube steel plant in Youngstown, Ohio, USA in 1930",
+      "note": "YST ore yard 1930",
+      "commonsFile": "Ore yard - Youngstown Sheet and Tube 1930.jpg"
+    },
+    "mercer-courthouse": {
+      "image": "/nature/assets/shenango/music/mercer-courthouse.jpg",
+      "source": "https://commons.wikimedia.org/wiki/File:Mercer_County_Courthouse_Pennsylvania_2010.jpg",
+      "title": "File:Mercer County Courthouse Pennsylvania 2010.jpg",
+      "artist": "Canadian2006",
+      "license": "CC BY-SA 3.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+      "caption": "Mercer County Courthouse, Mercer, Pennsylvania. Built 1909.",
+      "note": "Mercer County Courthouse — Reznor hometown county seat",
+      "commonsFile": "Mercer County Courthouse Pennsylvania 2010.jpg"
     }
   }
 }

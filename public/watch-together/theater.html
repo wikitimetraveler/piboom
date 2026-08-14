@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Theater · Watch together.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/watch-together/css/watch-together.css">
+</head>
+<body class="wt-body">
+  <div class="wt-glow" aria-hidden="true"></div>
+  <div class="wt-scanlines" aria-hidden="true"></div>
+  <a class="wt-home-link" href="/watch-together/">Back</a>
+
+  <main class="wt-theater">
+    <header class="wt-theater-top">
+      <h1 class="wt-brand">Watch <span>together.</span></h1>
+      <div class="wt-viewers" id="wtViewers" aria-label="People in the theater"></div>
+    </header>
+
+    <div class="wt-load">
+      <input id="wtUrl" type="url" placeholder="Paste a YouTube link or a video URL" autocomplete="off">
+      <button class="wt-enter" id="wtLoad" type="button">Load</button>
+    </div>
+
+    <div class="wt-stage-grid">
+      <div class="wt-stage-main">
+        <div class="wt-player-shell">
+          <div id="wtYt" class="yt" hidden></div>
+          <video id="wtFile" hidden playsinline controls></video>
+          <canvas id="wtDraw" class="wt-draw" aria-hidden="true"></canvas>
+          <p class="wt-empty" id="wtEmpty">Paste a YouTube link. Everyone stays on the same frame.</p>
+          <div class="wt-tap" id="wtTap" hidden>
+            <button class="wt-enter" type="button">Tap to join the clock</button>
+          </div>
+        </div>
+        <div class="wt-controls">
+          <button class="wt-icon-btn" id="wtPlay" type="button" aria-label="Play or pause">▶</button>
+          <input class="wt-seek" id="wtSeek" type="range" min="0" max="7200" value="0" aria-label="Seek">
+          <label class="wt-status" for="wtVolume">Vol</label>
+          <input class="wt-volume" id="wtVolume" type="range" min="0" max="100" value="80" aria-label="Your volume (never synced)">
+          <button class="wt-ghost" id="wtFill" type="button" aria-pressed="false">Fill screen</button>
+          <button class="wt-icon-btn" id="wtDrawBtn" type="button" aria-pressed="false" aria-label="Draw">✎</button>
+          <button class="wt-ghost" id="wtClearDraw" type="button">Clear draw</button>
+          <button class="wt-ghost" id="wtMic" type="button" aria-pressed="false" hidden>Mic</button>
+          <button class="wt-ghost" id="wtCam" type="button" aria-pressed="false" hidden>Cam</button>
+          <span class="wt-status" id="wtStatus"></span>
+        </div>
+      </div>
+
+      <aside class="wt-side">
+        <section class="wt-faces" id="wtFaces" aria-label="See each other">
+          <p class="wt-faces-empty" id="wtFacesEmpty">Cameras land here so the couches can see each other.</p>
+        </section>
+        <section class="wt-chat">
+          <h2>Chat</h2>
+          <div class="wt-log" id="wtLog"></div>
+          <form id="wtChatForm">
+            <input id="wtChatText" maxlength="280" placeholder="Say something to the couch" autocomplete="off">
+            <button class="wt-enter" type="submit">Send</button>
+          </form>
+        </section>
+        <section class="wt-map-panel" aria-label="Where each logged-in user is">
+          <div class="wt-map-head">
+            <h2>Couches on the map</h2>
+            <p>One pin per person.</p>
+          </div>
+          <div id="wtMap" class="wt-map" role="region" aria-label="Viewer locations"></div>
+          <p class="wt-map-status" id="wtMapStatus" hidden></p>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <div id="wtRemoteAudio" class="wt-remote-audio" hidden></div>
+  <div id="wtGateHost"></div>
+  <script src="https://cdn.jsdelivr.net/npm/livekit-client@2.15.8/dist/livekit-client.umd.min.js"></script>
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js" crossorigin="anonymous"></script>
+  <script src="/shared/demo-users.js"></script>
+  <script src="/shared/user-login.js"></script>
+  <script src="/shared/collection-utils.js"></script>
+  <script src="/family/js/lane-family-google-maps.js"></script>
+  <script src="/shared/google-advanced-markers.js"></script>
+  <script src="/watch-together/js/gate.js"></script>
+  <script src="/watch-together/js/map.js"></script>
+  <script src="/watch-together/js/sync.js"></script>
+  <script src="/watch-together/js/theater.js"></script>
+</body>
+</html>

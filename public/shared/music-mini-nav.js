@@ -7,6 +7,7 @@
  */
 (function () {
   const FALLBACK_ITEMS = [
+    { href: '/studio/', label: 'Studio', icon: 'bi-cassette', title: 'Browser studio' },
     { href: '/music/music-research.html', label: 'Music Research', icon: 'bi-search', title: 'Search albums, artists, Spotify' },
     { href: '/music/album-discovery.html', label: 'Album Discovery', icon: 'bi-disc', title: 'Discover albums' },
     { href: '/music/collection.html', label: 'My Collection', icon: 'bi-collection-fill', title: 'Your music collection' },

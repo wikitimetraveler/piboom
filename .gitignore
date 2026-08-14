@@ -100,5 +100,12 @@ scripts/__pycache__/
 # music/*.wav
 # music/*.flac
 
+# Studio bounced releases (local WAV/WebM; metadata in Postgres)
+data/studio-releases/*
+!data/studio-releases/.gitkeep
+
+# Nested LiveKit agent clone (local env/secrets; not this app)
+StarBand/
+
 # Enhanced Conditions dry-run CDO + handoff outputs (local only; may be large / tenant-specific)
 data/encompass-conditions/

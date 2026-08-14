@@ -136,6 +136,17 @@
     infoWindow.open(gmap, anchor);
   }
 
+  /** Advanced markers use gmp-click; legacy Marker still uses click. */
+  function onMapMarkerClick(marker, handler) {
+    if (!marker || typeof handler !== 'function') return;
+    if (advancedMarkersAvailable() && typeof marker.addEventListener === 'function') {
+      marker.addEventListener('gmp-click', handler);
+      return;
+    }
+    if (typeof marker.addListener === 'function') marker.addListener('click', handler);
+    else marker.addEventListener?.('click', handler);
+  }
+
   global.googleAdvancedMarkers = {
     DEFAULT_MAP_ID,
     MAP_LIBRARIES: 'places,marker',
@@ -146,5 +157,6 @@
     removeMapMarker,
     getMapMarkerPosition,
     openMapInfoWindow,
+    onMapMarkerClick,
   };
 })(typeof window !== 'undefined' ? window : globalThis);

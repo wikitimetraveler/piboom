@@ -65,6 +65,7 @@
 
   /** Navbar Music dropdown items */
   const NAV_MUSIC = [
+    { href: '/studio/', icon: 'bi-cassette', label: 'Studio' },
     { href: '/music/music-research.html', icon: 'bi-search', label: 'Music Research' },
     { href: '/music/album-discovery.html', icon: 'bi-disc', label: 'Album Discovery' },
     { href: '/music/collection.html', icon: 'bi-collection-fill', label: 'My Collection' },
@@ -82,6 +83,7 @@
 
   /** Navbar Entertainment dropdown items */
   const NAV_ENTERTAINMENT = [
+    { href: '/watch-together/', icon: 'bi-play-btn', label: 'Watch together' },
     { href: '/entertainment/coffee-dreams.html', icon: 'bi-cup-hot', label: 'Coffee Dreams' },
     { href: '/entertainment/player.html', icon: 'bi-volume-up', label: 'The Boombox' },
     { href: '/entertainment/visualizer.html', icon: 'bi-palette-fill', label: 'Psychedelic Visualizer' },
@@ -95,6 +97,7 @@
 
   /** Entertainment hub tool grid */
   const ENTERTAINMENT_TOOLS = [
+    { href: '/watch-together/', icon: 'bi-play-btn', label: 'Watch together', title: 'Private watch-together theater — synced YouTube, chat, draw, viewer map' },
     { href: '/entertainment/coffee-dreams.html', icon: 'bi-cup-hot', label: 'Coffee Dreams', title: 'Private coffee photo gallery' },
     { href: '/entertainment/player.html', icon: 'bi-volume-up', label: 'The Boombox', title: 'Boombox audio player' },
     { href: '/entertainment/visualizer.html', icon: 'bi-palette-fill', label: 'Psychedelic Visualizer', title: 'Psychedelic visualizer' },
@@ -116,7 +119,7 @@
     { href: '/iraq/', icon: 'bi-globe-central-south-asia', label: 'Iraq', title: 'Iraq — bilingual history, food, music, café and living culture atlas with Zayd (no login)' },
     { href: '/lebanon/', icon: 'bi-globe-central-south-asia', label: 'Lebanon', title: 'Lebanon — bilingual history, food, music, café and living culture atlas with Karim (no login)' },
     { href: '/egypt/', icon: 'bi-globe-central-south-asia', label: 'Egypt', title: 'Egypt — bilingual history, food, music, café and living culture atlas with Omar (no login)' },
-    { href: '/nature/shenango-valley.html', icon: 'bi-geo-alt', label: 'The Valley', title: 'PA history atlas — Buhl Park hub, steel, Amish, sports, Lettermen, Reznor, photos & film' },
+    { href: '/nature/shenango-valley.html', icon: 'bi-geo-alt', label: 'The Valley', title: 'West PA & East Ohio history gallery — Buhl Park hub, HyperFrames reel, Youngstown corridor, AI expert David' },
     { href: '/gse-analyzer.html', icon: 'bi-graph-up-arrow', label: 'GSE scenario analyzer' },
     { href: '/bike-store-home.html', icon: 'bi-bicycle', label: 'Bike Store' },
     { href: '/ai/voice-dj.html', icon: 'bi-mic', label: 'Wolfman Dave' },
@@ -241,7 +244,7 @@
     { href: '/nature/rock-discovery.html', icon: 'bi-gem', label: 'Rocky The Rock Star', title: 'Rubies, gems & meteorites — Rocky The Rock Star' },
     { href: '/nature/rock-collection.html', icon: 'bi-circle', label: 'Rock Collection', title: 'Your rock specimens' },
     { href: '/nature/share-collection.html', icon: 'bi-share', label: 'Share Collection', title: 'Share your collection' },
-    { href: '/nature/shenango-valley.html', icon: 'bi-geo-alt', label: 'The Valley', title: 'PA history — Buhl Park center, steel, Amish, sports, music, photos & film' },
+    { href: '/nature/shenango-valley.html', icon: 'bi-geo-alt', label: 'The Valley', title: 'West PA & East Ohio gallery — HyperFrames, Youngstown mob history, AI expert' },
   ];
 
   /** Bike hub tool grid */
@@ -254,6 +257,7 @@
 
   /** Music mini-nav items (used by music-mini-nav.js) */
   const MUSIC_TOOLS = [
+    { href: '/studio/', icon: 'bi-cassette', label: 'Studio', title: 'Browser studio — record, LiveKit, listening room' },
     { href: '/music/music-research.html', icon: 'bi-search', label: 'Music Research', title: 'Search albums, artists, Spotify' },
     { href: '/music/album-discovery.html', icon: 'bi-disc', label: 'Album Discovery', title: 'Discover albums' },
     { href: '/music/collection.html', icon: 'bi-collection-fill', label: 'My Collection', title: 'Your music collection' },

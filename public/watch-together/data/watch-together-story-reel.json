@@ -1,0 +1,49 @@
+{
+  "id": "watch-together-director-cut",
+  "title": "Watch together. · 60s",
+  "voice": "en-US-Neural2-D",
+  "pitch": -2,
+  "speakingRate": 0.94,
+  "scenes": [
+    {
+      "id": "hook",
+      "anchor": "wtHero",
+      "spotlight": "#wtTitle",
+      "durationMs": 10000,
+      "kicker": "Beat 01 · Hook",
+      "title": "Three couches. One clock.",
+      "copy": "",
+      "narration": "Three couches. One clock."
+    },
+    {
+      "id": "clock",
+      "anchor": "wtSpecs",
+      "spotlight": "#wtSpecs",
+      "durationMs": 14000,
+      "kicker": "Beat 02 · Clock",
+      "title": "Intents only. Volume stays yours.",
+      "copy": "",
+      "narration": "Intents only. Volume stays yours."
+    },
+    {
+      "id": "proof",
+      "anchor": "wtSync",
+      "spotlight": "#wtCouches",
+      "durationMs": 18000,
+      "kicker": "Beat 03 · Proof",
+      "title": "Dave. Ana. Dev.",
+      "copy": "Same playhead.",
+      "narration": "Dave. Ana. Dev. Same playhead."
+    },
+    {
+      "id": "cta",
+      "anchor": "wtCta",
+      "spotlight": "#wtEnter",
+      "durationMs": 12000,
+      "kicker": "Beat 04 · Door",
+      "title": "Ask Dave for the code.",
+      "copy": "Enter.",
+      "narration": "Ask Dave for the code. Enter."
+    }
+  ]
+}

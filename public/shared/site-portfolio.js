@@ -78,6 +78,14 @@
   /** @type {PortfolioSite[]} */
   const PORTFOLIO_SITES = [
     {
+      id: 'studio',
+      label: 'Studio',
+      tagline: 'Browser DAW, LiveKit rooms, listening room',
+      domain: PRIMARY_HOST,
+      path: '/studio/',
+      icon: 'bi-cassette',
+    },
+    {
       id: 'music',
       label: 'Music',
       tagline: 'Research, pilgrimage atlas, song ID, time machine',

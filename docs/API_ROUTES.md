@@ -134,6 +134,10 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | Method | Path | Description |
 |--------|------|-------------|
 | * | `/api/audio/*` | Audio routes |
+| * | `/api/studio/*` | Browser Studio: LiveKit tokens, reel sessions, listening-room unlock, WAV releases, Reed engineer chat |
+| GET | `/api/studio/health` | LiveKit / OpenAI status |
+| POST | `/api/studio/livekit-token` | Mint LiveKit JWT (`reelCode`, `name`) |
+| POST | `/api/studio/listen/unlock` | Listening-room password (default `reel1`) |
 | * | `/api/voice/*` | Voice (init, start, stop, speak, etc.) |
 | * | `/api/music-research/*` | Knowledge graph, Wikipedia, MusicBrainz, etc. |
 | POST | `/api/music-research/map-data` | Birth/formation map points; MusicBrainz fallback for dates/places when Wikidata is sparse; **503** + `{ rateLimited: true }` only if both Wikimedia and MusicBrainz fail; `{ wikipediaRateLimited: true }` when map used MB-only due to 429 |

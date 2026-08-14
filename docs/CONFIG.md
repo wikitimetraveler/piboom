@@ -56,6 +56,10 @@ Hybrid vector RAG + GraphRAG details: `docs/VECTOR_RAG.md`.
 | `GOOGLE_CLOUD_PROJECT` | Google Cloud project ID |
 | `SHAZAM_API_KEY` | Shazam/RapidAPI song identification |
 | `SETLISTFM_API_KEY` | Setlist.fm API |
+| `LIVEKIT_URL` | LiveKit WebSocket URL (`wss://…livekit.cloud`) for Studio voice, video, and screen share |
+| `LIVEKIT_API_KEY` | LiveKit API key (server-only; mints room tokens) |
+| `LIVEKIT_API_SECRET` | LiveKit API secret (server-only) |
+| `STUDIO_LISTEN_PASSWORD` | Listening-room password (default `reel1`) |
 
 ## Misc
 

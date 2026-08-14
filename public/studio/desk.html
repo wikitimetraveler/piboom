@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>StarBand desk — music studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="/shared/design-tokens.css"/>
+  <link rel="stylesheet" href="/studio/css/studio.css"/>
+  <script src="/shared/menu-config.js"></script>
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/demo-users.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/livekit-client@2.15.8/dist/livekit-client.umd.min.js"></script>
+</head>
+<body class="st-page encompass-dark-mode">
+  <modern-navbar></modern-navbar>
+  <main class="st-desk-shell">
+    <header class="st-desk-top">
+      <h1>StarBand</h1>
+      <span class="st-code" id="stReelCode">------</span>
+      <span class="st-status" id="stSocketStatus">Socket…</span>
+      <span class="st-status" id="stLivekitStatus">LiveKit…</span>
+      <label class="st-status">
+        Name
+        <input class="st-input" id="stName" value="Player" maxlength="40" style="width:9rem;display:inline-block;margin-left:.4rem"/>
+      </label>
+      <a class="st-btn st-btn--ghost" href="/studio/">Landing</a>
+      <a class="st-btn st-btn--ghost" href="/studio/listen.html">Listening room</a>
+    </header>
+
+    <div class="st-grid">
+      <aside class="st-panel">
+        <h2>Tracks</h2>
+        <div id="stTracks"></div>
+        <div class="st-transport">
+          <button type="button" class="st-btn st-btn--ghost" id="stAddTrack">Add track</button>
+        </div>
+        <label class="st-status" style="display:block;margin-top:0.75rem">
+          <input type="checkbox" id="stMusicMode"/> Music input (no echo cancel)
+        </label>
+        <div class="st-meter" aria-hidden="true"><span id="stMeter"></span></div>
+      </aside>
+
+      <section class="st-panel">
+        <h2>Timeline</h2>
+        <canvas class="st-timeline" id="stTimeline" width="900" height="280"></canvas>
+        <div class="st-transport">
+          <button type="button" class="st-btn st-btn--primary" id="stRecord">Record</button>
+          <button type="button" class="st-btn st-btn--ghost" id="stStop">Stop</button>
+          <button type="button" class="st-btn st-btn--ghost" id="stPlay">Play</button>
+          <button type="button" class="st-btn st-btn--ghost" id="stBounce">Bounce WAV</button>
+          <button type="button" class="st-btn st-btn--ghost" id="stRelease">Release</button>
+        </div>
+        <p class="st-status" id="stTransportLabel">Playhead 00:00.00</p>
+      </section>
+
+      <aside class="st-panel">
+        <h2>LiveKit stage</h2>
+        <div class="st-transport">
+          <button type="button" class="st-btn st-btn--primary" id="stJoinLive">Join room</button>
+          <button type="button" class="st-btn st-btn--ghost" id="stMic">Mic</button>
+          <button type="button" class="st-btn st-btn--ghost" id="stCam">Cam</button>
+          <button type="button" class="st-btn st-btn--ghost" id="stShare">Share</button>
+        </div>
+        <div class="st-stage" id="stStage"></div>
+        <p class="st-status" id="stPresence">No one in the reel yet.</p>
+        <h2 style="margin-top:1rem">Reed</h2>
+        <div class="st-chat">
+          <div class="st-chat-log" id="stReedLog"></div>
+          <form id="stReedForm">
+            <input type="text" id="stReedInput" placeholder="Ask the engineer…" autocomplete="off"/>
+          </form>
+        </div>
+      </aside>
+    </div>
+  </main>
+  <script src="/studio/js/studio-desk.js"></script>
+</body>
+</html>

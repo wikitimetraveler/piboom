@@ -15,6 +15,7 @@ import { ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc, ingestFema, 
 import { ensureDisasterImpactGraphReady, refreshDisasterImpactGraphFromCurrentData } from './services/disaster-impact-graph.service.js';
 import { financePathNeedsSession, hasFinanceSession } from './lib/finance-session.js';
 import { scheduleDailyAt } from './lib/disaster-daily-scheduler.js';
+import { attachStudioRealtime } from './services/studio-socket.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -128,6 +129,7 @@ app.use('/finance/encompass-assistant.html', (req, res, next) => {
 
 // Make io available to routes
 app.locals.io = io;
+attachStudioRealtime(io);
 
 app.use(requireFinanceSession);
 app.use('/api', buildRoutes(io));

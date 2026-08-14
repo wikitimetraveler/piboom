@@ -1,0 +1,96 @@
+{
+  "id": "shenango-hyperframes-reel",
+  "title": "The Valley HyperFrame Tour",
+  "portrait": "/family/assets/david-lane-time-traveler-scene.png",
+  "voice": "en-US-Neural2-D",
+  "pitch": -1,
+  "speakingRate": 0.98,
+  "scenes": [
+    {
+      "id": "open",
+      "anchor": "svHero",
+      "spotlight": "#svHeroInner",
+      "durationMs": 8200,
+      "kicker": "HyperFrame · 01 · Gallery",
+      "title": "Names, places, and record",
+      "copy": "A memorial-wall tone for western Pennsylvania — Context for the region, Evidence for what you can stand beside on the map.",
+      "narration": "Welcome. I am David, your regional historian for western Pennsylvania and eastern Ohio. Tonight we walk The Valley as a HyperFrame gallery — scholastic wall text, not a brochure. Context means background. Evidence means places and published record. We begin at Buhl Park."
+    },
+    {
+      "id": "atlas",
+      "anchor": "svMap",
+      "spotlight": "#svMap",
+      "action": "openAtlas",
+      "durationMs": 7800,
+      "kicker": "HyperFrame · 02 · Atlas",
+      "title": "Satellite from the hub",
+      "copy": "Every pin radiates from Hermitage’s free green. Ohio sites sit just across the state line.",
+      "narration": "Open the atlas on satellite view. Buhl Park is the hub — Frank H. Buhl’s gift so working families could gather without a ticket. Select a pin for on-the-ground notes. The Youngstown corridor appears because the border is minutes away."
+    },
+    {
+      "id": "steel",
+      "anchor": "svSteel",
+      "spotlight": "#svSteelGrid .sv-card:first-child",
+      "action": "flipFirstSteel",
+      "durationMs": 8000,
+      "kicker": "HyperFrame · 03 · Steel",
+      "title": "Fortune that funded a park",
+      "copy": "Sharon Iron to Farrell’s mill — wealth, labor, and the endowment that still keeps golf free.",
+      "narration": "Steel built this valley. Frank Buhl’s fortune rose with the mills; his philanthropy returned as Buhl Farm Park. Flip the first steel card — wall text, not romance. The Magic City of Farrell and the long mill closures are part of the same gallery."
+    },
+    {
+      "id": "amish",
+      "anchor": "svAmish",
+      "spotlight": "#svAmish",
+      "action": "flipFirstAmish",
+      "durationMs": 7600,
+      "kicker": "HyperFrame · 04 · Neighbors",
+      "title": "New Wilmington, not Lancaster",
+      "copy": "Old Order roads since eighteen forty-seven — courtesy first; people are not exhibits.",
+      "narration": "Ten miles from the hub lies New Wilmington and Volant Amish country. This is a living settlement, not Lancaster tourism. Drive slowly for buggies. Photograph fields, not faces. Museum etiquette applies on the road as well as in the gallery."
+    },
+    {
+      "id": "music",
+      "anchor": "svMusic",
+      "spotlight": "#svMusicGrid .sv-card:first-child",
+      "action": "flipFirstMusic",
+      "durationMs": 8000,
+      "kicker": "HyperFrame · 05 · Music",
+      "title": "Lettermen and Mercer County",
+      "copy": "Tony Butala from Sharon; Trent Reznor from Mercer borough — same county, careful geography.",
+      "narration": "Music leaves inscriptions too. Tony Butala of The Lettermen is Sharon’s harmony story. Trent Reznor grew up in Mercer — the county seat, not the mill towns. Keep the towns straight, the way a wall keeps dates straight."
+    },
+    {
+      "id": "mob",
+      "anchor": "svMob",
+      "spotlight": "#svMob",
+      "action": "openMob",
+      "durationMs": 9800,
+      "kicker": "HyperFrame · 06 · 1970s",
+      "title": "Youngstown’s decisive decade",
+      "copy": "Cleveland vs Pittsburgh for the bug and the tables — 1970s war while steel fell. Context vs Evidence on the wall.",
+      "narration": "Now the Youngstown corridor — and the big chapter is the nineteen-seventies. No resident Mafia family; Cleveland and Pittsburgh fought for the Mahoning Valley. The Saturday Evening Post had already named Crime Town U.S.A. Then came the late-decade faction war, the Cleveland bombing that pulled in the Carabbias, and Charlie Carabbia’s nineteen-eighty disappearance — later sworn in court. Same decade, the mills died. Read the cards as a museum room. No romance. No rumor."
+    },
+    {
+      "id": "black-monday",
+      "anchor": "svVideo",
+      "spotlight": "#svVideo",
+      "durationMs": 8200,
+      "kicker": "HyperFrame · 07 · Black Monday",
+      "title": "1977 — mills and rackets, same decade",
+      "copy": "Youngstown Sheet & Tube’s Campbell Works fell on 19 September 1977. Watch the archival mini-doc beside the mob gallery.",
+      "narration": "Same decade as the faction war: Black Monday — September nineteenth, nineteen seventy-seven — when Youngstown Sheet and Tube closed Campbell Works and thousands lost work overnight. Scroll to Watch for the period mini-documentary. Steel collapse and contested rackets share one map."
+    },
+    {
+      "id": "close",
+      "anchor": "svGuide",
+      "spotlight": "#svGuide",
+      "action": "unflipCards",
+      "durationMs": 7200,
+      "kicker": "HyperFrame · 08 · Ask",
+      "title": "Continue with the expert",
+      "copy": "Eight gallery chapters await. Ask David about West Pennsylvania, East Ohio, or any pin on the satellite atlas.",
+      "narration": "The reel stops here — once through, like a memorial highlight pass. Eight chapters on the wall. Ask me anything about western Pennsylvania or eastern Ohio. Facts first. Context labeled. Evidence preferred."
+    }
+  ]
+}

@@ -11,7 +11,8 @@
     amish: '#c48a3a',
     sports: '#2a5f9e',
     music: '#8b3a62',
-    food: '#b5301f'
+    food: '#b5301f',
+    mob: '#3d2a4a'
   };
 
   const DEFAULT_CENTER = { lat: 41.245889, lng: -80.477848 };
@@ -341,9 +342,16 @@
     initMap();
   });
 
+  function setFilter(filter) {
+    state.filter = filter || 'all';
+    renderFilters();
+    applyFilter();
+  }
+
   window.ShenangoMap = {
     focusSite,
     resetView,
+    setFilter,
     getSites: () => state.sites
   };
 })();

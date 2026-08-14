@@ -1,0 +1,167 @@
+/**
+ * Development work by David Lane
+ */
+import {
+  extractYouTubeId,
+  parseMediaUrl,
+  createRoomState,
+  expectedMediaTime,
+  needsDriftCorrection,
+  applyIntent,
+  sanitizeLocation,
+  buildViewerRecord,
+  handleWatchIntent,
+  resetWatchTogetherRoom,
+  getWatchTogetherSnapshot,
+  getWatchTogetherStatus,
+  mintWatchTogetherLivekitToken,
+  setWatchTogetherLivekitTokenFactory,
+  LIVEKIT_ROOM_NAME,
+  DRIFT_PLAYING_S,
+  DRIFT_PAUSED_S,
+} from '../../services/watch-together.service.js';
+
+describe('watch-together.service', () => {
+  test('extractYouTubeId reads watch, short, embed, and raw ids', () => {
+    expect(extractYouTubeId('https://www.youtube.com/watch?v=dQw4w9wgGcQ')).toBe('dQw4w9wgGcQ');
+    expect(extractYouTubeId('https://youtu.be/dQw4w9wgGcQ')).toBe('dQw4w9wgGcQ');
+    expect(extractYouTubeId('https://www.youtube.com/embed/dQw4w9wgGcQ')).toBe('dQw4w9wgGcQ');
+    expect(extractYouTubeId('dQw4w9wgGcQ')).toBe('dQw4w9wgGcQ');
+  });
+
+  test('parseMediaUrl prefers YouTube over a generic file URL', () => {
+    const parsed = parseMediaUrl('https://www.youtube.com/watch?v=dQw4w9wgGcQ');
+    expect(parsed).toEqual({
+      ok: true,
+      kind: 'youtube',
+      youtubeId: 'dQw4w9wgGcQ',
+      url: 'https://www.youtube.com/watch?v=dQw4w9wgGcQ',
+    });
+  });
+
+  test('parseMediaUrl accepts a direct https video URL', () => {
+    const parsed = parseMediaUrl('https://example.com/clip.mp4');
+    expect(parsed.ok).toBe(true);
+    expect(parsed.kind).toBe('file');
+    expect(parsed.src).toBe('https://example.com/clip.mp4');
+  });
+
+  test('expectedMediaTime advances only while playing', () => {
+    const paused = { playing: false, position: 10, updatedAt: 1_000 };
+    expect(expectedMediaTime(paused, 5_000)).toBe(10);
+    const playing = { playing: true, position: 10, updatedAt: 1_000 };
+    expect(expectedMediaTime(playing, 3_000)).toBe(12);
+  });
+
+  test('needsDriftCorrection uses 1.0s playing and 0.35s paused', () => {
+    expect(DRIFT_PLAYING_S).toBe(1);
+    expect(DRIFT_PAUSED_S).toBe(0.35);
+    expect(needsDriftCorrection({ playing: true, localTime: 10, expectedTime: 10.9 })).toBe(false);
+    expect(needsDriftCorrection({ playing: true, localTime: 10, expectedTime: 11.1 })).toBe(true);
+    expect(needsDriftCorrection({ playing: false, localTime: 10, expectedTime: 10.3 })).toBe(false);
+    expect(needsDriftCorrection({ playing: false, localTime: 10, expectedTime: 10.4 })).toBe(true);
+  });
+
+  test('applyIntent never stores volume', () => {
+    const next = applyIntent(createRoomState(1_000), { type: 'play', position: 4, volume: 99 }, 2_000);
+    expect(next.playing).toBe(true);
+    expect(next.position).toBe(4);
+    expect(next.volume).toBeUndefined();
+  });
+
+  test('applyIntent load resets playback and uses parsed media', () => {
+    const next = applyIntent(createRoomState(1_000), {
+      type: 'load',
+      media: { kind: 'youtube', youtubeId: 'dQw4w9wgGcQ' },
+    }, 2_000);
+    expect(next.playing).toBe(false);
+    expect(next.position).toBe(0);
+    expect(next.media.youtubeId).toBe('dQw4w9wgGcQ');
+  });
+
+  test('sanitizeLocation drops invalid GPS and keeps valid points', () => {
+    expect(sanitizeLocation(41.2, -80.5)).toEqual({ lat: 41.2, lng: -80.5 });
+    expect(sanitizeLocation(91, -80)).toBeNull();
+    expect(sanitizeLocation('n/a', '-80')).toBeNull();
+  });
+
+  test('buildViewerRecord keeps name, login id, and location for the map', () => {
+    const viewer = buildViewerRecord('sock-1', {
+      name: 'Karti',
+      userId: 'demo-analyst-1',
+      lat: 41.233,
+      lng: -80.493,
+    });
+    expect(viewer).toEqual({
+      id: 'sock-1',
+      name: 'Karti',
+      userId: 'demo-analyst-1',
+      lat: 41.233,
+      lng: -80.493,
+    });
+  });
+
+  test('handleWatchIntent load updates the shared clock without volume', () => {
+    resetWatchTogetherRoom(1_000);
+    const result = handleWatchIntent(
+      { type: 'load', url: 'https://youtu.be/dQw4w9wgGcQ', volume: 11 },
+      { name: 'Karti' }
+    );
+    expect(result.ok).toBe(true);
+    expect(result.kind).toBe('playback');
+    expect(result.snapshot.media.youtubeId).toBe('dQw4w9wgGcQ');
+    expect(result.snapshot.playing).toBe(false);
+    expect(result.snapshot.volume).toBeUndefined();
+    expect(getWatchTogetherSnapshot().media.youtubeId).toBe('dQw4w9wgGcQ');
+  });
+
+  test('LiveKit room name is dedicated to the theater', () => {
+    expect(LIVEKIT_ROOM_NAME).toBe('watch-together-theater');
+  });
+
+  test('mintWatchTogetherLivekitToken throws when unconfigured', async () => {
+    const keys = ['LIVEKIT_URL', 'LIVEKIT_API_KEY', 'LIVEKIT_API_SECRET'];
+    const saved = {};
+    keys.forEach((key) => {
+      saved[key] = process.env[key];
+      delete process.env[key];
+    });
+    setWatchTogetherLivekitTokenFactory(null);
+    await expect(mintWatchTogetherLivekitToken({ name: 'Karti' })).rejects.toMatchObject({
+      code: 'LIVEKIT_NOT_CONFIGURED',
+    });
+    expect(getWatchTogetherStatus().livekitConfigured).toBe(false);
+    keys.forEach((key) => {
+      if (saved[key] === undefined) delete process.env[key];
+      else process.env[key] = saved[key];
+    });
+  });
+
+  test('mintWatchTogetherLivekitToken uses injected factory', async () => {
+    const keys = ['LIVEKIT_URL', 'LIVEKIT_API_KEY', 'LIVEKIT_API_SECRET'];
+    const saved = {};
+    keys.forEach((key) => {
+      saved[key] = process.env[key];
+    });
+    process.env.LIVEKIT_URL = 'wss://example.livekit.cloud';
+    process.env.LIVEKIT_API_KEY = 'key';
+    process.env.LIVEKIT_API_SECRET = 'secret';
+    setWatchTogetherLivekitTokenFactory(async (opts) => {
+      expect(opts.roomName).toBe('watch-together-theater');
+      expect(opts.name).toBe('Karti');
+      return 'jwt-watch';
+    });
+    try {
+      const minted = await mintWatchTogetherLivekitToken({ name: 'Karti' });
+      expect(minted.token).toBe('jwt-watch');
+      expect(minted.url).toBe('wss://example.livekit.cloud');
+      expect(minted.roomName).toBe('watch-together-theater');
+    } finally {
+      setWatchTogetherLivekitTokenFactory(null);
+      keys.forEach((key) => {
+        if (saved[key] === undefined) delete process.env[key];
+        else process.env[key] = saved[key];
+      });
+    }
+  });
+});

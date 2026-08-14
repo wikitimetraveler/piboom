@@ -783,6 +783,32 @@ export async function createTables() {
       CREATE INDEX IF NOT EXISTS idx_mp_routes_client ON music_pilgrimage_saved_routes(client_id)
     `);
 
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS studio_sessions (
+        code VARCHAR(8) PRIMARY KEY,
+        title VARCHAR(120) NOT NULL,
+        livekit_room VARCHAR(80) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS studio_releases (
+        id VARCHAR(40) PRIMARY KEY,
+        title VARCHAR(120) NOT NULL,
+        artist VARCHAR(80),
+        reel_code VARCHAR(8),
+        filename VARCHAR(180) NOT NULL,
+        mime_type VARCHAR(80),
+        bytes INTEGER,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_studio_releases_created ON studio_releases(created_at DESC)
+    `);
+
     // Create artists table for expandable concert collections
     await pool.query(`
       CREATE TABLE IF NOT EXISTS artists (

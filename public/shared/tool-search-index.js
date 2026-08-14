@@ -71,6 +71,7 @@
     { name: 'The Transformer', url: '/finance/tool6.html', category: 'Encompass', keywords: 'XML JSON converter', requiresAuth: true },
     { name: 'The Alchemist', url: '/finance/tool8.html', category: 'Encompass', keywords: 'code converter', requiresAuth: true },
     // Music
+    { name: 'Studio', url: '/studio/', category: 'Music', keywords: 'daw record mix livekit websocket bounce wav listening room' },
     { name: 'Music Research', url: '/music/music-research.html', category: 'Music', keywords: 'artist search' },
     { name: 'Album Discovery', url: '/music/album-discovery.html', category: 'Music', keywords: 'albums covers' },
     { name: 'My Collection', url: '/music/collection.html', category: 'Music', keywords: 'album collection' },
@@ -85,6 +86,7 @@
     { name: 'Google Earth KML Files', url: '/music/musical-google-earth-files.html', category: 'Music', keywords: 'kml google earth network link download beatles dylan dead venues' },
     // Entertainment
     { name: 'Entertainment Hub', url: '/entertainment/index.html', category: 'Entertainment', keywords: 'hub entertainment boombox visualizer gallery posters' },
+    { name: 'Watch together', url: '/watch-together/', category: 'Entertainment', keywords: 'youtube watch together sync theater chat draw map couches dave' },
     { name: 'Coffee Dreams', url: '/entertainment/coffee-dreams.html', category: 'Entertainment', keywords: 'coffee cafe gallery password vietnamese coffee shop girls glam' },
     { name: 'The Boombox', url: '/entertainment/player.html', category: 'Entertainment', keywords: 'player audio' },
     { name: 'Psychedelic Visualizer', url: '/entertainment/visualizer.html', category: 'Entertainment', keywords: 'visualizer trippy' },
@@ -106,7 +108,7 @@
     { name: 'Tree Collection', url: '/nature/tree-collection.html', category: 'Nature', keywords: 'trees forest' },
     { name: 'Critter Discovery', url: '/nature/critter-discovery.html', category: 'Nature', keywords: 'animal wildlife identify photo' },
     { name: 'Critter Collection', url: '/nature/critter-collection.html', category: 'Nature', keywords: 'critters wildlife collection' },
-    { name: 'The Valley', url: '/nature/shenango-valley.html', category: 'Nature', keywords: 'shenango valley buhl park hermitage sharon farrell steel amish new wilmington sports lettermen tony butala trent reznor nine inch nails music quaker steak lube luigi pizza david heygen atlas photos video' },
+    { name: 'The Valley', url: '/nature/shenango-valley.html', category: 'Nature', keywords: 'shenango valley buhl park hermitage sharon farrell steel amish new wilmington sports lettermen tony butala trent reznor nine inch nails music quaker steak lube luigi pizza david heygen atlas photos video youngstown mahoning mob organized crime east ohio west pennsylvania hyperframes reel story mode museum' },
     { name: 'Local Spots', url: '/local/local-spots.html', category: 'Local', keywords: 'thrift spots map' },
     { name: 'Finds', url: '/finds/index.html', category: 'Local', keywords: 'thrift flea vintage collection AI' },
     { name: 'Home', url: '/', category: 'Hub', keywords: 'hub index' },

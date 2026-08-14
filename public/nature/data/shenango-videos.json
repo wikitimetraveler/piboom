@@ -1,7 +1,7 @@
 {
   "id": "shenango-valley-videos",
-  "updatedAt": "2026-08-12",
-  "note": "Embed verified YouTube / Internet Archive clips. Prefer official channels. Amish footage: landscapes only — never film people without permission.",
+  "updatedAt": "2026-08-13",
+  "note": "Embed verified YouTube / Internet Archive clips. Prefer official or archival. Amish: landscapes only.",
   "clips": [
     {
       "id": "lettermen-way-you-look",
@@ -9,8 +9,8 @@
       "title": "The Lettermen — The Way You Look Tonight",
       "youtubeId": "Np6BbA6z3eE",
       "url": "https://www.youtube.com/watch?v=Np6BbA6z3eE",
-      "source": "The Lettermen - Topic (Universal / Capitol)",
-      "blurb": "Sharon native Tony Butala's group — signature close-harmony hit (1961)."
+      "source": "The Lettermen - Topic",
+      "blurb": "Sharon native Tony Butala’s group — signature close-harmony hit."
     },
     {
       "id": "reznor-sax-1982",
@@ -18,8 +18,8 @@
       "title": "Trent Reznor — Mercer HS Jazz Band sax solo (1982)",
       "youtubeId": "SiDAyGkC-LY",
       "url": "https://www.youtube.com/watch?v=SiDAyGkC-LY",
-      "source": "theorchidpool / private-press transfer",
-      "blurb": "Pressure Cooker — early Reznor on Mercer, PA high school jazz record before Nine Inch Nails."
+      "source": "Mercer PA high school jazz transfer",
+      "blurb": "Pressure Cooker — early Reznor before Nine Inch Nails."
     },
     {
       "id": "nin-head-like-a-hole",
@@ -28,26 +28,26 @@
       "youtubeId": "ao-Sahfy7Hg",
       "url": "https://www.youtube.com/watch?v=ao-Sahfy7Hg",
       "source": "NineInchNailsVEVO",
-      "blurb": "National career after Mercer County — industrial rock that left western PA for the world stage."
+      "blurb": "National career after Mercer County."
     },
     {
-      "id": "nin-head-like-a-hole-audio",
-      "theme": "music",
-      "title": "Head Like A Hole (album audio)",
-      "youtubeId": "ghIRu6UvQPc",
-      "url": "https://www.youtube.com/watch?v=ghIRu6UvQPc",
-      "source": "Nine Inch Nails - Topic",
-      "blurb": "Album version from Pretty Hate Machine."
+      "id": "black-monday-1977",
+      "theme": "mob",
+      "title": "Aftermath of 1977 Youngstown steel mill closure (mini-doc)",
+      "youtubeId": "ivGFfw3gqGg",
+      "url": "https://www.youtube.com/watch?v=ivGFfw3gqGg",
+      "source": "Archival mini-documentary (period broadcast)",
+      "blurb": "Black Monday context — Youngstown Sheet & Tube Campbell Works shutdown, 19 Sept 1977; Struthers families. Same decade as the mob gallery’s climax."
     },
     {
       "id": "steel-mans-servant",
       "theme": "steel",
-      "title": "Steel: Man's Servant (1938) — public domain industrial film",
+      "title": "Steel: Man’s Servant (1938) — public domain",
       "archiveId": "steel-man-s-servant-1938",
       "url": "https://archive.org/details/steel-man-s-servant-1938",
       "embedUrl": "https://archive.org/embed/steel-man-s-servant-1938",
-      "source": "Internet Archive / Roland Reed Productions",
-      "blurb": "Technicolor U.S. Steel documentary — era atmosphere for Shenango mill towns (not filmed in Farrell, but period steel culture)."
+      "source": "Internet Archive",
+      "blurb": "Technicolor U.S. Steel documentary — period mill culture for the Shenango–Mahoning belt."
     },
     {
       "id": "valley-town-1940",
@@ -57,16 +57,16 @@
       "url": "https://archive.org/details/ValleyTo1940",
       "embedUrl": "https://archive.org/embed/ValleyTo1940",
       "source": "Internet Archive / NYU Educational Film Institute",
-      "blurb": "Social documentary on a Pennsylvania steel town facing automation — pairs with Farrell / Sharon Steel stories."
+      "blurb": "Social documentary on a Pennsylvania steel town facing automation."
     },
     {
-      "id": "lettermen-search",
-      "theme": "music",
-      "title": "More Lettermen / Tony Butala (search)",
-      "url": "https://www.youtube.com/results?search_query=Tony+Butala+Lettermen+Sharon+Pennsylvania",
+      "id": "sharon-downtown-search",
+      "theme": "steel",
+      "title": "Sharon / Farrell steel history (search)",
+      "url": "https://www.youtube.com/results?search_query=Sharon+Steel+Farrell+Pennsylvania+history",
       "youtubeId": null,
       "source": "YouTube search",
-      "blurb": "Interviews and Vocal Group Hall of Fame stories from Sharon."
+      "blurb": "Local history clips of Farrell works and valley steel."
     },
     {
       "id": "buhl-concerts-search",
@@ -78,6 +78,15 @@
       "blurb": "Free concert series at the Performing Arts Center."
     },
     {
+      "id": "lock-10-search",
+      "theme": "steel",
+      "title": "Sharpsville Lock 10 (search)",
+      "url": "https://www.youtube.com/results?search_query=Sharpsville+Lock+10+Erie+Extension+Canal",
+      "youtubeId": null,
+      "source": "YouTube search",
+      "blurb": "On-site visits to the surviving Erie Extension Canal lock."
+    },
+    {
       "id": "steel-bowl-search",
       "theme": "sports",
       "title": "Sharon–Farrell Steel Bowl (search)",
@@ -87,31 +96,13 @@
       "blurb": "Valley football rivalry highlight clips."
     },
     {
-      "id": "farrell-bball-search",
+      "id": "farrell-hoops-search",
       "theme": "sports",
       "title": "Farrell Steelers basketball (search)",
       "url": "https://www.youtube.com/results?search_query=Farrell+Steelers+basketball+District+10",
       "youtubeId": null,
       "source": "YouTube search",
       "blurb": "District 10 title and playoff coverage."
-    },
-    {
-      "id": "sharon-steel-search",
-      "theme": "steel",
-      "title": "Sharon Steel / Farrell mill (search)",
-      "url": "https://www.youtube.com/results?search_query=Sharon+Steel+Farrell+Pennsylvania+history",
-      "youtubeId": null,
-      "source": "YouTube search",
-      "blurb": "Local and industrial history clips of the Magic City mill."
-    },
-    {
-      "id": "lock10-search",
-      "theme": "steel",
-      "title": "Sharpsville Lock 10 (search)",
-      "url": "https://www.youtube.com/results?search_query=Sharpsville+Lock+10+Erie+Extension+Canal",
-      "youtubeId": null,
-      "source": "YouTube search",
-      "blurb": "On-site visits to the surviving canal lock."
     },
     {
       "id": "new-wilmington-search",
@@ -126,10 +117,19 @@
       "id": "qsl-search",
       "theme": "food",
       "title": "Original Quaker Steak & Lube (search)",
-      "url": "https://www.youtube.com/results?search_query=Quaker+Steak+Lube+Sharon+original+50+years",
+      "url": "https://www.youtube.com/results?search_query=Quaker+Steak+Lube+Sharon+original",
       "youtubeId": null,
       "source": "YouTube search",
       "blurb": "Local news on the 1974 Sharon original."
+    },
+    {
+      "id": "youngstown-history-search",
+      "theme": "mob",
+      "title": "Youngstown / Crimetown history (search)",
+      "url": "https://www.youtube.com/results?search_query=Youngstown+Ohio+organized+crime+history+Crimetown",
+      "youtubeId": null,
+      "source": "YouTube search",
+      "blurb": "Documentary and news packages — cross-check against court record; museum reading, not folklore."
     }
   ]
 }

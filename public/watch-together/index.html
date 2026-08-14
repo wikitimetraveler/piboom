@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Watch together.</title>
+  <meta name="description" content="Private watch-together theaters. Paste a YouTube link, press play, and stay in sync.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/watch-together/css/watch-together.css">
+</head>
+<body class="wt-body">
+  <div class="wt-glow" aria-hidden="true"></div>
+  <div class="wt-scanlines" aria-hidden="true"></div>
+  <a class="wt-home-link" href="/entertainment/index.html">Entertainment</a>
+
+  <div class="wt-intro" id="wtIntro">
+    <p class="wt-kicker">Private screening</p>
+    <p class="wt-intro-title">Watch <span class="together">together.</span></p>
+    <button class="wt-ghost" id="wtIntroSkip" type="button" aria-label="Skip opening">Skip</button>
+  </div>
+
+  <main class="wt-page">
+    <section class="wt-hero-row" id="wtHero">
+      <div>
+        <p class="wt-kicker">Private watch-together theaters</p>
+        <h1 class="wt-title" id="wtTitle">Watch <span class="together">together.</span></h1>
+        <p class="wt-lede">Paste a YouTube link. Press play. Three couches stay on the same frame — play, pause, seek, draw, chat. Volume stays yours.</p>
+        <div class="wt-cta-row" id="wtCta">
+          <button class="wt-enter" id="wtEnter" type="button">Enter the theater</button>
+          <button class="wt-ghost wt-cut" id="wtStoryPlay" type="button" aria-pressed="false">Play the 60s cut</button>
+          <label class="wt-narrate">
+            <input type="checkbox" id="wtStoryNarrate" checked>
+            Narration
+          </label>
+          <span class="wt-private">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            Private. Ask Dave for the code.
+          </span>
+        </div>
+      </div>
+      <div class="wt-rule" aria-hidden="true"></div>
+      <dl class="wt-specs" id="wtSpecs">
+        <div class="wt-spec">
+          <dt>The server sends</dt>
+          <dd>control intents only</dd>
+        </div>
+        <div class="wt-spec">
+          <dt>Drift correction</dt>
+          <dd>1.0s playing · 0.35s paused</dd>
+        </div>
+        <div class="wt-spec">
+          <dt>Your volume</dt>
+          <dd>always yours, never synced</dd>
+        </div>
+        <div class="wt-spec">
+          <dt>Presence</dt>
+          <dd>LiveKit · couches on the map</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="wt-sync" id="wtSync" aria-label="Synchronized couches">
+      <div class="wt-timeline" aria-hidden="true">
+        <div class="wt-timeline-line"></div>
+        <div class="wt-playhead"></div>
+      </div>
+      <div class="wt-couches" id="wtCouches">
+        <article class="wt-couch">
+          <div class="wt-screen">
+            <svg class="wt-play" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5.5v13l11-6.5L8 5.5z"/></svg>
+            <div class="wt-bar"><span></span></div>
+          </div>
+          <p class="wt-name">Dave</p>
+        </article>
+        <article class="wt-couch">
+          <div class="wt-screen">
+            <svg class="wt-play" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5.5v13l11-6.5L8 5.5z"/></svg>
+            <div class="wt-bar"><span></span></div>
+          </div>
+          <p class="wt-name">Ana</p>
+        </article>
+        <article class="wt-couch">
+          <div class="wt-screen">
+            <svg class="wt-play" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8 5.5v13l11-6.5L8 5.5z"/></svg>
+            <div class="wt-bar"><span></span></div>
+          </div>
+          <p class="wt-name">Dev</p>
+        </article>
+      </div>
+      <p class="wt-caption">One clock. Three couches. The same frame.</p>
+    </section>
+  </main>
+
+  <div class="wt-story-overlay" id="wtStoryOverlay" hidden aria-hidden="true" aria-live="polite">
+    <p class="wt-story-kicker" id="wtStoryKicker"></p>
+    <h2 class="wt-story-title" id="wtStoryTitle"></h2>
+    <p class="wt-story-copy" id="wtStoryCopy"></p>
+    <p class="wt-story-progress" id="wtStoryProgress"></p>
+  </div>
+
+  <div id="wtGateHost"></div>
+  <script src="/shared/tts.js"></script>
+  <script src="/shared/demo-users.js"></script>
+  <script src="/shared/user-login.js"></script>
+  <script src="/watch-together/js/gate.js"></script>
+  <script src="/watch-together/js/landing.js"></script>
+  <script src="/watch-together/js/story-reel.js"></script>
+</body>
+</html>

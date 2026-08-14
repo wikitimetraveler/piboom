@@ -30,6 +30,8 @@
   --fun-valley: #2f5d46;
   --fun-family: #c9852a;
   --fun-glazed: #e85a7a;
+  --fun-studio: #ff9d4d;
+  --fun-watch: #c45c4a;
   --fun-heygen: #2a9bb0;
   --fun-jordan: #b5301f;
   --fun-syria: #9c2233;
@@ -739,6 +741,16 @@ body[data-theme="dark"] .fun-hero__title {
   outline-offset: 3px;
 }
 
+.fun-card--studio {
+  grid-column: span 4;
+  min-height: 16rem;
+}
+
+.fun-card--watch {
+  grid-column: span 2;
+  min-height: 16rem;
+}
+
 .fun-card--music {
   grid-column: span 4;
   grid-row: span 1;
@@ -822,6 +834,18 @@ body[data-theme="dark"] .fun-card:hover {
   z-index: -1;
 }
 
+.fun-card--studio:hover .fun-card__glow {
+  opacity: 0.75;
+  background: radial-gradient(circle at 50% 0%, rgba(255, 157, 77, 0.28), rgba(255, 157, 77, 0.08) 40%, transparent 70%);
+  filter: blur(14px);
+}
+
+.fun-card--watch:hover .fun-card__glow {
+  opacity: 0.75;
+  background: radial-gradient(circle at 50% 0%, rgba(196, 92, 74, 0.28), rgba(196, 92, 74, 0.08) 40%, transparent 70%);
+  filter: blur(14px);
+}
+
 .fun-card--music:hover .fun-card__glow {
   opacity: 0.7;
   background: radial-gradient(circle at 50% 0%, rgba(61, 122, 138, 0.2), rgba(61, 122, 138, 0.08) 40%, transparent 70%);
@@ -887,6 +911,16 @@ body[data-theme="dark"] .fun-card:hover {
   .fun-card:hover .fun-card__icon {
     transform: scale(1.05);
   }
+}
+
+.fun-card--studio .fun-card__icon {
+  background: rgba(255, 157, 77, 0.12);
+  color: var(--fun-studio);
+}
+
+.fun-card--watch .fun-card__icon {
+  background: rgba(196, 92, 74, 0.12);
+  color: var(--fun-watch);
 }
 
 .fun-card--music .fun-card__icon {
@@ -1191,6 +1225,8 @@ body[data-theme="dark"] .fun-card:hover {
       linear-gradient(180deg, rgba(10, 16, 22, 0.35) 0%, rgba(10, 16, 22, 0.72) 55%, rgba(10, 16, 22, 0.92) 100%);
   }
 
+  .fun-card--studio,
+  .fun-card--watch,
   .fun-card--music,
   .fun-card--nature,
   .fun-card--valley,
@@ -1225,6 +1261,8 @@ body[data-theme="dark"] .fun-card:hover {
   }
 
   .fun-card,
+  .fun-card--studio,
+  .fun-card--watch,
   .fun-card--music,
   .fun-card--nature,
   .fun-card--valley,

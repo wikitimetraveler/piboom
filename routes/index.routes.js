@@ -63,6 +63,8 @@ import lebanonRoutes from './lebanon.routes.js';
 import egyptRoutes from './egypt.routes.js';
 import shenangoRoutes from './shenango.routes.js';
 import newportPierRoutes from './newport-pier.routes.js';
+import studioRoutes from './studio.routes.js';
+import buildWatchTogetherRoutes from './watch-together.routes.js';
 
 export default function buildRoutes(io) {
   const api = Router();
@@ -126,6 +128,8 @@ export default function buildRoutes(io) {
   api.use('/egypt', egyptRoutes);
   api.use('/shenango', shenangoRoutes);
   api.use('/newport-pier', newportPierRoutes);
+  api.use('/studio', studioRoutes);
+  api.use('/watch-together', buildWatchTogetherRoutes(io));
   api.use('/', musicHistoryRoutes); // Music history and concert finder
   return api;
 }
