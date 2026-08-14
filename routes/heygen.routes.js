@@ -12,7 +12,10 @@ import {
   getHeygenDemoScript,
   postHeygenDisasterBriefing,
   getHeygenLibrary,
-  postHeygenSpeech
+  postHeygenSpeech,
+  postHeygenStreamingStart,
+  postHeygenStreamingSpeak,
+  postHeygenStreamingStop
 } from '../controllers/heygen.controller.js';
 
 const router = Router();
@@ -27,5 +30,8 @@ router.get('/scripts/demo', getHeygenDemoScript);
 router.post('/videos/briefing', postHeygenDisasterBriefing);
 router.post('/videos', postHeygenVideo);
 router.get('/videos/:videoId', getHeygenVideoStatus);
+router.post('/streaming/start', postHeygenStreamingStart);
+router.post('/streaming/speak', postHeygenStreamingSpeak);
+router.post('/streaming/stop', postHeygenStreamingStop);
 
 export default router;

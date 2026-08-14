@@ -72,6 +72,20 @@ uvicorn main:app --host 127.0.0.1 --port 8000 --reload
 
 The service will start on `http://localhost:8000`
 
+### LiveKit Agents worker (optional, separate process)
+
+Reed (StarBand) and Wolfman Dave join LiveKit rooms from a worker, not from FastAPI.
+
+```bash
+cd python-service
+pip install -r requirements-livekit.txt
+python livekit_agent/worker.py start
+```
+
+Or from the repo root: `npm run python:livekit-agent`.
+
+Uses `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`, and `OPENAI_API_KEY`. Set `LIVEKIT_AGENT_NAME=WolfmanDave` for the booth.
+
 ### 4. View API Documentation
 
 FastAPI automatically generates interactive API docs:

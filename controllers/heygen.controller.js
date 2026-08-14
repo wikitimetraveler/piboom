@@ -7,7 +7,11 @@ import {
   listVoices,
   createAvatarVideo,
   getVideoStatus,
-  generateSpeech
+  generateSpeech,
+  createHeygenStreamingSession,
+  startHeygenStreamingSession,
+  speakHeygenStreamingSession,
+  stopHeygenStreamingSession
 } from '../services/heygen.service.js';
 import {
   getSchemaWalkthrough,
@@ -211,5 +215,43 @@ export async function postHeygenDisasterBriefing(req, res) {
     res.json({ success: true, preview: false, videoId, libraryId: regId, ...payload, data });
   } catch (e) {
     handleHeygenError(res, e, 'Failed to create disaster briefing video');
+  }
+}
+
+export async function postHeygenStreamingStart(req, res) {
+  try {
+    const session = await createHeygenStreamingSession({
+      avatarId: req.body?.avatarId,
+      voiceId: req.body?.voiceId
+    });
+    if (session.sessionId) {
+      await startHeygenStreamingSession(session.sessionId);
+    }
+    res.json({ success: true, ok: true, ...session });
+  } catch (e) {
+    if (e.code === 'HEYGEN_STREAMING_AVATAR_REQUIRED') {
+      return res.status(503).json({ success: false, error: e.message, code: e.code });
+    }
+    handleHeygenError(res, e, 'Failed to start HeyGen streaming avatar');
+  }
+}
+
+export async function postHeygenStreamingSpeak(req, res) {
+  try {
+    const sessionId = req.body?.sessionId;
+    const text = req.body?.text;
+    const data = await speakHeygenStreamingSession(sessionId, text);
+    res.json({ success: true, ok: true, data });
+  } catch (e) {
+    handleHeygenError(res, e, 'Failed to speak on streaming avatar');
+  }
+}
+
+export async function postHeygenStreamingStop(req, res) {
+  try {
+    const data = await stopHeygenStreamingSession(req.body?.sessionId);
+    res.json({ success: true, ok: true, data });
+  } catch (e) {
+    handleHeygenError(res, e, 'Failed to stop streaming avatar');
   }
 }

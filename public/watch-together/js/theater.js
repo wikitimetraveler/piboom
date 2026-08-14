@@ -46,6 +46,7 @@
     cam: () => document.getElementById('wtCam'),
     blur: () => document.getElementById('wtBlur'),
     record: () => document.getElementById('wtRecord'),
+    archive: () => document.getElementById('wtArchive'),
     faces: () => document.getElementById('wtFaces'),
     facesEmpty: () => document.getElementById('wtFacesEmpty'),
   };
@@ -852,11 +853,13 @@
     const cam = els.cam();
     const blur = els.blur();
     const rec = els.record();
+    const archive = els.archive();
     if (mic) mic.hidden = !live;
     if (chatMic) chatMic.hidden = !live;
     if (cam) cam.hidden = !live;
     if (blur) blur.hidden = !live;
     if (rec) rec.hidden = !live;
+    if (archive) archive.hidden = !live;
     if (live) {
       try {
         syncBlurButton(window.WatchTogetherSync.blurOn());
@@ -1059,6 +1062,39 @@
       } catch (err) {
         syncRecordButton(false);
         setStatus(err?.message || 'Could not record.');
+      }
+    });
+    let archiveId = null;
+    els.archive()?.addEventListener('click', async () => {
+      const btn = els.archive();
+      const code = window.WatchTogetherGate?.getStoredCode?.() || '';
+      try {
+        if (archiveId) {
+          await fetch('/api/watch-together/egress/stop', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code, egressId: archiveId }),
+          });
+          archiveId = null;
+          if (btn) btn.setAttribute('aria-pressed', 'false');
+          setStatus('Mic archive stopped. The movie was never captured.');
+          return;
+        }
+        const res = await fetch('/api/watch-together/egress/audio', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) {
+          setStatus(data.error || 'Could not archive mics.');
+          return;
+        }
+        archiveId = data.egressId;
+        if (btn) btn.setAttribute('aria-pressed', 'true');
+        setStatus('Archiving couch mics on the server · YouTube is not in the file.');
+      } catch (err) {
+        setStatus(err?.message || 'Could not archive mics.');
       }
     });
     els.chatForm()?.addEventListener('submit', (event) => {

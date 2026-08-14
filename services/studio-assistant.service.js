@@ -6,7 +6,7 @@ import { ChatOpenAI } from '@langchain/openai';
 import { HumanMessage, SystemMessage, AIMessage } from '@langchain/core/messages';
 import { persistConversationTurn } from './langchain-memory.service.js';
 import { resolveOpenAiAgentModel } from './openai-agent-model.js';
-import { getLivekitConfig } from './studio.service.js';
+import { getLivekitConfig } from './livekit.service.js';
 
 const GUIDE_NAME = 'Reed';
 

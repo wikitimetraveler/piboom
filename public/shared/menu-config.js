@@ -123,6 +123,7 @@
     { href: '/gse-analyzer.html', icon: 'bi-graph-up-arrow', label: 'GSE scenario analyzer' },
     { href: '/bike-store-home.html', icon: 'bi-bicycle', label: 'Bike Store' },
     { href: '/ai/voice-dj.html', icon: 'bi-mic', label: 'Wolfman Dave' },
+    { href: '/ai/wolfman-booth.html', icon: 'bi-broadcast', label: 'Wolfman booth', title: 'LiveKit booth for Wolfman Dave — shared voice room' },
     { href: '/ai/assistant.html', icon: 'bi-chat-dots', label: 'Levi Assistant' },
     { href: '/ai/voice-guide.html', icon: 'bi-book', label: 'Voice Guide' },
     { href: '/family/lane-family.html', icon: 'bi-house-heart', label: 'Lane Family' },

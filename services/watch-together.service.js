@@ -2,7 +2,13 @@
  * Development work by David Lane
  */
 import { verifyWatchTogetherAccess } from '../lib/watch-together-auth.js';
-import { getLivekitConfig } from './studio.service.js';
+import {
+  getLivekitConfig,
+  listRoomParticipantCount,
+  mintLivekitAccessToken,
+  startAudioOnlyRoomEgress,
+  stopLivekitEgress,
+} from './livekit.service.js';
 import { getGoogleBrowserApiKey, getGoogleServerApiKey } from '../lib/google-api-key.js';
 
 export const DRIFT_PLAYING_S = 1.0;
@@ -373,21 +379,8 @@ export function getWatchTogetherStatus() {
   };
 }
 
-function livekitHttpUrl(url) {
-  return String(url || '').replace(/^ws/i, 'http');
-}
-
 async function countLivekitParticipants() {
-  const config = getLivekitConfig();
-  if (!config.configured) return 0;
-  try {
-    const { RoomServiceClient } = await import('livekit-server-sdk');
-    const svc = new RoomServiceClient(livekitHttpUrl(config.url), config.apiKey, config.apiSecret);
-    const parts = await svc.listParticipants(LIVEKIT_ROOM_NAME);
-    return Array.isArray(parts) ? parts.length : 0;
-  } catch {
-    return 0;
-  }
+  return listRoomParticipantCount(LIVEKIT_ROOM_NAME);
 }
 
 export async function getTheaterOccupancy() {
@@ -413,25 +406,6 @@ export function livekitIdentity(name, userId) {
   return `${base}-${Date.now().toString(36)}`.slice(0, 64);
 }
 
-async function defaultMintWatchTogetherToken({ roomName, identity, name }) {
-  const { AccessToken } = await import('livekit-server-sdk');
-  const { apiKey, apiSecret } = getLivekitConfig();
-  const token = new AccessToken(apiKey, apiSecret, {
-    identity,
-    name,
-    ttl: '6h',
-  });
-  token.addGrant({
-    roomJoin: true,
-    room: roomName,
-    canPublish: true,
-    canSubscribe: true,
-    canPublishData: true,
-    canUpdateOwnMetadata: true,
-  });
-  return token.toJwt();
-}
-
 export async function mintWatchTogetherLivekitToken({ identity, name, userId } = {}) {
   const config = getLivekitConfig();
   if (!config.configured) {
@@ -444,19 +418,34 @@ export async function mintWatchTogetherLivekitToken({ identity, name, userId } =
   const participantId = String(identity || livekitIdentity(participantName, userId))
     .replace(/[^\w.-]/g, '-')
     .slice(0, 64);
-  const factory = livekitTokenFactory || defaultMintWatchTogetherToken;
-  const jwt = await factory({
+  if (livekitTokenFactory) {
+    const jwt = await livekitTokenFactory({
+      roomName: LIVEKIT_ROOM_NAME,
+      identity: participantId,
+      name: participantName,
+    });
+    return {
+      token: jwt,
+      url: config.url,
+      roomName: LIVEKIT_ROOM_NAME,
+      identity: participantId,
+      name: participantName,
+    };
+  }
+  return mintLivekitAccessToken({
     roomName: LIVEKIT_ROOM_NAME,
     identity: participantId,
     name: participantName,
+    agentName: null,
   });
-  return {
-    token: jwt,
-    url: config.url,
-    roomName: LIVEKIT_ROOM_NAME,
-    identity: participantId,
-    name: participantName,
-  };
+}
+
+export async function startWatchTogetherAudioEgress() {
+  return startAudioOnlyRoomEgress({ roomName: LIVEKIT_ROOM_NAME });
+}
+
+export async function stopWatchTogetherAudioEgress(egressId) {
+  return stopLivekitEgress(egressId);
 }
 
 /**
@@ -644,6 +633,8 @@ export default {
   getWatchTogetherSnapshot,
   getWatchTogetherStatus,
   mintWatchTogetherLivekitToken,
+  startWatchTogetherAudioEgress,
+  stopWatchTogetherAudioEgress,
   setWatchTogetherLivekitTokenFactory,
   setWatchTogetherOccupancyReader,
   getTheaterOccupancy,

@@ -48,6 +48,7 @@
     "python:install": "cd python-service && pip install -r requirements.txt",
     "python:start": "cd python-service && python main.py",
     "python:dev": "cd python-service && python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000",
+    "python:livekit-agent": "cd python-service && python livekit_agent/worker.py start",
     "example:python-disasters": "node examples/python-service-example.js",
     "example:encompass-rag": "node examples/encompass-rag-example.js",
     "example:rag-workflow": "node examples/rag-workflow-example.js",

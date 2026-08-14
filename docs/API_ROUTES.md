@@ -134,9 +134,18 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | Method | Path | Description |
 |--------|------|-------------|
 | * | `/api/audio/*` | Audio routes |
-| * | `/api/studio/*` | Browser Studio: LiveKit tokens, reel sessions, listening-room unlock, WAV releases, Reed engineer chat |
+| * | `/api/studio/*` | Browser Studio: LiveKit tokens, reel sessions, listening-room unlock, WAV releases, Reed engineer chat, audio-only egress |
 | GET | `/api/studio/health` | LiveKit / OpenAI status |
-| POST | `/api/studio/livekit-token` | Mint LiveKit JWT (`reelCode`, `name`) |
+| POST | `/api/studio/livekit-token` | Mint LiveKit JWT (`reelCode`, `name`) — dispatches `StarBand` |
+| POST | `/api/studio/egress/audio` | Start audio-only LiveKit egress for the reel (mics, never YouTube) |
+| POST | `/api/studio/egress/stop` | Stop egress (`egressId`) |
+| POST | `/api/watch-together/egress/audio` | Archive couch mics only |
+| POST | `/api/watch-together/egress/stop` | Stop theater mic archive |
+| GET | `/api/wolfman/health` | Wolfman Dave LiveKit booth status |
+| POST | `/api/wolfman/livekit-token` | Mint JWT for `music-wolfman-lobby` (dispatches `WolfmanDave`) |
+| POST | `/api/heygen/streaming/start` | HeyGen Interactive Avatar LiveKit session |
+| POST | `/api/heygen/streaming/speak` | Speak on an open streaming session |
+| POST | `/api/heygen/streaming/stop` | Stop streaming avatar |
 | POST | `/api/studio/listen/unlock` | Listening-room password (default `reel1`) |
 | * | `/api/voice/*` | Voice (init, start, stop, speak, etc.) |
 | * | `/api/music-research/*` | Knowledge graph, Wikipedia, MusicBrainz, etc. |

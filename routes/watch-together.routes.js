@@ -10,6 +10,8 @@ import {
   postWatchTogetherIntent,
   postWatchTogetherLivekitToken,
   postWatchTogetherYoutubeSearch,
+  postWatchTogetherAudioEgress,
+  postWatchTogetherAudioEgressStop,
 } from '../controllers/watch-together.controller.js';
 import { attachWatchTogetherSockets } from '../services/watch-together.service.js';
 
@@ -23,5 +25,7 @@ export default function buildWatchTogetherRoutes(io) {
   router.post('/intent', postWatchTogetherIntent);
   router.post('/livekit-token', postWatchTogetherLivekitToken);
   router.post('/youtube-search', postWatchTogetherYoutubeSearch);
+  router.post('/egress/audio', postWatchTogetherAudioEgress);
+  router.post('/egress/stop', postWatchTogetherAudioEgressStop);
   return router;
 }

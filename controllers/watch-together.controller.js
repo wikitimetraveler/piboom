@@ -8,6 +8,8 @@ import {
   getWatchTogetherStatus,
   handleWatchIntent,
   mintWatchTogetherLivekitToken,
+  startWatchTogetherAudioEgress,
+  stopWatchTogetherAudioEgress,
   searchWatchTogetherYouTube,
   MAX_VIEWERS,
 } from '../services/watch-together.service.js';
@@ -118,6 +120,34 @@ export async function postWatchTogetherYoutubeSearch(req, res) {
   }
 }
 
+export async function postWatchTogetherAudioEgress(req, res) {
+  try {
+    const code = typeof req.body?.code === 'string' ? req.body.code : '';
+    if (!verifyWatchTogetherAccess(code).valid) {
+      return res.status(401).json({ ok: false, error: 'invalid-code' });
+    }
+    const started = await startWatchTogetherAudioEgress();
+    return res.json({ ok: true, ...started });
+  } catch (error) {
+    const status = error.code === 'LIVEKIT_NOT_CONFIGURED' ? 503 : 500;
+    return res.status(status).json({ ok: false, error: error.code || error.message });
+  }
+}
+
+export async function postWatchTogetherAudioEgressStop(req, res) {
+  try {
+    const code = typeof req.body?.code === 'string' ? req.body.code : '';
+    if (!verifyWatchTogetherAccess(code).valid) {
+      return res.status(401).json({ ok: false, error: 'invalid-code' });
+    }
+    const stopped = await stopWatchTogetherAudioEgress(req.body?.egressId);
+    return res.json({ ok: true, ...stopped });
+  } catch (error) {
+    const status = error.code === 'LIVEKIT_NOT_CONFIGURED' ? 503 : 400;
+    return res.status(status).json({ ok: false, error: error.code || error.message });
+  }
+}
+
 export default {
   postVerifyWatchTogether,
   getWatchTogetherGoogleApiKey,
@@ -126,4 +156,6 @@ export default {
   postWatchTogetherIntent,
   postWatchTogetherLivekitToken,
   postWatchTogetherYoutubeSearch,
+  postWatchTogetherAudioEgress,
+  postWatchTogetherAudioEgressStop,
 };

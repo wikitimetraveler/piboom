@@ -24,6 +24,9 @@
     mic: document.getElementById('stMic'),
     cam: document.getElementById('stCam'),
     share: document.getElementById('stShare'),
+    egress: document.getElementById('stEgress'),
+    heygenFace: document.getElementById('stHeygenFace'),
+    heygenTile: document.getElementById('stHeygenTile'),
     stage: document.getElementById('stStage'),
     presence: document.getElementById('stPresence'),
     reedLog: document.getElementById('stReedLog'),
@@ -50,6 +53,9 @@
     camOn: false,
     shareOn: false,
     lastBounce: null,
+    heygenRoom: null,
+    heygenSessionId: null,
+    egressId: null,
     analyser: null,
     raf: 0,
     playSources: [],
@@ -599,6 +605,87 @@
     attachLocalPreview();
   }
 
+  async function toggleAudioEgress() {
+    if (state.egressId) {
+      await fetch('/api/studio/egress/stop', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ egressId: state.egressId }),
+      });
+      state.egressId = null;
+      appendReed('Mic archive stopped.');
+      return;
+    }
+    const res = await fetch('/api/studio/egress/audio', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reelCode: state.reel }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.ok) {
+      appendReed(data.error || 'Audio egress needs LiveKit (and S3 dest in production).');
+      return;
+    }
+    state.egressId = data.egressId;
+    appendReed('Archiving room mics only — audio-only LiveKit egress.');
+  }
+
+  async function toggleReedFace() {
+    const LK = window.LivekitClient;
+    if (state.heygenRoom) {
+      await fetch('/api/heygen/streaming/stop', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId: state.heygenSessionId }),
+      }).catch(() => {});
+      await state.heygenRoom.disconnect();
+      state.heygenRoom = null;
+      state.heygenSessionId = null;
+      if (els.heygenTile) {
+        els.heygenTile.innerHTML = '';
+        els.heygenTile.hidden = true;
+      }
+      appendReed('HeyGen face closed.');
+      return;
+    }
+    const res = await fetch('/api/heygen/streaming/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.url || !data.accessToken) {
+      appendReed(data.error || 'HeyGen streaming needs HEYGEN_API_KEY and HEYGEN_STREAMING_AVATAR_ID.');
+      return;
+    }
+    if (!LK) {
+      appendReed('LiveKit client missing');
+      return;
+    }
+    const faceRoom = new LK.Room({ adaptiveStream: true, dynacast: true });
+    faceRoom.on(LK.RoomEvent.TrackSubscribed, (track) => {
+      if (!els.heygenTile) return;
+      els.heygenTile.hidden = false;
+      const el = track.attach();
+      el.style.maxWidth = '100%';
+      els.heygenTile.appendChild(el);
+    });
+    await faceRoom.connect(data.url, data.accessToken);
+    state.heygenRoom = faceRoom;
+    state.heygenSessionId = data.sessionId;
+    appendReed('Reed face is a HeyGen LiveKit tile — separate from the StarBand room.');
+    if (data.sessionId) {
+      fetch('/api/heygen/streaming/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId: data.sessionId,
+          text: 'Console is up. Arm a track when you are ready.',
+        }),
+      }).catch(() => {});
+    }
+  }
+
   async function askReed(event) {
     event.preventDefault();
     const message = String(els.reedInput.value || '').trim();
@@ -678,6 +765,8 @@
   els.mic?.addEventListener('click', () => toggleMic().catch((err) => appendReed(err.message)));
   els.cam?.addEventListener('click', () => toggleCam().catch((err) => appendReed(err.message)));
   els.share?.addEventListener('click', () => toggleShare().catch((err) => appendReed(err.message)));
+  els.egress?.addEventListener('click', () => toggleAudioEgress().catch((err) => appendReed(err.message)));
+  els.heygenFace?.addEventListener('click', () => toggleReedFace().catch((err) => appendReed(err.message)));
   els.reedForm?.addEventListener('submit', askReed);
   els.tracks?.addEventListener('click', (event) => {
     const arm = event.target.getAttribute('data-arm');

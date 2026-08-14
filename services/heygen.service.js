@@ -228,6 +228,60 @@ export async function getVideoStatus(videoId) {
   return heygenRequest(`/v3/videos/${encodeURIComponent(videoId)}`);
 }
 
+function streamingAvatarId() {
+  return String(process.env.HEYGEN_STREAMING_AVATAR_ID || process.env.HEYGEN_AVATAR_ID || '').trim();
+}
+
+function streamingVoiceId() {
+  return String(process.env.HEYGEN_STREAMING_VOICE_ID || process.env.HEYGEN_VOICE_ID || '').trim();
+}
+
+/**
+ * HeyGen Interactive Avatar — LiveKit session from HeyGen Cloud.
+ * Separate from StarBand rooms; the desk attaches the returned URL/token as a tile.
+ */
+export async function createHeygenStreamingSession({ avatarId, voiceId, quality = 'medium' } = {}) {
+  const avatar = String(avatarId || streamingAvatarId()).trim();
+  if (!avatar) {
+    const err = new Error('HEYGEN_STREAMING_AVATAR_ID is not configured');
+    err.code = 'HEYGEN_STREAMING_AVATAR_REQUIRED';
+    throw err;
+  }
+  const body = { quality, avatar_name: avatar, version: 'v2' };
+  const voice = String(voiceId || streamingVoiceId()).trim();
+  if (voice) body.voice = { voice_id: voice };
+  const data = await heygenRequest('/v1/streaming.new', { method: 'POST', body });
+  return {
+    sessionId: data?.session_id || data?.sessionId || null,
+    url: data?.url || null,
+    accessToken: data?.access_token || data?.accessToken || null,
+    avatarId: avatar,
+  };
+}
+
+export async function startHeygenStreamingSession(sessionId) {
+  const id = String(sessionId || '').trim();
+  if (!id) throw new Error('sessionId is required');
+  return heygenRequest('/v1/streaming.start', { method: 'POST', body: { session_id: id } });
+}
+
+export async function speakHeygenStreamingSession(sessionId, text) {
+  const id = String(sessionId || '').trim();
+  const script = String(text || '').trim();
+  if (!id) throw new Error('sessionId is required');
+  if (!script) throw new Error('text is required');
+  return heygenRequest('/v1/streaming.task', {
+    method: 'POST',
+    body: { session_id: id, text: script.slice(0, 2000), task_type: 'talk' },
+  });
+}
+
+export async function stopHeygenStreamingSession(sessionId) {
+  const id = String(sessionId || '').trim();
+  if (!id) throw new Error('sessionId is required');
+  return heygenRequest('/v1/streaming.stop', { method: 'POST', body: { session_id: id } });
+}
+
 /**
  * Poll until a video completes or fails.
  * @param {string} videoId

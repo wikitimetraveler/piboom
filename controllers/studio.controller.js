@@ -14,6 +14,8 @@ import {
   resolveReleaseFile,
   sanitizeDisplayName,
   normalizeReelCode,
+  startStudioAudioEgress,
+  stopStudioAudioEgress,
 } from '../services/studio.service.js';
 import { getRoomSnapshot } from '../services/studio-socket.service.js';
 import { verifyStudioListenPassword } from '../lib/studio-auth.js';
@@ -66,6 +68,27 @@ export async function postLivekitToken(req, res) {
       error: error.code || error.message,
       livekitConfigured: false,
     });
+  }
+}
+
+export async function postStudioAudioEgress(req, res) {
+  try {
+    const reelCode = normalizeReelCode(req.body?.reelCode || req.body?.code);
+    const started = await startStudioAudioEgress(reelCode);
+    res.json({ ok: true, ...started });
+  } catch (error) {
+    const status = error.code === 'LIVEKIT_NOT_CONFIGURED' ? 503 : 500;
+    res.status(status).json({ ok: false, error: error.code || error.message });
+  }
+}
+
+export async function postStudioAudioEgressStop(req, res) {
+  try {
+    const stopped = await stopStudioAudioEgress(req.body?.egressId);
+    res.json({ ok: true, ...stopped });
+  } catch (error) {
+    const status = error.code === 'LIVEKIT_NOT_CONFIGURED' ? 503 : 400;
+    res.status(status).json({ ok: false, error: error.code || error.message });
   }
 }
 
@@ -164,6 +187,27 @@ export async function postEngineerChat(req, res) {
   }
 }
 
+export async function postStudioAudioEgress(req, res) {
+  try {
+    const reelCode = normalizeReelCode(req.body?.reelCode || req.body?.code);
+    const started = await startStudioAudioEgress(reelCode);
+    res.json({ ok: true, ...started });
+  } catch (error) {
+    const status = error.code === 'LIVEKIT_NOT_CONFIGURED' ? 503 : 500;
+    res.status(status).json({ ok: false, error: error.code || error.message });
+  }
+}
+
+export async function postStudioAudioEgressStop(req, res) {
+  try {
+    const stopped = await stopStudioAudioEgress(req.body?.egressId);
+    res.json({ ok: true, ...stopped });
+  } catch (error) {
+    const status = error.code === 'LIVEKIT_NOT_CONFIGURED' ? 503 : 400;
+    res.status(status).json({ ok: false, error: error.code || error.message });
+  }
+}
+
 export default {
   getHealth,
   postSession,
@@ -174,4 +218,6 @@ export default {
   getReleases,
   getReleaseAudio,
   postEngineerChat,
+  postStudioAudioEgress,
+  postStudioAudioEgressStop,
 };

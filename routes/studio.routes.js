@@ -29,5 +29,7 @@ router.get('/releases', studioController.getReleases);
 router.get('/releases/:id/audio', studioController.getReleaseAudio);
 router.post('/releases', bounceUpload.single('audio'), studioController.postRelease);
 router.post('/assistant/chat', studioController.postEngineerChat);
+router.post('/egress/audio', studioController.postStudioAudioEgress);
+router.post('/egress/stop', studioController.postStudioAudioEgressStop);
 
 export default router;

@@ -6,6 +6,15 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { getPool } from './database.service.js';
+import {
+  STARBAND_AGENT_NAME,
+  getLivekitConfig,
+  getLivekitStatusExtras,
+  mintLivekitAccessToken,
+  setLivekitTokenFactory,
+  startAudioOnlyRoomEgress,
+  stopLivekitEgress,
+} from './livekit.service.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const RELEASE_DIR = path.join(__dirname, '../data/studio-releases');
@@ -14,12 +23,7 @@ const REEL_ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
 const memorySessions = new Map();
 const memoryReleases = new Map();
 
-/** @type {null | ((opts: object) => Promise<string>)} */
-let livekitTokenFactory = null;
-
-export function setLivekitTokenFactory(factory) {
-  livekitTokenFactory = typeof factory === 'function' ? factory : null;
-}
+export { STARBAND_AGENT_NAME, getLivekitConfig, setLivekitTokenFactory };
 
 export function normalizeReelCode(raw) {
   return String(raw || '')
@@ -49,74 +53,28 @@ export function sanitizeDisplayName(raw) {
   return name || 'Player';
 }
 
-export function getLivekitConfig() {
-  const url = String(process.env.LIVEKIT_URL || '').trim();
-  const apiKey = String(process.env.LIVEKIT_API_KEY || '').trim();
-  const apiSecret = String(process.env.LIVEKIT_API_SECRET || '').trim();
-  return {
-    url,
-    apiKey,
-    apiSecret,
-    configured: Boolean(url && apiKey && apiSecret),
-  };
-}
-
-export const STARBAND_AGENT_NAME = 'StarBand';
-
-async function defaultMintToken({ roomName, identity, name, canPublish }) {
-  const { AccessToken, RoomAgentDispatch, RoomConfiguration } = await import('livekit-server-sdk');
-  const { apiKey, apiSecret } = getLivekitConfig();
-  const token = new AccessToken(apiKey, apiSecret, {
-    identity,
-    name,
-    ttl: '6h',
-  });
-  token.addGrant({
-    roomJoin: true,
-    room: roomName,
-    canPublish: canPublish !== false,
-    canSubscribe: true,
-    canPublishData: true,
-    canUpdateOwnMetadata: true,
-  });
-  token.roomConfig = new RoomConfiguration({
-    agents: [new RoomAgentDispatch({ agentName: STARBAND_AGENT_NAME })],
-  });
-  return token.toJwt();
-}
-
 export async function mintLivekitToken({
   reelCode,
   identity,
   name,
   canPublish = true,
 } = {}) {
-  const config = getLivekitConfig();
-  if (!config.configured) {
-    const err = new Error('LIVEKIT_NOT_CONFIGURED');
-    err.code = 'LIVEKIT_NOT_CONFIGURED';
-    throw err;
-  }
-  const roomName = livekitRoomName(reelCode);
-  const participantName = sanitizeDisplayName(name);
-  const participantId = String(identity || `${participantName}-${Date.now()}`)
-    .replace(/[^\w.-]/g, '-')
-    .slice(0, 64);
-  const factory = livekitTokenFactory || defaultMintToken;
-  const jwt = await factory({
-    roomName,
-    identity: participantId,
-    name: participantName,
+  const minted = await mintLivekitAccessToken({
+    roomName: livekitRoomName(reelCode),
+    identity,
+    name: sanitizeDisplayName(name),
     canPublish,
-  });
-  return {
-    token: jwt,
-    url: config.url,
-    roomName,
-    identity: participantId,
-    name: participantName,
     agentName: STARBAND_AGENT_NAME,
-  };
+  });
+  return minted;
+}
+
+export async function startStudioAudioEgress(reelCode) {
+  return startAudioOnlyRoomEgress({ roomName: livekitRoomName(reelCode) });
+}
+
+export async function stopStudioAudioEgress(egressId) {
+  return stopLivekitEgress(egressId);
 }
 
 function sessionRecord(code, title) {
@@ -287,11 +245,10 @@ export async function resolveReleaseFile(release) {
 }
 
 export function getStudioStatus() {
-  const livekit = getLivekitConfig();
+  const extras = getLivekitStatusExtras();
   return {
     ok: true,
-    livekitConfigured: livekit.configured,
-    livekitUrl: livekit.configured ? livekit.url : null,
+    ...extras,
     agentName: STARBAND_AGENT_NAME,
     openaiConfigured: Boolean((process.env.OPENAI_API_KEY || '').trim()),
     listenConfigured: true,
@@ -307,6 +264,8 @@ export default {
   sanitizeDisplayName,
   getLivekitConfig,
   mintLivekitToken,
+  startStudioAudioEgress,
+  stopStudioAudioEgress,
   createSession,
   getSession,
   addRelease,

@@ -56,9 +56,16 @@ Hybrid vector RAG + GraphRAG details: `docs/VECTOR_RAG.md`.
 | `GOOGLE_CLOUD_PROJECT` | Google Cloud project ID |
 | `SHAZAM_API_KEY` | Shazam/RapidAPI song identification |
 | `SETLISTFM_API_KEY` | Setlist.fm API |
-| `LIVEKIT_URL` | LiveKit WebSocket URL (`wss://…livekit.cloud`) for Studio voice, video, and screen share |
+| `LIVEKIT_URL` | LiveKit WebSocket URL (`wss://…livekit.cloud`) for Studio, Watch Together, and Wolfman booth |
 | `LIVEKIT_API_KEY` | LiveKit API key (server-only; mints room tokens) |
 | `LIVEKIT_API_SECRET` | LiveKit API secret (server-only) |
+| `LIVEKIT_AGENT_NAME` | Python worker dispatch name (`StarBand` default, or `WolfmanDave`) |
+| `LIVEKIT_EGRESS_S3_BUCKET` | Optional S3 bucket for audio-only room egress |
+| `LIVEKIT_EGRESS_S3_ACCESS_KEY` | Optional S3 access key for egress (falls back to `AWS_ACCESS_KEY_ID`) |
+| `LIVEKIT_EGRESS_S3_SECRET` | Optional S3 secret for egress (falls back to `AWS_SECRET_ACCESS_KEY`) |
+| `LIVEKIT_EGRESS_S3_REGION` | Optional S3 region |
+| `HEYGEN_STREAMING_AVATAR_ID` | HeyGen Interactive Avatar id for the Studio “Reed face” LiveKit tile |
+| `HEYGEN_STREAMING_VOICE_ID` | Optional HeyGen voice for streaming |
 | `STUDIO_LISTEN_PASSWORD` | Listening-room password (default `reel1`) |
 
 ## Misc
