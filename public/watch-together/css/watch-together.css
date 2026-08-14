@@ -2,17 +2,22 @@
  * Development work by David Lane
  */
 :root {
-  --wt-bg: #08090c;
-  --wt-bg-2: #0d0e12;
-  --wt-ink: #f4f5f7;
-  --wt-muted: #9aa3ae;
-  --wt-dim: #6b7380;
-  --wt-line: rgba(255, 255, 255, 0.12);
-  --wt-card: #12141a;
-  --wt-card-border: rgba(150, 170, 200, 0.16);
-  --wt-accent: #ff3d4d;
-  --wt-accent-soft: rgba(255, 61, 77, 0.22);
+  --wt-bg: #07060a;
+  --wt-bg-2: #100c08;
+  --wt-ink: #f6eed8;
+  --wt-muted: #c4b48a;
+  --wt-dim: #8a7a58;
+  --wt-line: rgba(232, 200, 114, 0.28);
+  --wt-card: #14110c;
+  --wt-card-border: rgba(232, 200, 114, 0.32);
+  --wt-accent: #d4a017;
+  --wt-accent-soft: rgba(212, 160, 23, 0.22);
+  --wt-gold: #e8c872;
+  --wt-gold-deep: #8a6410;
+  --wt-burgundy: #4a1220;
   --wt-font: "Inter", "Segoe UI", system-ui, sans-serif;
+  --wt-display: "Cinzel", "Times New Roman", serif;
+  --wt-ornament: "Cinzel Decorative", "Cinzel", serif;
 }
 
 *,
@@ -46,17 +51,24 @@ body.wt-body {
 
 .wt-glow {
   background:
-    radial-gradient(ellipse 55% 40% at 12% 8%, rgba(255, 61, 77, 0.16), transparent 62%),
-    radial-gradient(ellipse 40% 30% at 80% 90%, rgba(255, 61, 77, 0.05), transparent 70%);
+    radial-gradient(ellipse 70% 55% at 50% -10%, rgba(212, 160, 23, 0.22), transparent 58%),
+    radial-gradient(circle at 50% 120%, rgba(74, 18, 32, 0.55), transparent 48%),
+    repeating-conic-gradient(from 0deg at 50% 0%, rgba(232, 200, 114, 0.07) 0deg 8deg, transparent 8deg 16deg);
 }
 
 .wt-scanlines {
-  opacity: 0.35;
-  background-image: repeating-linear-gradient(
-    to bottom,
-    transparent 0 3px,
-    rgba(255, 255, 255, 0.025) 3px 4px
-  );
+  opacity: 0.45;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 11px,
+      rgba(232, 200, 114, 0.03) 11px 12px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 4px,
+      rgba(232, 200, 114, 0.035) 4px 5px
+    );
 }
 
 .wt-page {
@@ -76,27 +88,29 @@ body.wt-body {
 
 .wt-kicker {
   margin: 0 0 1.1rem;
-  color: var(--wt-accent);
+  color: var(--wt-gold);
+  font-family: var(--wt-display);
   font-size: 0.68rem;
-  font-weight: 650;
-  letter-spacing: 0.22em;
+  font-weight: 700;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
 }
 
 .wt-title {
   margin: 0 0 1.35rem;
-  font-size: clamp(3.4rem, 8.2vw, 6.35rem);
-  font-weight: 800;
-  letter-spacing: -0.055em;
-  line-height: 0.92;
+  font-family: var(--wt-ornament);
+  font-size: clamp(3.1rem, 7.6vw, 5.8rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 0.95;
+  text-transform: uppercase;
 }
 
 .wt-title .together {
-  color: var(--wt-accent);
+  color: var(--wt-gold);
   text-shadow:
-    0 0 18px rgba(255, 61, 77, 0.55),
-    0 0 48px rgba(255, 61, 77, 0.4),
-    0 0 90px rgba(255, 61, 77, 0.22);
+    0 0 18px rgba(232, 200, 114, 0.45),
+    0 0 48px rgba(212, 160, 23, 0.28);
 }
 
 .wt-lede {
@@ -116,19 +130,20 @@ body.wt-body {
 
 .wt-enter {
   appearance: none;
-  border: 0;
-  border-radius: 12px;
+  border: 1px solid var(--wt-gold);
+  border-radius: 2px;
   padding: 0.85rem 1.35rem;
-  background: var(--wt-accent);
-  color: #fff;
-  font: inherit;
-  font-size: 0.98rem;
-  font-weight: 650;
+  background: linear-gradient(180deg, #f0d78a, var(--wt-accent) 55%, var(--wt-gold-deep));
+  color: #1a1208;
+  font-family: var(--wt-display);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   cursor: pointer;
   box-shadow:
-    0 0 0 1px rgba(255, 61, 77, 0.35),
-    0 10px 28px rgba(255, 61, 77, 0.35),
-    0 0 42px rgba(255, 61, 77, 0.28);
+    0 0 0 1px rgba(26, 18, 8, 0.55),
+    0 8px 22px rgba(212, 160, 23, 0.28);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -136,9 +151,8 @@ body.wt-body {
 .wt-enter:focus-visible {
   transform: translateY(-1px);
   box-shadow:
-    0 0 0 1px rgba(255, 61, 77, 0.5),
-    0 14px 34px rgba(255, 61, 77, 0.42),
-    0 0 56px rgba(255, 61, 77, 0.34);
+    0 0 0 1px rgba(26, 18, 8, 0.7),
+    0 12px 28px rgba(212, 160, 23, 0.38);
   outline: none;
 }
 
@@ -202,7 +216,7 @@ body.wt-body {
   right: 0;
   top: 50%;
   height: 1px;
-  background: linear-gradient(90deg, rgba(255, 61, 77, 0.15), var(--wt-accent) 78%, rgba(255, 61, 77, 0.25));
+  background: linear-gradient(90deg, rgba(212, 160, 23, 0.15), var(--wt-accent) 78%, rgba(212, 160, 23, 0.25));
 }
 
 .wt-playhead {
@@ -214,7 +228,7 @@ body.wt-body {
   border-radius: 50%;
   background: var(--wt-accent);
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 0 4px rgba(255, 61, 77, 0.18), 0 0 16px rgba(255, 61, 77, 0.7);
+  box-shadow: 0 0 0 4px rgba(212, 160, 23, 0.18), 0 0 16px rgba(212, 160, 23, 0.7);
   animation: wt-playhead 9s ease-in-out infinite;
 }
 
@@ -264,7 +278,7 @@ body.wt-body {
   width: 34px;
   height: 34px;
   color: var(--wt-accent);
-  filter: drop-shadow(0 0 10px rgba(255, 61, 77, 0.45));
+  filter: drop-shadow(0 0 10px rgba(212, 160, 23, 0.45));
 }
 
 .wt-bar {
@@ -274,7 +288,7 @@ body.wt-body {
   bottom: 10px;
   height: 5px;
   border-radius: 99px;
-  background: rgba(255, 61, 77, 0.18);
+  background: rgba(212, 160, 23, 0.18);
   overflow: hidden;
 }
 
@@ -284,7 +298,7 @@ body.wt-body {
   height: 100%;
   border-radius: inherit;
   background: var(--wt-accent);
-  box-shadow: 0 0 10px rgba(255, 61, 77, 0.55);
+  box-shadow: 0 0 10px rgba(212, 160, 23, 0.55);
 }
 
 .wt-name {
@@ -312,9 +326,11 @@ body.wt-body {
 }
 
 .wt-home-link {
-  color: var(--wt-dim);
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
+  color: var(--wt-gold);
+  font-family: var(--wt-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
   text-decoration: none;
 }
 
@@ -341,16 +357,20 @@ body.wt-body {
 .wt-gate-card {
   width: min(100%, 420px);
   padding: 1.6rem 1.5rem 1.4rem;
-  border: 1px solid var(--wt-card-border);
-  border-radius: 18px;
-  background: #101218;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--wt-gold);
+  border-radius: 3px;
+  background: #14110c;
+  box-shadow:
+    0 0 0 6px #100c08,
+    0 24px 80px rgba(0, 0, 0, 0.45);
 }
 
 .wt-gate-card h2 {
   margin: 0 0 0.4rem;
+  font-family: var(--wt-ornament);
   font-size: 1.35rem;
-  letter-spacing: -0.03em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .wt-gate-card p {
@@ -386,7 +406,7 @@ body.wt-body {
 }
 
 .wt-field input:focus {
-  outline: 2px solid rgba(255, 61, 77, 0.45);
+  outline: 2px solid rgba(212, 160, 23, 0.45);
   border-color: transparent;
 }
 
@@ -405,11 +425,15 @@ body.wt-body {
 .wt-ghost {
   appearance: none;
   border: 1px solid var(--wt-card-border);
-  border-radius: 12px;
+  border-radius: 2px;
   padding: 0.75rem 1rem;
   background: transparent;
   color: var(--wt-muted);
-  font: inherit;
+  font-family: var(--wt-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   cursor: pointer;
 }
 
@@ -437,7 +461,7 @@ body.wt-cinema-on {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  padding: 0.55rem 0.7rem 0.65rem;
+  padding: 0.7rem 0.9rem 0.8rem;
 }
 
 .wt-theater.is-cinema .wt-theater-top {
@@ -491,18 +515,39 @@ body.wt-cinema-on {
   justify-content: space-between;
   gap: 0.8rem;
   margin-bottom: 1rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--wt-line);
+  background-image:
+    linear-gradient(90deg, transparent, var(--wt-gold) 18%, transparent 18% 82%, var(--wt-gold)),
+    repeating-linear-gradient(90deg, var(--wt-gold) 0 6px, transparent 6px 12px);
+  background-size: 100% 1px, 100% 3px;
+  background-position: left bottom, left calc(100% - 4px);
+  background-repeat: no-repeat;
+}
+
+.wt-marquee {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.wt-marquee .wt-kicker {
+  margin: 0;
+  font-size: 0.58rem;
 }
 
 .wt-brand {
   margin: 0;
-  font-size: 1.35rem;
-  font-weight: 800;
-  letter-spacing: -0.04em;
+  font-family: var(--wt-ornament);
+  font-size: 1.28rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .wt-brand span {
-  color: var(--wt-accent);
-  text-shadow: 0 0 18px rgba(255, 61, 77, 0.45);
+  color: var(--wt-gold);
+  text-shadow: 0 0 18px rgba(232, 200, 114, 0.45);
 }
 
 .wt-viewers {
@@ -513,17 +558,18 @@ body.wt-cinema-on {
 
 .wt-chip {
   border: 1px solid var(--wt-card-border);
-  border-radius: 99px;
+  border-radius: 2px;
   padding: 0.2rem 0.65rem;
   color: var(--wt-muted);
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
+  font-family: var(--wt-display);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
 .wt-chip-count {
   color: var(--wt-ink);
-  border-color: rgba(255, 61, 77, 0.45);
+  border-color: rgba(212, 160, 23, 0.45);
 }
 
 .wt-load {
@@ -536,9 +582,9 @@ body.wt-cinema-on {
   flex: 1;
   min-width: 0;
   border: 1px solid var(--wt-card-border);
-  border-radius: 12px;
+  border-radius: 2px;
   padding: 0.75rem 0.9rem;
-  background: #101218;
+  background: #100c08;
   color: var(--wt-ink);
   font: inherit;
 }
@@ -547,8 +593,8 @@ body.wt-cinema-on {
   margin: -0.35rem 0 0.85rem;
   padding: 0.7rem;
   border: 1px solid var(--wt-card-border);
-  border-radius: 14px;
-  background: #101218;
+  border-radius: 3px;
+  background: #100c08;
 }
 
 .wt-picker-row {
@@ -654,13 +700,42 @@ body.wt-cinema-on {
 
 .wt-player-shell {
   position: relative;
-  border: 1px solid var(--wt-card-border);
-  border-radius: 16px;
+  border: 2px solid var(--wt-gold);
+  border-radius: 3px;
   overflow: hidden;
-  background: #050608;
+  background: #050308;
   width: 100%;
   aspect-ratio: 16 / 9;
   min-height: 0;
+  box-shadow:
+    0 0 0 5px #120e08,
+    0 0 0 7px rgba(232, 200, 114, 0.55),
+    0 0 0 14px #1a0c12,
+    0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
+.wt-proscenium::before,
+.wt-proscenium::after {
+  content: "";
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+  width: 3.2rem;
+  height: 3.2rem;
+  background:
+    linear-gradient(135deg, var(--wt-gold) 0 2px, transparent 2px 8px, var(--wt-gold) 8px 10px, transparent 10px);
+  opacity: 0.85;
+}
+
+.wt-proscenium::before {
+  top: 0.35rem;
+  left: 0.35rem;
+}
+
+.wt-proscenium::after {
+  right: 0.35rem;
+  bottom: 0.35rem;
+  transform: rotate(180deg);
 }
 
 .wt-poster {
@@ -891,16 +966,16 @@ body.wt-cinema-on {
   width: 40px;
   height: 40px;
   border: 1px solid var(--wt-card-border);
-  border-radius: 10px;
-  background: #101218;
-  color: var(--wt-ink);
+  border-radius: 2px;
+  background: #100c08;
+  color: var(--wt-gold);
   cursor: pointer;
 }
 
 .wt-icon-btn[aria-pressed="true"] {
   border-color: var(--wt-accent);
   color: var(--wt-accent);
-  box-shadow: 0 0 16px rgba(255, 61, 77, 0.25);
+  box-shadow: 0 0 16px rgba(212, 160, 23, 0.25);
 }
 
 .wt-seek {
@@ -924,18 +999,19 @@ input[type="range"] {
   min-height: 160px;
   max-height: none;
   border: 1px solid var(--wt-card-border);
-  border-radius: 16px;
-  background: #101218;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #18120c, #100c08);
   overflow: hidden;
 }
 
 .wt-chat h2 {
   margin: 0;
   padding: 0.8rem 0.9rem 0.15rem;
+  font-family: var(--wt-display);
   font-size: 0.72rem;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--wt-dim);
+  color: var(--wt-gold);
 }
 
 .wt-chat-hint {
@@ -1014,7 +1090,7 @@ input[type="range"] {
 }
 
 .wt-cut {
-  border-color: rgba(255, 61, 77, 0.35);
+  border-color: rgba(212, 160, 23, 0.35);
   color: var(--wt-ink);
 }
 
@@ -1046,10 +1122,12 @@ input[type="range"] {
 
 .wt-intro-title {
   margin: 0;
-  font-size: clamp(2.8rem, 8vw, 5.4rem);
-  font-weight: 800;
-  letter-spacing: -0.05em;
-  line-height: 0.92;
+  font-family: var(--wt-ornament);
+  font-size: clamp(2.6rem, 7.5vw, 5rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 0.95;
+  text-transform: uppercase;
 }
 
 .wt-story-overlay {
@@ -1100,8 +1178,8 @@ input[type="range"] {
 }
 
 .wt-spotlight {
-  outline: 1px solid rgba(255, 61, 77, 0.45);
-  box-shadow: 0 0 0 6px rgba(255, 61, 77, 0.12), 0 0 40px rgba(255, 61, 77, 0.18);
+  outline: 1px solid rgba(212, 160, 23, 0.45);
+  box-shadow: 0 0 0 6px rgba(212, 160, 23, 0.12), 0 0 40px rgba(212, 160, 23, 0.18);
   border-radius: 16px;
 }
 

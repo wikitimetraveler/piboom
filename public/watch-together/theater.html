@@ -6,7 +6,7 @@
   <title>Theater · Watch together.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Cinzel+Decorative:wght@700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/watch-together/css/watch-together.css">
 </head>
 <body class="wt-body wt-cinema-on">
@@ -19,7 +19,10 @@
 
   <main class="wt-theater is-cinema">
     <header class="wt-theater-top">
-      <h1 class="wt-brand">Watch <span>together.</span></h1>
+      <div class="wt-marquee">
+        <p class="wt-kicker">Palace theater</p>
+        <h1 class="wt-brand">Watch <span>together.</span></h1>
+      </div>
       <div class="wt-viewers" id="wtViewers" aria-label="People in the theater"></div>
     </header>
 
@@ -43,7 +46,7 @@
 
     <div class="wt-stage-grid">
       <div class="wt-stage-main">
-        <div class="wt-player-shell">
+        <div class="wt-player-shell wt-proscenium">
           <img id="wtPoster" class="wt-poster" alt="" hidden decoding="async">
           <div id="wtYt" class="yt" hidden></div>
           <video id="wtFile" hidden playsinline controls></video>
