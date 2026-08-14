@@ -392,6 +392,13 @@ body.st-page modern-navbar {
   border-color: rgba(255, 157, 77, 0.35);
 }
 
+.st-hint {
+  margin: 0.45rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: var(--st-dim);
+}
+
 .st-track button {
   background: #1a1a1a;
   color: var(--st-ink);

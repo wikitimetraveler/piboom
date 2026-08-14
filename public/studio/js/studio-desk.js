@@ -12,6 +12,7 @@
     tracks: document.getElementById('stTracks'),
     addTrack: document.getElementById('stAddTrack'),
     musicMode: document.getElementById('stMusicMode'),
+    acousticDesk: document.getElementById('stAcousticDesk'),
     meter: document.getElementById('stMeter'),
     timeline: document.getElementById('stTimeline'),
     record: document.getElementById('stRecord'),
@@ -47,6 +48,16 @@
     recorder: null,
     chunks: [],
     recordStartedAt: 0,
+    recordClockOrigin: 0,
+    recordArmed: null,
+    pcmChunks: [],
+    pcmNode: null,
+    pcmSource: null,
+    pcmSilent: null,
+    captureTap: null,
+    graphNodes: [],
+    roomIr: null,
+    roomIrRate: 0,
     socket: null,
     livekitRoom: null,
     micOn: false,
@@ -76,13 +87,175 @@
     return `${String(m).padStart(2, '0')}:${rem.toFixed(2).padStart(5, '0')}`;
   }
 
+  function acousticOn() {
+    return els.acousticDesk ? els.acousticDesk.checked : true;
+  }
+
   function ensureAudio() {
     if (!state.audioCtx) {
       const AC = window.AudioContext || window.webkitAudioContext;
-      state.audioCtx = new AC();
+      try {
+        state.audioCtx = new AC({ sampleRate: 48000, latencyHint: 'playback' });
+      } catch (_) {
+        state.audioCtx = new AC();
+      }
     }
     if (state.audioCtx.state === 'suspended') state.audioCtx.resume();
     return state.audioCtx;
+  }
+
+  function acousticProfile(track) {
+    const name = String(track.name || '').toLowerCase();
+    if (track.kind === 'acoustic-guitar' && /neck/.test(name)) {
+      return {
+        hpf: 120,
+        notch: { f: 250, q: 0.85, g: -2 },
+        presence: { f: 3400, q: 0.85, g: 2.6 },
+        air: { f: 10500, g: 2.2 },
+        compress: { threshold: -18, ratio: 2.4, attack: 0.012, release: 0.22, knee: 14 },
+        send: 0.14,
+      };
+    }
+    if (track.kind === 'acoustic-guitar') {
+      return {
+        hpf: 70,
+        notch: { f: 430, q: 1.05, g: -2.8 },
+        body: { f: 155, q: 0.8, g: 2.4 },
+        presence: { f: 900, q: 0.7, g: 1.4 },
+        air: { f: 7800, g: -1.6 },
+        compress: { threshold: -16, ratio: 2.2, attack: 0.018, release: 0.28, knee: 16 },
+        send: 0.18,
+      };
+    }
+    if (/vocal|harmony/.test(name)) {
+      return {
+        hpf: 85,
+        notch: { f: 320, q: 0.9, g: -1.4 },
+        presence: { f: 2700, q: 1, g: 1.8 },
+        air: { f: 11000, g: 1.6 },
+        compress: { threshold: -14, ratio: 2.8, attack: 0.008, release: 0.16, knee: 12 },
+        send: 0.11,
+      };
+    }
+    return { hpf: 45, send: 0.08 };
+  }
+
+  function addBiquad(ctx, type, freq, q, gainDb) {
+    const filter = ctx.createBiquadFilter();
+    filter.type = type;
+    filter.frequency.value = freq;
+    if (Number.isFinite(q)) filter.Q.value = q;
+    if (Number.isFinite(gainDb)) filter.gain.value = gainDb;
+    return filter;
+  }
+
+  function getRoomImpulse(ctx) {
+    if (state.roomIr && state.roomIrRate === ctx.sampleRate) return state.roomIr;
+    const seconds = 1.05;
+    const rate = ctx.sampleRate;
+    const length = Math.floor(rate * seconds);
+    const ir = ctx.createBuffer(2, length, rate);
+    for (let ch = 0; ch < 2; ch += 1) {
+      const data = ir.getChannelData(ch);
+      const skew = ch * 0.0063;
+      let lp = 0;
+      const early = [0.011 + skew, 0.017 + skew, 0.023 + skew, 0.031 + skew, 0.044 + skew];
+      const gains = [0.55, 0.32, 0.22, 0.16, 0.1];
+      for (let i = 0; i < length; i += 1) {
+        const t = i / rate;
+        let sample = 0;
+        for (let e = 0; e < early.length; e += 1) {
+          if (i === Math.floor(early[e] * rate)) sample += gains[e];
+        }
+        sample += (Math.random() * 2 - 1) * Math.exp(-t * 3.6) * 0.2;
+        lp = lp * 0.58 + sample * 0.42;
+        data[i] = lp;
+      }
+    }
+    state.roomIr = ir;
+    state.roomIrRate = rate;
+    return ir;
+  }
+
+  function createMixBus(ctx, nodes) {
+    const master = ctx.createGain();
+    master.gain.value = 1;
+    nodes.push(master);
+    const rumble = addBiquad(ctx, 'highpass', 38, 0.7);
+    master.connect(rumble);
+    nodes.push(rumble);
+    let output = rumble;
+    if (acousticOn()) {
+      const glue = ctx.createDynamicsCompressor();
+      glue.threshold.value = -10;
+      glue.knee.value = 12;
+      glue.ratio.value = 2.6;
+      glue.attack.value = 0.02;
+      glue.release.value = 0.32;
+      rumble.connect(glue);
+      nodes.push(glue);
+      const makeup = ctx.createGain();
+      makeup.gain.value = 1.08;
+      glue.connect(makeup);
+      nodes.push(makeup);
+      output = makeup;
+    }
+    let roomIn = null;
+    if (acousticOn() && ctx.createConvolver) {
+      const conv = ctx.createConvolver();
+      conv.buffer = getRoomImpulse(ctx);
+      conv.normalize = true;
+      const wet = ctx.createGain();
+      wet.gain.value = 0.85;
+      conv.connect(wet);
+      wet.connect(master);
+      nodes.push(conv, wet);
+      roomIn = conv;
+    }
+    return { master, roomIn, output };
+  }
+
+  function connectChain(ctx, input, track, master, roomIn, nodes) {
+    let node = input;
+    const hook = (next) => {
+      node.connect(next);
+      nodes.push(next);
+      node = next;
+      return next;
+    };
+    const profile = acousticOn() ? acousticProfile(track) : { send: 0 };
+    if (profile.hpf) hook(addBiquad(ctx, 'highpass', profile.hpf, 0.7));
+    if (profile.notch) hook(addBiquad(ctx, 'peaking', profile.notch.f, profile.notch.q, profile.notch.g));
+    if (profile.body) hook(addBiquad(ctx, 'peaking', profile.body.f, profile.body.q, profile.body.g));
+    if (profile.presence) hook(addBiquad(ctx, 'peaking', profile.presence.f, profile.presence.q, profile.presence.g));
+    if (profile.air) hook(addBiquad(ctx, 'highshelf', profile.air.f, 0.7, profile.air.g));
+    if (profile.compress) {
+      const comp = ctx.createDynamicsCompressor();
+      comp.threshold.value = profile.compress.threshold;
+      comp.ratio.value = profile.compress.ratio;
+      comp.attack.value = profile.compress.attack;
+      comp.release.value = profile.compress.release;
+      comp.knee.value = profile.compress.knee;
+      hook(comp);
+    }
+    hook((() => {
+      const gain = ctx.createGain();
+      gain.gain.value = track.gain;
+      return gain;
+    })());
+    if (typeof ctx.createStereoPanner === 'function') {
+      const pan = ctx.createStereoPanner();
+      pan.pan.value = track.pan;
+      hook(pan);
+    }
+    node.connect(master);
+    if (roomIn && profile.send > 0) {
+      const send = ctx.createGain();
+      send.gain.value = profile.send;
+      node.connect(send);
+      send.connect(roomIn);
+      nodes.push(send);
+    }
   }
 
   function addTrack(name, opts = {}) {
@@ -200,20 +373,44 @@
     return peaks;
   }
 
+  async function openMicStream() {
+    const music = !!els.musicMode?.checked;
+    const audio = {
+      echoCancellation: !music,
+      noiseSuppression: !music,
+      autoGainControl: !music,
+      voiceIsolation: false,
+      channelCount: { ideal: 1 },
+      sampleRate: { ideal: 48000 },
+      sampleSize: { ideal: 16 },
+      latency: { ideal: 0 },
+      googEchoCancellation: !music,
+      googNoiseSuppression: !music,
+      googAutoGainControl: !music,
+      googHighpassFilter: false,
+      googTypingNoiseDetection: false,
+    };
+    try {
+      return await navigator.mediaDevices.getUserMedia({ audio });
+    } catch (_) {
+      return navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: !music,
+          noiseSuppression: !music,
+          autoGainControl: !music,
+        },
+      });
+    }
+  }
+
   async function armMic() {
     const ctx = ensureAudio();
-    const constraints = {
-      audio: {
-        echoCancellation: !els.musicMode?.checked,
-        noiseSuppression: !els.musicMode?.checked,
-        autoGainControl: !els.musicMode?.checked,
-        channelCount: 1,
-      },
-    };
-    state.mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+    teardownCapture();
+    state.mediaStream = await openMicStream();
     const source = ctx.createMediaStreamSource(state.mediaStream);
+    state.pcmSource = source;
     state.analyser = ctx.createAnalyser();
-    state.analyser.fftSize = 256;
+    state.analyser.fftSize = 2048;
     source.connect(state.analyser);
     pumpMeter();
   }
@@ -240,6 +437,16 @@
     return ends.length ? Math.max(...ends) : 0;
   }
 
+  function disconnectNodes(nodes) {
+    (nodes || []).forEach((node) => {
+      try {
+        node.disconnect();
+      } catch (_) {
+        /* already disconnected */
+      }
+    });
+  }
+
   function stopSources() {
     (state.playSources || []).forEach((src) => {
       try {
@@ -249,27 +456,108 @@
       }
     });
     state.playSources = [];
+    disconnectNodes(state.graphNodes);
+    state.graphNodes = [];
     if (state.playRaf) {
       cancelAnimationFrame(state.playRaf);
       state.playRaf = 0;
     }
   }
 
-  function tickPlayhead() {
-    if (!state.playing || !state.audioCtx) return;
-    const elapsed = Math.max(0, state.audioCtx.currentTime - state.playOriginTime);
-    state.playhead = state.playOriginHead + elapsed;
-    const end = mixEnd();
-    if (end > 0 && state.playhead >= end) {
-      state.playhead = end;
-      stopSources();
-      state.playing = false;
-      emitTransport();
-      drawTimeline();
+  function teardownCapture() {
+    if (state.pcmNode) {
+      try {
+        state.pcmNode.onaudioprocess = null;
+      } catch (_) {
+        /* ignore */
+      }
+    }
+    disconnectNodes([state.pcmNode, state.pcmSilent, state.pcmSource, state.captureTap, state.analyser]);
+    state.pcmNode = null;
+    state.pcmSilent = null;
+    state.pcmSource = null;
+    state.captureTap = null;
+    if (state.mediaStream) {
+      state.mediaStream.getTracks().forEach((track) => track.stop());
+      state.mediaStream = null;
+    }
+  }
+
+  function tickClock() {
+    if (!state.audioCtx) return;
+    if (state.recording) {
+      state.playhead = state.recordStartedAt + Math.max(0, state.audioCtx.currentTime - state.recordClockOrigin);
+    } else if (state.playing) {
+      state.playhead = state.playOriginHead + Math.max(0, state.audioCtx.currentTime - state.playOriginTime);
+      const end = mixEnd();
+      if (end > 0 && state.playhead >= end) {
+        state.playhead = end;
+        stopSources();
+        state.playing = false;
+        emitTransport();
+        drawTimeline();
+        return;
+      }
+    } else {
       return;
     }
     drawTimeline();
-    state.playRaf = requestAnimationFrame(tickPlayhead);
+    state.playRaf = requestAnimationFrame(tickClock);
+  }
+
+  function startPcmCapture(ctx) {
+    state.pcmChunks = [];
+    const silent = ctx.createGain();
+    silent.gain.value = 0;
+    const processor = ctx.createScriptProcessor(4096, 1, 1);
+    processor.onaudioprocess = (event) => {
+      state.pcmChunks.push(new Float32Array(event.inputBuffer.getChannelData(0)));
+    };
+    state.pcmSource.connect(processor);
+    processor.connect(silent);
+    silent.connect(ctx.destination);
+    state.pcmNode = processor;
+    state.pcmSilent = silent;
+  }
+
+  function bufferFromPcm(ctx, trimStart = 0) {
+    const total = state.pcmChunks.reduce((sum, chunk) => sum + chunk.length, 0);
+    const skip = Math.max(0, Math.min(Math.max(0, total - 1), trimStart | 0));
+    const length = Math.max(1, total - skip);
+    const buffer = ctx.createBuffer(1, length, ctx.sampleRate);
+    const dest = buffer.getChannelData(0);
+    let offset = 0;
+    let remainingSkip = skip;
+    state.pcmChunks.forEach((chunk) => {
+      if (remainingSkip >= chunk.length) {
+        remainingSkip -= chunk.length;
+        return;
+      }
+      const start = remainingSkip;
+      remainingSkip = 0;
+      dest.set(chunk.subarray(start), offset);
+      offset += chunk.length - start;
+    });
+    return buffer;
+  }
+
+  function fileTake(armed, audioBuf, blob) {
+    armed.clips.push({
+      offset: state.recordStartedAt,
+      duration: audioBuf.duration,
+      buffer: audioBuf,
+      peaks: peaksFromBuffer(audioBuf),
+      blob: blob || null,
+    });
+    state.playhead = state.recordStartedAt + audioBuf.duration;
+    state.socket?.emit('studio:take-filed', {
+      name: playerName(),
+      trackName: armed.name,
+      duration: audioBuf.duration,
+    });
+    appendReed(`Take filed on ${armed.name} (${formatTime(audioBuf.duration)}). Hit Play to hear the acoustic desk.`);
+    renderTracks();
+    drawTimeline();
   }
 
   async function startRecord() {
@@ -278,110 +566,153 @@
     state.playing = false;
     const armed = state.tracks.find((t) => t.id === state.armedId) || addTrack();
     state.armedId = armed.id;
-    await armMic();
-    const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
-      ? 'audio/webm;codecs=opus'
-      : 'audio/webm';
-    state.chunks = [];
-    state.recorder = new MediaRecorder(state.mediaStream, { mimeType: mime });
-    state.recorder.ondataavailable = (event) => {
-      if (event.data && event.data.size) state.chunks.push(event.data);
-    };
-    state.recorder.onstop = async () => {
-      try {
-        const blob = new Blob(state.chunks, { type: mime });
-        const arrayBuf = await blob.arrayBuffer();
-        const audioBuf = await ensureAudio().decodeAudioData(arrayBuf.slice(0));
-        armed.clips.push({
-          offset: state.recordStartedAt,
-          duration: audioBuf.duration,
-          buffer: audioBuf,
-          peaks: peaksFromBuffer(audioBuf),
-          blob,
-        });
-        state.playhead = state.recordStartedAt + audioBuf.duration;
-        state.socket?.emit('studio:take-filed', {
-          name: playerName(),
-          trackName: armed.name,
-          duration: audioBuf.duration,
-        });
-        appendReed(`Take filed on ${armed.name} (${formatTime(audioBuf.duration)}). Hit Play to hear it.`);
-      } catch (err) {
-        appendReed(`Could not decode that take: ${err.message}`);
-      }
-      state.recording = false;
-      emitTransport();
-      renderTracks();
-      drawTimeline();
-    };
-    state.recordStartedAt = state.playhead;
-    state.recording = true;
-    state.recorder.start();
-    emitTransport();
-    drawTimeline();
-  }
-
-  function stopRecordOrPlay() {
-    if (state.recorder && state.recording) {
-      state.recorder.stop();
-    }
-    stopSources();
-    state.playing = false;
-    state.recording = false;
-    emitTransport();
-    drawTimeline();
-  }
-
-  async function playMix() {
-    if (state.playing) return;
-    const end = mixEnd();
-    if (end <= 0.02) {
-      appendReed('Nothing to play yet. Record a take first.');
-      return;
-    }
+    state.recordArmed = armed;
     const ctx = ensureAudio();
     if (ctx.state === 'suspended') await ctx.resume();
-    stopRecordOrPlay();
-    if (state.playhead >= end - 0.05) state.playhead = 0;
-    const origin = state.playhead;
-    state.playing = true;
-    const startAt = ctx.currentTime + 0.05;
-    state.playOriginTime = startAt;
-    state.playOriginHead = origin;
-    state.playSources = [];
+    await armMic();
+    state.recordStartedAt = state.playhead;
+    const t0 = ctx.currentTime + 0.03;
+    state.recordClockOrigin = t0;
+    state.pcmTrimStart = 0;
+    state.recording = true;
+    try {
+      startPcmCapture(ctx);
+      state.pcmTrimStart = Math.max(0, Math.round((t0 - ctx.currentTime) * ctx.sampleRate));
+    } catch (err) {
+      const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=pcm')
+        ? 'audio/webm;codecs=pcm'
+        : MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+          ? 'audio/webm;codecs=opus'
+          : 'audio/webm';
+      state.chunks = [];
+      state.recorder = new MediaRecorder(state.mediaStream, { mimeType: mime });
+      state.recorder.ondataavailable = (event) => {
+        if (event.data && event.data.size) state.chunks.push(event.data);
+      };
+      state.recorder.onstop = async () => {
+        try {
+          const blob = new Blob(state.chunks, { type: mime });
+          const arrayBuf = await blob.arrayBuffer();
+          const audioBuf = await ensureAudio().decodeAudioData(arrayBuf.slice(0));
+          fileTake(armed, audioBuf, blob);
+        } catch (decodeErr) {
+          appendReed(`Could not decode that take: ${decodeErr.message}`);
+        }
+        state.recording = false;
+        emitTransport();
+      };
+      state.recorder.start();
+    }
+    if (mixEnd() > state.playhead + 0.05) {
+      try {
+        await schedulePlayback({ overdub: true, from: state.playhead, startAt: t0 });
+      } catch (playErr) {
+        appendReed(`Overdub: ${playErr.message}`);
+      }
+    }
+    emitTransport();
+    tickClock();
+  }
+
+  async function finishRecording() {
+    if (!state.recording) return;
+    const armed = state.recordArmed;
+    const usedRecorder = !!state.recorder;
+    state.recording = false;
+    if (usedRecorder) {
+      try {
+        state.recorder.stop();
+      } catch (_) {
+        /* already stopped */
+      }
+      state.recorder = null;
+      teardownCapture();
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 95));
+    try {
+      if (armed && state.pcmChunks.length) {
+        fileTake(armed, bufferFromPcm(ensureAudio(), state.pcmTrimStart || 0));
+      }
+    } catch (err) {
+      appendReed(`Could not file that take: ${err.message}`);
+    }
+    teardownCapture();
+    state.recordArmed = null;
+    emitTransport();
+  }
+
+  async function stopRecordOrPlay() {
+    const wasRecording = state.recording;
+    stopSources();
+    state.playing = false;
+    if (wasRecording) await finishRecording();
+    else emitTransport();
+    drawTimeline();
+  }
+
+  function scheduleClips(ctx, { origin, startAt, bounce }, master, roomIn, nodes) {
+    const sources = [];
     state.tracks.forEach((track) => {
       if (track.muted) return;
       track.clips.forEach((clip) => {
         if (!clip.buffer) return;
         const when = startAt + Math.max(0, clip.offset - origin);
         const offset = Math.max(0, origin - clip.offset);
-        if (offset >= clip.buffer.duration) return;
+        if (!bounce && offset >= clip.buffer.duration) return;
         const src = ctx.createBufferSource();
         src.buffer = clip.buffer;
-        const gain = ctx.createGain();
-        gain.gain.value = track.gain;
-        src.connect(gain);
-        if (typeof ctx.createStereoPanner === 'function') {
-          const pan = ctx.createStereoPanner();
-          pan.pan.value = track.pan;
-          gain.connect(pan);
-          pan.connect(ctx.destination);
-        } else {
-          gain.connect(ctx.destination);
-        }
-        src.start(when, offset);
-        state.playSources.push(src);
+        nodes.push(src);
+        connectChain(ctx, src, track, master, roomIn, nodes);
+        if (bounce) src.start(clip.offset);
+        else src.start(when, offset);
+        sources.push(src);
       });
     });
-    if (!state.playSources.length) {
-      state.playing = false;
-      appendReed('Playhead is past the takes. Click the timeline or hit Play again to start from zero.');
-      state.playhead = 0;
-      drawTimeline();
+    return sources;
+  }
+
+  async function schedulePlayback({ overdub = false, from = null, startAt = null } = {}) {
+    const end = mixEnd();
+    if (end <= 0.02) {
+      if (!overdub) appendReed('Nothing to play yet. Record a take first.');
       return;
     }
-    emitTransport();
-    tickPlayhead();
+    const ctx = ensureAudio();
+    if (ctx.state === 'suspended') await ctx.resume();
+    if (!overdub) {
+      stopSources();
+      state.playing = false;
+    }
+    let origin = from == null ? state.playhead : from;
+    if (!overdub && origin >= end - 0.05) origin = 0;
+    state.playhead = origin;
+    const nodes = [];
+    const bus = createMixBus(ctx, nodes);
+    bus.output.connect(ctx.destination);
+    const when = Math.max(ctx.currentTime, startAt == null ? ctx.currentTime + 0.05 : startAt);
+    state.playOriginTime = when;
+    state.playOriginHead = origin;
+    state.graphNodes = nodes;
+    state.playSources = scheduleClips(ctx, { origin, startAt: when, bounce: false }, bus.master, bus.roomIn, nodes);
+    if (!state.playSources.length) {
+      if (!overdub) {
+        appendReed('Playhead is past the takes. Click the timeline or hit Play again to start from zero.');
+        state.playhead = 0;
+        drawTimeline();
+      }
+      return;
+    }
+    state.playing = true;
+    if (!overdub) {
+      emitTransport();
+      tickClock();
+    }
+  }
+
+  async function playMix() {
+    if (state.recording || state.playing) return;
+    await schedulePlayback();
   }
 
   function encodeWav(buffer) {
@@ -423,25 +754,10 @@
     );
     const sampleRate = state.audioCtx?.sampleRate || 48000;
     const offline = new OfflineAudioContext(2, Math.ceil(duration * sampleRate), sampleRate);
-    state.tracks.forEach((track) => {
-      if (track.muted) return;
-      track.clips.forEach((clip) => {
-        const src = offline.createBufferSource();
-        src.buffer = clip.buffer;
-        const gain = offline.createGain();
-        gain.gain.value = track.gain;
-        src.connect(gain);
-        if (typeof offline.createStereoPanner === 'function') {
-          const pan = offline.createStereoPanner();
-          pan.pan.value = track.pan;
-          gain.connect(pan);
-          pan.connect(offline.destination);
-        } else {
-          gain.connect(offline.destination);
-        }
-        src.start(clip.offset);
-      });
-    });
+    const nodes = [];
+    const bus = createMixBus(offline, nodes);
+    bus.output.connect(offline.destination);
+    scheduleClips(offline, { origin: 0, startAt: 0, bounce: true }, bus.master, bus.roomIn, nodes);
     const rendered = await offline.startRendering();
     const blob = encodeWav(rendered);
     state.lastBounce = blob;
@@ -539,6 +855,9 @@
         echoCancellation: !els.musicMode?.checked,
         noiseSuppression: !els.musicMode?.checked,
         autoGainControl: !els.musicMode?.checked,
+        voiceIsolation: false,
+        channelCount: 1,
+        sampleRate: 48000,
       },
     });
     room.on(LK.RoomEvent.TrackSubscribed, (track, publication, participant) => {
@@ -706,11 +1025,12 @@
   }
 
   async function boot() {
-    addTrack('Acoustic Guitar Neck', { kind: 'acoustic-guitar', pan: -0.28, arm: true });
-    addTrack('Acoustic Guitar Body', { kind: 'acoustic-guitar', pan: 0.28 });
-    addTrack('Vocal');
-    addTrack('Harmony');
+    addTrack('Acoustic Guitar Neck', { kind: 'acoustic-guitar', pan: -0.34, gain: 0.92, arm: true });
+    addTrack('Acoustic Guitar Body', { kind: 'acoustic-guitar', pan: 0.34, gain: 1 });
+    addTrack('Vocal', { gain: 0.88 });
+    addTrack('Harmony', { gain: 0.8 });
     if (els.musicMode) els.musicMode.checked = true;
+    if (els.acousticDesk) els.acousticDesk.checked = true;
     if (!state.reel) {
       try {
         const res = await fetch('/api/studio/sessions', {
@@ -737,12 +1057,12 @@
         else els.livekitStatus.textContent = 'LiveKit ready';
       })
       .catch(() => {});
-    appendReed('Reed: Two acoustic guitar lanes are up — Neck and Body. Music input is on. Arm Neck, point a mic at the twelfth fret, then stack Body on the soundhole.');
+    appendReed('Reed: Acoustic desk is on. Neck is brighter at the twelfth fret, Body is warmer at the soundhole. Takes are PCM, not phone-call Opus. Headphones on, arm Neck, then stack Body while the mix plays.');
   }
 
   els.addTrack?.addEventListener('click', () => addTrack());
   els.record?.addEventListener('click', () => startRecord().catch((err) => appendReed(`Mic: ${err.message}`)));
-  els.stop?.addEventListener('click', stopRecordOrPlay);
+  els.stop?.addEventListener('click', () => stopRecordOrPlay().catch((err) => appendReed(err.message)));
   els.play?.addEventListener('click', () => {
     playMix().catch((err) => appendReed(`Play: ${err.message}`));
   });
@@ -755,7 +1075,7 @@
       state.playhead + 2
     );
     const x = event.clientX - rect.left;
-    if (state.playing) stopRecordOrPlay();
+    if (state.playing) stopRecordOrPlay().catch((err) => appendReed(err.message));
     state.playhead = Math.max(0, Math.min(seconds, (x / rect.width) * seconds));
     drawTimeline();
   });

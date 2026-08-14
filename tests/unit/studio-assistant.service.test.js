@@ -20,6 +20,7 @@ describe('studio-assistant.service', () => {
     const reply = groundedReply('how do I track acoustic guitar');
     expect(reply.toLowerCase()).toMatch(/neck/);
     expect(reply.toLowerCase()).toMatch(/body/);
+    expect(reply.toLowerCase()).toMatch(/pcm|wood/);
   });
 
   test('chatWithReed falls back when OpenAI is unset', async () => {

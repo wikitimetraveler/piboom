@@ -42,8 +42,12 @@
           <button type="button" class="st-btn st-btn--ghost" id="stAddTrack">Add track</button>
         </div>
         <label class="st-status" style="display:block;margin-top:0.75rem">
-          <input type="checkbox" id="stMusicMode"/> Music input (no echo cancel)
+          <input type="checkbox" id="stMusicMode" checked/> Music input (hi-fi, no voice processing)
         </label>
+        <label class="st-status" style="display:block;margin-top:0.4rem">
+          <input type="checkbox" id="stAcousticDesk" checked/> Acoustic desk (neck/body EQ + wood room)
+        </label>
+        <p class="st-hint">Use headphones. Speakers will leak into the mics.</p>
         <div class="st-meter" aria-hidden="true"><span id="stMeter"></span></div>
       </aside>
 

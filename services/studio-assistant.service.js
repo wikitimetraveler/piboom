@@ -23,10 +23,12 @@ function buildSystemPrompt() {
 - Every reply may be read aloud, so keep answers to two short paragraphs. No markdown lists unless asked.
 
 ## How the desk actually works
-- The session opens with two acoustic-guitar tracks: Acoustic Guitar Neck (twelfth-fret mic, panned a little left) and Acoustic Guitar Body (soundhole / body mic, panned a little right). Vocal and Harmony sit under those.
-- Music input is on by default for guitar — echo cancellation and noise suppression stay off so the acoustic is not chewed up.
-- Recording, stacking, mixing, and WAV bounce happen client-side in the tab (Web Audio). Nothing is rendered on a server.
-- Takes are Opus in the browser; bounces are WAV. Indexed in the listening room behind one password (default reel1, override STUDIO_LISTEN_PASSWORD).
+- The session opens with two acoustic-guitar tracks: Acoustic Guitar Neck (twelfth-fret mic, panned a little left, brighter presence) and Acoustic Guitar Body (soundhole / body mic, panned a little right, warmer low mids). Vocal and Harmony sit under those.
+- Music input is on by default. Echo cancellation, noise suppression, auto-gain, and the browser high-pass stay off so the acoustic is not chewed up.
+- Acoustic desk is on by default: neck/body EQ, light compression, and a small wood-room reverb on play and bounce. Players should use headphones so speakers do not leak into the mics.
+- Takes are recorded as PCM in the tab, not Opus. Stacking Body while Neck plays is an overdub — the live mic is not routed to speakers.
+- Mixing and WAV bounce happen client-side in the tab (Web Audio). Nothing is rendered on a server.
+- Bounces are WAV. Indexed in the listening room behind one password (default reel1, override STUDIO_LISTEN_PASSWORD).
 - Socket.IO namespace /studio is the control plane: who is in the reel, transport (play/record), take-filed, booth chat.
 - LiveKit is the media plane: microphone talkback or music input, camera, and screen share of the desk. Reed the StarBand agent can join the same room.
 - Latency compensation: clips land at the playhead where the player actually hit record.
@@ -56,7 +58,7 @@ export function groundedReply(message) {
       : 'LiveKit keys are not on this server yet. You can still record in the tab. Set LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET to open voice, camera, and screen share.';
   }
   if (q.includes('guitar') || q.includes('acoustic')) {
-    return 'Two acoustic guitar tracks are already on the desk. Neck is the twelfth-fret mic, panned a little left. Body is the soundhole mic, panned a little right. Music input is on so the acoustic is not echo-cancelled. Arm Neck first, then stack Body.';
+    return 'Two acoustic guitar tracks are already on the desk. Neck is the twelfth-fret mic, panned a little left and brighter. Body is the soundhole mic, panned a little right and warmer. Takes are PCM, not Opus. Acoustic desk adds neck/body EQ and a small wood room. Headphones on. Arm Neck first, then stack Body.';
   }
   if (q.includes('record') || q.includes('mic') || q.includes('arm')) {
     return 'Add a track, arm it, pick music input if you are tracking a performance. Hit record. The waveform draws on the timeline. Remote friends file takes over LiveKit; the bounce still renders here.';
