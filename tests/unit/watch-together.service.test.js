@@ -70,6 +70,39 @@ describe('watch-together.service', () => {
     expect(result).toEqual({ ok: false, reason: 'empty' });
   });
 
+  test('searchWatchTogetherYouTube retries without embeddable filter when YouTube errors', async () => {
+    const prev = process.env.GOOGLE_API_KEY;
+    process.env.GOOGLE_API_KEY = prev || 'test-youtube-key';
+    const calls = [];
+    const fetcher = async (url) => {
+      calls.push(String(url));
+      if (url.includes('videoEmbeddable')) {
+        return { ok: false, json: async () => ({ error: { message: 'bad filter' } }) };
+      }
+      return {
+        ok: true,
+        json: async () => ({
+          items: [
+            {
+              id: { videoId: 'dQw4w9wgGcQ' },
+              snippet: { title: 'Never Gonna', channelTitle: 'Rick' },
+            },
+          ],
+        }),
+      };
+    };
+    try {
+      const result = await searchWatchTogetherYouTube('never gonna', fetcher);
+      expect(result.ok).toBe(true);
+      expect(result.videos).toHaveLength(1);
+      expect(result.videos[0].videoId).toBe('dQw4w9wgGcQ');
+      expect(calls).toHaveLength(2);
+    } finally {
+      if (prev == null) delete process.env.GOOGLE_API_KEY;
+      else process.env.GOOGLE_API_KEY = prev;
+    }
+  });
+
   test('parseMediaUrl prefers YouTube over a generic file URL', () => {
     const parsed = parseMediaUrl('https://www.youtube.com/watch?v=dQw4w9wgGcQ');
     expect(parsed).toEqual({

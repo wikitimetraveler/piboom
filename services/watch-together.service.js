@@ -3,7 +3,7 @@
  */
 import { verifyWatchTogetherAccess } from '../lib/watch-together-auth.js';
 import { getLivekitConfig } from './studio.service.js';
-import { getGoogleServerApiKey } from '../lib/google-api-key.js';
+import { getGoogleBrowserApiKey, getGoogleServerApiKey } from '../lib/google-api-key.js';
 
 export const DRIFT_PLAYING_S = 1.0;
 export const DRIFT_PAUSED_S = 0.35;
@@ -108,20 +108,31 @@ export function mapYouTubeSearchHits(items) {
 export async function searchWatchTogetherYouTube(rawQuery, fetcher = fetch) {
   const query = sanitizeYoutubeSearchQuery(rawQuery);
   if (query.length < 2) return { ok: false, reason: 'empty' };
-  const apiKey = getGoogleServerApiKey();
+  const apiKey = getGoogleServerApiKey() || getGoogleBrowserApiKey();
   if (!apiKey) return { ok: false, reason: 'no-key' };
-  const params = new URLSearchParams({
-    part: 'snippet',
-    type: 'video',
-    videoEmbeddable: 'true',
-    maxResults: '8',
-    q: query,
-    key: apiKey,
-  });
-  const res = await fetcher(`https://www.googleapis.com/youtube/v3/search?${params}`);
-  if (!res?.ok) return { ok: false, reason: 'search-failed' };
-  const data = await res.json().catch(() => ({}));
-  return { ok: true, query, videos: mapYouTubeSearchHits(data.items) };
+
+  async function runSearch(extra) {
+    const params = new URLSearchParams({
+      part: 'snippet',
+      type: 'video',
+      maxResults: '8',
+      q: query,
+      key: apiKey,
+      ...extra,
+    });
+    const res = await fetcher(`https://www.googleapis.com/youtube/v3/search?${params}`);
+    const data = res?.json ? await res.json().catch(() => ({})) : {};
+    return { ok: Boolean(res?.ok), items: data.items };
+  }
+
+  let result = await runSearch({ videoEmbeddable: 'true' });
+  let videos = result.ok ? mapYouTubeSearchHits(result.items) : [];
+  if (!result.ok || !videos.length) {
+    result = await runSearch({});
+    if (result.ok) videos = mapYouTubeSearchHits(result.items);
+  }
+  if (!result.ok) return { ok: false, reason: 'search-failed' };
+  return { ok: true, query, videos };
 }
 
 /**

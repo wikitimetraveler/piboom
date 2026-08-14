@@ -178,7 +178,7 @@
           <div class="sv-card-tags">${tagHtml}</div>
           <p class="sv-card-hint">${esc(t('flipHint'))}</p>
         </button>
-        <div class="sv-card-face sv-card-back">
+        <div class="sv-card-face sv-card-back" aria-hidden="true">
           <h3 class="sv-card-name">${esc(pick(item.name))}</h3>
           <p class="sv-card-history">${esc(pick(item.history))}</p>
           <div class="sv-card-actions">
@@ -230,9 +230,19 @@
     const card = document.querySelector(`#${gridId} .sv-card`);
     if (!card) return;
     document.querySelectorAll(`#${gridId} .sv-card.is-flipped`).forEach((el) => {
-      if (el !== card) el.classList.remove('is-flipped');
+      if (el !== card) {
+        el.classList.remove('is-flipped');
+        el.querySelectorAll('.sv-card-front.sv-card-flip').forEach((btn) => {
+          btn.setAttribute('aria-expanded', 'false');
+        });
+        el.querySelector('.sv-card-back')?.setAttribute('aria-hidden', 'true');
+      }
     });
     card.classList.add('is-flipped');
+    card.querySelectorAll('.sv-card-front.sv-card-flip').forEach((btn) => {
+      btn.setAttribute('aria-expanded', 'true');
+    });
+    card.querySelector('.sv-card-back')?.setAttribute('aria-hidden', 'false');
     card.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
@@ -342,9 +352,19 @@
   }
 
   function onCardClick(event) {
+    if (event.target.closest('a[href]')) return;
+
     const flip = event.target.closest('.sv-card-flip');
     if (flip) {
-      flip.closest('.sv-card')?.classList.toggle('is-flipped');
+      const card = flip.closest('.sv-card');
+      if (!card) return;
+      const next = !card.classList.contains('is-flipped');
+      card.classList.toggle('is-flipped', next);
+      card.querySelectorAll('.sv-card-front.sv-card-flip').forEach((btn) => {
+        btn.setAttribute('aria-expanded', next ? 'true' : 'false');
+      });
+      const back = card.querySelector('.sv-card-back');
+      if (back) back.setAttribute('aria-hidden', next ? 'false' : 'true');
       return;
     }
     const listen = event.target.closest('[data-card-listen]');

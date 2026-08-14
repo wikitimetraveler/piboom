@@ -429,16 +429,18 @@
 
 .sv-card {
   perspective: 900px;
-  min-height: 260px;
+  min-height: 300px;
 }
 
 .sv-card-inner {
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 260px;
-  transition: transform 0.55s;
+  min-height: 300px;
+  transition: transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1);
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  border-radius: 0.85rem;
 }
 
 .sv-card.is-flipped .sv-card-inner {
@@ -449,10 +451,12 @@
   position: absolute;
   inset: 0;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   border-radius: 0.85rem;
   border: 1px solid var(--sv-line);
   padding: 1.1rem;
   background: #fff;
+  overflow: hidden;
 }
 
 .sv-card-back {
@@ -462,6 +466,8 @@
   border-color: var(--sv-green-deep);
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .sv-card-front {
@@ -469,6 +475,13 @@
   text-align: left;
   cursor: pointer;
   color: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  box-sizing: border-box;
 }
 
 .sv-card-emoji {
@@ -501,6 +514,7 @@
   line-height: 1.5;
   flex: 1;
   margin: 0 0 0.75rem;
+  overflow-wrap: anywhere;
 }
 
 .sv-card-tags {
@@ -791,9 +805,16 @@ body.dark-mode .sv-hero {
 .sv-card-img {
   width: calc(100% + 2.2rem);
   margin: 0 -1.1rem 0.75rem;
-  max-height: 140px;
+  height: 148px;
+  max-height: none;
   object-fit: cover;
   display: block;
+  flex-shrink: 0;
+  background: var(--sv-mist);
+}
+
+.sv-card.has-image .sv-card-name {
+  margin-top: 0.15rem;
 }
 
 .sv-gallery {

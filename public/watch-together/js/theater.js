@@ -54,7 +54,7 @@
   let ytApiReady = null;
   let loadedYtId = null;
   let ytLoadGen = 0;
-  let room = { media: null, playing: false, position: 0, updatedAt: Date.now() };
+  let room = { media: null, playing: false, position: 0, updatedAt: 0 };
   let applyingRemote = false;
   let ignoreStateUntil = 0;
   let drawing = false;
@@ -263,7 +263,7 @@
         return;
       }
       if (!data.ok) {
-        renderPicker([], 'Search failed. Paste a link instead.');
+        renderPicker([], 'YouTube search failed. Paste a watch link instead.');
         return;
       }
       if (!data.videos || !data.videos.length) {
@@ -335,6 +335,7 @@
   }
 
   function isStalePlayback(incoming) {
+    if (!hasMedia(room.media)) return false;
     const incomingAt = Number(incoming?.updatedAt) || 0;
     const localAt = Number(room.updatedAt) || 0;
     return incomingAt > 0 && localAt > 0 && incomingAt < localAt;
@@ -392,59 +393,69 @@
     showMedia('youtube');
     void yt.offsetWidth;
     applyingRemote = true;
-    const player = new window.YT.Player('wtYtPlayer', {
-      videoId,
-      width: '100%',
-      height: '100%',
-      playerVars: {
-        autoplay: 0,
-        controls: 1,
-        fs: 1,
-        rel: 0,
-        modestbranding: 1,
-        playsinline: 1,
-        enablejsapi: 1,
-        origin: window.location.origin,
-      },
-      events: {
-        onReady() {
-          if (gen !== ytLoadGen) return;
-          ytPlayer = player;
-          loadedYtId = videoId;
-          const iframe = player.getIframe?.();
-          if (iframe) {
-            iframe.setAttribute('allowfullscreen', '1');
-            iframe.setAttribute(
-              'allow',
-              'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen; web-share'
-            );
-          }
-          applyLocalVolume();
-          applyingRemote = false;
-          setStatus('Loaded. Press play.');
-          showMedia('youtube');
-          if (youtubeIframeReady()) applyPlayback(room, true);
+    await new Promise((resolve) => {
+      const player = new window.YT.Player('wtYtPlayer', {
+        videoId,
+        width: '100%',
+        height: '100%',
+        playerVars: {
+          autoplay: 0,
+          controls: 1,
+          fs: 1,
+          rel: 0,
+          modestbranding: 1,
+          playsinline: 1,
+          enablejsapi: 1,
+          origin: window.location.origin,
         },
-        onError(event) {
-          if (gen !== ytLoadGen) return;
-          setStatus(youtubeErrorMessage(Number(event?.data)));
+        events: {
+          onReady() {
+            if (gen !== ytLoadGen) {
+              resolve();
+              return;
+            }
+            ytPlayer = player;
+            loadedYtId = videoId;
+            const iframe = player.getIframe?.();
+            if (iframe) {
+              iframe.setAttribute('allowfullscreen', '1');
+              iframe.setAttribute(
+                'allow',
+                'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen; web-share'
+              );
+            }
+            applyLocalVolume();
+            applyingRemote = false;
+            showMedia('youtube');
+            applyPlayback(room, true);
+            resolve();
+          },
+          onError(event) {
+            if (gen !== ytLoadGen) {
+              resolve();
+              return;
+            }
+            setStatus(youtubeErrorMessage(Number(event?.data)));
+            applyingRemote = false;
+            resolve();
+          },
+          onStateChange(event) {
+            if (gen !== ytLoadGen) return;
+            if (applyingRemote || Date.now() < ignoreStateUntil || !window.YT) return;
+            const YT = window.YT;
+            if (event.data === YT.PlayerState.PLAYING) {
+              emitClock({ type: 'play', position: localTime() });
+            } else if (event.data === YT.PlayerState.PAUSED) {
+              emitClock({ type: 'pause', position: localTime() });
+            }
+          },
         },
-        onStateChange(event) {
-          if (gen !== ytLoadGen) return;
-          if (applyingRemote || Date.now() < ignoreStateUntil || !window.YT) return;
-          const YT = window.YT;
-          if (event.data === YT.PlayerState.PLAYING) {
-            emitClock({ type: 'play', position: localTime() });
-          } else if (event.data === YT.PlayerState.PAUSED) {
-            emitClock({ type: 'pause', position: localTime() });
-          }
-        },
-      },
+      });
+      if (gen === ytLoadGen) {
+        ytPlayer = player;
+        loadedYtId = videoId;
+      }
     });
-    if (gen === ytLoadGen) {
-      ytPlayer = player;
-      loadedYtId = videoId;
-    }
   }
 
   function loadFile(src) {
@@ -805,7 +816,7 @@
       handlers: {
         state: (payload) => applyState(payload || {}),
         playback: (payload) => {
-          adoptPlayback(payload, false);
+          adoptPlayback(payload, true);
         },
         viewers: (viewers) => {
           renderViewers(viewers || []);
