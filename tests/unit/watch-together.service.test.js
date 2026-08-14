@@ -8,6 +8,8 @@ import {
   sanitizeYoutubeSearchQuery,
   mapYouTubeSearchHits,
   searchWatchTogetherYouTube,
+  lookupWatchTogetherArtist,
+  youtubeQueryFromMusicLookup,
   createRoomState,
   expectedMediaTime,
   needsDriftCorrection,
@@ -54,6 +56,28 @@ describe('watch-together.service', () => {
     expect(sanitizeYoutubeSearchQuery('a'.repeat(90)).length).toBe(80);
   });
 
+  test('youtubeQueryFromMusicLookup uses live when the query is just an artist', () => {
+    expect(youtubeQueryFromMusicLookup('grateful dead', 'Grateful Dead')).toBe('Grateful Dead live');
+    expect(youtubeQueryFromMusicLookup('concert film', 'Grateful Dead')).toBe('concert film');
+    expect(youtubeQueryFromMusicLookup('never gonna', 'never gonna', false)).toBe('never gonna');
+  });
+
+  test('lookupWatchTogetherArtist uses MusicBrainz like music research', async () => {
+    const mb = async (path, params) => {
+      expect(path).toBe('/artist');
+      expect(params.query).toBe('Phish');
+      return {
+        data: {
+          artists: [{ id: 'abc', name: 'Phish', type: 'Group', area: { name: 'United States' } }],
+        },
+      };
+    };
+    const hit = await lookupWatchTogetherArtist('Phish', mb);
+    expect(hit.matched).toBe(true);
+    expect(hit.name).toBe('Phish');
+    expect(hit.musicbrainzUrl).toBe('https://musicbrainz.org/artist/abc');
+  });
+
   test('mapYouTubeSearchHits keeps embeddable videos and drops junk', () => {
     const hits = mapYouTubeSearchHits([
       { id: { videoId: 'dQw4w9wgGcQ' }, snippet: { title: 'Never Gonna', channelTitle: 'Rick' } },
@@ -92,7 +116,9 @@ describe('watch-together.service', () => {
       };
     };
     try {
-      const result = await searchWatchTogetherYouTube('never gonna', fetcher);
+      const result = await searchWatchTogetherYouTube('never gonna', fetcher, async () => ({
+        data: { artists: [] },
+      }));
       expect(result.ok).toBe(true);
       expect(result.videos).toHaveLength(1);
       expect(result.videos[0].videoId).toBe('dQw4w9wgGcQ');

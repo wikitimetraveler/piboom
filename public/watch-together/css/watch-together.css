@@ -645,6 +645,17 @@ body.wt-cinema-on {
   margin-top: 0.7rem;
 }
 
+.wt-pick-artist {
+  margin: 0.65rem 0 0;
+  color: var(--wt-muted);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.wt-pick-artist a {
+  color: var(--wt-accent);
+}
+
 .wt-pick-card {
   appearance: none;
   display: flex;
@@ -656,6 +667,20 @@ body.wt-cinema-on {
   border-radius: 12px;
   overflow: hidden;
   background: #0b0c10;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+}
+
+.wt-pick-play {
+  appearance: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: inherit;
   text-align: left;
   cursor: pointer;
@@ -672,10 +697,23 @@ body.wt-cinema-on {
 
 .wt-pick-card span {
   display: block;
-  padding: 0 0.5rem 0.5rem;
+  padding: 0 0.5rem 0.35rem;
   color: var(--wt-ink);
   font-size: 0.75rem;
   line-height: 1.35;
+}
+
+.wt-pick-yt {
+  display: block;
+  padding: 0 0.55rem 0.5rem;
+  color: var(--wt-accent);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+}
+
+.wt-pick-yt:hover {
+  text-decoration: underline;
 }
 
 .wt-pick-empty {

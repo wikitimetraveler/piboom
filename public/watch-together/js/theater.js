@@ -21,6 +21,7 @@
     pickGo: () => document.getElementById('wtPickGo'),
     pickChips: () => document.getElementById('wtPickChips'),
     pickGrid: () => document.getElementById('wtPickGrid'),
+    pickArtist: () => document.getElementById('wtPickArtist'),
     yt: () => document.getElementById('wtYt'),
     file: () => document.getElementById('wtFile'),
     empty: () => document.getElementById('wtEmpty'),
@@ -212,6 +213,31 @@
     btn?.setAttribute('aria-pressed', on ? 'true' : 'false');
   }
 
+  function renderArtist(artist) {
+    const el = els.pickArtist();
+    if (!el) return;
+    el.replaceChildren();
+    if (!artist?.name) {
+      el.hidden = true;
+      return;
+    }
+    el.hidden = false;
+    const name = document.createElement('strong');
+    name.textContent = artist.name;
+    el.append(name);
+    if (artist.description) {
+      el.append(document.createTextNode(' — ' + artist.description));
+    }
+    if (artist.musicbrainzUrl) {
+      const mb = document.createElement('a');
+      mb.href = artist.musicbrainzUrl;
+      mb.target = '_blank';
+      mb.rel = 'noopener noreferrer';
+      mb.textContent = 'MusicBrainz';
+      el.append(document.createTextNode(' · '), mb);
+    }
+  }
+
   function renderPicker(videos, message) {
     const grid = els.pickGrid();
     if (!grid) return;
@@ -224,22 +250,31 @@
       return;
     }
     (videos || []).forEach((video) => {
-      const card = document.createElement('button');
-      card.type = 'button';
+      const card = document.createElement('article');
       card.className = 'wt-pick-card';
+      const play = document.createElement('button');
+      play.type = 'button';
+      play.className = 'wt-pick-play';
       const img = document.createElement('img');
       img.alt = '';
       img.loading = 'lazy';
       img.src = video.thumbnail || youtubeThumb(video.videoId);
       const cap = document.createElement('span');
       cap.textContent = video.title;
-      card.append(img, cap);
-      card.addEventListener('click', () => {
+      play.append(img, cap);
+      play.addEventListener('click', () => {
         const input = els.url();
         if (input) input.value = video.url;
         setPickerOpen(false);
         loadUrl(video.url).catch((err) => setStatus(err.message));
       });
+      const yt = document.createElement('a');
+      yt.className = 'wt-pick-yt';
+      yt.href = video.url || 'https://www.youtube.com/watch?v=' + video.videoId;
+      yt.target = '_blank';
+      yt.rel = 'noopener noreferrer';
+      yt.textContent = 'YouTube';
+      card.append(play, yt);
       grid.appendChild(card);
     });
   }
@@ -248,10 +283,11 @@
     const typed = String(query || els.pickQ()?.value || '').trim();
     if (els.pickQ() && query) els.pickQ().value = typed;
     if (typed.length < 2) {
-      renderPicker([], 'Type a title, or tap Full movie.');
+      renderArtist(null);
+      renderPicker([], 'Type an artist, or tap Live.');
       return;
     }
-    renderPicker([], 'Searching YouTube…');
+    renderPicker([], 'Looking up the artist, then YouTube…');
     try {
       const res = await fetch('/api/watch-together/youtube-search', {
         method: 'POST',
@@ -260,19 +296,23 @@
       });
       const data = await res.json().catch(() => ({}));
       if (data.error === 'no-key' || res.status === 503) {
+        renderArtist(null);
         renderPicker([], 'YouTube search is not configured. Paste a link instead.');
         return;
       }
       if (!data.ok) {
+        renderArtist(data.artist || null);
         renderPicker([], 'YouTube search failed. Paste a watch link instead.');
         return;
       }
+      renderArtist(data.artist || null);
       if (!data.videos || !data.videos.length) {
-        renderPicker([], 'Nothing embeddable for that. Try another title or paste a link.');
+        renderPicker([], 'Nothing embeddable for that. Try another name or paste a link.');
         return;
       }
       renderPicker(data.videos);
     } catch {
+      renderArtist(null);
       renderPicker([], 'Search failed. Paste a link instead.');
     }
   }
@@ -868,7 +908,17 @@
         syncBlurButton(window.WatchTogetherSync.blurOn());
         const micOn = await window.WatchTogetherSync.setMic(true);
         syncMicButtons(micOn);
-        if (!hasMedia(room.media)) {
+        if (!camOn) {
+          setStatus('Click Cam so the other couches can see you.');
+          const retryCam = () => {
+            document.removeEventListener('pointerdown', retryCam);
+            window.WatchTogetherSync.setCamera(true).then((ok) => {
+              syncCamButton(ok);
+              if (ok && !hasMedia(room.media)) setStatus('Camera on.');
+            });
+          };
+          document.addEventListener('pointerdown', retryCam, { once: true });
+        } else if (!hasMedia(room.media)) {
           if (micOn) {
             setStatus('Mic on · they can hear you. Load a movie when you want.');
           } else {
@@ -876,7 +926,7 @@
           }
         }
       } catch (err) {
-        setStatus(err?.message || 'Click Talk in chat so they can hear you.');
+        setStatus(err?.message || 'Click Cam, then Talk, so they can see and hear you.');
       }
     } else if (result?.transport === 'full') {
       setStatus('Theater is full — 10 people already here.');
@@ -977,7 +1027,11 @@
     els.pickChips()?.addEventListener('click', (event) => {
       const chip = event.target?.closest?.('button[data-q]');
       if (!chip) return;
-      const q = chip.getAttribute('data-q') || '';
+      const suffix = chip.getAttribute('data-q') || '';
+      const typed = String(els.pickQ()?.value || '').trim();
+      const q = typed && !typed.toLowerCase().includes(suffix.toLowerCase())
+        ? `${typed} ${suffix}`.trim()
+        : suffix;
       if (els.pickQ()) els.pickQ().value = q;
       searchPicker(q).catch((err) => setStatus(err.message));
     });
@@ -1038,6 +1092,9 @@
       const next = !window.WatchTogetherSync?.camOn();
       const on = await window.WatchTogetherSync?.setCamera(next);
       syncCamButton(Boolean(on));
+      if (next && !on) {
+        setStatus('Camera did not start. Allow the camera in the browser, then click Cam again.');
+      }
     });
     els.blur()?.addEventListener('click', async () => {
       const next = !window.WatchTogetherSync?.blurOn();

@@ -189,6 +189,21 @@
     playAudioEl(el);
   }
 
+  function attachExistingRemoteVideo(room) {
+    const participants = room?.remoteParticipants;
+    if (!participants || typeof participants.forEach !== 'function') return;
+    participants.forEach((participant) => {
+      const pubs = participant.videoTrackPublications || participant.trackPublications;
+      if (!pubs || typeof pubs.forEach !== 'function') return;
+      pubs.forEach((pub) => {
+        const track = pub?.track;
+        if (track && (track.kind === 'video' || pub.kind === 'video')) {
+          emit('track', { action: 'subscribed', track, publication: pub, participant });
+        }
+      });
+    });
+  }
+
   function attachExistingRemoteAudio(room) {
     const participants = room?.remoteParticipants;
     if (!participants || typeof participants.forEach !== 'function') return;
@@ -273,6 +288,7 @@
     state.identity = data.identity || room.localParticipant.identity;
     state.transport = 'livekit';
     attachExistingRemoteAudio(room);
+    attachExistingRemoteVideo(room);
     const coords = parseCoords(opts.lat, opts.lng);
     await setMetadata(coords || {});
     publishViewers();
@@ -484,32 +500,80 @@
     state.camOn = false;
   }
 
+  function emitLocalVideo(track) {
+    const lp = state.room?.localParticipant;
+    if (!track || !lp) return;
+    emit('track', {
+      action: 'local',
+      track,
+      publication: cameraPublication(),
+      participant: lp,
+    });
+  }
+
+  async function createCameraTrack() {
+    const LK = global.LivekitClient;
+    if (typeof LK.createLocalVideoTrack !== 'function') {
+      throw new Error('no-local-video');
+    }
+    const attempts = [];
+    if (LK.VideoPresets?.h360?.resolution) {
+      attempts.push({ facingMode: 'user', resolution: LK.VideoPresets.h360.resolution });
+    }
+    attempts.push({ facingMode: 'user' });
+    let lastErr;
+    for (const opts of attempts) {
+      try {
+        return await LK.createLocalVideoTrack(opts);
+      } catch (err) {
+        lastErr = err;
+      }
+    }
+    throw lastErr || new Error('camera');
+  }
+
   async function startCamera() {
     const LK = global.LivekitClient;
     const lp = state.room.localParticipant;
     let track = cameraTrack();
     if (trackIsLive(track)) {
-      await syncBlurProcessor(track);
       state.camOn = true;
+      emitLocalVideo(track);
+      if (state.blurOn) void applyBlurLater(track);
       return true;
     }
-    const opts = { facingMode: 'user' };
-    if (LK.VideoPresets?.h360?.resolution) {
-      opts.resolution = LK.VideoPresets.h360.resolution;
-    }
-    if (typeof LK.createLocalVideoTrack !== 'function') {
+    try {
+      track = await createCameraTrack();
+      state.localVideoTrack = track;
+      await lp.publishTrack(track);
+    } catch {
       await lp.setCameraEnabled(true);
       track = cameraTrack();
-      if (trackIsLive(track) && state.blurOn) await syncBlurProcessor(track);
-      state.camOn = trackIsLive(track);
-      return state.camOn;
     }
-    track = await LK.createLocalVideoTrack(opts);
-    state.localVideoTrack = track;
-    if (state.blurOn) await syncBlurProcessor(track);
-    await lp.publishTrack(track);
+    if (!trackIsLive(track)) return false;
     state.camOn = true;
+    emitLocalVideo(track);
+    if (state.blurOn) void applyBlurLater(track);
     return true;
+  }
+
+  async function applyBlurLater(track) {
+    try {
+      const ok = await Promise.race([
+        syncBlurProcessor(track),
+        new Promise((resolve) => setTimeout(() => resolve(false), 4000)),
+      ]);
+      if (state.blurOn && !ok) {
+        state.blurOn = false;
+        persistBlurPref(false);
+        emit('blur', { on: false, error: 'unavailable' });
+      }
+    } catch (err) {
+      console.warn('Watch together blur failed', err);
+      state.blurOn = false;
+      persistBlurPref(false);
+      emit('blur', { on: false, error: 'unavailable' });
+    }
   }
 
   async function setCamera(on) {

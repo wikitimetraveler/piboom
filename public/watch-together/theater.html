@@ -33,14 +33,15 @@
     </div>
     <div class="wt-picker" id="wtPicker" hidden>
       <div class="wt-picker-row">
-        <input id="wtPickQ" type="search" maxlength="80" placeholder="Search YouTube movies and videos" autocomplete="off">
+        <input id="wtPickQ" type="search" maxlength="80" placeholder="Search an artist — MusicBrainz, then YouTube" autocomplete="off">
         <button class="wt-enter" id="wtPickGo" type="button">Search</button>
       </div>
       <div class="wt-picker-chips" id="wtPickChips">
-        <button type="button" data-q="full movie">Full movie</button>
-        <button type="button" data-q="concert film">Concert</button>
-        <button type="button" data-q="official trailer">Trailer</button>
+        <button type="button" data-q="live">Live</button>
+        <button type="button" data-q="concert film">Concert film</button>
+        <button type="button" data-q="official video">Official video</button>
       </div>
+      <p class="wt-pick-artist" id="wtPickArtist" hidden></p>
       <div class="wt-picker-grid" id="wtPickGrid"></div>
     </div>
 
@@ -51,7 +52,7 @@
           <div id="wtYt" class="yt" hidden></div>
           <video id="wtFile" hidden playsinline controls></video>
           <canvas id="wtDraw" class="wt-draw" aria-hidden="true"></canvas>
-      <p class="wt-empty" id="wtEmpty">Paste a YouTube or video URL, or Pick from YouTube. Everyone stays on the same frame.</p>
+      <p class="wt-empty" id="wtEmpty">Paste a YouTube link, or Pick an artist. Music lookup opens a direct YouTube watch URL.</p>
           <div class="wt-tap" id="wtTap" hidden>
             <button class="wt-enter" type="button">Tap to join the clock</button>
           </div>

@@ -10,6 +10,7 @@ import {
   stopLivekitEgress,
 } from './livekit.service.js';
 import { getGoogleBrowserApiKey, getGoogleServerApiKey } from '../lib/google-api-key.js';
+import { mbGet } from './musicbrainz.service.js';
 
 export const DRIFT_PLAYING_S = 1.0;
 export const DRIFT_PAUSED_S = 0.35;
@@ -111,18 +112,58 @@ export function mapYouTubeSearchHits(items) {
     .slice(0, 8);
 }
 
-export async function searchWatchTogetherYouTube(rawQuery, fetcher = fetch) {
+export function youtubeQueryFromMusicLookup(rawQuery, artistName, matched = true) {
+  const query = sanitizeYoutubeSearchQuery(rawQuery);
+  if (/\b(live|concert|trailer|movie|official|film)\b/i.test(query)) return query;
+  const name = sanitizeYoutubeSearchQuery(artistName);
+  if (matched && name) return `${name} live`;
+  return query;
+}
+
+/**
+ * Same MusicBrainz artist lookup as /api/music-research/knowledge-graph.
+ * @param {string} rawQuery
+ * @param {typeof mbGet} [mb]
+ */
+export async function lookupWatchTogetherArtist(rawQuery, mb = mbGet) {
+  const query = sanitizeYoutubeSearchQuery(rawQuery);
+  if (query.length < 2) return null;
+  try {
+    const response = await mb('/artist', { query, limit: 1 });
+    const artist = response?.data?.artists?.[0];
+    if (!artist?.name) {
+      return { name: query, description: '', musicbrainzUrl: '', matched: false };
+    }
+    const area = artist.area?.name || artist.begin_area?.name || '';
+    const kind = artist.type || 'music artist';
+    return {
+      name: artist.name,
+      description: area
+        ? `${artist.name} is a ${kind} from ${area}.`
+        : `${artist.name} is a ${kind}.`,
+      musicbrainzUrl: artist.id ? `https://musicbrainz.org/artist/${artist.id}` : '',
+      matched: true,
+    };
+  } catch {
+    return { name: query, description: '', musicbrainzUrl: '', matched: false };
+  }
+}
+
+export async function searchWatchTogetherYouTube(rawQuery, fetcher = fetch, mb = mbGet) {
   const query = sanitizeYoutubeSearchQuery(rawQuery);
   if (query.length < 2) return { ok: false, reason: 'empty' };
   const apiKey = getGoogleServerApiKey() || getGoogleBrowserApiKey();
   if (!apiKey) return { ok: false, reason: 'no-key' };
+
+  const artist = await lookupWatchTogetherArtist(query, mb);
+  const ytQuery = youtubeQueryFromMusicLookup(query, artist?.name, artist?.matched);
 
   async function runSearch(extra) {
     const params = new URLSearchParams({
       part: 'snippet',
       type: 'video',
       maxResults: '8',
-      q: query,
+      q: ytQuery,
       key: apiKey,
       ...extra,
     });
@@ -137,8 +178,8 @@ export async function searchWatchTogetherYouTube(rawQuery, fetcher = fetch) {
     result = await runSearch({});
     if (result.ok) videos = mapYouTubeSearchHits(result.items);
   }
-  if (!result.ok) return { ok: false, reason: 'search-failed' };
-  return { ok: true, query, videos };
+  if (!result.ok) return { ok: false, reason: 'search-failed', artist, query: ytQuery };
+  return { ok: true, query: ytQuery, artist, videos };
 }
 
 /**
@@ -620,6 +661,8 @@ export default {
   sanitizeYoutubeSearchQuery,
   mapYouTubeSearchHits,
   searchWatchTogetherYouTube,
+  lookupWatchTogetherArtist,
+  youtubeQueryFromMusicLookup,
   createRoomState,
   expectedMediaTime,
   needsDriftCorrection,
