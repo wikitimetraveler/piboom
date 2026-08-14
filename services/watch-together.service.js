@@ -452,35 +452,16 @@ export async function mintWatchTogetherLivekitToken({ identity, name, userId } =
  * Apply a client intent to the shared clock. Volume is ignored.
  * @returns {{ ok: boolean, reason?: string, kind?: string, snapshot?: object, message?: object, stroke?: object }}
  */
-const CLOCK_TYPES = new Set(['load', 'play', 'pause', 'seek']);
-
 export function handleWatchIntent(intent, actor = {}) {
   const type = intent?.type;
   const name = sanitizeName(actor.name);
-  const actorKey = hostKeyFromActor({ ...actor, name });
 
-  if (type === 'host-claim') {
-    if (room.host?.key && room.host.key !== actorKey) {
-      return { ok: false, reason: 'host-held' };
-    }
-    room = applyIntent(room, {
-      type: 'host-claim',
-      host: { key: actorKey, name },
-    });
+  // Projector baton is off for now — anyone can load/play/seek.
+  if (type === 'host-claim' || type === 'host-release') {
+    if (room.host) room = applyIntent(room, { type: 'host-release' });
     return { ok: true, kind: 'playback', snapshot: getWatchTogetherSnapshot() };
   }
-
-  if (type === 'host-release') {
-    if (room.host?.key && room.host.key !== actorKey) {
-      return { ok: false, reason: 'host-held' };
-    }
-    room = applyIntent(room, { type: 'host-release' });
-    return { ok: true, kind: 'playback', snapshot: getWatchTogetherSnapshot() };
-  }
-
-  if (CLOCK_TYPES.has(type) && room.host?.key && room.host.key !== actorKey) {
-    return { ok: false, reason: 'host-lock' };
-  }
+  if (room.host) room = applyIntent(room, { type: 'host-release' });
 
   if (type === 'load') {
     const parsed = parseMediaUrl(intent.url);

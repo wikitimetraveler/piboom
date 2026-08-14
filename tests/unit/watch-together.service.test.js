@@ -163,8 +163,11 @@ describe('watch-together.service', () => {
     expect(hostKeyFromActor({ name: 'Karti' })).toBe('Karti');
   });
 
-  test('projector baton is off by default and anyone can load', () => {
+  test('projector baton is disabled so anyone can load and seek', () => {
     resetWatchTogetherRoom(1_000);
+    const claimed = handleWatchIntent({ type: 'host-claim' }, { name: 'Ada', id: 'a1' });
+    expect(claimed.ok).toBe(true);
+    expect(claimed.snapshot.host).toBeNull();
     const first = handleWatchIntent(
       { type: 'load', url: 'https://youtu.be/dQw4w9wgGcQ' },
       { name: 'Ada', id: 'a1' }
@@ -176,24 +179,8 @@ describe('watch-together.service', () => {
     );
     expect(second.ok).toBe(true);
     expect(second.snapshot.playing).toBe(true);
-  });
-
-  test('projector baton blocks other couches from seek until released', () => {
-    resetWatchTogetherRoom(1_000);
-    const claimed = handleWatchIntent({ type: 'host-claim' }, { name: 'Ada', id: 'a1' });
-    expect(claimed.ok).toBe(true);
-    expect(claimed.snapshot.host).toEqual({ key: 'a1', name: 'Ada' });
-    const blocked = handleWatchIntent({ type: 'seek', position: 40 }, { name: 'Bo', id: 'b1' });
-    expect(blocked).toEqual({ ok: false, reason: 'host-lock' });
-    const held = handleWatchIntent({ type: 'host-claim' }, { name: 'Bo', id: 'b1' });
-    expect(held).toEqual({ ok: false, reason: 'host-held' });
-    const allowed = handleWatchIntent({ type: 'pause', position: 2 }, { name: 'Ada', id: 'a1' });
-    expect(allowed.ok).toBe(true);
-    const released = handleWatchIntent({ type: 'host-release' }, { name: 'Ada', id: 'a1' });
-    expect(released.ok).toBe(true);
-    expect(released.snapshot.host).toBeNull();
-    const after = handleWatchIntent({ type: 'play', position: 2 }, { name: 'Bo', id: 'b1' });
-    expect(after.ok).toBe(true);
+    const seek = handleWatchIntent({ type: 'seek', position: 40 }, { name: 'Bo', id: 'b1' });
+    expect(seek.ok).toBe(true);
   });
 
   test('LiveKit room name is dedicated to the theater', () => {

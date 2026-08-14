@@ -31,7 +31,6 @@
     volume: () => document.getElementById('wtVolume'),
     fill: () => document.getElementById('wtFill'),
     cinema: () => document.getElementById('wtCinema'),
-    host: () => document.getElementById('wtHost'),
     theater: () => document.querySelector('.wt-theater'),
     stageMain: () => document.querySelector('.wt-stage-main'),
     drawBtn: () => document.getElementById('wtDrawBtn'),
@@ -155,36 +154,7 @@
     window.WatchTogetherSync?.send(payload);
   }
 
-  function myHostKey() {
-    const uid = userId();
-    if (uid) return String(uid);
-    const identity = window.WatchTogetherSync?.identity?.() || '';
-    if (identity) return String(identity).replace(/[^\w.-]/g, '-').slice(0, 64);
-    return displayName();
-  }
-
-  function canDriveClock() {
-    const key = room.host?.key;
-    if (!key) return true;
-    return key === myHostKey();
-  }
-
-  function syncHostButton() {
-    const btn = els.host();
-    if (!btn) return;
-    const host = room.host;
-    const mine = Boolean(host?.key && host.key === myHostKey());
-    btn.setAttribute('aria-pressed', mine ? 'true' : 'false');
-    if (!host?.key) btn.textContent = 'Projector';
-    else if (mine) btn.textContent = 'Projector on';
-    else btn.textContent = 'Projector: ' + (host.name || 'taken');
-  }
-
   function emitClock(payload) {
-    if (!canDriveClock()) {
-      setStatus((room.host?.name || 'Someone') + ' is running the projector.');
-      return;
-    }
     emitIntent(payload);
   }
 
@@ -527,7 +497,6 @@
       updatedAt: Number(incoming.updatedAt) || Date.now(),
       host: incoming.host === undefined ? room.host || null : incoming.host,
     };
-    syncHostButton();
     return ensureMedia(room.media).then(() => applyPlayback(room, forceSeek));
   }
 
@@ -858,12 +827,6 @@
             setStatus('Theater is full — 10 people already here.');
             return;
           }
-          if (err?.reason === 'host-lock' || err?.reason === 'host-held') {
-            setStatus(
-              (room.host?.name || 'Someone') + ' is running the projector.'
-            );
-            return;
-          }
           if (err?.reason === 'unsupported' || err?.reason === 'empty') {
             setStatus('That does not look like a YouTube link.');
             return;
@@ -1032,17 +995,6 @@
     els.cinema()?.addEventListener('click', () => {
       setCinema(!isCinema());
     });
-    els.host()?.addEventListener('click', () => {
-      if (room.host?.key && room.host.key === myHostKey()) {
-        emitIntent({ type: 'host-release' });
-        return;
-      }
-      if (room.host?.key) {
-        setStatus((room.host.name || 'Someone') + ' is running the projector.');
-        return;
-      }
-      emitIntent({ type: 'host-claim' });
-    });
     setCinema(readCinema());
     document.addEventListener('fullscreenchange', syncFillButton);
     document.addEventListener('webkitfullscreenchange', syncFillButton);
@@ -1167,7 +1119,6 @@
     window.WatchTogetherGate.setName(selfName);
     await window.WatchTogetherMap?.init();
     connect();
-    syncHostButton();
   }
 
   start();
