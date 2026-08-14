@@ -160,6 +160,12 @@
       }),
     });
     const data = await res.json().catch(() => ({}));
+    if (res.status === 409 || data.error === 'theater-full') {
+      const err = new Error('THEATER_FULL');
+      err.code = 'THEATER_FULL';
+      err.max = Number(data.max) || 10;
+      throw err;
+    }
     if (!res.ok || !data.token || !data.url) return false;
 
     const room = new LK.Room({
@@ -247,6 +253,10 @@
       const ok = await connectLivekit(opts);
       if (ok) return { transport: 'livekit' };
     } catch (err) {
+      if (err?.code === 'THEATER_FULL') {
+        emit('error', { reason: 'theater-full', max: err.max || 10 });
+        return { transport: 'full' };
+      }
       console.warn('Watch together LiveKit join failed, using Socket.IO', err);
     }
     connectSocket(opts);

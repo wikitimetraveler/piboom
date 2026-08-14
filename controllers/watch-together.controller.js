@@ -8,6 +8,7 @@ import {
   getWatchTogetherStatus,
   handleWatchIntent,
   mintWatchTogetherLivekitToken,
+  MAX_VIEWERS,
 } from '../services/watch-together.service.js';
 
 export async function postVerifyWatchTogether(req, res) {
@@ -80,6 +81,13 @@ export async function postWatchTogetherLivekitToken(req, res) {
     });
     return res.json({ ok: true, livekitConfigured: true, ...minted });
   } catch (error) {
+    if (error.code === 'THEATER_FULL') {
+      return res.status(409).json({
+        ok: false,
+        error: 'theater-full',
+        max: MAX_VIEWERS,
+      });
+    }
     const status = error.code === 'LIVEKIT_NOT_CONFIGURED' ? 503 : 500;
     return res.status(status).json({
       ok: false,

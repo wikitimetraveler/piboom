@@ -97,7 +97,7 @@
 
   /** Entertainment hub tool grid */
   const ENTERTAINMENT_TOOLS = [
-    { href: '/watch-together/', icon: 'bi-play-btn', label: 'Watch together', title: 'Open watch-together theater — synced YouTube, chat, draw, viewer map. No code.' },
+    { href: '/watch-together/', icon: 'bi-play-btn', label: 'Watch together', title: 'Open watch-together theater for up to 10 people — synced YouTube, chat, draw, viewer map. No code.' },
     { href: '/entertainment/coffee-dreams.html', icon: 'bi-cup-hot', label: 'Coffee Dreams', title: 'Private coffee photo gallery' },
     { href: '/entertainment/player.html', icon: 'bi-volume-up', label: 'The Boombox', title: 'Boombox audio player' },
     { href: '/entertainment/visualizer.html', icon: 'bi-palette-fill', label: 'Psychedelic Visualizer', title: 'Psychedelic visualizer' },

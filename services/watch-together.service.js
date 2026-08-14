@@ -9,6 +9,7 @@ export const DRIFT_PAUSED_S = 0.35;
 export const ROOM_NAME = 'theater';
 export const SOCKET_NAMESPACE = '/watch-together';
 export const LIVEKIT_ROOM_NAME = 'watch-together-theater';
+export const MAX_VIEWERS = 10;
 export const MAX_CHAT = 80;
 export const MAX_NAME = 24;
 export const MAX_CHAT_TEXT = 280;
@@ -248,9 +249,16 @@ export function clearDraw(state) {
 let room = createRoomState();
 /** @type {null | ((opts: object) => Promise<string>)} */
 let livekitTokenFactory = null;
+/** @type {null | (() => number | Promise<number>)} */
+let occupancyReader = null;
+const socketViewers = new Map();
 
 export function setWatchTogetherLivekitTokenFactory(factory) {
   livekitTokenFactory = typeof factory === 'function' ? factory : null;
+}
+
+export function setWatchTogetherOccupancyReader(reader) {
+  occupancyReader = typeof reader === 'function' ? reader : null;
 }
 
 export function resetWatchTogetherRoom(now = Date.now()) {
@@ -270,7 +278,41 @@ export function getWatchTogetherStatus() {
     ok: true,
     livekitConfigured: getLivekitConfig().configured,
     livekitRoom: LIVEKIT_ROOM_NAME,
+    maxViewers: MAX_VIEWERS,
   };
+}
+
+function livekitHttpUrl(url) {
+  return String(url || '').replace(/^ws/i, 'http');
+}
+
+async function countLivekitParticipants() {
+  const config = getLivekitConfig();
+  if (!config.configured) return 0;
+  try {
+    const { RoomServiceClient } = await import('livekit-server-sdk');
+    const svc = new RoomServiceClient(livekitHttpUrl(config.url), config.apiKey, config.apiSecret);
+    const parts = await svc.listParticipants(LIVEKIT_ROOM_NAME);
+    return Array.isArray(parts) ? parts.length : 0;
+  } catch {
+    return 0;
+  }
+}
+
+export async function getTheaterOccupancy() {
+  if (occupancyReader) return Math.max(0, Number(await occupancyReader()) || 0);
+  const live = await countLivekitParticipants();
+  return live + socketViewers.size;
+}
+
+export async function assertTheaterHasSeat() {
+  const occupied = await getTheaterOccupancy();
+  if (occupied >= MAX_VIEWERS) {
+    const err = new Error('THEATER_FULL');
+    err.code = 'THEATER_FULL';
+    err.max = MAX_VIEWERS;
+    throw err;
+  }
 }
 
 export function livekitIdentity(name, userId) {
@@ -306,6 +348,7 @@ export async function mintWatchTogetherLivekitToken({ identity, name, userId } =
     err.code = 'LIVEKIT_NOT_CONFIGURED';
     throw err;
   }
+  await assertTheaterHasSeat();
   const participantName = sanitizeName(name);
   const participantId = String(identity || livekitIdentity(participantName, userId))
     .replace(/[^\w.-]/g, '-')
@@ -391,10 +434,9 @@ export function attachWatchTogetherSockets(io) {
   io._watchTogetherAttached = true;
 
   const nsp = io.of(SOCKET_NAMESPACE);
-  const viewers = new Map();
 
   function viewerList() {
-    return [...viewers.values()].map(publicViewer).filter(Boolean);
+    return [...socketViewers.values()].map(publicViewer).filter(Boolean);
   }
 
   function emitRoom(socket) {
@@ -407,15 +449,25 @@ export function attachWatchTogetherSockets(io) {
   }
 
   nsp.on('connection', (socket) => {
-    socket.on('watch:join', (payload = {}) => {
+    socket.on('watch:join', async (payload = {}) => {
       const code = typeof payload.code === 'string' ? payload.code : '';
       if (!verifyWatchTogetherAccess(code).valid) {
         socket.emit('watch:error', { reason: 'invalid-code' });
         socket.disconnect(true);
         return;
       }
+      try {
+        await assertTheaterHasSeat();
+      } catch (err) {
+        if (err?.code === 'THEATER_FULL') {
+          socket.emit('watch:error', { reason: 'theater-full', max: MAX_VIEWERS });
+          socket.disconnect(true);
+          return;
+        }
+        throw err;
+      }
       const viewer = buildViewerRecord(socket.id, payload);
-      viewers.set(socket.id, viewer);
+      socketViewers.set(socket.id, viewer);
       socket.data.joined = true;
       socket.data.name = viewer.name;
       socket.join(ROOM_NAME);
@@ -425,11 +477,11 @@ export function attachWatchTogetherSockets(io) {
 
     socket.on('watch:location', (payload = {}) => {
       if (!socket.data.joined) return;
-      const current = viewers.get(socket.id);
+      const current = socketViewers.get(socket.id);
       if (!current) return;
       const loc = sanitizeLocation(payload.lat, payload.lng);
       if (!loc) return;
-      viewers.set(socket.id, { ...current, lat: loc.lat, lng: loc.lng });
+      socketViewers.set(socket.id, { ...current, lat: loc.lat, lng: loc.lng });
       nsp.to(ROOM_NAME).emit('watch:viewers', viewerList());
     });
 
@@ -463,8 +515,8 @@ export function attachWatchTogetherSockets(io) {
     });
 
     socket.on('disconnect', () => {
-      if (!viewers.has(socket.id)) return;
-      viewers.delete(socket.id);
+      if (!socketViewers.has(socket.id)) return;
+      socketViewers.delete(socket.id);
       nsp.to(ROOM_NAME).emit('watch:viewers', viewerList());
     });
   });
@@ -488,7 +540,10 @@ export default {
   getWatchTogetherStatus,
   mintWatchTogetherLivekitToken,
   setWatchTogetherLivekitTokenFactory,
+  setWatchTogetherOccupancyReader,
+  getTheaterOccupancy,
   resetWatchTogetherRoom,
   LIVEKIT_ROOM_NAME,
+  MAX_VIEWERS,
   attachWatchTogetherSockets,
 };

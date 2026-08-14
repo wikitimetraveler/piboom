@@ -80,18 +80,15 @@
     return Boolean(res.ok && data.valid);
   }
 
-  function buildGate({ onCancel, onUnlock, requireName }) {
+  function buildNamePrompt({ onCancel, onUnlock, suggested } = {}) {
     const overlay = document.createElement('div');
     overlay.className = 'wt-gate';
     overlay.id = 'wtGate';
     overlay.innerHTML =
       '<form class="wt-gate-card" id="wtGateForm">' +
-      '<h2>Watch together</h2>' +
-      '<p>Open to everyone. No code. Volume stays yours. The clock is shared.</p>' +
-      (requireName
-        ? '<div class="wt-field"><label for="wtGateName">Your name</label><input id="wtGateName" name="name" autocomplete="nickname" maxlength="24" value=""></div>'
-        : '') +
-      '<div class="wt-field"><label for="wtGateCode">Access code</label><input id="wtGateCode" name="code" type="password" autocomplete="current-password" required></div>' +
+      '<h2>What should we call you?</h2>' +
+      '<p>This name shows in chat, on your camera tile, and on the map. You only enter it once.</p>' +
+      '<div class="wt-field"><label for="wtGateName">Your name</label><input id="wtGateName" name="name" autocomplete="nickname" maxlength="24" required></div>' +
       '<p class="wt-gate-error" id="wtGateError" role="alert"></p>' +
       '<div class="wt-gate-actions">' +
       '<button class="wt-enter" type="submit">Enter the theater</button>' +
@@ -101,31 +98,25 @@
     const form = overlay.querySelector('#wtGateForm');
     const errorEl = overlay.querySelector('#wtGateError');
     const nameEl = overlay.querySelector('#wtGateName');
-    if (nameEl) nameEl.value = getName();
+    nameEl.value = String(suggested || getName() || '').trim();
 
     overlay.querySelector('#wtGateCancel')?.addEventListener('click', () => {
       overlay.remove();
       if (typeof onCancel === 'function') onCancel();
     });
 
-    form.addEventListener('submit', async (event) => {
+    form.addEventListener('submit', (event) => {
       event.preventDefault();
       errorEl.textContent = '';
-      const code = String(form.code.value || '');
-      const name = nameEl ? String(nameEl.value || '').trim() : getName();
-      try {
-        const ok = await verifyCode(code);
-        if (!ok) {
-          errorEl.textContent = 'That code is not the one.';
-          return;
-        }
-        markUnlockedWithCode(code);
-        if (name) setName(name);
-        overlay.remove();
-        if (typeof onUnlock === 'function') onUnlock({ code, name: name || 'Guest' });
-      } catch {
-        errorEl.textContent = 'Could not reach the theater. Try again.';
+      const name = String(nameEl.value || '').trim();
+      if (!name) {
+        errorEl.textContent = 'Type the name people should see.';
+        nameEl.focus();
+        return;
       }
+      setName(name);
+      overlay.remove();
+      if (typeof onUnlock === 'function') onUnlock({ name });
     });
 
     return overlay;
@@ -139,6 +130,7 @@
     getName,
     setName,
     verifyCode,
-    buildGate,
+    buildNamePrompt,
+    buildGate: buildNamePrompt,
   };
 })(window);

@@ -238,8 +238,8 @@ body.wt-body {
 
 .wt-couches {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(0.9rem, 2.4vw, 1.6rem);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: clamp(0.55rem, 1.6vw, 1.1rem);
 }
 
 .wt-couch {
@@ -464,7 +464,7 @@ body.wt-cinema-on {
 }
 
 .wt-theater.is-cinema .wt-faces {
-  max-height: 7.5rem;
+  max-height: 12rem;
   overflow: auto;
 }
 
@@ -508,6 +508,11 @@ body.wt-cinema-on {
   font-size: 0.72rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+.wt-chip-count {
+  color: var(--wt-ink);
+  border-color: rgba(255, 61, 77, 0.45);
 }
 
 .wt-load {
@@ -636,7 +641,7 @@ body.wt-cinema-on {
 
 .wt-faces {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(108px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
   gap: 0.45rem;
   flex: 0 0 auto;
 }
@@ -971,7 +976,7 @@ input[type="range"] {
   }
 
   .wt-couches {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .wt-stage-grid {

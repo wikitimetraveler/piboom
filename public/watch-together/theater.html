@@ -9,12 +9,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/watch-together/css/watch-together.css">
 </head>
-<body class="wt-body">
+<body class="wt-body wt-cinema-on">
   <div class="wt-glow" aria-hidden="true"></div>
   <div class="wt-scanlines" aria-hidden="true"></div>
   <a class="wt-home-link" href="/watch-together/">Back</a>
 
-  <main class="wt-theater">
+  <main class="wt-theater is-cinema">
     <header class="wt-theater-top">
       <h1 class="wt-brand">Watch <span>together.</span></h1>
       <div class="wt-viewers" id="wtViewers" aria-label="People in the theater"></div>
@@ -42,7 +42,7 @@
           <label class="wt-status" for="wtVolume">Vol</label>
           <input class="wt-volume" id="wtVolume" type="range" min="0" max="100" value="80" aria-label="Your volume (never synced)">
           <button class="wt-ghost" id="wtFill" type="button" aria-pressed="false">Fill screen</button>
-          <button class="wt-ghost" id="wtCinema" type="button" aria-pressed="false">Chat left</button>
+          <button class="wt-ghost" id="wtCinema" type="button" aria-pressed="true">Exit chat left</button>
           <button class="wt-icon-btn" id="wtDrawBtn" type="button" aria-pressed="false" aria-label="Draw">✎</button>
           <button class="wt-ghost" id="wtClearDraw" type="button">Clear draw</button>
           <button class="wt-ghost" id="wtMic" type="button" aria-pressed="false" hidden>Mic</button>

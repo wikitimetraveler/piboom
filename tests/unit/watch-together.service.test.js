@@ -16,7 +16,9 @@ import {
   getWatchTogetherStatus,
   mintWatchTogetherLivekitToken,
   setWatchTogetherLivekitTokenFactory,
+  setWatchTogetherOccupancyReader,
   LIVEKIT_ROOM_NAME,
+  MAX_VIEWERS,
   DRIFT_PLAYING_S,
   DRIFT_PAUSED_S,
 } from '../../services/watch-together.service.js';
@@ -119,6 +121,36 @@ describe('watch-together.service', () => {
 
   test('LiveKit room name is dedicated to the theater', () => {
     expect(LIVEKIT_ROOM_NAME).toBe('watch-together-theater');
+  });
+
+  test('theater holds up to 10 people', () => {
+    expect(MAX_VIEWERS).toBe(10);
+    expect(getWatchTogetherStatus().maxViewers).toBe(10);
+  });
+
+  test('mintWatchTogetherLivekitToken throws when the theater is full', async () => {
+    const keys = ['LIVEKIT_URL', 'LIVEKIT_API_KEY', 'LIVEKIT_API_SECRET'];
+    const saved = {};
+    keys.forEach((key) => {
+      saved[key] = process.env[key];
+    });
+    process.env.LIVEKIT_URL = 'wss://example.livekit.cloud';
+    process.env.LIVEKIT_API_KEY = 'key';
+    process.env.LIVEKIT_API_SECRET = 'secret';
+    setWatchTogetherOccupancyReader(() => 10);
+    setWatchTogetherLivekitTokenFactory(async () => 'jwt-watch');
+    try {
+      await expect(mintWatchTogetherLivekitToken({ name: 'Sam' })).rejects.toMatchObject({
+        code: 'THEATER_FULL',
+      });
+    } finally {
+      setWatchTogetherOccupancyReader(null);
+      setWatchTogetherLivekitTokenFactory(null);
+      keys.forEach((key) => {
+        if (saved[key] === undefined) delete process.env[key];
+        else process.env[key] = saved[key];
+      });
+    }
   });
 
   test('mintWatchTogetherLivekitToken throws when unconfigured', async () => {

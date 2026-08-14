@@ -11,9 +11,9 @@
       "spotlight": "#wtTitle",
       "durationMs": 10000,
       "kicker": "Beat 01 · Hook",
-      "title": "Three couches. One clock.",
+      "title": "Ten couches. One clock.",
       "copy": "",
-      "narration": "Three couches. One clock."
+      "narration": "Ten couches. One clock."
     },
     {
       "id": "clock",
@@ -31,9 +31,9 @@
       "spotlight": "#wtCouches",
       "durationMs": 18000,
       "kicker": "Beat 03 · Proof",
-      "title": "Dave. Ana. Dev.",
+      "title": "Ten couches. One clock.",
       "copy": "Same playhead.",
-      "narration": "Dave. Ana. Dev. Same playhead."
+      "narration": "Ten couches. One clock. Same playhead."
     },
     {
       "id": "cta",

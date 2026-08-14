@@ -9,7 +9,18 @@
 (function (global) {
   'use strict';
 
-  const PIN_COLORS = ['#ff3d4d', '#3d9eff', '#f5c14a', '#5ad18a', '#c07bff'];
+  const PIN_COLORS = [
+    '#ff3d4d',
+    '#3d9eff',
+    '#f5c14a',
+    '#5ad18a',
+    '#c07bff',
+    '#ff8a3d',
+    '#3de0d4',
+    '#ff5ad5',
+    '#9ad14a',
+    '#6b8cff',
+  ];
   const DEFAULT_COUCH = { lat: 41.233, lng: -80.493 };
   let map = null;
   let info = null;
@@ -95,7 +106,7 @@
   }
 
   function offsetAround(home, index) {
-    const angle = (2 * Math.PI * index) / 6;
+    const angle = (2 * Math.PI * index) / 10;
     const meters = 70 + index * 35;
     const dLat = (meters / 111320) * Math.cos(angle);
     const cosLat = Math.cos((home.lat * Math.PI) / 180) || 1;
@@ -200,7 +211,7 @@
         Math.abs(a.lat - b.lat) < 0.00018 && Math.abs(a.lng - b.lng) < 0.00018;
       let pos = position;
       let n = 0;
-      while (placed.some((p) => tooClose(p, pos)) && n < 8) {
+      while (placed.some((p) => tooClose(p, pos)) && n < 12) {
         pos = offsetAround(position, n + 1);
         n += 1;
       }

@@ -63,9 +63,11 @@
   }
 
   function displayName() {
+    const entered = window.WatchTogetherGate?.getName?.();
+    if (entered) return entered;
     const user = loggedInUser();
     if (user?.name) return String(user.name).trim();
-    return window.WatchTogetherGate?.getName() || 'Guest';
+    return 'Guest';
   }
 
   function userId() {
@@ -435,7 +437,12 @@
     const host = els.viewers();
     if (!host) return;
     host.replaceChildren();
-    (viewers || []).forEach((viewer) => {
+    const list = viewers || [];
+    const count = document.createElement('span');
+    count.className = 'wt-chip wt-chip-count';
+    count.textContent = list.length + ' / 10';
+    host.appendChild(count);
+    list.forEach((viewer) => {
       const chip = document.createElement('span');
       chip.className = 'wt-chip';
       chip.textContent = viewer.name || 'Guest';
@@ -633,6 +640,10 @@
         'clear-draw': () => replayDraw([]),
         track: handleMediaTrack,
         error: (err) => {
+          if (err?.reason === 'theater-full') {
+            setStatus('Theater is full — 10 people already here.');
+            return;
+          }
           if (err?.reason === 'unsupported' || err?.reason === 'empty') {
             setStatus('That does not look like a YouTube link.');
             return;
@@ -657,6 +668,8 @@
       } catch (err) {
         setStatus(err?.message || 'Click Cam to show your face.');
       }
+    } else if (result?.transport === 'full') {
+      setStatus('Theater is full — 10 people already here.');
     } else {
       setStatus('On the shared clock.');
     }
@@ -702,13 +715,15 @@
     syncFillButton();
   }
 
-  const CINEMA_KEY = 'dc_watch_together_cinema_v1';
+  const CINEMA_KEY = 'dc_watch_together_cinema_v2';
 
   function readCinema() {
     try {
-      return sessionStorage.getItem(CINEMA_KEY) === '1';
+      const raw = sessionStorage.getItem(CINEMA_KEY);
+      if (raw === null) return true;
+      return raw === '1';
     } catch {
-      return false;
+      return true;
     }
   }
 
@@ -837,9 +852,21 @@
   }
 
   function requireUnlock() {
-    const user = loggedInUser();
-    if (user?.name) window.WatchTogetherGate?.setName(user.name);
-    return Promise.resolve();
+    const gate = window.WatchTogetherGate;
+    if (gate?.getName?.()) return Promise.resolve();
+    return new Promise((resolve) => {
+      const host = els.gateHost();
+      if (!host || !gate?.buildNamePrompt) {
+        resolve();
+        return;
+      }
+      const overlay = gate.buildNamePrompt({
+        suggested: loggedInUser()?.name || '',
+        onUnlock: resolve,
+      });
+      host.appendChild(overlay);
+      overlay.querySelector('#wtGateName')?.focus();
+    });
   }
 
   async function start() {

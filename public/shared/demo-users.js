@@ -14,38 +14,38 @@
   const DEMO_USERS = [
     {
       id: 'demo-analyst-1',
-      name: 'Analyst One',
+      name: 'Harrison Ford',
       avatar: '/images/demo-avatars/analyst-1.svg',
       color: '#0d6efd',
-      description: 'Demo workspace profile',
+      description: 'Watch together profile',
     },
     {
       id: 'demo-analyst-2',
-      name: 'Analyst Two',
+      name: 'Sigourney Weaver',
       avatar: '/images/demo-avatars/analyst-2.svg',
       color: '#5a6a85',
-      description: 'Demo workspace profile',
+      description: 'Watch together profile',
     },
     {
       id: 'demo-analyst-3',
-      name: 'Analyst Three',
+      name: 'Denzel Washington',
       avatar: '/images/demo-avatars/analyst-3.svg',
       color: '#198754',
-      description: 'Demo workspace profile',
+      description: 'Watch together profile',
     },
     {
       id: 'demo-analyst-4',
-      name: 'Analyst Four',
+      name: 'Meryl Streep',
       avatar: '/images/demo-avatars/analyst-4.svg',
       color: '#6f42c1',
-      description: 'Demo workspace profile',
+      description: 'Watch together profile',
     },
     {
       id: 'demo-analyst-5',
-      name: 'Analyst Five',
+      name: 'Keanu Reeves',
       avatar: '/images/demo-avatars/analyst-5.svg',
       color: '#fd7e14',
-      description: 'Demo workspace profile',
+      description: 'Watch together profile',
     },
   ];
 
