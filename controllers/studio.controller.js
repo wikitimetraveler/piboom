@@ -187,27 +187,6 @@ export async function postEngineerChat(req, res) {
   }
 }
 
-export async function postStudioAudioEgress(req, res) {
-  try {
-    const reelCode = normalizeReelCode(req.body?.reelCode || req.body?.code);
-    const started = await startStudioAudioEgress(reelCode);
-    res.json({ ok: true, ...started });
-  } catch (error) {
-    const status = error.code === 'LIVEKIT_NOT_CONFIGURED' ? 503 : 500;
-    res.status(status).json({ ok: false, error: error.code || error.message });
-  }
-}
-
-export async function postStudioAudioEgressStop(req, res) {
-  try {
-    const stopped = await stopStudioAudioEgress(req.body?.egressId);
-    res.json({ ok: true, ...stopped });
-  } catch (error) {
-    const status = error.code === 'LIVEKIT_NOT_CONFIGURED' ? 503 : 400;
-    res.status(status).json({ ok: false, error: error.code || error.message });
-  }
-}
-
 export default {
   getHealth,
   postSession,
