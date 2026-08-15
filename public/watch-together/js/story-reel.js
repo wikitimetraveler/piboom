@@ -232,12 +232,7 @@
 
     state.ready = true;
     const wantsReel = new URLSearchParams(window.location.search).get('reel') === '1';
-    if (wantsReel) dismissIntro();
-    else if (!state.reducedMotion) {
-      window.setTimeout(dismissIntro, 4200);
-    } else {
-      dismissIntro();
-    }
+    dismissIntro();
 
     if (state.pendingPlay || wantsReel) {
       state.pendingPlay = false;

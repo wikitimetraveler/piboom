@@ -372,6 +372,9 @@ class AIChatWidget {
         
         if (!message) return;
 
+        // Always show the transcript in chat (voice + typed)
+        if (!this.isOpen) this.open();
+
         // Clear input
         if (input) input.value = '';
 
@@ -583,9 +586,15 @@ class AIChatWidget {
         }
         if (this.isVoiceListening(voice)) voice.stop();
         else {
+            if (!this.isOpen) this.open();
             voice.start((transcript) => {
                 const text = String(transcript || '').trim();
-                if (text) this.sendMessage(text);
+                if (!text) return;
+                // Show what was heard in the input, then send so it lands in the chat thread
+                if (!this.isOpen) this.open();
+                const input = document.getElementById('aiChatInput');
+                if (input) input.value = text;
+                this.sendMessage(text);
             });
         }
     }

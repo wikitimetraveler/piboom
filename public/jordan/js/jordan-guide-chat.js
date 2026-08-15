@@ -35,7 +35,7 @@ function speakReply(text) {
   i18n()?.speakAsGuide(clean);
 }
 
-function openChat(prefill) {
+function openChat(prefill, { startVoice = false } = {}) {
   const widget = window.aiChatWidget;
   if (!widget) return;
   if (typeof widget.open === 'function') widget.open();
@@ -44,6 +44,20 @@ function openChat(prefill) {
   const message = String(prefill || '').trim();
   if (message && typeof widget.sendMessage === 'function') {
     window.setTimeout(() => widget.sendMessage(message), 180);
+    return;
+  }
+
+  // Like before: open chat and listen — spoken words go into the thread
+  if (startVoice && typeof widget.toggleVoice === 'function') {
+    window.setTimeout(() => {
+      try {
+        const voice = widget.ensureVoiceRecognition?.();
+        const already = voice && widget.isVoiceListening?.(voice);
+        if (!already) widget.toggleVoice();
+      } catch (_) {
+        widget.toggleVoice();
+      }
+    }, 220);
   }
 }
 
@@ -65,15 +79,23 @@ function initChat() {
     inputPlaceholder: PLACEHOLDER.en,
     welcomeHtml: WELCOME.en,
     getContext: () => ({ lang: i18n()?.lang() || 'en' }),
-    onMessageReceived: (response) => speakReply(response)
+    onMessageSent: () => {
+      if (typeof window.aiChatWidget?.open === 'function') window.aiChatWidget.open();
+    },
+    onMessageReceived: (response) => {
+      if (typeof window.aiChatWidget?.open === 'function') window.aiChatWidget.open();
+      speakReply(response);
+    }
   });
 
   window.aiChatWidget = widget;
   applyLanguage(widget);
   i18n()?.onChange(() => applyLanguage(widget));
 
-  document.getElementById('jdAskGuide')?.addEventListener('click', () => openChat());
-  window.JordanAskGuide = openChat;
+  document.getElementById('jdAskGuide')?.addEventListener('click', () => {
+    openChat(null, { startVoice: true });
+  });
+  window.JordanAskGuide = (msg) => openChat(msg, { startVoice: !msg });
 }
 
 if (document.readyState === 'loading') {

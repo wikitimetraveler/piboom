@@ -2286,17 +2286,34 @@ body.jd-story-running .jd-guide {
 
 /* --------------------------------------------------------------- chat fab */
 
-/* Chat opens from Rami dock “Ask Rami” — hide duplicate FAB */
+/* Chat FAB — keep visible so speak → chat works like before */
 .jd-page .ai-chat-button {
-  display: none !important;
+  display: flex !important;
+  background: linear-gradient(135deg, var(--jd-rose), var(--jd-rose-deep)) !important;
+  bottom: 24px;
+  inset-inline-end: 24px;
+  z-index: 1400 !important;
+  box-shadow: 0 8px 20px rgba(140, 34, 20, 0.4) !important;
+}
+
+/* Keep conversation above story overlay so spoken lines stay readable */
+.jd-page .ai-chat-panel {
+  z-index: 1400 !important;
 }
 
 .jd-page .ai-chat-header {
   background: linear-gradient(135deg, var(--jd-panel), var(--jd-panel-soft)) !important;
 }
 
-.jd-page .ai-chat-send-btn {
+.jd-page .ai-chat-send-btn,
+.jd-page .ai-chat-voice-btn {
   background: var(--jd-rose) !important;
+  color: #fff6ec !important;
+}
+
+.jd-page .ai-chat-voice-btn.listening {
+  background: var(--jd-gold) !important;
+  color: #1c1510 !important;
 }
 
 .jd-page .dark-mode-toggle {

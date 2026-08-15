@@ -30,7 +30,6 @@
     gateHost.replaceChildren();
     const overlay = window.WatchTogetherGate.buildNamePrompt({
       suggested: suggestedName(),
-      onCancel: () => gateHost.replaceChildren(),
       onUnlock: goTheater,
     });
     gateHost.appendChild(overlay);
