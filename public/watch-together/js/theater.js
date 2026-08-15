@@ -609,7 +609,7 @@
       const log = els.log();
       if (log) {
         log.replaceChildren();
-        state.chat.forEach((message) => appendChat(message, false));
+        state.chat.forEach((message) => appendChat(message));
       }
     }
     if (Array.isArray(state.draw)) replayDraw(state.draw);
@@ -695,42 +695,46 @@
     attachFace(participant, track, payload.action === 'local');
   }
 
-  function speakChat(message) {
-    const text = String(message?.text || '').trim();
-    const who = String(message?.name || '').trim();
-    if (!text) return;
-    if (message.spoken) return;
-    if (who && who === selfName) return;
-    const line = (who ? who + '. ' : '') + text;
-    window.ensureAudioUnlock?.();
-    window.primeSpeechSynthesis?.();
-    const speakBrowser = () => {
-      if (!('speechSynthesis' in window)) return;
-      try {
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(line);
-        u.rate = 0.85;
-        u.pitch = 0.65;
-        u.volume = 1;
-        window.speechSynthesis.speak(u);
-      } catch {
-        /* ignore */
-      }
-    };
-    if (typeof window.speakWithGoogle === 'function') {
-      window.speakWithGoogle(line, 'en-US-Standard-D', {
-        pitch: -2,
-        speakingRate: 0.85,
-        volume: 1,
-      }).then((ok) => {
-        if (!ok) speakBrowser();
-      }).catch(speakBrowser);
-      return;
-    }
-    speakBrowser();
+  const recentChatNorm = [];
+
+  function normalizeTalk(text) {
+    return String(text || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
-  function appendChat(message, speak) {
+  function rememberChatLine(text) {
+    const n = normalizeTalk(text);
+    if (!n) return;
+    recentChatNorm.push(n);
+    if (recentChatNorm.length > 16) recentChatNorm.shift();
+  }
+
+  function isEchoCaption(text) {
+    const n = normalizeTalk(text);
+    if (!n || n.length < 2) return true;
+    const words = n.split(' ');
+    if (words.length >= 6) {
+      const counts = {};
+      words.forEach((w) => {
+        counts[w] = (counts[w] || 0) + 1;
+      });
+      if (Math.max(...Object.values(counts)) >= 4) return true;
+    }
+    const name = normalizeTalk(selfName);
+    for (const prev of recentChatNorm) {
+      if (!prev) continue;
+      if (n === prev) return true;
+      if (n.startsWith(prev) && n.length > prev.length) return true;
+      if (prev.includes(n) && n.length >= 6) return true;
+      if (name && n.replace(name, ' ').replace(/\s+/g, ' ').trim() === prev) return true;
+    }
+    return false;
+  }
+
+  function appendChat(message) {
     const log = els.log();
     if (!log || !message) return;
     const row = document.createElement('div');
@@ -742,7 +746,7 @@
     row.append(who, body);
     log.appendChild(row);
     log.scrollTop = log.scrollHeight;
-    if (speak !== false) speakChat(message);
+    rememberChatLine(message.text);
   }
 
   function syncCamButton(on) {
@@ -805,15 +809,17 @@
     if (!talkCaptions) {
       talkCaptions = window.DcSpeechRecognition.createSpeechBridge({
         lang: 'en-US',
-        continuous: true,
+        continuous: false,
         interimResults: false,
         onResult: (transcript) => {
           const text = String(transcript || '').trim();
           if (!text) return;
           const now = Date.now();
-          if (text === lastCaption && now - lastCaptionAt < 2500) return;
+          if (now - lastCaptionAt < 2200) return;
+          if (isEchoCaption(text)) return;
           lastCaption = text;
           lastCaptionAt = now;
+          rememberChatLine(text);
           emitIntent({ type: 'chat', text, fromVoice: true });
         },
         onEnd: () => {
@@ -825,7 +831,7 @@
             } catch {
               /* ignore */
             }
-          }, 250);
+          }, 900);
         },
         onError: (error) => {
           if (error === 'not-allowed' || error === 'service-not-allowed') {
