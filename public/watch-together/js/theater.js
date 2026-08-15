@@ -745,13 +745,20 @@
   }
 
   async function toggleMic(event) {
+    event?.preventDefault?.();
+    void window.WatchTogetherSync?.resumeRemoteAudio?.();
     const fromTalk = event?.currentTarget?.id === 'wtChatMic';
     const currentlyOn = Boolean(window.WatchTogetherSync?.micOn());
     const next = fromTalk ? true : !currentlyOn;
     const on = await window.WatchTogetherSync?.setMic(next);
     syncMicButtons(Boolean(on));
     if (next && !on) {
-      setStatus('Mic did not start. Allow the microphone, then click Talk.');
+      const why = window.WatchTogetherSync?.micError?.() || '';
+      setStatus(
+        why
+          ? 'Mic did not start (' + why + '). Allow the microphone, then click Talk.'
+          : 'Mic did not start. Allow the microphone, then click Talk.'
+      );
       return false;
     }
     if (on) setStatus('Mic on · they can hear you.');

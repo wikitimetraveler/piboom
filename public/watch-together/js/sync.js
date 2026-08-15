@@ -41,7 +41,9 @@
     camOn: false,
     blurOn: readBlurPref(),
     localVideoTrack: null,
+    localAudioTrack: null,
     audioUnlockBound: false,
+    micError: '',
     handlers: {},
   };
 
@@ -274,7 +276,9 @@
     room.on(LK.RoomEvent.ParticipantDisconnected, publishViewers);
     room.on(LK.RoomEvent.ParticipantMetadataChanged, publishViewers);
     room.on(LK.RoomEvent.TrackSubscribed, (track, publication, participant) => {
-      if (track.kind === 'audio') attachRemoteAudio(track);
+      if (track.kind === 'audio' || publication?.kind === 'audio') {
+        attachRemoteAudio(track);
+      }
       emit('track', { action: 'subscribed', track, publication, participant });
     });
     room.on(LK.RoomEvent.TrackUnsubscribed, (track, publication, participant) => {
@@ -420,19 +424,55 @@
 
   async function setMic(on) {
     if (!state.room?.localParticipant) return false;
+    const LK = global.LivekitClient;
+    const lp = state.room.localParticipant;
     const want = Boolean(on);
+    void resumeRemoteAudio();
     try {
-      await state.room.localParticipant.setMicrophoneEnabled(want);
-      if (want) {
-        const pub = microphonePublication();
-        await unmuteMic(pub);
-        await resumeRemoteAudio();
+      if (!want) {
+        await lp.setMicrophoneEnabled(false);
+        if (state.localAudioTrack) {
+          try {
+            await lp.unpublishTrack(state.localAudioTrack);
+          } catch {
+            /* ignore */
+          }
+          try {
+            state.localAudioTrack.stop();
+          } catch {
+            /* ignore */
+          }
+          state.localAudioTrack = null;
+        }
+        state.micOn = false;
+        state.micError = '';
+        return false;
       }
-      state.micOn = want;
-      return state.micOn;
+      if (typeof LK.createLocalAudioTrack === 'function') {
+        try {
+          const track = await LK.createLocalAudioTrack({
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          });
+          state.localAudioTrack = track;
+          await lp.publishTrack(track);
+        } catch (err) {
+          console.warn('Watch together createLocalAudioTrack failed, trying setMicrophoneEnabled', err);
+          await lp.setMicrophoneEnabled(true);
+        }
+      } else {
+        await lp.setMicrophoneEnabled(true);
+      }
+      await unmuteMic(microphonePublication());
+      state.micOn = true;
+      state.micError = '';
+      await resumeRemoteAudio();
+      return true;
     } catch (err) {
       console.warn('Watch together mic failed', err);
       state.micOn = false;
+      state.micError = err?.name || err?.message || 'mic-failed';
       return false;
     }
   }
@@ -703,6 +743,7 @@
     micOn,
     camOn,
     blurOn,
+    micError: () => state.micError || '',
     identity,
   };
 })(window);

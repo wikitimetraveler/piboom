@@ -80,12 +80,14 @@
           <p class="wt-faces-empty" id="wtFacesEmpty">Cameras land here so the couches can see each other.</p>
         </section>
         <section class="wt-chat">
-          <h2>Chat</h2>
-          <p class="wt-chat-hint">Talk is live voice. Type to send a line.</p>
+          <div class="wt-chat-head">
+            <h2>Chat</h2>
+            <button class="wt-enter" id="wtChatMic" type="button" aria-pressed="false" hidden aria-label="Let the other couches hear you">Talk</button>
+          </div>
+          <p class="wt-chat-hint">Click Talk so they can hear you. Type to send a line.</p>
           <div class="wt-log" id="wtLog"></div>
           <form id="wtChatForm">
             <input id="wtChatText" maxlength="280" placeholder="Type a line" autocomplete="off">
-            <button class="wt-icon-btn" id="wtChatMic" type="button" aria-pressed="false" hidden aria-label="Let the other couches hear you">Talk</button>
             <button class="wt-enter" type="submit">Send</button>
           </form>
         </section>

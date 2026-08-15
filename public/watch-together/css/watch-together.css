@@ -1048,12 +1048,30 @@ input[type="range"] {
 
 .wt-chat h2 {
   margin: 0;
-  padding: 0.8rem 0.9rem 0.15rem;
   font-family: var(--wt-display);
   font-size: 0.72rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--wt-gold);
+}
+
+.wt-chat-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.55rem 0.7rem 0.1rem 0.9rem;
+}
+
+.wt-chat-head h2 {
+  padding: 0.25rem 0 0;
+}
+
+.wt-chat-head #wtChatMic {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 4.5rem;
+  padding: 0.45rem 0.85rem;
 }
 
 .wt-chat-hint {
