@@ -1,7 +1,6 @@
 /**
  * Development work by David Lane
  */
-import axios from 'axios';
 import OpenAI from 'openai';
 import { getUserConversationHistory } from '../services/langchain-memory.service.js';
 import { resolveOpenAiAgentModel } from '../services/openai-agent-model.js';
@@ -179,7 +178,10 @@ RESPOND WITH ONLY VALID JSON!`
         break;
         
       default:
-        // General question - just return the AI response
+        if (aiResult.searchQuery) {
+          results = await searchAlbums(aiResult.searchQuery);
+          resultType = 'albums';
+        }
         break;
     }
 
@@ -188,7 +190,8 @@ RESPOND WITH ONLY VALID JSON!`
       response: aiResult.response,
       results: results,
       resultType: resultType,
-      intent: aiResult.intent
+      intent: aiResult.intent,
+      searchQuery: aiResult.searchQuery || command
     });
 
   } catch (error) {
@@ -200,7 +203,11 @@ RESPOND WITH ONLY VALID JSON!`
   }
 }
 
-// Search for albums by artist
+function coverUrlForReleaseGroup(id) {
+  if (!id) return null;
+  return `https://coverartarchive.org/release-group/${id}/front-250`;
+}
+
 async function searchArtistAlbums(artist) {
   const albums = [];
   
@@ -212,19 +219,11 @@ async function searchArtistAlbums(artist) {
 
     if (response.data['release-groups']) {
       for (const rg of response.data['release-groups'].slice(0, 12)) {
-        let coverUrl = null;
-        try {
-          const coverResponse = await axios.head(`https://coverartarchive.org/release-group/${rg.id}/front-250`);
-          if (coverResponse.status === 200) {
-            coverUrl = `https://coverartarchive.org/release-group/${rg.id}/front-250`;
-          }
-        } catch (e) {}
-
         albums.push({
           album: rg.title,
           artist: artist,
           year: rg['first-release-date']?.substring(0, 4),
-          coverUrl: coverUrl
+          coverUrl: coverUrlForReleaseGroup(rg.id)
         });
       }
     }
@@ -250,21 +249,12 @@ async function searchByYear(year, genre, userId) {
 
     if (response.data['release-groups']) {
       for (const rg of response.data['release-groups'].slice(0, 12)) {
-        let coverUrl = null;
-        try {
-          const coverResponse = await axios.head(`https://coverartarchive.org/release-group/${rg.id}/front-250`);
-          if (coverResponse.status === 200) {
-            coverUrl = `https://coverartarchive.org/release-group/${rg.id}/front-250`;
-          }
-        } catch (e) {}
-
         const artistName = rg['artist-credit'] ? rg['artist-credit'][0].name : 'Unknown';
-        
         albums.push({
           album: rg.title,
           artist: artistName,
           year: year,
-          coverUrl: coverUrl
+          coverUrl: coverUrlForReleaseGroup(rg.id)
         });
       }
     }
@@ -324,21 +314,12 @@ async function searchByGenre(genre, userId) {
 
     if (response.data['release-groups']) {
       for (const rg of response.data['release-groups'].slice(0, 12)) {
-        let coverUrl = null;
-        try {
-          const coverResponse = await axios.head(`https://coverartarchive.org/release-group/${rg.id}/front-250`);
-          if (coverResponse.status === 200) {
-            coverUrl = `https://coverartarchive.org/release-group/${rg.id}/front-250`;
-          }
-        } catch (e) {}
-
         const artistName = rg['artist-credit'] ? rg['artist-credit'][0].name : 'Unknown';
-        
         albums.push({
           album: rg.title,
           artist: artistName,
           year: rg['first-release-date']?.substring(0, 4),
-          coverUrl: coverUrl
+          coverUrl: coverUrlForReleaseGroup(rg.id)
         });
       }
     }
@@ -361,21 +342,12 @@ async function searchAlbums(query) {
 
     if (response.data['release-groups']) {
       for (const rg of response.data['release-groups'].slice(0, 12)) {
-        let coverUrl = null;
-        try {
-          const coverResponse = await axios.head(`https://coverartarchive.org/release-group/${rg.id}/front-250`);
-          if (coverResponse.status === 200) {
-            coverUrl = `https://coverartarchive.org/release-group/${rg.id}/front-250`;
-          }
-        } catch (e) {}
-
         const artistName = rg['artist-credit'] ? rg['artist-credit'][0].name : 'Unknown';
-        
         albums.push({
           album: rg.title,
           artist: artistName,
           year: rg['first-release-date']?.substring(0, 4),
-          coverUrl: coverUrl
+          coverUrl: coverUrlForReleaseGroup(rg.id)
         });
       }
     }

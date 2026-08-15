@@ -640,53 +640,56 @@ function selectDJUser(userId) {
 
 // Process voice command
 async function processVoiceCommand(command) {
-  document.getElementById('voiceStatus').textContent = 'Processing...';
-  
+  const statusEl = document.getElementById('voiceStatus');
+  statusEl.textContent = 'Processing...';
+  const ctrl = new AbortController();
+  const timer = window.setTimeout(() => ctrl.abort(), 28000);
+
   try {
-    // Get selected user for LangChain memory
     const userId = document.getElementById('selectedUserId').value;
-    
-    // Send to backend for AI processing with LangChain memory
     const response = await fetch('/api/voice-dj/process', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         command: command,
         userId: userId
-      })
+      }),
+      signal: ctrl.signal
     });
-    
-    const data = await response.json();
-    
-    if (data.success) {
-      // Show DJ response
-      document.getElementById('djResponseText').innerHTML = data.response;
-      document.getElementById('djResponseSection').style.display = 'block';
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 768);
-      const tapBtn = document.getElementById('tapToHearBtn');
-      if (tapBtn) {
-        tapBtn.style.display = isMobile && data.response ? 'inline-block' : 'none';
-        tapBtn.dataset.responseText = data.response ? data.response.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() : '';
-      }
-      
-      if (data.results && data.results.length > 0) {
-        displayResults(data.results, data.resultType);
-      }
-      await searchYouTubeForResults(data, command);
-      
-      // Speak the response
-      if (data.response) {
-        speakResponse(data.response);
-      }
-      
-      document.getElementById('voiceStatus').textContent = 'Ready - Click mic to ask another question';
-    } else {
-      document.getElementById('voiceStatus').textContent = 'Sorry, I didn\'t understand that';
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok || !data.success) {
+      statusEl.textContent = data.message || data.error || 'Sorry, I didn\'t understand that';
+      return;
     }
-    
+
+    document.getElementById('djResponseText').innerHTML = data.response;
+    document.getElementById('djResponseSection').style.display = 'block';
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 768);
+    const tapBtn = document.getElementById('tapToHearBtn');
+    if (tapBtn) {
+      tapBtn.style.display = isMobile && data.response ? 'inline-block' : 'none';
+      tapBtn.dataset.responseText = data.response ? data.response.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() : '';
+    }
+
+    if (data.results && data.results.length > 0) {
+      displayResults(data.results, data.resultType);
+    }
+    await searchYouTubeForResults(data, command);
+
+    if (data.response) {
+      speakResponse(data.response);
+    }
+
+    statusEl.textContent = 'Ready - Click mic to ask another question';
   } catch (error) {
     console.error('Error processing command:', error);
-    document.getElementById('voiceStatus').textContent = 'Error - Try again';
+    statusEl.textContent = error?.name === 'AbortError'
+      ? 'That took too long — try again'
+      : 'Error - Try again';
+  } finally {
+    window.clearTimeout(timer);
   }
 }
 
