@@ -964,16 +964,20 @@ body.wt-cinema-on {
 }
 
 .wt-remote-audio {
-  position: absolute;
-  width: 1px;
-  height: 1px;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 8px;
+  height: 8px;
+  opacity: 0.01;
+  pointer-events: none;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
 }
 
 .wt-remote-audio audio {
-  width: 1px;
-  height: 1px;
+  width: 8px;
+  height: 8px;
 }
 
 .wt-draw {

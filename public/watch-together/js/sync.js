@@ -41,6 +41,7 @@
     camOn: false,
     blurOn: readBlurPref(),
     localVideoTrack: null,
+    audioUnlockBound: false,
     handlers: {},
   };
 
@@ -219,7 +220,12 @@
     });
   }
 
-  function resumeRemoteAudio() {
+  async function resumeRemoteAudio() {
+    try {
+      await state.room?.startAudio?.();
+    } catch {
+      /* autoplay still blocked until a click */
+    }
     const host = document.getElementById('wtRemoteAudio');
     if (!host) return;
     host.querySelectorAll('audio').forEach(playAudioEl);
@@ -291,12 +297,24 @@
         participant: participant || room.localParticipant,
       });
     });
+    if (LK.RoomEvent.AudioPlaybackStatusChanged) {
+      room.on(LK.RoomEvent.AudioPlaybackStatusChanged, () => {
+        if (room.canPlaybackAudio) void resumeRemoteAudio();
+      });
+    }
     await room.connect(data.url, data.token);
     state.room = room;
     state.identity = data.identity || room.localParticipant.identity;
     state.transport = 'livekit';
     attachExistingRemoteAudio(room);
     attachExistingRemoteVideo(room);
+    void resumeRemoteAudio();
+    if (!state.audioUnlockBound) {
+      state.audioUnlockBound = true;
+      document.addEventListener('pointerdown', () => {
+        void resumeRemoteAudio();
+      });
+    }
     const coords = parseCoords(opts.lat, opts.lng);
     await setMetadata(coords || {});
     publishViewers();
@@ -402,17 +420,64 @@
 
   async function setMic(on) {
     if (!state.room?.localParticipant) return false;
+    const LK = global.LivekitClient;
+    const lp = state.room.localParticipant;
     const want = Boolean(on);
     try {
-      await state.room.localParticipant.setMicrophoneEnabled(want);
-      state.micOn = want;
-      if (want) resumeRemoteAudio();
+      if (!want) {
+        await lp.setMicrophoneEnabled(false);
+        state.micOn = false;
+        return false;
+      }
+      try {
+        await lp.setMicrophoneEnabled(true);
+      } catch (err) {
+        console.warn('Watch together setMicrophoneEnabled failed', err);
+      }
+      let pub = microphonePublication();
+      if (!trackIsLive(pub?.track) && typeof LK.createLocalAudioTrack === 'function') {
+        const track = await LK.createLocalAudioTrack({
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        });
+        await lp.publishTrack(track);
+        pub = microphonePublication();
+      }
+      await unmuteMic(pub || microphonePublication());
+      state.micOn = trackIsLive(microphoneTrack());
+      if (state.micOn) await resumeRemoteAudio();
       return state.micOn;
     } catch (err) {
       console.warn('Watch together mic failed', err);
       state.micOn = false;
       return false;
     }
+  }
+
+  function microphonePublication() {
+    const LK = global.LivekitClient;
+    const lp = state.room?.localParticipant;
+    if (!lp || !LK?.Track?.Source) return null;
+    if (typeof lp.getTrackPublication === 'function') {
+      return lp.getTrackPublication(LK.Track.Source.Microphone) || null;
+    }
+    return null;
+  }
+
+  function microphoneTrack() {
+    return microphonePublication()?.track || null;
+  }
+
+  async function unmuteMic(pub) {
+    if (!pub) return;
+    try {
+      if (pub.isMuted && typeof pub.unmute === 'function') await pub.unmute();
+    } catch {
+      /* ignore */
+    }
+    const media = pub.track?.mediaStreamTrack;
+    if (media) media.enabled = true;
   }
 
   function cameraPublication() {

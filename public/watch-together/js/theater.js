@@ -748,6 +748,10 @@
     const next = !window.WatchTogetherSync?.micOn();
     const on = await window.WatchTogetherSync?.setMic(next);
     syncMicButtons(Boolean(on));
+    if (next && !on) {
+      setStatus('Mic did not start. Allow the microphone, then click Mic or Talk.');
+      return false;
+    }
     if (on) setStatus('Mic on · they can hear you.');
     else setStatus('Mic off · type in chat instead.');
     return on;
@@ -1174,11 +1178,6 @@
       window.WatchTogetherSync?.resumeRemoteAudio?.();
       applyPlayback(room, true);
     });
-    document.addEventListener(
-      'click',
-      () => window.WatchTogetherSync?.resumeRemoteAudio?.(),
-      { once: true }
-    );
     const video = els.file();
     if (video) {
       video.addEventListener('play', () => {
