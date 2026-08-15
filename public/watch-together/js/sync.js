@@ -164,12 +164,44 @@
     publishViewers();
   }
 
+  let voiceCtx = null;
+  let meterRaf = 0;
+
+  function voiceContext() {
+    const AC = global.AudioContext || global.webkitAudioContext;
+    if (!AC) return null;
+    if (!voiceCtx) voiceCtx = new AC();
+    if (voiceCtx.state === 'suspended') {
+      const resume = voiceCtx.resume();
+      if (resume && typeof resume.catch === 'function') resume.catch(() => {});
+    }
+    return voiceCtx;
+  }
+
   function playAudioEl(el) {
     if (!el) return;
     el.muted = false;
     el.volume = 1;
     const play = el.play?.();
     if (play && typeof play.catch === 'function') play.catch(() => {});
+  }
+
+  function wireRemoteVoice(el, track) {
+    const ctx = voiceContext();
+    if (!ctx || !el || el.dataset.wtVoice === '1') return;
+    const media = track?.mediaStreamTrack;
+    const stream = el.srcObject || (media ? new MediaStream([media]) : null);
+    if (!stream) return;
+    try {
+      const src = ctx.createMediaStreamSource(stream);
+      const gain = ctx.createGain();
+      gain.gain.value = 1.4;
+      src.connect(gain);
+      gain.connect(ctx.destination);
+      el.dataset.wtVoice = '1';
+    } catch (err) {
+      console.warn('Watch together remote voice graph failed', err);
+    }
   }
 
   function attachRemoteAudio(track) {
@@ -180,6 +212,7 @@
       already.forEach((el) => {
         if (!host.contains(el)) host.appendChild(el);
         playAudioEl(el);
+        wireRemoteVoice(el, track);
       });
       return;
     }
@@ -190,6 +223,7 @@
     el.volume = 1;
     host.appendChild(el);
     playAudioEl(el);
+    wireRemoteVoice(el, track);
   }
 
   function attachExistingRemoteVideo(room) {
@@ -223,6 +257,12 @@
   }
 
   async function resumeRemoteAudio() {
+    const ctx = voiceContext();
+    try {
+      await ctx?.resume?.();
+    } catch {
+      /* ignore */
+    }
     try {
       await state.room?.startAudio?.();
     } catch {
@@ -231,6 +271,39 @@
     const host = document.getElementById('wtRemoteAudio');
     if (!host) return;
     host.querySelectorAll('audio').forEach(playAudioEl);
+  }
+
+  function stopMicMeter() {
+    if (meterRaf) cancelAnimationFrame(meterRaf);
+    meterRaf = 0;
+  }
+
+  function startMicMeter(track) {
+    stopMicMeter();
+    const ctx = voiceContext();
+    const media = track?.mediaStreamTrack;
+    if (!ctx || !media) return;
+    let src;
+    try {
+      src = ctx.createMediaStreamSource(new MediaStream([media]));
+    } catch {
+      return;
+    }
+    const analyser = ctx.createAnalyser();
+    analyser.fftSize = 512;
+    src.connect(analyser);
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    const tick = () => {
+      analyser.getByteTimeDomainData(data);
+      let sum = 0;
+      for (let i = 0; i < data.length; i += 1) {
+        const v = (data[i] - 128) / 128;
+        sum += v * v;
+      }
+      emit('talk-level', { rms: Math.sqrt(sum / data.length) });
+      meterRaf = requestAnimationFrame(tick);
+    };
+    tick();
   }
 
   async function connectLivekit(opts) {
@@ -263,8 +336,11 @@
       dynacast: true,
       audioCaptureDefaults: {
         echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true,
+        noiseSuppression: false,
+        autoGainControl: false,
+      },
+      publishDefaults: {
+        dtx: false,
       },
       videoCaptureDefaults: {
         facingMode: 'user',
@@ -446,17 +522,21 @@
         }
         state.micOn = false;
         state.micError = '';
+        stopMicMeter();
         return false;
       }
       if (typeof LK.createLocalAudioTrack === 'function') {
         try {
           const track = await LK.createLocalAudioTrack({
             echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true,
+            noiseSuppression: false,
+            autoGainControl: false,
           });
           state.localAudioTrack = track;
-          await lp.publishTrack(track);
+          const pubOpts = { dtx: false };
+          if (LK.Track?.Source?.Microphone) pubOpts.source = LK.Track.Source.Microphone;
+          await lp.publishTrack(track, pubOpts);
+          startMicMeter(track);
         } catch (err) {
           console.warn('Watch together createLocalAudioTrack failed, trying setMicrophoneEnabled', err);
           await lp.setMicrophoneEnabled(true);
@@ -467,6 +547,7 @@
       await unmuteMic(microphonePublication());
       state.micOn = true;
       state.micError = '';
+      startMicMeter(state.localAudioTrack || microphoneTrack());
       await resumeRemoteAudio();
       return true;
     } catch (err) {

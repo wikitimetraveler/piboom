@@ -741,6 +741,10 @@
     if (chatMic) {
       chatMic.setAttribute('aria-pressed', pressed);
       chatMic.textContent = on ? 'Live' : 'Talk';
+      if (!on) {
+        chatMic.style.boxShadow = '';
+        chatMic.removeAttribute('data-heard');
+      }
     }
   }
 
@@ -888,6 +892,21 @@
           syncBlurButton(Boolean(payload?.on));
           if (payload?.error) {
             setStatus('Background blur could not start. Try Chrome or Edge.');
+          }
+        },
+        talkLevel: (payload) => {
+          const chatMic = els.chatMic();
+          const rms = Number(payload?.rms) || 0;
+          if (chatMic) {
+            chatMic.style.boxShadow = rms > 0.03
+              ? '0 0 ' + Math.round(10 + rms * 48) + 'px rgba(232, 200, 114, 0.9)'
+              : '';
+          }
+          if (rms > 0.05 && window.WatchTogetherSync?.micOn()) {
+            if (chatMic?.getAttribute('data-heard') !== '1') {
+              chatMic?.setAttribute('data-heard', '1');
+              setStatus('Hearing you — the other couch should hear this too.');
+            }
           }
         },
         error: (err) => {
