@@ -699,6 +699,8 @@
     const text = String(message?.text || '').trim();
     const who = String(message?.name || '').trim();
     if (!text) return;
+    if (message.spoken) return;
+    if (who && who === selfName) return;
     const line = (who ? who + '. ' : '') + text;
     window.ensureAudioUnlock?.();
     window.primeSpeechSynthesis?.();
@@ -782,6 +784,64 @@
     }
   }
 
+  let talkCaptions = null;
+  let talkCaptionsWanted = false;
+  let lastCaption = '';
+  let lastCaptionAt = 0;
+
+  function stopTalkCaptions() {
+    talkCaptionsWanted = false;
+    try {
+      talkCaptions?.stop?.();
+    } catch {
+      /* ignore */
+    }
+  }
+
+  function startTalkCaptions() {
+    talkCaptionsWanted = true;
+    if (talkCaptions?.isListening) return;
+    if (!window.DcSpeechRecognition?.createSpeechBridge) return;
+    if (!talkCaptions) {
+      talkCaptions = window.DcSpeechRecognition.createSpeechBridge({
+        lang: 'en-US',
+        continuous: true,
+        interimResults: false,
+        onResult: (transcript) => {
+          const text = String(transcript || '').trim();
+          if (!text) return;
+          const now = Date.now();
+          if (text === lastCaption && now - lastCaptionAt < 2500) return;
+          lastCaption = text;
+          lastCaptionAt = now;
+          emitIntent({ type: 'chat', text, fromVoice: true });
+        },
+        onEnd: () => {
+          if (!talkCaptionsWanted) return;
+          window.setTimeout(() => {
+            if (!talkCaptionsWanted) return;
+            try {
+              talkCaptions.start();
+            } catch {
+              /* ignore */
+            }
+          }, 250);
+        },
+        onError: (error) => {
+          if (error === 'not-allowed' || error === 'service-not-allowed') {
+            talkCaptionsWanted = false;
+            setStatus('Allow microphone speech for chat captions, then click Talk.');
+          }
+        },
+      });
+    }
+    try {
+      talkCaptions.start();
+    } catch {
+      /* ignore */
+    }
+  }
+
   async function toggleMic(event) {
     event?.preventDefault?.();
     window.ensureAudioUnlock?.();
@@ -801,8 +861,13 @@
       );
       return false;
     }
-    if (on) setStatus('Mic on · they can hear you.');
-    else setStatus('Mic off · type in chat instead.');
+    if (on) {
+      startTalkCaptions();
+      setStatus('Mic on · they can hear you, and your words go in chat.');
+    } else {
+      stopTalkCaptions();
+      setStatus('Mic off · type in chat instead.');
+    }
     return on;
   }
 

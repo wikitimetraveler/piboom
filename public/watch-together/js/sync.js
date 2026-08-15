@@ -434,10 +434,13 @@
       const reliable = payload.type !== 'draw';
       if (payload.type === 'chat') {
         const saved = await persistIntent(payload);
-        const message = saved?.message || {
-          name: state.name,
-          text: payload.text,
-          at: Date.now(),
+        const message = {
+          ...(saved?.message || {
+            name: state.name,
+            text: payload.text,
+            at: Date.now(),
+          }),
+          spoken: Boolean(payload.fromVoice),
         };
         await publishData({ type: 'chat', message }, true);
         emit('chat', message);
