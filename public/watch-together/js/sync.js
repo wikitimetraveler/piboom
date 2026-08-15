@@ -186,33 +186,14 @@
     if (play && typeof play.catch === 'function') play.catch(() => {});
   }
 
-  function wireRemoteVoice(el, track) {
-    const ctx = voiceContext();
-    if (!ctx || !el || el.dataset.wtVoice === '1') return;
-    const media = track?.mediaStreamTrack;
-    const stream = el.srcObject || (media ? new MediaStream([media]) : null);
-    if (!stream) return;
-    try {
-      const src = ctx.createMediaStreamSource(stream);
-      const gain = ctx.createGain();
-      gain.gain.value = 1.4;
-      src.connect(gain);
-      gain.connect(ctx.destination);
-      el.dataset.wtVoice = '1';
-    } catch (err) {
-      console.warn('Watch together remote voice graph failed', err);
-    }
-  }
-
   function attachRemoteAudio(track) {
-    const host = document.getElementById('wtRemoteAudio');
-    if (!host || !track?.attach) return;
+    if (!track?.attach) return;
+    const host = document.getElementById('wtRemoteAudio') || document.body;
     const already = Array.from(track.attachedElements || []);
     if (already.length) {
       already.forEach((el) => {
-        if (!host.contains(el)) host.appendChild(el);
+        if (el.parentNode !== host) host.appendChild(el);
         playAudioEl(el);
-        wireRemoteVoice(el, track);
       });
       return;
     }
@@ -221,9 +202,8 @@
     el.playsInline = true;
     el.muted = false;
     el.volume = 1;
-    host.appendChild(el);
+    if (el.parentNode !== host) host.appendChild(el);
     playAudioEl(el);
-    wireRemoteVoice(el, track);
   }
 
   function attachExistingRemoteVideo(room) {
@@ -500,56 +480,18 @@
 
   async function setMic(on) {
     if (!state.room?.localParticipant) return false;
-    const LK = global.LivekitClient;
     const lp = state.room.localParticipant;
     const want = Boolean(on);
     void resumeRemoteAudio();
     try {
-      if (!want) {
-        await lp.setMicrophoneEnabled(false);
-        if (state.localAudioTrack) {
-          try {
-            await lp.unpublishTrack(state.localAudioTrack);
-          } catch {
-            /* ignore */
-          }
-          try {
-            state.localAudioTrack.stop();
-          } catch {
-            /* ignore */
-          }
-          state.localAudioTrack = null;
-        }
-        state.micOn = false;
-        state.micError = '';
-        stopMicMeter();
-        return false;
-      }
-      if (typeof LK.createLocalAudioTrack === 'function') {
-        try {
-          const track = await LK.createLocalAudioTrack({
-            echoCancellation: true,
-            noiseSuppression: false,
-            autoGainControl: false,
-          });
-          state.localAudioTrack = track;
-          const pubOpts = { dtx: false };
-          if (LK.Track?.Source?.Microphone) pubOpts.source = LK.Track.Source.Microphone;
-          await lp.publishTrack(track, pubOpts);
-          startMicMeter(track);
-        } catch (err) {
-          console.warn('Watch together createLocalAudioTrack failed, trying setMicrophoneEnabled', err);
-          await lp.setMicrophoneEnabled(true);
-        }
-      } else {
-        await lp.setMicrophoneEnabled(true);
-      }
+      await lp.setMicrophoneEnabled(want);
       await unmuteMic(microphonePublication());
-      state.micOn = true;
+      state.micOn = want;
       state.micError = '';
-      startMicMeter(state.localAudioTrack || microphoneTrack());
+      if (want) startMicMeter(microphoneTrack());
+      else stopMicMeter();
       await resumeRemoteAudio();
-      return true;
+      return want;
     } catch (err) {
       console.warn('Watch together mic failed', err);
       state.micOn = false;

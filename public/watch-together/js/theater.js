@@ -609,7 +609,7 @@
       const log = els.log();
       if (log) {
         log.replaceChildren();
-        state.chat.forEach(appendChat);
+        state.chat.forEach((message) => appendChat(message, false));
       }
     }
     if (Array.isArray(state.draw)) replayDraw(state.draw);
@@ -699,26 +699,36 @@
     const text = String(message?.text || '').trim();
     const who = String(message?.name || '').trim();
     if (!text) return;
-    if (who && who === selfName) return;
     const line = (who ? who + '. ' : '') + text;
     window.ensureAudioUnlock?.();
     window.primeSpeechSynthesis?.();
+    const speakBrowser = () => {
+      if (!('speechSynthesis' in window)) return;
+      try {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(line);
+        u.rate = 0.85;
+        u.pitch = 0.65;
+        u.volume = 1;
+        window.speechSynthesis.speak(u);
+      } catch {
+        /* ignore */
+      }
+    };
     if (typeof window.speakWithGoogle === 'function') {
-      window.speakWithGoogle(line, 'en-US-Standard-D', { speakingRate: 0.98 }).catch(() => {});
+      window.speakWithGoogle(line, 'en-US-Standard-D', {
+        pitch: -2,
+        speakingRate: 0.85,
+        volume: 1,
+      }).then((ok) => {
+        if (!ok) speakBrowser();
+      }).catch(speakBrowser);
       return;
     }
-    if (!('speechSynthesis' in window)) return;
-    try {
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(line);
-      u.rate = 1;
-      window.speechSynthesis.speak(u);
-    } catch {
-      /* ignore */
-    }
+    speakBrowser();
   }
 
-  function appendChat(message) {
+  function appendChat(message, speak) {
     const log = els.log();
     if (!log || !message) return;
     const row = document.createElement('div');
@@ -730,7 +740,7 @@
     row.append(who, body);
     log.appendChild(row);
     log.scrollTop = log.scrollHeight;
-    speakChat(message);
+    if (speak !== false) speakChat(message);
   }
 
   function syncCamButton(on) {
