@@ -744,12 +744,14 @@
     }
   }
 
-  async function toggleMic() {
-    const next = !window.WatchTogetherSync?.micOn();
+  async function toggleMic(event) {
+    const fromTalk = event?.currentTarget?.id === 'wtChatMic';
+    const currentlyOn = Boolean(window.WatchTogetherSync?.micOn());
+    const next = fromTalk ? true : !currentlyOn;
     const on = await window.WatchTogetherSync?.setMic(next);
     syncMicButtons(Boolean(on));
     if (next && !on) {
-      setStatus('Mic did not start. Allow the microphone, then click Mic or Talk.');
+      setStatus('Mic did not start. Allow the microphone, then click Talk.');
       return false;
     }
     if (on) setStatus('Mic on · they can hear you.');
@@ -917,8 +919,7 @@
         const camOn = await window.WatchTogetherSync.setCamera(true);
         syncCamButton(camOn);
         syncBlurButton(window.WatchTogetherSync.blurOn());
-        const micOn = await window.WatchTogetherSync.setMic(true);
-        syncMicButtons(micOn);
+        syncMicButtons(false);
         if (!camOn) {
           setStatus('Click Cam so the other couches can see you.');
           const retryCam = () => {
@@ -930,11 +931,7 @@
           };
           document.addEventListener('pointerdown', retryCam, { once: true });
         } else if (!hasMedia(room.media)) {
-          if (micOn) {
-            setStatus('Mic on · they can hear you. Load a movie when you want.');
-          } else {
-            setStatus('Click Talk in chat so the other couches can hear you.');
-          }
+          setStatus('Click Talk in chat so the other couches can hear you.');
         }
       } catch (err) {
         setStatus(err?.message || 'Click Cam, then Talk, so they can see and hear you.');
@@ -1097,8 +1094,8 @@
       els.drawBtn()?.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
     els.clearDraw()?.addEventListener('click', () => emitIntent({ type: 'clear-draw' }));
-    els.mic()?.addEventListener('click', () => toggleMic());
-    els.chatMic()?.addEventListener('click', () => toggleMic());
+    els.mic()?.addEventListener('click', (event) => toggleMic(event));
+    els.chatMic()?.addEventListener('click', (event) => toggleMic(event));
     els.cam()?.addEventListener('click', async () => {
       const next = !window.WatchTogetherSync?.camOn();
       const on = await window.WatchTogetherSync?.setCamera(next);

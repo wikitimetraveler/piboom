@@ -420,33 +420,15 @@
 
   async function setMic(on) {
     if (!state.room?.localParticipant) return false;
-    const LK = global.LivekitClient;
-    const lp = state.room.localParticipant;
     const want = Boolean(on);
     try {
-      if (!want) {
-        await lp.setMicrophoneEnabled(false);
-        state.micOn = false;
-        return false;
+      await state.room.localParticipant.setMicrophoneEnabled(want);
+      if (want) {
+        const pub = microphonePublication();
+        await unmuteMic(pub);
+        await resumeRemoteAudio();
       }
-      try {
-        await lp.setMicrophoneEnabled(true);
-      } catch (err) {
-        console.warn('Watch together setMicrophoneEnabled failed', err);
-      }
-      let pub = microphonePublication();
-      if (!trackIsLive(pub?.track) && typeof LK.createLocalAudioTrack === 'function') {
-        const track = await LK.createLocalAudioTrack({
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        });
-        await lp.publishTrack(track);
-        pub = microphonePublication();
-      }
-      await unmuteMic(pub || microphonePublication());
-      state.micOn = trackIsLive(microphoneTrack());
-      if (state.micOn) await resumeRemoteAudio();
+      state.micOn = want;
       return state.micOn;
     } catch (err) {
       console.warn('Watch together mic failed', err);
