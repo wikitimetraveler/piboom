@@ -695,6 +695,29 @@
     attachFace(participant, track, payload.action === 'local');
   }
 
+  function speakChat(message) {
+    const text = String(message?.text || '').trim();
+    const who = String(message?.name || '').trim();
+    if (!text) return;
+    if (who && who === selfName) return;
+    const line = (who ? who + '. ' : '') + text;
+    window.ensureAudioUnlock?.();
+    window.primeSpeechSynthesis?.();
+    if (typeof window.speakWithGoogle === 'function') {
+      window.speakWithGoogle(line, 'en-US-Standard-D', { speakingRate: 0.98 }).catch(() => {});
+      return;
+    }
+    if (!('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(line);
+      u.rate = 1;
+      window.speechSynthesis.speak(u);
+    } catch {
+      /* ignore */
+    }
+  }
+
   function appendChat(message) {
     const log = els.log();
     if (!log || !message) return;
@@ -707,6 +730,7 @@
     row.append(who, body);
     log.appendChild(row);
     log.scrollTop = log.scrollHeight;
+    speakChat(message);
   }
 
   function syncCamButton(on) {
@@ -750,6 +774,8 @@
 
   async function toggleMic(event) {
     event?.preventDefault?.();
+    window.ensureAudioUnlock?.();
+    window.primeSpeechSynthesis?.();
     void window.WatchTogetherSync?.resumeRemoteAudio?.();
     const fromTalk = event?.currentTarget?.id === 'wtChatMic';
     const currentlyOn = Boolean(window.WatchTogetherSync?.micOn());
@@ -1193,6 +1219,8 @@
       const input = els.chatText();
       const text = String(input?.value || '').trim();
       if (!text) return;
+      window.ensureAudioUnlock?.();
+      window.primeSpeechSynthesis?.();
       emitIntent({ type: 'chat', text });
       if (input) input.value = '';
     });
