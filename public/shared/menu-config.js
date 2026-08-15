@@ -8,7 +8,7 @@
 
   /** Home page domain tiles. demoOnly: true = shown only in demo mode (?demo=1) */
   const DOMAIN_TILES = [
-    { href: '/music/music-research.html', icon: 'bi-music-note-beamed', label: 'Music', domain: 'music', title: 'Music research, albums, Spotify, song ID', demoOnly: false },
+    { href: '/music/music-research.html', icon: 'bi-music-note-beamed', label: 'Music', domain: 'music', title: 'Field research: artist dossiers, members, birthplaces', demoOnly: false },
     { href: '/finance/disasters-unified.html', icon: 'bi-shield-exclamation', label: 'Unified Disasters', domain: 'disasters', title: 'Unified Disasters — hazard monitoring and pipeline risk', demoOnly: false },
     { href: '/nature/nature-hub.html', icon: 'bi-tree-fill', label: 'Nature', domain: 'nature', title: 'Trees, critters, field guide', demoOnly: false },
     { href: '/family/lane-family.html', icon: 'bi-house-heart', label: 'Lane Family', domain: 'family', title: 'Lane Family hub — tree, museum, and tools', demoOnly: false },
@@ -259,7 +259,7 @@
   /** Music mini-nav items (used by music-mini-nav.js) */
   const MUSIC_TOOLS = [
     { href: '/studio/', icon: 'bi-cassette', label: 'Studio', title: 'Browser studio — record, LiveKit, listening room' },
-    { href: '/music/music-research.html', icon: 'bi-search', label: 'Music Research', title: 'Search albums, artists, Spotify' },
+    { href: '/music/music-research.html', icon: 'bi-search', label: 'Music Research', title: 'Field research: artists, members, birthplaces' },
     { href: '/music/album-discovery.html', icon: 'bi-disc', label: 'Album Discovery', title: 'Discover albums' },
     { href: '/music/collection.html', icon: 'bi-collection-fill', label: 'My Collection', title: 'Your music collection' },
     { href: '/music/music-graph.html', icon: 'bi-diagram-3', label: 'Music Graph', title: 'Collection graph explorer (artist, album, show, member)' },

@@ -311,27 +311,38 @@
     }
     if (!res.ok || !data.token || !data.url) return false;
 
-    const room = new LK.Room({
-      adaptiveStream: true,
-      dynacast: true,
-      audioCaptureDefaults: {
-        echoCancellation: true,
-        noiseSuppression: false,
-        autoGainControl: false,
-      },
-      publishDefaults: {
-        dtx: false,
-      },
-      videoCaptureDefaults: {
-        facingMode: 'user',
-        resolution: LK.VideoPresets?.h360?.resolution,
-      },
-    });
+    const talk = global.LivekitTalkAudio;
+    const room = new LK.Room(
+      talk
+        ? talk.roomOptions({
+            publishDefaults: { dtx: false },
+            videoCaptureDefaults: {
+              facingMode: 'user',
+              resolution: LK.VideoPresets?.h360?.resolution,
+            },
+          })
+        : {
+            adaptiveStream: true,
+            dynacast: true,
+            audioCaptureDefaults: {
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true,
+              voiceIsolation: true,
+            },
+            publishDefaults: { dtx: false },
+            videoCaptureDefaults: {
+              facingMode: 'user',
+              resolution: LK.VideoPresets?.h360?.resolution,
+            },
+          }
+    );
     room.on(LK.RoomEvent.DataReceived, handleData);
     room.on(LK.RoomEvent.ParticipantConnected, publishViewers);
     room.on(LK.RoomEvent.ParticipantDisconnected, publishViewers);
     room.on(LK.RoomEvent.ParticipantMetadataChanged, publishViewers);
     room.on(LK.RoomEvent.TrackSubscribed, (track, publication, participant) => {
+      if (talk?.skipAttach(track, participant) || participant?.isLocal) return;
       if (track.kind === 'audio' || publication?.kind === 'audio') {
         attachRemoteAudio(track);
       }
@@ -487,7 +498,7 @@
     const want = Boolean(on);
     void resumeRemoteAudio();
     try {
-      await lp.setMicrophoneEnabled(want);
+      await lp.setMicrophoneEnabled(want, want ? global.LivekitTalkAudio?.capture : undefined);
       await unmuteMic(microphonePublication());
       state.micOn = want;
       state.micError = '';

@@ -155,65 +155,159 @@
   ];
 
   const STACK_CHIPS = [
-    { label: 'Node.js / Express', icon: 'bi-server' },
-    { label: 'Python / FastAPI', icon: 'bi-code-slash' },
-    { label: 'PostgreSQL', icon: 'bi-database' },
-    { label: 'LangChain + OpenAI', icon: 'bi-robot' },
-    { label: 'OpenAI Vision', icon: 'bi-eye' },
-    { label: 'HeyGen', icon: 'bi-camera-reels' },
-    { label: 'Encompass / ICE APIs', icon: 'bi-bank2' },
-    { label: 'Brownfield: Bootstrap + vanilla JS', icon: 'bi-layout-text-window' },
-    { label: 'Greenfield: React + TypeScript', icon: 'bi-filetype-tsx' },
-    { label: 'AG Grid & DataTables', icon: 'bi-table' },
-    { label: 'Google Maps & geocoding', icon: 'bi-geo-alt' },
-    { label: 'FEMA / NASA / NOAA feeds', icon: 'bi-cloud-lightning-rain' },
+    { label: 'Brownfield: Bootstrap + vanilla JS', icon: 'bi-layout-text-window', tone: 'frontend' },
+    { label: 'Greenfield: React + TypeScript', icon: 'bi-filetype-tsx', tone: 'frontend' },
+    { label: 'AG Grid & DataTables', icon: 'bi-table', tone: 'frontend' },
+    { label: 'Node.js / Express', icon: 'bi-server', tone: 'platform' },
+    { label: 'Python / FastAPI', icon: 'bi-code-slash', tone: 'platform' },
+    { label: 'PostgreSQL', icon: 'bi-database', tone: 'platform' },
+    { label: 'Google Maps & geocoding', icon: 'bi-geo-alt', tone: 'data' },
+    { label: 'FEMA / NASA / NOAA feeds', icon: 'bi-cloud-lightning-rain', tone: 'data' },
+    { label: 'LangChain + OpenAI', icon: 'bi-robot', tone: 'ai' },
+    { label: 'OpenAI Vision', icon: 'bi-eye', tone: 'ai' },
+    { label: 'HeyGen', icon: 'bi-camera-reels', tone: 'ai' },
+    { label: 'Encompass / ICE APIs', icon: 'bi-bank2', tone: 'mortgage', authRequired: true },
+    { label: 'LiveKit', icon: 'bi-broadcast', tone: 'live' },
   ];
 
-  /** Grouped stack for /stack.html */
+  /** Grouped stack for /stack.html — only technologies this repo actually ships. */
   const STACK_GROUPS = [
     {
+      id: 'frontend',
+      title: 'Frontend',
+      tone: 'frontend',
+      lead: 'Encompass stays Bootstrap + vanilla JS. New product UIs may use React + TypeScript. Studio and Watch Together load livekit-client from CDN.',
+      items: [
+        { label: 'Brownfield (Encompass)', detail: 'Bootstrap + vanilla JS · AG Grid and DataTables', icon: 'bi-layout-text-window' },
+        { label: 'Greenfield apps', detail: 'React + TypeScript preferred for new product UIs', icon: 'bi-filetype-tsx' },
+        { label: 'Design tokens', detail: 'Zen palette, dark mode, Lane heritage accents', icon: 'bi-palette' },
+        { label: 'Voice widget', detail: 'Sitewide speech commands and Google Cloud TTS (browser speech is fallback only)', icon: 'bi-mic' },
+      ],
+    },
+    {
+      id: 'platform',
       title: 'Platform',
+      tone: 'platform',
+      lead: 'Node serves the app. FastAPI does spatial RAG and analytics. The LiveKit agent is a separate Python process.',
       items: [
         { label: 'Node.js + Express', detail: 'API routes, services layer, static hosting', icon: 'bi-server' },
-        { label: 'Python/FastAPI', detail: 'PostGIS spatial queries, disaster PostgreSQL feed, Encompass RAG (keyword + vector search), text processing, data analytics', icon: 'bi-code-slash' },
+        {
+          label: 'Python / FastAPI',
+          detail:
+            'PostGIS spatial queries, disaster feed, Encompass RAG (keyword + pgvector), text processing, data analytics. Port 8000 — not the LiveKit worker.',
+          icon: 'bi-code-slash',
+        },
         { label: 'PostgreSQL', detail: 'Lane graph, disasters, Encompass config, chat memory', icon: 'bi-database' },
         { label: 'Jest CI', detail: 'Unit tests across finance, genealogy, ingest pipelines', icon: 'bi-check2-circle' },
       ],
     },
     {
+      id: 'data',
+      title: 'Data & maps',
+      tone: 'data',
+      lead: 'Public hazard feeds, Google Maps on family / disaster / discovery pages, MusicBrainz for research.',
+      items: [
+        {
+          label: 'FEMA / NASA / NOAA',
+          detail: 'Unified disasters, hazard webcams, pipeline risk',
+          icon: 'bi-cloud-lightning-rain',
+          href: '/finance/disasters-unified.html',
+        },
+        { label: 'Google Maps + geocoding', detail: 'Family maps, disaster layers, discovery pages. Geocoding stays server-side.', icon: 'bi-geo-alt' },
+        {
+          label: 'MusicBrainz + Wikimedia',
+          detail: 'Music research, pilgrimage atlas, timelines',
+          icon: 'bi-music-note-beamed',
+          href: '/music/music-research.html',
+        },
+      ],
+    },
+    {
+      id: 'ai',
       title: 'AI & assistants',
+      tone: 'ai',
+      lead: 'LangChain on the loan side. HeyGen for presenter video. LiveKit agents only where a room exists.',
       items: [
         { label: 'LangChain + OpenAI', detail: 'Encompass Assistant, loan pipeline AI, Screen Test', icon: 'bi-robot' },
         { label: 'OpenAI Vision (GPT-4o)', detail: 'Automator field-image parsing, Screen Test, multimodal discovery', icon: 'bi-eye' },
         { label: 'ICE knowledge RAG', detail: 'Python pgvector semantic search + Encompass docs', icon: 'bi-journal-code' },
-        { label: 'HeyGen', detail: 'Avatar video, QR guide popups, demo explainers', icon: 'bi-camera-reels' },
+        {
+          label: 'HeyGen',
+          detail: 'Avatar video, QR guide popups, demo explainers. Interactive Reed face is a HeyGen LiveKit tile.',
+          icon: 'bi-camera-reels',
+          href: '/heygen-hub.html',
+        },
         { label: 'HyperFrames', detail: 'Guided story reels and narrative overlays', icon: 'bi-film' },
+        {
+          label: 'LiveKit Agents',
+          detail:
+            'Separate Python worker (python-service/livekit_agent) — agents StarBand and WolfmanDave. Start with npm run python:livekit-agent. Not the FastAPI service.',
+          icon: 'bi-soundwave',
+        },
       ],
     },
     {
+      id: 'mortgage',
       title: 'Mortgage / Encompass',
+      tone: 'mortgage',
+      authRequired: true,
+      lead: 'Brownfield Encompass — Bootstrap, AG Grid, shared calculationEngine. No LiveKit on these pages.',
       items: [
-        { label: 'Encompass Hub APIs', detail: 'Loans, users, custom fields, pipeline', icon: 'bi-bank2' },
+        {
+          label: 'Encompass Hub APIs',
+          detail: 'Loans, users, custom fields, pipeline',
+          icon: 'bi-bank2',
+          href: '/finance/encompass-hub.html',
+        },
         { label: 'calculationEngine', detail: 'Shared worksheet math and GSE scenario ratios', icon: 'bi-calculator' },
-        { label: 'Processor assignment', detail: 'Rules + optional AI scoring, capacity-aware', icon: 'bi-people' },
-        { label: 'Unit Tests & Automator', detail: 'Custom field parsers, manifest review', icon: 'bi-clipboard-check' },
+        {
+          label: 'Processor assignment',
+          detail: 'Rules + optional AI scoring, capacity-aware',
+          icon: 'bi-people',
+          href: '/finance/processor-assignment.html',
+        },
+        {
+          label: 'Unit Tests & Automator',
+          detail: 'Custom field parsers, manifest review',
+          icon: 'bi-clipboard-check',
+          href: '/finance/unit-tests.html',
+        },
       ],
     },
     {
-      title: 'Frontend',
+      id: 'live',
+      title: 'Live rooms',
+      tone: 'live',
+      lead: 'Same LiveKit mint. Different rooms. This wire does not run through Encompass.',
       items: [
-        { label: 'Brownfield (Encompass)', detail: 'Bootstrap + vanilla JS · AG Grid and DataTables', icon: 'bi-layout-text-window' },
-        { label: 'Greenfield apps', detail: 'React + TypeScript preferred for new product UIs', icon: 'bi-filetype-tsx' },
-        { label: 'Design tokens', detail: 'Zen palette, dark mode, Lane heritage accents', icon: 'bi-palette' },
-        { label: 'Voice widget', detail: 'Sitewide speech commands and TTS', icon: 'bi-mic' },
-      ],
-    },
-    {
-      title: 'Data & maps',
-      items: [
-        { label: 'FEMA / NASA / NOAA', detail: 'Unified disasters, hazard webcams, pipeline risk', icon: 'bi-cloud-lightning-rain' },
-        { label: 'Google Maps + geocoding', detail: 'Family maps, disaster layers, discovery pages', icon: 'bi-geo-alt' },
-        { label: 'MusicBrainz + Wikimedia', detail: 'Music research, pilgrimage atlas, timelines', icon: 'bi-music-note-beamed' },
+        {
+          label: 'LiveKit',
+          detail:
+            'Shared JWT mint, occupancy, and audio-only egress from services/livekit.service.js. Needs LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET. Studio, Watch Together, and Wolfman join rooms here — loan tools do not.',
+          icon: 'bi-broadcast',
+          href: '/studio/',
+        },
+        {
+          label: 'Browser Studio',
+          detail:
+            'livekit-client voice, video, and screen share on the desk. StarBand agent on the Python LiveKit worker. Socket.IO /studio for desk control. Client-side Web Audio record, mix, and WAV bounce still work if LiveKit keys are unset.',
+          icon: 'bi-cassette',
+          href: '/studio/',
+        },
+        {
+          label: 'Watch Together',
+          detail:
+            'Theater room uses LiveKit first (same keys as Studio). Socket.IO fallback if keys are missing. Local volume stays on the viewer.',
+          icon: 'bi-play-btn',
+          href: '/watch-together/',
+        },
+        {
+          label: 'Wolfman + HeyGen tile',
+          detail:
+            'Wolfman booth is LiveKit room music-wolfman-lobby (agent WolfmanDave). Reed’s face is a separate HeyGen Interactive Avatar LiveKit tile — not the StarBand room.',
+          icon: 'bi-mic',
+          href: '/ai/wolfman-booth.html',
+        },
       ],
     },
   ];
@@ -1110,44 +1204,191 @@
     }).join('');
   }
 
-  function renderPortfolioStackChips() {
-    return STACK_CHIPS.map(
-      (item) =>
-        '<span class="portfolio-stack-chip"><i class="bi ' +
-        item.icon +
-        '" aria-hidden="true"></i>' +
-        escapeHtml(item.label) +
-        '</span>'
-    ).join('');
+  function stackToneClass(tone) {
+    const safe = String(tone || '').replace(/[^a-z0-9-]/gi, '');
+    return safe ? ' lane-stack-tone--' + safe : '';
   }
 
-  function renderPortfolioStackGroups() {
-    return STACK_GROUPS.map((group) => {
-      const cards = group.items
-        .map(
-          (item) =>
-            '<article class="portfolio-stack-item">' +
-            '<div class="portfolio-stack-item__icon"><i class="bi ' +
-            item.icon +
-            '" aria-hidden="true"></i></div>' +
-            '<div><h3 class="portfolio-stack-item__title">' +
-            escapeHtml(item.label) +
-            '</h3>' +
-            '<p class="portfolio-stack-item__detail">' +
-            escapeHtml(item.detail) +
-            '</p></div></article>'
-        )
-        .join('');
-      return (
-        '<section class="portfolio-stack-group">' +
-        '<h2 class="portfolio-stack-group__title">' +
-        escapeHtml(group.title) +
-        '</h2>' +
-        '<div class="portfolio-stack-group__grid">' +
-        cards +
-        '</div></section>'
-      );
-    }).join('');
+  function stackViewerIsLoggedIn(options) {
+    const opts = options || {};
+    if (typeof opts.loggedIn === 'boolean') return opts.loggedIn;
+    return isPortfolioSessionActive();
+  }
+
+  function visibleStackChips(options) {
+    const loggedIn = stackViewerIsLoggedIn(options);
+    return STACK_CHIPS.filter(function (item) {
+      return loggedIn || !item.authRequired;
+    });
+  }
+
+  function visibleStackEntries(options) {
+    const loggedIn = stackViewerIsLoggedIn(options);
+    return STACK_GROUPS.map(function (group, index) {
+      return { group: group, index: index };
+    }).filter(function (entry) {
+      return loggedIn || !entry.group.authRequired;
+    });
+  }
+
+  function renderPortfolioStackChips(options) {
+    const chips = visibleStackChips(options);
+    return chips
+      .map(function (item, index) {
+        return (
+          '<li class="portfolio-stack-chip lane-stack-chip' +
+          stackToneClass(item.tone) +
+          (index === chips.length - 1 ? ' is-last' : '') +
+          '"><i class="bi ' +
+          item.icon +
+          '" aria-hidden="true"></i>' +
+          escapeHtml(item.label) +
+          '</li>'
+        );
+      })
+      .join('');
+  }
+
+  function renderStackJack(item, isLast) {
+    const body =
+      '<span class="lane-tree-leaf__icon" aria-hidden="true"><i class="bi ' +
+      item.icon +
+      '"></i></span>' +
+      '<span class="lane-tree-leaf__copy"><span class="lane-tree-leaf__title">' +
+      escapeHtml(item.label) +
+      '</span><span class="lane-tree-leaf__detail">' +
+      escapeHtml(item.detail) +
+      '</span></span>';
+    const go = item.href
+      ? '<i class="bi bi-arrow-up-right lane-tree-leaf__go" aria-hidden="true"></i>'
+      : '';
+    const inner = item.href
+      ? '<a class="lane-tree-leaf__node" href="' + escapeHtml(item.href) + '">' + body + go + '</a>'
+      : '<div class="lane-tree-leaf__node">' + body + '</div>';
+    return (
+      '<li class="lane-tree-leaf' +
+      (isLast ? ' is-last' : '') +
+      '">' +
+      inner +
+      '</li>'
+    );
+  }
+
+  function renderLaneStackBay(group, index, options) {
+    const opts = options || {};
+    const slot = typeof opts.slot === 'number' ? opts.slot : index;
+    const num = String(slot + 1).padStart(2, '0');
+    const id = group.id || 'bay-' + num;
+    const items = group.items || [];
+    const leaves = items
+      .map(function (item, i) {
+        return renderStackJack(item, i === items.length - 1);
+      })
+      .join('');
+    const lead = group.lead
+      ? '<p class="lane-tree-branch__lead">' + escapeHtml(group.lead) + '</p>'
+      : '';
+    const openAttr = opts.open ? ' open' : '';
+    return (
+      '<details class="lane-tree-branch' +
+      stackToneClass(group.tone) +
+      (opts.last ? ' is-last' : '') +
+      '" id="stack-' +
+      escapeHtml(id) +
+      '" data-stack-id="' +
+      escapeHtml(id) +
+      '"' +
+      openAttr +
+      '>' +
+      '<summary class="lane-tree-branch__summary">' +
+      '<span class="lane-tree-branch__chevron" aria-hidden="true"></span>' +
+      '<span class="lane-tree-branch__num">' +
+      num +
+      '</span>' +
+      '<span class="lane-tree-branch__text">' +
+      '<span class="lane-tree-branch__title">' +
+      escapeHtml(group.title) +
+      '</span>' +
+      lead +
+      '</span>' +
+      '<span class="lane-tree-branch__count">' +
+      items.length +
+      '</span></summary>' +
+      '<ul class="lane-tree-leaves">' +
+      leaves +
+      '</ul></details>'
+    );
+  }
+
+  function renderLaneStackDesk(options) {
+    const entries = visibleStackEntries(options);
+    const toc = entries
+      .map(function (entry, visibleIndex) {
+        const group = entry.group;
+        const id = group.id || 'bay-' + String(entry.index + 1).padStart(2, '0');
+        const num = String(entry.index + 1).padStart(2, '0');
+        return (
+          '<li class="lane-stack-toc__limb' +
+          stackToneClass(group.tone) +
+          (visibleIndex === entries.length - 1 ? ' is-last' : '') +
+          '">' +
+          '<a class="lane-stack-toc__link" href="#stack-' +
+          escapeHtml(id) +
+          '" data-stack-jump="' +
+          escapeHtml(id) +
+          '">' +
+          '<span class="lane-stack-toc__num">' +
+          num +
+          '</span>' +
+          '<span class="lane-stack-toc__knot" aria-hidden="true"></span>' +
+          '<span class="lane-stack-toc__name">' +
+          escapeHtml(group.title) +
+          '</span></a></li>'
+        );
+      })
+      .join('');
+    const branches = entries
+      .map(function (entry, visibleIndex) {
+        return renderLaneStackBay(entry.group, entry.index, {
+          slot: entry.index,
+          open: visibleIndex === 0,
+          last: visibleIndex === entries.length - 1,
+        });
+      })
+      .join('');
+    const loggedIn = stackViewerIsLoggedIn(options);
+    const note = loggedIn
+      ? 'One trunk. Six branches. UI first, LiveKit last — rooms only, not Encompass.'
+      : 'One trunk. Public branches first. LiveKit last — rooms only.';
+    return (
+      '<div class="lane-tree">' +
+      '<div class="lane-tree-root">' +
+      '<span class="lane-tree-root__knot" aria-hidden="true"></span>' +
+      '<div>' +
+      '<p class="lane-tree-root__kicker">Root</p>' +
+      '<h2 class="lane-tree-root__title">The desk</h2>' +
+      '<p class="lane-tree-root__note">' +
+      note +
+      '</p>' +
+      '</div></div>' +
+      '<nav class="lane-stack-toc" aria-label="Stack branches">' +
+      '<p class="lane-stack-toc__kicker">Limbs</p>' +
+      '<ol class="lane-stack-toc__list">' +
+      toc +
+      '</ol>' +
+      '<p class="lane-stack-toc__tools">' +
+      '<button type="button" class="lane-stack-toc__all" data-stack-expand="1">Open canopy</button>' +
+      '<span aria-hidden="true"> · </span>' +
+      '<button type="button" class="lane-stack-toc__all" data-stack-expand="0">Fold</button>' +
+      '</p></nav>' +
+      '<div class="lane-tree-trunk">' +
+      branches +
+      '</div></div>'
+    );
+  }
+
+  function renderPortfolioStackGroups(options) {
+    return renderLaneStackDesk(options);
   }
 
   function renderDock(activeId) {
@@ -1349,6 +1590,7 @@
     renderPortfolioContactCards,
     renderPortfolioStackChips,
     renderPortfolioStackGroups,
+    renderLaneStackDesk,
     renderFeaturedSites,
     renderContactCards,
     renderStackChips,

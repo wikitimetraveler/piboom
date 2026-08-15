@@ -830,7 +830,14 @@
     els.reedLog.scrollTop = els.reedLog.scrollHeight;
   }
 
-  async function joinLivekit() {
+  function syncMicButton() {
+    if (!els.mic) return;
+    els.mic.textContent = state.micOn ? 'Mic on' : 'Mic off';
+    els.mic.setAttribute('aria-pressed', state.micOn ? 'true' : 'false');
+  }
+
+  async function joinLivekit(opts) {
+    const enableMic = Boolean(opts && opts.enableMic);
     const LK = window.LivekitClient;
     if (!LK) {
       els.livekitStatus.textContent = 'LiveKit client missing';
@@ -848,20 +855,26 @@
       return;
     }
     if (state.livekitRoom) await state.livekitRoom.disconnect();
-    const room = new LK.Room({
-      adaptiveStream: true,
-      dynacast: true,
-      audioCaptureDefaults: {
-        echoCancellation: !els.musicMode?.checked,
-        noiseSuppression: !els.musicMode?.checked,
-        autoGainControl: !els.musicMode?.checked,
-        voiceIsolation: false,
-        channelCount: 1,
-        sampleRate: 48000,
-      },
-    });
+    const room = new LK.Room(
+      window.LivekitTalkAudio
+        ? window.LivekitTalkAudio.roomOptions()
+        : {
+            adaptiveStream: true,
+            dynacast: true,
+            audioCaptureDefaults: {
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true,
+              voiceIsolation: true,
+              channelCount: 1,
+            },
+          }
+    );
     room.on(LK.RoomEvent.TrackSubscribed, (track, publication, participant) => {
-      attachTile(participant.identity, track, participant.name || participant.identity);
+      if (window.LivekitTalkAudio?.skipAttach(track, participant)) return;
+      attachTile(participant.identity, track, participant.name || participant.identity, {
+        local: Boolean(participant?.isLocal),
+      });
     });
     room.on(LK.RoomEvent.TrackUnsubscribed, (track) => {
       track.detach().forEach((el) => el.remove());
@@ -870,12 +883,21 @@
     state.livekitRoom = room;
     els.livekitStatus.textContent = `LiveKit ${data.roomName}`;
     els.livekitStatus.classList.add('is-live');
-    state.micOn = true;
-    await room.localParticipant.setMicrophoneEnabled(true);
+    state.micOn = false;
+    await room.localParticipant.setMicrophoneEnabled(false);
     attachLocalPreview();
+    syncMicButton();
+    appendReed('Joined muted so guitar and speakers stay off the room. Click Mic when you want to talk.');
+    if (enableMic) {
+      state.micOn = true;
+      await room.localParticipant.setMicrophoneEnabled(true, window.LivekitTalkAudio?.capture);
+      syncMicButton();
+    }
   }
 
-  function attachTile(id, track, label) {
+  function attachTile(id, track, label, opts) {
+    const local = Boolean(opts && opts.local) || id === 'local';
+    if (local && track.kind === 'audio') return;
     const tileId = `tile-${String(id).replace(/[^\w-]/g, '')}`;
     let tile = document.getElementById(tileId);
     if (!tile) {
@@ -889,7 +911,12 @@
     }
     const el = track.attach();
     if (el) {
-      el.playsInline = true;
+      if (window.LivekitTalkAudio) {
+        window.LivekitTalkAudio.prepareAttachedMedia(el, local);
+      } else {
+        el.playsInline = true;
+        if (local) el.muted = true;
+      }
       tile.prepend(el);
     }
   }
@@ -898,14 +925,19 @@
     const room = state.livekitRoom;
     if (!room) return;
     room.localParticipant.trackPublications.forEach((pub) => {
-      if (pub.track) attachTile('local', pub.track, `${playerName()} (you)`);
+      if (!pub.track || pub.track.kind === 'audio') return;
+      attachTile('local', pub.track, `${playerName()} (you)`, { local: true });
     });
   }
 
   async function toggleMic() {
-    if (!state.livekitRoom) return joinLivekit();
+    if (!state.livekitRoom) return joinLivekit({ enableMic: true });
     state.micOn = !state.micOn;
-    await state.livekitRoom.localParticipant.setMicrophoneEnabled(state.micOn);
+    await state.livekitRoom.localParticipant.setMicrophoneEnabled(
+      state.micOn,
+      state.micOn ? window.LivekitTalkAudio?.capture : undefined
+    );
+    syncMicButton();
   }
 
   async function toggleCam() {

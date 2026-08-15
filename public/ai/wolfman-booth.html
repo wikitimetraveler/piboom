@@ -9,6 +9,7 @@
   <script src="/shared/menu-config.js"></script>
   <script src="/shared/modern-navbar.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/livekit-client@2.15.8/dist/livekit-client.umd.min.js"></script>
+  <script src="/shared/js/livekit-talk-audio.js"></script>
   <style>
     body { background: #0e1412; color: #d7ece4; font-family: Georgia, serif; margin: 0; }
     main { max-width: 42rem; margin: 2rem auto; padding: 0 1.25rem 4rem; }
@@ -37,7 +38,7 @@
     <div class="row">
       <input id="wbName" value="Listener" maxlength="40" aria-label="Display name"/>
       <button class="primary" id="wbJoin" type="button">Join booth</button>
-      <button id="wbMic" type="button" disabled>Mic</button>
+      <button id="wbMic" type="button" disabled aria-pressed="false">Mic off</button>
     </div>
     <p class="status" id="wbStatus">LiveKit…</p>
     <div id="wbLog"></div>

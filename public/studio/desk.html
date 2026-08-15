@@ -17,6 +17,7 @@
   <script src="/shared/user-selector.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/livekit-client@2.15.8/dist/livekit-client.umd.min.js"></script>
+  <script src="/shared/js/livekit-talk-audio.js"></script>
 </head>
 <body class="st-page encompass-dark-mode">
   <modern-navbar></modern-navbar>
@@ -42,12 +43,12 @@
           <button type="button" class="st-btn st-btn--ghost" id="stAddTrack">Add track</button>
         </div>
         <label class="st-status" style="display:block;margin-top:0.75rem">
-          <input type="checkbox" id="stMusicMode" checked/> Music input (hi-fi, no voice processing)
+          <input type="checkbox" id="stMusicMode"/> Music input for local record only (hi-fi, no voice processing)
         </label>
         <label class="st-status" style="display:block;margin-top:0.4rem">
           <input type="checkbox" id="stAcousticDesk" checked/> Acoustic desk (neck/body EQ + wood room)
         </label>
-        <p class="st-hint">Use headphones. Speakers will leak into the mics.</p>
+        <p class="st-hint">LiveKit talk mic always echo-cancels. Headphones still help. Check music input only for local guitar/record takes — not the room.</p>
         <div class="st-meter" aria-hidden="true"><span id="stMeter"></span></div>
       </aside>
 
@@ -68,7 +69,7 @@
         <h2>LiveKit stage</h2>
         <div class="st-transport">
           <button type="button" class="st-btn st-btn--primary" id="stJoinLive">Join room</button>
-          <button type="button" class="st-btn st-btn--ghost" id="stMic">Mic</button>
+          <button type="button" class="st-btn st-btn--ghost" id="stMic" aria-pressed="false">Mic off</button>
           <button type="button" class="st-btn st-btn--ghost" id="stCam">Cam</button>
           <button type="button" class="st-btn st-btn--ghost" id="stShare">Share</button>
           <button type="button" class="st-btn st-btn--ghost" id="stEgress">Archive mics</button>

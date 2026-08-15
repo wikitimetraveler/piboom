@@ -65,24 +65,38 @@
       return;
     }
     if (room) await room.disconnect();
-    room = new LK.Room({ adaptiveStream: true, dynacast: true });
+    room = new LK.Room(
+      window.LivekitTalkAudio
+        ? window.LivekitTalkAudio.roomOptions()
+        : { adaptiveStream: true, dynacast: true }
+    );
     room.on(LK.RoomEvent.DataReceived, onData);
-    room.on(LK.RoomEvent.TrackSubscribed, (track) => {
+    room.on(LK.RoomEvent.TrackSubscribed, (track, publication, participant) => {
+      if (window.LivekitTalkAudio?.skipAttach(track, participant) || participant?.isLocal) return;
       if (track.kind === 'audio') track.attach();
     });
     await room.connect(data.url, data.token);
-    micOn = true;
-    await room.localParticipant.setMicrophoneEnabled(true);
+    micOn = false;
+    await room.localParticipant.setMicrophoneEnabled(false);
     els.mic.disabled = false;
-    els.status.textContent = `Live ${data.roomName} · agent ${data.agentName || 'WolfmanDave'}`;
-    line('You are in the booth. Talk, or type a request.');
+    els.mic.textContent = 'Mic off';
+    els.mic.setAttribute('aria-pressed', 'false');
+    els.status.textContent = `Live ${data.roomName} · agent ${data.agentName || 'WolfmanDave'} · mic off`;
+    line('Joined muted. Click Mic when you want to talk.');
   }
 
   async function toggleMic() {
-    if (!room) return join();
+    if (!room) {
+      await join();
+      if (!room) return;
+    }
     micOn = !micOn;
-    await room.localParticipant.setMicrophoneEnabled(micOn);
+    await room.localParticipant.setMicrophoneEnabled(micOn, micOn ? window.LivekitTalkAudio?.capture : undefined);
     els.status.textContent = micOn ? 'Mic on' : 'Mic off';
+    if (els.mic) {
+      els.mic.textContent = micOn ? 'Mic on' : 'Mic off';
+      els.mic.setAttribute('aria-pressed', micOn ? 'true' : 'false');
+    }
   }
 
   els.join?.addEventListener('click', () => join().catch((err) => {
