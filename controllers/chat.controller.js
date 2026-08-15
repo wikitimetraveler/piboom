@@ -2,10 +2,9 @@
  * Development work by David Lane
  */
 import OpenAI from 'openai';
-import axios from 'axios';
 import { getConversationChain, getUserConversationHistory, clearUserConversationHistory, getUserConversationStats } from '../services/langchain-memory.service.js';
 import { resolveOpenAiAgentModel } from '../services/openai-agent-model.js';
-import { getGoogleServerApiKey } from '../lib/google-api-key.js';
+import { searchWatchTogetherYouTube } from '../services/watch-together.service.js';
 
 // OpenAI configuration
 const OPENAI_API_KEY = (process.env.OPENAI_API_KEY || '').trim();
@@ -857,61 +856,38 @@ const getConversationStats = async (req, res) => {
 // Search YouTube videos based on chat conversation
 export async function searchYouTubeVideos(req, res) {
   try {
-    const { query } = req.body;
-    
-    if (!query || query.trim().length < 5) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Search query is required and must be at least 5 characters' 
+    const result = await searchWatchTogetherYouTube(req.body?.query);
+    if (!result.ok && result.reason === 'empty') {
+      return res.status(400).json({
+        success: false,
+        message: 'Search query is required',
       });
     }
-    
-    
-    // Get YouTube API key from environment
-    const apiKey = getGoogleServerApiKey();
-    if (!apiKey) {
-      return res.status(500).json({ error: 'YouTube API key not configured' });
-    }
-
-    // Search YouTube Data API
-    const searchQuery = encodeURIComponent(query);
-    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${searchQuery}&type=video&key=${apiKey}&maxResults=6`;
-
-    const response = await axios.get(url);
-    const data = response.data;
-
-    if (data.items && data.items.length > 0) {
-      const videos = data.items.map(item => ({
-        videoId: item.id.videoId,
-        title: item.snippet.title,
-        channel: item.snippet.channelTitle,
-        description: item.snippet.description,
-        thumbnail: item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url || '',
-        url: `https://www.youtube.com/watch?v=${item.id.videoId}`
-      }));
-
-
-      res.json({ 
-        success: true, 
-        videos: videos,
-        query: query 
-      });
-    } else {
-      res.json({ 
-        success: true, 
-        videos: [],
-        query: query,
-        message: 'No videos found for this query'
+    if (!result.ok && result.reason === 'no-key') {
+      return res.status(503).json({
+        success: false,
+        message: 'YouTube API key not configured',
       });
     }
-    
+    if (!result.ok) {
+      return res.status(502).json({
+        success: false,
+        message: 'Failed to search YouTube videos',
+        error: result.reason || 'search-failed',
+      });
+    }
+    return res.json({
+      success: true,
+      videos: result.videos,
+      query: result.query,
+    });
   } catch (error) {
     console.error('YouTube search error:', error);
     console.error('Error details:', error.response?.data || error.message);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: 'Failed to search YouTube videos',
-      error: error.message
+      error: error.message,
     });
   }
 }

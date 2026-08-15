@@ -669,13 +669,10 @@ async function processVoiceCommand(command) {
         tapBtn.dataset.responseText = data.response ? data.response.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() : '';
       }
       
-      // Show results if any
       if (data.results && data.results.length > 0) {
         displayResults(data.results, data.resultType);
-        
-        // Automatically search YouTube for relevant videos
-        searchYouTubeForResults(data);
       }
+      await searchYouTubeForResults(data, command);
       
       // Speak the response
       if (data.response) {
@@ -803,49 +800,50 @@ if ('speechSynthesis' in window) {
 }
 
 // Search YouTube based on Voice DJ results
-async function searchYouTubeForResults(data) {
+function showYouTubeMessage(text) {
+  const youtubeSection = document.getElementById('youtubeSection');
+  const youtubeGrid = document.getElementById('youtubeGrid');
+  if (!youtubeSection || !youtubeGrid) return;
+  youtubeGrid.innerHTML = `<p class="text-center" style="color:#5a7370;">${text}</p>`;
+  youtubeSection.style.display = 'block';
+}
+
+async function searchYouTubeForResults(data, spoken) {
   try {
-    // Build search query from the results
     let searchQuery = '';
     
     if (data.intent === 'search_artist' && data.results && data.results.length > 0) {
-      // Search for artist's top songs
       searchQuery = `${data.results[0].artist} greatest hits live`;
     } else if (data.intent === 'search_album' && data.results && data.results.length > 0) {
-      // Search for specific album
       searchQuery = `${data.results[0].artist} ${data.results[0].album} full album`;
     } else if (data.intent === 'search_year' && data.results && data.results.length > 0) {
-      // Search for hits from that year
       const year = data.results[0].year;
       searchQuery = `best songs ${year} hits`;
     } else if (data.intent === 'search_genre') {
-      // Search for genre playlists
-      searchQuery = data.searchQuery || 'music';
+      searchQuery = data.searchQuery || spoken || 'music';
     } else {
-      // Default: use the search query
-      searchQuery = data.searchQuery || data.results[0]?.artist || 'music';
+      searchQuery = data.searchQuery || data.results?.[0]?.artist || spoken || 'music';
     }
     
     console.log('🔍 Searching YouTube for:', searchQuery);
     
-    // Call YouTube search API
     const response = await fetch('/api/chat/youtube-search', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query: searchQuery })
     });
     
-    const youtubeData = await response.json();
+    const youtubeData = await response.json().catch(() => ({}));
     console.log('YouTube search response:', youtubeData);
     
     if (youtubeData.success && youtubeData.videos && youtubeData.videos.length > 0) {
-      console.log('Found', youtubeData.videos.length, 'YouTube videos');
       displayYouTubeVideos(youtubeData.videos);
-    } else {
-      console.log('No YouTube videos found or empty response');
+      return;
     }
+    showYouTubeMessage(youtubeData.message || 'No YouTube videos for that search. Try another ask.');
   } catch (error) {
     console.error('Error searching YouTube:', error);
+    showYouTubeMessage('YouTube search failed. Try again in a moment.');
   }
 }
 
