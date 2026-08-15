@@ -1,5 +1,5 @@
 /**
- * Talk-mic defaults for LiveKit rooms — always echo-cancel so speakers/guitar do not loop.
+ * Talk-mic defaults for LiveKit rooms — echo-cancel so speakers/guitar do not loop.
  * Local DAW “music input” stays separate (studio-desk openMicStream).
  */
 (function (global) {
@@ -9,8 +9,10 @@
     echoCancellation: true,
     noiseSuppression: true,
     autoGainControl: true,
-    voiceIsolation: true,
-    channelCount: 1,
+  };
+
+  const captureSoft = {
+    echoCancellation: true,
   };
 
   function roomOptions(extra) {
@@ -43,11 +45,55 @@
     return el;
   }
 
+  async function unmuteMicrophone(localParticipant) {
+    const LK = global.LivekitClient;
+    if (!localParticipant || !LK?.Track?.Source) return;
+    const pub =
+      typeof localParticipant.getTrackPublication === 'function'
+        ? localParticipant.getTrackPublication(LK.Track.Source.Microphone)
+        : null;
+    try {
+      if (pub?.isMuted && typeof pub.unmute === 'function') await pub.unmute();
+    } catch (_) {
+      /* ignore */
+    }
+    const media = pub?.track?.mediaStreamTrack;
+    if (media) media.enabled = true;
+  }
+
+  async function setTalkMic(localParticipant, enabled) {
+    if (!localParticipant || typeof localParticipant.setMicrophoneEnabled !== 'function') {
+      throw new Error('No LiveKit participant');
+    }
+    if (!enabled) {
+      await localParticipant.setMicrophoneEnabled(false);
+      return false;
+    }
+    const attempts = [capture, captureSoft, undefined];
+    let lastErr = null;
+    for (let i = 0; i < attempts.length; i += 1) {
+      try {
+        if (attempts[i]) {
+          await localParticipant.setMicrophoneEnabled(true, attempts[i]);
+        } else {
+          await localParticipant.setMicrophoneEnabled(true);
+        }
+        await unmuteMicrophone(localParticipant);
+        return true;
+      } catch (err) {
+        lastErr = err;
+      }
+    }
+    throw lastErr || new Error('Mic failed');
+  }
+
   global.LivekitTalkAudio = {
     capture,
     roomOptions,
     isLocalParticipant,
     skipAttach,
     prepareAttachedMedia,
+    unmuteMicrophone,
+    setTalkMic,
   };
 })(typeof window !== 'undefined' ? window : globalThis);

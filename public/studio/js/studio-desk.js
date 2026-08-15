@@ -884,15 +884,27 @@
     els.livekitStatus.textContent = `LiveKit ${data.roomName}`;
     els.livekitStatus.classList.add('is-live');
     state.micOn = false;
-    await room.localParticipant.setMicrophoneEnabled(false);
     attachLocalPreview();
     syncMicButton();
     appendReed('Joined muted so guitar and speakers stay off the room. Click Mic when you want to talk.');
     if (enableMic) {
-      state.micOn = true;
-      await room.localParticipant.setMicrophoneEnabled(true, window.LivekitTalkAudio?.capture);
-      syncMicButton();
+      await setRoomMic(true);
     }
+  }
+
+  async function setRoomMic(on) {
+    const lp = state.livekitRoom?.localParticipant;
+    if (!lp) return false;
+    if (window.LivekitTalkAudio?.setTalkMic) {
+      const ok = await window.LivekitTalkAudio.setTalkMic(lp, on);
+      state.micOn = Boolean(ok);
+      syncMicButton();
+      return state.micOn;
+    }
+    await lp.setMicrophoneEnabled(on);
+    state.micOn = on;
+    syncMicButton();
+    return on;
   }
 
   function attachTile(id, track, label, opts) {
@@ -932,12 +944,15 @@
 
   async function toggleMic() {
     if (!state.livekitRoom) return joinLivekit({ enableMic: true });
-    state.micOn = !state.micOn;
-    await state.livekitRoom.localParticipant.setMicrophoneEnabled(
-      state.micOn,
-      state.micOn ? window.LivekitTalkAudio?.capture : undefined
-    );
-    syncMicButton();
+    try {
+      await setRoomMic(!state.micOn);
+      appendReed(state.micOn ? 'Mic on — they can hear you.' : 'Mic off.');
+    } catch (err) {
+      state.micOn = false;
+      syncMicButton();
+      appendReed('Mic did not start. Allow the microphone, then try Mic on again.');
+      throw err;
+    }
   }
 
   async function toggleCam() {

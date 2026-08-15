@@ -77,7 +77,6 @@
     });
     await room.connect(data.url, data.token);
     micOn = false;
-    await room.localParticipant.setMicrophoneEnabled(false);
     els.mic.disabled = false;
     els.mic.textContent = 'Mic off';
     els.mic.setAttribute('aria-pressed', 'false');
@@ -85,17 +84,32 @@
     line('Joined muted. Click Mic when you want to talk.');
   }
 
+  function syncMicUi() {
+    els.status.textContent = micOn ? 'Mic on' : 'Mic off';
+    if (els.mic) {
+      els.mic.textContent = micOn ? 'Mic on' : 'Mic off';
+      els.mic.setAttribute('aria-pressed', micOn ? 'true' : 'false');
+    }
+  }
+
   async function toggleMic() {
     if (!room) {
       await join();
       if (!room) return;
     }
-    micOn = !micOn;
-    await room.localParticipant.setMicrophoneEnabled(micOn, micOn ? window.LivekitTalkAudio?.capture : undefined);
-    els.status.textContent = micOn ? 'Mic on' : 'Mic off';
-    if (els.mic) {
-      els.mic.textContent = micOn ? 'Mic on' : 'Mic off';
-      els.mic.setAttribute('aria-pressed', micOn ? 'true' : 'false');
+    const want = !micOn;
+    try {
+      if (window.LivekitTalkAudio?.setTalkMic) {
+        micOn = Boolean(await window.LivekitTalkAudio.setTalkMic(room.localParticipant, want));
+      } else {
+        await room.localParticipant.setMicrophoneEnabled(want);
+        micOn = want;
+      }
+      syncMicUi();
+    } catch (err) {
+      micOn = false;
+      syncMicUi();
+      els.status.textContent = 'Mic did not start — allow the microphone and try again';
     }
   }
 

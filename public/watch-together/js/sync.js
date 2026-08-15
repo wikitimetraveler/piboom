@@ -498,14 +498,19 @@
     const want = Boolean(on);
     void resumeRemoteAudio();
     try {
-      await lp.setMicrophoneEnabled(want, want ? global.LivekitTalkAudio?.capture : undefined);
-      await unmuteMic(microphonePublication());
-      state.micOn = want;
+      if (global.LivekitTalkAudio?.setTalkMic) {
+        const ok = await global.LivekitTalkAudio.setTalkMic(lp, want);
+        state.micOn = Boolean(ok);
+      } else {
+        await lp.setMicrophoneEnabled(want, want ? global.LivekitTalkAudio?.capture : undefined);
+        await unmuteMic(microphonePublication());
+        state.micOn = want;
+      }
       state.micError = '';
-      if (want) startMicMeter(microphoneTrack());
+      if (state.micOn) startMicMeter(microphoneTrack());
       else stopMicMeter();
       await resumeRemoteAudio();
-      return want;
+      return state.micOn;
     } catch (err) {
       console.warn('Watch together mic failed', err);
       state.micOn = false;
