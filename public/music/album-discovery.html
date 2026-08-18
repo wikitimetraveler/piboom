@@ -1066,7 +1066,7 @@
 
       <header class="discovery-hero">
         <h1><i class="bi-disc" aria-hidden="true"></i> Album Discovery</h1>
-        <p class="discovery-kicker">Search a band, upload a cover, or scan your shelf — then add what you find to your collection.</p>
+        <p class="discovery-kicker">Search a band, or photograph a jacket to read title and artist — then add the copy you hold.</p>
       </header>
 
       <!-- Search Mode Tabs -->
@@ -1148,11 +1148,11 @@
               <span>No image selected yet. Upload an album cover to begin.</span>
             </div>
             <div class="camera-instructions">
-              <strong>Best results when:</strong>
+              <strong>Photo identify reads the jacket only:</strong>
               <ul>
-                <li>The photo is clear and taken straight-on.</li>
-                <li>The entire album artwork is visible.</li>
-                <li>The file size is under 10 MB.</li>
+                <li>Clear, straight-on shot of the whole cover.</li>
+                <li>Title and artist must be readable — no guessed value or history.</li>
+                <li>File size under 10 MB.</li>
               </ul>
             </div>
             <div id="imagePreview" style="display: none; margin-top: 15px;">
@@ -1192,10 +1192,10 @@
             </div>
             <div id="cameraStatus" class="camera-status camera-status--info" style="display: none;" aria-live="polite"></div>
             <div class="camera-instructions">
-              <strong>Tips for clearer identification:</strong>
+              <strong>Jacket read — not an appraisal:</strong>
               <ul>
-                <li>Fill the green square with the album art and avoid glare.</li>
-                <li>Use steady hands or rest the album on a flat surface.</li>
+                <li>Fill the green square with the cover; avoid glare.</li>
+                <li>Steady the album so title and artist are readable.</li>
               </ul>
             </div>
             <div id="cameraLoadingIndicator" class="camera-loading" style="display:none;" aria-hidden="true">
@@ -1262,10 +1262,10 @@
               <span>Lay up to 5 album covers in frame, then upload one shelf photo.</span>
             </div>
             <div class="camera-instructions">
-              <strong>Best results when:</strong>
+              <strong>Jacket read — not an appraisal:</strong>
               <ul>
-                <li>Covers are spread out so each title is readable.</li>
-                <li>Photo is taken from above or straight-on with good light.</li>
+                <li>Covers spread so each title and artist is readable.</li>
+                <li>Straight-on light; skip unreadable jackets.</li>
                 <li>Up to <strong>5</strong> distinct albums in one shot.</li>
               </ul>
             </div>
@@ -2393,6 +2393,12 @@ function escapeMultiHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
+function coverYearLabel(year) {
+  const s = String(year || '').trim();
+  if (!s || /^(unknown|n\/a|none)$/i.test(s)) return '';
+  return s;
+}
+
 function renderMultiIdentifyResults() {
   const resultsEl = document.getElementById('multiIdentifyResults');
   const actionsEl = document.getElementById('multiBulkActions');
@@ -2409,9 +2415,7 @@ function renderMultiIdentifyResults() {
 
   resultsEl.innerHTML = multiIdentifyResults.map((album, i) => {
     const low = album.confidence === 'low';
-    const valueHtml = album.estimatedValue
-      ? `<div class="multi-album-card__meta"><i class="bi-cash-coin text-success"></i> Est. $${(parseFloat(album.estimatedValue) / 2).toFixed(2)} <small class="text-muted">(AI÷2)</small></div>`
-      : '';
+    const yearLabel = coverYearLabel(album.year);
     return `
       <div class="multi-album-card ${low ? 'multi-album-card--low' : ''}">
         <img src="${multiImageData}" alt="#${album.index}" class="multi-album-card__thumb">
@@ -2427,9 +2431,8 @@ function renderMultiIdentifyResults() {
           <label class="form-label small mb-0">Artist</label>
           <input class="form-control form-control-sm" value="${escapeMultiHtml(album.artistName)}" onchange="updateMultiAlbumField(${i}, 'artistName', this.value)">
         </div>
-        <div class="multi-album-card__meta">${escapeMultiHtml(album.year || 'Unknown')} · ${escapeMultiHtml(album.genre || 'Unknown')}</div>
-        ${valueHtml}
-        <button class="btn btn-sm btn-outline-success mt-2" onclick="showAddModal('${album.artistName.replace(/'/g, "\\'")}', '${album.albumName.replace(/'/g, "\\'")}', '${album.year || ''}', '${album.genre || ''}', '${multiImageData}', null, true, ${album.estimatedValue || 'null'})">
+        ${yearLabel ? `<div class="multi-album-card__meta">${escapeMultiHtml(yearLabel)} · printed on jacket</div>` : `<div class="multi-album-card__meta text-muted">Year not printed — leave blank</div>`}
+        <button class="btn btn-sm btn-outline-success mt-2" onclick="showAddModal('${album.artistName.replace(/'/g, "\\'")}', '${album.albumName.replace(/'/g, "\\'")}', '${yearLabel}', '', '${multiImageData}', null, true, null)">
           <i class="bi-plus-circle"></i> Add This One
         </button>
       </div>
@@ -2507,12 +2510,12 @@ async function addSelectedMultiAlbumsToCollection() {
       await showAddModal(
         album.artistName,
         album.albumName,
-        album.year || '',
-        album.genre || '',
+        coverYearLabel(album.year),
+        '',
         multiImageData,
         null,
         false,
-        album.estimatedValue || null
+        null
       );
       added += 1;
     } catch (error) {
@@ -2736,23 +2739,23 @@ async function analyzeAlbumImage() {
 // Display identified album information
 function displayIdentifiedAlbum(data) {
   const kgCard = document.getElementById('kgCard');
+  const yearLabel = coverYearLabel(data.year);
+  const conf = String(data.confidence || '').toLowerCase();
+  const review = conf === 'low' ? '<span class="badge badge-warning">Review — low confidence</span>' : '';
   kgCard.innerHTML = `
-    <div class="kg-result-card" style="background: linear-gradient(135deg, rgba(135,206,250,0.1), rgba(144,238,144,0.1)); padding: 20px; border-radius: 15px; border: 2px solid #4CAF50;">
+    <div class="kg-result-card" style="background: var(--lf-bg-elevated, #fffcf7); padding: 20px; border-radius: 2px; border: 1px solid rgba(28,27,25,0.12);">
       <div class="row g-0">
         <div class="col-md-3">
-          <img src="${uploadedImageData}" class="img-fluid rounded-start" alt="${data.albumName}" style="width: 100%; height: 200px; object-fit: cover;">
+          <img src="${uploadedImageData}" class="img-fluid rounded-start" alt="${escapeMultiHtml(data.albumName)}" style="width: 100%; height: 200px; object-fit: cover;">
         </div>
         <div class="col-md-9">
           <div class="card-body">
-            <h4 class="card-title"><i class="bi-check-circle-fill text-success"></i> Album Identified!</h4>
-            <h5 class="card-title">${data.albumName}</h5>
-            <p class="card-text"><strong>Artist:</strong> ${data.artistName}</p>
-            ${data.year ? `<p class="card-text"><strong>Year:</strong> ${data.year}</p>` : ''}
-            ${data.genre ? `<p class="card-text"><strong>Genre:</strong> ${data.genre}</p>` : ''}
-            ${data.estimatedValue ? `<p class="card-text"><strong><i class="bi-cash-coin text-success"></i> Est. Value:</strong> <span style="text-decoration: line-through; opacity: 0.5;">$${parseFloat(data.estimatedValue).toFixed(2)}</span> → <strong style="color: #28a745;">$${(parseFloat(data.estimatedValue) / 2).toFixed(2)}</strong> <small class="text-muted">(÷2)</small></p>` : ''}
-            ${data.description ? `<p class="card-text">${data.description}</p>` : ''}
-            <p class="card-text"><small class="text-muted">Identified using AI vision ${data.estimatedValue ? '· AI values cut in half' : ''}</small></p>
-            <button class="btn btn-success btn-lg mt-3" onclick="showAddModal('${data.artistName.replace(/'/g, "\\'")}', '${data.albumName.replace(/'/g, "\\'")}', '${data.year || ''}', '${data.genre || ''}', '${uploadedImageData}', null, true, ${data.estimatedValue || 'null'})">
+            <h4 class="card-title">Read from this photo ${review}</h4>
+            <h5 class="card-title">${escapeMultiHtml(data.albumName)}</h5>
+            <p class="card-text"><strong>Artist:</strong> ${escapeMultiHtml(data.artistName)}</p>
+            ${yearLabel ? `<p class="card-text"><strong>Year on jacket:</strong> ${escapeMultiHtml(yearLabel)}</p>` : '<p class="card-text text-muted">Year not printed on this jacket.</p>'}
+            <p class="card-text"><small class="text-muted">Cover read only — verify title and artist before saving. No appraisal, genre, or history is invented from the photo.</small></p>
+            <button class="btn btn-success btn-lg mt-3" onclick="showAddModal('${data.artistName.replace(/'/g, "\\'")}', '${data.albumName.replace(/'/g, "\\'")}', '${yearLabel}', '', '${uploadedImageData}', null, true, null)">
               <i class="bi-plus-circle"></i> Add to My Collection
             </button>
             <button class="btn btn-outline-primary btn-lg mt-3 ml-2" onclick="addAnotherAlbum()" id="addAnotherBtn" style="display: none;">
@@ -3522,7 +3525,7 @@ async function showAddModal(artist, album, year, genre, coverUrl, musicbrainzId,
       locationLat: locationLat ?? null,
       locationLng: locationLng ?? null,
       locationLabel: locationLabel ?? null,
-      valuation: estimatedValue && estimatedValue !== 'null' ? parseFloat(estimatedValue) / 2 : null,
+      valuation: null,
       aiAnalysis: aiAnalysis,
     };
     const zs = document.getElementById('addStorageZone');
@@ -3548,7 +3551,7 @@ async function showAddModal(artist, album, year, genre, coverUrl, musicbrainzId,
       // Show enhanced success toast with album details
       showToast(
         '✅ Album Added!', 
-        `<strong>${album}</strong> by ${artist}<br>Added to <strong>${currentUser.name}'s collection</strong>!${estimatedValue && estimatedValue !== 'null' ? `<br>💰 Estimated value: $${(parseFloat(estimatedValue) / 2).toFixed(2)} <small class="text-muted">(AI÷2)</small>` : ''}`, 
+        `<strong>${album}</strong> by ${artist}<br>Added to <strong>${currentUser.name}'s collection</strong>!`, 
         'success'
       );
       resetPhotoLocation();

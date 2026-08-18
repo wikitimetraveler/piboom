@@ -8,11 +8,17 @@
     reelCode: document.getElementById('stReelCode'),
     socketStatus: document.getElementById('stSocketStatus'),
     livekitStatus: document.getElementById('stLivekitStatus'),
+    livekitChip: document.getElementById('stLivekitChip'),
+    socketChip: document.getElementById('stSocketChip'),
+    micChip: document.getElementById('stMicChip'),
+    archiveChip: document.getElementById('stArchiveChip'),
     name: document.getElementById('stName'),
     tracks: document.getElementById('stTracks'),
     addTrack: document.getElementById('stAddTrack'),
     musicMode: document.getElementById('stMusicMode'),
     acousticDesk: document.getElementById('stAcousticDesk'),
+    tuneKey: document.getElementById('stTuneKey'),
+    tuneHard: document.getElementById('stTuneHard'),
     meter: document.getElementById('stMeter'),
     timeline: document.getElementById('stTimeline'),
     record: document.getElementById('stRecord'),
@@ -28,7 +34,9 @@
     egress: document.getElementById('stEgress'),
     heygenFace: document.getElementById('stHeygenFace'),
     heygenTile: document.getElementById('stHeygenTile'),
+    heygenMedia: document.getElementById('stHeygenMedia'),
     stage: document.getElementById('stStage'),
+    onStage: document.getElementById('stOnStage'),
     presence: document.getElementById('stPresence'),
     reedLog: document.getElementById('stReedLog'),
     reedForm: document.getElementById('stReedForm'),
@@ -73,7 +81,116 @@
     playRaf: 0,
     playOriginTime: 0,
     playOriginHead: 0,
+    health: { livekitConfigured: false, egressS3Configured: false },
+    lkState: 'unset',
+    sawAgent: false,
+    agentTimer: 0,
   };
+
+  function isVoiceTrack(track) {
+    return window.StarBandAutotune?.isVoiceTrack(track)
+      || /vocal|harmony|voice|vox/i.test(String(track?.name || ''));
+  }
+
+  function tuneOpts() {
+    const raw = String(els.tuneKey?.value || 'chromatic');
+    const hard = els.tuneHard ? els.tuneHard.checked : true;
+    if (raw === 'chromatic') {
+      return { root: 0, scale: 'chromatic', amount: 0.92, speed: hard ? 'hard' : 'natural' };
+    }
+    const [name, scale] = raw.split(':');
+    const key = (window.StarBandAutotune?.KEYS || []).find((item) => item.id === name);
+    return {
+      root: key ? key.root : 0,
+      scale: scale || 'major',
+      amount: 0.92,
+      speed: hard ? 'hard' : 'natural',
+    };
+  }
+
+  function tuneSignature() {
+    const opts = tuneOpts();
+    return `${opts.root}|${opts.scale}|${opts.amount}|${opts.speed}`;
+  }
+
+  function bufferForClip(track, clip) {
+    if (!clip?.buffer) return null;
+    if (!isVoiceTrack(track) || !track.autotune) return clip.buffer;
+    const api = window.StarBandAutotune;
+    if (!api?.correctBuffer) return clip.buffer;
+    const sig = tuneSignature();
+    if (clip.tunedBuffer && clip.tunedSig === sig) return clip.tunedBuffer;
+    clip.tunedBuffer = api.correctBuffer(clip.buffer, tuneOpts());
+    clip.tunedSig = sig;
+    return clip.tunedBuffer;
+  }
+
+  const LK_CHIP_LABELS = {
+    unset: 'Unset',
+    ready: 'Ready',
+    joining: 'Joining',
+    live: 'Live',
+    reconnecting: 'Reconnecting',
+    down: 'Down',
+  };
+
+  const IDENTITY_KEY = 'stLivekitIdentity';
+
+  function stableIdentity(name) {
+    try {
+      const existing = sessionStorage.getItem(IDENTITY_KEY);
+      if (existing) return existing;
+      const base = String(name || 'player').replace(/[^\w.-]/g, '-').slice(0, 48);
+      const id = (base + '-' + Math.random().toString(36).slice(2, 10)).slice(0, 64);
+      sessionStorage.setItem(IDENTITY_KEY, id);
+      return id;
+    } catch {
+      return '';
+    }
+  }
+
+  function setLkChip(next, line) {
+    if (next) state.lkState = next;
+    const chip = els.livekitChip;
+    if (chip) {
+      const key = state.lkState;
+      chip.dataset.state = key;
+      const room = state.livekitRoom?.name || '';
+      chip.textContent = key === 'live' && room ? `Live · ${room}` : (LK_CHIP_LABELS[key] || key);
+    }
+    if (line != null && els.livekitStatus) els.livekitStatus.textContent = line;
+    applyArchiveGate();
+  }
+
+  function setSocketChip(live) {
+    if (!els.socketChip) return;
+    els.socketChip.dataset.state = live ? 'live' : 'down';
+    els.socketChip.textContent = live ? 'Socket live' : 'Socket down';
+  }
+
+  function syncMicChip() {
+    if (!els.micChip) return;
+    const music = Boolean(els.musicMode?.checked);
+    els.micChip.dataset.state = music ? 'ready' : (state.micOn ? 'live' : 'ready');
+    els.micChip.textContent = music
+      ? 'Music input · local takes'
+      : (state.micOn ? 'Talk mic · live' : 'Talk mic · echo cancel');
+  }
+
+  function applyArchiveGate() {
+    const s3 = Boolean(state.health.egressS3Configured);
+    const live = state.lkState === 'live' || state.lkState === 'reconnecting';
+    if (els.egress) {
+      els.egress.disabled = !s3 || !live;
+      els.egress.title = s3
+        ? 'Archive mics only — not the timeline, not a WAV bounce.'
+        : 'Archive needs S3 dest (LIVEKIT_EGRESS_S3_*). Use Record for the timeline and Bounce for a local WAV.';
+    }
+    if (els.archiveChip) {
+      els.archiveChip.dataset.state = s3 ? 'ready' : 'unset';
+      els.archiveChip.textContent = s3 ? 'Archive ready' : 'Archive needs S3';
+    }
+  }
 
   function playerName() {
     state.name = String(els.name?.value || 'Player').trim() || 'Player';
@@ -267,6 +384,9 @@
       gain: Number.isFinite(opts.gain) ? opts.gain : 1,
       pan: Number.isFinite(opts.pan) ? opts.pan : 0,
       muted: false,
+      autotune: opts.autotune != null
+        ? Boolean(opts.autotune)
+        : isVoiceTrack({ name, kind: opts.kind || 'audio' }),
     };
     state.tracks.push(track);
     if (!state.armedId || opts.arm) state.armedId = track.id;
@@ -280,26 +400,68 @@
     els.tracks.innerHTML = '';
     state.tracks.forEach((track) => {
       const row = document.createElement('div');
-      const kindLabel = track.kind === 'acoustic-guitar' ? 'Acoustic guitar · ' : '';
-      row.className = `st-track${track.id === state.armedId ? ' is-armed' : ''}${track.kind === 'acoustic-guitar' ? ' st-track--guitar' : ''}`;
+      const armed = track.id === state.armedId;
+      const kindLabel = track.kind === 'acoustic-guitar'
+        ? 'Acoustic guitar · '
+        : isVoiceTrack(track)
+          ? 'Voice · '
+          : '';
+      row.className = `st-track${armed ? ' is-armed' : ''}${track.kind === 'acoustic-guitar' ? ' st-track--guitar' : ''}${isVoiceTrack(track) ? ' st-track--vocal' : ''}`;
+      row.setAttribute('data-track', track.id);
+      row.setAttribute('tabindex', '0');
+      row.setAttribute('aria-pressed', armed ? 'true' : 'false');
       row.innerHTML = `
-        <div>
-          <strong>${escapeHtml(track.name)}</strong>
-          <div class="st-status">${kindLabel}${track.clips.length} clip${track.clips.length === 1 ? '' : 's'}</div>
+        <div class="st-track-head">
+          <button type="button" class="st-track-pick" data-arm="${track.id}" aria-pressed="${armed ? 'true' : 'false'}">
+            <strong>${escapeHtml(track.name)}</strong>
+            <span class="st-status">${kindLabel}${track.clips.length} clip${track.clips.length === 1 ? '' : 's'}${armed ? ' · recording here' : ''}</span>
+          </button>
+          <div class="st-track-keys">
+            <button type="button" class="st-arm" data-arm="${track.id}" aria-pressed="${armed ? 'true' : 'false'}">${armed ? 'Armed' : 'Arm'}</button>
+            <button type="button" class="st-mute" data-mute="${track.id}">${track.muted ? 'Unmute' : 'Mute'}</button>
+          </div>
         </div>
-        <div>
-          <button type="button" data-arm="${track.id}">Arm</button>
-          <button type="button" data-mute="${track.id}">${track.muted ? 'Unmute' : 'Mute'}</button>
-        </div>
-        <label class="st-status">Gain
+        <label class="st-fader">Gain
           <input type="range" min="0" max="2" step="0.01" value="${track.gain}" data-gain="${track.id}"/>
         </label>
-        <label class="st-status">Pan
+        <label class="st-fader">Pan
           <input type="range" min="-1" max="1" step="0.01" value="${track.pan}" data-pan="${track.id}"/>
         </label>
+        ${isVoiceTrack(track) ? `<label class="st-fader st-fader--check">Autotune
+          <input type="checkbox" data-autotune="${track.id}" ${track.autotune ? 'checked' : ''}/>
+        </label>` : ''}
       `;
+      row.querySelectorAll('[data-arm]').forEach((btn) => {
+        btn.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          armTrack(track.id);
+        });
+      });
+      row.querySelector('[data-mute]')?.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        track.muted = !track.muted;
+        renderTracks();
+        drawTimeline();
+      });
       els.tracks.appendChild(row);
     });
+  }
+
+  function armTrack(trackId, announce) {
+    const track = state.tracks.find((t) => t.id === trackId);
+    if (!track) return;
+    state.armedId = track.id;
+    renderTracks();
+    drawTimeline();
+    if (announce !== false) {
+      appendReed(`Armed ${track.name}. Record files on this track.`);
+    }
+  }
+
+  function timelineRowHeight(canvas) {
+    return Math.max(36, canvas.height / Math.max(state.tracks.length, 1) - 8);
   }
 
   function escapeHtml(value) {
@@ -319,7 +481,7 @@
     ctx.fillRect(0, 0, w, h);
     const seconds = Math.max(12, ...state.tracks.flatMap((t) => t.clips.map((c) => c.offset + c.duration)), state.playhead + 2);
     const px = w / seconds;
-    const rowH = Math.max(36, h / Math.max(state.tracks.length, 1) - 8);
+    const rowH = timelineRowHeight(canvas);
 
     state.tracks.forEach((track, index) => {
       const y = 8 + index * (rowH + 8);
@@ -328,7 +490,7 @@
       track.clips.forEach((clip) => {
         const x = clip.offset * px;
         const cw = Math.max(2, clip.duration * px);
-        ctx.fillStyle = track.id === state.armedId ? '#ff9d4d' : '#3a3a3a';
+        ctx.fillStyle = track.id === state.armedId ? '#d4a017' : '#3a3220';
         ctx.globalAlpha = 0.85;
         ctx.fillRect(x, y + 4, cw, rowH - 8);
         ctx.globalAlpha = 1;
@@ -344,8 +506,8 @@
           ctx.stroke();
         }
       });
-      ctx.fillStyle = '#666';
-      ctx.font = '11px Outfit, sans-serif';
+      ctx.fillStyle = track.id === state.armedId ? '#e8c872' : '#8a7a58';
+      ctx.font = '11px Cinzel, Times New Roman, serif';
       ctx.fillText(track.name, 8, y + 14);
     });
 
@@ -556,6 +718,16 @@
       duration: audioBuf.duration,
     });
     appendReed(`Take filed on ${armed.name} (${formatTime(audioBuf.duration)}). Hit Play to hear the acoustic desk.`);
+    if (isVoiceTrack(armed) && armed.autotune && window.StarBandAutotune?.correctBuffer) {
+      try {
+        const clip = armed.clips[armed.clips.length - 1];
+        clip.tunedBuffer = window.StarBandAutotune.correctBuffer(clip.buffer, tuneOpts());
+        clip.tunedSig = tuneSignature();
+        appendReed(`Autotune on ${armed.name}. Guitar stays dry.`);
+      } catch (err) {
+        appendReed(`Autotune skipped: ${err.message}`);
+      }
+    }
     renderTracks();
     drawTimeline();
   }
@@ -656,12 +828,13 @@
     state.tracks.forEach((track) => {
       if (track.muted) return;
       track.clips.forEach((clip) => {
-        if (!clip.buffer) return;
+        const playBuf = bufferForClip(track, clip);
+        if (!playBuf) return;
         const when = startAt + Math.max(0, clip.offset - origin);
         const offset = Math.max(0, origin - clip.offset);
-        if (!bounce && offset >= clip.buffer.duration) return;
+        if (!bounce && offset >= playBuf.duration) return;
         const src = ctx.createBufferSource();
-        src.buffer = clip.buffer;
+        src.buffer = playBuf;
         nodes.push(src);
         connectChain(ctx, src, track, master, roomIn, nodes);
         if (bounce) src.start(clip.offset);
@@ -807,15 +980,17 @@
     state.socket.on('connect', () => {
       els.socketStatus.textContent = 'Socket live';
       els.socketStatus.classList.add('is-live');
+      setSocketChip(true);
       state.socket.emit('studio:join', { reelCode: state.reel, name: playerName() });
     });
     state.socket.on('disconnect', () => {
       els.socketStatus.textContent = 'Socket down';
       els.socketStatus.classList.remove('is-live');
+      setSocketChip(false);
     });
     state.socket.on('studio:presence', (payload) => {
       const names = (payload.members || []).map((m) => m.name).join(', ');
-      els.presence.textContent = names ? `In the reel: ${names}` : 'No one in the reel yet.';
+      els.presence.textContent = names ? `On the reel: ${names}` : 'On the reel: no one yet.';
     });
     state.socket.on('studio:take-filed', (payload) => {
       appendReed(`${payload.by} filed ${payload.trackName} (${formatTime(payload.duration)})`);
@@ -834,24 +1009,77 @@
     if (!els.mic) return;
     els.mic.textContent = state.micOn ? 'Mic on' : 'Mic off';
     els.mic.setAttribute('aria-pressed', state.micOn ? 'true' : 'false');
+    syncMicChip();
+  }
+
+  function isAgentParticipant(participant) {
+    if (!participant) return false;
+    const kind = participant.kind || participant.participantInfo?.kind;
+    if (kind === 'agent' || kind === 4) return true;
+    return /starband|agent/i.test(String(participant.identity || participant.name || ''));
+  }
+
+  function refreshOnStage() {
+    const room = state.livekitRoom;
+    if (!els.onStage) return;
+    if (!room) {
+      els.onStage.textContent = 'On stage: —';
+      return;
+    }
+    const names = [];
+    const local = room.localParticipant;
+    if (local) names.push(`${local.name || playerName()} (you)`);
+    room.remoteParticipants?.forEach((p) => {
+      names.push(isAgentParticipant(p) ? 'Reed (voice)' : (p.name || p.identity));
+    });
+    els.onStage.textContent = names.length ? `On stage: ${names.join(', ')}` : 'On stage: —';
+  }
+
+  function markAgentIfPresent(participant) {
+    if (!isAgentParticipant(participant)) return;
+    state.sawAgent = true;
+    if (state.agentTimer) {
+      clearTimeout(state.agentTimer);
+      state.agentTimer = 0;
+    }
+    appendReed('Voice Reed is on stage.');
+    refreshOnStage();
+  }
+
+  function scheduleAgentWatch() {
+    state.sawAgent = false;
+    if (state.agentTimer) clearTimeout(state.agentTimer);
+    state.livekitRoom?.remoteParticipants?.forEach((p) => {
+      if (isAgentParticipant(p)) state.sawAgent = true;
+    });
+    if (state.sawAgent) return;
+    state.agentTimer = window.setTimeout(() => {
+      if (state.sawAgent || state.lkState !== 'live') return;
+      appendReed('Voice Reed offline — text Reed still works.');
+    }, 8000);
   }
 
   async function joinLivekit(opts) {
     const enableMic = Boolean(opts && opts.enableMic);
     const LK = window.LivekitClient;
     if (!LK) {
-      els.livekitStatus.textContent = 'LiveKit client missing';
+      setLkChip('unset', 'LiveKit client missing');
       return;
     }
+    setLkChip('joining', 'Joining…');
     const res = await fetch('/api/studio/livekit-token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reelCode: state.reel, name: playerName() }),
+      body: JSON.stringify({
+        reelCode: state.reel,
+        name: playerName(),
+        identity: stableIdentity(playerName()),
+      }),
     });
     const data = await res.json();
     if (!res.ok || !data.token) {
-      els.livekitStatus.textContent = 'LiveKit keys needed';
-      appendReed('LiveKit is not configured. Set LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET. Local record still works.');
+      setLkChip('unset', 'LiveKit keys needed');
+      appendReed('LiveKit is not configured. Set LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET in local .env. Local record still works.');
       return;
     }
     if (state.livekitRoom) await state.livekitRoom.disconnect();
@@ -874,19 +1102,50 @@
       if (window.LivekitTalkAudio?.skipAttach(track, participant)) return;
       attachTile(participant.identity, track, participant.name || participant.identity, {
         local: Boolean(participant?.isLocal),
+        agent: isAgentParticipant(participant),
       });
+      markAgentIfPresent(participant);
     });
     room.on(LK.RoomEvent.TrackUnsubscribed, (track) => {
       track.detach().forEach((el) => el.remove());
     });
+    room.on(LK.RoomEvent.ParticipantConnected, (participant) => {
+      markAgentIfPresent(participant);
+      refreshOnStage();
+    });
+    room.on(LK.RoomEvent.ParticipantDisconnected, refreshOnStage);
+    if (LK.RoomEvent.Reconnecting) {
+      room.on(LK.RoomEvent.Reconnecting, () => setLkChip('reconnecting', 'Reconnecting…'));
+    }
+    if (LK.RoomEvent.Reconnected) {
+      room.on(LK.RoomEvent.Reconnected, () => setLkChip('live', data.roomName));
+    }
+    if (LK.RoomEvent.Disconnected) {
+      room.on(LK.RoomEvent.Disconnected, () => {
+        setLkChip('down', 'LiveKit dropped. Local record still works.');
+        refreshOnStage();
+      });
+    }
+    if (LK.RoomEvent.ActiveSpeakersChanged) {
+      room.on(LK.RoomEvent.ActiveSpeakersChanged, (speakers) => {
+        const ids = new Set((speakers || []).map((p) => p?.identity).filter(Boolean));
+        document.querySelectorAll('.st-tile').forEach((tile) => {
+          tile.classList.toggle('is-speaking', ids.has(tile.dataset.identity));
+        });
+      });
+    }
     await room.connect(data.url, data.token);
     state.livekitRoom = room;
     els.livekitStatus.textContent = `LiveKit ${data.roomName}`;
     els.livekitStatus.classList.add('is-live');
+    setLkChip('live', data.roomName);
     state.micOn = false;
     attachLocalPreview();
     syncMicButton();
-    appendReed('Joined muted so guitar and speakers stay off the room. Click Mic when you want to talk.');
+    syncMicChip();
+    refreshOnStage();
+    scheduleAgentWatch();
+    appendReed('Joined muted so guitar and speakers stay off the room. Click Mic when you want to talk. Text Reed still works without the voice worker.');
     if (enableMic) {
       await setRoomMic(true);
     }
@@ -914,10 +1173,11 @@
     let tile = document.getElementById(tileId);
     if (!tile) {
       tile = document.createElement('div');
-      tile.className = 'st-tile';
+      tile.className = 'st-tile' + (opts && opts.agent ? ' is-agent' : '');
       tile.id = tileId;
+      tile.dataset.identity = String(id);
       const caption = document.createElement('span');
-      caption.textContent = label;
+      caption.textContent = opts && opts.agent ? 'Reed (voice)' : label;
       tile.appendChild(caption);
       els.stage.appendChild(tile);
     }
@@ -931,6 +1191,7 @@
       }
       tile.prepend(el);
     }
+    refreshOnStage();
   }
 
   function attachLocalPreview() {
@@ -955,23 +1216,57 @@
     }
   }
 
+  function permissionDenied(err) {
+    const name = err?.name || '';
+    const msg = String(err?.message || '');
+    return name === 'NotAllowedError' || /permission|notallowed|denied/i.test(name + msg);
+  }
+
   async function toggleCam() {
     if (!state.livekitRoom) await joinLivekit();
     if (!state.livekitRoom) return;
-    state.camOn = !state.camOn;
-    await state.livekitRoom.localParticipant.setCameraEnabled(state.camOn);
-    attachLocalPreview();
+    const next = !state.camOn;
+    try {
+      await state.livekitRoom.localParticipant.setCameraEnabled(next);
+      state.camOn = next;
+      if (els.cam) els.cam.setAttribute('aria-pressed', next ? 'true' : 'false');
+      attachLocalPreview();
+    } catch (err) {
+      state.camOn = false;
+      if (els.cam) els.cam.setAttribute('aria-pressed', 'false');
+      appendReed(
+        permissionDenied(err)
+          ? 'Camera permission denied. Allow the camera, then click Cam again.'
+          : (err?.message || 'Camera did not start.')
+      );
+    }
   }
 
   async function toggleShare() {
     if (!state.livekitRoom) await joinLivekit();
     if (!state.livekitRoom) return;
-    state.shareOn = !state.shareOn;
-    await state.livekitRoom.localParticipant.setScreenShareEnabled(state.shareOn);
-    attachLocalPreview();
+    const next = !state.shareOn;
+    try {
+      await state.livekitRoom.localParticipant.setScreenShareEnabled(next);
+      state.shareOn = next;
+      if (els.share) els.share.setAttribute('aria-pressed', next ? 'true' : 'false');
+      attachLocalPreview();
+    } catch (err) {
+      state.shareOn = false;
+      if (els.share) els.share.setAttribute('aria-pressed', 'false');
+      appendReed(
+        permissionDenied(err)
+          ? 'Screen share permission denied.'
+          : (err?.message || 'Screen share did not start.')
+      );
+    }
   }
 
   async function toggleAudioEgress() {
+    if (!state.health.egressS3Configured) {
+      appendReed('Archive needs S3 dest (LIVEKIT_EGRESS_S3_*). Use Record for the timeline and Bounce for a local WAV.');
+      return;
+    }
     if (state.egressId) {
       await fetch('/api/studio/egress/stop', {
         method: 'POST',
@@ -979,7 +1274,11 @@
         body: JSON.stringify({ egressId: state.egressId }),
       });
       state.egressId = null;
-      appendReed('Mic archive stopped.');
+      if (els.archiveChip) {
+        els.archiveChip.dataset.state = 'ready';
+        els.archiveChip.textContent = 'Archive ready';
+      }
+      appendReed('Mic archive stopped. The timeline was never captured.');
       return;
     }
     const res = await fetch('/api/studio/egress/audio', {
@@ -989,11 +1288,19 @@
     });
     const data = await res.json();
     if (!res.ok || !data.ok) {
-      appendReed(data.error || 'Audio egress needs LiveKit (and S3 dest in production).');
+      appendReed(
+        data.error === 'LIVEKIT_EGRESS_DEST_REQUIRED'
+          ? 'Archive needs S3 dest (LIVEKIT_EGRESS_S3_*). Use Record for the timeline and Bounce for a local WAV.'
+          : (data.error || 'Audio egress needs LiveKit and an S3 dest.')
+      );
       return;
     }
     state.egressId = data.egressId;
-    appendReed('Archiving room mics only — audio-only LiveKit egress.');
+    if (els.archiveChip) {
+      els.archiveChip.dataset.state = 'live';
+      els.archiveChip.textContent = 'Archiving mics';
+    }
+    appendReed('Archiving room mics only — not the timeline, not a WAV bounce.');
   }
 
   async function toggleReedFace() {
@@ -1008,7 +1315,8 @@
       state.heygenRoom = null;
       state.heygenSessionId = null;
       if (els.heygenTile) {
-        els.heygenTile.innerHTML = '';
+        if (els.heygenMedia) els.heygenMedia.innerHTML = '';
+        else els.heygenTile.innerHTML = '';
         els.heygenTile.hidden = true;
       }
       appendReed('HeyGen face closed.');
@@ -1030,11 +1338,12 @@
     }
     const faceRoom = new LK.Room({ adaptiveStream: true, dynacast: true });
     faceRoom.on(LK.RoomEvent.TrackSubscribed, (track) => {
-      if (!els.heygenTile) return;
+      const host = els.heygenMedia || els.heygenTile;
+      if (!els.heygenTile || !host) return;
       els.heygenTile.hidden = false;
       const el = track.attach();
       el.style.maxWidth = '100%';
-      els.heygenTile.appendChild(el);
+      host.appendChild(el);
     });
     await faceRoom.connect(data.url, data.accessToken);
     state.heygenRoom = faceRoom;
@@ -1072,10 +1381,10 @@
   }
 
   async function boot() {
-    addTrack('Acoustic Guitar Neck', { kind: 'acoustic-guitar', pan: -0.34, gain: 0.92, arm: true });
-    addTrack('Acoustic Guitar Body', { kind: 'acoustic-guitar', pan: 0.34, gain: 1 });
-    addTrack('Vocal', { gain: 0.88 });
-    addTrack('Harmony', { gain: 0.8 });
+    addTrack('Acoustic Guitar Neck', { kind: 'acoustic-guitar', pan: -0.34, gain: 0.92, arm: true, autotune: false });
+    addTrack('Acoustic Guitar Body', { kind: 'acoustic-guitar', pan: 0.34, gain: 1, autotune: false });
+    addTrack('Vocal', { kind: 'vocal', gain: 0.88, autotune: true });
+    addTrack('Harmony', { kind: 'vocal', gain: 0.8, autotune: true });
     if (els.musicMode) els.musicMode.checked = true;
     if (els.acousticDesk) els.acousticDesk.checked = true;
     if (!state.reel) {
@@ -1100,14 +1409,36 @@
     fetch('/api/studio/health')
       .then((res) => res.json())
       .then((status) => {
-        if (!status.livekitConfigured) els.livekitStatus.textContent = 'LiveKit unset';
-        else els.livekitStatus.textContent = 'LiveKit ready';
+        state.health = status || {};
+        if (!status.livekitConfigured) setLkChip('unset', 'LiveKit unset');
+        else setLkChip('ready', 'LiveKit ready');
+        applyArchiveGate();
+        syncMicChip();
       })
-      .catch(() => {});
-    appendReed('Reed: Acoustic desk is on. Neck is brighter at the twelfth fret, Body is warmer at the soundhole. Takes are PCM, not phone-call Opus. Headphones on, arm Neck, then stack Body while the mix plays.');
+      .catch(() => setLkChip('unset', 'LiveKit unset'));
+    appendReed('Reed: Acoustic desk is on. Autotune is on your voice only — Vocal and Harmony. Guitar stays dry. Headphones on, arm Neck, then stack Body, then sing.');
   }
 
   els.addTrack?.addEventListener('click', () => addTrack());
+  els.tuneKey?.addEventListener('change', () => {
+    state.tracks.forEach((track) => {
+      if (!isVoiceTrack(track)) return;
+      track.clips.forEach((clip) => {
+        clip.tunedBuffer = null;
+        clip.tunedSig = '';
+      });
+    });
+  });
+  els.tuneHard?.addEventListener('change', () => {
+    state.tracks.forEach((track) => {
+      if (!isVoiceTrack(track)) return;
+      track.clips.forEach((clip) => {
+        clip.tunedBuffer = null;
+        clip.tunedSig = '';
+      });
+    });
+  });
+  els.musicMode?.addEventListener('change', syncMicChip);
   els.record?.addEventListener('click', () => startRecord().catch((err) => appendReed(`Mic: ${err.message}`)));
   els.stop?.addEventListener('click', () => stopRecordOrPlay().catch((err) => appendReed(err.message)));
   els.play?.addEventListener('click', () => {
@@ -1122,6 +1453,13 @@
       state.playhead + 2
     );
     const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const scaleY = els.timeline.height / rect.height;
+    const rowH = timelineRowHeight(els.timeline);
+    const index = Math.floor((y * scaleY - 8) / (rowH + 8));
+    if (index >= 0 && index < state.tracks.length) {
+      armTrack(state.tracks[index].id);
+    }
     if (state.playing) stopRecordOrPlay().catch((err) => appendReed(err.message));
     state.playhead = Math.max(0, Math.min(seconds, (x / rect.width) * seconds));
     drawTimeline();
@@ -1136,19 +1474,26 @@
   els.heygenFace?.addEventListener('click', () => toggleReedFace().catch((err) => appendReed(err.message)));
   els.reedForm?.addEventListener('submit', askReed);
   els.tracks?.addEventListener('click', (event) => {
-    const arm = event.target.getAttribute('data-arm');
-    const mute = event.target.getAttribute('data-mute');
-    if (arm) state.armedId = arm;
-    if (mute) {
-      const track = state.tracks.find((t) => t.id === mute);
-      if (track) track.muted = !track.muted;
-    }
-    renderTracks();
-    drawTimeline();
+    const node = event.target && event.target.nodeType === 1 ? event.target : event.target?.parentElement;
+    if (!node || typeof node.closest !== 'function') return;
+    if (node.closest('[data-mute], input, select, .st-fader')) return;
+    const row = node.closest('[data-track]');
+    if (!row) return;
+    armTrack(row.getAttribute('data-track'));
+  });
+  els.tracks?.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const node = event.target && event.target.nodeType === 1 ? event.target : event.target?.parentElement;
+    if (!node || typeof node.closest !== 'function') return;
+    const row = node.closest('[data-track]');
+    if (!row || node.closest('input, select, .st-fader, [data-mute]')) return;
+    event.preventDefault();
+    armTrack(row.getAttribute('data-track'));
   });
   els.tracks?.addEventListener('input', (event) => {
     const gainId = event.target.getAttribute('data-gain');
     const panId = event.target.getAttribute('data-pan');
+    const autotuneId = event.target.getAttribute('data-autotune');
     if (gainId) {
       const track = state.tracks.find((t) => t.id === gainId);
       if (track) track.gain = Number(event.target.value);
@@ -1156,6 +1501,16 @@
     if (panId) {
       const track = state.tracks.find((t) => t.id === panId);
       if (track) track.pan = Number(event.target.value);
+    }
+    if (autotuneId) {
+      const track = state.tracks.find((t) => t.id === autotuneId);
+      if (track && isVoiceTrack(track)) {
+        track.autotune = event.target.checked;
+        track.clips.forEach((clip) => {
+          clip.tunedBuffer = null;
+          clip.tunedSig = '';
+        });
+      }
     }
   });
 

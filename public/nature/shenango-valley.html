@@ -5,7 +5,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>The Valley — West PA &amp; East Ohio History Gallery | Buhl Park</title>
-  <meta name="description" content="Museum-style atlas of western Pennsylvania and the Mahoning Valley edge: Buhl Park hub, steel, Amish neighbors, sports, music, Youngstown corridor history, HyperFrames reel, and AI expert David."/>
+  <meta name="description" content="Museum-style atlas of western Pennsylvania and the Mahoning Valley edge: Buhl Park hub, happening-now local events, steel, Amish neighbors, sports, music, Youngstown corridor history, HyperFrames reel, and AI expert David."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet"/>
@@ -46,6 +46,9 @@
               <button type="button" class="sv-btn sv-btn-sand" id="svStoryPlay" aria-pressed="false">
                 <i class="bi bi-film"></i> Play highlight reel
               </button>
+              <a class="sv-btn sv-btn-ghost" href="#svEvents">
+                <i class="bi bi-calendar-event"></i> <span id="svOpenEventsLabel">What’s on</span>
+              </a>
               <a class="sv-btn sv-btn-ghost" href="#svMob">
                 <i class="bi bi-building"></i> Youngstown gallery
               </a>
@@ -99,8 +102,27 @@
     <div class="container">
       <section class="sv-onboarding" aria-label="How to read this gallery">
         <p class="mb-0" id="svOnboardingHow">
-          <strong>How to read this gallery:</strong> Context = regional background. Evidence / On the ground = places and published record you can locate. Story Mode is a HyperFrames reel that walks the wall.
+          <strong>How to read this gallery:</strong> Context = regional background. Evidence / On the ground = places and published record you can locate. Happening now is a dated local calendar. Story Mode is a HyperFrames reel that walks the wall.
         </p>
+      </section>
+
+      <section class="sv-section" id="svEvents">
+        <div class="sv-section-head">
+          <h2 id="svEventsHeading">Happening now</h2>
+          <p id="svEventsLead">Dated local listings still on the 2026 calendar — Buhl Park concerts, Buhl Day, Sharon riverfront markets, Acoustic Sundays, and Rockin’ on the Rails.</p>
+          <p class="sv-context-evidence-note" id="svEventsNote"></p>
+        </div>
+        <div class="sv-map-filters sv-event-filters" id="svEventFilters" role="group" aria-label="Filter local events">
+          <button type="button" class="sv-chip is-active" data-event-filter="upcoming">All upcoming</button>
+          <button type="button" class="sv-chip" data-event-filter="now">Tonight / today</button>
+          <button type="button" class="sv-chip" data-event-filter="week">This week</button>
+          <button type="button" class="sv-chip" data-event-filter="music">Music</button>
+          <button type="button" class="sv-chip" data-event-filter="downtown">Downtown Sharon</button>
+          <button type="button" class="sv-chip" data-event-filter="park">Buhl Park</button>
+        </div>
+        <ol class="sv-event-list" id="svEventList">
+          <li class="sv-loading">Loading valley dates…</li>
+        </ol>
       </section>
 
       <section class="sv-section sv-section--map-first" id="svMap">

@@ -249,6 +249,34 @@ describe('watch-together.service', () => {
   test('theater holds up to 10 people', () => {
     expect(MAX_VIEWERS).toBe(10);
     expect(getWatchTogetherStatus().maxViewers).toBe(10);
+    expect(getWatchTogetherStatus()).toHaveProperty('egressS3Configured');
+  });
+
+  test('assertTheaterHasSeat fails closed when occupancy cannot be read', async () => {
+    const keys = ['LIVEKIT_URL', 'LIVEKIT_API_KEY', 'LIVEKIT_API_SECRET'];
+    const saved = {};
+    keys.forEach((key) => {
+      saved[key] = process.env[key];
+    });
+    process.env.LIVEKIT_URL = 'wss://example.livekit.cloud';
+    process.env.LIVEKIT_API_KEY = 'key';
+    process.env.LIVEKIT_API_SECRET = 'secret';
+    setWatchTogetherOccupancyReader(async () => {
+      throw new Error('livekit down');
+    });
+    setWatchTogetherLivekitTokenFactory(async () => 'jwt-watch');
+    try {
+      await expect(mintWatchTogetherLivekitToken({ name: 'Sam' })).rejects.toMatchObject({
+        code: 'THEATER_FULL',
+      });
+    } finally {
+      setWatchTogetherOccupancyReader(null);
+      setWatchTogetherLivekitTokenFactory(null);
+      keys.forEach((key) => {
+        if (saved[key] === undefined) delete process.env[key];
+        else process.env[key] = saved[key];
+      });
+    }
   });
 
   test('mintWatchTogetherLivekitToken throws when the theater is full', async () => {
@@ -303,6 +331,7 @@ describe('watch-together.service', () => {
     process.env.LIVEKIT_URL = 'wss://example.livekit.cloud';
     process.env.LIVEKIT_API_KEY = 'key';
     process.env.LIVEKIT_API_SECRET = 'secret';
+    setWatchTogetherOccupancyReader(() => 0);
     setWatchTogetherLivekitTokenFactory(async (opts) => {
       expect(opts.roomName).toBe('watch-together-theater');
       expect(opts.name).toBe('Karti');
@@ -314,6 +343,7 @@ describe('watch-together.service', () => {
       expect(minted.url).toBe('wss://example.livekit.cloud');
       expect(minted.roomName).toBe('watch-together-theater');
     } finally {
+      setWatchTogetherOccupancyReader(null);
       setWatchTogetherLivekitTokenFactory(null);
       keys.forEach((key) => {
         if (saved[key] === undefined) delete process.env[key];

@@ -87,7 +87,7 @@
     overlay.innerHTML =
       '<form class="wt-gate-card" id="wtGateForm">' +
       '<h2>What should we call you?</h2>' +
-      '<p>This name shows in chat, on your camera tile, and on the map. You only enter it once.</p>' +
+      '<p>Your couch goes live. They hear you. They see you. Mute anytime. This name shows in chat, on your camera, and on the map.</p>' +
       '<div class="wt-field"><label for="wtGateName">Your name</label><input id="wtGateName" name="name" autocomplete="nickname" maxlength="24" required></div>' +
       '<p class="wt-gate-error" id="wtGateError" role="alert"></p>' +
       '<div class="wt-gate-actions">' +

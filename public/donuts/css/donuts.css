@@ -1986,8 +1986,10 @@ body.gz-recipe-open {
   margin: 0 0 0.45rem;
   border: none;
   background: transparent;
-  box-shadow: none;
+  box-shadow: 0 0 0 2px rgba(255, 122, 154, 0.55), 0 8px 22px rgba(232, 90, 122, 0.28);
+  border-radius: 10px;
   overflow: visible;
+  padding: 0.2rem;
 }
 
 @media (max-width: 767.98px) {

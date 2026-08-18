@@ -10,6 +10,7 @@ import {
   mintLivekitToken,
   setLivekitTokenFactory,
   getStudioStatus,
+  STARBAND_AGENT_NAME,
 } from '../../services/studio.service.js';
 
 describe('studio.service', () => {
@@ -84,11 +85,41 @@ describe('studio.service', () => {
     expect(minted.token).toBe('jwt-test');
     expect(minted.url).toBe('wss://example.livekit.cloud');
     expect(minted.roomName).toBe('studio-ABC123');
+    expect(minted.agentName).toBeNull();
+  });
+
+  test('mintLivekitToken does not dispatch StarBand by default', async () => {
+    process.env.LIVEKIT_URL = 'wss://example.livekit.cloud';
+    process.env.LIVEKIT_API_KEY = 'key';
+    process.env.LIVEKIT_API_SECRET = 'secret';
+    setLivekitTokenFactory(async (opts) => {
+      expect(opts.agentName).toBeNull();
+      return 'jwt-quiet';
+    });
+    const minted = await mintLivekitToken({ reelCode: 'ABC123', name: 'Ada' });
+    expect(minted.agentName).toBeNull();
+  });
+
+  test('mintLivekitToken dispatches StarBand when inviteVoice is true', async () => {
+    process.env.LIVEKIT_URL = 'wss://example.livekit.cloud';
+    process.env.LIVEKIT_API_KEY = 'key';
+    process.env.LIVEKIT_API_SECRET = 'secret';
+    setLivekitTokenFactory(async (opts) => {
+      expect(opts.agentName).toBe(STARBAND_AGENT_NAME);
+      return 'jwt-voice';
+    });
+    const minted = await mintLivekitToken({
+      reelCode: 'ABC123',
+      name: 'Ada',
+      inviteVoice: true,
+    });
+    expect(minted.agentName).toBe(STARBAND_AGENT_NAME);
   });
 
   test('getStudioStatus reports livekit flag', () => {
     delete process.env.LIVEKIT_URL;
     expect(getStudioStatus().ok).toBe(true);
     expect(getStudioStatus().livekitConfigured).toBe(false);
+    expect(getStudioStatus().voiceAgentDispatchDefault).toBe(false);
   });
 });

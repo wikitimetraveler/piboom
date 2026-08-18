@@ -27,7 +27,7 @@ function buildSystemPrompt() {
 - Music input is on by default. Echo cancellation, noise suppression, auto-gain, and the browser high-pass stay off so the acoustic is not chewed up.
 - Acoustic desk is on by default: neck/body EQ, light compression, and a small wood-room reverb on play and bounce. Players should use headphones so speakers do not leak into the mics.
 - Takes are recorded as PCM in the tab, not Opus. Stacking Body while Neck plays is an overdub — the live mic is not routed to speakers.
-- Mixing and WAV bounce happen client-side in the tab (Web Audio). Nothing is rendered on a server.
+- Autotune is voice only (Vocal and Harmony). Acoustic guitar never gets pitch correction. Default is chromatic hard retune on those two lanes.
 - Bounces are WAV. Indexed in the listening room behind one password (default reel1, override STUDIO_LISTEN_PASSWORD).
 - Socket.IO namespace /studio is the control plane: who is in the reel, transport (play/record), take-filed, booth chat.
 - LiveKit is the media plane: microphone talkback or music input, camera, and screen share of the desk. Reed the StarBand agent can join the same room.
@@ -59,6 +59,9 @@ export function groundedReply(message) {
   }
   if (q.includes('guitar') || q.includes('acoustic')) {
     return 'Two acoustic guitar tracks are already on the desk. Neck is the twelfth-fret mic, panned a little left and brighter. Body is the soundhole mic, panned a little right and warmer. Takes are PCM, not Opus. Acoustic desk adds neck/body EQ and a small wood room. Headphones on. Arm Neck first, then stack Body.';
+  }
+  if (q.includes('autotune') || q.includes('auto tune') || q.includes('auto-tune') || q.includes('pitch')) {
+    return 'Autotune is on your voice only — Vocal and Harmony. Guitar stays dry. Chromatic hard retune is the default. Pick a key if you want it to snap to a scale. Uncheck Autotune on the voice lane to hear the dry take.';
   }
   if (q.includes('record') || q.includes('mic') || q.includes('arm')) {
     return 'Add a track, arm it, pick music input if you are tracking a performance. Hit record. The waveform draws on the timeline. Remote friends file takes over LiveKit; the bounce still renders here.';

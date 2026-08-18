@@ -22,10 +22,20 @@
       <div class="wt-marquee">
         <p class="wt-kicker">Palace theater</p>
         <h1 class="wt-brand">Watch <span>together.</span></h1>
+        <div class="wt-marquee-bulbs" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+      <div class="wt-lk-status" id="wtLkStatus" aria-live="polite">
+        <span class="wt-hear-chip" id="wtHearChip" data-state="typed" hidden>Typed only</span>
+        <span class="wt-lk-chip" id="wtLkChip" data-state="unset">Unset</span>
+        <span class="wt-status" id="wtStatus"></span>
       </div>
       <div class="wt-viewers" id="wtViewers" aria-label="People in the theater"></div>
+      <button class="wt-ghost" id="wtChangeReel" type="button" hidden>Change reel</button>
     </header>
 
+    <div class="wt-ticket" id="wtTicket">
     <div class="wt-load">
       <input id="wtUrl" type="text" inputmode="url" placeholder="Paste a YouTube link or a video URL" autocomplete="off">
       <button class="wt-enter" id="wtLoad" type="button">Load</button>
@@ -44,10 +54,16 @@
       <p class="wt-pick-artist" id="wtPickArtist" hidden></p>
       <div class="wt-picker-grid" id="wtPickGrid"></div>
     </div>
+    </div>
 
     <div class="wt-stage-grid">
       <div class="wt-stage-main">
         <div class="wt-player-shell wt-proscenium">
+          <span class="wt-valance" aria-hidden="true"></span>
+          <span class="wt-chevron wt-chevron--tl" aria-hidden="true"></span>
+          <span class="wt-chevron wt-chevron--tr" aria-hidden="true"></span>
+          <span class="wt-chevron wt-chevron--bl" aria-hidden="true"></span>
+          <span class="wt-chevron wt-chevron--br" aria-hidden="true"></span>
           <img id="wtPoster" class="wt-poster" alt="" hidden decoding="async">
           <div id="wtYt" class="yt" hidden></div>
           <video id="wtFile" hidden playsinline controls></video>
@@ -61,30 +77,32 @@
           <button class="wt-icon-btn" id="wtPlay" type="button" aria-label="Play or pause">▶</button>
           <input class="wt-seek" id="wtSeek" type="range" min="0" max="7200" value="0" aria-label="Seek">
           <label class="wt-status" for="wtVolume">Vol</label>
+          <span class="wt-chip wt-vol-yours">yours</span>
           <input class="wt-volume" id="wtVolume" type="range" min="0" max="100" value="80" aria-label="Your volume (never synced)">
           <button class="wt-ghost" id="wtFill" type="button" aria-pressed="false">Fill screen</button>
-          <button class="wt-ghost" id="wtCinema" type="button" aria-pressed="true">Exit chat left</button>
+          <button class="wt-ghost" id="wtCinema" type="button" aria-pressed="true">Hide aisle</button>
           <button class="wt-icon-btn" id="wtDrawBtn" type="button" aria-pressed="false" aria-label="Draw">✎</button>
           <button class="wt-ghost" id="wtClearDraw" type="button">Clear draw</button>
-          <button class="wt-ghost" id="wtMic" type="button" aria-pressed="false" hidden aria-label="Let the other couches hear you">Mic</button>
-          <button class="wt-ghost" id="wtCam" type="button" aria-pressed="false" hidden>Cam</button>
-          <button class="wt-ghost" id="wtBlur" type="button" aria-pressed="true" hidden aria-label="Blur camera background">Blur on</button>
-          <button class="wt-ghost" id="wtRecord" type="button" aria-pressed="false" hidden aria-label="Record the couches">Record</button>
-          <button class="wt-ghost" id="wtArchive" type="button" aria-pressed="false" hidden aria-label="Archive couch mics on the server">Archive mics</button>
-          <span class="wt-status" id="wtStatus"></span>
+          <p class="wt-kbd-hint">F fill · C aisle</p>
+        </div>
+        <div class="wt-booth" id="wtBooth" hidden>
+          <button class="wt-ghost" id="wtCam" type="button" aria-pressed="false">Cam</button>
+          <button class="wt-ghost" id="wtBlur" type="button" aria-pressed="true" aria-label="Blur camera background">Blur on</button>
+          <button class="wt-enter" id="wtChatMic" type="button" aria-pressed="false" hidden aria-label="Let the other couches hear you">Talk</button>
+          <button class="wt-ghost" id="wtRecord" type="button" aria-pressed="false" hidden aria-label="Record this-tab couch mix">Record couches</button>
+          <button class="wt-ghost" id="wtArchive" type="button" aria-pressed="false" hidden disabled title="Archive needs S3 dest (LIVEKIT_EGRESS_S3_*). Use Record couches for a local mix." aria-label="Archive couch mics on the server">Archive mics</button>
         </div>
       </div>
 
       <aside class="wt-side">
         <section class="wt-faces" id="wtFaces" aria-label="See each other">
-          <p class="wt-faces-empty" id="wtFacesEmpty">Cameras land here so the couches can see each other.</p>
+          <p class="wt-faces-empty" id="wtFacesEmpty">Couches appear here.</p>
         </section>
         <section class="wt-chat">
           <div class="wt-chat-head">
             <h2>Chat</h2>
-            <button class="wt-enter" id="wtChatMic" type="button" aria-pressed="false" hidden aria-label="Let the other couches hear you">Talk</button>
           </div>
-          <p class="wt-chat-hint">Talk so they can hear you. Chat is text only — it is not read aloud.</p>
+          <p class="wt-chat-hint" id="wtChatHint">Talk in the booth is live voice. Type to send a line.</p>
           <div class="wt-log" id="wtLog"></div>
           <form id="wtChatForm">
             <input id="wtChatText" maxlength="280" placeholder="Type a line" autocomplete="off">

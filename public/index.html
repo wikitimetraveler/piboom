@@ -43,24 +43,29 @@
     <canvas id="heroCanvas" class="fun-hero__canvas" aria-hidden="true"></canvas>
     <div class="fun-hero__shader" id="shaderBg" aria-hidden="true"></div>
     <div class="fun-hero__veil" aria-hidden="true"></div>
+    <div class="fun-hero__orb" aria-hidden="true"></div>
 
     <div class="fun-hero__content">
       <p class="fun-hero__kicker">Creative projects</p>
       <h1 class="fun-hero__title" id="funHeroTitle">
         <span class="fun-hero__brand">David Lane</span>
-        <span class="fun-hero__title-line">Explore</span>
-        <span class="fun-hero__title-line">Discover</span>
-        <span class="fun-hero__title-line">Create</span>
+        <span class="fun-hero__tagline" aria-hidden="false">
+          <span class="fun-hero__title-line">Explore</span>
+          <span class="fun-hero__title-sep" aria-hidden="true">·</span>
+          <span class="fun-hero__title-line">Discover</span>
+          <span class="fun-hero__title-sep" aria-hidden="true">·</span>
+          <span class="fun-hero__title-line">Create</span>
+        </span>
       </h1>
 
       <p class="fun-hero__lead">
-        Tools built with curiosity and craft — Studio, Music, Nature, The Valley, Family, Glazed, Middle East atlases, and AI video.
+        Studio, Music, Nature, Family, Glazed, Middle East atlases, and AI video — built with curiosity and craft.
       </p>
 
       <div class="fun-hero__cta">
         <div class="fun-hero__cta-row fun-hero__cta-row--projects">
           <a class="fun-btn fun-btn--primary" href="#projects">
-            Projects
+            Browse projects
             <i class="bi bi-arrow-down" aria-hidden="true"></i>
           </a>
         </div>
@@ -105,10 +110,18 @@
         </div>
       </div>
     </div>
+
+    <a class="fun-hero__scroll-cue" href="#projects" aria-label="Scroll to projects">
+      <span class="fun-hero__scroll-cue-dot" aria-hidden="true"></span>
+    </a>
   </section>
 
-  <section class="fun-projects" id="projects">
-
+  <section class="fun-projects" id="projects" aria-labelledby="funProjectsTitle">
+    <header class="fun-projects__intro">
+      <p class="fun-projects__kicker">Start exploring</p>
+      <h2 class="fun-projects__title" id="funProjectsTitle">Projects</h2>
+      <p class="fun-projects__lead">Pick a world — each door opens a full experience.</p>
+    </header>
     <article class="fun-card fun-card--studio" data-project="studio">
       <div class="fun-card__icon">
         <i class="bi bi-cassette"></i>
@@ -235,7 +248,7 @@
       </div>
       <h2 class="fun-card__title">The Valley</h2>
       <p class="fun-card__desc">
-        Museum-style West PA &amp; East Ohio gallery — Buhl Park hub, HyperFrames reel, Youngstown corridor, AI expert David.
+        Museum-style West PA &amp; East Ohio gallery — Buhl Park hub, happening-now events, HyperFrames reel, Youngstown corridor, AI expert David.
       </p>
       <div class="fun-card__links">
         <a href="/nature/shenango-valley.html" class="fun-card__link fun-card__link--primary">
@@ -247,6 +260,10 @@
           <a href="/nature/shenango-valley.html#svMap" class="fun-card__link">
             <span>Buhl Park map</span>
             <i class="bi bi-map"></i>
+          </a>
+          <a href="/nature/shenango-valley.html?events=1" class="fun-card__link">
+            <span>Happening now</span>
+            <i class="bi bi-calendar-event"></i>
           </a>
           <a href="/nature/shenango-valley.html?reel=1" class="fun-card__link">
             <span>HyperFrames reel</span>

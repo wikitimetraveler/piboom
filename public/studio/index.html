@@ -8,7 +8,7 @@
   <meta name="description" content="StarBand music studio: record, stack, mix, and bounce in the tab. LiveKit voice, video, and screen share. One password listening room."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Cinzel+Decorative:wght@700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
   <link rel="stylesheet" href="/shared/design-tokens.css"/>
   <link rel="stylesheet" href="/studio/css/studio.css"/>
@@ -19,19 +19,16 @@
   <script src="/shared/dark-mode.js" defer></script>
 </head>
 <body class="st-page encompass-dark-mode">
+  <div class="st-glow" aria-hidden="true"></div>
+  <div class="st-scanlines" aria-hidden="true"></div>
   <modern-navbar></modern-navbar>
   <main class="st-main">
     <section class="st-hero" aria-labelledby="stHeroTitle">
       <div>
-        <p class="st-kicker">StarBand · Music studio</p>
-        <h1 class="st-title" id="stHeroTitle">
-          <span>A pro studio</span>
-          <span>in your</span>
-          <span>browser tab.</span>
-        </h1>
+        <p class="st-kicker">Palace studio</p>
+        <h1 class="st-wordmark" id="stHeroTitle">StarBand</h1>
         <p class="st-lead">
-          Record straight onto a timeline. Stack takes. Mix with faders. Bounce a WAV.
-          No plugins to install, no session to upload — the whole desk runs in the tab.
+          A pro studio in your browser tab. Record straight onto a timeline. Stack takes. Mix with faders. Bounce a WAV.
           LiveKit carries voice, video, and screen share. Socket.IO keeps the reel in sync.
         </p>
         <div class="st-cta">
@@ -96,6 +93,7 @@
         <span class="st-chip" data-cap="socket">Socket.IO control</span>
         <span class="st-chip" data-cap="livekit">LiveKit A/V</span>
         <span class="st-chip" data-cap="openai">Reed engineer</span>
+        <span class="st-chip" data-cap="egress">Archive S3</span>
         <span class="st-chip">Client-side bounce</span>
       </div>
     </section>

@@ -48,6 +48,7 @@
     { href: '/finance/encompass-native-fields.html', icon: 'bi-list-columns', label: 'Native Fields' },
     { href: '/finance/encompass-custom-fields.html', icon: 'bi-sliders', label: 'Custom Fields' },
     { href: '/finance/condition-manager.html', icon: 'bi-clipboard-check', label: 'Condition Manager' },
+    { href: '/finance/enhanced-conditions.html', icon: 'bi-ui-checks-grid', label: 'Enhanced Conditions' },
     { href: '/finance/enhanced-conditions-expert.html', icon: 'bi-journal-richtext', label: 'EC Expert' },
     { href: '/finance/tpo-connect.html', icon: 'bi-people', label: 'TPO Connect' },
     { href: '/finance/encompass-hub-test.html', icon: 'bi-plug', label: 'Test Endpoints' },
@@ -119,7 +120,7 @@
     { href: '/iraq/', icon: 'bi-globe-central-south-asia', label: 'Iraq', title: 'Iraq — bilingual history, food, music, café and living culture atlas with Zayd (no login)' },
     { href: '/lebanon/', icon: 'bi-globe-central-south-asia', label: 'Lebanon', title: 'Lebanon — bilingual history, food, music, café and living culture atlas with Karim (no login)' },
     { href: '/egypt/', icon: 'bi-globe-central-south-asia', label: 'Egypt', title: 'Egypt — bilingual history, food, music, café and living culture atlas with Omar (no login)' },
-    { href: '/nature/shenango-valley.html', icon: 'bi-geo-alt', label: 'The Valley', title: 'West PA & East Ohio history gallery — Buhl Park hub, HyperFrames reel, Youngstown corridor, AI expert David' },
+    { href: '/nature/shenango-valley.html', icon: 'bi-geo-alt', label: 'The Valley', title: 'West PA & East Ohio history gallery — Buhl Park hub, happening-now events, HyperFrames reel, Youngstown corridor, AI expert David' },
     { href: '/gse-analyzer.html', icon: 'bi-graph-up-arrow', label: 'GSE scenario analyzer' },
     { href: '/bike-store-home.html', icon: 'bi-bicycle', label: 'Bike Store' },
     { href: '/ai/voice-dj.html', icon: 'bi-mic', label: 'Wolfman Dave' },
@@ -174,6 +175,7 @@
     { href: '/finance/encompass-native-fields.html', icon: 'bi-list-columns', label: 'Native Fields', title: 'Native Loan Fields' },
     { href: '/finance/encompass-custom-fields.html', icon: 'bi-sliders', label: 'Custom Fields', title: 'Custom Loan Fields' },
     { href: '/finance/condition-manager.html', icon: 'bi-clipboard-check', label: 'Condition Manager', title: 'Convert the legacy Conditions CDO into Enhanced Conditions' },
+    { href: '/finance/enhanced-conditions.html', icon: 'bi-ui-checks-grid', label: 'Enhanced Conditions', title: 'Live Enhanced Conditions CRUD — types, templates, loan conditions' },
     { href: '/finance/enhanced-conditions-expert.html', icon: 'bi-journal-richtext', label: 'EC Expert', title: 'Enhanced Conditions AI expert — APIs, personas, handoff pack' },
     { href: '/finance/tpo-connect.html', icon: 'bi-people', label: 'TPO Connect', title: 'TPO Connect — guest apps, SSF objects, LoanContractTPO fields' },
     { href: '/finance/encompass-hub-test.html', icon: 'bi-plug', label: 'Test Endpoints', title: 'Test API endpoints' },
@@ -245,7 +247,7 @@
     { href: '/nature/rock-discovery.html', icon: 'bi-gem', label: 'Rocky The Rock Star', title: 'Rubies, gems & meteorites — Rocky The Rock Star' },
     { href: '/nature/rock-collection.html', icon: 'bi-circle', label: 'Rock Collection', title: 'Your rock specimens' },
     { href: '/nature/share-collection.html', icon: 'bi-share', label: 'Share Collection', title: 'Share your collection' },
-    { href: '/nature/shenango-valley.html', icon: 'bi-geo-alt', label: 'The Valley', title: 'West PA & East Ohio gallery — HyperFrames, Youngstown mob history, AI expert' },
+    { href: '/nature/shenango-valley.html', icon: 'bi-geo-alt', label: 'The Valley', title: 'West PA & East Ohio gallery — happening-now events, HyperFrames, Youngstown mob history, AI expert' },
   ];
 
   /** Bike hub tool grid */

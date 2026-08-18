@@ -29,6 +29,10 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | POST | `/api/encompass-hub/update-fields` | Update custom fields (tool4 JSON payload for Modify rows) |
 | POST | `/api/encompass-hub/automator/parse-field-image` | Parse field-definition rows from image via vision API (`{ imageData }`) |
 | POST | `/api/encompass-hub/loan-batch/update-requests` | Proxy to Encompass `POST …/loanBatch/updateRequests` (body: loanIds + loanData or filter + loanData) |
+| GET | `/api/encompass-conditions/catalog` | Allowlisted Enhanced Conditions ICE operations (types, templates, sets, loan conditions, personas) |
+| POST | `/api/encompass-conditions/invoke` | Invoke a catalog operation; PATCH `?action=add\|update\|delete` for types/templates/loan conditions |
+| * | `/api/encompass-conditions/types`, `/templates`, `/sets`, `/personas`, `/loans/:loanId/conditions` | REST CRUD aliases; convert + expert remain under the same mount |
+| POST | `/api/encompass-conditions/convert` | Dry-run CDO → Enhanced Conditions payload conversion |
 | * | `/api/encompass/*` | Encompass Assistant (search, chat, summary) |
 | POST | `/api/webhooks/encompass` | Encompass webhook receiver |
 | POST | `/api/reviewer/ai/chat` | The Screen Test AI |
@@ -200,6 +204,7 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | Route file | Mount path |
 |------------|------------|
 | `routes/encompass-hub.routes.js` | `/api/encompass-hub` |
+| `routes/encompass-conditions.routes.js` | `/api/encompass-conditions` |
 | `routes/encompass-assistant.routes.js` | `/api/encompass` |
 | `routes/encompass-webhook.routes.js` | `/api/webhooks` |
 | `routes/reviewer.routes.js` | `/api/reviewer` |

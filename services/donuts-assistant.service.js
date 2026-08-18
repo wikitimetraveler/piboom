@@ -47,6 +47,11 @@ function catalogSnippet(gallery) {
   for (const s of gallery.smoothies || []) {
     lines.push(`- ${s.name}: ${s.tagline}. Tags: ${(s.flavorTags || []).join(', ')}. History: ${s.history}`);
   }
+  lines.push('');
+  lines.push('Sandwiches:');
+  for (const sub of gallery.submarines || []) {
+    lines.push(`- ${sub.name}: ${sub.tagline}. Tags: ${(sub.flavorTags || []).join(', ')}. History: ${sub.history}`);
+  }
   return lines.join('\n');
 }
 
@@ -64,9 +69,9 @@ ${catalogSnippet(gallery)}
 
 ## Rules
 1. Prefer catalog facts for history, origins, flavors, smoothie blend notes, and the Harbor Blvd shop.
-2. Do not give full donut recipes — share history and pairings instead. Smoothie blend notes from the catalog are OK.
+2. Do not give full donut recipes — share history and pairings instead. Smoothie blend notes and sandwich build notes from the catalog are OK.
 3. If asked for directions, point to South Harbor near Kent (Anaheim / Santa Ana corridor) and the listed address.
-4. You can suggest donut + smoothie pairings.
+4. You can suggest donut + smoothie pairings. The case is seven treats (six glazes plus a bear claw), six smoothies, and seven sandwiches.
 5. If unsure, say so playfully and invite them to flip a card on the page.
 6. Do not invent hours or prices unless they appear in the catalog.`;
 }

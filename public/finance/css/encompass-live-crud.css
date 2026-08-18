@@ -1,0 +1,128 @@
+/**
+ * Development work by David Lane
+ * Shared live ICE CRUD console for TPO Connect and Enhanced Conditions.
+ */
+.live-crud {
+  background: color-mix(in srgb, #fff 94%, var(--zen-surface, #eef3f7));
+  border: 1px solid color-mix(in srgb, var(--zen-border, #c9d5d8) 70%, #c9d5d8);
+  border-radius: 18px;
+  box-shadow: 0 10px 28px rgba(26, 58, 74, 0.07);
+  padding: 1.2rem 1.35rem 1.35rem;
+  margin-bottom: 1.1rem;
+}
+
+.live-crud h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.live-crud-lead {
+  color: color-mix(in srgb, #1a2f4a 62%, transparent);
+  font-size: 0.92rem;
+  margin-bottom: 0.85rem;
+}
+
+.live-crud-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: end;
+  margin-bottom: 0.85rem;
+}
+
+.live-crud-toolbar label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #3d6a82;
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.live-crud-warn {
+  background: rgba(196, 92, 38, 0.1);
+  border: 1px solid rgba(196, 92, 38, 0.28);
+  color: #7a3a16;
+  border-radius: 12px;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.86rem;
+  margin-bottom: 0.85rem;
+}
+
+.live-crud-method {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.12rem 0.4rem;
+  border-radius: 6px;
+  background: #e8eef2;
+}
+
+.live-crud-method.get { background: #d7eee0; color: #146c43; }
+.live-crud-method.post { background: #d9e7fb; color: #1d4f91; }
+.live-crud-method.patch,
+.live-crud-method.put { background: #f8e7c8; color: #8a5a12; }
+.live-crud-method.delete { background: #f8d6d2; color: #8a2218; }
+
+.live-crud-path {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  word-break: break-all;
+}
+
+.live-crud-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.live-crud textarea {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  min-height: 140px;
+}
+
+.live-crud-table-wrap {
+  overflow: auto;
+  max-height: 320px;
+  border: 1px solid #d7e0e6;
+  border-radius: 12px;
+}
+
+.live-crud-table-wrap table {
+  margin: 0;
+  font-size: 0.84rem;
+}
+
+.live-crud-table-wrap tbody tr {
+  cursor: pointer;
+}
+
+.live-crud-table-wrap tbody tr:hover,
+.live-crud-table-wrap tbody tr.is-selected {
+  background: rgba(31, 95, 139, 0.08);
+}
+
+.live-crud-result {
+  background: #0f1c28;
+  color: #e8f0f5;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  font-size: 0.8rem;
+  max-height: 280px;
+  overflow: auto;
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+.live-crud-status {
+  font-size: 0.82rem;
+  color: #4a6573;
+}
+
+.live-crud-status.err { color: #b4533a; }
+.live-crud-status.ok { color: #2f8f5b; }

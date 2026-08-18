@@ -62,7 +62,14 @@ function factSheet(content) {
     }
   }
 
+  lines.push('', '### Happening now — dated 2026 local listings');
+  for (const ev of content.events || []) {
     lines.push(
+      `- ${ev.start || ''} ${pickEn(ev.title)} @ ${pickEn(ev.place)} [${ev.series || ev.category || ''}]: ${pickEn(ev.copy)} Source: ${ev.sourceName || ev.source || ''}`
+    );
+  }
+
+  lines.push(
     '',
     '### Geography & museum notes',
     '- Map hub is Buhl Farm Park, Hermitage / Shenango Valley, PA — deeded 1 Nov 1915 to F.H. Buhl Trustees for $1 + endowment; free nine-hole golf; Lake Julia; Casino; ~270 acres.',
@@ -90,7 +97,7 @@ function buildSystemPrompt(content) {
 - Hospitality first: greet a first question, and offer one natural follow-up thread at the end.
 
 ## Expertise scope
-- Western Pennsylvania: Shenango Valley steel (Sharon, Farrell, Sharpsville), Buhl philanthropy, New Wilmington / Volant Amish geography, Sharon–Farrell sports, Lettermen / Butala, Mercer County music (Reznor), WPIC / local music institutions, valley food landmarks.
+- Western Pennsylvania: Shenango Valley steel (Sharon, Farrell, Sharpsville), Buhl philanthropy, New Wilmington / Volant Amish geography, Sharon–Farrell sports, Lettermen / Butala, Mercer County music (Reznor), WPIC / local music institutions, valley food landmarks, and the Happening now calendar of dated 2026 public events (Buhl concerts, Buhl Day, Sharon River Market, Acoustic Sundays, Rockin’ on the Rails).
 - Eastern Ohio: Youngstown and the Mahoning Valley industrial belt, Cedars Lounge / Cedars West End and the Tomorrow Club / Youngstown Agora (State Theater) downtown music lineage, cross-border labor markets, and the public history of organized crime — especially the 1970s Cleveland–Pittsburgh war over Valley rackets — as Context and Evidence, not spectacle.
 - You may add well-established regional geography (Pittsburgh orbit, Cleveland family histories as published secondary sources, canal / steel corridor) when it helps the visitor, and say plainly when uncertain.
 
@@ -103,7 +110,7 @@ ${factSheet(content)}
 ## Rules
 1. Prefer the facts above. They are what the visitor is looking at on screen.
 2. For Youngstown / mob questions: stay scholastic. Distinguish media nicknames (for example “Crimetown”) from proven court history. Do not invent names of living private individuals, home addresses, or unverified “who ran what” folklore.
-3. Do not invent prices, opening hours, phone numbers, or private addresses. If unsure, say so.
+3. Do not invent prices, opening hours, phone numbers, or private addresses. If unsure, say so. For “what’s on tonight / this week,” use only the Happening now listings and tell the visitor to confirm on the official page (weather can cancel a park night).
 4. Be respectful about Amish neighbors — describe community geography and etiquette, never treat people as tourist props.
 5. When a place is mentioned, name the town (Hermitage, Sharon, Farrell, New Wilmington, Mercer, Youngstown, West Middlesex / Masury) so the visitor can find it on the map.
 6. Distinguish Sharon (Lettermen / Butala) from Mercer borough (Reznor) — same county, different towns.
@@ -171,7 +178,8 @@ export async function getShenangoSummary() {
     siteCount: (content.sites || []).length,
     mobCount: (content.mob || []).length,
     foodCount: (content.foods || []).length,
-    livingCount: (content.living || []).length
+    livingCount: (content.living || []).length,
+    eventCount: (content.events || []).length
   };
 }
 

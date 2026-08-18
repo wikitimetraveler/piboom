@@ -4,8 +4,11 @@
 import { verifyWatchTogetherAccess } from '../lib/watch-together-auth.js';
 import {
   getLivekitConfig,
+  getLivekitStatusExtras,
   listRoomParticipantCount,
+  livekitIdentity,
   mintLivekitAccessToken,
+  occupancyUnavailableError,
   startAudioOnlyRoomEgress,
   stopLivekitEgress,
 } from './livekit.service.js';
@@ -414,7 +417,7 @@ export function getWatchTogetherSnapshot() {
 export function getWatchTogetherStatus() {
   return {
     ok: true,
-    livekitConfigured: getLivekitConfig().configured,
+    ...getLivekitStatusExtras(),
     livekitRoom: LIVEKIT_ROOM_NAME,
     maxViewers: MAX_VIEWERS,
   };
@@ -425,27 +428,39 @@ async function countLivekitParticipants() {
 }
 
 export async function getTheaterOccupancy() {
-  if (occupancyReader) return Math.max(0, Number(await occupancyReader()) || 0);
+  if (occupancyReader) {
+    try {
+      const n = Number(await occupancyReader());
+      if (!Number.isFinite(n)) throw occupancyUnavailableError();
+      return Math.max(0, n);
+    } catch (err) {
+      if (err?.code === 'LIVEKIT_OCCUPANCY_UNAVAILABLE') throw err;
+      throw occupancyUnavailableError();
+    }
+  }
   const live = await countLivekitParticipants();
   return live + socketViewers.size;
 }
 
-export async function assertTheaterHasSeat() {
-  const occupied = await getTheaterOccupancy();
-  if (occupied >= MAX_VIEWERS) {
-    const err = new Error('THEATER_FULL');
-    err.code = 'THEATER_FULL';
-    err.max = MAX_VIEWERS;
-    throw err;
-  }
+function theaterFullError() {
+  const err = new Error('THEATER_FULL');
+  err.code = 'THEATER_FULL';
+  err.max = MAX_VIEWERS;
+  return err;
 }
 
-export function livekitIdentity(name, userId) {
-  const base = String(userId || name || 'guest')
-    .replace(/[^\w.-]/g, '-')
-    .slice(0, 48);
-  return `${base}-${Date.now().toString(36)}`.slice(0, 64);
+export async function assertTheaterHasSeat() {
+  let occupied;
+  try {
+    occupied = await getTheaterOccupancy();
+  } catch (err) {
+    if (err?.code === 'LIVEKIT_OCCUPANCY_UNAVAILABLE') throw theaterFullError();
+    throw err;
+  }
+  if (occupied >= MAX_VIEWERS) throw theaterFullError();
 }
+
+export { livekitIdentity };
 
 export async function mintWatchTogetherLivekitToken({ identity, name, userId } = {}) {
   const config = getLivekitConfig();

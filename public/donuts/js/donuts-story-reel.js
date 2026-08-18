@@ -49,10 +49,10 @@
       },
       {
         id: 'dozen',
-        kicker: 'Baker’s dozen',
+        kicker: 'The case',
         title: 'Today’s case',
-        copy: 'Flip any donut for history and where it began.',
-        narration: 'Here’s the baker’s dozen. Flip a card for the history and where that style began.',
+        copy: 'Six glazes plus a bear claw.',
+        narration: 'Seven in the case: classic, coconut, cinnamon, chocolate, buttermilk, maple, and a bear claw. Flip a card for the history.',
         anchor: 'gzCase',
         spotlight: '#gzGrid .gz-card',
         action: 'flipFirstDonut',
@@ -62,11 +62,21 @@
         id: 'smoothies',
         kicker: 'Cold cups',
         title: 'Smoothie board',
-        copy: 'Pair a donut with something icy from the Savy counter energy.',
-        narration: 'And the smoothie board — cold cups ready to pair with a warm glaze.',
+        copy: 'Six cold cups from the Savy counter.',
+        narration: 'Six smoothies on the board — cold cups ready to pair with a warm glaze.',
         anchor: 'gzSmoothies',
         spotlight: '#gzSmoothieGrid .gz-card',
         action: 'unflipCards',
+        durationMs: 5000
+      },
+      {
+        id: 'subs',
+        kicker: 'Deli',
+        title: 'Seven sandwiches',
+        copy: 'Hot and cold subs from the Harbor deli.',
+        narration: 'Seven sandwiches from the deli — Italian through chicken bacon ranch. Flip for the build.',
+        anchor: 'gzSubmarines',
+        spotlight: '#gzSubmarineGrid .gz-card',
         durationMs: 5000
       },
       {

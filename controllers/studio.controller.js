@@ -59,6 +59,7 @@ export async function postLivekitToken(req, res) {
       identity: req.body?.identity,
       name,
       canPublish,
+      inviteVoice: req.body?.inviteVoice === true,
     });
     res.json({ ok: true, ...minted });
   } catch (error) {
@@ -77,7 +78,11 @@ export async function postStudioAudioEgress(req, res) {
     const started = await startStudioAudioEgress(reelCode);
     res.json({ ok: true, ...started });
   } catch (error) {
-    const status = error.code === 'LIVEKIT_NOT_CONFIGURED' ? 503 : 500;
+    const status = error.code === 'LIVEKIT_NOT_CONFIGURED'
+      ? 503
+      : error.code === 'LIVEKIT_EGRESS_DEST_REQUIRED'
+        ? 400
+        : 500;
     res.status(status).json({ ok: false, error: error.code || error.message });
   }
 }

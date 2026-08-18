@@ -3,9 +3,12 @@
  */
 import {
   getLivekitConfig,
+  getLivekitStatusExtras,
+  listRoomParticipantCount,
   mintLivekitAccessToken,
   setLivekitTokenFactory,
   setLivekitEgressClientFactory,
+  setLivekitOccupancyFactory,
   startAudioOnlyRoomEgress,
   stopLivekitEgress,
   sanitizeParticipantName,
@@ -14,7 +17,15 @@ import {
 } from '../../services/livekit.service.js';
 
 describe('livekit.service', () => {
-  const keys = ['LIVEKIT_URL', 'LIVEKIT_API_KEY', 'LIVEKIT_API_SECRET'];
+  const keys = [
+    'LIVEKIT_URL',
+    'LIVEKIT_API_KEY',
+    'LIVEKIT_API_SECRET',
+    'LIVEKIT_EGRESS_S3_BUCKET',
+    'LIVEKIT_EGRESS_S3_ACCESS_KEY',
+    'LIVEKIT_EGRESS_S3_SECRET',
+    'LIVEKIT_EGRESS_S3_REGION',
+  ];
   const saved = {};
 
   beforeEach(() => {
@@ -23,6 +34,7 @@ describe('livekit.service', () => {
     });
     setLivekitTokenFactory(null);
     setLivekitEgressClientFactory(null);
+    setLivekitOccupancyFactory(null);
   });
 
   afterEach(() => {
@@ -32,6 +44,7 @@ describe('livekit.service', () => {
     });
     setLivekitTokenFactory(null);
     setLivekitEgressClientFactory(null);
+    setLivekitOccupancyFactory(null);
   });
 
   test('getLivekitConfig requires url key and secret', () => {
@@ -93,10 +106,26 @@ describe('livekit.service', () => {
     expect(STARBAND_AGENT_NAME).toBe('StarBand');
   });
 
-  test('startAudioOnlyRoomEgress uses injected egress client', async () => {
+  test('startAudioOnlyRoomEgress refuses when S3 dest is missing', async () => {
     process.env.LIVEKIT_URL = 'wss://example.livekit.cloud';
     process.env.LIVEKIT_API_KEY = 'key';
     process.env.LIVEKIT_API_SECRET = 'secret';
+    delete process.env.LIVEKIT_EGRESS_S3_BUCKET;
+    delete process.env.LIVEKIT_EGRESS_S3_ACCESS_KEY;
+    delete process.env.LIVEKIT_EGRESS_S3_SECRET;
+    await expect(startAudioOnlyRoomEgress({ roomName: 'studio-ABC' })).rejects.toMatchObject({
+      code: 'LIVEKIT_EGRESS_DEST_REQUIRED',
+    });
+  });
+
+  test('startAudioOnlyRoomEgress uses injected egress client when S3 is set', async () => {
+    process.env.LIVEKIT_URL = 'wss://example.livekit.cloud';
+    process.env.LIVEKIT_API_KEY = 'key';
+    process.env.LIVEKIT_API_SECRET = 'secret';
+    process.env.LIVEKIT_EGRESS_S3_BUCKET = 'lk-audio';
+    process.env.LIVEKIT_EGRESS_S3_ACCESS_KEY = 'ak';
+    process.env.LIVEKIT_EGRESS_S3_SECRET = 'sk';
+    process.env.LIVEKIT_EGRESS_S3_REGION = 'us-east-1';
     setLivekitEgressClientFactory(async () => ({
       startRoomCompositeEgress: async (room, _out, opts) => {
         expect(room).toBe('studio-ABC');
@@ -107,6 +136,30 @@ describe('livekit.service', () => {
     const started = await startAudioOnlyRoomEgress({ roomName: 'studio-ABC' });
     expect(started.egressId).toBe('EG_1');
     expect(started.audioOnly).toBe(true);
+    expect(started.s3Configured).toBe(true);
+  });
+
+  test('getLivekitStatusExtras reports egress S3 flag', () => {
+    delete process.env.LIVEKIT_EGRESS_S3_BUCKET;
+    expect(getLivekitStatusExtras().egressS3Configured).toBe(false);
+    process.env.LIVEKIT_EGRESS_S3_BUCKET = 'lk-audio';
+    process.env.LIVEKIT_EGRESS_S3_ACCESS_KEY = 'ak';
+    process.env.LIVEKIT_EGRESS_S3_SECRET = 'sk';
+    expect(getLivekitStatusExtras().egressS3Configured).toBe(true);
+  });
+
+  test('listRoomParticipantCount fails closed when occupancy cannot be read', async () => {
+    setLivekitOccupancyFactory(async () => {
+      throw new Error('network');
+    });
+    await expect(listRoomParticipantCount('watch-together-theater')).rejects.toMatchObject({
+      code: 'LIVEKIT_OCCUPANCY_UNAVAILABLE',
+    });
+  });
+
+  test('listRoomParticipantCount returns a real zero when the room is empty', async () => {
+    setLivekitOccupancyFactory(async () => 0);
+    await expect(listRoomParticipantCount('watch-together-theater')).resolves.toBe(0);
   });
 
   test('stopLivekitEgress uses injected client', async () => {

@@ -102,12 +102,23 @@
       "narration": "Chapter seven — Youngstown. Crime Town label, faction war, Charlie Carabbia vanishing, and Black Monday at Campbell Works. Same decade. Museum reading only."
     },
     {
+      "id": "events",
+      "anchor": "svEvents",
+      "spotlight": "#svEvents",
+      "action": "openEvents",
+      "durationMs": 7800,
+      "kicker": "HyperFrame · 10 · Tonight",
+      "title": "Happening now",
+      "copy": "Dated 2026 nights still on the calendar — Buhl PAC concerts, Buhl Day, Sharon riverfront, Acoustic Sundays.",
+      "narration": "Present tense. The Happening now board lists published dates — Buhl’s free concerts, Labor Day at the park, river market on Chestnut, patio Sundays at the Lube. Confirm on the official listing. Weather moves a night."
+    },
+    {
       "id": "close",
       "anchor": "svGuide",
       "spotlight": "#svGuide",
       "action": "unflipCards",
       "durationMs": 7200,
-      "kicker": "HyperFrame · 10 · Ask",
+      "kicker": "HyperFrame · 11 · Ask",
       "title": "Living valley",
       "copy": "Keep Buhl free. Ask David about any chapter on the wall.",
       "narration": "Closing chapter — living valley. The reel stops once through. Ask me anything about western Pennsylvania or eastern Ohio. Facts first."

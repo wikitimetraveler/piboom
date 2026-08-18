@@ -7,7 +7,7 @@
   "overview": [
     "Enhanced Conditions (Encompass 20.2+) replace flat standard/eFolder conditions with a tiered model: condition types own shared vocabularies; condition templates reference a type.",
     "Access is configured on personas (Company/User Setup > Personas > Enhanced Conditions tab), not on individual user accounts and not as a per-condition ACL like the legacy ConditionsTemplate.xml CDO.",
-    "DevConnect Labs Condition Manager converts the legacy ConditionsTemplate.xml Custom Data Object into dry-run Enhanced Conditions payloads. It never writes to Encompass."
+    "DevConnect Labs Condition Manager converts the legacy ConditionsTemplate.xml Custom Data Object into dry-run Enhanced Conditions payloads. Live create/read/update/delete against ICE APIs is on the Enhanced Conditions pages (Live CRUD console) via /api/encompass-conditions."
   ],
   "concepts": [
     {
@@ -50,7 +50,7 @@
     ],
     "iceAdminTool": "Encompass Admin Tools > Enhanced Conditions Tool: Convert Standard to Enhanced Conditions, or Migrate Enhanced Conditions between instances. Converted conditions stay inactive until an admin activates them. Prerequisites: condition types (matching Category/Prior To/Source/Recipient), documents, matching roles/personas, Enable Enhanced Conditions.",
     "rules": [
-      "Dry-run only in DevConnect Labs until an explicit write path is approved.",
+      "Dry-run conversion stays in Condition Manager / convert until an admin uses Live CRUD or Postman. Live writes go through /api/encompass-conditions (catalog + invoke + REST) on the Enhanced Conditions pages.",
       "Create condition types first, then templates.",
       "Apply ACL profiles on personas; Enhanced Conditions has no per-condition ACL.",
       "Reconcile CDO role names against GET /encompass/v3/settings/personas. Only a Production persona list is authoritative; UAT is provisional.",
@@ -238,17 +238,27 @@
     {
       "name": "Condition Manager",
       "path": "/finance/condition-manager.html",
-      "purpose": "Dry-run CDO → types/templates/ACL profiles UI"
+      "purpose": "Dry-run CDO → types/templates/ACL profiles UI; apply after via Enhanced Conditions CRUD"
+    },
+    {
+      "name": "Enhanced Conditions CRUD",
+      "path": "/finance/enhanced-conditions.html",
+      "purpose": "Live ICE CRUD UI for types, templates, sets, loan conditions, personas"
     },
     {
       "name": "Enhanced Conditions Expert",
       "path": "/finance/enhanced-conditions-expert.html",
-      "purpose": "This chat — consolidates migration, API, persona, and Postman guidance"
+      "purpose": "This chat — migration, API, persona, and Postman guidance"
     },
     {
       "name": "Convert API",
       "path": "POST /api/encompass-conditions/convert",
       "purpose": "Server-side dry-run conversion"
+    },
+    {
+      "name": "Live ICE APIs",
+      "path": "/api/encompass-conditions/catalog and POST /api/encompass-conditions/invoke",
+      "purpose": "Allowlisted CRUD proxy for types, templates, sets, personas, and loan conditions"
     },
     {
       "name": "Expert API",
@@ -267,7 +277,7 @@
     },
     {
       "q": "What is the admin handoff pack?",
-      "a": "Dry-run JSON under data/encompass-conditions/handoff/: condition-types.json, condition-templates.json, acl-profiles.json, plus the data-quality report. Admins use these to configure Encompass; DevConnect Labs does not auto-push them."
+      "a": "Dry-run JSON under data/encompass-conditions/handoff/: condition-types.json, condition-templates.json, acl-profiles.json, plus the data-quality report. Admins can apply these with the Live CRUD console (UAT first) or Postman. Condition Manager itself does not auto-push."
     },
     {
       "q": "Types or templates first?",

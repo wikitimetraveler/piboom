@@ -1,11 +1,11 @@
 {
   "brand": {
     "name": "Glazed",
-    "tagline": "Flip a treat. Hear the history. Meet Savy Donuts and Smoothie on Harbor.",
+    "tagline": "Seven in the case. Six smoothies. Seven sandwiches. Meet Savy on Harbor.",
     "guideName": "Pip",
     "guideTitle": "Head baker & glaze gossip",
     "guidePortrait": "/donuts/assets/pip-baker-portrait.png",
-    "welcomeScript": "Hey! I'm Pip — welcome to Glazed, celebrating Savy Donuts and Smoothie on Harbor. Flip any donut for its story and where it came from. Smoothies still share blend notes. Ask me in chat too — I'm your baker guide."
+    "welcomeScript": "Hey! I'm Pip — welcome to Glazed. Today's case is seven: classic, coconut, cinnamon, chocolate, buttermilk, maple, and a bear claw. Six smoothies and seven sandwiches ride along. Flip a card, or ask me in chat."
   },
   "shop": {
     "name": "Savy Donuts & Smoothie",
@@ -53,68 +53,92 @@
       }
     },
     {
-      "id": "boston-cream",
-      "name": "Boston Cream",
-      "tagline": "Custard heart, chocolate hat",
+      "id": "coconut-glaze",
+      "name": "Coconut Glaze",
+      "tagline": "Vanilla shine, toasted flake",
       "flavorTags": [
-        "filled",
-        "custard",
-        "chocolate"
+        "coconut",
+        "glaze",
+        "tropical"
       ],
-      "image": "/donuts/assets/products/boston-cream.png",
+      "image": "/donuts/assets/products/classic-glazed.png",
       "visual": {
-        "dough": "#c9956a",
-        "icing": "#3b2416",
-        "icingShine": "#6b3f2a",
-        "filled": true,
+        "dough": "#d4a574",
+        "icing": "#fff8ee",
+        "icingShine": "#ffffff",
+        "sprinkle": "#c4a574",
         "sparkle": true
       },
-      "history": "Boston cream pie (really a cake) became a Massachusetts pride dish in the 1800s: sponge, vanilla custard, chocolate top. Bakers later compressed that idea into a filled yeast doughnut — custard piped inside, chocolate ganache on top. By the mid-20th century it was a New England bakery fixture and a Dunkin’-era classic nationwide, a portable echo of Boston’s favorite “pie.”",
-      "avatarScript": "Boston Cream is dessert cosplay: vanilla custard inside, chocolate on top.",
+      "history": "Coconut on American doughnuts followed tropical trade and California–Hawaii bakery taste: a thin vanilla glaze rolled in shredded coconut so the ring stays shiny and the flake toasts at the edges. It is a West Coast case regular more than an Old World pastry — sunshine pantry on a yeast ring.",
+      "avatarScript": "Coconut Glaze is a beach handshake — glassy vanilla and toasted flake crunch.",
       "origin": {
-        "place": "Boston, Massachusetts, USA",
-        "year": "1850s–1900s",
-        "lat": 42.3601,
-        "lng": -71.0589,
-        "note": "Named for Boston cream pie — custard + chocolate — remade as a filled yeast doughnut."
+        "place": "California and Hawaiian bakery counters",
+        "year": "mid-20th century",
+        "lat": 21.3069,
+        "lng": -157.8583,
+        "note": "Shredded coconut on a vanilla glaze — tropical pantry meeting the American yeast ring."
       }
     },
     {
-      "id": "raspberry-jelly",
-      "name": "Raspberry Jelly",
-      "tagline": "Powdered sugar, secret jam",
+      "id": "cinnamon-glaze",
+      "name": "Cinnamon Glaze",
+      "tagline": "Warm spice in a shiny coat",
       "flavorTags": [
-        "filled",
-        "fruit",
-        "powdered"
+        "cinnamon",
+        "glaze",
+        "spice"
       ],
-      "image": "/donuts/assets/products/raspberry-jelly.png",
+      "image": "/donuts/assets/products/cinnamon-sugar.png",
       "visual": {
-        "dough": "#d2a06c",
-        "icing": "#f7f0e8",
-        "icingShine": "#ffffff",
-        "sprinkle": "#c6284a",
-        "filled": true,
+        "dough": "#c9956a",
+        "icing": "#c47a2c",
+        "icingShine": "#e8a84a",
         "powdered": true,
         "sparkle": true
       },
-      "history": "Jelly doughnuts descend from Central and Eastern European fried filled pastries — German Berliners, Polish pączki — brought into North American bakeries by immigrant bakers. Powdered sugar hides the surprise; raspberry’s bright acid cuts rich fried dough. In the U.S. they became carnival and bakery-case standards, especially around holidays and Sunday mornings.",
-      "avatarScript": "Raspberry Jelly is the plot twist donut — quiet powdered exterior, then a berry burst.",
+      "history": "Cinnamon glaze folds warm spice into the sugar coat instead of a dry shake. The idea echoes spiced fried dough from Spanish and colonial kitchens, then American shops made a pourable cinnamon glaze that sets glossy and clings to a yeast ring.",
+      "avatarScript": "Cinnamon Glaze is cozy shine — spice in the coat, not just dusted on top.",
       "origin": {
-        "place": "Central Europe → North America",
-        "year": "1800s",
-        "lat": 52.52,
-        "lng": 13.405,
-        "note": "Cousin to Berliners and Polish pączki; jelly-filled rounds crossed the Atlantic with immigrant bakers."
+        "place": "Spanish / colonial Americas influence",
+        "year": "long tradition",
+        "lat": 40.4168,
+        "lng": -3.7038,
+        "note": "Spice in the glaze, not only a sugar shake — bakery cousin to churros and warm fried dough."
       }
     },
     {
-      "id": "old-fashioned",
-      "name": "Old-Fashioned",
-      "tagline": "Craggy cake, deep glaze pools",
+      "id": "chocolate-glaze",
+      "name": "Chocolate Glaze",
+      "tagline": "Thin cocoa glass, not a frosting hat",
       "flavorTags": [
+        "chocolate",
+        "glaze",
+        "classic"
+      ],
+      "image": "/donuts/assets/products/chocolate-frosted.png",
+      "visual": {
+        "dough": "#c9956a",
+        "icing": "#3d2314",
+        "icingShine": "#6b3a22",
+        "sparkle": true
+      },
+      "history": "Chocolate glaze is thinner than bakery frosting — cocoa, sugar, and a little fat that sets to a snap. American doughnut shops used it as a shiny cocoa dip, a quieter cousin of sprinkle-loaded chocolate frosted rings.",
+      "avatarScript": "Chocolate Glaze is cocoa glass — a dip, a shine, no sprinkle party required.",
+      "origin": {
+        "place": "United States doughnut shops",
+        "year": "mid-20th century",
+        "lat": 40.7128,
+        "lng": -74.006,
+        "note": "A thin cocoa dip that sets shiny — glaze energy, not a thick frosting crown."
+      }
+    },
+    {
+      "id": "buttermilk",
+      "name": "Buttermilk",
+      "tagline": "Tangy cake crumb, glaze in the cracks",
+      "flavorTags": [
+        "buttermilk",
         "cake",
-        "sour cream",
         "classic"
       ],
       "image": "/donuts/assets/products/old-fashioned.png",
@@ -125,23 +149,23 @@
         "craggy": true,
         "sparkle": true
       },
-      "history": "Unlike puffy yeast rings, old-fashioned cake donuts use chemical leavening and often sour cream for tenderness. The cracked, craggy surface isn’t a flaw — it’s the signature that holds thick glaze in little pools. Midwestern and neighborhood American bakeries perfected the style in the early 1900s as a denser, dunkable cousin to the yeast raised ring.",
-      "avatarScript": "Old-Fashioned is the crunchy-edged cousin — cake crumb, nutmeg hush, glaze in every crack.",
+      "history": "Buttermilk cake doughnuts use tangy dairy and chemical leavening instead of yeast. The crumb fries dense and the surface cracks so glaze pools in every ridge — a Midwest and neighborhood-bakery staple, cousin to the sour-cream old-fashioned.",
+      "avatarScript": "Buttermilk is the tangy cake ring — glaze hiding in every crack.",
       "origin": {
         "place": "American Midwest bakery counters",
         "year": "early 1900s",
         "lat": 41.8781,
         "lng": -87.6298,
-        "note": "Sour-cream cake rings with craggy cracks — denser than yeast, built to catch glaze pools."
+        "note": "Buttermilk cake rings — denser than yeast, built so glaze settles in the cracks."
       }
     },
     {
-      "id": "maple-walnut",
-      "name": "Maple Walnut",
-      "tagline": "Forest-sweet glaze, toasted crunch",
+      "id": "maple",
+      "name": "Maple",
+      "tagline": "Sugar-shack shine",
       "flavorTags": [
         "maple",
-        "nuts",
+        "glaze",
         "autumn"
       ],
       "image": "/donuts/assets/products/maple-walnut.png",
@@ -149,233 +173,43 @@
         "dough": "#c48a52",
         "icing": "#c47a2c",
         "icingShine": "#e8a84a",
-        "sprinkle": "#6b4423",
-        "nuts": true,
         "sparkle": true
       },
-      "history": "Maple sugar and syrup are rooted in Indigenous foodways across the northeastern woodlands. Colonial and New England sugarhouses later commercialized the spring sap run. Bakeries turned that forest sweetness into maple glaze; toasted walnuts add crunch that echoes Vermont and Canadian sugar-shack seasons more than tropical fruit shops.",
-      "avatarScript": "Maple Walnut tastes like autumn trees — sticky maple shine and walnut crunch.",
+      "history": "Maple sugar and syrup are rooted in Indigenous foodways across the northeastern woodlands. Bakeries turned that forest sweetness into a maple glaze that sets amber on a warm ring — sugar-shack flavor without needing a walnut topping.",
+      "avatarScript": "Maple is amber glaze — sticky forest sweet, no extra crunch required.",
       "origin": {
         "place": "Northeastern woodlands / New England",
         "year": "Indigenous → colonial sugarhouses",
         "lat": 44.2619,
         "lng": -72.5806,
-        "note": "Maple syrup has deep Indigenous roots; New England bakeries turned it into cold-weather glaze."
+        "note": "Maple syrup has deep Indigenous roots; shops poured it as a cold-weather glaze."
       }
     },
     {
-      "id": "french-cruller",
-      "name": "French Cruller",
-      "tagline": "Airy ridges, whisper-light glaze",
+      "id": "bear-claw",
+      "name": "Bear Claw",
+      "tagline": "Almond filling, sugared toes",
       "flavorTags": [
-        "choux",
-        "ridged",
-        "light"
-      ],
-      "image": "/donuts/assets/products/french-cruller.png",
-      "visual": {
-        "dough": "#e0b888",
-        "icing": "#fff9f0",
-        "icingShine": "#ffffff",
-        "cruller": true,
-        "sparkle": true
-      },
-      "history": "“Cruller” names vary, but the French-style ring uses pâte à choux — the same cooked dough behind éclairs and cream puffs — piped with a star tip so ridges catch a light glaze. It fries hollow and airy, a European pastry technique that found a second life in North American doughnut cases as the lightest bite in the box.",
-      "avatarScript": "French Cruller is the ballerina of the case — choux dough and a glaze that almost floats.",
-      "origin": {
-        "place": "France (pâte à choux tradition)",
-        "year": "1800s",
-        "lat": 48.8566,
-        "lng": 2.3522,
-        "note": "Ridged rings of choux pastry — the same airy dough family as éclairs — fried and lightly glazed."
-      }
-    },
-    {
-      "id": "chocolate-frosted",
-      "name": "Chocolate Frosted",
-      "tagline": "Party sprinkles, cocoa crown",
-      "flavorTags": [
-        "chocolate",
-        "sprinkles",
-        "classic"
-      ],
-      "image": "/donuts/assets/products/chocolate-frosted.png",
-      "visual": {
-        "dough": "#c9956a",
-        "icing": "#3d2314",
-        "icingShine": "#6b3a22",
-        "sprinkle": "#ff7a9a",
-        "sparkle": true
-      },
-      "history": "Once American doughnut shops scaled yeast rings, thick chocolate frosting beat thin glaze for holding sprinkles. Mid-century counters and national chains made the cocoa crown + candy jimmies a childhood default — less about Old World pastry lineage, more about soda-fountain color and Saturday mornings.",
-      "avatarScript": "Chocolate Frosted is pure celebration energy — cocoa hat and a confetti of sprinkles.",
-      "origin": {
-        "place": "United States doughnut shops",
-        "year": "mid-20th century",
-        "lat": 40.7128,
-        "lng": -74.006,
-        "note": "Thick cocoa frosting + sprinkles became the kid-counter classic once chains scaled yeast rings."
-      }
-    },
-    {
-      "id": "strawberry-sprinkle",
-      "name": "Strawberry Sprinkle",
-      "tagline": "Pink frost, weekend vibes",
-      "flavorTags": [
-        "strawberry",
-        "sprinkles",
-        "fun"
-      ],
-      "image": "/donuts/assets/products/strawberry-sprinkle.png",
-      "visual": {
-        "dough": "#d4a574",
-        "icing": "#ff8fab",
-        "icingShine": "#ffc2d4",
-        "sprinkle": "#ffffff",
-        "sparkle": true
-      },
-      "history": "Pink strawberry frosting is a mid-century American bakery color language — soda fountains, birthday boxes, and “fun” frosting long before Instagram. The flavor is often strawberry puree or oil in a sweet frosting base; sprinkles turn it into weekend energy on a classic yeast ring.",
-      "avatarScript": "Strawberry Sprinkle is Glazed’s pink wink — berry frost and a sparkle of candy.",
-      "origin": {
-        "place": "American soda-fountain bakeries",
-        "year": "mid-20th century",
-        "lat": 34.0522,
-        "lng": -118.2437,
-        "note": "Bright pink frost rode mid-century soda-fountain color — bakery shorthand for “fun” long before social media."
-      }
-    },
-    {
-      "id": "lemon-poppy",
-      "name": "Lemon Poppy",
-      "tagline": "Zest and tiny crunch",
-      "flavorTags": [
-        "citrus",
-        "poppy",
-        "bright"
-      ],
-      "image": "/donuts/assets/products/lemon-poppy.png",
-      "visual": {
-        "dough": "#e0b888",
-        "icing": "#f5e6a3",
-        "icingShine": "#fff8c9",
-        "sprinkle": "#2a1810",
-        "sparkle": true
-      },
-      "history": "Lemon and poppy seed traveled with Central European baking (think Austrian and Hungarian cakes) into American morning pastry. Citrus oil brightens fried dough; tiny poppy seeds add nutty crunch. It reads sunny and bakery-European even when sold beside chocolate-frosted American classics.",
-      "avatarScript": "Lemon Poppy wakes up the case — sunshine glaze and tiny seed crackle.",
-      "origin": {
-        "place": "Central Europe → American bakeries",
-        "year": "1900s",
-        "lat": 48.2082,
-        "lng": 16.3738,
-        "note": "Lemon and poppy seed traveled with Central European baking into sunny American morning cases."
-      }
-    },
-    {
-      "id": "apple-fritter",
-      "name": "Apple Fritter",
-      "tagline": "No ring required",
-      "flavorTags": [
-        "apple",
-        "fritter",
-        "glaze"
+        "almond",
+        "pastry",
+        "filled"
       ],
       "image": "/donuts/assets/products/apple-fritter.png",
       "visual": {
-        "dough": "#c48a52",
-        "icing": "#fff0d4",
+        "dough": "#c9956a",
+        "icing": "#fff6e8",
         "icingShine": "#ffffff",
         "craggy": true,
         "sparkle": true
       },
-      "history": "Fritters are older than tidy rings — irregular fried dough studded with fruit. American fairgrounds and orchard belts (Pennsylvania, Ohio, New England) made apple fritters a cold-weather and carnival favorite: cinnamon, chunks of apple, and a glaze that clings to every jagged edge.",
-      "avatarScript": "Apple Fritter breaks the ring rule — crispy edges, soft apple pockets, sticky glaze.",
+      "history": "The bear claw is an American bakery pastry — yeast dough or Danish-style dough, almond paste or frangipane in the middle, and cuts along one edge that bake into “claws.” West Coast shops made it a case regular beside rings and fritters: not a punched hole, but still fryer-and-glaze family, with toasted almond perfume.",
+      "avatarScript": "Bear Claw is the big paw of the case — almond heart and sugared toes.",
       "origin": {
-        "place": "American fair & orchard belts",
-        "year": "1800s–1900s",
-        "lat": 40.2732,
-        "lng": -76.8867,
-        "note": "Irregular fried apple dough — carnival and orchard country energy more than tidy ring geometry."
-      }
-    },
-    {
-      "id": "cinnamon-sugar",
-      "name": "Cinnamon Sugar",
-      "tagline": "Warm spice, no frosting drama",
-      "flavorTags": [
-        "cinnamon",
-        "sugar",
-        "classic"
-      ],
-      "image": "/donuts/assets/products/cinnamon-sugar.png",
-      "visual": {
-        "dough": "#c9956a",
-        "icing": "#c47a2c",
-        "icingShine": "#e8a84a",
-        "powdered": true,
-        "sparkle": true
-      },
-      "history": "Cinnamon-sugar coatings echo Spanish and colonial New World sweets (think churros and spiced fried dough). U.S. shops made the warm sugar shake a simple classic — no frosting required — just spice, crunch, and heat from the fryer.",
-      "avatarScript": "Cinnamon Sugar is cozy minimalism — warm spice that sticks to your fingers.",
-      "origin": {
-        "place": "Spanish / colonial Americas influence",
-        "year": "long tradition",
-        "lat": 40.4168,
-        "lng": -3.7038,
-        "note": "Cinnamon-sugar coatings echo Spanish and colonial sweets; American shops made the warm shake iconic."
-      }
-    },
-    {
-      "id": "matcha-white-chocolate",
-      "name": "Matcha White Chocolate",
-      "tagline": "Green tea gloss, sweet drizzle",
-      "flavorTags": [
-        "matcha",
-        "modern",
-        "drizzle"
-      ],
-      "image": "/donuts/assets/products/matcha-white-chocolate.png",
-      "visual": {
-        "dough": "#d4a574",
-        "icing": "#7a9b5a",
-        "icingShine": "#b5d48a",
-        "sprinkle": "#ffffff",
-        "sparkle": true
-      },
-      "history": "Matcha’s home is Japanese tea culture; late 20th- and 21st-century cafés folded it into global pastry. On a doughnut, grassy umami meets sweet white chocolate so the tea note stays friendly. It’s a modern fusion case item — Kyoto green meeting American fryer tradition.",
-      "avatarScript": "Matcha White Chocolate is the modern looker — jade glaze with a sweet white drizzle.",
-      "origin": {
-        "place": "Japan → global café culture",
-        "year": "late 20th–21st c.",
-        "lat": 35.0116,
-        "lng": 135.7681,
-        "note": "Matcha moved from tea ceremony into modern pastry; white chocolate softens the grassy bitterness."
-      }
-    },
-    {
-      "id": "blueberry-cake",
-      "name": "Blueberry Cake",
-      "tagline": "The baker’s lucky extra",
-      "flavorTags": [
-        "cake",
-        "blueberry",
-        "bakery"
-      ],
-      "visual": {
-        "dough": "#c4a07a",
-        "icing": "#6b5b95",
-        "icingShine": "#a89bc8",
-        "sprinkle": "#3d2a6d",
-        "sparkle": true
-      },
-      "history": "Wild lowbush blueberries shaped Maine and Northeast baking — muffins, pies, and cake crumbs. Blueberry cake doughnuts borrow that orchard-and-coast pantry: tender cake crumb, berry pockets, and a nod to summer markets along the Downeast shore.",
-      "avatarScript": "Blueberry Cake is the baker’s dozen lucky extra — purple-kissed cake crumb.",
-      "origin": {
-        "place": "Maine & Northeast blueberry country",
-        "year": "20th century bakery staple",
-        "lat": 44.3106,
-        "lng": -69.7795,
-        "note": "Wild blueberries shaped Northeastern cake tradition — crumb cake energy in doughnut form."
+        "place": "American West Coast bakeries",
+        "year": "early–mid 20th century",
+        "lat": 37.7749,
+        "lng": -122.4194,
+        "note": "Almond-filled pastry with sliced “claws” — a West Coast bakery staple next to the doughnut case."
       }
     }
   ],
@@ -808,6 +642,43 @@
       },
       "history": "Tuna salad subs are American lunch-counter heritage — canned tuna, mayo, and celery on a soft roll. Simple, filling, and a staple since mid-century diners.",
       "avatarScript": "Tuna Salad Sub is the retro champ — creamy, cold, and always lunch-ready."
+    },
+    {
+      "id": "chicken-bacon-ranch",
+      "name": "Chicken Bacon Ranch",
+      "tagline": "Hot sub, cool ranch",
+      "flavorTags": [
+        "chicken",
+        "bacon",
+        "ranch"
+      ],
+      "image": "/donuts/assets/products/turkey-club-sub.png",
+      "visual": {
+        "kind": "submarine",
+        "bread": "#d4a574",
+        "filling": "#e8c4a0"
+      },
+      "recipe": {
+        "yield": "1 sub",
+        "time": "12 minutes",
+        "ingredients": [
+          "1 sub roll, toasted",
+          "4 oz sliced or grilled chicken",
+          "3 strips cooked bacon",
+          "2 slices provolone or cheddar",
+          "Lettuce and tomato",
+          "Ranch dressing"
+        ],
+        "steps": [
+          "Toast the roll.",
+          "Spread ranch on both sides.",
+          "Layer chicken, bacon, and cheese.",
+          "Add lettuce and tomato.",
+          "Close, slice, and serve warm."
+        ]
+      },
+      "history": "Chicken-bacon-ranch landed on American sandwich boards in the late 20th century as ranch dressing left the salad bowl. It is a deli and chain-sub staple — savory, creamy, and built for a toasted roll.",
+      "avatarScript": "Chicken Bacon Ranch is the seventh sandwich — hot chicken, crisp bacon, cool ranch."
     }
   ]
 }

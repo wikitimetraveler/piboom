@@ -2,6 +2,18 @@
  * Album cover vision helpers — single and multi (shelf) identification.
  */
 
+function blankUnknown(value) {
+  const s = String(value || '').trim();
+  if (!s || /^(unknown|n\/a|none|null)$/i.test(s)) return '';
+  return s;
+}
+
+function yearIfPrinted(value) {
+  const s = blankUnknown(value);
+  const match = s.match(/\b(1[89]\d{2}|20\d{2})\b/);
+  return match ? match[1] : '';
+}
+
 export function extractAlbumInfoFromText(text) {
   const info = {
     albumName: '',
@@ -13,25 +25,14 @@ export function extractAlbumInfoFromText(text) {
     confidence: 'medium',
   };
 
-  const albumMatch = text.match(/album[:\s]+["']?([^"'\n]+)["']?/i);
+  const albumMatch = text.match(/album(?:Name)?[:\s]+["']?([^"'\n]+)["']?/i);
   if (albumMatch) info.albumName = albumMatch[1].trim();
 
-  const artistMatch = text.match(/artist[:\s]+["']?([^"'\n]+)["']?/i);
+  const artistMatch = text.match(/artist(?:Name)?[:\s]+["']?([^"'\n]+)["']?/i);
   if (artistMatch) info.artistName = artistMatch[1].trim();
 
-  const yearMatch = text.match(/(\d{4})/);
+  const yearMatch = text.match(/year[:\s]+["']?(1[89]\d{2}|20\d{2})["']?/i);
   if (yearMatch) info.year = yearMatch[1];
-
-  const genreMatch = text.match(/genre[:\s]+["']?([^"'\n]+)["']?/i);
-  if (genreMatch) info.genre = genreMatch[1].trim();
-
-  const valueMatch = text.match(/value[:\s]+\$?(\d+(?:\.\d{2})?)/i);
-  if (valueMatch) info.estimatedValue = parseFloat(valueMatch[1]);
-
-  const sentences = text.split(/[.!?]/);
-  if (sentences.length > 0) {
-    info.description = sentences[0].trim();
-  }
 
   return info;
 }
@@ -49,14 +50,6 @@ export function normalizeAlbumEntry(raw, index = 0) {
   const artistName = String(raw.artistName || raw.artist || '').trim();
   if (!albumName || !artistName) return null;
 
-  let estimatedValue = raw.estimatedValue;
-  if (estimatedValue != null && estimatedValue !== '') {
-    const parsed = Number.parseFloat(String(estimatedValue).replace(/[$,]/g, ''));
-    estimatedValue = Number.isFinite(parsed) ? parsed : null;
-  } else {
-    estimatedValue = null;
-  }
-
   const confidence = String(raw.confidence || 'medium').toLowerCase();
   const normalizedConfidence = ['high', 'medium', 'low'].includes(confidence) ? confidence : 'medium';
 
@@ -64,10 +57,10 @@ export function normalizeAlbumEntry(raw, index = 0) {
     index: Number.isFinite(raw.index) ? raw.index : index + 1,
     albumName,
     artistName,
-    year: raw.year ? String(raw.year).trim() : 'Unknown',
-    genre: raw.genre ? String(raw.genre).trim() : 'Unknown',
-    description: raw.description ? String(raw.description).trim() : 'Album identified by AI vision',
-    estimatedValue,
+    year: yearIfPrinted(raw.year),
+    genre: '',
+    description: '',
+    estimatedValue: null,
     confidence: normalizedConfidence,
     position: raw.position ? String(raw.position).trim() : null,
   };
@@ -121,24 +114,28 @@ export function parseVisionAlbumsFromText(text) {
 }
 
 export function buildSingleAlbumVisionPrompt() {
-  return 'Please identify this album cover and estimate its value. Provide the exact album name, artist name, release year, genre, a brief description, AND estimated market value in USD. Consider: original pressing vs reissue, condition (assume VG+ if visible), rarity, and current collector market. Format your response as JSON with fields: albumName, artistName, year, genre, description, estimatedValue (number, no $ sign), confidence (high|medium|low).';
+  return `Read this album jacket. Return JSON only:
+{"albumName":"title printed on the cover","artistName":"artist printed on the cover","year":"four-digit year only if printed on the jacket","confidence":"high|medium|low"}
+
+Rules:
+- Use only text you can read on the cover or spine.
+- Do not guess year, genre, history, condition, pressing, or market value.
+- If the year is not printed, omit year or use "".
+- If title and artist are unreadable, return {}.`;
 }
 
 export function buildShelfVisionPrompt(maxAlbums = 5) {
   const cap = clampMaxAlbums(maxAlbums);
-  return `This photo may show multiple vinyl album covers or record jackets laid out together (up to ${cap}). Identify every distinct album cover you can see clearly.
+  return `This photo may show multiple vinyl album covers laid out together (up to ${cap}). Read every distinct jacket you can see clearly.
 
-Return JSON only in this shape:
+Return JSON only:
 {
   "albums": [
     {
       "index": 1,
-      "albumName": "exact album title",
-      "artistName": "artist name",
-      "year": "release year or Unknown",
-      "genre": "genre or Unknown",
-      "description": "brief note",
-      "estimatedValue": 0,
+      "albumName": "title printed on the cover",
+      "artistName": "artist printed on the cover",
+      "year": "four-digit year only if printed",
       "confidence": "high|medium|low",
       "position": "left-to-right position label"
     }
@@ -149,7 +146,7 @@ Rules:
 - Return at most ${cap} albums.
 - Order albums left-to-right, then top-to-bottom.
 - Skip duplicates and unreadable covers.
-- estimatedValue is USD number only (no $ sign); assume VG+ condition.
+- Use only text visible on each jacket. Do not guess year, genre, history, condition, or market value.
 - If only one album is visible, still return an albums array with one item.`;
 }
 
@@ -159,7 +156,7 @@ export async function identifySingleAlbumFromImage(openai, model, imageData) {
     messages: [
       {
         role: 'system',
-        content: 'You are an expert music historian and album cover identifier. When shown an album cover, you identify the album name, artist, and provide relevant details. Be precise and confident in your identification.',
+        content: 'You read album jackets. Report only title and artist you can see, and a year only if it is printed. Never invent genre, history, condition, pressing, or collector value. If unsure, use confidence low or return nothing.',
       },
       {
         role: 'user',
@@ -169,8 +166,8 @@ export async function identifySingleAlbumFromImage(openai, model, imageData) {
         ],
       },
     ],
-    max_tokens: 500,
-    temperature: 0.3,
+    max_tokens: 400,
+    temperature: 0,
   });
 
   const aiResponse = completion.choices[0]?.message?.content || '';
@@ -187,7 +184,7 @@ export async function identifyShelfAlbumsFromImage(openai, model, imageData, max
     messages: [
       {
         role: 'system',
-        content: 'You are an expert music historian and album cover identifier. You identify multiple album covers in one photo when present. Be precise; only list albums you can read clearly.',
+        content: 'You read album jackets in a photo. List only covers whose title and artist you can see. Never invent year, genre, history, condition, or collector value.',
       },
       {
         role: 'user',
@@ -197,8 +194,8 @@ export async function identifyShelfAlbumsFromImage(openai, model, imageData, max
         ],
       },
     ],
-    max_tokens: 1200,
-    temperature: 0.3,
+    max_tokens: 900,
+    temperature: 0,
   });
 
   const aiResponse = completion.choices[0]?.message?.content || '';

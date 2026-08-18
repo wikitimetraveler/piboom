@@ -8,8 +8,22 @@
 
   const NS = '/watch-together';
   const BLUR_KEY = 'wtCamBlur';
+  const IDENTITY_KEY = 'wtLivekitIdentity';
   const encoder = new TextEncoder();
   const decoder = new TextDecoder();
+
+  function stableIdentity(name, userId) {
+    try {
+      const existing = sessionStorage.getItem(IDENTITY_KEY);
+      if (existing) return existing;
+      const base = String(userId || name || 'guest').replace(/[^\w.-]/g, '-').slice(0, 48);
+      const id = (base + '-' + Math.random().toString(36).slice(2, 10)).slice(0, 64);
+      sessionStorage.setItem(IDENTITY_KEY, id);
+      return id;
+    } catch {
+      return '';
+    }
+  }
 
   function readBlurPref() {
     try {
@@ -35,6 +49,7 @@
     name: 'Guest',
     userId: null,
     identity: '',
+    roomName: '',
     socket: null,
     room: null,
     micOn: false,
@@ -296,6 +311,7 @@
         code: opts.code,
         name: opts.name,
         userId: opts.userId,
+        identity: stableIdentity(opts.name, opts.userId),
       }),
     });
     const data = await res.json().catch(() => ({}));
@@ -373,10 +389,30 @@
         if (room.canPlaybackAudio) void resumeRemoteAudio();
       });
     }
+    if (LK.RoomEvent.Reconnecting) {
+      room.on(LK.RoomEvent.Reconnecting, () => emit('livekit', { state: 'reconnecting' }));
+    }
+    if (LK.RoomEvent.Reconnected) {
+      room.on(LK.RoomEvent.Reconnected, () => {
+        emit('livekit', { state: 'live', roomName: state.roomName });
+      });
+    }
+    if (LK.RoomEvent.Disconnected) {
+      room.on(LK.RoomEvent.Disconnected, () => emit('livekit', { state: 'down' }));
+    }
+    if (LK.RoomEvent.ActiveSpeakersChanged) {
+      room.on(LK.RoomEvent.ActiveSpeakersChanged, (speakers) => {
+        const ids = (speakers || []).map((p) => p?.identity).filter(Boolean);
+        emit('speakers', ids);
+      });
+    }
+    emit('livekit', { state: 'joining' });
     await room.connect(data.url, data.token);
     state.room = room;
     state.identity = data.identity || room.localParticipant.identity;
+    state.roomName = data.roomName || 'watch-together-theater';
     state.transport = 'livekit';
+    emit('livekit', { state: 'live', roomName: state.roomName });
     attachExistingRemoteAudio(room);
     attachExistingRemoteVideo(room);
     void resumeRemoteAudio();
@@ -787,5 +823,6 @@
     blurOn,
     micError: () => state.micError || '',
     identity,
+    roomName: () => state.roomName || '',
   };
 })(window);

@@ -48,6 +48,24 @@ export function notConfiguredError() {
   return err;
 }
 
+export function occupancyUnavailableError() {
+  const err = new Error('LIVEKIT_OCCUPANCY_UNAVAILABLE');
+  err.code = 'LIVEKIT_OCCUPANCY_UNAVAILABLE';
+  return err;
+}
+
+export function egressDestRequiredError() {
+  const err = new Error('LIVEKIT_EGRESS_DEST_REQUIRED');
+  err.code = 'LIVEKIT_EGRESS_DEST_REQUIRED';
+  return err;
+}
+
+function isMissingRoomError(err) {
+  const status = err?.status || err?.statusCode || err?.code;
+  if (status === 404 || status === 'not_found') return true;
+  return /not found|does not exist|room does not exist/i.test(String(err?.message || ''));
+}
+
 export function sanitizeParticipantName(raw, { fallback = 'Guest', max = 40 } = {}) {
   const name = String(raw || '')
     .replace(/[\r\n<>]/g, '')
@@ -166,7 +184,14 @@ export async function mintLivekitAccessToken({
 
 export async function listRoomParticipantCount(roomName) {
   if (livekitOccupancyFactory) {
-    return Math.max(0, Number(await livekitOccupancyFactory(roomName)) || 0);
+    try {
+      const n = Number(await livekitOccupancyFactory(roomName));
+      if (!Number.isFinite(n)) throw occupancyUnavailableError();
+      return Math.max(0, n);
+    } catch (err) {
+      if (err?.code === 'LIVEKIT_OCCUPANCY_UNAVAILABLE') throw err;
+      throw occupancyUnavailableError();
+    }
   }
   const config = getLivekitConfig();
   if (!config.configured) return 0;
@@ -175,8 +200,9 @@ export async function listRoomParticipantCount(roomName) {
     const svc = new RoomServiceClient(livekitHttpUrl(config.url), config.apiKey, config.apiSecret);
     const parts = await svc.listParticipants(roomName);
     return Array.isArray(parts) ? parts.length : 0;
-  } catch {
-    return 0;
+  } catch (err) {
+    if (isMissingRoomError(err)) return 0;
+    throw occupancyUnavailableError();
   }
 }
 
@@ -205,15 +231,14 @@ export async function startAudioOnlyRoomEgress({ roomName, filepath } = {}) {
     err.code = 'LIVEKIT_ROOM_REQUIRED';
     throw err;
   }
+  const s3 = getS3UploadConfig();
+  if (!s3) throw egressDestRequiredError();
   const { EncodedFileOutput, EncodedFileType, S3Upload } = await import('livekit-server-sdk');
   const outputOpts = {
     fileType: EncodedFileType.OGG,
     filepath: filepath || audioFilepath(safeRoom),
     disableManifest: true,
-  };
-  const s3 = getS3UploadConfig();
-  if (s3) {
-    outputOpts.output = {
+    output: {
       case: 's3',
       value: new S3Upload({
         accessKey: s3.accessKey,
@@ -221,8 +246,8 @@ export async function startAudioOnlyRoomEgress({ roomName, filepath } = {}) {
         bucket: s3.bucket,
         region: s3.region,
       }),
-    };
-  }
+    },
+  };
   const file = new EncodedFileOutput(outputOpts);
   const client = await getEgressClient();
   const info = await client.startRoomCompositeEgress(safeRoom, { file }, { audioOnly: true });
@@ -278,4 +303,6 @@ export default {
   sanitizeLivekitIdentity,
   livekitIdentity,
   getLivekitStatusExtras,
+  occupancyUnavailableError,
+  egressDestRequiredError,
 };

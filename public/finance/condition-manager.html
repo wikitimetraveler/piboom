@@ -212,11 +212,15 @@
         <p class="lead">
           Converts the legacy <code>ConditionsTemplate.xml</code> custom data object into Encompass
           Enhanced Conditions — condition types, condition templates, and the persona access
-          patterns the tiered model can no longer store per condition. Everything here is a dry
-          run: nothing is written to Encompass.
+          patterns the tiered model can no longer store per condition. Conversion is still a dry
+          run. After you review the payloads, write them with
+          <a href="/finance/enhanced-conditions.html">Enhanced Conditions CRUD</a>.
         </p>
         <div class="d-flex justify-content-center align-items-center gap-3 flex-wrap">
           <span class="status-chip" id="statusChip"><i class="bi bi-upload"></i> Waiting for a CDO</span>
+          <a class="btn btn-sm btn-primary" href="/finance/enhanced-conditions.html">
+            <i class="bi bi-ui-checks-grid"></i> Enhanced Conditions CRUD
+          </a>
           <a class="btn btn-sm btn-outline-secondary" href="/finance/enhanced-conditions-expert.html">
             <i class="bi bi-journal-richtext"></i> Ask EC Expert
           </a>
@@ -258,7 +262,7 @@
             <div class="dropzone" id="personaDrop">
               <i class="bi bi-people"></i>
               <div class="mt-2">Drop the persona list here, or click to choose</div>
-              <div class="small text-muted">Response from <code>GET /encompass/v3/settings/personas</code></div>
+              <div class="small text-muted">Response from <code>GET /encompass/v3/settings/personas</code> — or list personas in Live CRUD above</div>
               <div class="dropzone-file mt-2" id="personaFileName">No file chosen</div>
             </div>
             <input type="file" id="personaFile" class="d-none" accept=".json" />
@@ -450,6 +454,17 @@
           </div>
         </div>
       </div>
+
+      <section id="live-crud" class="card p-4 mt-4 mb-4" aria-label="After conversion — live Enhanced Conditions">
+        <h2 class="h5">After conversion — write to Encompass</h2>
+        <p class="text-muted mb-3">
+          Everything above is a dry run. Open Enhanced Conditions CRUD to create types, then templates,
+          then loan conditions against the live ICE APIs.
+        </p>
+        <a class="btn btn-primary" href="/finance/enhanced-conditions.html">
+          <i class="bi bi-ui-checks-grid"></i> Open Enhanced Conditions CRUD
+        </a>
+      </section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

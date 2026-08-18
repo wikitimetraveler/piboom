@@ -34,8 +34,8 @@
     for (let i = 0; i < bars; i += 1) {
       const wave = 0.25 + 0.75 * Math.abs(Math.sin(now / 180 + i * 0.55));
       const bh = Math.max(4, wave * h);
-      const hue = 90 + i * 8;
-      ctx.fillStyle = `hsl(${hue}, 85%, 55%)`;
+      const hue = 42 + i * 2;
+      ctx.fillStyle = `hsl(${hue}, 72%, ${48 + i}%)`;
       ctx.fillRect(i * (barW + gap), h - bh, barW, bh);
     }
   }
@@ -79,6 +79,8 @@
       if (socketChip) socketChip.classList.add('is-on');
       if (livekitChip && status.livekitConfigured) livekitChip.classList.add('is-on');
       if (openaiChip && status.openaiConfigured) openaiChip.classList.add('is-on');
+      const egressChip = document.querySelector('[data-cap="egress"]');
+      if (egressChip && status.egressS3Configured) egressChip.classList.add('is-on');
     })
     .catch(() => {});
 })();

@@ -9,11 +9,14 @@
   const VIDEOS_URL = '/nature/data/shenango-videos.json';
   const BUHL_CENTER = { lat: 41.245889, lng: -80.477848 };
 
+  const EVENT_TZ = 'America/New_York';
+
   const state = {
     data: null,
     videos: null,
     activeEra: null,
-    sheetSpeech: ''
+    sheetSpeech: '',
+    eventFilter: 'upcoming'
   };
 
   function esc(value) {
@@ -105,7 +108,11 @@
       ['svStoryModeKicker', 'storyModeKicker'],
       ['svStoryModeCopy', 'storyModeCopy'],
       ['svNarrateLabel', 'narrateScenes'],
-      ['svOnboardingHow', 'onboardingHow']
+      ['svOnboardingHow', 'onboardingHow'],
+      ['svEventsHeading', 'eventsHeading'],
+      ['svEventsLead', 'eventsLead'],
+      ['svEventsNote', 'eventsNote'],
+      ['svOpenEventsLabel', 'openEvents']
     ];
     map.forEach(([id, key]) => {
       const el = document.getElementById(id);
@@ -121,6 +128,18 @@
     if (hub && ui.mapHubNote) hub.innerHTML = `<i class="bi bi-bullseye"></i> ${esc(ui.mapHubNote)}`;
     const mobChip = document.querySelector('#svMapFilters [data-filter="mob"]');
     if (mobChip && ui.mapMob) mobChip.textContent = ui.mapMob;
+    const eventChips = {
+      upcoming: 'eventsAll',
+      now: 'eventsNow',
+      week: 'eventsWeek',
+      music: 'eventsMusic',
+      downtown: 'eventsDowntown',
+      park: 'eventsPark'
+    };
+    Object.entries(eventChips).forEach(([filter, key]) => {
+      const chip = document.querySelector(`#svEventFilters [data-event-filter="${filter}"]`);
+      if (chip && ui[key]) chip.textContent = ui[key];
+    });
     const year = document.getElementById('svFooterYear');
     if (year) year.textContent = String(new Date().getFullYear());
   }
@@ -158,6 +177,127 @@
         </li>`;
       })
       .join('');
+  }
+
+  function parseEventInstant(value, endOfDay) {
+    const raw = String(value || '').trim();
+    if (!raw) return null;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+      const [year, month, day] = raw.split('-').map(Number);
+      if (endOfDay) return new Date(year, month - 1, day, 23, 59, 59, 999);
+      return new Date(year, month - 1, day, 0, 0, 0, 0);
+    }
+    const dt = new Date(raw);
+    return Number.isNaN(dt.getTime()) ? null : dt;
+  }
+
+  function eventParts(date) {
+    const fmt = (options) =>
+      new Intl.DateTimeFormat('en-US', { timeZone: EVENT_TZ, ...options }).format(date);
+    return {
+      month: fmt({ month: 'short' }),
+      day: fmt({ day: 'numeric' }),
+      weekday: fmt({ weekday: 'short' }),
+      dateLine: fmt({ weekday: 'long', month: 'long', day: 'numeric' }),
+      timeLine: fmt({ hour: 'numeric', minute: '2-digit' }),
+      dayKey: fmt({ year: 'numeric', month: '2-digit', day: '2-digit' })
+    };
+  }
+
+  function classifyEvent(ev, now) {
+    const start = parseEventInstant(ev.start, false);
+    const end = parseEventInstant(ev.end || ev.start, true);
+    if (!start || !end) return 'upcoming';
+    if (end < now) return 'past';
+    const nowParts = eventParts(now);
+    const startParts = eventParts(start);
+    if (start <= now && now <= end) return 'now';
+    if (startParts.dayKey === nowParts.dayKey) return 'now';
+    const weekLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    if (start <= weekLater) return 'week';
+    return 'upcoming';
+  }
+
+  function eventMatchesFilter(ev, status, filter) {
+    if (filter === 'now') return status === 'now';
+    if (filter === 'week') return status === 'now' || status === 'week';
+    if (filter === 'music') return status !== 'past' && ev.category === 'music';
+    if (filter === 'downtown') return status !== 'past' && ev.area === 'downtown';
+    if (filter === 'park') return status !== 'past' && ev.area === 'park';
+    return true;
+  }
+
+  function eventMarkup(ev, status) {
+    const start = parseEventInstant(ev.start, false);
+    const end = parseEventInstant(ev.end || ev.start, true);
+    const parts = start ? eventParts(start) : { month: '', day: '', weekday: '', dateLine: '', timeLine: '' };
+    const when = ev.allDay
+      ? parts.dateLine
+      : `${parts.dateLine} · ${parts.timeLine}${end && !ev.allDay ? `–${eventParts(end).timeLine}` : ''}`;
+    const badge =
+      status === 'now'
+        ? `<span class="sv-event-badge">${esc(t('eventsNow'))}</span>`
+        : ev.free
+          ? `<span class="sv-event-badge">${esc(t('eventsFree'))}</span>`
+          : '';
+    return `<li class="sv-event-card${status === 'now' ? ' is-now' : ''}${status === 'past' ? ' is-past' : ''}" data-event-id="${esc(ev.id)}">
+      <div class="sv-event-date" aria-hidden="true">
+        <span class="sv-event-date-month">${esc(parts.month)}</span>
+        <span class="sv-event-date-day">${esc(parts.day)}</span>
+        <span class="sv-event-date-dow">${esc(parts.weekday)}</span>
+      </div>
+      <div class="sv-event-body">
+        <p class="sv-event-kicker"><span>${esc(ev.series || '')}</span>${badge}</p>
+        <h3 class="sv-event-title">${esc(pick(ev.title))}</h3>
+        <p class="sv-event-when"><span class="visually-hidden">${esc(t('eventsWhen'))}: </span>${esc(when)}</p>
+        <p class="sv-event-place"><span class="visually-hidden">${esc(t('eventsWhere'))}: </span>${esc(pick(ev.place))}</p>
+        <p class="sv-event-copy">${esc(pick(ev.copy))}</p>
+        <div class="sv-event-actions">
+          <button type="button" class="sv-btn sv-btn-sand sv-btn-sm" data-event-listen="${esc(ev.id)}">
+            <i class="bi bi-volume-up-fill"></i> ${esc(t('listen'))}
+          </button>
+          ${
+            ev.siteId
+              ? `<button type="button" class="sv-btn sv-btn-ghost sv-btn-sm" data-event-map="${esc(ev.siteId)}">
+                  <i class="bi bi-geo-alt"></i> ${esc(t('mapShow'))}
+                </button>`
+              : ''
+          }
+          ${
+            ev.source
+              ? `<a class="sv-btn sv-btn-ghost sv-btn-sm" href="${esc(ev.source)}" target="_blank" rel="noopener noreferrer">
+                  <i class="bi bi-box-arrow-up-right"></i> ${esc(t('eventsSource'))}
+                </a>`
+              : ''
+          }
+        </div>
+      </div>
+    </li>`;
+  }
+
+  function renderEvents() {
+    const list = document.getElementById('svEventList');
+    if (!list) return;
+    const now = new Date();
+    const filter = state.eventFilter || 'upcoming';
+    const rows = (state.data?.events || [])
+      .map((ev) => ({ ev, status: classifyEvent(ev, now), start: parseEventInstant(ev.start, false) }))
+      .filter((row) => row.start)
+      .sort((a, b) => a.start - b.start);
+
+    const visible = rows.filter((row) => eventMatchesFilter(row.ev, row.status, filter));
+    const upcoming = visible.filter((row) => row.status !== 'past');
+    const past = filter === 'upcoming' ? visible.filter((row) => row.status === 'past') : [];
+
+    if (!upcoming.length && !past.length) {
+      list.innerHTML = `<li class="sv-event-empty">${esc(t('eventsEmpty'))}</li>`;
+      return;
+    }
+
+    const pastBlock = past.length
+      ? `<li class="sv-event-empty">${esc(t('eventsPast'))}</li>${past.map((row) => eventMarkup(row.ev, row.status)).join('')}`
+      : '';
+    list.innerHTML = `${upcoming.map((row) => eventMarkup(row.ev, row.status)).join('')}${pastBlock}`;
   }
 
   function cardMarkup(item, kind) {
@@ -413,6 +553,30 @@
       document.getElementById(id)?.addEventListener('click', onCardClick);
     });
 
+    document.getElementById('svEventFilters')?.addEventListener('click', (event) => {
+      const chip = event.target.closest('[data-event-filter]');
+      if (!chip) return;
+      state.eventFilter = chip.getAttribute('data-event-filter') || 'upcoming';
+      document.querySelectorAll('#svEventFilters .sv-chip').forEach((el) => {
+        el.classList.toggle('is-active', el === chip);
+      });
+      renderEvents();
+    });
+
+    document.getElementById('svEventList')?.addEventListener('click', (event) => {
+      const listen = event.target.closest('[data-event-listen]');
+      if (listen) {
+        const ev = (state.data?.events || []).find((item) => item.id === listen.getAttribute('data-event-listen'));
+        if (ev) speak(`${pick(ev.title)}. ${pick(ev.place)}. ${pick(ev.copy)}`);
+        return;
+      }
+      const mapBtn = event.target.closest('[data-event-map]');
+      if (mapBtn) {
+        document.getElementById('svMap')?.scrollIntoView({ behavior: 'smooth' });
+        window.ShenangoMap?.focusSite(mapBtn.getAttribute('data-event-map'), { speak: true });
+      }
+    });
+
     document.getElementById('svSheetClose')?.addEventListener('click', closeSheet);
     document.getElementById('svSheetBackdrop')?.addEventListener('click', closeSheet);
     document.getElementById('svSheetListen')?.addEventListener('click', () => speak(state.sheetSpeech));
@@ -440,6 +604,7 @@
       renderStaticUi();
       renderGuide();
       renderEras();
+      renderEvents();
       renderCards();
       renderGallery();
       renderVideos();
@@ -461,6 +626,9 @@
         document.getElementById('svMob')?.scrollIntoView({ behavior: 'smooth' });
         window.ShenangoMap?.setFilter?.('mob');
       }
+      if (params.get('events') === '1' || window.location.hash === '#svEvents') {
+        document.getElementById('svEvents')?.scrollIntoView({ behavior: 'smooth' });
+      }
     } catch (err) {
       console.error('shenango-content:', err);
       const list = document.getElementById('svEraList');
@@ -477,6 +645,7 @@
     openEra,
     flipFirst,
     unflipAll,
+    renderEvents,
     getData: () => state.data,
     BUHL_CENTER
   };

@@ -58,13 +58,14 @@ export async function mintLivekitToken({
   identity,
   name,
   canPublish = true,
+  inviteVoice = false,
 } = {}) {
   const minted = await mintLivekitAccessToken({
     roomName: livekitRoomName(reelCode),
     identity,
     name: sanitizeDisplayName(name),
     canPublish,
-    agentName: STARBAND_AGENT_NAME,
+    agentName: inviteVoice ? STARBAND_AGENT_NAME : null,
   });
   return minted;
 }
@@ -250,6 +251,7 @@ export function getStudioStatus() {
     ok: true,
     ...extras,
     agentName: STARBAND_AGENT_NAME,
+    voiceAgentDispatchDefault: false,
     openaiConfigured: Boolean((process.env.OPENAI_API_KEY || '').trim()),
     listenConfigured: true,
   };

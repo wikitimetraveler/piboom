@@ -43,13 +43,17 @@
     chatMic: () => document.getElementById('wtChatMic'),
     tap: () => document.getElementById('wtTap'),
     status: () => document.getElementById('wtStatus'),
-    mic: () => document.getElementById('wtMic'),
+    lkChip: () => document.getElementById('wtLkChip'),
+    hearChip: () => document.getElementById('wtHearChip'),
+    changeReel: () => document.getElementById('wtChangeReel'),
+    booth: () => document.getElementById('wtBooth'),
     cam: () => document.getElementById('wtCam'),
     blur: () => document.getElementById('wtBlur'),
     record: () => document.getElementById('wtRecord'),
     archive: () => document.getElementById('wtArchive'),
     faces: () => document.getElementById('wtFaces'),
     facesEmpty: () => document.getElementById('wtFacesEmpty'),
+    chatHint: () => document.getElementById('wtChatHint'),
   };
 
   let ytPlayer = null;
@@ -63,10 +67,102 @@
   let strokeId = '';
   let localVolume = 80;
   let selfName = 'Guest';
+  let health = { livekitConfigured: false, egressS3Configured: false };
+  let lkState = 'unset';
+
+  const LK_CHIP_LABELS = {
+    unset: 'Unset',
+    ready: 'Ready',
+    joining: 'Joining',
+    live: 'Live',
+    reconnecting: 'Reconnecting',
+    down: 'Down',
+  };
+
+  const HEAR_LABELS = {
+    hear: 'They can hear you',
+    muted: 'Muted · they cannot',
+    typed: 'Typed only · they cannot hear you',
+    joining: 'Joining…',
+    down: 'Voice down · they cannot hear you',
+  };
+
+  function setLkChip(state, line) {
+    if (state) lkState = state;
+    const chip = els.lkChip();
+    if (chip) {
+      chip.dataset.state = lkState;
+      chip.textContent = LK_CHIP_LABELS[lkState] || lkState;
+    }
+    if (line != null) setStatus(line);
+  }
+
+  function setHearChip(state) {
+    const chip = els.hearChip();
+    if (!chip) return;
+    if (!state) {
+      chip.hidden = true;
+      return;
+    }
+    chip.hidden = false;
+    chip.dataset.state = state;
+    chip.textContent = HEAR_LABELS[state] || state;
+  }
+
+  function setChatHint(text) {
+    const el = els.chatHint();
+    if (el) el.textContent = text || '';
+  }
+
+  function syncTicketBar() {
+    const theater = els.theater();
+    const hasReel = hasMedia(room.media);
+    theater?.classList.toggle('has-reel', hasReel);
+    const change = els.changeReel();
+    if (change) {
+      change.hidden = !hasReel;
+      change.setAttribute(
+        'aria-pressed',
+        theater?.classList.contains('is-ticket-open') ? 'true' : 'false'
+      );
+    }
+  }
+
+  function setTicketOpen(on) {
+    const theater = els.theater();
+    theater?.classList.toggle('is-ticket-open', Boolean(on));
+    if (!on) setPickerOpen(false);
+    syncTicketBar();
+  }
 
   function setStatus(text) {
     const el = els.status();
     if (el) el.textContent = text || '';
+  }
+
+  function setBoothVisible(on) {
+    const booth = els.booth();
+    if (booth) booth.hidden = !on;
+  }
+
+  function setBoothEnabled(on) {
+    ['cam', 'blur', 'chatMic', 'record'].forEach((key) => {
+      const el = els[key]?.();
+      if (el) el.disabled = !on;
+    });
+    applyArchiveGate(on);
+  }
+
+  function applyArchiveGate(roomLive) {
+    const archive = els.archive();
+    if (!archive) return;
+    const s3 = Boolean(health.egressS3Configured);
+    const live = roomLive !== false && (lkState === 'live' || lkState === 'reconnecting');
+    archive.hidden = !live;
+    archive.disabled = !s3 || !live;
+    archive.title = s3
+      ? 'Archive mics only — not YouTube, not the movie.'
+      : 'Archive needs S3 dest (LIVEKIT_EGRESS_S3_*). Use Record couches for a local mix.';
   }
 
   function loggedInUser() {
@@ -194,6 +290,7 @@
     try {
       await ensureMedia(media);
       applyPlayback(room, true);
+      setTicketOpen(false);
       setStatus('Loaded. Press play.');
     } catch (err) {
       setStatus(err?.message || 'Player did not start.');
@@ -211,6 +308,10 @@
     const btn = els.pick();
     if (picker) picker.hidden = !on;
     btn?.setAttribute('aria-pressed', on ? 'true' : 'false');
+    if (on) {
+      els.theater()?.classList.add('is-ticket-open');
+      syncTicketBar();
+    }
   }
 
   function renderArtist(artist) {
@@ -354,6 +455,7 @@
     if (file) file.hidden = kind !== 'file';
     if (empty) empty.hidden = Boolean(kind);
     setPoster(kind === 'youtube' ? room.media?.youtubeId : '');
+    syncTicketBar();
   }
 
   function applyLocalVolume() {
@@ -655,6 +757,7 @@
       tile = document.createElement('div');
       tile.className = 'wt-face';
       tile.id = id;
+      tile.dataset.identity = String(participant?.identity || 'local');
       const caption = document.createElement('span');
       caption.textContent = isLocal
         ? (participant?.name || selfName || 'You') + ' (you)'
@@ -767,24 +870,27 @@
     const rec = els.record();
     if (!rec) return;
     rec.setAttribute('aria-pressed', on ? 'true' : 'false');
-    rec.textContent = on ? 'Stop' : 'Record';
+    rec.textContent = on ? 'Stop mix' : 'Record couches';
   }
 
   function syncMicButtons(on) {
-    const pressed = on ? 'true' : 'false';
-    const mic = els.mic();
     const chatMic = els.chatMic();
-    if (mic) {
-      mic.setAttribute('aria-pressed', pressed);
-      mic.textContent = on ? 'Mic on' : 'Mic';
-    }
     if (chatMic) {
-      chatMic.setAttribute('aria-pressed', pressed);
+      chatMic.setAttribute('aria-pressed', on ? 'true' : 'false');
       chatMic.textContent = on ? 'Live' : 'Talk';
       if (!on) {
         chatMic.style.boxShadow = '';
         chatMic.removeAttribute('data-heard');
       }
+    }
+    const voiceLive = lkState === 'live' || lkState === 'reconnecting';
+    if (voiceLive) {
+      setHearChip(on ? 'hear' : 'muted');
+      setChatHint(
+        on
+          ? "You're live. Type if you want it on the record."
+          : 'Talk in the booth is live voice. Type to send a line.'
+      );
     }
   }
 
@@ -853,9 +959,8 @@
     window.ensureAudioUnlock?.();
     window.primeSpeechSynthesis?.();
     void window.WatchTogetherSync?.resumeRemoteAudio?.();
-    const fromTalk = event?.currentTarget?.id === 'wtChatMic';
     const currentlyOn = Boolean(window.WatchTogetherSync?.micOn());
-    const next = fromTalk ? true : !currentlyOn;
+    const next = !currentlyOn;
     const on = await window.WatchTogetherSync?.setMic(next);
     syncMicButtons(Boolean(on));
     if (next && !on) {
@@ -869,10 +974,8 @@
     }
     if (on) {
       startTalkCaptions();
-      setStatus('Mic on · they can hear you, and your words go in chat.');
     } else {
       stopTalkCaptions();
-      setStatus('Mic off · type in chat instead.');
     }
     return on;
   }
@@ -1016,13 +1119,50 @@
             }
           }
         },
+        speakers: (identities) => {
+          const ids = new Set(identities || []);
+          document.querySelectorAll('.wt-face').forEach((tile) => {
+            tile.classList.toggle('is-speaking', ids.has(tile.dataset.identity));
+          });
+        },
+        livekit: (payload) => {
+          const state = payload?.state;
+          if (state === 'joining') {
+            setBoothVisible(true);
+            setBoothEnabled(false);
+            setLkChip('joining');
+            setHearChip('joining');
+            return;
+          }
+          if (state === 'live') {
+            setBoothVisible(true);
+            setBoothEnabled(true);
+            setLkChip('live');
+            setHearChip(window.WatchTogetherSync?.micOn() ? 'hear' : 'muted');
+            return;
+          }
+          if (state === 'reconnecting') {
+            setLkChip('reconnecting');
+            setHearChip(window.WatchTogetherSync?.micOn() ? 'hear' : 'muted');
+            return;
+          }
+          if (state === 'down') {
+            setBoothEnabled(false);
+            setLkChip('down');
+            setHearChip('down');
+            setChatHint('They cannot hear you. Type a line.');
+            setStatus('Voice dropped. Typed chat and the clock still run.');
+          }
+        },
         error: (err) => {
           if (err?.reason === 'theater-full') {
             setStatus('Theater is full — 10 people already here.');
             return;
           }
           if (err?.reason === 'livekit-missing') {
-            setStatus('Camera needs LiveKit keys on the server. Set LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET on Render, then redeploy.');
+            setLkChip('unset', 'Camera needs LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET in local .env.');
+            setHearChip('typed');
+            setChatHint('They cannot hear you. Type a line.');
             return;
           }
           if (err?.reason === 'unsupported' || err?.reason === 'empty') {
@@ -1034,19 +1174,21 @@
       },
     });
     const live = result?.transport === 'livekit';
-    const mic = els.mic();
     const chatMic = els.chatMic();
     const cam = els.cam();
     const blur = els.blur();
     const rec = els.record();
     const archive = els.archive();
-    if (mic) mic.hidden = !live;
+    setBoothVisible(live);
     if (chatMic) chatMic.hidden = !live;
     if (cam) cam.hidden = !live;
     if (blur) blur.hidden = !live;
     if (rec) rec.hidden = !live;
-    if (archive) archive.hidden = !live;
+    applyArchiveGate(live);
     if (live) {
+      setLkChip('live');
+      setHearChip('muted');
+      setBoothEnabled(true);
       try {
         syncBlurButton(window.WatchTogetherSync.blurOn());
         const camOn = await window.WatchTogetherSync.setCamera(true);
@@ -1063,16 +1205,23 @@
             });
           };
           document.addEventListener('pointerdown', retryCam, { once: true });
-        } else if (!hasMedia(room.media)) {
-          setStatus('Click Talk in chat so the other couches can hear you.');
         }
       } catch (err) {
+        syncCamButton(false);
         setStatus(err?.message || 'Click Cam, then Talk, so they can see and hear you.');
       }
     } else if (result?.transport === 'full') {
+      setHearChip('typed');
+      setChatHint('They cannot hear you. Type a line.');
+      setLkChip(health.livekitConfigured ? 'ready' : 'unset');
       setStatus('Theater is full — 10 people already here.');
     } else {
-      setStatus('On the shared clock. Typed chat only — add LiveKit keys on Render for camera and voice.');
+      setHearChip('typed');
+      setChatHint('They cannot hear you. Type a line.');
+      setLkChip(
+        health.livekitConfigured ? 'ready' : 'unset',
+        'On the shared clock. Typed chat only — they cannot hear you.'
+      );
     }
     getLocation().then((loc) => {
       if (loc?.lat != null && loc?.lng != null) {
@@ -1139,7 +1288,7 @@
     document.body.classList.toggle('wt-cinema-on', Boolean(on));
     if (btn) {
       btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-      btn.textContent = on ? 'Exit chat left' : 'Chat left';
+      btn.textContent = on ? 'Hide aisle' : 'Show aisle';
     }
     try {
       sessionStorage.setItem(CINEMA_KEY, on ? '1' : '0');
@@ -1204,6 +1353,12 @@
     els.cinema()?.addEventListener('click', () => {
       setCinema(!isCinema());
     });
+    els.changeReel()?.addEventListener('click', () => {
+      const theater = els.theater();
+      const open = !theater?.classList.contains('is-ticket-open');
+      setTicketOpen(open);
+      if (open) els.url()?.focus();
+    });
     setCinema(readCinema());
     document.addEventListener('fullscreenchange', syncFillButton);
     document.addEventListener('webkitfullscreenchange', syncFillButton);
@@ -1227,7 +1382,6 @@
       els.drawBtn()?.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
     els.clearDraw()?.addEventListener('click', () => emitIntent({ type: 'clear-draw' }));
-    els.mic()?.addEventListener('click', (event) => toggleMic(event));
     els.chatMic()?.addEventListener('click', (event) => toggleMic(event));
     els.cam()?.addEventListener('click', async () => {
       const next = !window.WatchTogetherSync?.camOn();
@@ -1285,7 +1439,11 @@
         });
         const data = await res.json();
         if (!res.ok || !data.ok) {
-          setStatus(data.error || 'Could not archive mics.');
+          setStatus(
+            data.error === 'LIVEKIT_EGRESS_DEST_REQUIRED'
+              ? 'Archive needs S3 dest (LIVEKIT_EGRESS_S3_*). Use Record couches for a local mix.'
+              : (data.error || 'Could not archive mics.')
+          );
           return;
         }
         archiveId = data.egressId;
@@ -1353,9 +1511,24 @@
     });
   }
 
+  async function fetchHealth() {
+    try {
+      const res = await fetch('/api/watch-together/status');
+      const data = await res.json().catch(() => null);
+      if (data && typeof data === 'object') health = data;
+    } catch {
+      health = { livekitConfigured: false, egressS3Configured: false };
+    }
+    if (health.livekitConfigured) setLkChip('ready', 'Ready · join for cam and talk');
+    else setLkChip('unset', 'Unset · Socket clock. Add LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET in local .env.');
+    applyArchiveGate(false);
+  }
+
   async function start() {
     bindDraw();
     bindControls();
+    syncTicketBar();
+    await fetchHealth();
     await requireUnlock();
     selfName = displayName();
     window.WatchTogetherGate.setName(selfName);

@@ -7,7 +7,7 @@
   <title>StarBand desk — music studio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Cinzel+Decorative:wght@700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
   <link rel="stylesheet" href="/shared/design-tokens.css"/>
   <link rel="stylesheet" href="/studio/css/studio.css"/>
@@ -20,13 +20,20 @@
   <script src="/shared/js/livekit-talk-audio.js"></script>
 </head>
 <body class="st-page encompass-dark-mode">
+  <div class="st-glow" aria-hidden="true"></div>
+  <div class="st-scanlines" aria-hidden="true"></div>
   <modern-navbar></modern-navbar>
   <main class="st-desk-shell">
     <header class="st-desk-top">
       <h1>StarBand</h1>
+      <div class="st-marquee-bulbs" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
       <span class="st-code" id="stReelCode">------</span>
-      <span class="st-status" id="stSocketStatus">Socket…</span>
-      <span class="st-status" id="stLivekitStatus">LiveKit…</span>
+      <span class="st-lk-chip" id="stSocketChip" data-state="unset">Socket</span>
+      <span class="st-lk-chip" id="stLivekitChip" data-state="unset">Unset</span>
+      <span class="st-lk-chip" id="stMicChip" data-state="unset">Talk mic · echo cancel</span>
+      <span class="st-lk-chip" id="stArchiveChip" data-state="unset">Archive</span>
+      <span class="st-status" id="stSocketStatus" hidden>Socket…</span>
+      <span class="st-status" id="stLivekitStatus" hidden>LiveKit…</span>
       <label class="st-status">
         Name
         <input class="st-input" id="stName" value="Player" maxlength="40" style="width:9rem;display:inline-block;margin-left:.4rem"/>
@@ -48,7 +55,23 @@
         <label class="st-status" style="display:block;margin-top:0.4rem">
           <input type="checkbox" id="stAcousticDesk" checked/> Acoustic desk (neck/body EQ + wood room)
         </label>
-        <p class="st-hint">LiveKit talk mic always echo-cancels. Headphones still help. Check music input only for local guitar/record takes — not the room.</p>
+        <label class="st-status" style="display:block;margin-top:0.4rem">
+          Autotune my voice
+          <select class="st-input" id="stTuneKey" style="width:auto;margin-left:.4rem">
+            <option value="chromatic" selected>Chromatic (classic)</option>
+            <option value="C:major">C major</option>
+            <option value="G:major">G major</option>
+            <option value="D:major">D major</option>
+            <option value="A:major">A major</option>
+            <option value="F:major">F major</option>
+            <option value="A:minor">A minor</option>
+            <option value="E:minor">E minor</option>
+          </select>
+        </label>
+        <label class="st-status" style="display:block;margin-top:0.4rem">
+          <input type="checkbox" id="stTuneHard" checked/> Hard retune
+        </label>
+        <p class="st-hint">Autotune is Vocal and Harmony only. Guitar never gets it. LiveKit talk mic always echo-cancels. Headphones still help when you stack.</p>
         <div class="st-meter" aria-hidden="true"><span id="stMeter"></span></div>
       </aside>
 
@@ -62,7 +85,7 @@
           <button type="button" class="st-btn st-btn--ghost" id="stBounce">Bounce WAV</button>
           <button type="button" class="st-btn st-btn--ghost" id="stRelease">Release</button>
         </div>
-        <p class="st-status" id="stTransportLabel">Playhead 00:00.00</p>
+        <p class="st-status" id="stTransportLabel">Playhead 00:00.00 · Record = timeline · Bounce = WAV in this tab</p>
       </section>
 
       <aside class="st-panel">
@@ -72,12 +95,16 @@
           <button type="button" class="st-btn st-btn--ghost" id="stMic" aria-pressed="false">Mic off</button>
           <button type="button" class="st-btn st-btn--ghost" id="stCam">Cam</button>
           <button type="button" class="st-btn st-btn--ghost" id="stShare">Share</button>
-          <button type="button" class="st-btn st-btn--ghost" id="stEgress">Archive mics</button>
+          <button type="button" class="st-btn st-btn--ghost" id="stEgress" disabled title="Archive needs S3 dest (LIVEKIT_EGRESS_S3_*). Use Record for the timeline and Bounce for a local WAV.">Archive mics</button>
           <button type="button" class="st-btn st-btn--ghost" id="stHeygenFace">Reed face</button>
         </div>
         <div class="st-stage" id="stStage"></div>
-        <div class="st-stage" id="stHeygenTile" hidden></div>
-        <p class="st-status" id="stPresence">No one in the reel yet.</p>
+        <p class="st-on-stage" id="stOnStage">On stage: —</p>
+        <div class="st-heygen-frame" id="stHeygenTile" hidden>
+          <p class="st-heygen-caption">Face tile · HeyGen room (not StarBand)</p>
+          <div id="stHeygenMedia"></div>
+        </div>
+        <p class="st-status" id="stPresence">On the reel: no one yet.</p>
         <h2 style="margin-top:1rem">Reed</h2>
         <div class="st-chat">
           <div class="st-chat-log" id="stReedLog"></div>
@@ -88,6 +115,7 @@
       </aside>
     </div>
   </main>
+  <script src="/studio/js/studio-autotune.js"></script>
   <script src="/studio/js/studio-desk.js"></script>
 </body>
 </html>

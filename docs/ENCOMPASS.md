@@ -66,6 +66,7 @@ In-browser binding to Encompass forms via Encompass Hub. The assistant knows bot
 - **Processor assignment** – UI at `public/finance/processor-assignment.html`: rule/AI complexity scoring, capacity-aware processor slots, dry run / apply via `POST /api/encompass-hub/processor-assignment/run`. Processors can be picked from company users (`GET /api/encompass-hub/users`); config persists in Postgres (`GET`/`PUT /api/encompass-hub/processor-assignment/config`, table `processor_assignment_tool_config`, one row per `X-Encompass-Env`). Services: `services/processor-assignment.service.js`, `services/processor-assignment-config.service.js`, `services/loan-complexity.service.js`, `services/loan-complexity-ai.service.js`.
 - **OAuth** – Token exchange
 - **Users/Organizations** – Via Settings API
+- **Enhanced Conditions** – Live CRUD UI at `/finance/enhanced-conditions.html` (`/api/encompass-conditions` catalog/invoke plus `/types`, `/templates`, `/loans/:loanId/conditions`). Condition Manager CDO conversion remains dry-run (`POST /convert`); apply after conversion via the CRUD page.
 - **Custom Fields** – Field management
 
 ## Environment Variables

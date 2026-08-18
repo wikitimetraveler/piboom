@@ -250,24 +250,18 @@
 
   const PAIRINGS = {
     'classic-glazed': 'mango-sunrise',
-    'boston-cream': 'cookies-cream',
-    'raspberry-jelly': 'berry-blast',
-    'old-fashioned': 'strawberry-banana',
-    'maple-walnut': 'pb-banana',
-    'french-cruller': 'mango-sunrise',
-    'chocolate-frosted': 'cookies-cream',
-    'strawberry-sprinkle': 'strawberry-banana',
-    'lemon-poppy': 'tropical-green',
-    'apple-fritter': 'pb-banana',
-    'cinnamon-sugar': 'mango-sunrise',
-    'matcha-white-chocolate': 'tropical-green',
-    'blueberry-cake': 'berry-blast',
+    'coconut-glaze': 'tropical-green',
+    'cinnamon-glaze': 'mango-sunrise',
+    'chocolate-glaze': 'cookies-cream',
+    'buttermilk': 'strawberry-banana',
+    'maple': 'pb-banana',
+    'bear-claw': 'mango-sunrise',
     'mango-sunrise': 'classic-glazed',
-    'berry-blast': 'raspberry-jelly',
-    'tropical-green': 'lemon-poppy',
-    'strawberry-banana': 'strawberry-sprinkle',
-    'cookies-cream': 'boston-cream',
-    'pb-banana': 'maple-walnut'
+    'berry-blast': 'cinnamon-glaze',
+    'tropical-green': 'coconut-glaze',
+    'strawberry-banana': 'buttermilk',
+    'cookies-cream': 'chocolate-glaze',
+    'pb-banana': 'maple'
   };
 
   function originHtml(origin) {
@@ -1049,7 +1043,7 @@
       if (loading) {
         loading.hidden = false;
         loading.textContent =
-          'Couldn’t load the baker’s dozen (network hiccup). Refresh the page — Pip’s still here.';
+          'Couldn’t load the case (network hiccup). Refresh the page — Pip’s still here.';
       }
     }
   }

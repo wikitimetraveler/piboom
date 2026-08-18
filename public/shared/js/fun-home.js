@@ -75,7 +75,7 @@
 
   // Smooth scroll for hero CTA / legacy scroll indicator
   function initSmoothScroll() {
-    document.querySelectorAll('a[href="#projects"], .fun-hero__scroll').forEach((el) => {
+    document.querySelectorAll('a[href="#projects"], .fun-hero__scroll, .fun-hero__scroll-cue').forEach((el) => {
       el.addEventListener('click', (e) => {
         const projectsSection = document.getElementById('projects') || document.querySelector('.fun-projects');
         if (!projectsSection) return;
@@ -83,6 +83,16 @@
         projectsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     });
+  }
+
+  function initHeaderScroll() {
+    const header = document.querySelector('.fun-header');
+    if (!header) return;
+    const onScroll = () => {
+      header.classList.toggle('is-scrolled', window.scrollY > 12);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
   }
 
   // Update year
@@ -624,6 +634,7 @@
     initThemeToggle();
     initCardEffects();
     initSmoothScroll();
+    initHeaderScroll();
     updateYear();
     initParallaxSparkles();
     initScrollAnimations();

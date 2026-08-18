@@ -186,6 +186,13 @@
         window.ShenangoMap?.setFilter?.('mob');
         content.flipFirst?.('svMobGrid');
         break;
+      case 'openEvents':
+        content.unflipAll?.();
+        document.getElementById('svEvents')?.scrollIntoView({
+          behavior: state.reducedMotion ? 'auto' : 'smooth',
+          block: 'start'
+        });
+        break;
       case 'unflipCards':
         content.unflipAll?.();
         break;
