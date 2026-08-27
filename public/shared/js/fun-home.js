@@ -364,20 +364,23 @@
     console.log('✨ Extra sparkles activated! ✨');
   }
 
-  // Three.js Hero Scene — faceted zen glass crystal (CSS orb is fallback only)
+  // Three.js Hero Scene — cinematic zen glass crystal
   function makeZenEnvMap(renderer) {
     const envScene = new THREE.Scene();
-    envScene.add(new THREE.HemisphereLight(0xf4fbff, 0x163040, 1.35));
+    envScene.add(new THREE.HemisphereLight(0xffffff, 0x102028, 1.8));
+    envScene.add(new THREE.AmbientLight(0xf4fbff, 0.45));
     const panels = [
-      { color: 0xffffff, pos: [0, 5, 0] },
-      { color: 0x4a90a4, pos: [5, 1, 2] },
-      { color: 0xc8ab57, pos: [-4, 2, 3] },
-      { color: 0x7ec8b8, pos: [2, -3, 4] },
-      { color: 0xd8eef4, pos: [-2, 1, -5] }
+      { color: 0xffffff, pos: [0, 8, 1], scale: 10 },
+      { color: 0xe8f4f8, pos: [-6, 5, 4], scale: 7 },
+      { color: 0x4a90a4, pos: [7, 2, 3], scale: 8 },
+      { color: 0xc8ab57, pos: [-5, 1, 6], scale: 6 },
+      { color: 0x7ec8b8, pos: [3, -5, 5], scale: 7 },
+      { color: 0xd8eef4, pos: [0, 2, -8], scale: 9 },
+      { color: 0xfff6d6, pos: [5, 6, -3], scale: 5 }
     ];
     panels.forEach((p) => {
       const mesh = new THREE.Mesh(
-        new THREE.PlaneGeometry(7, 7),
+        new THREE.PlaneGeometry(p.scale, p.scale),
         new THREE.MeshBasicMaterial({ color: p.color, side: THREE.DoubleSide })
       );
       mesh.position.set(p.pos[0], p.pos[1], p.pos[2]);
@@ -385,7 +388,7 @@
       envScene.add(mesh);
     });
     const pmrem = new THREE.PMREMGenerator(renderer);
-    const envTex = pmrem.fromScene(envScene, 0.06).texture;
+    const envTex = pmrem.fromScene(envScene, 0.02).texture;
     pmrem.dispose();
     return envTex;
   }
@@ -397,6 +400,7 @@
     if (!canvas) return;
 
     const container = canvas.parentElement;
+    const hero = container;
     let width = container.clientWidth;
     let height = container.clientHeight;
     const isNarrow = window.matchMedia('(max-width: 991.98px)').matches;
@@ -411,112 +415,187 @@
     renderer.setSize(width, height);
     if (THREE.SRGBColorSpace) renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.18;
+    renderer.toneMappingExposure = 1.42;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(isNarrow ? 40 : 32, width / height, 0.1, 100);
-    camera.position.set(0, 0.08, isNarrow ? 4.6 : 3.7);
+    const camera = new THREE.PerspectiveCamera(isNarrow ? 38 : 30, width / height, 0.1, 100);
+    camera.position.set(0, 0.12, isNarrow ? 4.2 : 3.15);
 
     const envMap = makeZenEnvMap(renderer);
 
     const group = new THREE.Group();
-    group.position.set(isNarrow ? 0 : 1.45, isNarrow ? 0.42 : 0.04, 0);
-    group.scale.setScalar(isNarrow ? 1.28 : 1.72);
+    const baseX = isNarrow ? 0 : 1.38;
+    const baseY = isNarrow ? 0.38 : 0.02;
+    group.position.set(baseX, baseY, 0);
+    group.scale.setScalar(isNarrow ? 1.42 : 2.05);
     scene.add(group);
 
     function getMaterials() {
       const dark = document.body.getAttribute('data-theme') === 'dark';
       const core = new THREE.MeshPhysicalMaterial({
-        color: dark ? 0x8ec5d4 : 0xc5e6ee,
-        metalness: 0.05,
-        roughness: 0.06,
-        transmission: 0.88,
-        thickness: 1.55,
-        ior: 1.48,
+        color: dark ? 0xa8d8e4 : 0xd4eef4,
+        metalness: 0.02,
+        roughness: 0.035,
+        transmission: 0.94,
+        thickness: 2.1,
+        ior: 1.52,
         clearcoat: 1,
-        clearcoatRoughness: 0.04,
+        clearcoatRoughness: 0.02,
         envMap: envMap,
-        envMapIntensity: dark ? 1.7 : 1.35,
-        attenuationColor: dark ? 0x3d7a8a : 0x4a90a4,
-        attenuationDistance: 2.4,
+        envMapIntensity: dark ? 2.1 : 1.75,
+        attenuationColor: dark ? 0x2f6f7e : 0x4a90a4,
+        attenuationDistance: 1.6,
         specularIntensity: 1,
-        iridescence: 0.12,
-        iridescenceIOR: 1.3
+        iridescence: 0.22,
+        iridescenceIOR: 1.32,
+        sheen: 0.4,
+        sheenColor: new THREE.Color(dark ? 0x7eb8c6 : 0xb8dce6)
       });
       const ring = new THREE.MeshStandardMaterial({
-        color: dark ? 0xe8c96a : 0xc8ab57,
-        metalness: 0.92,
-        roughness: 0.22,
+        color: dark ? 0xf0d478 : 0xc8ab57,
+        metalness: 1,
+        roughness: 0.16,
         envMap: envMap,
-        envMapIntensity: 1.1
+        envMapIntensity: 1.35
+      });
+      const ice = new THREE.MeshStandardMaterial({
+        color: dark ? 0xb7e0ea : 0x9fd0dc,
+        metalness: 0.72,
+        roughness: 0.18,
+        envMap: envMap,
+        envMapIntensity: 1.05
       });
       const rim = new THREE.LineBasicMaterial({
-        color: dark ? 0xeaf6fa : 0xffffff,
+        color: dark ? 0xf4fbff : 0xffffff,
         transparent: true,
-        opacity: dark ? 0.42 : 0.38
+        opacity: dark ? 0.55 : 0.48
       });
       const heart = new THREE.MeshStandardMaterial({
-        color: dark ? 0x2a6070 : 0x4a90a4,
-        emissive: dark ? 0x4a90a4 : 0x7eb8c6,
-        emissiveIntensity: dark ? 0.95 : 0.65,
-        roughness: 0.4,
-        metalness: 0.1
+        color: dark ? 0x1f5a68 : 0x3d8fa4,
+        emissive: dark ? 0x5aa3b5 : 0x7eb8c6,
+        emissiveIntensity: dark ? 1.35 : 0.95,
+        roughness: 0.28,
+        metalness: 0.15
       });
-      return { core, ring, rim, heart };
+      const halo = new THREE.MeshBasicMaterial({
+        color: dark ? 0x4a90a4 : 0x8ec5d4,
+        transparent: true,
+        opacity: dark ? 0.16 : 0.13,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        side: THREE.BackSide
+      });
+      const sparkle = new THREE.PointsMaterial({
+        color: dark ? 0xf4fbff : 0xffffff,
+        size: isNarrow ? 0.045 : 0.038,
+        transparent: true,
+        opacity: 0.9,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+        sizeAttenuation: true
+      });
+      const shard = new THREE.MeshPhysicalMaterial({
+        color: dark ? 0xc8ab57 : 0xe8d48a,
+        metalness: 0.85,
+        roughness: 0.12,
+        transmission: 0.35,
+        thickness: 0.4,
+        envMap: envMap,
+        envMapIntensity: 1.2,
+        clearcoat: 0.8
+      });
+      return { core, ring, ice, rim, heart, halo, sparkle, shard };
     }
 
     let mats = getMaterials();
     const detail = isNarrow ? 1 : 2;
-    const orbGeom = new THREE.IcosahedronGeometry(1.12, detail);
+    const orbGeom = new THREE.IcosahedronGeometry(1.08, detail);
     const orb = new THREE.Mesh(orbGeom, mats.core);
     group.add(orb);
 
-    const heart = new THREE.Mesh(new THREE.IcosahedronGeometry(0.42, 0), mats.heart);
+    const heart = new THREE.Mesh(new THREE.OctahedronGeometry(0.38, 0), mats.heart);
     group.add(heart);
 
-    const edgeGeom = new THREE.EdgesGeometry(orbGeom, 18);
+    const edgeGeom = new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(1.08, 0), 1);
     const facets = new THREE.LineSegments(edgeGeom, mats.rim);
     group.add(facets);
 
-    const ringGeom = new THREE.TorusGeometry(1.58, 0.038, 12, isNarrow ? 64 : 96);
+    const halo = new THREE.Mesh(new THREE.SphereGeometry(1.55, 40, 40), mats.halo);
+    group.add(halo);
+
+    const ringGeom = new THREE.TorusGeometry(1.52, 0.042, 14, isNarrow ? 72 : 128);
     const ring = new THREE.Mesh(ringGeom, mats.ring);
-    ring.rotation.x = Math.PI / 2.28;
+    ring.rotation.x = Math.PI / 2.2;
     group.add(ring);
 
-    const ring2Geom = new THREE.TorusGeometry(1.92, 0.016, 10, isNarrow ? 48 : 80);
-    const ring2 = new THREE.Mesh(
-      ring2Geom,
-      new THREE.MeshStandardMaterial({
-        color: 0x9fd0dc,
-        metalness: 0.55,
-        roughness: 0.28,
-        envMap: envMap,
-        envMapIntensity: 0.8,
-        transparent: true,
-        opacity: 0.85
-      })
-    );
-    ring2.rotation.x = Math.PI / 2.7;
-    ring2.rotation.y = 0.38;
+    const ring2Geom = new THREE.TorusGeometry(1.82, 0.018, 12, isNarrow ? 56 : 96);
+    const ring2 = new THREE.Mesh(ring2Geom, mats.ice);
+    ring2.rotation.x = Math.PI / 2.85;
+    ring2.rotation.y = 0.55;
     group.add(ring2);
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.35));
-    scene.add(new THREE.HemisphereLight(0xf4fbff, 0x1a3040, 0.7));
-    const key = new THREE.DirectionalLight(0xffffff, 1.55);
-    key.position.set(2.8, 3.6, 4.2);
+    const ring3Geom = new THREE.TorusGeometry(2.12, 0.012, 10, isNarrow ? 48 : 80);
+    const ring3 = new THREE.Mesh(ring3Geom, mats.ring.clone());
+    ring3.material.opacity = 0.85;
+    ring3.material.transparent = true;
+    ring3.rotation.x = Math.PI / 1.7;
+    ring3.rotation.z = 0.4;
+    group.add(ring3);
+
+    const shardGeom = new THREE.OctahedronGeometry(0.09, 0);
+    const shards = new THREE.Group();
+    const shardCount = isNarrow ? 6 : 10;
+    for (let i = 0; i < shardCount; i++) {
+      const shard = new THREE.Mesh(shardGeom, mats.shard);
+      const a = (i / shardCount) * Math.PI * 2;
+      shard.position.set(Math.cos(a) * 2.05, Math.sin(a * 1.7) * 0.35, Math.sin(a) * 2.05);
+      shard.userData.angle = a;
+      shards.add(shard);
+    }
+    group.add(shards);
+
+    const sparkCount = isNarrow ? 40 : 96;
+    const sparkPos = new Float32Array(sparkCount * 3);
+    for (let i = 0; i < sparkCount; i++) {
+      const r = 1.7 + Math.random() * 1.55;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      sparkPos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      sparkPos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      sparkPos[i * 3 + 2] = r * Math.cos(phi);
+    }
+    const sparkGeom = new THREE.BufferGeometry();
+    sparkGeom.setAttribute('position', new THREE.BufferAttribute(sparkPos, 3));
+    const sparkles = new THREE.Points(sparkGeom, mats.sparkle);
+    group.add(sparkles);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.28));
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x152028, 0.95));
+    const key = new THREE.DirectionalLight(0xffffff, 2.1);
+    key.position.set(3.2, 4.2, 5);
     scene.add(key);
-    const fill = new THREE.DirectionalLight(0x4a90a4, 0.55);
-    fill.position.set(-3.4, 0.6, -1.8);
+    const fill = new THREE.DirectionalLight(0x4a90a4, 0.7);
+    fill.position.set(-4, 0.8, -2);
     scene.add(fill);
-    const spark = new THREE.PointLight(0xffffff, 1.4, 8, 2);
-    spark.position.set(1.2, 1.4, 2.2);
+    const rimLight = new THREE.DirectionalLight(0xc8ab57, 0.85);
+    rimLight.position.set(-2.5, 3.2, -4);
+    scene.add(rimLight);
+    const spark = new THREE.PointLight(0xffffff, 2.2, 10, 2);
+    spark.position.set(1.4, 1.6, 2.4);
     scene.add(spark);
+    const coreLight = new THREE.PointLight(0x7eb8c6, 1.6, 6, 2);
+    group.add(coreLight);
+
     document.body.classList.add('fun-home--webgl');
 
     let animationFrameId = null;
     let isPageVisible = true;
     let inView = true;
     const clock = new THREE.Clock();
+    let parallaxX = 0;
+    let parallaxY = 0;
+    let targetParallaxX = 0;
+    let targetParallaxY = 0;
 
     document.addEventListener('visibilitychange', () => {
       isPageVisible = !document.hidden;
@@ -532,19 +611,55 @@
       io.observe(container);
     }
 
+    const onPointerMove = (e) => {
+      const rect = hero.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      targetParallaxX = ((e.clientX - rect.left) / rect.width - 0.5) * 0.55;
+      targetParallaxY = ((e.clientY - rect.top) / rect.height - 0.5) * 0.32;
+    };
+    hero.addEventListener('pointermove', onPointerMove);
+
+    const burstSpin = () => {
+      if (typeof gsap === 'undefined') return;
+      gsap.fromTo(
+        group.rotation,
+        { z: group.rotation.z },
+        { z: group.rotation.z + Math.PI * 2, duration: 1.15, ease: 'power3.inOut' }
+      );
+      gsap.fromTo(
+        group.scale,
+        { x: group.scale.x, y: group.scale.y, z: group.scale.z },
+        {
+          x: group.scale.x * 1.08,
+          y: group.scale.y * 1.08,
+          z: group.scale.z * 1.08,
+          duration: 0.35,
+          yoyo: true,
+          repeat: 1,
+          ease: 'power2.out'
+        }
+      );
+    };
+    const onHeroActivate = (e) => {
+      if (e.target.closest('a, button, details, summary')) return;
+      burstSpin();
+    };
+    hero.addEventListener('click', onHeroActivate);
+    hero.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      if (e.target !== hero) return;
+      e.preventDefault();
+      burstSpin();
+    });
+
     if (typeof gsap !== 'undefined') {
+      const startScale = isNarrow ? 0.55 : 0.85;
       gsap.from(group.scale, {
-        x: isNarrow ? 0.72 : 1.15,
-        y: isNarrow ? 0.72 : 1.15,
-        z: isNarrow ? 0.72 : 1.15,
-        duration: 1.35,
+        x: startScale,
+        y: startScale,
+        z: startScale,
+        duration: 1.55,
         ease: 'power3.out',
-        delay: 0.12
-      });
-      gsap.from(group.rotation, {
-        y: -0.85,
-        duration: 1.45,
-        ease: 'power2.out',
         delay: 0.08
       });
     }
@@ -553,16 +668,35 @@
       animationFrameId = requestAnimationFrame(animate);
       if (!isPageVisible || !inView) return;
       const elapsed = clock.getElapsedTime();
-      orb.rotation.y = elapsed * 0.16;
-      orb.rotation.x = Math.sin(elapsed * 0.22) * 0.08;
+      parallaxX += (targetParallaxX - parallaxX) * 0.06;
+      parallaxY += (targetParallaxY - parallaxY) * 0.06;
+
+      orb.rotation.y = elapsed * 0.18;
+      orb.rotation.x = Math.sin(elapsed * 0.2) * 0.12;
       facets.rotation.copy(orb.rotation);
-      heart.rotation.y = -elapsed * 0.22;
-      ring.rotation.z = elapsed * 0.14;
-      ring2.rotation.z = -elapsed * 0.09;
-      spark.position.x = Math.cos(elapsed * 0.4) * 1.5;
-      spark.position.z = 2.1 + Math.sin(elapsed * 0.4) * 0.6;
-      group.position.y =
-        (isNarrow ? 0.42 : 0.04) + Math.sin(elapsed * 0.5) * 0.07;
+      heart.rotation.y = -elapsed * 0.55;
+      heart.rotation.z = elapsed * 0.2;
+      ring.rotation.z = elapsed * 0.16;
+      ring2.rotation.z = -elapsed * 0.11;
+      ring3.rotation.y = elapsed * 0.09;
+      sparkles.rotation.y = elapsed * 0.05;
+      halo.scale.setScalar(1 + Math.sin(elapsed * 1.4) * 0.03);
+
+      shards.children.forEach((shard, i) => {
+        const a = shard.userData.angle + elapsed * 0.35;
+        shard.position.set(Math.cos(a) * 2.05, Math.sin(a * 1.7 + elapsed) * 0.42, Math.sin(a) * 2.05);
+        shard.rotation.x = elapsed * 0.8 + i;
+        shard.rotation.y = elapsed * 1.1;
+      });
+
+      spark.position.x = baseX + Math.cos(elapsed * 0.55) * 1.7;
+      spark.position.y = 1.5 + Math.sin(elapsed * 0.7) * 0.5;
+      spark.position.z = 2.3 + Math.sin(elapsed * 0.55) * 0.8;
+
+      group.position.x = baseX + parallaxX * 0.55;
+      group.position.y = baseY + Math.sin(elapsed * 0.55) * 0.08 - parallaxY * 0.4;
+      group.rotation.x = parallaxY * 0.35;
+      group.rotation.y = parallaxX * 0.45;
 
       renderer.render(scene, camera);
     }
@@ -582,35 +716,58 @@
     });
 
     const themeToggle = document.getElementById('funThemeToggle');
-    if (themeToggle) {
-      themeToggle.addEventListener('click', () => {
-        setTimeout(() => {
-          mats.core.dispose();
-          mats.ring.dispose();
-          mats.rim.dispose();
-          mats.heart.dispose();
-          mats = getMaterials();
-          orb.material = mats.core;
-          ring.material = mats.ring;
-          facets.material = mats.rim;
-          heart.material = mats.heart;
-        }, 50);
-      });
-    }
+    const onTheme = () => {
+      setTimeout(() => {
+        mats.core.dispose();
+        mats.ring.dispose();
+        mats.ice.dispose();
+        mats.rim.dispose();
+        mats.heart.dispose();
+        mats.halo.dispose();
+        mats.sparkle.dispose();
+        mats.shard.dispose();
+        if (ring3.material) ring3.material.dispose();
+        mats = getMaterials();
+        orb.material = mats.core;
+        ring.material = mats.ring;
+        ring2.material = mats.ice;
+        ring3.material = mats.ring.clone();
+        ring3.material.transparent = true;
+        ring3.material.opacity = 0.85;
+        facets.material = mats.rim;
+        heart.material = mats.heart;
+        halo.material = mats.halo;
+        sparkles.material = mats.sparkle;
+        shards.children.forEach((s) => {
+          s.material = mats.shard;
+        });
+      }, 50);
+    };
+    if (themeToggle) themeToggle.addEventListener('click', onTheme);
 
     window.addEventListener('pagehide', () => {
       document.body.classList.remove('fun-home--webgl');
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      hero.removeEventListener('pointermove', onPointerMove);
+      hero.removeEventListener('click', onHeroActivate);
       orbGeom.dispose();
       ringGeom.dispose();
       ring2Geom.dispose();
+      ring3Geom.dispose();
       edgeGeom.dispose();
+      shardGeom.dispose();
+      sparkGeom.dispose();
       heart.geometry.dispose();
-      if (ring2.material) ring2.material.dispose();
+      halo.geometry.dispose();
+      if (ring3.material) ring3.material.dispose();
       orb.material.dispose();
       ring.material.dispose();
+      ring2.material.dispose();
       facets.material.dispose();
       heart.material.dispose();
+      halo.material.dispose();
+      sparkles.material.dispose();
+      mats.shard.dispose();
       if (envMap && envMap.dispose) envMap.dispose();
       renderer.dispose();
     });
