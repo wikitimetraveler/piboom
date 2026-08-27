@@ -394,15 +394,15 @@
   }
 
   function initHeroScene() {
-    if (typeof THREE === 'undefined' || prefersReducedMotion) return;
+    if (typeof THREE === 'undefined') return;
 
     const canvas = document.getElementById('heroCanvas');
     if (!canvas) return;
 
     const container = canvas.parentElement;
     const hero = container;
-    let width = container.clientWidth;
-    let height = container.clientHeight;
+    let width = container.clientWidth || window.innerWidth;
+    let height = container.clientHeight || window.innerHeight;
     const isNarrow = window.matchMedia('(max-width: 991.98px)').matches;
 
     const renderer = new THREE.WebGLRenderer({
@@ -432,24 +432,29 @@
 
     function getMaterials() {
       const dark = document.body.getAttribute('data-theme') === 'dark';
-      const core = new THREE.MeshPhysicalMaterial({
-        color: dark ? 0xa8d8e4 : 0xd4eef4,
-        metalness: 0.02,
-        roughness: 0.035,
-        transmission: 0.94,
-        thickness: 2.1,
-        ior: 1.52,
-        clearcoat: 1,
-        clearcoatRoughness: 0.02,
+      const core = new THREE.MeshStandardMaterial({
+        color: dark ? 0x6eb3c4 : 0x8ec5d4,
+        metalness: 0.42,
+        roughness: 0.18,
         envMap: envMap,
-        envMapIntensity: dark ? 2.1 : 1.75,
-        attenuationColor: dark ? 0x2f6f7e : 0x4a90a4,
-        attenuationDistance: 1.6,
-        specularIntensity: 1,
-        iridescence: 0.22,
-        iridescenceIOR: 1.32,
-        sheen: 0.4,
-        sheenColor: new THREE.Color(dark ? 0x7eb8c6 : 0xb8dce6)
+        envMapIntensity: dark ? 1.8 : 1.45,
+        flatShading: true,
+        emissive: dark ? 0x163844 : 0x2a6070,
+        emissiveIntensity: 0.35
+      });
+      const glass = new THREE.MeshPhysicalMaterial({
+        color: dark ? 0xc5e6ee : 0xeef8fb,
+        metalness: 0.05,
+        roughness: 0.06,
+        transmission: 0.42,
+        thickness: 1.1,
+        ior: 1.45,
+        transparent: true,
+        opacity: 0.55,
+        clearcoat: 1,
+        clearcoatRoughness: 0.04,
+        envMap: envMap,
+        envMapIntensity: dark ? 1.6 : 1.3
       });
       const ring = new THREE.MeshStandardMaterial({
         color: dark ? 0xf0d478 : 0xc8ab57,
@@ -504,14 +509,17 @@
         envMapIntensity: 1.2,
         clearcoat: 0.8
       });
-      return { core, ring, ice, rim, heart, halo, sparkle, shard };
+      return { core, glass, ring, ice, rim, heart, halo, sparkle, shard };
     }
 
     let mats = getMaterials();
-    const detail = isNarrow ? 1 : 2;
-    const orbGeom = new THREE.IcosahedronGeometry(1.08, detail);
+    const orbGeom = new THREE.IcosahedronGeometry(1.12, 0);
     const orb = new THREE.Mesh(orbGeom, mats.core);
     group.add(orb);
+
+    const glassGeom = new THREE.IcosahedronGeometry(1.2, 1);
+    const glassShell = new THREE.Mesh(glassGeom, mats.glass);
+    group.add(glassShell);
 
     const heart = new THREE.Mesh(new THREE.OctahedronGeometry(0.38, 0), mats.heart);
     group.add(heart);
@@ -586,6 +594,7 @@
     const coreLight = new THREE.PointLight(0x7eb8c6, 1.6, 6, 2);
     group.add(coreLight);
 
+    renderer.render(scene, camera);
     document.body.classList.add('fun-home--webgl');
 
     let animationFrameId = null;
@@ -667,12 +676,14 @@
     function animate() {
       animationFrameId = requestAnimationFrame(animate);
       if (!isPageVisible || !inView) return;
+      if (!prefersReducedMotion) {
       const elapsed = clock.getElapsedTime();
       parallaxX += (targetParallaxX - parallaxX) * 0.06;
       parallaxY += (targetParallaxY - parallaxY) * 0.06;
 
       orb.rotation.y = elapsed * 0.18;
       orb.rotation.x = Math.sin(elapsed * 0.2) * 0.12;
+      glassShell.rotation.copy(orb.rotation);
       facets.rotation.copy(orb.rotation);
       heart.rotation.y = -elapsed * 0.55;
       heart.rotation.z = elapsed * 0.2;
@@ -697,6 +708,7 @@
       group.position.y = baseY + Math.sin(elapsed * 0.55) * 0.08 - parallaxY * 0.4;
       group.rotation.x = parallaxY * 0.35;
       group.rotation.y = parallaxX * 0.45;
+      }
 
       renderer.render(scene, camera);
     }
@@ -719,6 +731,7 @@
     const onTheme = () => {
       setTimeout(() => {
         mats.core.dispose();
+        mats.glass.dispose();
         mats.ring.dispose();
         mats.ice.dispose();
         mats.rim.dispose();
@@ -729,6 +742,7 @@
         if (ring3.material) ring3.material.dispose();
         mats = getMaterials();
         orb.material = mats.core;
+        glassShell.material = mats.glass;
         ring.material = mats.ring;
         ring2.material = mats.ice;
         ring3.material = mats.ring.clone();
@@ -751,6 +765,7 @@
       hero.removeEventListener('pointermove', onPointerMove);
       hero.removeEventListener('click', onHeroActivate);
       orbGeom.dispose();
+      glassGeom.dispose();
       ringGeom.dispose();
       ring2Geom.dispose();
       ring3Geom.dispose();
@@ -761,6 +776,7 @@
       halo.geometry.dispose();
       if (ring3.material) ring3.material.dispose();
       orb.material.dispose();
+      glassShell.material.dispose();
       ring.material.dispose();
       ring2.material.dispose();
       facets.material.dispose();
@@ -774,21 +790,23 @@
   }
 
   function startHeroWhenReady() {
-    if (prefersReducedMotion) return;
+    const boot = () => {
+      try {
+        initHeroScene();
+      } catch (err) {
+        console.warn('Hero crystal failed', err);
+        document.body.classList.remove('fun-home--webgl');
+      }
+    };
     if (typeof THREE !== 'undefined') {
-      initHeroScene();
+      window.requestAnimationFrame(boot);
       return;
     }
-    let tries = 0;
-    const wait = window.setInterval(() => {
-      tries += 1;
-      if (typeof THREE !== 'undefined') {
-        window.clearInterval(wait);
-        initHeroScene();
-      } else if (tries > 40) {
-        window.clearInterval(wait);
-      }
-    }, 50);
+    const script = document.createElement('script');
+    script.src = '/vendor/three.r160.min.js';
+    script.onload = () => window.requestAnimationFrame(boot);
+    script.onerror = () => console.warn('Three.js failed to load');
+    document.head.appendChild(script);
   }
 
   /** Unit Tests / Condition Manager chips — only when logged in. */
