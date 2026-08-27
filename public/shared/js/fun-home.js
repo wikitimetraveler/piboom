@@ -364,7 +364,32 @@
     console.log('✨ Extra sparkles activated! ✨');
   }
 
-  // Three.js Hero Scene — zen crystal orb; CSS orb is fallback only
+  // Three.js Hero Scene — faceted zen glass crystal (CSS orb is fallback only)
+  function makeZenEnvMap(renderer) {
+    const envScene = new THREE.Scene();
+    envScene.add(new THREE.HemisphereLight(0xf4fbff, 0x163040, 1.35));
+    const panels = [
+      { color: 0xffffff, pos: [0, 5, 0] },
+      { color: 0x4a90a4, pos: [5, 1, 2] },
+      { color: 0xc8ab57, pos: [-4, 2, 3] },
+      { color: 0x7ec8b8, pos: [2, -3, 4] },
+      { color: 0xd8eef4, pos: [-2, 1, -5] }
+    ];
+    panels.forEach((p) => {
+      const mesh = new THREE.Mesh(
+        new THREE.PlaneGeometry(7, 7),
+        new THREE.MeshBasicMaterial({ color: p.color, side: THREE.DoubleSide })
+      );
+      mesh.position.set(p.pos[0], p.pos[1], p.pos[2]);
+      mesh.lookAt(0, 0, 0);
+      envScene.add(mesh);
+    });
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const envTex = pmrem.fromScene(envScene, 0.06).texture;
+    pmrem.dispose();
+    return envTex;
+  }
+
   function initHeroScene() {
     if (typeof THREE === 'undefined' || prefersReducedMotion) return;
 
@@ -384,71 +409,109 @@
     });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isNarrow ? 1.5 : 2));
     renderer.setSize(width, height);
-    document.body.classList.add('fun-home--webgl');
+    if (THREE.SRGBColorSpace) renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.18;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(isNarrow ? 42 : 36, width / height, 0.1, 100);
-    camera.position.set(0, 0.05, isNarrow ? 5.6 : 4.6);
+    const camera = new THREE.PerspectiveCamera(isNarrow ? 40 : 32, width / height, 0.1, 100);
+    camera.position.set(0, 0.08, isNarrow ? 4.6 : 3.7);
+
+    const envMap = makeZenEnvMap(renderer);
 
     const group = new THREE.Group();
-    // Desktop: dominate the right half. Narrow: sit behind/above copy.
-    group.position.set(isNarrow ? 0.15 : 1.55, isNarrow ? 0.55 : 0.05, 0);
-    group.scale.setScalar(isNarrow ? 1.15 : 1.55);
+    group.position.set(isNarrow ? 0 : 1.45, isNarrow ? 0.42 : 0.04, 0);
+    group.scale.setScalar(isNarrow ? 1.28 : 1.72);
     scene.add(group);
 
     function getMaterials() {
       const dark = document.body.getAttribute('data-theme') === 'dark';
       const core = new THREE.MeshPhysicalMaterial({
-        color: dark ? 0x4a90a4 : 0x5aa3b5,
-        emissive: dark ? 0x1a3a44 : 0x2a6070,
-        emissiveIntensity: dark ? 0.45 : 0.28,
-        metalness: 0.18,
-        roughness: 0.32,
-        transparent: true,
-        opacity: 0.95,
-        clearcoat: 0.78,
-        clearcoatRoughness: 0.22
+        color: dark ? 0x8ec5d4 : 0xc5e6ee,
+        metalness: 0.05,
+        roughness: 0.06,
+        transmission: 0.88,
+        thickness: 1.55,
+        ior: 1.48,
+        clearcoat: 1,
+        clearcoatRoughness: 0.04,
+        envMap: envMap,
+        envMapIntensity: dark ? 1.7 : 1.35,
+        attenuationColor: dark ? 0x3d7a8a : 0x4a90a4,
+        attenuationDistance: 2.4,
+        specularIntensity: 1,
+        iridescence: 0.12,
+        iridescenceIOR: 1.3
       });
-      const ring = new THREE.MeshBasicMaterial({
+      const ring = new THREE.MeshStandardMaterial({
         color: dark ? 0xe8c96a : 0xc8ab57,
-        transparent: true,
-        opacity: 0.7,
-        side: THREE.DoubleSide
+        metalness: 0.92,
+        roughness: 0.22,
+        envMap: envMap,
+        envMapIntensity: 1.1
       });
-      return { core, ring };
+      const rim = new THREE.LineBasicMaterial({
+        color: dark ? 0xeaf6fa : 0xffffff,
+        transparent: true,
+        opacity: dark ? 0.42 : 0.38
+      });
+      const heart = new THREE.MeshStandardMaterial({
+        color: dark ? 0x2a6070 : 0x4a90a4,
+        emissive: dark ? 0x4a90a4 : 0x7eb8c6,
+        emissiveIntensity: dark ? 0.95 : 0.65,
+        roughness: 0.4,
+        metalness: 0.1
+      });
+      return { core, ring, rim, heart };
     }
 
     let mats = getMaterials();
-    const detail = isNarrow ? 0 : 1;
-    const orbGeom = new THREE.IcosahedronGeometry(1.15, detail);
+    const detail = isNarrow ? 1 : 2;
+    const orbGeom = new THREE.IcosahedronGeometry(1.12, detail);
     const orb = new THREE.Mesh(orbGeom, mats.core);
     group.add(orb);
 
-    const ringGeom = new THREE.TorusGeometry(1.72, 0.032, 10, isNarrow ? 48 : 72);
+    const heart = new THREE.Mesh(new THREE.IcosahedronGeometry(0.42, 0), mats.heart);
+    group.add(heart);
+
+    const edgeGeom = new THREE.EdgesGeometry(orbGeom, 18);
+    const facets = new THREE.LineSegments(edgeGeom, mats.rim);
+    group.add(facets);
+
+    const ringGeom = new THREE.TorusGeometry(1.58, 0.038, 12, isNarrow ? 64 : 96);
     const ring = new THREE.Mesh(ringGeom, mats.ring);
-    ring.rotation.x = Math.PI / 2.35;
+    ring.rotation.x = Math.PI / 2.28;
     group.add(ring);
 
+    const ring2Geom = new THREE.TorusGeometry(1.92, 0.016, 10, isNarrow ? 48 : 80);
     const ring2 = new THREE.Mesh(
-      new THREE.TorusGeometry(2.05, 0.018, 8, isNarrow ? 40 : 64),
-      new THREE.MeshBasicMaterial({
-        color: 0x4a90a4,
+      ring2Geom,
+      new THREE.MeshStandardMaterial({
+        color: 0x9fd0dc,
+        metalness: 0.55,
+        roughness: 0.28,
+        envMap: envMap,
+        envMapIntensity: 0.8,
         transparent: true,
-        opacity: 0.28,
-        side: THREE.DoubleSide
+        opacity: 0.85
       })
     );
-    ring2.rotation.x = Math.PI / 2.8;
-    ring2.rotation.y = 0.35;
+    ring2.rotation.x = Math.PI / 2.7;
+    ring2.rotation.y = 0.38;
     group.add(ring2);
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-    const key = new THREE.DirectionalLight(0xe8f4f8, 1.15);
-    key.position.set(3, 4, 5);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+    scene.add(new THREE.HemisphereLight(0xf4fbff, 0x1a3040, 0.7));
+    const key = new THREE.DirectionalLight(0xffffff, 1.55);
+    key.position.set(2.8, 3.6, 4.2);
     scene.add(key);
-    const fill = new THREE.DirectionalLight(0x4a90a4, 0.5);
-    fill.position.set(-4, 1, -2);
+    const fill = new THREE.DirectionalLight(0x4a90a4, 0.55);
+    fill.position.set(-3.4, 0.6, -1.8);
     scene.add(fill);
+    const spark = new THREE.PointLight(0xffffff, 1.4, 8, 2);
+    spark.position.set(1.2, 1.4, 2.2);
+    scene.add(spark);
+    document.body.classList.add('fun-home--webgl');
 
     let animationFrameId = null;
     let isPageVisible = true;
@@ -471,18 +534,18 @@
 
     if (typeof gsap !== 'undefined') {
       gsap.from(group.scale, {
-        x: isNarrow ? 0.85 : 1.1,
-        y: isNarrow ? 0.85 : 1.1,
-        z: isNarrow ? 0.85 : 1.1,
-        duration: 1.45,
+        x: isNarrow ? 0.72 : 1.15,
+        y: isNarrow ? 0.72 : 1.15,
+        z: isNarrow ? 0.72 : 1.15,
+        duration: 1.35,
         ease: 'power3.out',
-        delay: 0.15
+        delay: 0.12
       });
       gsap.from(group.rotation, {
-        y: -0.65,
-        duration: 1.5,
+        y: -0.85,
+        duration: 1.45,
         ease: 'power2.out',
-        delay: 0.1
+        delay: 0.08
       });
     }
 
@@ -490,12 +553,16 @@
       animationFrameId = requestAnimationFrame(animate);
       if (!isPageVisible || !inView) return;
       const elapsed = clock.getElapsedTime();
-      orb.rotation.y = elapsed * 0.18;
-      orb.rotation.x = Math.sin(elapsed * 0.28) * 0.1;
-      ring.rotation.z = elapsed * 0.12;
-      ring2.rotation.z = -elapsed * 0.08;
+      orb.rotation.y = elapsed * 0.16;
+      orb.rotation.x = Math.sin(elapsed * 0.22) * 0.08;
+      facets.rotation.copy(orb.rotation);
+      heart.rotation.y = -elapsed * 0.22;
+      ring.rotation.z = elapsed * 0.14;
+      ring2.rotation.z = -elapsed * 0.09;
+      spark.position.x = Math.cos(elapsed * 0.4) * 1.5;
+      spark.position.z = 2.1 + Math.sin(elapsed * 0.4) * 0.6;
       group.position.y =
-        (isNarrow ? 0.55 : 0.05) + Math.sin(elapsed * 0.55) * 0.08;
+        (isNarrow ? 0.42 : 0.04) + Math.sin(elapsed * 0.5) * 0.07;
 
       renderer.render(scene, camera);
     }
@@ -520,9 +587,13 @@
         setTimeout(() => {
           mats.core.dispose();
           mats.ring.dispose();
+          mats.rim.dispose();
+          mats.heart.dispose();
           mats = getMaterials();
           orb.material = mats.core;
           ring.material = mats.ring;
+          facets.material = mats.rim;
+          heart.material = mats.heart;
         }, 50);
       });
     }
@@ -532,12 +603,35 @@
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
       orbGeom.dispose();
       ringGeom.dispose();
-      ring2.geometry.dispose();
+      ring2Geom.dispose();
+      edgeGeom.dispose();
+      heart.geometry.dispose();
       if (ring2.material) ring2.material.dispose();
       orb.material.dispose();
       ring.material.dispose();
+      facets.material.dispose();
+      heart.material.dispose();
+      if (envMap && envMap.dispose) envMap.dispose();
       renderer.dispose();
     });
+  }
+
+  function startHeroWhenReady() {
+    if (prefersReducedMotion) return;
+    if (typeof THREE !== 'undefined') {
+      initHeroScene();
+      return;
+    }
+    let tries = 0;
+    const wait = window.setInterval(() => {
+      tries += 1;
+      if (typeof THREE !== 'undefined') {
+        window.clearInterval(wait);
+        initHeroScene();
+      } else if (tries > 40) {
+        window.clearInterval(wait);
+      }
+    }, 50);
   }
 
   /** Unit Tests / Condition Manager chips — only when logged in. */
@@ -573,14 +667,7 @@
     initSecretMortgageLink();
     initGatedFeatured();
 
-    // Wait for libraries to load
-    if (typeof THREE !== 'undefined') {
-      initHeroScene();
-    } else {
-      window.addEventListener('load', () => {
-        setTimeout(initHeroScene, 100);
-      });
-    }
+    startHeroWhenReady();
   }
 
   // Run on DOM ready
