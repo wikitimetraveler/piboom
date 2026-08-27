@@ -52,7 +52,7 @@ function initDisastersMap() {
       mapId: googleAdvancedMarkers.DEFAULT_MAP_ID,
     });
     if (lastLoadedDisasterRows.length) {
-      renderMap(lastLoadedDisasterRows);
+      renderMap(typeof getActiveViewDisasterRows === 'function' ? getActiveViewDisasterRows() : lastLoadedDisasterRows);
     }
     if (selectedDisasterObj) {
       focusMapOnDisaster(selectedDisasterObj);

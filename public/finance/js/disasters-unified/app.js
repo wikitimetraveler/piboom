@@ -1308,7 +1308,9 @@ function getCurrentFilters() {
     state: $('#stateInput').val(),
     county: $('#countyInput').val(),
     sources: $('#sourceInput').val() || [],
-    events: $('#eventInput').val() || []
+    events: $('#eventInput').val() || [],
+    majorNow: !!majorNowFilterActive,
+    majorNowHours: majorNowFilterHours || 72
   };
 }
 
@@ -1568,6 +1570,9 @@ $(function init() {
       const value = e.target.value;
       if (value === 'all') {
         timeRangeFilterHours = null;
+        if (majorNowFilterActive) {
+          setMajorNowFilter(false, { silent: true, remap: true });
+        }
       } else {
         const hours = {
           '24h': 24,
@@ -1577,9 +1582,19 @@ $(function init() {
           '30d': 720
         };
         timeRangeFilterHours = hours[value] || null;
+        if (majorNowFilterActive && (timeRangeFilterHours === 48 || timeRangeFilterHours === 72)) {
+          majorNowFilterHours = timeRangeFilterHours;
+        } else if (majorNowFilterActive && timeRangeFilterHours !== 48 && timeRangeFilterHours !== 72) {
+          setMajorNowFilter(false, { silent: true, remap: true, resetTimeRange: false });
+        }
       }
-      refreshNwsGridExternalFilter();
+      if (typeof syncMajorNowView === 'function' && majorNowFilterActive) {
+        syncMajorNowView({ remap: true });
+      } else {
+        refreshNwsGridExternalFilter();
+      }
 
+      if (majorNowFilterActive) return;
       if (timeRangeFilterHours) {
         const label = value === '7d' ? 'week' : value === '30d' ? '30 days' : value.replace('h', ' hours').replace('d', ' days');
         setDashboardStatus(`Filtered to events from the last ${label}`, 'info');
@@ -1588,6 +1603,29 @@ $(function init() {
       }
     });
   });
+
+  document.getElementById('duMajorNowBtn')?.addEventListener('click', () => {
+    toggleMajorNowFilter();
+  });
+  document.getElementById('duClearMajorNowFilter')?.addEventListener('click', () => {
+    setMajorNowFilter(false);
+  });
+  document.querySelectorAll('input[name="duMajorNowWindow"]').forEach((radio) => {
+    radio.addEventListener('change', (e) => {
+      const hours = Number(e.target.value) || 72;
+      if (majorNowFilterActive) {
+        setMajorNowFilter(true, { hours, resetTimeRange: false });
+      } else {
+        majorNowFilterHours = hours;
+        updateMajorNowFilterUi();
+      }
+    });
+  });
+  const majorParam = new URLSearchParams(window.location.search).get('major');
+  if (majorParam === '1' || majorParam === '2' || majorParam === '3') {
+    const hours = majorParam === '2' ? 48 : 72;
+    setMajorNowFilter(true, { hours, remap: false, silent: true });
+  }
   initDuSectionCards();
   initHotspotFilterBadge();
   initDuSectionSidebar();

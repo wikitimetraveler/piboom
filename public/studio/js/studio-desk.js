@@ -19,7 +19,18 @@
     acousticDesk: document.getElementById('stAcousticDesk'),
     tuneKey: document.getElementById('stTuneKey'),
     tuneHard: document.getElementById('stTuneHard'),
+    tuner: document.getElementById('stTuner'),
+    tunerNote: document.getElementById('stTunerNote'),
+    tunerNeedle: document.getElementById('stTunerNeedle'),
+    tunerCents: document.getElementById('stTunerCents'),
     meter: document.getElementById('stMeter'),
+    meterWrap: document.getElementById('stMeterWrap'),
+    meterPeak: document.getElementById('stMeterPeak'),
+    micPreamp: document.getElementById('stMicPreamp'),
+    micPreampVal: document.getElementById('stMicPreampVal'),
+    monitor: document.getElementById('stMonitor'),
+    monitorLevel: document.getElementById('stMonitorLevel'),
+    monitorVal: document.getElementById('stMonitorVal'),
     timeline: document.getElementById('stTimeline'),
     record: document.getElementById('stRecord'),
     stop: document.getElementById('stStop'),
@@ -50,6 +61,18 @@
     armedId: null,
     playhead: 0,
     recording: false,
+    countingIn: false,
+    countInCancelled: false,
+    countInTimer: 0,
+    countInTimers: [],
+    countBeatLabel: '',
+    clickNodes: [],
+    monitorNode: null,
+    livePeaks: [],
+    lastLivePeakAt: 0,
+    meterPeak: 0,
+    tunerBuf: null,
+    tunerCents: 0,
     playing: false,
     audioCtx: null,
     mediaStream: null,
@@ -62,6 +85,10 @@
     pcmNode: null,
     pcmSource: null,
     pcmSilent: null,
+    micSource: null,
+    preampNode: null,
+    limitNode: null,
+    captureDest: null,
     captureTap: null,
     graphNodes: [],
     roomIr: null,
@@ -135,6 +162,10 @@
   };
 
   const IDENTITY_KEY = 'stLivekitIdentity';
+  const PREAMP_KEY = 'stMicPreampDb';
+  const PREAMP_DEFAULT_DB = 10;
+  const PREAMP_MIN_DB = 0;
+  const PREAMP_MAX_DB = 18;
 
   function stableIdentity(name) {
     try {
@@ -197,6 +228,192 @@
     return state.name;
   }
 
+  function clampPreampDb(value) {
+    const n = Number(value);
+    if (!Number.isFinite(n)) return PREAMP_DEFAULT_DB;
+    return Math.max(PREAMP_MIN_DB, Math.min(PREAMP_MAX_DB, n));
+  }
+
+  function micPreampDb() {
+    return clampPreampDb(els.micPreamp?.value);
+  }
+
+  function micPreampGain() {
+    return 10 ** (micPreampDb() / 20);
+  }
+
+  function syncPreampLabel() {
+    if (!els.micPreampVal) return;
+    const db = micPreampDb();
+    els.micPreampVal.textContent = db === 0 ? '0 dB' : `+${db} dB`;
+  }
+
+  function applyMicPreamp() {
+    const gain = micPreampGain();
+    if (state.preampNode) state.preampNode.gain.value = gain;
+    const lp = state.livekitRoom?.localParticipant;
+    if (state.micOn && lp && window.LivekitTalkAudio?.applyLocalMicGain) {
+      window.LivekitTalkAudio.applyLocalMicGain(lp, gain);
+    }
+    try {
+      localStorage.setItem(PREAMP_KEY, String(micPreampDb()));
+    } catch (_) {
+      /* ignore */
+    }
+    syncPreampLabel();
+  }
+
+  function boothBpm() {
+    const api = window.StarBandBooth;
+    return api ? api.clampBpm(els.bpm?.value) : 92;
+  }
+
+  function countInBeatCount() {
+    const api = window.StarBandBooth;
+    return api ? api.countInBeats(els.countIn?.value) : 0;
+  }
+
+  function beatInterval() {
+    const api = window.StarBandBooth;
+    return api ? api.beatSec(boothBpm()) : 60 / boothBpm();
+  }
+
+  function monitorGain() {
+    if (!els.monitor?.checked) return 0;
+    const n = Number(els.monitorLevel?.value);
+    return Number.isFinite(n) ? Math.max(0, Math.min(1, n)) : 0.28;
+  }
+
+  function syncMonitorLabel() {
+    if (!els.monitorVal) return;
+    els.monitorVal.textContent = `${Math.round(monitorGain() * 100)}%`;
+  }
+
+  function applyMonitor() {
+    if (state.monitorNode) state.monitorNode.gain.value = monitorGain();
+    syncMonitorLabel();
+  }
+
+  function syncTransportLabel() {
+    if (!els.transportLabel) return;
+    const head = `Playhead ${formatTime(state.playhead)}`;
+    if (state.countingIn) {
+      els.transportLabel.textContent = `${head} · Count-in ${state.countBeatLabel || ''}`.trim();
+      return;
+    }
+    if (state.recording) {
+      els.transportLabel.textContent = `${head} · REC`;
+      return;
+    }
+    els.transportLabel.textContent = `${head} · Record = timeline · Bounce = WAV in this tab`;
+  }
+
+  function syncBoothUi() {
+    const lamp = els.recLamp;
+    if (lamp) {
+      if (state.countingIn) {
+        lamp.dataset.state = 'count';
+        lamp.textContent = state.countBeatLabel || 'Count';
+      } else if (state.recording) {
+        lamp.dataset.state = 'rec';
+        lamp.textContent = 'REC';
+      } else {
+        lamp.dataset.state = 'idle';
+        lamp.textContent = 'Idle';
+      }
+    }
+    document.body.classList.toggle('is-recording', Boolean(state.recording));
+    document.body.classList.toggle('is-count-in', Boolean(state.countingIn));
+    if (els.record) {
+      const hot = state.recording || state.countingIn;
+      els.record.setAttribute('aria-pressed', hot ? 'true' : 'false');
+      els.record.textContent = state.countingIn ? 'Count-in' : (state.recording ? 'Recording' : 'Record');
+    }
+    syncTransportLabel();
+  }
+
+  function stopClicks() {
+    (state.clickNodes || []).forEach((node) => {
+      try {
+        if (typeof node.stop === 'function') node.stop();
+      } catch (_) {
+        /* already ended */
+      }
+      try {
+        node.disconnect();
+      } catch (_) {
+        /* already disconnected */
+      }
+    });
+    state.clickNodes = [];
+  }
+
+  function clearCountTimers() {
+    (state.countInTimers || []).forEach((id) => clearTimeout(id));
+    state.countInTimers = [];
+    if (state.countInTimer) {
+      clearTimeout(state.countInTimer);
+      state.countInTimer = 0;
+    }
+  }
+
+  function fireClick(ctx, when, accent) {
+    const api = window.StarBandBooth;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.value = api ? api.clickHz(accent) : (accent ? 1320 : 880);
+    const peak = accent ? 0.2 : 0.12;
+    const dur = accent ? 0.05 : 0.035;
+    gain.gain.setValueAtTime(0.0001, when);
+    gain.gain.exponentialRampToValueAtTime(peak, when + 0.003);
+    gain.gain.exponentialRampToValueAtTime(0.0001, when + dur);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(when);
+    osc.stop(when + dur + 0.02);
+    state.clickNodes.push(osc, gain);
+  }
+
+  function scheduleClickRun(ctx, origin, beats) {
+    const api = window.StarBandBooth;
+    const interval = beatInterval();
+    for (let i = 0; i < beats; i += 1) {
+      const accent = api ? api.isCountDownbeat(i) : i % 4 === 0;
+      fireClick(ctx, origin + i * interval, accent);
+    }
+  }
+
+  function pulseCountLamp(ctx, origin, beats, interval) {
+    for (let i = 0; i < beats; i += 1) {
+      const delay = Math.max(0, (origin + i * interval - ctx.currentTime) * 1000);
+      const beat = (i % 4) + 1;
+      const id = window.setTimeout(() => {
+        if (!state.countingIn || state.countInCancelled) return;
+        state.countBeatLabel = String(beat);
+        syncBoothUi();
+      }, delay);
+      state.countInTimers.push(id);
+    }
+  }
+
+  function waitForAudioTime(ctx, when) {
+    return new Promise((resolve) => {
+      const tick = () => {
+        if (state.countInCancelled) {
+          resolve(false);
+          return;
+        }
+        if (ctx.currentTime >= when - 0.01) {
+          resolve(true);
+          return;
+        }
+        state.countInTimer = window.setTimeout(tick, 16);
+      };
+      tick();
+    });
+  }
+
   function formatTime(sec) {
     const s = Math.max(0, Number(sec) || 0);
     const m = Math.floor(s / 60);
@@ -212,7 +429,7 @@
     if (!state.audioCtx) {
       const AC = window.AudioContext || window.webkitAudioContext;
       try {
-        state.audioCtx = new AC({ sampleRate: 48000, latencyHint: 'playback' });
+        state.audioCtx = new AC({ sampleRate: 48000, latencyHint: 'interactive' });
       } catch (_) {
         state.audioCtx = new AC();
       }
@@ -570,17 +787,67 @@
     teardownCapture();
     state.mediaStream = await openMicStream();
     const source = ctx.createMediaStreamSource(state.mediaStream);
-    state.pcmSource = source;
-    state.analyser = ctx.createAnalyser();
-    state.analyser.fftSize = 2048;
-    source.connect(state.analyser);
+    const preamp = ctx.createGain();
+    preamp.gain.value = micPreampGain();
+    const limit = ctx.createDynamicsCompressor();
+    limit.threshold.value = -6;
+    limit.knee.value = 8;
+    limit.ratio.value = 12;
+    limit.attack.value = 0.003;
+    limit.release.value = 0.18;
+    const analyser = ctx.createAnalyser();
+    analyser.fftSize = 2048;
+    const dest = ctx.createMediaStreamDestination();
+    source.connect(preamp);
+    preamp.connect(limit);
+    limit.connect(analyser);
+    limit.connect(dest);
+    state.micSource = source;
+    state.preampNode = preamp;
+    state.limitNode = limit;
+    state.pcmSource = limit;
+    state.captureDest = dest;
+    state.analyser = analyser;
     pumpMeter();
+  }
+
+  function updateTuner(rms) {
+    const face = els.tuner;
+    const api = window.StarBandAutotune;
+    if (!face || !state.analyser || !api?.readPitch) return;
+    const n = state.analyser.fftSize || 2048;
+    if (!state.tunerBuf || state.tunerBuf.length !== n) state.tunerBuf = new Float32Array(n);
+    const buf = state.tunerBuf;
+    if (typeof state.analyser.getFloatTimeDomainData === 'function') {
+      state.analyser.getFloatTimeDomainData(buf);
+    } else {
+      const bytes = new Uint8Array(n);
+      state.analyser.getByteTimeDomainData(bytes);
+      for (let i = 0; i < n; i += 1) buf[i] = (bytes[i] - 128) / 128;
+    }
+    const reading = rms < 0.012 ? { voiced: false, note: '—', cents: 0, inTune: false } : api.readPitch(buf, state.audioCtx.sampleRate, {
+      root: 0,
+      scale: 'chromatic',
+    });
+    const cents = reading.voiced ? reading.cents : 0;
+    state.tunerCents += (cents - state.tunerCents) * 0.28;
+    const deg = state.tunerCents * 0.8;
+    if (els.tunerNeedle) els.tunerNeedle.style.transform = `rotate(${deg}deg)`;
+    if (els.tunerNote) els.tunerNote.textContent = reading.voiced ? reading.note : '—';
+    if (els.tunerCents) {
+      els.tunerCents.textContent = reading.voiced
+        ? (reading.inTune ? 'In tune' : `${cents > 0 ? '+' : ''}${Math.round(cents)} cents`)
+        : 'Live pitch · guitar stays dry';
+    }
+    face.dataset.state = !reading.voiced ? 'idle' : (reading.inTune ? 'in' : 'out');
   }
 
   function pumpMeter() {
     if (!state.analyser || !els.meter) return;
     const data = new Uint8Array(state.analyser.frequencyBinCount);
+    const wrap = els.meterWrap || els.meter.parentElement;
     const loop = () => {
+      if (!state.analyser) return;
       state.analyser.getByteTimeDomainData(data);
       let sum = 0;
       for (let i = 0; i < data.length; i += 1) {
@@ -589,7 +856,14 @@
       }
       const rms = Math.sqrt(sum / data.length);
       els.meter.style.width = `${Math.min(100, rms * 280)}%`;
-      if (state.recording || state.mediaStream) state.raf = requestAnimationFrame(loop);
+      if (rms > state.meterPeak) state.meterPeak = rms;
+      else state.meterPeak *= 0.985;
+      if (els.meterPeak) {
+        els.meterPeak.style.left = `${Math.min(100, state.meterPeak * 280)}%`;
+      }
+      if (wrap) wrap.classList.toggle('is-hot', rms > 0.22);
+      updateTuner(rms);
+      if (state.recording || state.countingIn || state.mediaStream) state.raf = requestAnimationFrame(loop);
     };
     loop();
   }
@@ -634,15 +908,42 @@
         /* ignore */
       }
     }
-    disconnectNodes([state.pcmNode, state.pcmSilent, state.pcmSource, state.captureTap, state.analyser]);
+    disconnectNodes([
+      state.pcmNode,
+      state.pcmSilent,
+      state.pcmSource,
+      state.preampNode,
+      state.limitNode,
+      state.micSource,
+      state.captureDest,
+      state.captureTap,
+      state.analyser,
+    ]);
     state.pcmNode = null;
     state.pcmSilent = null;
     state.pcmSource = null;
+    state.preampNode = null;
+    state.limitNode = null;
+    state.micSource = null;
     state.captureTap = null;
+    if (state.captureDest) {
+      try {
+        state.captureDest.stream.getTracks().forEach((track) => track.stop());
+      } catch (_) {
+        /* ignore */
+      }
+    }
+    state.captureDest = null;
     if (state.mediaStream) {
       state.mediaStream.getTracks().forEach((track) => track.stop());
       state.mediaStream = null;
     }
+    state.analyser = null;
+    if (els.tuner) els.tuner.dataset.state = 'idle';
+    if (els.tunerNote) els.tunerNote.textContent = '—';
+    if (els.tunerCents) els.tunerCents.textContent = 'Live pitch · guitar stays dry';
+    if (els.tunerNeedle) els.tunerNeedle.style.transform = 'rotate(0deg)';
+    state.tunerCents = 0;
   }
 
   function tickClock() {
@@ -757,7 +1058,7 @@
           ? 'audio/webm;codecs=opus'
           : 'audio/webm';
       state.chunks = [];
-      state.recorder = new MediaRecorder(state.mediaStream, { mimeType: mime });
+      state.recorder = new MediaRecorder(state.captureDest?.stream || state.mediaStream, { mimeType: mime });
       state.recorder.ondataavailable = (event) => {
         if (event.data && event.data.size) state.chunks.push(event.data);
       };
@@ -1085,15 +1386,17 @@
     if (state.livekitRoom) await state.livekitRoom.disconnect();
     const room = new LK.Room(
       window.LivekitTalkAudio
-        ? window.LivekitTalkAudio.roomOptions()
+        ? window.LivekitTalkAudio.roomOptions({
+            audioCaptureDefaults: Object.assign({}, window.LivekitTalkAudio.captureHot || window.LivekitTalkAudio.capture),
+          })
         : {
             adaptiveStream: true,
             dynacast: true,
             audioCaptureDefaults: {
               echoCancellation: true,
-              noiseSuppression: true,
+              noiseSuppression: false,
               autoGainControl: true,
-              voiceIsolation: true,
+              voiceIsolation: false,
               channelCount: 1,
             },
           }
@@ -1155,7 +1458,9 @@
     const lp = state.livekitRoom?.localParticipant;
     if (!lp) return false;
     if (window.LivekitTalkAudio?.setTalkMic) {
-      const ok = await window.LivekitTalkAudio.setTalkMic(lp, on);
+      const ok = await window.LivekitTalkAudio.setTalkMic(lp, on, on
+        ? { hot: true, gain: micPreampGain() }
+        : undefined);
       state.micOn = Boolean(ok);
       syncMicButton();
       return state.micOn;
@@ -1387,6 +1692,13 @@
     addTrack('Harmony', { kind: 'vocal', gain: 0.8, autotune: true });
     if (els.musicMode) els.musicMode.checked = true;
     if (els.acousticDesk) els.acousticDesk.checked = true;
+    try {
+      const saved = localStorage.getItem(PREAMP_KEY);
+      if (saved != null && els.micPreamp) els.micPreamp.value = String(clampPreampDb(saved));
+    } catch (_) {
+      /* ignore */
+    }
+    syncPreampLabel();
     if (!state.reel) {
       try {
         const res = await fetch('/api/studio/sessions', {
@@ -1416,7 +1728,7 @@
         syncMicChip();
       })
       .catch(() => setLkChip('unset', 'LiveKit unset'));
-    appendReed('Reed: Acoustic desk is on. Autotune is on your voice only — Vocal and Harmony. Guitar stays dry. Headphones on, arm Neck, then stack Body, then sing.');
+    appendReed('Reed: Acoustic desk is on. Mic preamp is +10 dB — raise it if the meter is tiny. Autotune is on your voice only — Vocal and Harmony. Guitar stays dry. Headphones on, arm Neck, then stack Body, then sing.');
   }
 
   els.addTrack?.addEventListener('click', () => addTrack());
@@ -1439,6 +1751,7 @@
     });
   });
   els.musicMode?.addEventListener('change', syncMicChip);
+  els.micPreamp?.addEventListener('input', applyMicPreamp);
   els.record?.addEventListener('click', () => startRecord().catch((err) => appendReed(`Mic: ${err.message}`)));
   els.stop?.addEventListener('click', () => stopRecordOrPlay().catch((err) => appendReed(err.message)));
   els.play?.addEventListener('click', () => {

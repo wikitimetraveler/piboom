@@ -359,6 +359,7 @@
 
       <!-- Sticky source chips (always visible) — Pull lives on hero #refreshBtnHero -->
       <div class="du-source-chip-bar mb-3" id="duSourceChipBar" aria-label="Source filters">
+        <div class="du-source-chip-bar-row">
         <div class="disaster-source-selector" id="unifiedSourceChips">
           <button type="button" class="source-chip source-chip-active freshness-ok" data-source="fema" onclick="toggleUnifiedSourceChip(this, 'fema')">
             <span class="freshness-dot" aria-hidden="true"></span>
@@ -400,9 +401,35 @@
             <i class="bi bi-camera-video"></i> Hazard webcams
           </a>
         </div>
+        <div class="du-major-now-control" role="group" aria-label="Major now: High and Critical current disasters">
+          <button type="button" class="btn du-major-now-btn" id="duMajorNowBtn" aria-pressed="false" title="Show only High and Critical intensity events from the last 2 or 3 days">
+            <span class="du-major-now-btn-main">
+              <i class="bi bi-exclamation-octagon" aria-hidden="true"></i>
+              <span class="du-major-now-btn-label">Major now</span>
+            </span>
+            <span class="du-major-now-btn-sub">High &amp; Critical · 2–3 days</span>
+          </button>
+          <div class="btn-group btn-group-sm du-major-now-window" role="group" aria-label="Major now window">
+            <input type="radio" class="btn-check" name="duMajorNowWindow" id="duMajorNow2d" value="48" autocomplete="off">
+            <label class="btn btn-outline-danger" for="duMajorNow2d" title="Last 2 days">2d</label>
+            <input type="radio" class="btn-check" name="duMajorNowWindow" id="duMajorNow3d" value="72" autocomplete="off" checked>
+            <label class="btn btn-outline-danger" for="duMajorNow3d" title="Last 3 days">3d</label>
+          </div>
+        </div>
+        </div>
         <p class="small text-muted mb-0 mt-1">
-          Chips filter the grid (auto-reload). To ingest APIs into Postgres, use <button type="button" class="btn btn-link btn-sm p-0 align-baseline" id="duFocusPullBtn">Pull all sources</button> in the hero.
+          Chips filter the grid (auto-reload). <strong>Major now</strong> keeps only High &amp; Critical intensity events from the last 2 or 3 days. To ingest APIs into Postgres, use <button type="button" class="btn btn-link btn-sm p-0 align-baseline" id="duFocusPullBtn">Pull all sources</button> in the hero.
         </p>
+      </div>
+
+      <div id="duMajorNowFilterStrip" class="alert alert-danger py-2 small mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2" role="status" hidden>
+        <span class="du-major-now-filter-strip-text">
+          <i class="bi bi-exclamation-octagon me-1" aria-hidden="true"></i>
+          <span id="duMajorNowFilterLabel">Major now</span>
+        </span>
+        <button type="button" class="btn btn-sm btn-outline-danger flex-shrink-0" id="duClearMajorNowFilter" aria-label="Clear Major now filter">
+          <i class="bi bi-x-lg" aria-hidden="true"></i> Show all events
+        </button>
       </div>
 
       <div id="duNwsGridFilterStrip" class="alert alert-info py-2 small mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2" role="status" hidden>
@@ -533,7 +560,7 @@
                   <input type="radio" class="btn-check" name="duTimeRange" id="duTime30d" value="30d" autocomplete="off">
                   <label class="btn btn-outline-secondary" for="duTime30d">Last 30d</label>
                 </div>
-                <p class="small text-muted mt-1 mb-0">Filter disasters by recency — highlights recent events with higher risk weighting</p>
+                <p class="small text-muted mt-1 mb-0">Filter disasters by recency. For High &amp; Critical events only, use <strong>Major now</strong> on the source bar (last 2 or 3 days).</p>
               </div>
               <div class="row g-3 align-items-start">
                 <div class="col-md-3 col-sm-6">
@@ -1202,6 +1229,7 @@
     <script src="/finance/js/du-encompass-map-handoff.js"></script>
     <script src="/finance/js/disaster-camera-filters.js"></script>
     <script src="/finance/js/disaster-weather-alert-filters.js"></script>
+    <script src="/finance/js/disaster-major-now-filter.js"></script>
     <script src="/finance/js/hazard-webcam-viewer.js"></script>
     <script type="module" src="/shared/disaster-kml-export.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>

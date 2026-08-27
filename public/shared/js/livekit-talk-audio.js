@@ -11,6 +11,13 @@
     autoGainControl: true,
   };
 
+  /** Studio talk: keep echo-cancel, drop NS gating, keep AGC so quiet mics come up. */
+  const captureHot = {
+    echoCancellation: true,
+    noiseSuppression: false,
+    autoGainControl: true,
+  };
+
   const captureSoft = {
     echoCancellation: true,
   };
@@ -61,7 +68,25 @@
     if (media) media.enabled = true;
   }
 
-  async function setTalkMic(localParticipant, enabled) {
+  function applyLocalMicGain(localParticipant, gain) {
+    const LK = global.LivekitClient;
+    if (!localParticipant || !LK?.Track?.Source) return;
+    const pub =
+      typeof localParticipant.getTrackPublication === 'function'
+        ? localParticipant.getTrackPublication(LK.Track.Source.Microphone)
+        : null;
+    const track = pub?.track;
+    if (!track || typeof track.setVolume !== 'function') return;
+    const vol = Number(gain);
+    if (!Number.isFinite(vol) || vol <= 0) return;
+    try {
+      track.setVolume(vol);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  async function setTalkMic(localParticipant, enabled, opts) {
     if (!localParticipant || typeof localParticipant.setMicrophoneEnabled !== 'function') {
       throw new Error('No LiveKit participant');
     }
@@ -69,7 +94,8 @@
       await localParticipant.setMicrophoneEnabled(false);
       return false;
     }
-    const attempts = [capture, captureSoft, undefined];
+    const preferred = opts && opts.hot ? captureHot : capture;
+    const attempts = [preferred, captureSoft, undefined];
     let lastErr = null;
     for (let i = 0; i < attempts.length; i += 1) {
       try {
@@ -79,6 +105,7 @@
           await localParticipant.setMicrophoneEnabled(true);
         }
         await unmuteMicrophone(localParticipant);
+        if (opts && opts.gain != null) applyLocalMicGain(localParticipant, opts.gain);
         return true;
       } catch (err) {
         lastErr = err;
@@ -89,11 +116,13 @@
 
   global.LivekitTalkAudio = {
     capture,
+    captureHot,
     roomOptions,
     isLocalParticipant,
     skipAttach,
     prepareAttachedMedia,
     unmuteMicrophone,
+    applyLocalMicGain,
     setTalkMic,
   };
 })(typeof window !== 'undefined' ? window : globalThis);

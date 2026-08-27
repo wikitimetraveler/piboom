@@ -182,6 +182,48 @@
     return /vocal|harmony|voice|vox/i.test(String(track.name || ''));
   }
 
+  function noteNameFromMidi(midi) {
+    if (!Number.isFinite(midi)) return '—';
+    const n = Math.round(midi);
+    const name = NOTE_NAMES[((n % 12) + 12) % 12];
+    const octave = Math.floor(n / 12) - 1;
+    return `${name}${octave}`;
+  }
+
+  function emptyReading() {
+    return { hz: 0, midi: 0, note: '—', cents: 0, inTune: false, voiced: false };
+  }
+
+  function centsOff(hz, root = 0, scale = 'chromatic') {
+    if (!(hz > 0)) return emptyReading();
+    const midi = hzToMidi(hz);
+    const snapped = snapMidi(midi, root, scale);
+    const cents = (midi - snapped) * 100;
+    return {
+      hz,
+      midi,
+      note: noteNameFromMidi(snapped),
+      cents: Math.max(-50, Math.min(50, cents)),
+      inTune: Math.abs(cents) < 8,
+      voiced: true,
+    };
+  }
+
+  function readPitch(samples, sampleRate, opts = {}) {
+    if (!samples || !samples.length || !(sampleRate > 0)) return emptyReading();
+    if (rms(samples) < 0.012) return emptyReading();
+    const tauMin = Math.max(2, Math.floor(sampleRate / 1100));
+    const tauMax = Math.floor(sampleRate / 70);
+    const hz = yinPitch(
+      samples,
+      sampleRate,
+      tauMin,
+      Math.min(tauMax, Math.floor(samples.length / 2) - 2)
+    );
+    if (!(hz >= 70 && hz <= 1100)) return emptyReading();
+    return centsOff(hz, opts.root || 0, opts.scale || 'chromatic');
+  }
+
   global.StarBandAutotune = {
     NOTE_NAMES,
     KEYS,
@@ -193,5 +235,8 @@
     yinPitch,
     correctBuffer,
     isVoiceTrack,
+    noteNameFromMidi,
+    centsOff,
+    readPitch,
   };
 })(typeof globalThis !== 'undefined' ? globalThis : window);

@@ -56,7 +56,7 @@ Hybrid vector RAG + GraphRAG details: `docs/VECTOR_RAG.md`.
 | `GOOGLE_CLOUD_PROJECT` | Google Cloud project ID |
 | `SHAZAM_API_KEY` | Shazam/RapidAPI song identification |
 | `SETLISTFM_API_KEY` | Setlist.fm API |
-| `LIVEKIT_URL` | LiveKit WebSocket URL (`wss://…livekit.cloud`) for Studio, Watch Together, and Wolfman booth |
+| `LIVEKIT_URL` | LiveKit WebSocket URL — self-hosted (`wss://livekit.thelanefamily.us`) or Cloud (`wss://…livekit.cloud`). Setup: [`docs/LIVEKIT_VM.md`](LIVEKIT_VM.md) |
 | `LIVEKIT_API_KEY` | LiveKit API key (server-only; mints room tokens) |
 | `LIVEKIT_API_SECRET` | LiveKit API secret (server-only) |
 | `LIVEKIT_AGENT_NAME` | Python worker dispatch name (`StarBand` default, or `WolfmanDave`) |

@@ -761,6 +761,16 @@
 .encompass-dark-mode .source-chip .source-chip-count {
   background: rgba(0, 0, 0, 0.25);
 }
+.encompass-dark-mode .du-major-now-btn:not(.is-active) {
+  background: #4b5563;
+  border-color: #f87171;
+  color: #fecaca;
+}
+.encompass-dark-mode .du-major-now-btn:not(.is-active):hover,
+.encompass-dark-mode .du-major-now-btn:not(.is-active):focus-visible {
+  background: #374151;
+  color: #fee2e2;
+}
 .encompass-dark-mode .du-page .form-control,
 .encompass-dark-mode .du-page .form-select {
   background: #4b5563;

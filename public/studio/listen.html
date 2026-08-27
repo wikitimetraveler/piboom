@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Listening room — Studio</title>
+  <title>Listening room — StarBand lounge</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Cinzel+Decorative:wght@700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
@@ -22,9 +22,9 @@
   <div class="st-scanlines" aria-hidden="true"></div>
   <modern-navbar></modern-navbar>
   <main class="st-listen">
-    <p class="st-kicker">One password</p>
+    <p class="st-kicker">Palace lounge</p>
     <h1>What's out</h1>
-    <p class="st-lead">Bounces from the desk land here. Same password for everyone on the reel.</p>
+    <p class="st-lead">Bounces from the desk land here as gold sleeves. Same password for everyone on the reel.</p>
 
     <form id="stUnlock" class="st-gate-card">
       <label class="st-status" for="stPassword">Listening password</label>
@@ -36,7 +36,29 @@
       <p class="st-status" id="stUnlockMsg"></p>
     </form>
 
-    <div id="stReleases" hidden></div>
+    <section id="stLounge" class="st-lounge" hidden>
+      <div class="st-lounge-stage">
+        <div class="st-sleeve-wrap">
+          <div class="st-sleeve" id="stSleeve">
+            <canvas id="stTitleCard" width="640" height="640" aria-label="Release title card"></canvas>
+          </div>
+          <div class="st-platter" id="stPlatter" aria-hidden="true">
+            <div class="st-reel st-reel--listen"></div>
+          </div>
+        </div>
+        <div class="st-lounge-copy">
+          <p class="st-kicker" id="stNowKicker">Now out</p>
+          <h2 class="st-now-title" id="stNowTitle">The lounge is empty</h2>
+          <p class="st-lead" id="stNowMeta">Record on the desk, then Release.</p>
+          <div class="st-transport">
+            <button type="button" class="st-btn st-btn--primary" id="stLoungePlay" disabled>Play</button>
+            <a class="st-btn st-btn--ghost" href="/studio/desk.html">Back to desk</a>
+          </div>
+        </div>
+      </div>
+      <div class="st-sleeves" id="stSleeves"></div>
+      <audio id="stLoungeAudio" class="st-lounge-audio" preload="none"></audio>
+    </section>
   </main>
   <script src="/studio/js/studio-listen.js"></script>
 </body>

@@ -25,10 +25,12 @@ function buildSystemPrompt() {
 ## How the desk actually works
 - The session opens with two acoustic-guitar tracks: Acoustic Guitar Neck (twelfth-fret mic, panned a little left, brighter presence) and Acoustic Guitar Body (soundhole / body mic, panned a little right, warmer low mids). Vocal and Harmony sit under those.
 - Music input is on by default. Echo cancellation, noise suppression, auto-gain, and the browser high-pass stay off so the acoustic is not chewed up.
+- Mic preamp defaults to +10 dB (slider 0–18). It boosts local PCM takes and the LiveKit talk mic. Back it off if the meter pins.
 - Acoustic desk is on by default: neck/body EQ, light compression, and a small wood-room reverb on play and bounce. Players should use headphones so speakers do not leak into the mics.
 - Takes are recorded as PCM in the tab, not Opus. Stacking Body while Neck plays is an overdub — the live mic is not routed to speakers.
 - Autotune is voice only (Vocal and Harmony). Acoustic guitar never gets pitch correction. Default is chromatic hard retune on those two lanes.
-- Bounces are WAV. Indexed in the listening room behind one password (default reel1, override STUDIO_LISTEN_PASSWORD).
+- A live tuner needle next to Autotune reads chromatic pitch for any armed take, including guitar. It never retunes guitar.
+- Bounces are WAV. Indexed in the listening lounge behind one password (default reel1, override STUDIO_LISTEN_PASSWORD). Each bounce paints a gold title-card sleeve; the platter spins while it plays.
 - Socket.IO namespace /studio is the control plane: who is in the reel, transport (play/record), take-filed, booth chat.
 - LiveKit is the media plane: microphone talkback or music input, camera, and screen share of the desk. Reed the StarBand agent can join the same room.
 - Latency compensation: clips land at the playhead where the player actually hit record.
@@ -48,8 +50,8 @@ export function groundedReply(message) {
   if (!q.trim()) {
     return 'Console is up. Arm a track, or ask me about LiveKit, bounce, or the listening room.';
   }
-  if (q.includes('password') || q.includes('listen')) {
-    return 'The listening room is one password. Default is reel1 unless STUDIO_LISTEN_PASSWORD is set. Bounce a WAV from the desk and it shows up there.';
+  if (q.includes('password') || q.includes('listen') || q.includes('lounge') || q.includes('sleeve')) {
+    return 'The listening lounge is one password. Default is reel1 unless STUDIO_LISTEN_PASSWORD is set. Bounce a WAV from the desk and it shows up as a gold sleeve with a spinning platter — not a stack of audio tags.';
   }
   if (q.includes('livekit') || q.includes('video') || q.includes('screen')) {
     const livekit = getLivekitConfig();
@@ -60,11 +62,17 @@ export function groundedReply(message) {
   if (q.includes('guitar') || q.includes('acoustic')) {
     return 'Two acoustic guitar tracks are already on the desk. Neck is the twelfth-fret mic, panned a little left and brighter. Body is the soundhole mic, panned a little right and warmer. Takes are PCM, not Opus. Acoustic desk adds neck/body EQ and a small wood room. Headphones on. Arm Neck first, then stack Body.';
   }
+  if (q.includes('tuner') || q.includes('needle') || q.includes('in tune')) {
+    return 'The needle next to Autotune reads live chromatic pitch. Guitar stays dry — it only shows sharp or flat. Voice can still get Autotune.';
+  }
   if (q.includes('autotune') || q.includes('auto tune') || q.includes('auto-tune') || q.includes('pitch')) {
-    return 'Autotune is on your voice only — Vocal and Harmony. Guitar stays dry. Chromatic hard retune is the default. Pick a key if you want it to snap to a scale. Uncheck Autotune on the voice lane to hear the dry take.';
+    return 'Autotune is on your voice only — Vocal and Harmony. Guitar stays dry. The tuner needle still reads guitar pitch. Chromatic hard retune is the default. Pick a key if you want voice to snap to a scale.';
+  }
+  if (q.includes('quiet') || q.includes('preamp') || q.includes('gain') || q.includes('loud') || q.includes('signal') || q.includes('level')) {
+    return 'Mic preamp sits above the meter. Default is +10 dB so quiet mics come up. It hits local takes and the LiveKit talk mic. Music input still skips browser voice processing. Back off the slider if the meter pins.';
   }
   if (q.includes('record') || q.includes('mic') || q.includes('arm')) {
-    return 'Add a track, arm it, pick music input if you are tracking a performance. Hit record. The waveform draws on the timeline. Remote friends file takes over LiveKit; the bounce still renders here.';
+    return 'Add a track, arm it, pick music input if you are tracking a performance. Hit record. If the meter is tiny, raise Mic preamp — it boosts the take and the talk mic. The waveform draws on the timeline.';
   }
   if (q.includes('wav') || q.includes('bounce') || q.includes('mix')) {
     return 'Faders and pans are local. Bounce writes a WAV in this machine, then you can push it to the listening room. No server mixdown.';

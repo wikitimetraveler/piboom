@@ -27,6 +27,9 @@ var lastNearbyWeatherAlerts = [];
 var nwsGridFilterActive = false;
 var nwsGridFilterContext = null;
 var timeRangeFilterHours = null;
+/** Major now: High/Critical event intensity + last 2–3 days */
+var majorNowFilterActive = false;
+var majorNowFilterHours = 72;
 var aiChatWidget = null;
 var aiInsightsCard = null;
 var voiceRecognition = null;

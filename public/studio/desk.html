@@ -71,12 +71,49 @@
         <label class="st-status" style="display:block;margin-top:0.4rem">
           <input type="checkbox" id="stTuneHard" checked/> Hard retune
         </label>
-        <p class="st-hint">Autotune is Vocal and Harmony only. Guitar never gets it. LiveKit talk mic always echo-cancels. Headphones still help when you stack.</p>
-        <div class="st-meter" aria-hidden="true"><span id="stMeter"></span></div>
+        <div class="st-tuner" id="stTuner" data-state="idle" aria-live="polite">
+          <span class="st-tuner-note" id="stTunerNote">—</span>
+          <div class="st-tuner-arc" aria-hidden="true">
+            <i class="st-tuner-needle" id="stTunerNeedle"></i>
+          </div>
+          <span class="st-tuner-cents" id="stTunerCents">Live pitch · guitar stays dry</span>
+        </div>
+        <p class="st-hint">Autotune is Vocal and Harmony only. The needle still reads guitar — it never retunes it. LiveKit talk mic always echo-cancels. Headphones still help when you stack.</p>
+        <label class="st-fader st-fader--mic">
+          Mic preamp <span id="stMicPreampVal">+10 dB</span>
+          <input type="range" id="stMicPreamp" min="0" max="18" step="1" value="10" aria-valuemin="0" aria-valuemax="18" aria-label="Mic preamp in decibels"/>
+        </label>
+        <p class="st-hint">Hotter input for quiet mics. Hits local takes and the talk mic. Back off if the meter pins.</p>
+        <label class="st-status" style="display:block;margin-top:0.55rem">
+          <input type="checkbox" id="stMonitor" checked/> Monitor in cans (headphones — speakers will loop)
+        </label>
+        <label class="st-fader st-fader--mic">
+          Monitor <span id="stMonitorVal">28%</span>
+          <input type="range" id="stMonitorLevel" min="0" max="1" step="0.01" value="0.28" aria-label="Headphone monitor level"/>
+        </label>
+        <div class="st-meter" id="stMeterWrap" aria-hidden="true">
+          <span id="stMeter"></span>
+          <i class="st-meter-peak" id="stMeterPeak"></i>
+        </div>
       </aside>
 
       <section class="st-panel">
-        <h2>Timeline</h2>
+        <h2 class="st-panel-head">Timeline <span class="st-rec-lamp" id="stRecLamp" data-state="idle">Idle</span></h2>
+        <div class="st-booth">
+          <label class="st-booth-field">BPM
+            <input class="st-input st-input--bpm" id="stBpm" type="number" min="40" max="220" step="1" value="92"/>
+          </label>
+          <label class="st-booth-field">Count-in
+            <select class="st-input" id="stCountIn">
+              <option value="0">Off</option>
+              <option value="1" selected>1 bar</option>
+              <option value="2">2 bars</option>
+            </select>
+          </label>
+          <label class="st-status st-booth-check">
+            <input type="checkbox" id="stClick" checked/> Click while recording
+          </label>
+        </div>
         <canvas class="st-timeline" id="stTimeline" width="900" height="280"></canvas>
         <div class="st-transport">
           <button type="button" class="st-btn st-btn--primary" id="stRecord">Record</button>
@@ -85,6 +122,7 @@
           <button type="button" class="st-btn st-btn--ghost" id="stBounce">Bounce WAV</button>
           <button type="button" class="st-btn st-btn--ghost" id="stRelease">Release</button>
         </div>
+        <p class="st-keys">Space play/stop · R record · 1–4 arm · M mute · Esc stop</p>
         <p class="st-status" id="stTransportLabel">Playhead 00:00.00 · Record = timeline · Bounce = WAV in this tab</p>
       </section>
 
@@ -116,6 +154,7 @@
     </div>
   </main>
   <script src="/studio/js/studio-autotune.js"></script>
+  <script src="/studio/js/studio-booth.js"></script>
   <script src="/studio/js/studio-desk.js"></script>
 </body>
 </html>

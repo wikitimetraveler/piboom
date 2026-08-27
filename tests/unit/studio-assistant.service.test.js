@@ -14,6 +14,7 @@ describe('studio-assistant.service', () => {
   test('groundedReply mentions listening password', () => {
     const reply = groundedReply('what is the listen password');
     expect(reply.toLowerCase()).toContain('reel1');
+    expect(reply.toLowerCase()).toMatch(/sleeve|lounge/);
   });
 
   test('groundedReply describes the acoustic guitar lanes', () => {
@@ -29,5 +30,11 @@ describe('studio-assistant.service', () => {
     expect(result.guideName).toBe('Reed');
     expect(result.source).toBe('grounded');
     expect(result.reply.toLowerCase()).toMatch(/arm|record|track/);
+  });
+
+  test('groundedReply explains mic preamp for quiet mics', () => {
+    const reply = groundedReply('the mic is too quiet');
+    expect(reply.toLowerCase()).toMatch(/preamp/);
+    expect(reply.toLowerCase()).toMatch(/\+10 dB|\+10 db|10 dB/i);
   });
 });

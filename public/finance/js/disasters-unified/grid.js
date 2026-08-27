@@ -63,8 +63,122 @@ function clearNwsGridFilter(uncheckToggle) {
   refreshNwsGridExternalFilter();
 }
 
+function getMajorNowFilterOptions() {
+  const F = typeof DisasterMajorNowFilter !== 'undefined' ? DisasterMajorNowFilter : null;
+  return {
+    hours: F ? F.normalizeHours(majorNowFilterHours) : (majorNowFilterHours || 72),
+    minScore: F ? F.HIGH_INTENSITY_MIN : 6,
+    nowMs: Date.now()
+  };
+}
+
+function getActiveViewGridRows() {
+  const rows = lastGridRows || [];
+  if (!majorNowFilterActive || typeof DisasterMajorNowFilter === 'undefined') return rows;
+  return DisasterMajorNowFilter.filterRows(rows, getMajorNowFilterOptions());
+}
+
+function getActiveViewDisasterRows() {
+  if (!majorNowFilterActive || typeof DisasterMajorNowFilter === 'undefined') {
+    return lastLoadedDisasterRows || [];
+  }
+  return DisasterMajorNowFilter.disasterObjsFromPassingRows(lastGridRows, getMajorNowFilterOptions());
+}
+
+function updateMajorNowFilterUi() {
+  const btn = document.getElementById('duMajorNowBtn');
+  const strip = document.getElementById('duMajorNowFilterStrip');
+  const labelEl = document.getElementById('duMajorNowFilterLabel');
+  const chipBar = document.getElementById('duSourceChipBar');
+  const F = typeof DisasterMajorNowFilter !== 'undefined' ? DisasterMajorNowFilter : null;
+  const hours = F ? F.normalizeHours(majorNowFilterHours) : majorNowFilterHours;
+  const windowRadio = document.querySelector(`input[name="duMajorNowWindow"][value="${hours}"]`);
+  if (windowRadio) windowRadio.checked = true;
+  if (btn) {
+    btn.classList.toggle('is-active', !!majorNowFilterActive);
+    btn.setAttribute('aria-pressed', majorNowFilterActive ? 'true' : 'false');
+    const sub = btn.querySelector('.du-major-now-btn-sub');
+    if (sub) {
+      if (!majorNowFilterActive) {
+        sub.textContent = 'High & Critical · 2–3 days';
+      } else {
+        const visible = getActiveViewGridRows().length;
+        sub.textContent = `${visible} in last ${hours === 48 ? '2' : '3'}d`;
+      }
+    }
+  }
+  chipBar?.classList.toggle('du-major-now-active', !!majorNowFilterActive);
+  if (!majorNowFilterActive) {
+    if (strip) strip.hidden = true;
+    return;
+  }
+  const visible = getActiveViewGridRows().length;
+  const total = (lastGridRows || []).length;
+  const message = F
+    ? F.statusMessage(visible, total, hours)
+    : `Major now: High & Critical · last ${hours === 48 ? '2' : '3'} days`;
+  if (labelEl) labelEl.textContent = message;
+  if (strip) strip.hidden = false;
+}
+
+function syncMajorNowView(options) {
+  const remap = options?.remap !== false;
+  refreshNwsGridExternalFilter();
+  updateMajorNowFilterUi();
+  if (!lastLoadedDisasterRows.length && !(lastGridRows || []).length) return;
+  const disasterRows = getActiveViewDisasterRows();
+  updateStats(disasterRows);
+  renderRiskIntelligencePanel(getActiveViewGridRows());
+  if (!remap || typeof renderMap !== 'function') return;
+  ++duMapRenderGeneration;
+  const mapGen = duMapRenderGeneration;
+  window.requestAnimationFrame(() => {
+    window.setTimeout(() => {
+      if (mapGen !== duMapRenderGeneration) return;
+      renderMap(disasterRows);
+    }, 0);
+  });
+}
+
+function setMajorNowFilter(active, options) {
+  const F = typeof DisasterMajorNowFilter !== 'undefined' ? DisasterMajorNowFilter : null;
+  const nextHours = options?.hours != null
+    ? (F ? F.normalizeHours(options.hours) : Number(options.hours) || 72)
+    : (F ? F.normalizeHours(majorNowFilterHours) : majorNowFilterHours);
+  majorNowFilterHours = nextHours;
+  majorNowFilterActive = !!active;
+  if (majorNowFilterActive) {
+    timeRangeFilterHours = nextHours;
+    const timeValue = nextHours === 48 ? '48h' : '72h';
+    const timeRadio = document.querySelector(`input[name="duTimeRange"][value="${timeValue}"]`);
+    if (timeRadio) timeRadio.checked = true;
+  } else if (options?.resetTimeRange !== false) {
+    timeRangeFilterHours = null;
+    const allRadio = document.getElementById('duTimeAll');
+    if (allRadio) allRadio.checked = true;
+  }
+  syncMajorNowView({ remap: options?.remap !== false });
+  if (majorNowFilterActive) {
+    const Fmsg = typeof DisasterMajorNowFilter !== 'undefined' ? DisasterMajorNowFilter : null;
+    const visible = getActiveViewGridRows().length;
+    const total = (lastGridRows || []).length;
+    setDashboardStatus(
+      Fmsg ? Fmsg.statusMessage(visible, total, majorNowFilterHours) : 'Major now filter on.',
+      visible || total === 0 ? 'info' : 'warning'
+    );
+  } else if (options?.silent !== true) {
+    setDashboardStatus('Showing all events in the current load (90-day window).', 'info');
+  }
+}
+
+function toggleMajorNowFilter() {
+  setMajorNowFilter(!majorNowFilterActive);
+}
+
 function disastersGridExternalFilterPresent() {
-  return (nwsGridFilterActive && !!nwsGridFilterContext) || timeRangeFilterHours !== null;
+  return (nwsGridFilterActive && !!nwsGridFilterContext)
+    || timeRangeFilterHours !== null
+    || majorNowFilterActive;
 }
 
 function disastersGridExternalFilterPass(node) {
@@ -81,6 +195,10 @@ function disastersGridExternalFilterPass(node) {
     if (!row || !row.start_time) return false;
     const hoursAgo = (Date.now() - new Date(row.start_time).getTime()) / (1000 * 60 * 60);
     if (hoursAgo > timeRangeFilterHours) return false;
+  }
+
+  if (majorNowFilterActive && typeof DisasterMajorNowFilter !== 'undefined') {
+    if (!DisasterMajorNowFilter.rowPasses(node.data, getMajorNowFilterOptions())) return false;
   }
   
   return true;
@@ -885,8 +1003,9 @@ function renderTable(rows) {
   const gridRows = uniqueRows.map((r, idx) => buildDisasterGridRow(r, uniqueRows, idx, relatedLookup));
   lastGridRows = gridRows;
   setDisastersGridRows(gridRows);
-  updateStats(rows);
-  renderRiskIntelligencePanel(gridRows);
+  updateMajorNowFilterUi();
+  updateStats(getActiveViewDisasterRows());
+  renderRiskIntelligencePanel(getActiveViewGridRows());
 
   if (disastersGridApi?.applyColumnState) {
     disastersGridApi.applyColumnState({
@@ -908,7 +1027,7 @@ function updateStats(rows) {
   const quakes = rows.filter(r => r.event_type?.toLowerCase() === 'earthquake').length;
   const counties = new Set(rows.filter(r => r.county_name).map(r => `${r.county_name}, ${r.state_abbr}`)).size;
 
-  renderSourceDeckCounts(rows);
+  renderSourceDeckCounts(lastLoadedDisasterRows.length ? lastLoadedDisasterRows : rows);
   void refreshSourceStatsFromApi();
 
   $('#totalDisasters').text(total).css('animation', 'none').offset().offset; // Trigger reflow

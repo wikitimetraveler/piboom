@@ -218,6 +218,7 @@ Mute: music icon in the AI chat header, or `localStorage` key `dc_disaster_music
 
 | UI element | Meaning |
 |------------|---------|
+| **Major now** | Sticky source-bar filter: keep only **High** (intensity ≥ 6) and **Critical** (≥ 10) events from the last **2 or 3 days**. Applies to the grid, map pins, stats, and risk intel. Event intensity is a relative ranking — not loan ops triage and not a loss probability. Deep link: `?major=1` (3 days) or `?major=2` / `?major=3`. |
 | **Freshness dot (green)** | Source is enabled and returned rows in the current grid load |
 | **Freshness dot (amber)** | Source is enabled but returned zero rows (check filters or run **Refresh data**) |
 | **Freshness dot (gray)** | Source is disabled |

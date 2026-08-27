@@ -267,10 +267,9 @@ function finishDisastersLoad(allRows) {
   // Progressive: paint grid/stats first, then chunk Google markers so Leaflet stays interactive.
   ++duMapRenderGeneration;
   renderTable(allRows);
-  updateStats(allRows);
   updateFirmsDeferredAlert();
   const mapGen = duMapRenderGeneration;
-  const rowsForMap = allRows;
+  const rowsForMap = getActiveViewDisasterRows();
   window.requestAnimationFrame(() => {
     window.setTimeout(() => {
       if (mapGen !== duMapRenderGeneration) return;

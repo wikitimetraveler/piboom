@@ -13,3 +13,5 @@
 #
 # Needs the same LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET, and OPENAI_API_KEY
 # as the Node app (loaded from the repo-root .env if you export them).
+#
+# Self-hosted SFU on thelanefamily.us: docs/LIVEKIT_VM.md
