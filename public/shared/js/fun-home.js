@@ -364,7 +364,7 @@
     console.log('✨ Extra sparkles activated! ✨');
   }
 
-  // Three.js Hero Scene — intentional full-bleed orb (dominant visual plane)
+  // Three.js Hero Scene — zen crystal orb; CSS orb is fallback only
   function initHeroScene() {
     if (typeof THREE === 'undefined' || prefersReducedMotion) return;
 
@@ -384,6 +384,7 @@
     });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isNarrow ? 1.5 : 2));
     renderer.setSize(width, height);
+    document.body.classList.add('fun-home--webgl');
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(isNarrow ? 42 : 36, width / height, 0.1, 100);
@@ -400,24 +401,23 @@
       const core = new THREE.MeshPhysicalMaterial({
         color: dark ? 0x4a90a4 : 0x5aa3b5,
         emissive: dark ? 0x1a3a44 : 0x2a6070,
-        emissiveIntensity: dark ? 0.4 : 0.28,
+        emissiveIntensity: dark ? 0.45 : 0.28,
         metalness: 0.18,
         roughness: 0.32,
         transparent: true,
         opacity: 0.95,
-        clearcoat: 0.7,
-        clearcoatRoughness: 0.3
+        clearcoat: 0.78,
+        clearcoatRoughness: 0.22
       });
       const ring = new THREE.MeshBasicMaterial({
-        color: dark ? 0xc9a227 : 0xb8922e,
+        color: dark ? 0xe8c96a : 0xc8ab57,
         transparent: true,
-        opacity: 0.62,
+        opacity: 0.7,
         side: THREE.DoubleSide
       });
       return { core, ring };
     }
 
-    const ORB_PALETTE = [0x3d7a8a, 0x10b981, 0x2a9bb0, 0xc9852a, 0xe85a7a];
     let mats = getMaterials();
     const detail = isNarrow ? 0 : 1;
     const orbGeom = new THREE.IcosahedronGeometry(1.15, detail);
@@ -490,21 +490,12 @@
       animationFrameId = requestAnimationFrame(animate);
       if (!isPageVisible || !inView) return;
       const elapsed = clock.getElapsedTime();
-      orb.rotation.y = elapsed * 0.2;
-      orb.rotation.x = Math.sin(elapsed * 0.32) * 0.14;
-      ring.rotation.z = elapsed * 0.16;
-      ring2.rotation.z = -elapsed * 0.11;
+      orb.rotation.y = elapsed * 0.18;
+      orb.rotation.x = Math.sin(elapsed * 0.28) * 0.1;
+      ring.rotation.z = elapsed * 0.12;
+      ring2.rotation.z = -elapsed * 0.08;
       group.position.y =
-        (isNarrow ? 0.55 : 0.05) + Math.sin(elapsed * 0.65) * 0.1;
-
-      const t = (elapsed * 0.15) % ORB_PALETTE.length;
-      const i0 = Math.floor(t);
-      const i1 = (i0 + 1) % ORB_PALETTE.length;
-      const mix = t - i0;
-      const c0 = new THREE.Color(ORB_PALETTE[i0]);
-      const c1 = new THREE.Color(ORB_PALETTE[i1]);
-      mats.core.color.copy(c0).lerp(c1, mix);
-      mats.ring.color.copy(c1).lerp(c0, mix * 0.5);
+        (isNarrow ? 0.55 : 0.05) + Math.sin(elapsed * 0.55) * 0.08;
 
       renderer.render(scene, camera);
     }
@@ -537,6 +528,7 @@
     }
 
     window.addEventListener('pagehide', () => {
+      document.body.classList.remove('fun-home--webgl');
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
       orbGeom.dispose();
       ringGeom.dispose();
@@ -545,69 +537,6 @@
       orb.material.dispose();
       ring.material.dispose();
       renderer.dispose();
-    });
-  }
-  // Enhanced card interactions with GSAP
-  function initEnhancedCardEffects() {
-    if (typeof gsap === 'undefined' || prefersReducedMotion) return;
-
-    const cards = document.querySelectorAll('.fun-card');
-    
-    cards.forEach((card, index) => {
-      const icon = card.querySelector('.fun-card__icon');
-      const links = card.querySelectorAll('.fun-card__link');
-      
-      // Stagger link animations on card hover
-      card.addEventListener('mouseenter', () => {
-        gsap.to(links, {
-          x: 6,
-          stagger: 0.05,
-          duration: 0.3,
-          ease: 'power2.out'
-        });
-
-        gsap.to(icon, {
-          scale: 1.15,
-          rotation: 5,
-          duration: 0.4,
-          ease: 'back.out(1.5)'
-        });
-      });
-
-      card.addEventListener('mouseleave', () => {
-        gsap.to(links, {
-          x: 0,
-          stagger: 0.03,
-          duration: 0.3,
-          ease: 'power2.in'
-        });
-
-        gsap.to(icon, {
-          scale: 1,
-          rotation: 0,
-          duration: 0.4,
-          ease: 'power2.inOut'
-        });
-      });
-
-      // Individual link hover effects
-      links.forEach(link => {
-        link.addEventListener('mouseenter', () => {
-          gsap.to(link, {
-            x: 8,
-            duration: 0.3,
-            ease: 'power2.out'
-          });
-        });
-
-        link.addEventListener('mouseleave', () => {
-          gsap.to(link, {
-            x: 6,
-            duration: 0.3,
-            ease: 'power2.in'
-          });
-        });
-      });
     });
   }
 
@@ -650,14 +579,6 @@
     } else {
       window.addEventListener('load', () => {
         setTimeout(initHeroScene, 100);
-      });
-    }
-    
-    if (typeof gsap !== 'undefined') {
-      initEnhancedCardEffects();
-    } else {
-      window.addEventListener('load', () => {
-        setTimeout(initEnhancedCardEffects, 100);
       });
     }
   }

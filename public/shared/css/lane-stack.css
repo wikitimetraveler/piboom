@@ -2,6 +2,14 @@
  * Lane stack tree — accordion branches off one trunk.
  */
 
+.lane-stack-page {
+  --fun-surface: rgba(255, 255, 255, 0.86);
+}
+
+body.lane-stack-page[data-theme="dark"] {
+  --fun-surface: rgba(24, 34, 50, 0.88);
+}
+
 .lane-stack-page .fun-main {
   max-width: 46rem;
   margin: 0 auto;
