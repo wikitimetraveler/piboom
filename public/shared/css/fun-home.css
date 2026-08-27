@@ -395,13 +395,25 @@ body[data-theme="dark"] .fun-card__title {
   align-items: center;
 }
 
+.fun-hero__stage {
+  position: absolute;
+  z-index: 4;
+  right: max(3%, 1.25rem);
+  top: 50%;
+  translate: 0 -50%;
+  width: min(44vw, 30rem);
+  height: min(44vw, 30rem);
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+}
+
 .fun-hero__canvas {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  z-index: 4;
-  pointer-events: none;
+  display: block;
   opacity: 1;
 }
 
@@ -426,12 +438,13 @@ body[data-theme="dark"] .fun-hero__shader {
 
 .fun-hero__orb {
   position: absolute;
-  width: min(46vw, 24rem);
-  height: min(46vw, 24rem);
-  right: max(6%, 2rem);
-  top: 50%;
-  translate: 0 -50%;
-  z-index: 2;
+  inset: 12%;
+  width: auto;
+  height: auto;
+  right: auto;
+  top: auto;
+  translate: none;
+  z-index: 0;
   pointer-events: none;
   clip-path: polygon(50% 0%, 82% 12%, 100% 42%, 88% 78%, 50% 100%, 12% 78%, 0% 42%, 18% 12%);
   background:
@@ -1452,6 +1465,15 @@ body[data-theme="dark"] .fun-card:hover {
     min-height: min(92vh, 760px);
   }
 
+  .fun-hero__stage {
+    right: auto;
+    left: 50%;
+    top: 26%;
+    translate: -50% -50%;
+    width: min(68vw, 20rem);
+    height: min(68vw, 20rem);
+  }
+
   .fun-hero__content {
     max-width: 36rem;
     padding: clamp(5rem, 10vh, 6rem) 1.5rem 3rem;
@@ -1495,12 +1517,14 @@ body[data-theme="dark"] .fun-card:hover {
     opacity: 1;
   }
 
+  .fun-hero__stage {
+    top: 24%;
+    width: min(64vw, 16.5rem);
+    height: min(64vw, 16.5rem);
+  }
+
   .fun-hero__orb {
-    width: min(72vw, 18rem);
-    height: min(72vw, 18rem);
-    right: 50%;
-    top: 38%;
-    translate: 50% -50%;
+    inset: 10%;
     opacity: 1;
   }
 

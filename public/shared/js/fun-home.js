@@ -399,10 +399,10 @@
     const canvas = document.getElementById('heroCanvas');
     if (!canvas) return;
 
-    const container = canvas.parentElement;
-    const hero = container;
-    let width = container.clientWidth || window.innerWidth;
-    let height = container.clientHeight || window.innerHeight;
+    const stage = canvas.parentElement;
+    const hero = canvas.closest('.fun-hero') || stage;
+    let width = stage.clientWidth || 420;
+    let height = stage.clientHeight || 420;
     const isNarrow = window.matchMedia('(max-width: 991.98px)').matches;
 
     const renderer = new THREE.WebGLRenderer({
@@ -418,16 +418,14 @@
     renderer.toneMappingExposure = 1.42;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(isNarrow ? 38 : 30, width / height, 0.1, 100);
-    camera.position.set(0, 0.12, isNarrow ? 4.2 : 3.15);
+    const camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 40);
+    camera.position.set(0, 0.05, 5.4);
 
     const envMap = makeZenEnvMap(renderer);
 
     const group = new THREE.Group();
-    const baseX = isNarrow ? 0 : 1.38;
-    const baseY = isNarrow ? 0.38 : 0.02;
-    group.position.set(baseX, baseY, 0);
-    group.scale.setScalar(isNarrow ? 1.42 : 2.05);
+    group.position.set(0, 0, 0);
+    group.scale.setScalar(1);
     scene.add(group);
 
     function getMaterials() {
@@ -531,18 +529,18 @@
     const halo = new THREE.Mesh(new THREE.SphereGeometry(1.55, 40, 40), mats.halo);
     group.add(halo);
 
-    const ringGeom = new THREE.TorusGeometry(1.52, 0.042, 14, isNarrow ? 72 : 128);
+    const ringGeom = new THREE.TorusGeometry(1.38, 0.038, 14, isNarrow ? 64 : 96);
     const ring = new THREE.Mesh(ringGeom, mats.ring);
     ring.rotation.x = Math.PI / 2.2;
     group.add(ring);
 
-    const ring2Geom = new THREE.TorusGeometry(1.82, 0.018, 12, isNarrow ? 56 : 96);
+    const ring2Geom = new THREE.TorusGeometry(1.58, 0.016, 12, isNarrow ? 48 : 80);
     const ring2 = new THREE.Mesh(ring2Geom, mats.ice);
     ring2.rotation.x = Math.PI / 2.85;
     ring2.rotation.y = 0.55;
     group.add(ring2);
 
-    const ring3Geom = new THREE.TorusGeometry(2.12, 0.012, 10, isNarrow ? 48 : 80);
+    const ring3Geom = new THREE.TorusGeometry(1.76, 0.01, 10, isNarrow ? 40 : 64);
     const ring3 = new THREE.Mesh(ring3Geom, mats.ring.clone());
     ring3.material.opacity = 0.85;
     ring3.material.transparent = true;
@@ -556,7 +554,7 @@
     for (let i = 0; i < shardCount; i++) {
       const shard = new THREE.Mesh(shardGeom, mats.shard);
       const a = (i / shardCount) * Math.PI * 2;
-      shard.position.set(Math.cos(a) * 2.05, Math.sin(a * 1.7) * 0.35, Math.sin(a) * 2.05);
+      shard.position.set(Math.cos(a) * 1.62, Math.sin(a * 1.7) * 0.22, Math.sin(a) * 1.62);
       shard.userData.angle = a;
       shards.add(shard);
     }
@@ -565,7 +563,7 @@
     const sparkCount = isNarrow ? 40 : 96;
     const sparkPos = new Float32Array(sparkCount * 3);
     for (let i = 0; i < sparkCount; i++) {
-      const r = 1.7 + Math.random() * 1.55;
+      const r = 1.35 + Math.random() * 0.55;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
       sparkPos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
@@ -617,14 +615,14 @@
         },
         { threshold: 0.05 }
       );
-      io.observe(container);
+      io.observe(stage);
     }
 
     const onPointerMove = (e) => {
       const rect = hero.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
-      targetParallaxX = ((e.clientX - rect.left) / rect.width - 0.5) * 0.55;
-      targetParallaxY = ((e.clientY - rect.top) / rect.height - 0.5) * 0.32;
+      targetParallaxX = ((e.clientX - rect.left) / rect.width - 0.5) * 0.28;
+      targetParallaxY = ((e.clientY - rect.top) / rect.height - 0.5) * 0.18;
     };
     hero.addEventListener('pointermove', onPointerMove);
 
@@ -639,9 +637,9 @@
         group.scale,
         { x: group.scale.x, y: group.scale.y, z: group.scale.z },
         {
-          x: group.scale.x * 1.08,
-          y: group.scale.y * 1.08,
-          z: group.scale.z * 1.08,
+          x: group.scale.x * 1.04,
+          y: group.scale.y * 1.04,
+          z: group.scale.z * 1.04,
           duration: 0.35,
           yoyo: true,
           repeat: 1,
@@ -662,7 +660,7 @@
     });
 
     if (typeof gsap !== 'undefined') {
-      const startScale = isNarrow ? 0.55 : 0.85;
+      const startScale = 0.72;
       gsap.from(group.scale, {
         x: startScale,
         y: startScale,
@@ -695,19 +693,19 @@
 
       shards.children.forEach((shard, i) => {
         const a = shard.userData.angle + elapsed * 0.35;
-        shard.position.set(Math.cos(a) * 2.05, Math.sin(a * 1.7 + elapsed) * 0.42, Math.sin(a) * 2.05);
+        shard.position.set(Math.cos(a) * 1.62, Math.sin(a * 1.7 + elapsed) * 0.22, Math.sin(a) * 1.62);
         shard.rotation.x = elapsed * 0.8 + i;
         shard.rotation.y = elapsed * 1.1;
       });
 
-      spark.position.x = baseX + Math.cos(elapsed * 0.55) * 1.7;
-      spark.position.y = 1.5 + Math.sin(elapsed * 0.7) * 0.5;
-      spark.position.z = 2.3 + Math.sin(elapsed * 0.55) * 0.8;
+      spark.position.x = Math.cos(elapsed * 0.55) * 1.15;
+      spark.position.y = 0.9 + Math.sin(elapsed * 0.7) * 0.35;
+      spark.position.z = 1.6 + Math.sin(elapsed * 0.55) * 0.4;
 
-      group.position.x = baseX + parallaxX * 0.55;
-      group.position.y = baseY + Math.sin(elapsed * 0.55) * 0.08 - parallaxY * 0.4;
-      group.rotation.x = parallaxY * 0.35;
-      group.rotation.y = parallaxX * 0.45;
+      group.position.x = parallaxX * 0.18;
+      group.position.y = Math.sin(elapsed * 0.55) * 0.04 - parallaxY * 0.14;
+      group.rotation.x = parallaxY * 0.18;
+      group.rotation.y = parallaxX * 0.22;
       }
 
       renderer.render(scene, camera);
@@ -718,8 +716,8 @@
     window.addEventListener('resize', () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(() => {
-        width = container.clientWidth;
-        height = container.clientHeight;
+        width = stage.clientWidth || 420;
+        height = stage.clientHeight || 420;
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
         renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, width < 992 ? 1.5 : 2));
