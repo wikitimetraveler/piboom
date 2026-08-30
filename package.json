@@ -69,6 +69,8 @@
     "ingest:newport-pier": "node scripts/tools/ingest-newport-pier-video.mjs --input \"C:/Users/levij/Downloads/IMG_0847.MOV\"",
     "download:newport-pier-fish": "node scripts/tools/download-newport-pier-fish-images.mjs",
     "postprocess:heygen-pip": "node scripts/tools/postprocess-heygen-pip.mjs",
+    "create:zed-heygen-avatar": "node scripts/tools/create-zed-heygen-avatar.mjs",
+    "fetch:nasa-blue-marble": "node scripts/tools/fetch-nasa-blue-marble.mjs",
     "composite:newport-pier-stop": "node scripts/tools/composite-newport-pier-stop.mjs",
     "preview:newport-pier-reel": "npm run dev --prefix video/newport-pier",
     "check:newport-pier-reel": "npm run check --prefix video/newport-pier",

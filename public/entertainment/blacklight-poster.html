@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Black Light Poster | DevConnect Labs</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/shared/collection-styles.css"/>
+  <script src="/shared/toast.js"></script>
+  <script src="/shared/modern-navbar.js"></script>
+  <style>
+    body {
+      background: #050010;
+      color: #e8e8e8;
+      min-height: 100vh;
+    }
+    .blp-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 3rem;
+    }
+    .blp-stage {
+      position: relative;
+      width: 100%;
+      min-height: 62vh;
+      background: #030008;
+      border: 1px solid rgba(0, 255, 120, 0.35);
+      box-shadow: 0 0 40px rgba(255, 0, 180, 0.18);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    #blpCanvas {
+      width: 100%;
+      height: 62vh;
+      display: block;
+    }
+    .blp-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: end;
+      margin: 1rem 0;
+    }
+    .blp-controls .form-control {
+      background: #120018;
+      border-color: #00ff88;
+      color: #e8ffe8;
+    }
+    .blp-btn {
+      background: linear-gradient(135deg, #ff00aa, #00ff88);
+      border: 0;
+      color: #111;
+      font-weight: 700;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+    }
+    .blp-btn[aria-pressed="true"] {
+      box-shadow: 0 0 18px #00ff88;
+    }
+    .blp-btn:disabled {
+      opacity: 0.55;
+    }
+    .blp-status {
+      font-size: 0.9rem;
+      color: #9dffc4;
+    }
+  </style>
+</head>
+<body>
+  <modern-navbar></modern-navbar>
+  <main class="blp-wrap">
+    <h1 class="h3 mb-2">Black Light Poster</h1>
+    <p class="mb-3">gpt-image-1 draws the poster, then the same WebGPU compute path as the home globe paints it — warp, UV wash, night-city glow. Mic drives the light.</p>
+    <div class="blp-controls">
+      <label>Artist
+        <input id="blpArtist" class="form-control" value="Zed" maxlength="80"/>
+      </label>
+      <label>Album
+        <input id="blpAlbum" class="form-control" value="Studio Console" maxlength="80"/>
+      </label>
+      <button type="button" class="blp-btn" id="blpGpt">GPT image → GPU</button>
+      <button type="button" class="blp-btn" id="blpGenerate">GPU only</button>
+      <button type="button" class="blp-btn" id="blpMic" aria-pressed="false">Start mic</button>
+      <label>Or load image
+        <input id="blpFile" type="file" accept="image/*" class="form-control-file"/>
+      </label>
+    </div>
+    <p class="blp-status" id="blpStatus">Starting WebGPU…</p>
+    <div class="blp-stage">
+      <canvas id="blpCanvas" role="img" aria-label="WebGPU black light poster"></canvas>
+    </div>
+    <p class="mt-3 mb-0">
+      <a href="/">Home globe</a>
+      ·
+      <a href="/entertainment/poster-generator.html">AI Poster Generator</a>
+      ·
+      <a href="/entertainment/blacklight.html">Black Light Zone</a>
+    </p>
+  </main>
+  <script src="/shared/js/webgpu-runtime.js?v=2"></script>
+  <script src="/shared/js/webgpu-blacklight-poster.js?v=4"></script>
+  <script>
+    (function () {
+      const els = {
+        canvas: document.getElementById('blpCanvas'),
+        artist: document.getElementById('blpArtist'),
+        album: document.getElementById('blpAlbum'),
+        gpt: document.getElementById('blpGpt'),
+        generate: document.getElementById('blpGenerate'),
+        mic: document.getElementById('blpMic'),
+        file: document.getElementById('blpFile'),
+        status: document.getElementById('blpStatus'),
+      };
+      const params = new URLSearchParams(location.search);
+      if (params.get('artist')) els.artist.value = params.get('artist');
+      if (params.get('album')) els.album.value = params.get('album');
+
+      let view = null;
+      let audioCtx = null;
+      let analyser = null;
+      let micStream = null;
+      let raf = 0;
+
+      function setStatus(text) {
+        els.status.textContent = text;
+      }
+
+      function loadImage(url) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(img);
+          img.onerror = () => reject(new Error('Could not load image'));
+          img.src = url;
+        });
+      }
+
+      async function applyPoster(url, label) {
+        const img = await loadImage(url);
+        if (view && view.setPosterImage) view.setPosterImage(img);
+        setStatus((label || 'Image') + ' is now a GPU compute poster — start the mic.');
+      }
+
+      function reseed() {
+        if (!view || typeof view.generateProcedural !== 'function') return;
+        const seed = view.generateProcedural({
+          artist: String(els.artist.value || 'Zed').trim(),
+          album: String(els.album.value || 'Studio Console').trim(),
+        });
+        setStatus(`GPU-only compute live · seed ${(seed || 0).toFixed(3)}`);
+      }
+
+      async function gptToGpu() {
+        if (!view) {
+          setStatus('WebGPU not ready yet.');
+          return;
+        }
+        const artist = String(els.artist.value || 'Zed').trim();
+        const album = String(els.album.value || 'Studio Console').trim();
+        els.gpt.disabled = true;
+        setStatus('gpt-image-1 is drawing the poster…');
+        try {
+          const res = await fetch('/api/poster-generator/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              artist,
+              album,
+              style: 'blacklight',
+              quality: 'standard',
+              size: '1024x1792',
+            }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok || !data.posterUrl) {
+            setStatus(data.message || data.error || 'Image API failed');
+            return;
+          }
+          setStatus('Feeding GPT image into WebGPU compute…');
+          await applyPoster(data.posterUrl, 'GPT image');
+        } catch (err) {
+          setStatus(err.message || 'GPT image failed');
+        } finally {
+          els.gpt.disabled = false;
+        }
+      }
+
+      function tickAudio() {
+        if (!analyser || !view) return;
+        raf = requestAnimationFrame(tickAudio);
+        const data = new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(data);
+        view.setBands(window.WebGpuBlacklightPoster.fftBands(data));
+      }
+
+      async function toggleMic() {
+        if (micStream) {
+          cancelAnimationFrame(raf);
+          micStream.getTracks().forEach((t) => t.stop());
+          micStream = null;
+          if (audioCtx) audioCtx.close();
+          audioCtx = null;
+          analyser = null;
+          els.mic.setAttribute('aria-pressed', 'false');
+          els.mic.textContent = 'Start mic';
+          if (view) view.setBands({ bass: 0.05, mids: 0.1, highs: 0.06 });
+          setStatus('Mic off — poster still computing.');
+          return;
+        }
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+        audioCtx.createMediaStreamSource(stream).connect(analyser);
+        micStream = stream;
+        els.mic.setAttribute('aria-pressed', 'true');
+        els.mic.textContent = 'Stop mic';
+        setStatus('Listening — bass / mids / highs drive the UV wash.');
+        tickAudio();
+      }
+
+      els.gpt.addEventListener('click', () => gptToGpu());
+      els.generate.addEventListener('click', reseed);
+      els.mic.addEventListener('click', () =>
+        toggleMic().catch((err) => setStatus(err.message || 'Mic denied'))
+      );
+      els.file.addEventListener('change', () => {
+        const file = els.file.files && els.file.files[0];
+        if (!file) return;
+        applyPoster(URL.createObjectURL(file), 'Uploaded image').catch((err) =>
+          setStatus(err.message)
+        );
+      });
+
+      window.WebGpuBlacklightPoster.mount({
+        canvas: els.canvas,
+        seedKey: `${els.artist.value}|${els.album.value}`,
+      }).then((mounted) => {
+        view = mounted;
+        if (!mounted) {
+          setStatus('WebGPU unavailable in this browser — same requirement as the home globe.');
+          return;
+        }
+        const poster = params.get('poster');
+        if (poster) {
+          applyPoster(poster, 'Linked image').catch(() => reseed());
+          return;
+        }
+        reseed();
+        setStatus('WebGPU compute live — GPT image → GPU turns a gpt-image-1 poster into this shader.');
+      });
+    })();
+  </script>
+</body>
+</html>

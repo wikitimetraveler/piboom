@@ -623,7 +623,9 @@
             <div class="col-lg-7">
               <div class="gse-knowledge-canvas-wrap">
                 <svg id="gseKnowledgeGraph" class="gse-knowledge-graph" viewBox="0 0 640 320" role="img" aria-label="GSE knowledge graph by category"></svg>
+                <canvas id="gseKnowledgeConstellation" class="gse-knowledge-constellation" role="img" aria-label="RAG neighbor constellation"></canvas>
                 <p class="small text-muted mb-0 mt-1" id="gseKnowledgeGraphCaption">Category map of indexed pooling, ARM, product, and official-source slips.</p>
+                <p class="small text-muted mb-0" id="gseConstellationCaption">Constellation paints server-returned RAG neighbors (not client embeddings). Click a glow to open its source.</p>
               </div>
             </div>
             <div class="col-lg-5">
@@ -721,6 +723,8 @@
 <script src="/shared/voice-widget.js" defer></script>
     <script src="/shared/encompass-api.js" defer></script>
     <script src="/shared/gse-encompass-field-map.js" defer></script>
+    <script src="/shared/js/webgpu-runtime.js"></script>
+    <script src="/shared/js/webgpu-knowledge-constellation.js"></script>
     <script src="/js/gse-analyzer.js" defer></script>
   </body>
 </html>

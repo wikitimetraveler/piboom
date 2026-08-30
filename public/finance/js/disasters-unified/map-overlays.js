@@ -63,6 +63,8 @@
   let lastSeededAt = null;
   let lastDisasterRows = [];
   let lastFloodLoan = null;
+  let webgpuHeat = null;
+  let pulseGlobe = null;
 
   function prefersReducedMotion() {
     return global.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches === true;
@@ -312,12 +314,42 @@
     setLayerOnMap(graphNearLayer, graphNearVisible && rays.length > 0);
     syncLayerControl();
     syncChipState();
+    webgpuHeat?.setGraphNearRays?.(rays, { seededAtMax: lastSeededAt });
+    webgpuHeat?.setArcsVisible?.(graphNearVisible);
   }
 
   function setDisasterRows(rows) {
     lastDisasterRows = Array.isArray(rows) ? rows : [];
     paintSourceMarkers();
     paintFirmsHeat();
+    webgpuHeat?.setFirmsRows?.(lastDisasterRows);
+    syncPulseGlobeFromRows();
+  }
+
+  function syncPulseGlobeFromRows() {
+    if (!pulseGlobe) return;
+    const events = [];
+    lastDisasterRows.slice(0, 80).forEach((r) => {
+      const lat = Number(r.lat ?? r.latitude ?? r.avg_latitude);
+      const lng = Number(r.lng ?? r.longitude ?? r.avg_longitude);
+      if (!hasFiniteCoords(lat, lng)) return;
+      const key = normalizeSource(r.source);
+      const colors = {
+        firms: 'rgba(234,88,12,0.9)',
+        usgs: 'rgba(13,148,136,0.9)',
+        nws: 'rgba(2,132,199,0.9)',
+        nhc: 'rgba(192,38,211,0.9)',
+        fema: 'rgba(124,58,237,0.9)',
+      };
+      let strength = 0.45;
+      if (key === 'firms') strength = Math.min(1, parseFirmsIntensity(r).weight / 2);
+      else if (key === 'usgs') {
+        const mag = Number(r.raw?.mag ?? r.severity ?? r.raw?.magnitude);
+        strength = Number.isFinite(mag) ? Math.min(1, mag / 7) : 0.5;
+      }
+      events.push({ lat, lng, strength, color: colors[key] || 'rgba(255,200,80,0.85)' });
+    });
+    pulseGlobe.setEvents(events);
   }
 
   function paintSourceMarkers() {
@@ -466,15 +498,17 @@
     if (key === 'live') {
       liveRingVisible = !liveRingVisible;
       setLayerOnMap(liveRingLayer, liveRingVisible && !!lastLive);
-    } else if (key === 'graphNear') {
-      graphNearVisible = !graphNearVisible;
-      setLayerOnMap(graphNearLayer, graphNearVisible && lastRays.length > 0);
     } else if (key === 'firmsHeat') {
       firmsHeatVisible = !firmsHeatVisible;
       setLayerOnMap(
         firmsHeatLayer,
         firmsHeatVisible && firmsHeatLayer && firmsHeatLayer.getLayers().length > 0
       );
+      webgpuHeat?.setHeatVisible?.(firmsHeatVisible);
+    } else if (key === 'graphNear') {
+      graphNearVisible = !graphNearVisible;
+      setLayerOnMap(graphNearLayer, graphNearVisible && lastRays.length > 0);
+      webgpuHeat?.setArcsVisible?.(graphNearVisible);
     } else if (key === 'floodHalo') {
       floodHaloVisible = !floodHaloVisible;
       setLayerOnMap(floodHaloLayer, floodHaloVisible && !!lastFloodLoan);
@@ -499,6 +533,35 @@
     syncChipState();
   }
 
+  async function bindWebGpuOverlay(pickerMap) {
+    if (!pickerMap || !global.DuWebGpuHeat || webgpuHeat) return;
+    const host = document.getElementById('duGeoPickerMapHost') || document.getElementById('duGeoPickerMap')?.parentElement;
+    const canvas = document.getElementById('duWebgpuHeatCanvas');
+    if (!host || !canvas) return;
+    try {
+      webgpuHeat = await global.DuWebGpuHeat.mount({
+        map: pickerMap,
+        canvas,
+        heatOn: firmsHeatVisible,
+        arcsOn: graphNearVisible,
+      });
+      if (lastDisasterRows.length) webgpuHeat?.setFirmsRows?.(lastDisasterRows);
+      if (lastRays.length) webgpuHeat?.setGraphNearRays?.(lastRays, { seededAtMax: lastSeededAt });
+    } catch (err) {
+      console.warn('WebGPU heat overlay failed', err);
+    }
+
+    const globeCanvas = document.getElementById('duWebgpuPulseGlobe');
+    if (globeCanvas && !pulseGlobe) {
+      try {
+        pulseGlobe = await global.DuWebGpuHeat.mountPulseGlobe({ canvas: globeCanvas });
+        syncPulseGlobeFromRows();
+      } catch (_) {
+        /* optional */
+      }
+    }
+  }
+
   function bindPickerMap(pickerMap) {
     if (!ensureMap(pickerMap)) return;
     syncLayerControl();
@@ -509,6 +572,7 @@
       paintFirmsHeat();
     }
     if (lastFloodLoan) setFloodHalo(lastFloodLoan);
+    bindWebGpuOverlay(pickerMap);
   }
 
   global.duGeoOverlays = {

@@ -262,16 +262,24 @@
           </div>
           <div class="row g-3">
             <div class="col-lg-8">
-              <div id="duGeoPickerMap" class="du-geo-picker-map" role="application" aria-label="United States map"></div>
+              <div id="duGeoPickerMapHost" class="du-geo-picker-map-host">
+                <div id="duGeoPickerMap" class="du-geo-picker-map" role="application" aria-label="United States map"></div>
+                <canvas id="duWebgpuHeatCanvas" class="du-webgpu-heat-canvas" aria-hidden="true"></canvas>
+              </div>
               <div class="du-geo-legend small text-muted mt-2" id="duGeoChoroplethLegend" aria-label="Choropleth legend">
                 <span class="du-geo-legend-item"><span class="du-geo-legend-swatch du-geo-legend--none"></span> None</span>
                 <span class="du-geo-legend-item"><span class="du-geo-legend-swatch du-geo-legend--low"></span> Low</span>
                 <span class="du-geo-legend-item"><span class="du-geo-legend-swatch du-geo-legend--medium"></span> Moderate</span>
                 <span class="du-geo-legend-item"><span class="du-geo-legend-swatch du-geo-legend--high"></span> High</span>
               </div>
+              <p class="small text-muted mt-1 mb-0" id="duWebgpuHeatHint">WebGPU heat / NEAR arcs paint over the lens (non-interactive). Graph NEAR still shows <code>seeded_at</code> in the badge — not live /near.</p>
             </div>
             <div class="col-lg-4">
               <div class="du-geo-rail">
+                <div class="du-webgpu-globe-wrap mb-3">
+                  <canvas id="duWebgpuPulseGlobe" class="du-webgpu-pulse-globe" role="img" aria-label="Hazard pulse globe"></canvas>
+                  <p class="small text-muted mb-0 mt-1">Pulse globe — FIRMS / USGS / alerts from the loaded grid (ops viz, not risk probability).</p>
+                </div>
                 <label class="form-label small fw-semibold" for="duGeoStateSelect">State</label>
                 <select id="duGeoStateSelect" class="form-select form-select-sm mb-3" aria-label="Select US state">
                   <option value="">— Select state —</option>
@@ -1235,6 +1243,8 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
     <script src="https://d3js.org/d3.v7.min.js" crossorigin="anonymous"></script>
     <script src="/shared/vendor/topojson-client.min.js"></script>
+    <script src="/shared/js/webgpu-runtime.js"></script>
+    <script src="/finance/js/disasters-unified/webgpu-heat-overlay.js"></script>
     <script src="/finance/js/disasters-unified/core.js"></script>
     <script src="/finance/js/disasters-unified/geo-data.js"></script>
     <script src="/finance/js/disasters-unified/map-overlays.js"></script>

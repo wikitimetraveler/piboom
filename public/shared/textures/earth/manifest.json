@@ -1,0 +1,22 @@
+{
+  "fetchedAt": "2026-08-30T08:14:53.498Z",
+  "width": 2048,
+  "height": 1024,
+  "credit": "Imagery: NASA Visible Earth / Blue Marble",
+  "assets": {
+    "blueMarble": {
+      "file": "blue-marble.jpg",
+      "path": "/shared/textures/earth/blue-marble.jpg",
+      "sourceUrl": "https://eoimages.gsfc.nasa.gov/images/imagerecords/57000/57752/land_shallow_topo_2048.jpg",
+      "credit": "NASA Visible Earth — Blue Marble: Land Surface, Shallow Water, and Shaded Topography",
+      "skipped": true
+    },
+    "earthLights": {
+      "file": "earth-lights.jpg",
+      "path": "/shared/textures/earth/earth-lights.jpg",
+      "sourceUrl": "https://eoimages.gsfc.nasa.gov/images/imagerecords/55000/55167/earth_lights_lrg.jpg",
+      "credit": "NASA Visible Earth — Earth's City Lights (DMSP)",
+      "skipped": true
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "Zed",
+  "avatarFile": "AVATAR-ZED.md",
+  "avatarId": "057f1a1e84bfb592fb06313f857ed0a2",
+  "groupId": "057f1a1e84bfb592fb06313f857ed0a2",
+  "voiceId": "07d2ba65847541feb97abc9b60181555",
+  "voiceName": "Smooth Dev",
+  "greeting": "Signal acquired. Console is live — arm a track when you're ready.",
+  "status": "heygen-ready"
+}

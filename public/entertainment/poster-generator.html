@@ -414,6 +414,7 @@
             <a class="dropdown-item" href="/player.html"><i class="bi-volume-up"></i> The Boombox</a>
             <a class="dropdown-item" href="/visualizer.html"><i class="bi-palette-fill"></i> Psychedelic Visualizer</a>
             <a class="dropdown-item" href="/blacklight.html"><i class="bi-lightning"></i> Black Light Zone</a>
+            <a class="dropdown-item" href="/entertainment/blacklight-poster.html"><i class="bi-lightbulb"></i> Black Light Poster</a>
             <a class="dropdown-item active" href="/poster-generator.html"><i class="bi-palette"></i> Poster Generator</a>
             <a class="dropdown-item" href="/art-gallery.html"><i class="bi-image"></i> Art Gallery</a>
             <a class="dropdown-item" href="/ouija-board.html"><i class="bi-magic"></i> Ouija Board</a>
@@ -661,6 +662,9 @@
         <button class="download-btn" onclick="generateAnother()">
           <i class="bi-arrow-clockwise"></i> Generate Another
         </button>
+        <a class="download-btn" id="lightUnderBlacklight" href="/entertainment/blacklight-poster.html">
+          <i class="bi-lightbulb"></i> Light under black light
+        </a>
       </div>
     </div>
   </div>
@@ -926,6 +930,15 @@ async function generatePoster() {
       generatedPosterUrl = data.posterUrl;
       document.getElementById('generatedPoster').src = data.posterUrl;
       document.getElementById('resultSection').style.display = 'block';
+      const light = document.getElementById('lightUnderBlacklight');
+      if (light) {
+        const q = new URLSearchParams({
+          artist: selectedAlbum.artist || 'Zed',
+          album: selectedAlbum.album || 'Studio',
+          poster: data.posterUrl
+        });
+        light.href = '/entertainment/blacklight-poster.html?' + q.toString();
+      }
       
       // Scroll to result
       document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });

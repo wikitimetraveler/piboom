@@ -1,0 +1,154 @@
+/**
+ * Development work by David Lane
+ */
+import '../../public/shared/js/webgpu-runtime.js';
+import '../../public/shared/js/webgpu-globe.js';
+import '../../public/shared/js/webgpu-blacklight-poster.js';
+import '../../public/shared/js/webgpu-knowledge-constellation.js';
+import '../../public/finance/js/disasters-unified/webgpu-heat-overlay.js';
+
+const {
+  WebGpuRuntime,
+  WebGpuGlobe,
+  WebGpuBlacklightPoster,
+  WebGpuKnowledgeConstellation,
+  DuWebGpuHeat,
+} = globalThis;
+
+describe('WebGpuRuntime', () => {
+  test('detectBackend returns webgpu when navigator.gpu is present', () => {
+    expect(WebGpuRuntime.detectBackend({})).toBe('webgpu');
+  });
+
+  test('detectBackend falls back to webgl2 when gpu is missing', () => {
+    expect(WebGpuRuntime.detectBackend(null)).toBe('webgl2');
+    expect(WebGpuRuntime.detectBackend(undefined)).toBe('webgl2');
+  });
+
+  test('pixelRatio caps devicePixelRatio at 2', () => {
+    const prev = globalThis.window;
+    globalThis.window = { devicePixelRatio: 3.5 };
+    expect(WebGpuRuntime.pixelRatio(2)).toBe(2);
+    expect(WebGpuRuntime.pixelRatio(1.25)).toBe(1.25);
+    globalThis.window = prev;
+  });
+
+  test('shouldPause follows document.hidden', () => {
+    const prev = globalThis.document;
+    globalThis.document = { hidden: true };
+    expect(WebGpuRuntime.shouldPause()).toBe(true);
+    globalThis.document = { hidden: false };
+    expect(WebGpuRuntime.shouldPause()).toBe(false);
+    globalThis.document = prev;
+  });
+
+  test('requestGpu returns webgl2 when navigator.gpu is absent', async () => {
+    const prev = globalThis.navigator;
+    globalThis.navigator = {};
+    const result = await WebGpuRuntime.requestGpu();
+    expect(result.backend).toBe('webgl2');
+    globalThis.navigator = prev;
+  });
+});
+
+describe('WebGpuGlobe', () => {
+  test('latLonToUv wraps lon and clamps lat to equirect UV', () => {
+    const eq = WebGpuGlobe.latLonToUv(0, 0);
+    expect(eq.u).toBeCloseTo(0.5, 5);
+    expect(eq.v).toBeCloseTo(0.5, 5);
+    const west = WebGpuGlobe.latLonToUv(0, -180);
+    expect(west.u).toBeCloseTo(0, 5);
+    const north = WebGpuGlobe.latLonToUv(90, 0);
+    expect(north.v).toBeCloseTo(1, 5);
+    const south = WebGpuGlobe.latLonToUv(-90, 180);
+    expect(south.v).toBeCloseTo(0, 5);
+    expect(south.u).toBeCloseTo(0, 5);
+  });
+
+  test('HERO_BODIES lists ten NASA worlds including Mars and Moon', () => {
+    expect(WebGpuGlobe.HERO_BODIES).toHaveLength(10);
+    expect(WebGpuGlobe.HERO_BODIES).toEqual(
+      expect.arrayContaining(['mercury', 'venus', 'earth', 'moon', 'mars', 'jupiter', 'pluto'])
+    );
+    expect(WebGpuGlobe.resolveBody('mars').label).toBe('Mars');
+    expect(WebGpuGlobe.resolveBody('moon').href).toBe('/family/lane-museum.html?lunar=1');
+    expect(WebGpuGlobe.LANE_CRATER.lat).toBeCloseTo(-9.5, 5);
+    expect(WebGpuGlobe.LANE_CRATER.lon).toBeCloseTo(132.36, 5);
+    expect(WebGpuGlobe.LAVA_SEEDS.length).toBeGreaterThan(0);
+  });
+
+  test('capFirmsPoints drops bad coords and respects max', () => {
+    const rows = [
+      { lat: 34.1, lng: -118.2, raw: { frp: 40, brightness: 340 } },
+      { lat: 999, lng: 0 },
+      { latitude: 40, longitude: -120, frp: 10 },
+      { lat: 20, lng: 10 },
+    ];
+    const capped = WebGpuGlobe.capFirmsPoints(rows, 2);
+    expect(capped).toHaveLength(2);
+    expect(capped[0].lat).toBe(34.1);
+    expect(capped[0].lon).toBe(-118.2);
+    expect(capped[0].weight).toBeGreaterThan(0);
+    expect(capped[0].weight).toBeLessThanOrEqual(3);
+  });
+});
+
+describe('WebGpuBlacklightPoster', () => {
+  test('fftBands splits a frequency buffer into bass mids highs', () => {
+    const data = new Uint8Array(64);
+    data.fill(10);
+    data[0] = 255;
+    data[1] = 255;
+    const bands = WebGpuBlacklightPoster.fftBands(data);
+    expect(bands.bass).toBeGreaterThan(bands.mids);
+    expect(bands.mids).toBeGreaterThan(0);
+    expect(bands.highs).toBeGreaterThan(0);
+    expect(bands.bass).toBeLessThanOrEqual(1);
+  });
+
+  test('hashString is stable and in unit range', () => {
+    expect(WebGpuBlacklightPoster.hashString('Zed|Studio')).toBe(
+      WebGpuBlacklightPoster.hashString('Zed|Studio')
+    );
+    expect(WebGpuBlacklightPoster.hashString('Zed|Studio')).toBeGreaterThanOrEqual(0);
+    expect(WebGpuBlacklightPoster.hashString('Zed|Studio')).toBeLessThan(1);
+    expect(WebGpuBlacklightPoster.hashString('A')).not.toBe(WebGpuBlacklightPoster.hashString('B'));
+  });
+});
+
+describe('WebGpuKnowledgeConstellation', () => {
+  test('inferStore maps GSE / ICE / HeyGen / Encompass blobs', () => {
+    expect(WebGpuKnowledgeConstellation.inferStore({ category: 'pooling' })).toBe('gse');
+    expect(WebGpuKnowledgeConstellation.inferStore({ repo: 'imt-developerconnect' })).toBe('ice');
+    expect(WebGpuKnowledgeConstellation.inferStore({ sourceType: 'heygen-docs' })).toBe('heygen');
+    expect(WebGpuKnowledgeConstellation.inferStore({ title: 'Encompass custom field' })).toBe(
+      'encompass'
+    );
+  });
+
+  test('normalizeNeighbors and layoutNeighbors produce unit-square points', () => {
+    const rows = [
+      { id: 'S1', title: 'UMBS pooling', score: 0.9, category: 'pooling' },
+      { id: 'S2', title: 'ICE Postman', score: 0.4, repo: 'imt-foo' },
+    ];
+    const neighbors = WebGpuKnowledgeConstellation.normalizeNeighbors(rows);
+    expect(neighbors).toHaveLength(2);
+    expect(neighbors[0].store).toBe('gse');
+    expect(neighbors[1].store).toBe('ice');
+    const laid = WebGpuKnowledgeConstellation.layoutNeighbors(neighbors);
+    expect(laid[0].x).toBeGreaterThan(0);
+    expect(laid[0].x).toBeLessThan(1);
+    expect(laid[0].y).toBeGreaterThan(0);
+    expect(laid[0].y).toBeLessThan(1);
+  });
+});
+
+describe('DuWebGpuHeat', () => {
+  test('parseFirmsWeight blends FRP and brightness', () => {
+    const low = DuWebGpuHeat.parseFirmsWeight({ raw: { frp: 4, brightness: 290 } });
+    const high = DuWebGpuHeat.parseFirmsWeight({ raw: { frp: 80, brightness: 360 } });
+    expect(low).toBeGreaterThan(0);
+    expect(high).toBeGreaterThan(low);
+    expect(high).toBeLessThanOrEqual(3);
+  });
+});

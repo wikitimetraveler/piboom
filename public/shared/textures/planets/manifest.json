@@ -1,0 +1,56 @@
+{
+  "fetchedAt": "2026-08-30T08:14:53.502Z",
+  "width": 2048,
+  "height": 1024,
+  "credit": "Imagery: NASA / JPL Solar System Simulator texture maps",
+  "assets": {
+    "mercury": {
+      "file": "mercury.jpg",
+      "path": "/shared/textures/planets/mercury.jpg",
+      "sourceUrl": "https://maps.jpl.nasa.gov/tmaps/pix/mer0muu2.jpg",
+      "credit": "NASA / JPL / USGS — Mercury (Mariner 10 texture map)"
+    },
+    "venus": {
+      "file": "venus.jpg",
+      "path": "/shared/textures/planets/venus.jpg",
+      "sourceUrl": "https://maps.jpl.nasa.gov/tmaps/pix/ven0aaa2.jpg",
+      "credit": "NASA / JPL / USGS — Venus (Magellan texture map)"
+    },
+    "mars": {
+      "file": "mars.jpg",
+      "path": "/shared/textures/planets/mars.jpg",
+      "sourceUrl": "https://maps.jpl.nasa.gov/tmaps/pix/mar0kuu2.jpg",
+      "credit": "NASA / JPL / USGS — Mars (Viking color texture map)"
+    },
+    "jupiter": {
+      "file": "jupiter.jpg",
+      "path": "/shared/textures/planets/jupiter.jpg",
+      "sourceUrl": "https://maps.jpl.nasa.gov/tmaps/pix/jup1vss2.jpg",
+      "credit": "NASA / JPL — Jupiter (Voyager texture map)"
+    },
+    "saturn": {
+      "file": "saturn.jpg",
+      "path": "/shared/textures/planets/saturn.jpg",
+      "sourceUrl": "https://maps.jpl.nasa.gov/tmaps/pix/sat1vss2.jpg",
+      "credit": "NASA / JPL — Saturn (Voyager texture map)"
+    },
+    "uranus": {
+      "file": "uranus.jpg",
+      "path": "/shared/textures/planets/uranus.jpg",
+      "sourceUrl": "https://maps.jpl.nasa.gov/tmaps/pix/ura1vuu2.jpg",
+      "credit": "NASA / JPL — Uranus (Voyager texture map)"
+    },
+    "neptune": {
+      "file": "neptune.jpg",
+      "path": "/shared/textures/planets/neptune.jpg",
+      "sourceUrl": "https://maps.jpl.nasa.gov/tmaps/pix/nep1vuu2.jpg",
+      "credit": "NASA / JPL — Neptune (Voyager texture map)"
+    },
+    "pluto": {
+      "file": "pluto.jpg",
+      "path": "/shared/textures/planets/pluto.jpg",
+      "sourceUrl": "https://maps.jpl.nasa.gov/tmaps/pix/plu0rss1.jpg",
+      "credit": "NASA / JPL — Pluto texture map"
+    }
+  }
+}

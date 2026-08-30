@@ -101,6 +101,7 @@
     lastBounce: null,
     heygenRoom: null,
     heygenSessionId: null,
+    studioFace: null,
     egressId: null,
     analyser: null,
     raf: 0,
@@ -1608,6 +1609,23 @@
     appendReed('Archiving room mics only — not the timeline, not a WAV bounce.');
   }
 
+  async function loadStudioFace() {
+    try {
+      const res = await fetch('/data/studio-heygen-face.json', { cache: 'no-store' });
+      if (!res.ok) return null;
+      const data = await res.json();
+      state.studioFace = data && typeof data === 'object' ? data : null;
+      const faceName = String(state.studioFace?.name || 'Zed').trim() || 'Zed';
+      if (els.heygenFace) els.heygenFace.textContent = `${faceName} face`;
+      const caption = document.querySelector('.st-heygen-caption');
+      if (caption) caption.textContent = `Face tile · ${faceName} (HeyGen room, not StarBand)`;
+      return state.studioFace;
+    } catch (_) {
+      state.studioFace = null;
+      return null;
+    }
+  }
+
   async function toggleReedFace() {
     const LK = window.LivekitClient;
     if (state.heygenRoom) {
@@ -1627,14 +1645,25 @@
       appendReed('HeyGen face closed.');
       return;
     }
+    const face = state.studioFace || (await loadStudioFace());
+    const faceName = String(face?.name || 'Zed').trim() || 'Zed';
+    const body = {};
+    if (face?.avatarId) body.avatarId = face.avatarId;
+    if (face?.voiceId) body.voiceId = face.voiceId;
     const res = await fetch('/api/heygen/streaming/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({}),
+      body: JSON.stringify(body),
     });
     const data = await res.json();
     if (!res.ok || !data.url || !data.accessToken) {
-      appendReed(data.error || 'HeyGen streaming needs HEYGEN_API_KEY and HEYGEN_STREAMING_AVATAR_ID.');
+      const missingCatalog = !face?.avatarId;
+      appendReed(
+        data.error
+          || (missingCatalog
+            ? `${faceName} needs HeyGen IDs — run npm run create:zed-heygen-avatar or set HEYGEN_STREAMING_AVATAR_ID.`
+            : 'HeyGen streaming needs HEYGEN_API_KEY and a streaming avatar id.')
+      );
       return;
     }
     if (!LK) {
@@ -1653,14 +1682,16 @@
     await faceRoom.connect(data.url, data.accessToken);
     state.heygenRoom = faceRoom;
     state.heygenSessionId = data.sessionId;
-    appendReed('Reed face is a HeyGen LiveKit tile — separate from the StarBand room.');
+    appendReed(`${faceName} is a HeyGen LiveKit tile — separate from the StarBand room.`);
+    const greeting = String(face?.greeting || '').trim()
+      || 'Signal acquired. Console is live — arm a track when you are ready.';
     if (data.sessionId) {
       fetch('/api/heygen/streaming/speak', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionId: data.sessionId,
-          text: 'Console is up. Arm a track when you are ready.',
+          text: greeting,
         }),
       }).catch(() => {});
     }
@@ -1718,6 +1749,7 @@
     sessionStorage.setItem('studioReel', state.reel);
     els.reelCode.textContent = state.reel;
     connectSocket();
+    loadStudioFace().catch(() => {});
     fetch('/api/studio/health')
       .then((res) => res.json())
       .then((status) => {

@@ -174,6 +174,41 @@ export async function createPhotoAvatar({ name, assetId, imageUrl }) {
 }
 
 /**
+ * Create an AI-generated avatar from a text prompt (POST /v3/avatars type=prompt).
+ * @returns {Promise<{ lookId: string, groupId: string, raw: object }>}
+ */
+export async function createPromptAvatar({
+  name,
+  prompt,
+  avatarGroupId,
+  age = 'Young Adult',
+  gender = 'Unspecified',
+  ethnicity = 'Unspecified',
+  style = 'Cyberpunk',
+  orientation = 'horizontal',
+  pose = 'half_body'
+} = {}) {
+  if (!prompt || !String(prompt).trim()) throw new Error('prompt is required');
+  const body = {
+    type: 'prompt',
+    name: name || 'Prompt avatar',
+    prompt: String(prompt).trim().slice(0, 1000),
+    age,
+    gender,
+    ethnicity,
+    style,
+    orientation,
+    pose
+  };
+  if (avatarGroupId) body.avatar_group_id = avatarGroupId;
+  const data = await heygenRequest('/v3/avatars', { method: 'POST', body });
+  const lookId = data?.avatar_item?.id || data?.id;
+  const groupId = data?.avatar_item?.group_id || data?.group_id || '';
+  if (!lookId) throw new Error('HeyGen did not return a prompt avatar id');
+  return { lookId, groupId, raw: data };
+}
+
+/**
  * Create an avatar video from a script.
  * @param {object} opts
  * @param {string} opts.avatarId - HeyGen avatar ID (video avatar or photo avatar look ID)

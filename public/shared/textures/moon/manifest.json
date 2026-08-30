@@ -1,0 +1,15 @@
+{
+  "fetchedAt": "2026-08-30T08:14:53.501Z",
+  "width": 2048,
+  "height": 1024,
+  "credit": "Imagery: NASA SVS / LRO Moon",
+  "assets": {
+    "moonColor": {
+      "file": "moon-color.jpg",
+      "path": "/shared/textures/moon/moon-color.jpg",
+      "sourceUrl": "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/lroc_color_poles_2k.tif",
+      "credit": "NASA SVS / LRO — CGI Moon Kit color map",
+      "skipped": true
+    }
+  }
+}

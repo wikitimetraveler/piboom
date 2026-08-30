@@ -92,6 +92,7 @@
     { name: 'The Boombox', url: '/entertainment/player.html', category: 'Entertainment', keywords: 'player audio' },
     { name: 'Psychedelic Visualizer', url: '/entertainment/visualizer.html', category: 'Entertainment', keywords: 'visualizer trippy' },
     { name: 'Black Light Zone', url: '/entertainment/blacklight.html', category: 'Entertainment', keywords: 'cosmic neon' },
+    { name: 'Black Light Poster', url: '/entertainment/blacklight-poster.html', category: 'Entertainment', keywords: 'sound reactive uv poster webgpu' },
     { name: 'Poster Generator', url: '/entertainment/poster-generator.html', category: 'Entertainment', keywords: 'AI poster art' },
     { name: 'Art Gallery', url: '/entertainment/art-gallery.html', category: 'Entertainment', keywords: 'gallery art' },
     { name: 'Ouija Board', url: '/entertainment/ouija-board.html', category: 'Entertainment', keywords: 'spirit Houdini' },

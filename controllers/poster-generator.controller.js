@@ -140,69 +140,99 @@ export async function generatePoster(req, res) {
       prompt += ` Include a small QR code in the bottom corner linking to: ${spotifyUrl}.`;
     }
 
-    const validSizes = ['1024x1024', '1024x1792', '1792x1024'];
-    const posterSize = validSizes.includes(size) ? size : '1024x1792';
-    const posterQuality = quality === 'hd' ? 'hd' : 'standard';
+    // Map UI sizes/qualities onto gpt-image-1 (this account no longer has dall-e-3).
+    // Legacy UI values: 1024x1792 / 1792x1024 / standard / hd
+    const sizeMap = {
+      '1024x1024': '1024x1024',
+      '1024x1792': '1024x1536',
+      '1792x1024': '1536x1024',
+      '1024x1536': '1024x1536',
+      '1536x1024': '1536x1024',
+      auto: 'auto'
+    };
+    const qualityMap = {
+      standard: 'medium',
+      hd: 'high',
+      low: 'low',
+      medium: 'medium',
+      high: 'high',
+      auto: 'auto'
+    };
+    const imageModel = String(process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1').trim() || 'gpt-image-1';
+    const posterSize = sizeMap[size] || '1024x1536';
+    const posterQuality = qualityMap[quality] || 'medium';
 
-    console.log('Generating poster with DALL-E...');
+    console.log('Generating poster with', imageModel, '...');
     console.log('Style:', style, 'Quality:', posterQuality, 'Size:', posterSize);
     console.log('Album:', album, 'by', artist);
 
-    // Call OpenAI DALL-E API
     const response = await axios.post(
       'https://api.openai.com/v1/images/generations',
       {
-        model: 'dall-e-3',
+        model: imageModel,
         prompt,
         n: 1,
         size: posterSize,
-        quality: posterQuality,
-        style: 'vivid'
+        quality: posterQuality
       },
       {
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
+          Authorization: `Bearer ${apiKey}`,
           'Content-Type': 'application/json'
         },
-        timeout: 60000 // 60 second timeout
+        timeout: 120000
       }
     );
 
-    if (response.data && response.data.data && response.data.data[0]) {
-      const posterUrl = response.data.data[0].url;
-      
-      console.log('✅ Poster generated successfully');
-      
-      res.json({
-        success: true,
-        posterUrl: posterUrl,
-        artist: artist,
-        album: album,
-        style: style
-      });
-    } else {
-      throw new Error('No image data returned from DALL-E');
+    const image = response.data?.data?.[0];
+    if (!image) {
+      throw new Error('No image data returned from image model');
     }
 
+    let posterUrl = image.url || null;
+    // gpt-image-1 returns b64_json (no durable URL) — persist under /shared/posters/
+    if (!posterUrl && image.b64_json) {
+      const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+      const fileName = `gen-${id}.png`;
+      await fs.mkdir(POSTER_DIR, { recursive: true });
+      await fs.writeFile(path.join(POSTER_DIR, fileName), Buffer.from(image.b64_json, 'base64'));
+      posterUrl = `/shared/posters/${fileName}`;
+    }
+
+    if (!posterUrl) {
+      throw new Error('Image model returned neither url nor b64_json');
+    }
+
+    console.log('✅ Poster generated successfully');
+
+    res.json({
+      success: true,
+      posterUrl,
+      artist,
+      album,
+      style,
+      model: imageModel
+    });
   } catch (error) {
     console.error('❌ Error generating poster:', error.message);
-    
-    // Handle specific errors
+
     if (error.response?.status === 400) {
-      return res.status(400).json({ 
-        error: 'Invalid request to DALL-E',
-        message: error.response.data?.error?.message || 'Bad request' 
+      const detail = error.response.data?.error?.message || 'Bad request';
+      console.error('Image API 400 detail:', detail);
+      return res.status(400).json({
+        error: 'Invalid request to image API',
+        message: detail
       });
     } else if (error.response?.status === 429) {
-      return res.status(429).json({ 
+      return res.status(429).json({
         error: 'Rate limit exceeded',
-        message: 'Too many requests. Please wait a moment and try again.' 
+        message: 'Too many requests. Please wait a moment and try again.'
       });
     }
-    
-    res.status(500).json({ 
+
+    res.status(500).json({
       error: 'Failed to generate poster',
-      message: error.message 
+      message: error.response?.data?.error?.message || error.message
     });
   }
 }

@@ -970,6 +970,7 @@
     if (!host) return;
     if (!rows.length) {
       host.innerHTML = '<li class="text-muted">No matches in the knowledge bank.</li>';
+      updateKnowledgeConstellation([]);
       return;
     }
     host.innerHTML = rows
@@ -987,6 +988,41 @@
         return `<li><div><strong>${link}</strong></div><div class="gse-hit-meta">${meta}</div><div>${excerpt}</div></li>`;
       })
       .join('');
+    updateKnowledgeConstellation(rows);
+  }
+
+  let knowledgeConstellation = null;
+
+  function updateKnowledgeConstellation(rows) {
+    const caption = $('gseConstellationCaption');
+    if (!knowledgeConstellation) {
+      if (caption && rows?.length) {
+        caption.textContent = `${rows.length} neighbor(s) ready — constellation loading…`;
+      }
+      return;
+    }
+    knowledgeConstellation.setNeighbors(rows || []);
+    if (caption) {
+      const n = Array.isArray(rows) ? rows.length : 0;
+      caption.textContent = n
+        ? `${n} RAG neighbor(s) · backend ${knowledgeConstellation.backend} · click a glow for the source`
+        : 'Constellation paints server-returned RAG neighbors (not client embeddings). Search or ask the expert to populate.';
+    }
+  }
+
+  async function bootKnowledgeConstellation() {
+    const canvas = $('gseKnowledgeConstellation');
+    if (!canvas || !window.WebGpuKnowledgeConstellation) return;
+    try {
+      knowledgeConstellation = await window.WebGpuKnowledgeConstellation.mount({
+        canvas,
+        onSelect(n) {
+          if (n?.url) window.open(n.url, '_blank', 'noopener,noreferrer');
+        },
+      });
+    } catch (err) {
+      console.warn('Knowledge constellation failed', err);
+    }
   }
 
   async function loadKnowledgeBank() {
@@ -1167,6 +1203,7 @@
     initSuggestionsGrid();
     loadMeta();
     loadKnowledgeBank();
+    bootKnowledgeConstellation();
     $('btnAnalyze').addEventListener('click', runAnalyze);
     $('btnLoanLimits').addEventListener('click', runLoanLimits);
     const loadBtn = $('btnLoadPipeline');

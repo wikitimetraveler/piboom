@@ -130,6 +130,27 @@
     });
   }
 
+  /** Desert-sky twinkle field across the full hero top. */
+  function initDesertStarfield() {
+    const host = document.getElementById('funHeroStars');
+    if (!host || host.childElementCount) return;
+    const count = window.matchMedia('(max-width: 991.98px)').matches ? 42 : 72;
+    const frag = document.createDocumentFragment();
+    for (let i = 0; i < count; i += 1) {
+      const star = document.createElement('span');
+      star.className = 'fun-hero__star';
+      const bright = Math.random() > 0.72;
+      if (bright) star.classList.add('fun-hero__star--bright');
+      if (bright && Math.random() > 0.55) star.classList.add('fun-hero__star--flare');
+      star.style.left = (Math.random() * 100).toFixed(2) + '%';
+      star.style.top = (Math.random() * 78).toFixed(2) + '%';
+      star.style.setProperty('--twinkle-delay', (Math.random() * 5).toFixed(2) + 's');
+      star.style.setProperty('--twinkle-dur', (2.2 + Math.random() * 3.8).toFixed(2) + 's');
+      frag.appendChild(star);
+    }
+    host.appendChild(frag);
+  }
+
   // Add subtle animation to cards on scroll into view
   function initScrollAnimations() {
     const observerOptions = {
@@ -418,6 +439,7 @@
     renderer.toneMappingExposure = 1.42;
 
     const scene = new THREE.Scene();
+    scene.background = null;
     const camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 40);
     camera.position.set(0, 0.05, 5.4);
 
@@ -598,11 +620,21 @@
     let animationFrameId = null;
     let isPageVisible = true;
     let inView = true;
-    const clock = new THREE.Clock();
+    const sync =
+      (window.WebGpuGlobe && typeof window.WebGpuGlobe.ensureHeroSync === 'function'
+        ? window.WebGpuGlobe.ensureHeroSync()
+        : null) ||
+      (window.FunHomeHeroSync =
+        window.FunHomeHeroSync || {
+          t0: performance.now(),
+          spinRate: 0.18,
+          lookX: 0,
+          lookY: 0,
+          targetX: 0,
+          targetY: 0,
+        });
     let parallaxX = 0;
     let parallaxY = 0;
-    let targetParallaxX = 0;
-    let targetParallaxY = 0;
 
     document.addEventListener('visibilitychange', () => {
       isPageVisible = !document.hidden;
@@ -621,43 +653,17 @@
     const onPointerMove = (e) => {
       const rect = hero.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
-      targetParallaxX = ((e.clientX - rect.left) / rect.width - 0.5) * 0.28;
-      targetParallaxY = ((e.clientY - rect.top) / rect.height - 0.5) * 0.18;
+      sync.targetX = ((e.clientX - rect.left) / rect.width - 0.5) * 0.35;
+      sync.targetY = ((e.clientY - rect.top) / rect.height - 0.5) * 0.22;
     };
     hero.addEventListener('pointermove', onPointerMove);
 
-    const burstSpin = () => {
-      if (typeof gsap === 'undefined') return;
-      gsap.fromTo(
-        group.rotation,
-        { z: group.rotation.z },
-        { z: group.rotation.z + Math.PI * 2, duration: 1.15, ease: 'power3.inOut' }
-      );
-      gsap.fromTo(
-        group.scale,
-        { x: group.scale.x, y: group.scale.y, z: group.scale.z },
-        {
-          x: group.scale.x * 1.04,
-          y: group.scale.y * 1.04,
-          z: group.scale.z * 1.04,
-          duration: 0.35,
-          yoyo: true,
-          repeat: 1,
-          ease: 'power2.out'
-        }
-      );
-    };
     const onHeroActivate = (e) => {
       if (e.target.closest('a, button, details, summary')) return;
-      burstSpin();
+      const crystal = document.getElementById('heroCrystalPane');
+      if (crystal) crystal.click();
     };
     hero.addEventListener('click', onHeroActivate);
-    hero.addEventListener('keydown', (e) => {
-      if (e.key !== 'Enter' && e.key !== ' ') return;
-      if (e.target !== hero) return;
-      e.preventDefault();
-      burstSpin();
-    });
 
     if (typeof gsap !== 'undefined') {
       const startScale = 0.72;
@@ -675,11 +681,14 @@
       animationFrameId = requestAnimationFrame(animate);
       if (!isPageVisible || !inView) return;
       if (!prefersReducedMotion) {
-      const elapsed = clock.getElapsedTime();
-      parallaxX += (targetParallaxX - parallaxX) * 0.06;
-      parallaxY += (targetParallaxY - parallaxY) * 0.06;
+      const elapsed = (performance.now() - sync.t0) / 1000;
+      const spin = sync.spinRate || 0.18;
+      sync.lookX += (sync.targetX - sync.lookX) * 0.06;
+      sync.lookY += (sync.targetY - sync.lookY) * 0.06;
+      parallaxX = sync.lookX;
+      parallaxY = sync.lookY;
 
-      orb.rotation.y = elapsed * 0.18;
+      orb.rotation.y = elapsed * spin;
       orb.rotation.x = Math.sin(elapsed * 0.2) * 0.12;
       glassShell.rotation.copy(orb.rotation);
       facets.rotation.copy(orb.rotation);
@@ -787,7 +796,7 @@
     });
   }
 
-  function startHeroWhenReady() {
+  function startThreeHero() {
     const boot = () => {
       try {
         initHeroScene();
@@ -805,6 +814,78 @@
     script.onload = () => window.requestAnimationFrame(boot);
     script.onerror = () => console.warn('Three.js failed to load');
     document.head.appendChild(script);
+  }
+
+  function initGlobeEnlarge(mounts) {
+    const panes = document.querySelectorAll('.fun-hero__pane--planet, .fun-hero__pane--crystal');
+    if (!panes.length) return;
+    const crater =
+      (window.WebGpuGlobe && window.WebGpuGlobe.LANE_CRATER) || {
+        lat: -9.5,
+        lon: 132.36,
+      };
+
+    panes.forEach((pane) => {
+      pane.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const body = pane.getAttribute('data-body');
+        const already = pane.classList.contains('is-enlarged');
+        const moonApi = mounts && mounts.moon;
+        const moonZoomed = moonApi && moonApi._laneZoomed;
+
+        panes.forEach((other) => other.classList.remove('is-enlarged'));
+        pane.classList.add('is-enlarged');
+        window.dispatchEvent(new Event('resize'));
+
+        if (body !== 'moon' || !moonApi) return;
+        if (already && moonZoomed) {
+          if (typeof moonApi.clearLook === 'function') moonApi.clearLook();
+          moonApi._laneZoomed = false;
+          return;
+        }
+        if (typeof moonApi.lookAt === 'function') {
+          moonApi.lookAt(crater.lat, crater.lon, 2.35);
+          moonApi._laneZoomed = true;
+        }
+      });
+    });
+  }
+
+  async function startNasaGlobe() {
+    document.body.classList.add('fun-home--solar-system');
+
+    const Globe = window.WebGpuGlobe;
+    const mounts = {};
+    initGlobeEnlarge(mounts);
+    if (!Globe || !window.WebGpuRuntime) return;
+
+    const ids = Globe.HERO_BODIES || ['earth', 'moon', 'mars'];
+    try {
+      for (let i = 0; i < ids.length; i += 1) {
+        const spec = typeof Globe.resolveBody === 'function' ? Globe.resolveBody(ids[i]) : { id: ids[i] };
+        const canvas = document.getElementById(spec.canvasId || '');
+        const pane = document.getElementById(spec.paneId || '');
+        if (pane) pane.hidden = false;
+        if (!canvas) continue;
+        const mounted = await Globe.mount({
+          canvas: canvas,
+          body: spec.id || ids[i],
+          getNight: () => document.body.getAttribute('data-theme') === 'dark',
+          prefersReducedMotion: prefersReducedMotion,
+        });
+        if (mounted && typeof mounted.resize === 'function') mounted.resize();
+        if (mounted) mounts[spec.id || ids[i]] = mounted;
+      }
+      window.dispatchEvent(new Event('resize'));
+    } catch (err) {
+      console.warn('WebGPU NASA globe failed', err);
+    }
+  }
+
+  function startHeroWhenReady() {
+    startThreeHero();
+    startNasaGlobe();
   }
 
   /** Unit Tests / Condition Manager chips — only when logged in. */
@@ -833,6 +914,7 @@
     initHeaderScroll();
     updateYear();
     initParallaxSparkles();
+    initDesertStarfield();
     initScrollAnimations();
     initCardOpen();
     initEasterEgg();

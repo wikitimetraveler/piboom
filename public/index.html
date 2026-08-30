@@ -4,15 +4,15 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>David Lane — Explore · Discover · Create</title>
-<meta name="description" content="Explore, discover, and create — music pilgrimage, nature discovery, family history, Glazed donuts, Middle East bilingual atlases, and HeyGen AI video by David Lane."/>
+<meta name="description" content="Explore, discover, and create — music pilgrimage, nature discovery, family history, entertainment, Glazed donuts, Middle East bilingual atlases, and HeyGen AI video by David Lane."/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
 <link rel="stylesheet" href="/shared/design-tokens.css"/>
-<link rel="stylesheet" href="/shared/css/fun-home.css?v=crystal3"/>
+<link rel="stylesheet" href="/shared/css/fun-home.css?v=crystal16"/>
 </head>
-<body class="fun-home" data-theme="zen">
+<body class="fun-home fun-home--solar-system" data-theme="zen">
 
 <header class="fun-header">
   <a class="fun-logo" href="/">
@@ -38,9 +38,75 @@
 <main class="fun-main">
 
   <section class="fun-hero" aria-labelledby="funHeroTitle">
-    <div class="fun-hero__stage" aria-hidden="true">
-      <canvas id="heroCanvas" class="fun-hero__canvas"></canvas>
-      <div class="fun-hero__orb"></div>
+    <div class="fun-hero__stars" id="funHeroStars" aria-hidden="true"></div>
+    <div class="fun-hero__stage">
+      <div class="fun-hero__planets" id="heroPlanets">
+        <button type="button" class="fun-hero__pane fun-hero__pane--planet" id="heroMercuryPane" data-body="mercury" aria-label="Enlarge Mercury globe">
+          <span class="fun-hero__badge">Mercury</span>
+          <img class="fun-hero__fallback fun-hero__fallback--earth" src="/shared/textures/planets/mercury.jpg" alt="" width="2048" height="1024"/>
+          <canvas id="heroMercuryCanvas" class="fun-hero__canvas" role="img" aria-label="NASA Mercury globe"></canvas>
+          <p class="fun-hero__credit">NASA / JPL · Mariner 10</p>
+        </button>
+        <button type="button" class="fun-hero__pane fun-hero__pane--planet" id="heroVenusPane" data-body="venus" aria-label="Enlarge Venus globe">
+          <span class="fun-hero__badge">Venus</span>
+          <img class="fun-hero__fallback fun-hero__fallback--earth" src="/shared/textures/planets/venus.jpg" alt="" width="2048" height="1024"/>
+          <canvas id="heroVenusCanvas" class="fun-hero__canvas" role="img" aria-label="NASA Venus globe"></canvas>
+          <p class="fun-hero__credit">NASA / JPL · Magellan</p>
+        </button>
+        <button type="button" class="fun-hero__pane fun-hero__pane--planet fun-hero__pane--nasa is-enlarged" id="heroNasaPane" data-body="earth" aria-label="Enlarge Earth globe">
+          <span class="fun-hero__badge">Earth</span>
+          <img class="fun-hero__fallback fun-hero__fallback--earth" src="/shared/textures/earth/blue-marble.jpg" alt="" width="2048" height="1024"/>
+          <canvas id="heroNasaCanvas" class="fun-hero__canvas fun-hero__canvas--nasa" role="img" aria-label="NASA Blue Marble Earth globe"></canvas>
+          <p class="fun-hero__credit">NASA Visible Earth · Blue Marble</p>
+        </button>
+        <button type="button" class="fun-hero__pane fun-hero__pane--planet fun-hero__pane--moon" id="heroMoonPane" data-body="moon" aria-label="Enlarge the Moon and zoom to Lane crater, named for Jonathan Homer Lane">
+          <span class="fun-hero__badge">Moon</span>
+          <img class="fun-hero__fallback fun-hero__fallback--earth" src="/shared/textures/moon/moon-color.jpg" alt="" width="2048" height="1024"/>
+          <canvas id="heroMoonCanvas" class="fun-hero__canvas fun-hero__canvas--moon" role="img" aria-label="NASA Moon globe"></canvas>
+          <p class="fun-hero__credit">Lane crater · Jonathan Homer Lane</p>
+        </button>
+        <button type="button" class="fun-hero__pane fun-hero__pane--planet" id="heroMarsPane" data-body="mars" aria-label="Enlarge Mars globe">
+          <span class="fun-hero__badge">Mars</span>
+          <img class="fun-hero__fallback fun-hero__fallback--earth" src="/shared/textures/planets/mars.jpg" alt="" width="2048" height="1024"/>
+          <canvas id="heroMarsCanvas" class="fun-hero__canvas" role="img" aria-label="NASA Mars globe"></canvas>
+          <p class="fun-hero__credit">NASA / JPL · Viking</p>
+        </button>
+        <button type="button" class="fun-hero__pane fun-hero__pane--planet" id="heroJupiterPane" data-body="jupiter" aria-label="Enlarge Jupiter globe">
+          <span class="fun-hero__badge">Jupiter</span>
+          <img class="fun-hero__fallback fun-hero__fallback--earth" src="/shared/textures/planets/jupiter.jpg" alt="" width="2048" height="1024"/>
+          <canvas id="heroJupiterCanvas" class="fun-hero__canvas" role="img" aria-label="NASA Jupiter globe"></canvas>
+          <p class="fun-hero__credit">NASA / JPL · Voyager</p>
+        </button>
+        <button type="button" class="fun-hero__pane fun-hero__pane--planet" id="heroSaturnPane" data-body="saturn" aria-label="Enlarge Saturn globe">
+          <span class="fun-hero__badge">Saturn</span>
+          <img class="fun-hero__fallback fun-hero__fallback--earth" src="/shared/textures/planets/saturn.jpg" alt="" width="2048" height="1024"/>
+          <canvas id="heroSaturnCanvas" class="fun-hero__canvas" role="img" aria-label="NASA Saturn globe"></canvas>
+          <p class="fun-hero__credit">NASA / JPL · Voyager</p>
+        </button>
+        <button type="button" class="fun-hero__pane fun-hero__pane--planet" id="heroUranusPane" data-body="uranus" aria-label="Enlarge Uranus globe">
+          <span class="fun-hero__badge">Uranus</span>
+          <img class="fun-hero__fallback fun-hero__fallback--earth" src="/shared/textures/planets/uranus.jpg" alt="" width="2048" height="1024"/>
+          <canvas id="heroUranusCanvas" class="fun-hero__canvas" role="img" aria-label="NASA Uranus globe"></canvas>
+          <p class="fun-hero__credit">NASA / JPL · Voyager</p>
+        </button>
+        <button type="button" class="fun-hero__pane fun-hero__pane--planet" id="heroNeptunePane" data-body="neptune" aria-label="Enlarge Neptune globe">
+          <span class="fun-hero__badge">Neptune</span>
+          <img class="fun-hero__fallback fun-hero__fallback--earth" src="/shared/textures/planets/neptune.jpg" alt="" width="2048" height="1024"/>
+          <canvas id="heroNeptuneCanvas" class="fun-hero__canvas" role="img" aria-label="NASA Neptune globe"></canvas>
+          <p class="fun-hero__credit">NASA / JPL · Voyager</p>
+        </button>
+        <button type="button" class="fun-hero__pane fun-hero__pane--planet" id="heroPlutoPane" data-body="pluto" aria-label="Enlarge Pluto globe">
+          <span class="fun-hero__badge">Pluto</span>
+          <img class="fun-hero__fallback fun-hero__fallback--earth" src="/shared/textures/planets/pluto.jpg" alt="" width="2048" height="1024"/>
+          <canvas id="heroPlutoCanvas" class="fun-hero__canvas" role="img" aria-label="NASA Pluto globe"></canvas>
+          <p class="fun-hero__credit">NASA / JPL · Pluto</p>
+        </button>
+      </div>
+      <button type="button" class="fun-hero__pane fun-hero__pane--crystal" id="heroCrystalPane" aria-label="Enlarge crystal orb">
+        <span class="fun-hero__badge">WebGL</span>
+        <canvas id="heroCanvas" class="fun-hero__canvas fun-hero__canvas--crystal" role="img" aria-label="Crystal orb WebGL"></canvas>
+        <div class="fun-hero__orb"></div>
+      </button>
     </div>
     <div class="fun-hero__shader" id="shaderBg" aria-hidden="true"></div>
     <div class="fun-hero__veil" aria-hidden="true"></div>
@@ -60,7 +126,7 @@
       </h1>
 
       <p class="fun-hero__lead">
-        Studio, Music, Nature, Family, Glazed, Middle East atlases, and AI video — built with curiosity and craft.
+        Studio, Music, Nature, Family, Entertainment, Glazed, Middle East atlases, and AI video — built with curiosity and craft.
       </p>
 
       <div class="fun-hero__cta">
@@ -423,6 +489,38 @@
       <div class="fun-card__glow"></div>
     </article>
 
+    <article class="fun-card fun-card--ent" data-project="entertainment">
+      <div class="fun-card__icon">
+        <i class="bi bi-stars"></i>
+      </div>
+      <h2 class="fun-card__title">Entertainment</h2>
+      <p class="fun-card__desc">
+        Boombox, black-light posters, psychedelic visualizer, art gallery, and late-night curiosities.
+      </p>
+      <div class="fun-card__links">
+        <a href="/entertainment/" class="fun-card__link fun-card__link--primary">
+          <span>Enter Entertainment</span>
+          <i class="bi bi-arrow-right"></i>
+        </a>
+        <details class="fun-card__more">
+          <summary>More</summary>
+          <a href="/entertainment/blacklight-poster.html" class="fun-card__link">
+            <span>Black Light Poster</span>
+            <i class="bi bi-lightbulb"></i>
+          </a>
+          <a href="/entertainment/player.html" class="fun-card__link">
+            <span>The Boombox</span>
+            <i class="bi bi-volume-up"></i>
+          </a>
+          <a href="/entertainment/visualizer.html" class="fun-card__link">
+            <span>Visualizer</span>
+            <i class="bi bi-palette-fill"></i>
+          </a>
+        </details>
+      </div>
+      <div class="fun-card__glow"></div>
+    </article>
+
   </section>
 
   <section class="fun-about">
@@ -430,7 +528,7 @@
       <h2 class="fun-about__title">Explore · Discover · Create</h2>
       <p class="fun-about__text">
         Creative exploration meets technical craft — history, discovery, and technology in one place.
-        From Grateful Dead tours to AI fish ID, Lane heritage to Glazed on Harbor and bilingual Middle East atlases,
+        From Grateful Dead tours to AI fish ID, Lane heritage to Glazed on Harbor, black-light entertainment, and bilingual Middle East atlases,
         each tool is built with curiosity and care.
       </p>
       <p class="fun-about__text">
@@ -456,8 +554,10 @@
 
 <script src="/shared/demo-users.js"></script>
 <script src="/shared/user-login.js"></script>
+<script src="/shared/js/webgpu-runtime.js?v=2"></script>
+<script src="/shared/js/webgpu-globe.js?v=8"></script>
 <script src="/vendor/three.r160.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<script src="/shared/js/fun-home.js?v=crystal3"></script>
+<script src="/shared/js/fun-home.js?v=crystal17"></script>
 </body>
 </html>
