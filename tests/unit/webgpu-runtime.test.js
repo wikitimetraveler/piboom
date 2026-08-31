@@ -115,6 +115,14 @@ describe('WebGpuGlobe', () => {
     const sync = WebGpuGlobe.ensureHeroSync();
     expect(sync.sunDir.x).toBeGreaterThan(0);
   });
+
+  test('LANDMARKS include Moon, Mars, and Jupiter zoom targets', () => {
+    expect(WebGpuGlobe.LANDMARKS.moon.lat).toBeCloseTo(-9.5, 5);
+    expect(WebGpuGlobe.LANDMARKS.moon.href).toMatch(/lane-museum/);
+    expect(WebGpuGlobe.LANDMARKS.mars.label).toBe('Olympus Mons');
+    expect(WebGpuGlobe.LANDMARKS.jupiter.label).toBe('Great Red Spot');
+  });
+
   test('capFirmsPoints drops bad coords and respects max', () => {
     const rows = [
       { lat: 34.1, lng: -118.2, raw: { frp: 40, brightness: 340 } },

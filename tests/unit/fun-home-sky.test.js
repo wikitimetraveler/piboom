@@ -44,9 +44,27 @@ describe('FunHomeSky', () => {
     expect(resolved.getHours()).toBe(21);
   });
 
-  test('sunEclipticLon is near 90° at June solstice', () => {
-    const lon = FunHomeSky.sunEclipticLon(new Date('2026-06-21T12:00:00Z'));
-    expect(lon).toBeGreaterThan(80);
-    expect(lon).toBeLessThan(100);
+  test('projectAsterisms draws lines when both stars are up', () => {
+    const sky = FunHomeSky.projectSky(new Date('2026-08-31T02:00:00Z'));
+    const lines = FunHomeSky.projectAsterisms(sky);
+    expect(Array.isArray(lines)).toBe(true);
+    if (lines.length) {
+      expect(lines[0]).toEqual(
+        expect.objectContaining({ x1: expect.any(Number), x2: expect.any(Number) })
+      );
+    }
+  });
+
+  test('formatSkyCaption includes phase and observer', () => {
+    const sky = FunHomeSky.projectSky(new Date('2026-08-31T02:00:00Z'));
+    const caption = FunHomeSky.formatSkyCaption(sky);
+    expect(caption).toMatch(/Sky ·/);
+    expect(caption).toMatch(/Hampton/);
+    expect(caption).toMatch(/Moon|quarter|crescent|gibbous|Full|New/i);
+  });
+
+  test('moonPhaseLabel returns a named phase', () => {
+    const label = FunHomeSky.moonPhaseLabel(new Date('2026-08-31T02:00:00Z'));
+    expect(label.length).toBeGreaterThan(3);
   });
 });

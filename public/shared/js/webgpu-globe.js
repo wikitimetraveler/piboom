@@ -190,6 +190,30 @@
     href: '/family/lane-museum.html?lunar=1',
   };
 
+  /** Hero globe landmarks — click enlarged pane again to zoom. */
+  const LANDMARKS = {
+    moon: {
+      label: 'Lane crater',
+      lat: LANE_CRATER.lat,
+      lon: LANE_CRATER.lon,
+      zoom: 2.35,
+      href: LANE_CRATER.href,
+      immediate: true,
+    },
+    mars: {
+      label: 'Olympus Mons',
+      lat: 18.65,
+      lon: -133.8,
+      zoom: 2.2,
+    },
+    jupiter: {
+      label: 'Great Red Spot',
+      lat: -22,
+      lon: 106,
+      zoom: 2.05,
+    },
+  };
+
   const LAVA_SEEDS = [
     { lat: 19.4, lon: -155.3, weight: 2.6 },
     { lat: 64.65, lon: -17.5, weight: 2.1 },
@@ -970,6 +994,7 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
     BODIES,
     HERO_BODIES,
     LANE_CRATER,
+    LANDMARKS,
     LAVA_SEEDS,
     DEFAULT_SUN_DIR,
     EARTH_RADIUS_KM,

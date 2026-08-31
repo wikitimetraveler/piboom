@@ -192,15 +192,38 @@
     });
 
     sky.planets.forEach((p) => {
-      const el = document.createElement('span');
+      const el = document.createElement('button');
+      el.type = 'button';
       el.className = 'fun-hero__sky-planet fun-hero__sky-planet--' + p.id;
-      el.title = p.name;
+      el.title = p.name + ' — focus globe';
       el.setAttribute('data-planet', p.id);
-      el.setAttribute('aria-label', p.name);
+      el.setAttribute('aria-label', 'Focus ' + p.name + ' globe');
       el.style.left = p.x.toFixed(2) + '%';
       el.style.top = p.y.toFixed(2) + '%';
       frag.appendChild(el);
     });
+
+    if (typeof Sky.projectAsterisms === 'function') {
+      const lines = Sky.projectAsterisms(sky);
+      if (lines.length) {
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('class', 'fun-hero__constellations');
+        svg.setAttribute('aria-hidden', 'true');
+        svg.setAttribute('viewBox', '0 0 100 100');
+        svg.setAttribute('preserveAspectRatio', 'none');
+        lines.forEach((ln) => {
+          const seg = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          seg.setAttribute('x1', ln.x1.toFixed(2));
+          seg.setAttribute('y1', ln.y1.toFixed(2));
+          seg.setAttribute('x2', ln.x2.toFixed(2));
+          seg.setAttribute('y2', ln.y2.toFixed(2));
+          seg.setAttribute('data-asterism', ln.id);
+          svg.appendChild(seg);
+        });
+        host.appendChild(svg);
+      }
+    }
+
     host.appendChild(frag);
 
     let credit = document.getElementById('funHeroSkyCredit');
@@ -210,12 +233,10 @@
       credit.className = 'fun-hero__sky-credit';
       host.parentElement && host.parentElement.appendChild(credit);
     }
-    const when = sky.date;
-    const label = sky.observer.label || 'eastern US';
-    const hh = when.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-    credit.textContent = sky.usedEveningFallback
-      ? `Sky · ${label} · tonight ${hh}`
-      : `Sky · ${label} · now`;
+    credit.textContent =
+      typeof Sky.formatSkyCaption === 'function'
+        ? Sky.formatSkyCaption(sky)
+        : 'Sky · Hampton Falls, NH';
   }
 
   function seedFallbackStars(host) {
@@ -901,40 +922,114 @@
     document.head.appendChild(script);
   }
 
+  function clearLandmarkLinks() {
+    document.querySelectorAll('.fun-hero__landmark-link').forEach((el) => el.remove());
+  }
+
+  function showLandmarkLink(pane, landmark) {
+    if (!pane || !landmark || !landmark.href) return;
+    clearLandmarkLinks();
+    const link = document.createElement('a');
+    link.className = 'fun-hero__landmark-link';
+    link.href = landmark.href;
+    link.textContent = 'Lane Museum →';
+    link.setAttribute('aria-label', 'Open Lane Museum lunar exhibit');
+    pane.appendChild(link);
+  }
+
+  function enlargePlanetPane(body, panes, mounts, opts) {
+    const pane = document.querySelector('.fun-hero__pane--planet[data-body="' + body + '"]');
+    if (!pane) return null;
+    panes.forEach((other) => {
+      other.classList.remove('is-enlarged');
+      other._landmarkZoomed = false;
+    });
+    clearLandmarkLinks();
+    pane.classList.add('is-enlarged');
+    window.dispatchEvent(new Event('resize'));
+
+    const Globe = window.WebGpuGlobe;
+    const landmarks = (Globe && Globe.LANDMARKS) || {};
+    const lm = landmarks[body];
+    const api = mounts && mounts[body];
+
+    if (opts && opts.lookAt && lm && api && typeof api.lookAt === 'function') {
+      api.lookAt(lm.lat, lm.lon, lm.zoom || 2.2);
+      pane._landmarkZoomed = true;
+      if (lm.href) showLandmarkLink(pane, lm);
+    }
+    return pane;
+  }
+
+  function initSkyPlanetLinks(mounts) {
+    const host = document.getElementById('funHeroStars');
+    if (!host) return;
+    const panes = document.querySelectorAll('.fun-hero__pane--planet, .fun-hero__pane--crystal');
+    host.addEventListener('click', (event) => {
+      const dot = event.target.closest('.fun-hero__sky-planet');
+      if (!dot) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const body = dot.getAttribute('data-planet');
+      if (!body) return;
+      enlargePlanetPane(body, panes, mounts, { lookAt: body === 'moon' });
+    });
+  }
+
   function initGlobeEnlarge(mounts) {
     const panes = document.querySelectorAll('.fun-hero__pane--planet, .fun-hero__pane--crystal');
     if (!panes.length) return;
-    const crater =
-      (window.WebGpuGlobe && window.WebGpuGlobe.LANE_CRATER) || {
-        lat: -9.5,
-        lon: 132.36,
-      };
+    const Globe = window.WebGpuGlobe;
+    const landmarks = (Globe && Globe.LANDMARKS) || {};
 
     panes.forEach((pane) => {
       pane.addEventListener('click', (event) => {
         event.preventDefault();
         event.stopPropagation();
         const body = pane.getAttribute('data-body');
+        if (!body) return;
         const already = pane.classList.contains('is-enlarged');
-        const moonApi = mounts && mounts.moon;
-        const moonZoomed = moonApi && moonApi._laneZoomed;
+        const zoomed = pane._landmarkZoomed;
+        const lm = landmarks[body];
+        const api = mounts && mounts[body];
 
-        panes.forEach((other) => other.classList.remove('is-enlarged'));
+        panes.forEach((other) => {
+          if (other !== pane) {
+            other.classList.remove('is-enlarged');
+            other._landmarkZoomed = false;
+          }
+        });
+        clearLandmarkLinks();
         pane.classList.add('is-enlarged');
         window.dispatchEvent(new Event('resize'));
 
-        if (body !== 'moon' || !moonApi) return;
-        if (already && moonZoomed) {
-          if (typeof moonApi.clearLook === 'function') moonApi.clearLook();
-          moonApi._laneZoomed = false;
+        if (!lm || !api) return;
+
+        if (already && zoomed) {
+          if (typeof api.clearLook === 'function') api.clearLook();
+          pane._landmarkZoomed = false;
+          clearLandmarkLinks();
           return;
         }
-        if (typeof moonApi.lookAt === 'function') {
-          moonApi.lookAt(crater.lat, crater.lon, 2.35);
-          moonApi._laneZoomed = true;
+
+        if (already && !zoomed) {
+          if (typeof api.lookAt === 'function') {
+            api.lookAt(lm.lat, lm.lon, lm.zoom || 2.2);
+            pane._landmarkZoomed = true;
+            if (lm.href) showLandmarkLink(pane, lm);
+          }
+          return;
+        }
+
+        if (lm.immediate && typeof api.lookAt === 'function') {
+          api.lookAt(lm.lat, lm.lon, lm.zoom || 2.2);
+          pane._landmarkZoomed = true;
+          if (lm.href) showLandmarkLink(pane, lm);
         }
       });
     });
+
+    initSkyPlanetLinks(mounts);
   }
 
   /** Apply compressed radius scale + ring pane class from WebGpuGlobe.BODIES. */

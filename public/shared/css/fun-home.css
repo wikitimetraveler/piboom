@@ -451,6 +451,33 @@ body[data-theme="zen"] .fun-hero::after {
   -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 58%, transparent 92%);
 }
 
+.fun-hero__stars--catalog .fun-hero__sky-planet {
+  pointer-events: auto;
+  cursor: pointer;
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.fun-hero__constellations {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.fun-hero__constellations line {
+  stroke: rgba(186, 210, 255, 0.28);
+  stroke-width: 0.22;
+  stroke-linecap: round;
+}
+
+body[data-theme="zen"] .fun-hero__constellations line {
+  stroke: rgba(74, 144, 164, 0.35);
+}
+
 .fun-hero__milkyway {
   position: absolute;
   width: min(72vw, 38rem);
@@ -537,7 +564,7 @@ body[data-theme="zen"] .fun-hero__milkyway {
   bottom: clamp(4.5rem, 12vh, 7rem);
   z-index: 4;
   margin: 0;
-  max-width: 16rem;
+  max-width: min(42rem, 92vw);
   text-align: right;
   font-family: Outfit, system-ui, sans-serif;
   font-size: 0.68rem;
@@ -554,6 +581,36 @@ body[data-theme="zen"] .fun-hero__sky-credit {
 body[data-theme="zen"] .fun-hero__sky-planet {
   opacity: 0.55;
   filter: saturate(0.7);
+}
+
+.fun-hero__landmark-link {
+  position: absolute;
+  right: 0.15rem;
+  top: 0.15rem;
+  z-index: 4;
+  padding: 0.12rem 0.38rem;
+  font-family: Outfit, system-ui, sans-serif;
+  font-size: 0.52rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: rgba(255, 236, 190, 0.95);
+  background: rgba(8, 16, 24, 0.72);
+  border: 1px solid rgba(255, 210, 120, 0.35);
+  border-radius: 0.35rem;
+  pointer-events: auto;
+}
+
+.fun-hero__landmark-link:hover {
+  background: rgba(24, 36, 48, 0.88);
+  color: #fff;
+}
+
+body[data-theme="zen"] .fun-hero__landmark-link {
+  color: rgba(24, 40, 48, 0.9);
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(74, 144, 164, 0.35);
 }
 
 .fun-hero__star {

@@ -57,6 +57,12 @@
     { n: 'Polaris', ra: 37.954, dec: 89.264, mag: 1.98 },
     { n: 'Mirzam', ra: 95.078, dec: -17.956, mag: 1.98 },
     { n: 'Alphard', ra: 141.897, dec: -8.659, mag: 1.99 },
+    { n: 'Merak', ra: 165.932, dec: 56.383, mag: 2.34 },
+    { n: 'Phecda', ra: 178.458, dec: 53.695, mag: 2.41 },
+    { n: 'Megrez', ra: 183.857, dec: 57.033, mag: 3.31 },
+    { n: 'Schedar', ra: 10.127, dec: 56.537, mag: 2.24 },
+    { n: 'Navi', ra: 10.126, dec: 60.716, mag: 2.15 },
+    { n: 'Ruchbah', ra: 21.454, dec: 60.235, mag: 2.68 },
     { n: 'Hamal', ra: 31.793, dec: 23.462, mag: 2.01 },
     { n: 'Algieba', ra: 154.993, dec: 19.842, mag: 2.01 },
     { n: 'Diphda', ra: 10.897, dec: -17.987, mag: 2.04 },
@@ -79,6 +85,111 @@
     { n: 'Avior', ra: 139.273, dec: -59.509, mag: 1.86 },
     { n: 'Aspidiske', ra: 139.011, dec: -59.275, mag: 2.21 },
   ];
+
+  /** Famous asterism line pairs (both star names must be in catalog). */
+  const SKY_ASTERISMS = [
+    {
+      id: 'orion',
+      label: 'Orion',
+      pairs: [
+        ['Betelgeuse', 'Bellatrix'],
+        ['Betelgeuse', 'Alnitak'],
+        ['Bellatrix', 'Saiph'],
+        ['Alnitak', 'Alnilam'],
+        ['Alnilam', 'Rigel'],
+        ['Rigel', 'Saiph'],
+      ],
+    },
+    {
+      id: 'dipper',
+      label: 'Big Dipper',
+      pairs: [
+        ['Dubhe', 'Merak'],
+        ['Merak', 'Phecda'],
+        ['Phecda', 'Megrez'],
+        ['Megrez', 'Alioth'],
+        ['Alioth', 'Mizar'],
+        ['Mizar', 'Alkaid'],
+        ['Dubhe', 'Megrez'],
+      ],
+    },
+    {
+      id: 'cassiopeia',
+      label: 'Cassiopeia',
+      pairs: [
+        ['Cih', 'Schedar'],
+        ['Schedar', 'Navi'],
+        ['Navi', 'Ruchbah'],
+      ],
+    },
+    {
+      id: 'summer-tri',
+      label: 'Summer Triangle',
+      pairs: [
+        ['Vega', 'Deneb'],
+        ['Deneb', 'Altair'],
+        ['Altair', 'Vega'],
+      ],
+    },
+  ];
+
+  function moonPhaseLabel(date) {
+    const sunLon = sunEclipticLon(date);
+    const moon = moonEcliptic(date);
+    let phase = (moon.lon - sunLon) / 360;
+    if (phase < 0) phase += 1;
+    if (phase < 0.03 || phase > 0.97) return 'New Moon';
+    if (phase < 0.22) return 'Waxing crescent';
+    if (phase < 0.28) return 'First quarter';
+    if (phase < 0.47) return 'Waxing gibbous';
+    if (phase < 0.53) return 'Full Moon';
+    if (phase < 0.72) return 'Waning gibbous';
+    if (phase < 0.78) return 'Last quarter';
+    return 'Waning crescent';
+  }
+
+  function buildStarMap(stars) {
+    const map = Object.create(null);
+    for (let i = 0; i < stars.length; i += 1) {
+      map[stars[i].name] = stars[i];
+    }
+    return map;
+  }
+
+  /** Project asterism line segments from a projectSky() result. */
+  function projectAsterisms(sky) {
+    const map = buildStarMap(sky.stars || []);
+    const lines = [];
+    for (let a = 0; a < SKY_ASTERISMS.length; a += 1) {
+      const asterism = SKY_ASTERISMS[a];
+      for (let p = 0; p < asterism.pairs.length; p += 1) {
+        const pair = asterism.pairs[p];
+        const aStar = map[pair[0]];
+        const bStar = map[pair[1]];
+        if (!aStar || !bStar) continue;
+        lines.push({
+          id: asterism.id,
+          label: asterism.label,
+          x1: aStar.x,
+          y1: aStar.y,
+          x2: bStar.x,
+          y2: bStar.y,
+        });
+      }
+    }
+    return lines;
+  }
+
+  function formatSkyCaption(sky) {
+    const label = sky.observer.label || 'observer';
+    const when = sky.date;
+    const hh = when.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    const timeWord = sky.usedEveningFallback ? `tonight ${hh}` : 'now';
+    const phase = moonPhaseLabel(sky.date);
+    const up = (sky.planets || []).map((p) => p.name);
+    const planets = up.length ? up.join(' · ') : 'no naked-eye planets up';
+    return `Sky · ${label} · ${timeWord} · ${phase} · ${planets}`;
+  }
 
   /** Mean J2000 orbital elements for naked-eye planets (simplified). */
   const PLANET_ORBITS = {
@@ -370,6 +481,7 @@
   root.FunHomeSky = {
     DEFAULT_OBSERVER,
     BRIGHT_STARS,
+    SKY_ASTERISMS,
     julianDay,
     daysSinceJ2000,
     gmstDegrees,
@@ -381,6 +493,9 @@
     planetEquatorial,
     resolveSkyDate,
     projectSky,
+    projectAsterisms,
+    moonPhaseLabel,
+    formatSkyCaption,
     galacticToEquatorial,
     milkyWayBand,
   };
