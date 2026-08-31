@@ -1426,8 +1426,8 @@
     <!-- Empty State -->
     <div id="emptyState" class="empty-state" style="display: none;">
       <i class="bi-disc"></i>
-      <h4>No albums found</h4>
-      <p>Try searching for a different artist or check the spelling.</p>
+      <h4 id="emptyStateTitle">No albums found</h4>
+      <p id="emptyStateCopy">Try searching for a different artist or check the spelling.</p>
     </div>
 
     <!-- YouTube Results -->
@@ -1466,7 +1466,13 @@
 </footer>
 
 <script>
+const ALBUM_PLACEHOLDER =
+  "data:image/svg+xml," +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect fill="#e8f2f6" width="200" height="200"/><circle cx="100" cy="100" r="62" fill="none" stroke="#7eb6c9" stroke-width="8"/><circle cx="100" cy="100" r="14" fill="#7eb6c9"/></svg>'
+  );
 let currentArtist = '';
+let albumsSearchInFlight = false;
 let voiceEnabled = false;
 let currentInputMode = 'band'; // 'band', 'album', 'image', 'camera', or 'multi'
 let uploadedImageData = null;
@@ -2061,10 +2067,9 @@ async function fetchDetailedArtistInfo(artistName) {
     
     const data = await response.json();
     
-    if (data.success && data.name) {
+    if (data && data.name) {
       renderDetailedCard(data);
     } else {
-      // Fallback to basic info if API fails
       renderBasicCard(artistName);
     }
   } catch (error) {
@@ -2077,7 +2082,7 @@ async function fetchDetailedArtistInfo(artistName) {
 function renderDetailedCard(data) {
   const name = data.name || '';
   const desc = data.detailedDescription || data.description || 'No description available';
-  const img = data.imageUrl || 'https://via.placeholder.com/200x200/87CEEB/FFFFFF?text=No+Image';
+  const img = data.imageUrl || data.image || ALBUM_PLACEHOLDER;
   const url = data.url || '';
   const type = data.type || 'Unknown';
 
@@ -2108,7 +2113,7 @@ function renderBasicCard(artistName) {
     <div class="kg-result-card">
       <div class="row g-0">
         <div class="col-md-3">
-          <img src="https://via.placeholder.com/200x200/87CEEB/FFFFFF?text=No+Image" class="img-fluid rounded-start" alt="${artistName}" style="width: 100%; height: 200px; object-fit: cover;">
+          <img src="${ALBUM_PLACEHOLDER}" class="img-fluid rounded-start" alt="${artistName}" style="width: 100%; height: 200px; object-fit: cover;">
         </div>
         <div class="col-md-9">
           <div class="card-body">
@@ -3221,8 +3226,19 @@ async function getAIAlbumInfo(artist, albums) {
   }
 }
 
+function showAlbumEmpty(title, copy) {
+  const empty = document.getElementById('emptyState');
+  const titleEl = document.getElementById('emptyStateTitle');
+  const copyEl = document.getElementById('emptyStateCopy');
+  if (titleEl) titleEl.textContent = title;
+  if (copyEl) copyEl.textContent = copy;
+  if (empty) empty.style.display = 'block';
+}
+
 // Search for albums
 async function searchAlbums() {
+  if (albumsSearchInFlight) return;
+
   // Use currentArtist if set, otherwise get from KG search input
   let artist = currentArtist;
   if (!artist) {
@@ -3236,6 +3252,7 @@ async function searchAlbums() {
   }
   
   currentArtist = artist;
+  albumsSearchInFlight = true;
   
   // Add to search history
   if (typeof addToSearchHistory === 'function') {
@@ -3257,31 +3274,34 @@ async function searchAlbums() {
       body: JSON.stringify({ artist })
     });
     
-    const data = await response.json();
+    const data = await response.json().catch(() => ({}));
     
-    // Hide loading state
     document.getElementById('loadingState').style.display = 'none';
-    
-    if (data.error) {
-      document.getElementById('emptyState').style.display = 'block';
+
+    if (!response.ok || data.error) {
+      showAlbumEmpty(
+        'Could not load albums',
+        data.message || 'The lookup is briefly unavailable. Press Search to try again.'
+      );
       return;
     }
     
     if (data.albums && data.albums.length > 0) {
       displayAlbums(data.albums);
       
-      // Get AI analysis for the albums and store it
       setTimeout(() => {
         getAIAlbumInfo(artist, data.albums);
       }, 1000);
     } else {
-      document.getElementById('emptyState').style.display = 'block';
+      showAlbumEmpty('No albums found', 'Try searching for a different artist or check the spelling.');
     }
     
   } catch (error) {
     console.error('Error searching albums:', error);
     document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('emptyState').style.display = 'block';
+    showAlbumEmpty('Could not load albums', 'Press Search to try again.');
+  } finally {
+    albumsSearchInFlight = false;
   }
 }
 
@@ -3405,8 +3425,7 @@ function displayAlbums(albums) {
     const safeMbId = escapeAlbumHtml(album.musicBrainzId);
     
     albumCard.innerHTML = `
-      <img src="${safeCover}" alt="${safeTitle}" class="album-cover" loading="lazy"
-           onerror="this.src='https://via.placeholder.com/200x200/87CEEB/FFFFFF?text=No+Cover'">
+      <img src="${safeCover}" alt="${safeTitle}" class="album-cover" loading="lazy">
       <div class="album-info">
         <h5>${safeTitle}</h5>
         <p>${safeArtist}</p>
@@ -3431,6 +3450,12 @@ function displayAlbums(albums) {
       </div>
     `;
 
+    const coverImg = albumCard.querySelector('.album-cover');
+    if (coverImg) {
+      coverImg.addEventListener('error', () => {
+        coverImg.src = ALBUM_PLACEHOLDER;
+      }, { once: true });
+    }
     albumCard.querySelector('.release-day-btn').addEventListener('click', (event) => {
       event.stopPropagation();
       openReleaseDayPortal(album);

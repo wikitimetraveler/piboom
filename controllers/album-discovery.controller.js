@@ -200,6 +200,28 @@ function parseAIResponse(response) {
   return sections;
 }
 
+function quoteMusicBrainzTerm(value) {
+  return String(value || '')
+    .trim()
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"');
+}
+
+function mapReleaseGroups(releaseGroups, artistName) {
+  return (releaseGroups || []).map((releaseGroup) => ({
+    title: releaseGroup.title,
+    year: releaseGroup['first-release-date']
+      ? String(releaseGroup['first-release-date']).substring(0, 4)
+      : 'Unknown',
+    releaseDate: releaseGroup['first-release-date'] || null,
+    genre: releaseGroup.tags ? releaseGroup.tags.map((tag) => tag.name).join(', ') : 'Unknown',
+    artist: artistName,
+    coverArt: `https://coverartarchive.org/release-group/${releaseGroup.id}/front-250`,
+    musicBrainzId: releaseGroup.id,
+    type: releaseGroup['primary-type'] || 'Album'
+  }));
+}
+
 // Get album information (reuse from music-research controller)
 export async function getAlbums(req, res) {
   try {
@@ -209,47 +231,38 @@ export async function getAlbums(req, res) {
       return res.status(400).json({ error: 'Artist name is required' });
     }
 
+    const quoted = quoteMusicBrainzTerm(artist);
+    const searchResponse = await mbGet('/artist', { query: `"${quoted}"`, limit: 1 });
+    const artistData = searchResponse.data?.artists?.[0];
 
-    // Use MusicBrainz API for album information
-    const response = await mbGet('/release-group', {
-      query: `artist:${artist}`,
-      type: 'album',
-      limit: 20
-    });
-
-    const data = response.data;
-
-    if (data['release-groups'] && data['release-groups'].length > 0) {
-      const albums = data['release-groups'].map(releaseGroup => ({
-        title: releaseGroup.title,
-        year: releaseGroup['first-release-date'] ? releaseGroup['first-release-date'].substring(0, 4) : 'Unknown',
-        releaseDate: releaseGroup['first-release-date'] || null,
-        genre: releaseGroup.tags ? releaseGroup.tags.map(tag => tag.name).join(', ') : 'Unknown',
-        artist: artist,
-        coverArt: `https://coverartarchive.org/release-group/${releaseGroup.id}/front-250`,
-        musicBrainzId: releaseGroup.id,
-        type: 'Album'
-      }));
-
-      res.json({
+    if (!artistData?.id) {
+      return res.json({
         success: true,
-        artist: artist,
-        albums: albums
-      });
-    } else {
-      res.json({
-        success: true,
-        artist: artist,
+        artist,
         albums: [],
         message: 'No albums found for this artist'
       });
     }
 
+    const albumsResponse = await mbGet('/release-group', {
+      artist: artistData.id,
+      type: 'album',
+      limit: 20
+    });
+
+    const albums = mapReleaseGroups(albumsResponse.data?.['release-groups'], artistData.name || artist);
+
+    res.json({
+      success: true,
+      artist: artistData.name || artist,
+      albums
+    });
   } catch (error) {
     console.error('Error fetching albums:', error);
-    res.status(500).json({ 
+    res.status(503).json({
+      success: false,
       error: 'Failed to fetch albums',
-      message: error.message 
+      message: 'Album lookup is briefly unavailable. Press Search to try again.'
     });
   }
 }

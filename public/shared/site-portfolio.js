@@ -155,18 +155,20 @@
   ];
 
   const STACK_CHIPS = [
-    { label: 'Brownfield: Bootstrap + vanilla JS', icon: 'bi-layout-text-window', tone: 'frontend' },
-    { label: 'Greenfield: React + TypeScript', icon: 'bi-filetype-tsx', tone: 'frontend' },
-    { label: 'AG Grid & DataTables', icon: 'bi-table', tone: 'frontend' },
-    { label: 'Node.js / Express', icon: 'bi-server', tone: 'platform' },
-    { label: 'Python / FastAPI', icon: 'bi-code-slash', tone: 'platform' },
+    { label: 'WebGL', icon: 'bi-badge-3d', tone: 'frontend' },
+    { label: 'WebGPU', icon: 'bi-gpu-card', tone: 'frontend' },
+    { label: 'Bootstrap', icon: 'bi-layout-text-window', tone: 'frontend' },
+    { label: 'React', icon: 'bi-filetype-tsx', tone: 'frontend' },
+    { label: 'AG Grid', icon: 'bi-table', tone: 'frontend' },
+    { label: 'Node.js', icon: 'bi-server', tone: 'platform' },
+    { label: 'FastAPI', icon: 'bi-code-slash', tone: 'platform' },
     { label: 'PostgreSQL', icon: 'bi-database', tone: 'platform' },
-    { label: 'Google Maps & geocoding', icon: 'bi-geo-alt', tone: 'data' },
-    { label: 'FEMA / NASA / NOAA feeds', icon: 'bi-cloud-lightning-rain', tone: 'data' },
-    { label: 'LangChain + OpenAI', icon: 'bi-robot', tone: 'ai' },
+    { label: 'Google Maps', icon: 'bi-geo-alt', tone: 'data' },
+    { label: 'FEMA / NASA', icon: 'bi-cloud-lightning-rain', tone: 'data' },
+    { label: 'LangChain', icon: 'bi-robot', tone: 'ai' },
     { label: 'OpenAI Vision', icon: 'bi-eye', tone: 'ai' },
     { label: 'HeyGen', icon: 'bi-camera-reels', tone: 'ai' },
-    { label: 'Encompass / ICE APIs', icon: 'bi-bank2', tone: 'mortgage', authRequired: true },
+    { label: 'Encompass', icon: 'bi-bank2', tone: 'mortgage', authRequired: true },
     { label: 'LiveKit', icon: 'bi-broadcast', tone: 'live' },
   ];
 
@@ -176,19 +178,31 @@
       id: 'frontend',
       title: 'Frontend',
       tone: 'frontend',
-      lead: 'Encompass stays Bootstrap + vanilla JS. New product UIs may use React + TypeScript. Studio and Watch Together load livekit-client from CDN.',
+      lead: 'Bootstrap on Encompass. React for new UIs. WebGL and WebGPU only on canvases that paint.',
       items: [
-        { label: 'Brownfield (Encompass)', detail: 'Bootstrap + vanilla JS · AG Grid and DataTables', icon: 'bi-layout-text-window' },
-        { label: 'Greenfield apps', detail: 'React + TypeScript preferred for new product UIs', icon: 'bi-filetype-tsx' },
+        {
+          label: 'WebGL',
+          detail: 'Home crystal orb, Middle East timelines, Glazed explode, ice-ocean / fire gates',
+          icon: 'bi-badge-3d',
+          href: '/',
+        },
+        {
+          label: 'WebGPU',
+          detail: 'NASA globe, black-light poster, disaster heat, GSE constellation — WebGL2 fallback',
+          icon: 'bi-gpu-card',
+          href: '/entertainment/blacklight-poster.html',
+        },
+        { label: 'Bootstrap', detail: 'Brownfield Encompass · AG Grid and DataTables', icon: 'bi-layout-text-window' },
+        { label: 'React', detail: 'Preferred for new product UIs', icon: 'bi-filetype-tsx' },
         { label: 'Design tokens', detail: 'Zen palette, dark mode, Lane heritage accents', icon: 'bi-palette' },
-        { label: 'Voice widget', detail: 'Sitewide speech commands and Google Cloud TTS (browser speech is fallback only)', icon: 'bi-mic' },
+        { label: 'Voice widget', detail: 'Speech commands and Google Cloud TTS', icon: 'bi-mic' },
       ],
     },
     {
       id: 'platform',
       title: 'Platform',
       tone: 'platform',
-      lead: 'Node serves the app. FastAPI does spatial RAG and analytics. The LiveKit agent is a separate Python process.',
+      lead: 'Node serves the app. FastAPI does spatial RAG. LiveKit agent is a separate Python process.',
       items: [
         { label: 'Node.js + Express', detail: 'API routes, services layer, static hosting', icon: 'bi-server' },
         {
@@ -205,7 +219,7 @@
       id: 'data',
       title: 'Data & maps',
       tone: 'data',
-      lead: 'Public hazard feeds, Google Maps on family / disaster / discovery pages, MusicBrainz for research.',
+      lead: 'Hazard feeds, Google Maps, and MusicBrainz — only on pages that query them.',
       items: [
         {
           label: 'FEMA / NASA / NOAA',
@@ -226,7 +240,7 @@
       id: 'ai',
       title: 'AI & assistants',
       tone: 'ai',
-      lead: 'LangChain on the loan side. HeyGen for presenter video. LiveKit agents only where a room exists.',
+      lead: 'LangChain on the loan side. HeyGen for presenter video. LiveKit agents only in rooms.',
       items: [
         { label: 'LangChain + OpenAI', detail: 'Encompass Assistant, loan pipeline AI, Screen Test', icon: 'bi-robot' },
         { label: 'OpenAI Vision (GPT-4o)', detail: 'Automator field-image parsing, Screen Test, multimodal discovery', icon: 'bi-eye' },
@@ -251,7 +265,7 @@
       title: 'Mortgage / Encompass',
       tone: 'mortgage',
       authRequired: true,
-      lead: 'Brownfield Encompass — Bootstrap, AG Grid, shared calculationEngine. No LiveKit on these pages.',
+      lead: 'Brownfield Encompass — Bootstrap, AG Grid, calculationEngine. No LiveKit here.',
       items: [
         {
           label: 'Encompass Hub APIs',
@@ -278,7 +292,7 @@
       id: 'live',
       title: 'Live rooms',
       tone: 'live',
-      lead: 'Same LiveKit mint. Different rooms. This wire does not run through Encompass.',
+      lead: 'Same LiveKit mint. Different rooms. Not Encompass.',
       items: [
         {
           label: 'LiveKit',
@@ -384,7 +398,7 @@
       featuredOrder: 2,
       problem: 'Surface multi-source hazard intelligence with county-scoped views and pipeline risk context.',
       consultingBlurb: 'Postgres-backed ingest, Leaflet county gate, AG Grid, PostGIS nearby search, and live API pull workflows.',
-      stack: ['Python/FastAPI', 'PostGIS', 'FEMA / NOAA APIs', 'AG Grid', 'Google Maps'],
+      stack: ['Python/FastAPI', 'PostGIS', 'FEMA / NOAA APIs', 'AG Grid', 'Google Maps', 'WebGPU'],
       caseStudy: {
         role: 'Full-stack — ingest services, PostGIS schema, map UX, and pipeline risk views.',
         outcome:
@@ -503,7 +517,7 @@
       featuredOrder: 4,
       problem: 'Model GSE scenario ratios with shared calculationEngine helpers.',
       consultingBlurb: 'Pure calcMath helpers and scenario UI for mortgage worksheet workflows.',
-      stack: ['calculationEngine', 'calcMath', 'Bootstrap'],
+      stack: ['calculationEngine', 'calcMath', 'Bootstrap', 'WebGPU'],
     },
     {
       id: 'loan-batch',
@@ -543,7 +557,7 @@
       problem: 'A playful public bakery gallery with recipes, history, and an AI baker guide.',
       consultingBlurb:
         'Bootstrap + vanilla Glazed page — flip cards, HyperFrame highlight reel, HeyGen Pip intro, Google Maps shop pin, and TTS chat. Fully public — no login.',
-      stack: ['Bootstrap', 'HeyGen', 'Google Maps', 'Google TTS'],
+      stack: ['Bootstrap', 'HeyGen', 'Google Maps', 'Google TTS', 'WebGL'],
     },
     {
       id: 'middle-east',
@@ -560,7 +574,7 @@
         'Explore Middle East history, food, and music in English or Arabic across eight country atlases.',
       consultingBlurb:
         'One public Middle East collection — Jordan (base), Syria, Palestine · Israel, Oman, Iran, Iraq, Lebanon, and Egypt. EN/AR toggle, maps, HyperFrame tours, and local AI guides. Fully public — no login.',
-      stack: ['Bootstrap', 'Google Maps', 'Google TTS', 'LangChain', 'i18n', 'HeyGen'],
+      stack: ['Bootstrap', 'Google Maps', 'Google TTS', 'LangChain', 'i18n', 'HeyGen', 'WebGL'],
       related: [
         { label: 'Jordan', labelAr: 'الأردن', path: '/jordan/' },
         { label: 'Syria', labelAr: 'سوريا', path: '/syria/' },
@@ -1231,159 +1245,74 @@
     });
   }
 
+  function renderStackTag(item, tone) {
+    const title = item.detail ? ' title="' + escapeHtml(item.detail) + '"' : '';
+    const cls = 'lane-stack-tag' + stackToneClass(tone || item.tone);
+    const label = escapeHtml(item.label);
+    if (item.href) {
+      return (
+        '<a class="' +
+        cls +
+        '" href="' +
+        escapeHtml(item.href) +
+        '"' +
+        title +
+        '>' +
+        label +
+        '</a>'
+      );
+    }
+    return '<span class="' + cls + '"' + title + '>' + label + '</span>';
+  }
+
   function renderPortfolioStackChips(options) {
-    const chips = visibleStackChips(options);
-    return chips
-      .map(function (item, index) {
-        return (
-          '<li class="portfolio-stack-chip lane-stack-chip' +
-          stackToneClass(item.tone) +
-          (index === chips.length - 1 ? ' is-last' : '') +
-          '"><i class="bi ' +
-          item.icon +
-          '" aria-hidden="true"></i>' +
-          escapeHtml(item.label) +
-          '</li>'
-        );
+    return visibleStackChips(options)
+      .map(function (item) {
+        return '<li>' + renderStackTag(item, item.tone) + '</li>';
       })
       .join('');
   }
 
-  function renderStackJack(item, isLast) {
-    const body =
-      '<span class="lane-tree-leaf__icon" aria-hidden="true"><i class="bi ' +
-      item.icon +
-      '"></i></span>' +
-      '<span class="lane-tree-leaf__copy"><span class="lane-tree-leaf__title">' +
-      escapeHtml(item.label) +
-      '</span><span class="lane-tree-leaf__detail">' +
-      escapeHtml(item.detail) +
-      '</span></span>';
-    const go = item.href
-      ? '<i class="bi bi-arrow-up-right lane-tree-leaf__go" aria-hidden="true"></i>'
-      : '';
-    const inner = item.href
-      ? '<a class="lane-tree-leaf__node" href="' + escapeHtml(item.href) + '">' + body + go + '</a>'
-      : '<div class="lane-tree-leaf__node">' + body + '</div>';
-    return (
-      '<li class="lane-tree-leaf' +
-      (isLast ? ' is-last' : '') +
-      '">' +
-      inner +
-      '</li>'
-    );
-  }
-
-  function renderLaneStackBay(group, index, options) {
-    const opts = options || {};
-    const slot = typeof opts.slot === 'number' ? opts.slot : index;
-    const num = String(slot + 1).padStart(2, '0');
-    const id = group.id || 'bay-' + num;
+  function renderLaneStackBay(group) {
+    const id = group.id || 'group';
     const items = group.items || [];
-    const leaves = items
-      .map(function (item, i) {
-        return renderStackJack(item, i === items.length - 1);
+    const tags = items
+      .map(function (item) {
+        return renderStackTag(item, group.tone);
       })
       .join('');
     const lead = group.lead
-      ? '<p class="lane-tree-branch__lead">' + escapeHtml(group.lead) + '</p>'
+      ? '<p class="lane-stack-group__lead">' + escapeHtml(group.lead) + '</p>'
       : '';
-    const openAttr = opts.open ? ' open' : '';
     return (
-      '<details class="lane-tree-branch' +
+      '<section class="lane-stack-group' +
       stackToneClass(group.tone) +
-      (opts.last ? ' is-last' : '') +
       '" id="stack-' +
       escapeHtml(id) +
       '" data-stack-id="' +
       escapeHtml(id) +
-      '"' +
-      openAttr +
-      '>' +
-      '<summary class="lane-tree-branch__summary">' +
-      '<span class="lane-tree-branch__chevron" aria-hidden="true"></span>' +
-      '<span class="lane-tree-branch__num">' +
-      num +
-      '</span>' +
-      '<span class="lane-tree-branch__text">' +
-      '<span class="lane-tree-branch__title">' +
+      '">' +
+      '<h2 class="lane-stack-group__title">' +
       escapeHtml(group.title) +
-      '</span>' +
+      '</h2>' +
+      '<div class="lane-stack-group__tags">' +
+      tags +
+      '</div>' +
       lead +
-      '</span>' +
-      '<span class="lane-tree-branch__count">' +
-      items.length +
-      '</span></summary>' +
-      '<ul class="lane-tree-leaves">' +
-      leaves +
-      '</ul></details>'
+      '</section>'
     );
   }
 
   function renderLaneStackDesk(options) {
     const entries = visibleStackEntries(options);
-    const toc = entries
-      .map(function (entry, visibleIndex) {
-        const group = entry.group;
-        const id = group.id || 'bay-' + String(entry.index + 1).padStart(2, '0');
-        const num = String(entry.index + 1).padStart(2, '0');
-        return (
-          '<li class="lane-stack-toc__limb' +
-          stackToneClass(group.tone) +
-          (visibleIndex === entries.length - 1 ? ' is-last' : '') +
-          '">' +
-          '<a class="lane-stack-toc__link" href="#stack-' +
-          escapeHtml(id) +
-          '" data-stack-jump="' +
-          escapeHtml(id) +
-          '">' +
-          '<span class="lane-stack-toc__num">' +
-          num +
-          '</span>' +
-          '<span class="lane-stack-toc__knot" aria-hidden="true"></span>' +
-          '<span class="lane-stack-toc__name">' +
-          escapeHtml(group.title) +
-          '</span></a></li>'
-        );
-      })
-      .join('');
-    const branches = entries
-      .map(function (entry, visibleIndex) {
-        return renderLaneStackBay(entry.group, entry.index, {
-          slot: entry.index,
-          open: visibleIndex === 0,
-          last: visibleIndex === entries.length - 1,
-        });
-      })
-      .join('');
-    const loggedIn = stackViewerIsLoggedIn(options);
-    const note = loggedIn
-      ? 'One trunk. Six branches. UI first, LiveKit last — rooms only, not Encompass.'
-      : 'One trunk. Public branches first. LiveKit last — rooms only.';
     return (
-      '<div class="lane-tree">' +
-      '<div class="lane-tree-root">' +
-      '<span class="lane-tree-root__knot" aria-hidden="true"></span>' +
-      '<div>' +
-      '<p class="lane-tree-root__kicker">Root</p>' +
-      '<h2 class="lane-tree-root__title">The desk</h2>' +
-      '<p class="lane-tree-root__note">' +
-      note +
-      '</p>' +
-      '</div></div>' +
-      '<nav class="lane-stack-toc" aria-label="Stack branches">' +
-      '<p class="lane-stack-toc__kicker">Limbs</p>' +
-      '<ol class="lane-stack-toc__list">' +
-      toc +
-      '</ol>' +
-      '<p class="lane-stack-toc__tools">' +
-      '<button type="button" class="lane-stack-toc__all" data-stack-expand="1">Open canopy</button>' +
-      '<span aria-hidden="true"> · </span>' +
-      '<button type="button" class="lane-stack-toc__all" data-stack-expand="0">Fold</button>' +
-      '</p></nav>' +
-      '<div class="lane-tree-trunk">' +
-      branches +
-      '</div></div>'
+      '<div class="lane-stack-glance">' +
+      entries
+        .map(function (entry) {
+          return renderLaneStackBay(entry.group);
+        })
+        .join('') +
+      '</div>'
     );
   }
 

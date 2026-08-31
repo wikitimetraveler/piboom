@@ -66,35 +66,54 @@ export async function searchKnowledgeGraph(req, res) {
 
     if (data.artists && data.artists.length > 0) {
       const artistData = data.artists[0];
+      const description = `${artistData.name || artist} is a ${artistData.type || 'music artist'}${artistData.area ? ` from ${artistData.area.name}` : ''}${artistData.begin_area ? ` (born in ${artistData.begin_area.name})` : ''}.`;
       
       const result = {
+        success: true,
         name: artistData.name || artist,
-        description: `${artistData.name || artist} is a ${artistData.type || 'music artist'}${artistData.area ? ` from ${artistData.area.name}` : ''}${artistData.begin_area ? ` (born in ${artistData.begin_area.name})` : ''}.`,
+        description,
+        detailedDescription: description,
         genre: artistData.tags ? artistData.tags.map(tag => tag.name).join(', ') : 'Music',
         birthDate: artistData['life-span']?.begin || 'Not specified',
         birthPlace: artistData.area?.name || artistData.begin_area?.name || 'Not specified',
         bandMembers: [],
         url: `https://musicbrainz.org/artist/${artistData.id}`,
-        image: ''
+        image: '',
+        imageUrl: ''
       };
 
       res.json(result);
     } else {
       // Fallback to basic info if MusicBrainz doesn't have data
-      res.json({ 
+      res.json({
+        success: true,
         name: artist,
         description: `${artist} is a music artist with a significant following and impact on the music industry.`,
+        detailedDescription: `${artist} is a music artist with a significant following and impact on the music industry.`,
         genre: 'Music',
         birthDate: 'Not specified',
         birthPlace: 'Not specified',
         bandMembers: [],
         url: `https://en.wikipedia.org/wiki/${encodeURIComponent(artist.replace(/\s+/g, '_'))}`,
-        image: ''
+        image: '',
+        imageUrl: ''
       });
     }
   } catch (error) {
     console.error('MusicBrainz search error:', error);
-    res.status(500).json({ error: 'Failed to search MusicBrainz' });
+    res.json({
+      success: true,
+      name: artist,
+      description: `${artist} — artist lookup is briefly unavailable. Search again in a moment.`,
+      detailedDescription: `${artist} — artist lookup is briefly unavailable. Search again in a moment.`,
+      genre: 'Music',
+      birthDate: 'Not specified',
+      birthPlace: 'Not specified',
+      bandMembers: [],
+      url: '',
+      image: '',
+      imageUrl: ''
+    });
   }
 }
 

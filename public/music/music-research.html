@@ -4,76 +4,774 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Music Research — Field notes · DevConnect Labs</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+<title>Music Research - DevConnect Labs</title>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
 <link rel="stylesheet" href="https://www.gstatic.com/knowledge/kgsearch/widget/1.0/widget.min.css"/>
 <link rel="stylesheet" href="/shared/styles.css"/>
 <link rel="stylesheet" href="/shared/collection-styles.css"/>
-<link rel="stylesheet" href="/family/css/lane-shell.css"/>
-<link rel="stylesheet" href="/music/css/music-research.css"/>
 <link rel="stylesheet" href="/music/css/music-heygen-popup.css"/>
 <script src="/shared/toast.js"></script>
 <script src="/shared/modern-navbar.js"></script>
 <script src="/shared/music-mini-nav.js"></script>
 <!-- Google API for YouTube (client-side search) -->
 <script src="https://apis.google.com/js/api.js"></script>
+<style>
+  /* Floating Musical Notes */
+  .floating-notes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+    overflow: hidden;
+  }
+
+  .musical-note {
+    position: absolute;
+    font-size: 32px;
+    color: rgba(var(--zen-primary-rgb), 0.45);
+    animation: floatNote 15s linear infinite;
+    opacity: 0;
+    z-index: 10;
+  }
+
+  .discovery-hero {
+    text-align: center;
+    margin-bottom: 1.25rem;
+    padding: 0.25rem 0 0.5rem;
+  }
+  .discovery-hero h1 {
+    font-size: clamp(1.6rem, 3vw, 2.1rem);
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 0.35rem;
+    letter-spacing: -0.02em;
+  }
+  .discovery-hero .discovery-kicker {
+    color: var(--muted);
+    font-size: 1rem;
+    margin: 0 auto;
+    max-width: 36rem;
+    line-height: 1.45;
+  }
+  .search-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: center;
+    gap: 0.5rem;
+    max-width: 920px;
+    margin: 0 auto 0.75rem;
+  }
+  .search-toolbar .source-select {
+    max-width: 11.5rem;
+    height: 50px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.95);
+    color: var(--text);
+    font-weight: 500;
+  }
+  .search-toolbar .source-select:focus {
+    border-color: var(--ice-primary);
+    box-shadow: 0 0 0 3px var(--ice-glow);
+    outline: none;
+  }
+  .search-toolbar .search-box {
+    flex: 1 1 280px;
+    min-width: 0;
+  }
+  .search-toolbar .mic-toggle-btn {
+    height: 50px;
+    min-width: 50px;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    background: rgba(255,255,255,0.95);
+    color: var(--zen-primary);
+  }
+  .search-toolbar .mic-toggle-btn[aria-expanded="true"],
+  .search-toolbar .mic-toggle-btn.is-active {
+    border-color: var(--ice-primary);
+    background: var(--ice-light);
+  }
+  .music-panel-header {
+    background: var(--ice-light) !important;
+    color: var(--text) !important;
+    border-bottom: 1px solid var(--border);
+    border-radius: 16px 16px 0 0 !important;
+  }
+  .music-panel-header .btn-outline-light {
+    border-color: var(--border) !important;
+    color: var(--text) !important;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .musical-note:nth-child(1) { left: 10%; animation-delay: 0s; }
+  .musical-note:nth-child(2) { left: 20%; animation-delay: 3s; }
+  .musical-note:nth-child(3) { left: 30%; animation-delay: 6s; }
+  .musical-note:nth-child(4) { left: 40%; animation-delay: 9s; }
+  .musical-note:nth-child(5) { left: 50%; animation-delay: 12s; }
+  .musical-note:nth-child(6) { left: 60%; animation-delay: 15s; }
+  .musical-note:nth-child(7) { left: 70%; animation-delay: 18s; }
+  .musical-note:nth-child(8) { left: 80%; animation-delay: 21s; }
+  .musical-note:nth-child(9) { left: 90%; animation-delay: 24s; }
+
+  @keyframes floatNote {
+    0% {
+      transform: translateY(100vh) rotate(0deg);
+      opacity: 0;
+    }
+    5% {
+      opacity: 0.6;
+    }
+    95% {
+      opacity: 0.6;
+    }
+    100% {
+      transform: translateY(-100px) rotate(360deg);
+      opacity: 0;
+    }
+  }
+</style>
+<style>
+  .search-container {
+    background: rgba(255,255,255,.95);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  }
+  
+  .search-box {
+    border: 2px solid var(--ice-primary);
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .search-box:focus {
+    border-color: var(--ice-secondary);
+    box-shadow: 0 0 20px rgba(52, 152, 219, 0.3);
+    outline: none;
+  }
+  
+  .map-container {
+    background: rgba(255,255,255,.95);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,.08);
+    min-height: 400px;
+  }
+  
+  .timeline-container {
+    background: rgba(255,255,255,.95);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,.08);
+    min-height: 400px;
+  }
+  
+  .timeline-event {
+    background: rgba(248,250,252,.8);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--ice-primary);
+    position: relative;
+    transition: all 0.3s ease;
+  }
+  
+  .timeline-event:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.1);
+  }
+  
+  .timeline-event.birth {
+    border-left-color: #28a745;
+  }
+  
+  .timeline-event.formation {
+    border-left-color: #ffc107;
+  }
+  
+  .timeline-event.album {
+    border-left-color: #17a2b8;
+  }
+  
+  .timeline-event.other {
+    border-left-color: #6c757d;
+  }
+  
+  .timeline-date {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+  
+  .timeline-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--dark);
+  }
+  
+  .timeline-description {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-bottom: 0;
+  }
+  
+  .timeline-location {
+    font-size: 0.8rem;
+    color: var(--ice-primary);
+    margin-top: 0.25rem;
+  }
+
+  .timeline-album-cover {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-right: 0.75rem;
+    float: left;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  
+  .timeline-marker {
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--ice-primary);
+    border: 3px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,.2);
+  }
+  
+  .timeline-event.birth .timeline-marker {
+    background: #28a745;
+  }
+  
+  .timeline-event.formation .timeline-marker {
+    background: #ffc107;
+  }
+  
+  .timeline-event.album .timeline-marker {
+    background: #17a2b8;
+  }
+  
+  .timeline-event.other .timeline-marker {
+    background: #6c757d;
+  }
+
+  /* Google Maps birthplace / formation info popups */
+  .music-map-infowindow {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    min-width: 220px;
+    max-width: 280px;
+    padding: 0.15rem 0.1rem 0.1rem;
+  }
+  .music-map-infowindow-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    margin-bottom: 0.5rem;
+  }
+  .music-map-infowindow-badge.birth {
+    background: rgba(74, 144, 164, 0.15);
+    color: #3d7a8a;
+  }
+  .music-map-infowindow-badge.formation {
+    background: rgba(217, 119, 6, 0.15);
+    color: #b45309;
+  }
+  .music-map-infowindow-badge.member {
+    background: rgba(102, 126, 234, 0.15);
+    color: #5a67d8;
+  }
+  .music-map-infowindow-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1a2856;
+    margin: 0 0 0.45rem;
+    line-height: 1.35;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+  .music-map-infowindow-title i {
+    color: #4a90a4;
+    margin-top: 0.15rem;
+    flex-shrink: 0;
+  }
+  .music-map-infowindow-body {
+    font-size: 0.875rem;
+    color: #647196;
+    margin: 0;
+    line-height: 1.5;
+  }
+  .music-map-infowindow-meta {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-top: 0.35rem;
+  }
+
+  .member-card.member-card--map-focus {
+    border-color: #4a90a4 !important;
+    box-shadow: 0 6px 20px rgba(74, 144, 164, 0.25) !important;
+  }
+  
+  .youtube-container {
+    background: rgba(255,255,255,.95);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,.08);
+    min-height: 300px;
+  }
+  
+  .artist-info {
+    background: rgba(255,255,255,.95);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  }
+  
+  .info-card {
+    background: rgba(248,250,252,.8);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--ice-primary);
+  }
+  
+  .loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--muted);
+  }
+  
+  .spinner {
+    border: 3px solid var(--border);
+    border-top: 3px solid var(--ice-primary);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+  
+  .video-item {
+    background: rgba(248,250,252,.8);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+  
+  .video-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.1);
+  }
+  
+  .back-btn {
+    background: linear-gradient(135deg, var(--ice-primary), var(--ice-secondary));
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+  }
+  
+  .back-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    color: white;
+  }
+  
+  /* Google Knowledge Graph Widget Styles */
+  .kge-search-picker { 
+    width: 100%; 
+    max-width: 600px;
+    position: relative;
+    z-index: 10;
+  }
+  
+  .kg-widget-container {
+    background: rgba(255,255,255,.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,.08);
+    position: relative;
+    z-index: 5;
+    border: 1px solid rgba(255,255,255,0.4);
+  }
+  
+  .kg-result-card {
+    background: rgba(248,250,252,.8);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--ice-primary);
+  }
+  
+  /* Fix KG widget dropdown z-index issues */
+  .kge-search-picker .kge-dropdown {
+    z-index: 1000 !important;
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: white !important;
+    border: 1px solid #ddd !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    max-height: 300px !important;
+    overflow-y: auto !important;
+  }
+  
+  .kge-search-picker .kge-dropdown-item {
+    padding: 12px 16px !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    cursor: pointer !important;
+  }
+  
+  .kge-search-picker .kge-dropdown-item:hover {
+    background-color: #f8f9fa !important;
+  }
+  
+  .kge-search-picker .kge-dropdown-item:last-child {
+    border-bottom: none !important;
+  }
+  
+  /* Ensure content below search widget is properly spaced */
+  .kg-widget-container + .row {
+    margin-top: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Accordion Styling */
+  .accordion .card {
+    border: none;
+    margin-bottom: 1rem;
+  }
+  
+  .accordion .card-header {
+    border: none;
+    padding: 0;
+  }
+  
+  .accordion .card-header button {
+    color: inherit;
+    text-decoration: none;
+    padding: 1rem 1.5rem;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .accordion .card-header button:hover {
+    background: rgba(255,255,255,0.1);
+  }
+  
+  .accordion .card-header button:focus {
+    box-shadow: none;
+    outline: none;
+  }
+  
+  .accordion .card-header button[aria-expanded="true"] .bi-chevron-down {
+    transform: rotate(180deg);
+  }
+  
+  /* Toast Notifications */
+  .toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 400px;
+  }
+  
+  .toast {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    margin-bottom: 10px;
+    padding: 16px 20px;
+    transform: translateX(100%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    max-width: 100%;
+  }
+  
+  .toast.show {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  
+  .toast.success {
+    border-left: 4px solid #28a745;
+  }
+  
+  .toast.info {
+    border-left: 4px solid #17a2b8;
+  }
+  
+  .toast.warning {
+    border-left: 4px solid #ffc107;
+  }
+  
+  .toast.error {
+    border-left: 4px solid #dc3545;
+  }
+  
+  .toast-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .toast-icon {
+    font-size: 1.2em;
+    margin-right: 8px;
+  }
+  
+  .toast-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin: 0;
+  }
+  
+  .toast-body {
+    font-size: 0.9rem;
+    color: #6c757d;
+    line-height: 1.4;
+    margin: 0;
+  }
+  
+  .toast-close {
+    background: none;
+    border: none;
+    font-size: 1.2em;
+    color: #6c757d;
+    cursor: pointer;
+    margin-left: auto;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .toast-close:hover {
+    color: #495057;
+  }
+  
+  .accordion .card-body {
+    padding: 1.5rem;
+  }
+  
+  /* Smooth transitions */
+  .collapse {
+    transition: height 0.3s ease;
+  }
+  
+  /* Make sure the search input has proper focus styling */
+  #kgBand:focus {
+    border-color: var(--ice-secondary);
+    box-shadow: 0 0 20px rgba(52, 152, 219, 0.3);
+    outline: none;
+  }
+  
+  /* Mode button hover effects when text is present */
+  .btn-group .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  
+  /* Active search indication */
+  .btn-group .btn.active {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+</style>
 </head>
-<body class="music-research-page">
-<modern-navbar></modern-navbar>
+<body>
 <div class="music-mini-nav" data-music-mini-nav>
   <a href="/music/music-research.html"><i class="bi bi-search"></i> Music Research</a>
   <a href="/music/album-discovery.html"><i class="bi bi-disc"></i> Album Discovery</a>
   <a href="/music/collection.html"><i class="bi bi-collection-fill"></i> My Collection</a>
 </div>
+<div class="particles" id="particles"></div>
+
+<!-- Floating Musical Notes -->
+<div class="floating-notes">
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+</div>
+
+<!-- Modern Navbar Web Component -->
+<modern-navbar></modern-navbar>
+
+<nav class="navbar navbar-expand-lg navbar-light shadow-sm" style="background: linear-gradient(135deg, rgba(135,206,250,0.9) 0%, rgba(144,238,144,0.9) 100%); backdrop-filter: blur(20px); display: none;">
+  <div class="container">
+    <a class="navbar-brand" href="/" style="color: #2c3e50; font-weight: 600;"><i class="bi-box mr-1"></i>DevConnect Labs</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div id="nav" class="collapse navbar-collapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item"><a class="nav-link" href="/" style="color: #2c3e50;"><i class="bi-house"></i> Home</a></li>
+        
+        <!-- Music Discovery Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="musicDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #2c3e50;">
+            <i class="bi-music-note-beamed"></i> Music Discovery
+          </a>
+          <div class="dropdown-menu" aria-labelledby="musicDropdown" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border: none; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+            <a class="dropdown-item" href="/music-research.html"><i class="bi-search"></i> Music Research</a>
+            <a class="dropdown-item" href="/album-discovery.html"><i class="bi-disc"></i> Album Discovery</a>
+            <a class="dropdown-item" href="/collection.html"><i class="bi-collection-fill"></i> My Collection</a>
+            <a class="dropdown-item" href="/music-time-machine.html"><i class="bi-clock-history"></i> Time Machine</a>
+            <a class="dropdown-item" href="/spotify-dashboard.html"><i class="bi-spotify"></i> Spotify</a>
+          </div>
+        </li>
+
+        <!-- AI & Voice Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="aiDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #2c3e50;">
+            <i class="bi-robot"></i> AI & Voice
+          </a>
+          <div class="dropdown-menu" aria-labelledby="aiDropdown" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border: none; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+            <a class="dropdown-item" href="/voice-dj.html"><i class="bi-mic"></i> Voice DJ</a>
+            <a class="dropdown-item" href="/assistant.html"><i class="bi-chat-dots"></i> Levi Assistant</a>
+            <a class="dropdown-item" href="/poster-generator.html"><i class="bi-palette"></i> Poster Generator</a>
+          </div>
+        </li>
+
+        <!-- Entertainment Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="entertainmentDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #2c3e50;">
+            <i class="bi-stars"></i> Entertainment
+          </a>
+          <div class="dropdown-menu" aria-labelledby="entertainmentDropdown" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border: none; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+            <a class="dropdown-item" href="/player.html"><i class="bi-volume-up"></i> The Boombox</a>
+            <a class="dropdown-item" href="/visualizer.html"><i class="bi-palette-fill"></i> Psychedelic Visualizer</a>
+            <a class="dropdown-item" href="/blacklight.html"><i class="bi-lightning"></i> Black Light Zone</a>
+            <a class="dropdown-item" href="/art-gallery.html"><i class="bi-image"></i> Art Gallery</a>
+            <a class="dropdown-item" href="/ouija-board.html"><i class="bi-magic"></i> Ouija Board</a>
+          </div>
+        </li>
+
+        <!-- Nature Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="natureDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #2c3e50;">
+            <i class="bi-tree-fill"></i> Nature
+          </a>
+          <div class="dropdown-menu" aria-labelledby="natureDropdown" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border: none; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+            <a class="dropdown-item" href="/tree-discovery.html"><i class="bi-tree-fill"></i> Tree Discovery 🐻</a>
+            <a class="dropdown-item" href="/tree-collection.html"><i class="bi-trees"></i> Tree Collection 🌲</a>
+            <a class="dropdown-item" href="/nature/fish-identification.html"><i class="bi-droplet"></i> Fish Identification 🐟</a>
+            <a class="dropdown-item" href="/nature/fish-collection.html#map"><i class="bi-geo-alt"></i> Fish Collection (Map) 🎣</a>
+          </div>
+        </li>
+      </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="voiceDropdown" role="button" data-toggle="dropdown" style="color: #2c3e50;">
+            <i class="bi-mic"></i> Voice
+          </a>
+          <div class="dropdown-menu" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border: none; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+            <button class="dropdown-item" onclick="toggleVoiceSection()"><i class="bi-mic-fill"></i> Voice Commands</button>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown" style="color: #2c3e50;">
+            <i class="bi-search"></i> Search
+          </a>
+          <div class="dropdown-menu" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border: none; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+            <button class="dropdown-item" onclick="toggleSearchSection()"><i class="bi-search"></i> Search Panel</button>
+            <button class="dropdown-item" onclick="toggleResults()"><i class="bi-music-note-list"></i> Results</button>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="mediaDropdown" role="button" data-toggle="dropdown" style="color: #2c3e50;">
+            <i class="bi-collection"></i> Media
+          </a>
+          <div class="dropdown-menu" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border: none; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+            <button class="dropdown-item" onclick="toggleYouTube()"><i class="bi-youtube"></i> YouTube Videos</button>
+            <button class="dropdown-item" onclick="toggleMap()"><i class="bi-geo-alt"></i> Map View</button>
+            <button class="dropdown-item" onclick="toggleTimeline()"><i class="bi-clock-history"></i> Timeline</button>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
 <main class="container">
-  <header class="mr-hero">
-    <p class="mr-hero-kicker">Field research · artist · place · date</p>
-    <h1 class="mr-hero-title">Music Research</h1>
-    <p class="mr-hero-lede">
-      A working desk for field notes: look up an artist, then record members, birthplaces, and the documented story behind the band.
-    </p>
-    <p class="mr-hero-host">DevConnect Labs</p>
-    <div class="mr-era-strip" aria-hidden="true">
-      <span class="mr-era-strip__item">Origins</span>
-      <span class="mr-era-strip__dot"></span>
-      <span class="mr-era-strip__item">Members</span>
-      <span class="mr-era-strip__dot"></span>
-      <span class="mr-era-strip__item">Places</span>
-      <span class="mr-era-strip__dot"></span>
-      <span class="mr-era-strip__item">Timeline</span>
-      <span class="mr-era-strip__dot"></span>
-      <span class="mr-era-strip__item">Recordings</span>
-    </div>
-    <p class="mr-context-note">
-      <strong>Context vs evidence</strong><br>
-      Knowledge Graph and Wikipedia are starting points. ChatGPT is <em>context</em>, not proof. Verify members, dates, and places against Wikipedia, MusicBrainz, and the map pins before treating them as field evidence.
-    </p>
-    <p class="mr-reading-order">
-      <span class="mr-reading-order__label">Suggested path</span>
-      Search here for the artist, then read the dossier and timeline, click members to pin origins on the map, and open
-      <a href="/music/music-time-machine.html">Time Machine</a> for the calendar or
-      <a href="/music/music-pilgrimage-atlas.html">Pilgrimage Atlas</a> for venue stops.
-    </p>
-    <p class="mr-source-note">
-      <span class="mr-source-label">Sources</span>
-      <a href="https://musicbrainz.org/" target="_blank" rel="noopener noreferrer">MusicBrainz</a>
-      <span class="mr-source-sep">·</span>
-      <a href="https://www.wikidata.org/" target="_blank" rel="noopener noreferrer">Wikidata</a>
-      <span class="mr-source-sep">·</span>
-      <a href="https://en.wikipedia.org/" target="_blank" rel="noopener noreferrer">Wikipedia</a>
-      <span class="mr-source-sep">·</span>
-      Google Knowledge Graph
-      <span class="mr-source-sep">·</span>
-      YouTube
-    </p>
-  </header>
-
   <div class="kg-widget-container">
+    <header class="discovery-hero">
+      <h1><i class="bi-search" aria-hidden="true"></i> Music Research</h1>
+      <p class="discovery-kicker">Look up an artist for bio, members, birthplaces, and the story behind the band.</p>
+    </header>
     <div class="row">
       <div class="col-md-10 mx-auto">
         <div class="search-toolbar mb-3">
@@ -81,16 +779,16 @@
           <select id="searchSourceSelect" class="custom-select source-select" aria-label="Search source" onchange="handleSourceSelectChange()">
             <option value="kg">Knowledge Graph</option>
             <option value="wiki">Wikipedia</option>
-            <option value="chat">ChatGPT (context)</option>
+            <option value="chat">ChatGPT</option>
           </select>
           <label for="kgBand" class="sr-only">Search a band or artist</label>
-          <input id="kgBand" class="form-control search-box" placeholder="Artist or band for field notes…" aria-label="Search a band or artist" onkeypress="handleSearchKeypress(event)" oninput="updateModeButtonText()">
+          <input id="kgBand" class="form-control search-box" placeholder="Search a band or artist…" aria-label="Search a band or artist" onkeypress="handleSearchKeypress(event)" oninput="updateModeButtonText()">
           <button type="button" class="btn mic-toggle-btn" id="voicePanelToggle" aria-expanded="false" aria-controls="voiceCommandsHelp" title="Voice commands" onclick="toggleVoicePanel()">
             <i class="bi-mic" aria-hidden="true"></i>
             <span class="sr-only">Toggle voice commands</span>
           </button>
         </div>
-        <div class="mr-status-row mb-2">
+        <div class="text-center mb-2">
           <span class="badge badge-info" id="modeBadge">
             <i class="bi-cloud"></i> <span id="modeText">Loading...</span>
           </span>
@@ -113,10 +811,10 @@
 
 
   <!-- Search & Results Section (Combined) -->
-  <div class="card mb-4 mr-panel">
+  <div class="card mb-4" style="background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-radius: 16px; box-shadow: 0 6px 18px rgba(0,0,0,.08);">
     <div class="card-header music-panel-header">
       <h5 class="mb-0">
-        Dossier &amp; evidence
+        <i class="bi-search"></i> Search & Results
         <button class="btn btn-sm btn-outline-light float-right" type="button" data-toggle="collapse" data-target="#searchAndResults" aria-expanded="true">
           <i class="bi-chevron-down"></i>
         </button>
@@ -129,26 +827,26 @@
         <div class="row mb-4">
           <div class="col-lg-6">
             <div class="artist-info" id="artistInfo">
-              <h4>Artist dossier</h4>
+              <h4><i class="bi-person-circle"></i> Artist Information</h4>
               <div class="loading" id="artistLoading" style="display: none;">
                 <div class="spinner"></div>
                 <p>Loading artist information...</p>
               </div>
               <div id="artistContent">
-                <p class="text-muted">Search an artist to load the dossier — members, birthplaces, and source notes.</p>
+                <p class="text-muted">Search for an artist to see detailed information including band members, birth places, and more.</p>
               </div>
             </div>
           </div>
           
           <div class="col-lg-6">
             <div class="timeline-container" id="timelineContainer">
-              <h4>Chronology</h4>
+              <h4><i class="bi-clock-history"></i> Timeline</h4>
               <div class="loading" id="timelineLoading" style="display: none;">
                 <div class="spinner"></div>
                 <p>Loading timeline...</p>
               </div>
               <div id="timelineContent">
-                <p class="text-muted">Dated events appear here after a search — birth, formation, and releases when the sources have them.</p>
+                <p class="text-muted">Chronological events will appear here after searching.</p>
                 <div id="timeline" style="max-height: 400px; overflow-y: auto;">
                   <!-- Timeline events will be added here -->
                 </div>
@@ -160,14 +858,14 @@
         <!-- Row 2: Band Members and Map -->
         <div class="row">
           <div class="col-lg-8">
-            <div class="band-members" id="bandMembers">
-              <h4 class="mb-3">Members <small class="text-muted">(click a name to pin the map)</small></h4>
+            <div class="band-members" id="bandMembers" style="background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 6px 18px rgba(0,0,0,.08);">
+              <h4 class="mb-3"><i class="bi-people"></i> Band Members <small class="text-muted" style="font-size: 0.8rem;">(click to see on map)</small></h4>
               <div class="loading" id="membersLoading" style="display: none;">
                 <div class="spinner"></div>
                 <p>Loading members...</p>
               </div>
               <div id="membersContent">
-                <p class="text-muted">Members and recorded origins appear here after a search.</p>
+                <p class="text-muted">Band members and their locations will appear here after searching.</p>
                 <div id="membersList" class="row">
                   <!-- Band members will be added here as cards -->
                 </div>
@@ -176,18 +874,18 @@
           </div>
           
           <div class="col-lg-4">
-            <div class="map-container" id="mapContainer">
-              <h4>Origins map</h4>
+            <div class="map-container" id="mapContainer" style="position: sticky; top: 20px;">
+              <h4><i class="bi-geo-alt"></i> Birth Places Map</h4>
               <div class="loading" id="mapLoading" style="display: none;">
                 <div class="spinner"></div>
                 <p>Loading map...</p>
               </div>
               <div id="mapContent">
-                <p class="text-muted">Birth and formation pins appear after a search. Teal star = personal birth; amber notes = band formation.</p>
-                <div id="map">
+                <p class="text-muted">Artist birth places will appear on the map after searching.</p>
+                <div id="map" style="height: 500px; width: 100%; border-radius: 8px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: #6c757d;">
                   <div class="text-center">
-                    <i class="bi-map" aria-hidden="true"></i>
-                    <p class="mt-2 mb-0">Map loads here</p>
+                    <i class="bi-map" style="font-size: 3rem;"></i>
+                    <p class="mt-2">Map will load here</p>
                   </div>
                 </div>
               </div>
@@ -199,10 +897,10 @@
   </div>
 
   <!-- YouTube Videos Section -->
-  <div class="card mb-4 mr-panel">
+  <div class="card mb-4" style="background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-radius: 16px; box-shadow: 0 6px 18px rgba(0,0,0,.08);">
     <div class="card-header music-panel-header">
       <h5 class="mb-0">
-        Related recordings
+        <i class="bi-youtube"></i> YouTube Videos
         <button class="btn btn-sm btn-outline-light float-right" type="button" data-toggle="collapse" data-target="#youtubeVideos" aria-expanded="false">
           <i class="bi-chevron-down"></i>
         </button>
@@ -231,10 +929,10 @@
   </div>
 
   <!-- Voice Commands & AI Assistant Help Section -->
-  <div class="card mb-4 mr-panel">
+  <div class="card mb-4" style="background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-radius: 16px; box-shadow: 0 6px 18px rgba(0,0,0,.08);">
     <div class="card-header music-panel-header">
       <h5 class="mb-0">
-        Field notes — voice &amp; how to use
+        <i class="bi-mic"></i> Voice Commands & Instructions
         <button class="btn btn-sm btn-outline-light float-right" type="button" data-toggle="collapse" data-target="#voiceCommandsHelp" aria-expanded="false" id="voiceCommandsHelpToggle">
           <i class="bi-chevron-down"></i>
         </button>
@@ -312,8 +1010,8 @@
             </ul>
           </div>
           <div class="col-md-6">
-            <h6>About this desk</h6>
-            <p class="mb-0">This field-research desk combines Wikipedia, Wikidata, MusicBrainz, Google Knowledge Graph, and YouTube. Treat ChatGPT as context. Click a member to focus their origin on the map.</p>
+            <h6><i class="bi-info-circle"></i> About This System</h6>
+            <p class="mb-0">This music research system combines multiple APIs including Wikipedia, Wikidata, MusicBrainz, Google Knowledge Graph, and YouTube to provide comprehensive information about artists and bands. Click on band members in the sidebar to see their birth places on the interactive map.</p>
           </div>
         </div>
       </div>
@@ -321,11 +1019,23 @@
   </div>
 </main>
 
-<footer class="mr-footer">
-  <p class="mb-2"><a href="/">DevConnect Labs home</a></p>
-  <div data-lane-site-credit></div>
+<footer class="footer">
+  <div class="container text-center">
+    <div class="footer-content">
+      <span class="zen-element">🐢</span>
+      <span class="zen-dot"></span>
+      <span class="zen-element"><strong>David E Lane</strong></span>
+      <span class="zen-dot"></span>
+      <span class="zen-element">Powered by Cursor AI</span>
+      <span class="zen-dot"></span>
+      <span class="zen-element">ChatGPT™</span>
+      <span class="zen-dot"></span>
+      <span class="zen-element">All Rights Reserved</span>
+      <span class="zen-dot"></span>
+      <span class="zen-element">🦨</span>
+    </div>
+  </div>
 </footer>
-<script src="/family/js/lane-site-credit.js"></script>
 
 <script src="/shared/speech-recognition.js"></script>
 <script src="/shared/voice-widget.js"></script>
@@ -3133,7 +3843,6 @@ window.stopSpeaking = function() {
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="/music/js/music-heygen-popup.js"></script>
-<script src="/shared/dark-mode.js"></script>
 </body>
 </html>
 
