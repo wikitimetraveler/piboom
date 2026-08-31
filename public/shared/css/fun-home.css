@@ -575,6 +575,48 @@ body.fun-home--solar-system .fun-hero__stage {
   pointer-events: none;
 }
 
+/* Art-direction sun — stage-left glow matching shared shader sunDir */
+.fun-hero__sun {
+  position: absolute;
+  left: -4%;
+  top: 18%;
+  z-index: 0;
+  width: min(14vw, 7.5rem);
+  height: min(14vw, 7.5rem);
+  border-radius: 50%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 42% 40%,
+      rgba(255, 244, 210, 0.95) 0%,
+      rgba(255, 196, 90, 0.55) 28%,
+      rgba(255, 140, 40, 0.18) 55%,
+      transparent 72%);
+  filter: blur(0.5px);
+  opacity: 0.88;
+  animation: funSunPulse 9s ease-in-out infinite;
+}
+
+body[data-theme="dark"] .fun-hero__sun {
+  opacity: 0.72;
+  background:
+    radial-gradient(circle at 42% 40%,
+      rgba(255, 236, 190, 0.9) 0%,
+      rgba(255, 170, 70, 0.45) 30%,
+      rgba(255, 120, 40, 0.12) 58%,
+      transparent 74%);
+}
+
+@keyframes funSunPulse {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.06); opacity: 0.95; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fun-hero__sun {
+    animation: none;
+  }
+}
+
 .fun-hero__planets {
   display: flex;
   flex-wrap: wrap;
@@ -628,11 +670,20 @@ body.fun-home--dual-globe .fun-hero__pane--crystal {
 }
 
 body.fun-home--solar-system .fun-hero__pane--planet {
-  width: 8.75rem;
+  --planet-scale: 1;
+  width: clamp(3.5rem, calc(8.25rem * var(--planet-scale, 1)), 17rem);
+}
+
+body.fun-home--solar-system .fun-hero__pane--planet.fun-hero__pane--ringed {
+  width: clamp(5.5rem, calc(8.25rem * var(--planet-scale, 1) * 1.55), 22rem);
 }
 
 body.fun-home--solar-system .fun-hero__pane--planet.is-enlarged {
   width: min(48vw, 24rem);
+}
+
+body.fun-home--solar-system .fun-hero__pane--planet.fun-hero__pane--ringed.is-enlarged {
+  width: min(56vw, 28rem);
 }
 
 body.fun-home--solar-system .fun-hero__pane--crystal {
@@ -1834,11 +1885,26 @@ body[data-theme="dark"] .fun-card:hover {
   }
 
   body.fun-home--solar-system .fun-hero__pane--planet {
-    width: 5.75rem;
+    width: clamp(3.1rem, calc(5.5rem * var(--planet-scale, 1)), 11rem);
+  }
+
+  body.fun-home--solar-system .fun-hero__pane--planet.fun-hero__pane--ringed {
+    width: clamp(4.5rem, calc(5.5rem * var(--planet-scale, 1) * 1.5), 14rem);
   }
 
   body.fun-home--solar-system .fun-hero__pane--planet.is-enlarged {
     width: min(56vw, 16rem);
+  }
+
+  body.fun-home--solar-system .fun-hero__pane--planet.fun-hero__pane--ringed.is-enlarged {
+    width: min(64vw, 19rem);
+  }
+
+  .fun-hero__sun {
+    width: min(18vw, 5rem);
+    height: min(18vw, 5rem);
+    left: -2%;
+    top: 12%;
   }
 
   body.fun-home--solar-system .fun-hero__pane--crystal {
@@ -1910,11 +1976,27 @@ body[data-theme="dark"] .fun-card:hover {
   }
 
   body.fun-home--solar-system .fun-hero__pane--planet {
-    width: 4.5rem;
+    width: clamp(2.85rem, calc(4.25rem * var(--planet-scale, 1)), 8.5rem);
+  }
+
+  body.fun-home--solar-system .fun-hero__pane--planet.fun-hero__pane--ringed {
+    width: clamp(4rem, calc(4.25rem * var(--planet-scale, 1) * 1.45), 11rem);
   }
 
   body.fun-home--solar-system .fun-hero__pane--planet.is-enlarged {
     width: min(62vw, 13.5rem);
+  }
+
+  body.fun-home--solar-system .fun-hero__pane--planet.fun-hero__pane--ringed.is-enlarged {
+    width: min(72vw, 16rem);
+  }
+
+  .fun-hero__sun {
+    width: 3.25rem;
+    height: 3.25rem;
+    left: 0;
+    top: 8%;
+    opacity: 0.7;
   }
 
   .fun-hero__orb {

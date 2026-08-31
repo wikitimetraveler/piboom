@@ -852,13 +852,48 @@
     });
   }
 
+  /** Apply compressed radius scale + ring pane class from WebGpuGlobe.BODIES. */
+  function applyPlanetScales(Globe) {
+    if (!Globe || typeof Globe.resolveBody !== 'function') return;
+    const ids = Globe.HERO_BODIES || [];
+    ids.forEach((id) => {
+      const spec = Globe.resolveBody(id);
+      const pane = document.getElementById(spec.paneId || '');
+      if (!pane) return;
+      const scale =
+        typeof Globe.visualScale === 'function'
+          ? Globe.visualScale(spec.radiusKm)
+          : 1;
+      pane.style.setProperty('--planet-scale', String(scale));
+      pane.setAttribute('data-scale', String(scale));
+      if (spec.rings) pane.classList.add('fun-hero__pane--ringed');
+      else pane.classList.remove('fun-hero__pane--ringed');
+    });
+  }
+
+  function ensureHeroSunGlow() {
+    const stage = document.querySelector('.fun-hero__stage');
+    if (!stage || stage.querySelector('.fun-hero__sun')) return;
+    const sun = document.createElement('div');
+    sun.className = 'fun-hero__sun';
+    sun.setAttribute('aria-hidden', 'true');
+    stage.insertBefore(sun, stage.firstChild);
+  }
+
   async function startNasaGlobe() {
     document.body.classList.add('fun-home--solar-system');
+    ensureHeroSunGlow();
 
     const Globe = window.WebGpuGlobe;
     const mounts = {};
+    applyPlanetScales(Globe);
     initGlobeEnlarge(mounts);
     if (!Globe || !window.WebGpuRuntime) return;
+
+    if (typeof Globe.ensureHeroSync === 'function') {
+      const sync = Globe.ensureHeroSync();
+      if (Globe.DEFAULT_SUN_DIR) sync.sunDir = { ...Globe.DEFAULT_SUN_DIR };
+    }
 
     const ids = Globe.HERO_BODIES || ['earth', 'moon', 'mars'];
     try {

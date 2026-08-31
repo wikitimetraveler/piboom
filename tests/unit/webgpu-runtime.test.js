@@ -77,6 +77,44 @@ describe('WebGpuGlobe', () => {
     expect(WebGpuGlobe.LAVA_SEEDS.length).toBeGreaterThan(0);
   });
 
+  test('BODIES carry radius, tilt, spin, and Saturn ring bounds', () => {
+    const earth = WebGpuGlobe.resolveBody('earth');
+    const saturn = WebGpuGlobe.resolveBody('saturn');
+    const uranus = WebGpuGlobe.resolveBody('uranus');
+    const venus = WebGpuGlobe.resolveBody('venus');
+    expect(earth.radiusKm).toBe(6371);
+    expect(earth.tiltDeg).toBeCloseTo(23.4, 5);
+    expect(venus.spinRate).toBeLessThan(0);
+    expect(uranus.tiltDeg).toBeCloseTo(97.8, 5);
+    expect(saturn.rings).toEqual(
+      expect.objectContaining({
+        inner: 1.11,
+        outer: 2.27,
+        cassini: 1.95,
+      })
+    );
+    expect(saturn.rings.inner).toBeLessThan(saturn.rings.outer);
+    expect(WebGpuGlobe.resolveBody('jupiter').rings).toBeNull();
+  });
+
+  test('visualScale is monotonic Pluto < Earth < Jupiter and clamped', () => {
+    const pluto = WebGpuGlobe.visualScale(WebGpuGlobe.resolveBody('pluto').radiusKm);
+    const earth = WebGpuGlobe.visualScale(WebGpuGlobe.resolveBody('earth').radiusKm);
+    const jupiter = WebGpuGlobe.visualScale(WebGpuGlobe.resolveBody('jupiter').radiusKm);
+    expect(pluto).toBeLessThan(earth);
+    expect(earth).toBeLessThan(jupiter);
+    expect(pluto).toBeGreaterThanOrEqual(0.42);
+    expect(jupiter).toBeLessThanOrEqual(2.15);
+    expect(WebGpuGlobe.visualScale(0)).toBe(1);
+    expect(WebGpuGlobe.visualScale(NaN)).toBe(1);
+  });
+
+  test('DEFAULT_SUN_DIR points stage-left (positive X)', () => {
+    expect(WebGpuGlobe.DEFAULT_SUN_DIR.x).toBeGreaterThan(0);
+    expect(WebGpuGlobe.DEFAULT_SUN_DIR.y).toBeGreaterThan(0);
+    const sync = WebGpuGlobe.ensureHeroSync();
+    expect(sync.sunDir.x).toBeGreaterThan(0);
+  });
   test('capFirmsPoints drops bad coords and respects max', () => {
     const rows = [
       { lat: 34.1, lng: -118.2, raw: { frp: 40, brightness: 340 } },

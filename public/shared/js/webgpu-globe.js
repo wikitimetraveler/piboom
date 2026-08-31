@@ -12,6 +12,22 @@
   const TEX_NIGHT = '/shared/textures/earth/earth-lights.jpg';
   const TEX_MOON = '/shared/textures/moon/moon-color.jpg';
 
+  /** Shared art-direction sun — light from stage-left (+ slight up). */
+  const DEFAULT_SUN_DIR = { x: 0.85, y: 0.28, z: 0.42 };
+
+  const EARTH_RADIUS_KM = 6371;
+
+  /**
+   * Compressed family-portrait scale (not true AU / linear radius).
+   * visualScale = clamp((R / R_earth)^0.32, 0.42, 2.15)
+   */
+  function visualScale(radiusKm) {
+    const r = Number(radiusKm);
+    if (!Number.isFinite(r) || r <= 0) return 1;
+    const s = Math.pow(r / EARTH_RADIUS_KM, 0.32);
+    return Math.min(2.15, Math.max(0.42, s));
+  }
+
   const BODIES = {
     mercury: {
       id: 'mercury',
@@ -21,6 +37,10 @@
       bodyType: 2,
       canvasId: 'heroMercuryCanvas',
       paneId: 'heroMercuryPane',
+      radiusKm: 2440,
+      tiltDeg: 0.03,
+      spinRate: 0.06,
+      rings: null,
     },
     venus: {
       id: 'venus',
@@ -30,6 +50,10 @@
       bodyType: 3,
       canvasId: 'heroVenusCanvas',
       paneId: 'heroVenusPane',
+      radiusKm: 6052,
+      tiltDeg: 177.4,
+      spinRate: -0.04,
+      rings: null,
     },
     earth: {
       id: 'earth',
@@ -40,6 +64,10 @@
       bodyType: 0,
       canvasId: 'heroNasaCanvas',
       paneId: 'heroNasaPane',
+      radiusKm: 6371,
+      tiltDeg: 23.4,
+      spinRate: 0.18,
+      rings: null,
     },
     moon: {
       id: 'moon',
@@ -51,6 +79,10 @@
       canvasId: 'heroMoonCanvas',
       paneId: 'heroMoonPane',
       href: '/family/lane-museum.html?lunar=1',
+      radiusKm: 1737,
+      tiltDeg: 6.7,
+      spinRate: 0.05,
+      rings: null,
     },
     mars: {
       id: 'mars',
@@ -60,6 +92,10 @@
       bodyType: 4,
       canvasId: 'heroMarsCanvas',
       paneId: 'heroMarsPane',
+      radiusKm: 3390,
+      tiltDeg: 25.2,
+      spinRate: 0.17,
+      rings: null,
     },
     jupiter: {
       id: 'jupiter',
@@ -69,6 +105,10 @@
       bodyType: 5,
       canvasId: 'heroJupiterCanvas',
       paneId: 'heroJupiterPane',
+      radiusKm: 69911,
+      tiltDeg: 3.1,
+      spinRate: 0.42,
+      rings: null,
     },
     saturn: {
       id: 'saturn',
@@ -78,6 +118,10 @@
       bodyType: 6,
       canvasId: 'heroSaturnCanvas',
       paneId: 'heroSaturnPane',
+      radiusKm: 58232,
+      tiltDeg: 26.7,
+      spinRate: 0.38,
+      rings: { inner: 1.11, outer: 2.27, alpha: 0.88, cassini: 1.95 },
     },
     uranus: {
       id: 'uranus',
@@ -87,6 +131,10 @@
       bodyType: 7,
       canvasId: 'heroUranusCanvas',
       paneId: 'heroUranusPane',
+      radiusKm: 25362,
+      tiltDeg: 97.8,
+      spinRate: -0.22,
+      rings: { inner: 1.55, outer: 2.05, alpha: 0.2, cassini: 0 },
     },
     neptune: {
       id: 'neptune',
@@ -96,6 +144,10 @@
       bodyType: 8,
       canvasId: 'heroNeptuneCanvas',
       paneId: 'heroNeptunePane',
+      radiusKm: 24622,
+      tiltDeg: 28.3,
+      spinRate: 0.28,
+      rings: { inner: 1.6, outer: 2.15, alpha: 0.09, cassini: 0 },
     },
     pluto: {
       id: 'pluto',
@@ -105,6 +157,10 @@
       bodyType: 9,
       canvasId: 'heroPlutoCanvas',
       paneId: 'heroPlutoPane',
+      radiusKm: 1188,
+      tiltDeg: 119.6,
+      spinRate: -0.08,
+      rings: null,
     },
   };
 
@@ -159,8 +215,24 @@ struct Uniforms {
   pinOn: f32,
   pinLat: f32,
   pinLon: f32,
+  sunX: f32,
+  sunY: f32,
+  sunZ: f32,
+  tilt: f32,
+  spinRate: f32,
+  ringInner: f32,
+  ringOuter: f32,
+  ringAlpha: f32,
+  cassini: f32,
+  camPull: f32,
   _p0: f32,
   _p1: f32,
+  _p2: f32,
+  _p3: f32,
+  _p4: f32,
+  _p5: f32,
+  _p6: f32,
+  _p7: f32,
 };
 
 struct Fire {
@@ -233,10 +305,13 @@ fn lonLatFromNormal(n: vec3f) -> vec2f {
 }
 
 fn equirectUv(lonLat: vec2f) -> vec2f {
-  // +lat → high V so shared blit (flips Y) shows North at the top of the canvas
   let u = fract(lonLat.x / (2.0 * 3.14159265) + 0.5);
   let v = 0.5 + lonLat.y / 3.14159265;
   return vec2f(u, clamp(v, 0.0, 1.0));
+}
+
+fn toBody(p: vec3f, spin: f32, tilt: f32) -> vec3f {
+  return rotY(rotX(p, -tilt), spin);
 }
 
 fn proceduralAlbedo(lonLat: vec2f, dark: f32) -> vec3f {
@@ -299,6 +374,40 @@ fn fireGlow(lonLat: vec2f) -> f32 {
   return g;
 }
 
+fn shadeRing(ro: vec3f, rd: vec3f, tSphere: f32, spin: f32, tilt: f32, lightDir: vec3f) -> vec4f {
+  if (u.ringOuter <= u.ringInner || u.ringAlpha <= 0.001) {
+    return vec4f(0.0);
+  }
+  let roB = toBody(ro, spin, tilt);
+  let rdB = toBody(rd, spin, tilt);
+  if (abs(rdB.y) < 1e-5) { return vec4f(0.0); }
+  let t = -roB.y / rdB.y;
+  if (t < 0.001) { return vec4f(0.0); }
+  if (tSphere > 0.0 && t > tSphere) { return vec4f(0.0); }
+  let hitB = roB + rdB * t;
+  let rho = length(vec2f(hitB.x, hitB.z));
+  if (rho < u.ringInner || rho > u.ringOuter) { return vec4f(0.0); }
+  var dens = 1.0;
+  if (u.cassini > 0.5) {
+    let gap = abs(rho - u.cassini);
+    dens = dens * mix(0.08, 1.0, smoothstep(0.04, 0.12, gap));
+  }
+  let edge = smoothstep(u.ringInner, u.ringInner + 0.06, rho)
+    * (1.0 - smoothstep(u.ringOuter - 0.08, u.ringOuter, rho));
+  dens = dens * edge;
+  let band = 0.55 + 0.45 * sin(rho * 28.0 + hitB.x * 3.0);
+  var albedo = mix(vec3f(0.72, 0.66, 0.52), vec3f(0.92, 0.88, 0.78), band);
+  if (u.bodyType > 6.5) {
+    albedo = mix(vec3f(0.62, 0.78, 0.82), vec3f(0.78, 0.88, 0.9), band);
+  }
+  let nFace = select(-1.0, 1.0, rdB.y < 0.0);
+  let nW = normalize(rotX(vec3f(0.0, nFace, 0.0), tilt));
+  let ndl = 0.35 + 0.65 * max(dot(nW, lightDir), 0.0);
+  albedo = albedo * ndl;
+  let a = clamp(u.ringAlpha * dens * (0.55 + 0.45 * band), 0.0, 0.95);
+  return vec4f(albedo, a);
+}
+
 @compute @workgroup_size(8, 8, 1)
 fn main(@builtin(global_invocation_id) id: vec3u) {
   let w = u32(u.width);
@@ -311,8 +420,12 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
 
   let isEarth = u.bodyType < 0.5;
   let isMoon = u.bodyType > 0.5 && u.bodyType < 1.5;
-  let spinRate = select(0.18, 0.11, !isEarth);
-  var spin = select(u.time * spinRate, select(0.35, 0.55, isMoon), u.reduced > 0.5);
+  let tilt = u.tilt;
+  var spin = select(
+    u.time * u.spinRate,
+    select(0.35, 0.55, isMoon) * sign(u.spinRate + 0.0001),
+    u.reduced > 0.5
+  );
   var lookY = u.lookY;
   if (u.pinOn > 0.5) {
     let pinLonR = u.pinLon * (3.14159265 / 180.0);
@@ -321,16 +434,17 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
     lookY = lookY + pinLatR * 0.9;
   }
   let zoomAmt = clamp((max(u.zoom, 1.0) - 1.0) / 1.4, 0.0, 1.0);
-  let camZ = mix(2.65, 1.28, zoomAmt);
+  let pull = max(u.camPull, 0.0);
+  let camZ = mix(2.65 + pull, 1.28 + pull * 0.35, zoomAmt);
   let ro = rotY(rotX(vec3f(0.0, 0.12, camZ), lookY), u.lookX);
   let ta = vec3f(0.0, 0.0, 0.0);
   let ww = normalize(ta - ro);
   let uu = normalize(cross(ww, vec3f(0.0, 1.0, 0.0)));
   let vv = cross(uu, ww);
   let rd = normalize(p.x * uu + p.y * vv + 1.85 * ww);
+  let lightDir = normalize(vec3f(u.sunX, u.sunY, u.sunZ));
 
   let tHit = hitSphere(ro, rd, 1.0);
-  // Transparent clear — shared CSS starfield / page gradient shows through
   var col = vec3f(0.0);
   var alpha = 0.0;
   let dark = u.night;
@@ -338,7 +452,7 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
   if (tHit > 0.0) {
     let hit = ro + rd * tHit;
     let n = normalize(hit);
-    let local = rotY(hit, spin);
+    let local = toBody(hit, spin, tilt);
     let nLocal = normalize(local);
     let lonLat = lonLatFromNormal(nLocal);
     let euv = equirectUv(lonLat);
@@ -353,22 +467,18 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
       albedo = day;
       if (isEarth) {
         let lights = textureSampleLevel(nightTex, earthSamp, euv, 0.0).rgb;
-        let lightDir = normalize(vec3f(0.65, 0.35, 0.55));
         let ndl = max(dot(n, lightDir), 0.0);
         let nightSide = pow(1.0 - ndl, 1.6);
         albedo = albedo * (0.22 + 0.88 * ndl);
         albedo = albedo + lights * nightSide * (0.55 + 0.85 * dark);
       } else {
-        let lightDir = normalize(vec3f(0.55, 0.4, 0.65));
         let ndl = max(dot(n, lightDir), 0.0);
         albedo = albedo * (0.18 + 0.92 * ndl);
       }
     } else if (isMoon) {
-      let lightDir = normalize(vec3f(0.55, 0.4, 0.65));
       let ndl = max(dot(n, lightDir), 0.0);
       albedo = albedo * (0.18 + 0.92 * ndl);
     } else {
-      let lightDir = normalize(vec3f(0.65, 0.35, 0.55));
       let ndl = max(dot(n, lightDir), 0.0);
       let nightSide = pow(1.0 - ndl, 1.6);
       let city = step(0.86, hash21(floor(lonLat * vec2f(48.0, 48.0)))) * step(0.5, albedo.g);
@@ -414,6 +524,18 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
       );
       col = rim;
       alpha = select(0.16, 0.08, isMoon);
+    }
+  }
+
+  let ringCol = shadeRing(ro, rd, tHit, spin, tilt, lightDir);
+  if (ringCol.a > 0.001) {
+    if (alpha < 0.001) {
+      col = ringCol.rgb;
+      alpha = ringCol.a;
+    } else {
+      let ra = ringCol.a;
+      col = mix(col, ringCol.rgb, ra * 0.85);
+      alpha = max(alpha, ra);
     }
   }
 
@@ -556,7 +678,10 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
         lookY: 0,
         targetX: 0,
         targetY: 0,
+        sunDir: { ...DEFAULT_SUN_DIR },
       };
+    } else if (!root.FunHomeHeroSync.sunDir) {
+      root.FunHomeHeroSync.sunDir = { ...DEFAULT_SUN_DIR };
     }
     return root.FunHomeHeroSync;
   }
@@ -576,6 +701,10 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
     const format = gpu.format;
     const spec = resolveBody(opts && opts.body);
     const body = spec.id;
+    const rings = spec.rings || null;
+    const tiltRad = ((Number(spec.tiltDeg) || 0) * Math.PI) / 180;
+    const bodySpin = Number.isFinite(spec.spinRate) ? spec.spinRate : 0.11;
+    const camPull = rings ? Math.max(0.9, (rings.outer - 1) * 1.35) : 0;
     let destroyed = false;
     let raf = 0;
     let inView = true;
@@ -593,9 +722,9 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
     const sync = ensureHeroSync();
     const localLook = { lookX: 0, lookY: 0, targetX: 0, targetY: 0 };
 
-    const uniformData = new Float32Array(16);
+    const uniformData = new Float32Array(32);
     const uniformBuf = device.createBuffer({
-      size: 64,
+      size: 128,
       usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
     });
     const fireBuf = device.createBuffer({
@@ -649,7 +778,6 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
           ? 1.5
           : 2
       );
-      // Prefer the pane box; keep CSS sizing (do not set inline width/height).
       const pane = canvas.parentElement || stage;
       const cw = Math.max(1, pane.clientWidth || canvas.clientWidth || 420);
       const ch = Math.max(1, pane.clientHeight || canvas.clientHeight || cw);
@@ -693,6 +821,7 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
         lookY = sync.lookY;
       }
       const t = reduced ? 0 : (performance.now() - sync.t0) / 1000;
+      const sun = sync.sunDir || DEFAULT_SUN_DIR;
       uniformData[0] = t;
       uniformData[1] = nightValue();
       uniformData[2] = texW;
@@ -707,6 +836,16 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
       uniformData[11] = pinOn;
       uniformData[12] = pinLat;
       uniformData[13] = pinLon;
+      uniformData[14] = sun.x;
+      uniformData[15] = sun.y;
+      uniformData[16] = sun.z;
+      uniformData[17] = tiltRad;
+      uniformData[18] = bodySpin;
+      uniformData[19] = rings ? rings.inner : 0;
+      uniformData[20] = rings ? rings.outer : 0;
+      uniformData[21] = rings ? rings.alpha : 0;
+      uniformData[22] = rings && rings.cassini ? rings.cassini : 0;
+      uniformData[23] = camPull;
       device.queue.writeBuffer(uniformBuf, 0, uniformData);
 
       const computeBg = device.createBindGroup({
@@ -827,10 +966,13 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
     capFirmsPoints,
     ensureHeroSync,
     resolveBody,
+    visualScale,
     BODIES,
     HERO_BODIES,
     LANE_CRATER,
     LAVA_SEEDS,
+    DEFAULT_SUN_DIR,
+    EARTH_RADIUS_KM,
     MAX_FIRMS,
     TEX_DAY,
     TEX_NIGHT,
