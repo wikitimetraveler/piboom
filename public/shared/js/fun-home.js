@@ -130,10 +130,95 @@
     });
   }
 
-  /** Desert-sky twinkle field across the full hero top. */
+  /**
+   * Tonight's sky: catalog stars + Milky Way + naked-eye planets (FunHomeSky).
+   * Falls back to a light decorative field if the sky module is missing.
+   */
   function initDesertStarfield() {
     const host = document.getElementById('funHeroStars');
-    if (!host || host.childElementCount) return;
+    if (!host) return;
+    host.replaceChildren();
+    host.classList.add('fun-hero__stars--catalog');
+
+    const Sky = window.FunHomeSky;
+    if (!Sky || typeof Sky.projectSky !== 'function') {
+      seedFallbackStars(host);
+      return;
+    }
+
+    const mobile = window.matchMedia('(max-width: 991.98px)').matches;
+    const sky = Sky.projectSky(new Date(), Sky.DEFAULT_OBSERVER, {
+      fovAz: mobile ? 140 : 160,
+      minAlt: 4,
+      maxAlt: 88,
+    });
+
+    const mw = document.createElement('div');
+    mw.className = 'fun-hero__milkyway';
+    mw.setAttribute('aria-hidden', 'true');
+    if (sky.milkyWay && sky.milkyWay.length >= 2) {
+      const stops = sky.milkyWay
+        .map((p) => `${p.x.toFixed(1)}% ${p.y.toFixed(1)}%`)
+        .join(', ');
+      mw.style.setProperty('--mw-path', stops);
+      const mid = sky.milkyWay[Math.floor(sky.milkyWay.length / 2)];
+      const first = sky.milkyWay[0];
+      const last = sky.milkyWay[sky.milkyWay.length - 1];
+      const angle =
+        (Math.atan2(last.y - first.y, last.x - first.x) * 180) / Math.PI;
+      mw.style.left = mid.x.toFixed(2) + '%';
+      mw.style.top = mid.y.toFixed(2) + '%';
+      mw.style.setProperty('--mw-rot', angle.toFixed(1) + 'deg');
+      host.appendChild(mw);
+    }
+
+    const frag = document.createDocumentFragment();
+    const starCap = mobile ? 36 : 64;
+    const ranked = sky.stars.slice().sort((a, b) => a.mag - b.mag).slice(0, starCap);
+    ranked.forEach((s, i) => {
+      const el = document.createElement('span');
+      el.className = 'fun-hero__star';
+      if (s.bright) el.classList.add('fun-hero__star--bright');
+      if (s.flare) el.classList.add('fun-hero__star--flare');
+      el.title = s.name;
+      el.setAttribute('data-star', s.name);
+      el.style.left = s.x.toFixed(2) + '%';
+      el.style.top = s.y.toFixed(2) + '%';
+      el.style.width = s.size.toFixed(1) + 'px';
+      el.style.height = s.size.toFixed(1) + 'px';
+      el.style.setProperty('--twinkle-delay', ((i % 7) * 0.55).toFixed(2) + 's');
+      el.style.setProperty('--twinkle-dur', (2.8 + (i % 5) * 0.7).toFixed(2) + 's');
+      frag.appendChild(el);
+    });
+
+    sky.planets.forEach((p) => {
+      const el = document.createElement('span');
+      el.className = 'fun-hero__sky-planet fun-hero__sky-planet--' + p.id;
+      el.title = p.name;
+      el.setAttribute('data-planet', p.id);
+      el.setAttribute('aria-label', p.name);
+      el.style.left = p.x.toFixed(2) + '%';
+      el.style.top = p.y.toFixed(2) + '%';
+      frag.appendChild(el);
+    });
+    host.appendChild(frag);
+
+    let credit = document.getElementById('funHeroSkyCredit');
+    if (!credit) {
+      credit = document.createElement('p');
+      credit.id = 'funHeroSkyCredit';
+      credit.className = 'fun-hero__sky-credit';
+      host.parentElement && host.parentElement.appendChild(credit);
+    }
+    const when = sky.date;
+    const label = sky.observer.label || 'eastern US';
+    const hh = when.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    credit.textContent = sky.usedEveningFallback
+      ? `Sky · ${label} · tonight ${hh}`
+      : `Sky · ${label} · now`;
+  }
+
+  function seedFallbackStars(host) {
     const count = window.matchMedia('(max-width: 991.98px)').matches ? 42 : 72;
     const frag = document.createDocumentFragment();
     for (let i = 0; i < count; i += 1) {

@@ -451,18 +451,124 @@ body[data-theme="zen"] .fun-hero::after {
   -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 58%, transparent 92%);
 }
 
+.fun-hero__milkyway {
+  position: absolute;
+  width: min(72vw, 38rem);
+  height: min(18vw, 9rem);
+  margin: 0;
+  transform: translate(-50%, -50%) rotate(var(--mw-rot, -28deg));
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(210, 220, 255, 0.22) 0%,
+    rgba(180, 190, 230, 0.1) 42%,
+    transparent 72%
+  );
+  filter: blur(10px);
+  opacity: 0.85;
+}
+
+body[data-theme="zen"] .fun-hero__milkyway {
+  opacity: 0.35;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgba(74, 144, 164, 0.18) 0%,
+    rgba(74, 144, 164, 0.06) 45%,
+    transparent 72%
+  );
+}
+
+.fun-hero__sky-planet {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  margin: 0;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: #ffe8b0;
+  box-shadow:
+    0 0 8px 2px rgba(255, 220, 150, 0.7),
+    0 0 16px 4px rgba(255, 180, 80, 0.25);
+  opacity: 0.95;
+}
+
+.fun-hero__sky-planet--moon {
+  width: 7px;
+  height: 7px;
+  background: #f2f0e8;
+  box-shadow:
+    0 0 10px 3px rgba(230, 230, 240, 0.75),
+    0 0 18px 5px rgba(180, 190, 220, 0.3);
+}
+
+.fun-hero__sky-planet--venus {
+  width: 6px;
+  height: 6px;
+  background: #fff6d0;
+}
+
+.fun-hero__sky-planet--mars {
+  background: #ff8a5c;
+  box-shadow:
+    0 0 8px 2px rgba(255, 120, 70, 0.65),
+    0 0 14px 3px rgba(200, 80, 40, 0.25);
+}
+
+.fun-hero__sky-planet--jupiter {
+  width: 6px;
+  height: 6px;
+  background: #f0d2a0;
+}
+
+.fun-hero__sky-planet--saturn {
+  background: #e8d4a8;
+}
+
+.fun-hero__sky-planet--mercury {
+  width: 4px;
+  height: 4px;
+  background: #d8d0c4;
+}
+
+.fun-hero__sky-credit {
+  position: absolute;
+  right: clamp(0.75rem, 2vw, 1.5rem);
+  bottom: clamp(4.5rem, 12vh, 7rem);
+  z-index: 4;
+  margin: 0;
+  max-width: 16rem;
+  text-align: right;
+  font-family: Outfit, system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: rgba(255, 250, 240, 0.55);
+  pointer-events: none;
+}
+
+body[data-theme="zen"] .fun-hero__sky-credit {
+  color: rgba(30, 55, 72, 0.55);
+}
+
+body[data-theme="zen"] .fun-hero__sky-planet {
+  opacity: 0.55;
+  filter: saturate(0.7);
+}
+
 .fun-hero__star {
   position: absolute;
   width: 2px;
   height: 2px;
   margin: 0;
   border-radius: 50%;
+  transform: translate(-50%, -50%);
   background: #fff;
   box-shadow: 0 0 4px 1px rgba(255, 250, 235, 0.55);
   opacity: 0.35;
   animation: funDesertTwinkle var(--twinkle-dur, 3.2s) ease-in-out infinite;
   animation-delay: var(--twinkle-delay, 0s);
-  will-change: opacity, transform;
+  will-change: opacity;
 }
 
 .fun-hero__star--bright {
@@ -513,19 +619,15 @@ body[data-theme="zen"] .fun-hero__star--bright {
 @keyframes funDesertTwinkle {
   0%, 100% {
     opacity: 0.22;
-    transform: scale(0.85);
   }
   35% {
     opacity: 0.95;
-    transform: scale(1.15);
   }
   55% {
     opacity: 0.4;
-    transform: scale(0.95);
   }
   75% {
     opacity: 1;
-    transform: scale(1.25);
   }
 }
 
