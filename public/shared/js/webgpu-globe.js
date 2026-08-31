@@ -25,7 +25,7 @@
     const r = Number(radiusKm);
     if (!Number.isFinite(r) || r <= 0) return 1;
     const s = Math.pow(r / EARTH_RADIUS_KM, 0.32);
-    return Math.min(2.15, Math.max(0.42, s));
+    return Math.min(1.75, Math.max(0.48, s));
   }
 
   const BODIES = {

@@ -103,8 +103,8 @@ describe('WebGpuGlobe', () => {
     const jupiter = WebGpuGlobe.visualScale(WebGpuGlobe.resolveBody('jupiter').radiusKm);
     expect(pluto).toBeLessThan(earth);
     expect(earth).toBeLessThan(jupiter);
-    expect(pluto).toBeGreaterThanOrEqual(0.42);
-    expect(jupiter).toBeLessThanOrEqual(2.15);
+    expect(pluto).toBeGreaterThanOrEqual(0.48);
+    expect(jupiter).toBeLessThanOrEqual(1.75);
     expect(WebGpuGlobe.visualScale(0)).toBe(1);
     expect(WebGpuGlobe.visualScale(NaN)).toBe(1);
   });
