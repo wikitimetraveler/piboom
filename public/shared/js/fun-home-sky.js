@@ -231,12 +231,13 @@
     const projOpts = opts || {};
     const fovAz = projOpts.fovAz || 160;
     const minAlt = projOpts.minAlt || 4;
+    const centerAz = Number.isFinite(projOpts.centerAz) ? projOpts.centerAz : 180;
     const points = [];
-    const startAz = 180 - fovAz / 2;
-    const endAz = 180 + fovAz / 2;
+    const startAz = centerAz - fovAz / 2;
+    const endAz = centerAz + fovAz / 2;
     for (let az = startAz; az <= endAz; az += 3) {
-      const xy = projectAltAz(minAlt, az, projOpts);
-      if (xy) points.push({ x: xy.x, y: xy.y, az });
+      const xy = projectAltAz(minAlt, norm360(az), projOpts);
+      if (xy) points.push({ x: xy.x, y: xy.y, az: norm360(az) });
     }
     const cardinals = [];
     const dirs = [
@@ -247,7 +248,7 @@
     ];
     for (let i = 0; i < dirs.length; i += 1) {
       const d = dirs[i];
-      let delta = d.az - 180;
+      let delta = d.az - centerAz;
       while (delta > 180) delta -= 360;
       while (delta < -180) delta += 360;
       if (Math.abs(delta) > fovAz / 2 + 2) continue;
@@ -372,14 +373,17 @@
     const fovAz = (opts && opts.fovAz) || 160;
     const minAlt = (opts && opts.minAlt) || 2;
     const maxAlt = (opts && opts.maxAlt) || 88;
+    const centerAz = Number.isFinite(opts && opts.centerAz) ? opts.centerAz : 180;
+    const yScale = (opts && opts.yScale) || 78;
+    const yMax = (opts && opts.yMax) || 82;
     if (alt < minAlt || alt > maxAlt) return null;
-    let dAz = az - 180;
+    let dAz = az - centerAz;
     while (dAz > 180) dAz -= 360;
     while (dAz < -180) dAz += 360;
     if (Math.abs(dAz) > fovAz / 2) return null;
     const x = 50 + (dAz / (fovAz / 2)) * 48;
-    const y = ((maxAlt - alt) / (maxAlt - minAlt)) * 78;
-    if (x < 0 || x > 100 || y < 0 || y > 82) return null;
+    const y = ((maxAlt - alt) / (maxAlt - minAlt)) * yScale;
+    if (x < 0 || x > 100 || y < 0 || y > yMax) return null;
     return { x, y };
   }
 

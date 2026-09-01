@@ -91,6 +91,7 @@
     { name: 'Coffee Dreams', url: '/entertainment/coffee-dreams.html', category: 'Entertainment', keywords: 'coffee cafe gallery password vietnamese coffee shop girls glam' },
     { name: 'The Boombox', url: '/entertainment/player.html', category: 'Entertainment', keywords: 'player audio' },
     { name: 'Psychedelic Visualizer', url: '/entertainment/visualizer.html', category: 'Entertainment', keywords: 'visualizer trippy' },
+    { name: 'Planetarium', url: '/planetarium/', category: 'Entertainment', keywords: 'stars sky constellations planets astronomy moon' },
     { name: 'Black Light Zone', url: '/entertainment/blacklight.html', category: 'Entertainment', keywords: 'cosmic neon' },
     { name: 'Black Light Poster', url: '/entertainment/blacklight-poster.html', category: 'Entertainment', keywords: 'sound reactive uv poster webgpu' },
     { name: 'Poster Generator', url: '/entertainment/poster-generator.html', category: 'Entertainment', keywords: 'AI poster art' },

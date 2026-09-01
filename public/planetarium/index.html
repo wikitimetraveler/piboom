@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Planetarium | DevConnect Labs</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/shared/css/planetarium.css?v=1"/>
+  <script src="/shared/modern-navbar.js"></script>
+</head>
+<body class="plan-page">
+  <modern-navbar></modern-navbar>
+  <main class="plan-wrap">
+    <header class="plan-header">
+      <h1><i class="bi bi-stars" aria-hidden="true"></i> Planetarium</h1>
+      <p>
+        Full-sky view for any date and time — bright stars, constellations, Milky Way band,
+        and naked-eye planets. Same math as the home hero, with compass-facing and shareable links.
+      </p>
+    </header>
+
+    <p class="plan-status" id="planStatus" role="status" aria-live="polite"></p>
+
+    <div class="plan-controls" aria-label="Sky controls">
+      <label>
+        Date
+        <input type="date" id="planDate" class="form-control"/>
+      </label>
+      <label>
+        Time
+        <input type="time" id="planTime" class="form-control" step="60"/>
+      </label>
+      <label>
+        Facing
+        <select id="planFacing" class="form-control">
+          <option value="south">South</option>
+          <option value="east">East</option>
+          <option value="west">West</option>
+          <option value="north">North</option>
+        </select>
+      </label>
+      <button type="button" class="plan-btn" id="planNow">Now</button>
+      <button type="button" class="plan-btn plan-btn--ghost" id="planTonight">Tonight 9 PM</button>
+      <button type="button" class="plan-btn plan-btn--ghost" id="planGeolocate">
+        <i class="bi bi-geo-alt" aria-hidden="true"></i> My location
+      </button>
+      <button type="button" class="plan-btn plan-btn--ghost" id="planShare">
+        <i class="bi bi-link-45deg" aria-hidden="true"></i> Copy link
+      </button>
+    </div>
+
+    <p id="planLocation" class="mb-2 small text-muted"></p>
+
+    <div class="plan-layout">
+      <div class="plan-stage" aria-label="Sky dome">
+        <div class="plan-sky" id="planSky" aria-hidden="true"></div>
+      </div>
+
+      <aside class="plan-sidebar">
+        <section class="plan-panel" aria-labelledby="planPlanetsHeading">
+          <h2 id="planPlanetsHeading">Planets up</h2>
+          <table class="plan-planets">
+            <thead>
+              <tr>
+                <th scope="col">Body</th>
+                <th scope="col">Alt</th>
+                <th scope="col">Az</th>
+              </tr>
+            </thead>
+            <tbody id="planPlanetBody"></tbody>
+          </table>
+        </section>
+
+        <section class="plan-panel" aria-labelledby="planAsterismsHeading">
+          <h2 id="planAsterismsHeading">Asterisms</h2>
+          <ul class="plan-asterisms" id="planAsterisms"></ul>
+        </section>
+      </aside>
+    </div>
+
+    <p class="plan-footer-links">
+      <a href="/">Home hero sky</a>
+      ·
+      <a href="/entertainment/visualizer.html">Psychedelic Visualizer</a>
+      ·
+      <a href="/entertainment/index.html">Entertainment Hub</a>
+    </p>
+  </main>
+
+  <script src="/shared/js/fun-home-sky.js?v=5"></script>
+  <script src="/shared/js/planetarium.js?v=1"></script>
+</body>
+</html>
