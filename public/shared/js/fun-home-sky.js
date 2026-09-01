@@ -191,6 +191,89 @@
     return `Sky · ${label} · ${timeWord} · ${phase} · ${planets}`;
   }
 
+  /** Illuminated fraction 0 (new) → 1 (full) for moon disc art. */
+  function moonPhaseFraction(date) {
+    const sunLon = sunEclipticLon(date);
+    const moon = moonEcliptic(date);
+    let phase = (moon.lon - sunLon) / 360;
+    if (phase < 0) phase += 1;
+    return phase;
+  }
+
+  /** Horizon arc + cardinal labels in hero projection space. */
+  function projectHorizon(opts) {
+    const projOpts = opts || {};
+    const fovAz = projOpts.fovAz || 160;
+    const minAlt = projOpts.minAlt || 4;
+    const points = [];
+    const startAz = 180 - fovAz / 2;
+    const endAz = 180 + fovAz / 2;
+    for (let az = startAz; az <= endAz; az += 3) {
+      const xy = projectAltAz(minAlt, az, projOpts);
+      if (xy) points.push({ x: xy.x, y: xy.y, az });
+    }
+    const cardinals = [];
+    const dirs = [
+      { az: 0, label: 'N' },
+      { az: 90, label: 'E' },
+      { az: 180, label: 'S' },
+      { az: 270, label: 'W' },
+    ];
+    for (let i = 0; i < dirs.length; i += 1) {
+      const d = dirs[i];
+      let delta = d.az - 180;
+      while (delta > 180) delta -= 360;
+      while (delta < -180) delta += 360;
+      if (Math.abs(delta) > fovAz / 2 + 2) continue;
+      const xy = projectAltAz(minAlt + 1.5, d.az, projOpts);
+      if (xy) cardinals.push({ x: xy.x, y: xy.y, label: d.label, az: d.az });
+    }
+    return { points, cardinals };
+  }
+
+  const OBSERVER_STORAGE_KEY = 'funHomeObserver';
+
+  /** Browser geolocation with Hampton Falls fallback (cached per session). */
+  function resolveObserver(onReady) {
+    const fallback = () => onReady({ ...DEFAULT_OBSERVER });
+    if (typeof onReady !== 'function') return DEFAULT_OBSERVER;
+    try {
+      const raw = root.sessionStorage && root.sessionStorage.getItem(OBSERVER_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Number.isFinite(parsed.lat) && Number.isFinite(parsed.lon)) {
+          onReady(parsed);
+          return;
+        }
+      }
+    } catch (_) {
+      /* ignore bad cache */
+    }
+    if (!root.navigator || !root.navigator.geolocation) {
+      fallback();
+      return;
+    }
+    root.navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const obs = {
+          lat: pos.coords.latitude,
+          lon: pos.coords.longitude,
+          label: 'your location',
+        };
+        try {
+          if (root.sessionStorage) {
+            root.sessionStorage.setItem(OBSERVER_STORAGE_KEY, JSON.stringify(obs));
+          }
+        } catch (_) {
+          /* ignore quota */
+        }
+        onReady(obs);
+      },
+      fallback,
+      { enableHighAccuracy: false, timeout: 5000, maximumAge: 900000 }
+    );
+  }
+
   /** Mean J2000 orbital elements for naked-eye planets (simplified). */
   const PLANET_ORBITS = {
     mercury: { a: 0.3871, e: 0.2056, I: 7.005, L: 252.25, lp: 77.456, n: 4.0923 },
@@ -495,7 +578,11 @@
     projectSky,
     projectAsterisms,
     moonPhaseLabel,
+    moonPhaseFraction,
+    projectHorizon,
+    resolveObserver,
     formatSkyCaption,
+    OBSERVER_STORAGE_KEY,
     galacticToEquatorial,
     milkyWayBand,
   };

@@ -131,10 +131,9 @@
   }
 
   /**
-   * Tonight's sky: catalog stars + Milky Way + naked-eye planets (FunHomeSky).
-   * Falls back to a light decorative field if the sky module is missing.
+   * Paint tonight's sky for a given observer (stars, MW, planets, constellations).
    */
-  function initDesertStarfield() {
+  function renderHeroSky(observer) {
     const host = document.getElementById('funHeroStars');
     if (!host) return;
     host.replaceChildren();
@@ -147,20 +146,45 @@
     }
 
     const mobile = window.matchMedia('(max-width: 991.98px)').matches;
-    const sky = Sky.projectSky(new Date(), Sky.DEFAULT_OBSERVER, {
+    const projOpts = {
       fovAz: mobile ? 140 : 160,
       minAlt: 4,
       maxAlt: 88,
-    });
+    };
+    const obs = observer || Sky.DEFAULT_OBSERVER;
+    const sky = Sky.projectSky(new Date(), obs, projOpts);
+
+    const horizonSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    horizonSvg.setAttribute('class', 'fun-hero__horizon');
+    horizonSvg.setAttribute('aria-hidden', 'true');
+    horizonSvg.setAttribute('viewBox', '0 0 100 100');
+    horizonSvg.setAttribute('preserveAspectRatio', 'none');
+    if (typeof Sky.projectHorizon === 'function') {
+      const hz = Sky.projectHorizon(projOpts);
+      if (hz.points.length >= 2) {
+        const d = hz.points
+          .map((p, i) => (i === 0 ? 'M' : 'L') + p.x.toFixed(2) + ' ' + p.y.toFixed(2))
+          .join(' ');
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', d);
+        path.setAttribute('class', 'fun-hero__horizon-arc');
+        horizonSvg.appendChild(path);
+        hz.cardinals.forEach((c) => {
+          const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          t.setAttribute('x', c.x.toFixed(2));
+          t.setAttribute('y', (c.y + 2.8).toFixed(2));
+          t.setAttribute('class', 'fun-hero__horizon-label');
+          t.textContent = c.label;
+          horizonSvg.appendChild(t);
+        });
+        host.appendChild(horizonSvg);
+      }
+    }
 
     const mw = document.createElement('div');
     mw.className = 'fun-hero__milkyway';
     mw.setAttribute('aria-hidden', 'true');
     if (sky.milkyWay && sky.milkyWay.length >= 2) {
-      const stops = sky.milkyWay
-        .map((p) => `${p.x.toFixed(1)}% ${p.y.toFixed(1)}%`)
-        .join(', ');
-      mw.style.setProperty('--mw-path', stops);
       const mid = sky.milkyWay[Math.floor(sky.milkyWay.length / 2)];
       const first = sky.milkyWay[0];
       const last = sky.milkyWay[sky.milkyWay.length - 1];
@@ -171,37 +195,6 @@
       mw.style.setProperty('--mw-rot', angle.toFixed(1) + 'deg');
       host.appendChild(mw);
     }
-
-    const frag = document.createDocumentFragment();
-    const starCap = mobile ? 36 : 64;
-    const ranked = sky.stars.slice().sort((a, b) => a.mag - b.mag).slice(0, starCap);
-    ranked.forEach((s, i) => {
-      const el = document.createElement('span');
-      el.className = 'fun-hero__star';
-      if (s.bright) el.classList.add('fun-hero__star--bright');
-      if (s.flare) el.classList.add('fun-hero__star--flare');
-      el.title = s.name;
-      el.setAttribute('data-star', s.name);
-      el.style.left = s.x.toFixed(2) + '%';
-      el.style.top = s.y.toFixed(2) + '%';
-      el.style.width = s.size.toFixed(1) + 'px';
-      el.style.height = s.size.toFixed(1) + 'px';
-      el.style.setProperty('--twinkle-delay', ((i % 7) * 0.55).toFixed(2) + 's');
-      el.style.setProperty('--twinkle-dur', (2.8 + (i % 5) * 0.7).toFixed(2) + 's');
-      frag.appendChild(el);
-    });
-
-    sky.planets.forEach((p) => {
-      const el = document.createElement('button');
-      el.type = 'button';
-      el.className = 'fun-hero__sky-planet fun-hero__sky-planet--' + p.id;
-      el.title = p.name + ' — focus globe';
-      el.setAttribute('data-planet', p.id);
-      el.setAttribute('aria-label', 'Focus ' + p.name + ' globe');
-      el.style.left = p.x.toFixed(2) + '%';
-      el.style.top = p.y.toFixed(2) + '%';
-      frag.appendChild(el);
-    });
 
     if (typeof Sky.projectAsterisms === 'function') {
       const lines = Sky.projectAsterisms(sky);
@@ -224,19 +217,88 @@
       }
     }
 
+    const frag = document.createDocumentFragment();
+    const starCap = mobile ? 36 : 64;
+    const ranked = sky.stars.slice().sort((a, b) => a.mag - b.mag).slice(0, starCap);
+    const labelCap = mobile ? 4 : 8;
+    let labelsLeft = labelCap;
+    ranked.forEach((s, i) => {
+      const el = document.createElement('span');
+      el.className = 'fun-hero__star';
+      if (s.bright) el.classList.add('fun-hero__star--bright');
+      if (s.flare) el.classList.add('fun-hero__star--flare');
+      el.title = s.name;
+      el.setAttribute('data-star', s.name);
+      el.style.left = s.x.toFixed(2) + '%';
+      el.style.top = s.y.toFixed(2) + '%';
+      el.style.width = s.size.toFixed(1) + 'px';
+      el.style.height = s.size.toFixed(1) + 'px';
+      el.style.setProperty('--twinkle-delay', ((i % 7) * 0.55).toFixed(2) + 's');
+      el.style.setProperty('--twinkle-dur', (2.8 + (i % 5) * 0.7).toFixed(2) + 's');
+      frag.appendChild(el);
+      if (s.mag <= 1.05 && labelsLeft > 0) {
+        labelsLeft -= 1;
+        const lab = document.createElement('span');
+        lab.className = 'fun-hero__star-label';
+        lab.textContent = s.name;
+        lab.style.left = (s.x + 1.2).toFixed(2) + '%';
+        lab.style.top = (s.y - 0.8).toFixed(2) + '%';
+        frag.appendChild(lab);
+      }
+    });
+
+    sky.planets.forEach((p) => {
+      const el = document.createElement('button');
+      el.type = 'button';
+      el.className = 'fun-hero__sky-planet fun-hero__sky-planet--' + p.id;
+      el.title = p.name + ' — focus globe';
+      el.setAttribute('data-planet', p.id);
+      el.setAttribute('aria-label', 'Focus ' + p.name + ' globe');
+      el.style.left = p.x.toFixed(2) + '%';
+      el.style.top = p.y.toFixed(2) + '%';
+      frag.appendChild(el);
+    });
+
     host.appendChild(frag);
 
-    let credit = document.getElementById('funHeroSkyCredit');
-    if (!credit) {
-      credit = document.createElement('p');
-      credit.id = 'funHeroSkyCredit';
-      credit.className = 'fun-hero__sky-credit';
-      host.parentElement && host.parentElement.appendChild(credit);
+    let creditWrap = document.getElementById('funHeroSkyCreditWrap');
+    if (!creditWrap) {
+      creditWrap = document.createElement('div');
+      creditWrap.id = 'funHeroSkyCreditWrap';
+      creditWrap.className = 'fun-hero__sky-credit-wrap';
+      host.parentElement && host.parentElement.appendChild(creditWrap);
     }
+    creditWrap.replaceChildren();
+
+    if (typeof Sky.moonPhaseFraction === 'function') {
+      const phase = Sky.moonPhaseFraction(sky.date);
+      const disc = document.createElement('span');
+      disc.className = 'fun-hero__moon-phase';
+      disc.setAttribute('aria-hidden', 'true');
+      disc.style.setProperty('--moon-phase', phase.toFixed(3));
+      const waxing = phase <= 0.5;
+      disc.style.setProperty('--moon-wax', waxing ? '1' : '0');
+      creditWrap.appendChild(disc);
+    }
+
+    const credit = document.createElement('p');
+    credit.id = 'funHeroSkyCredit';
+    credit.className = 'fun-hero__sky-credit';
     credit.textContent =
       typeof Sky.formatSkyCaption === 'function'
         ? Sky.formatSkyCaption(sky)
         : 'Sky · Hampton Falls, NH';
+    creditWrap.appendChild(credit);
+  }
+
+  /** Geolocated tonight sky, or Hampton Falls fallback. */
+  function initDesertStarfield() {
+    const Sky = window.FunHomeSky;
+    if (Sky && typeof Sky.resolveObserver === 'function') {
+      Sky.resolveObserver((obs) => renderHeroSky(obs));
+      return;
+    }
+    renderHeroSky(Sky && Sky.DEFAULT_OBSERVER);
   }
 
   function seedFallbackStars(host) {
@@ -922,6 +984,23 @@
     document.head.appendChild(script);
   }
 
+  function clearLandmarkHints() {
+    document.querySelectorAll('.fun-hero__landmark-hint').forEach((el) => el.remove());
+  }
+
+  function syncLandmarkHint(pane, body, zoomed) {
+    clearLandmarkHints();
+    if (!pane || !body || zoomed || !pane.classList.contains('is-enlarged')) return;
+    const Globe = window.WebGpuGlobe;
+    const lm = Globe && Globe.LANDMARKS && Globe.LANDMARKS[body];
+    if (!lm) return;
+    if (lm.immediate && zoomed) return;
+    const hint = document.createElement('span');
+    hint.className = 'fun-hero__landmark-hint';
+    hint.textContent = lm.immediate ? 'Tap again · reset view' : 'Tap again · ' + lm.label;
+    pane.appendChild(hint);
+  }
+
   function clearLandmarkLinks() {
     document.querySelectorAll('.fun-hero__landmark-link').forEach((el) => el.remove());
   }
@@ -945,6 +1024,7 @@
       other._landmarkZoomed = false;
     });
     clearLandmarkLinks();
+    clearLandmarkHints();
     pane.classList.add('is-enlarged');
     window.dispatchEvent(new Event('resize'));
 
@@ -957,6 +1037,8 @@
       api.lookAt(lm.lat, lm.lon, lm.zoom || 2.2);
       pane._landmarkZoomed = true;
       if (lm.href) showLandmarkLink(pane, lm);
+    } else {
+      syncLandmarkHint(pane, body, false);
     }
     return pane;
   }
@@ -1000,6 +1082,7 @@
           }
         });
         clearLandmarkLinks();
+        clearLandmarkHints();
         pane.classList.add('is-enlarged');
         window.dispatchEvent(new Event('resize'));
 
@@ -1009,6 +1092,7 @@
           if (typeof api.clearLook === 'function') api.clearLook();
           pane._landmarkZoomed = false;
           clearLandmarkLinks();
+          syncLandmarkHint(pane, body, false);
           return;
         }
 
@@ -1016,6 +1100,7 @@
           if (typeof api.lookAt === 'function') {
             api.lookAt(lm.lat, lm.lon, lm.zoom || 2.2);
             pane._landmarkZoomed = true;
+            clearLandmarkHints();
             if (lm.href) showLandmarkLink(pane, lm);
           }
           return;
@@ -1025,7 +1110,10 @@
           api.lookAt(lm.lat, lm.lon, lm.zoom || 2.2);
           pane._landmarkZoomed = true;
           if (lm.href) showLandmarkLink(pane, lm);
+          return;
         }
+
+        syncLandmarkHint(pane, body, false);
       });
     });
 

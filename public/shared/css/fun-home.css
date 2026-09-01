@@ -478,6 +478,132 @@ body[data-theme="zen"] .fun-hero__constellations line {
   stroke: rgba(74, 144, 164, 0.35);
 }
 
+.fun-hero__horizon {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.fun-hero__horizon-arc {
+  fill: none;
+  stroke: rgba(255, 230, 190, 0.18);
+  stroke-width: 0.35;
+}
+
+body[data-theme="zen"] .fun-hero__horizon-arc {
+  stroke: rgba(74, 144, 164, 0.22);
+}
+
+.fun-hero__horizon-label {
+  fill: rgba(255, 245, 230, 0.45);
+  font-family: Outfit, system-ui, sans-serif;
+  font-size: 2.4px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+
+body[data-theme="zen"] .fun-hero__horizon-label {
+  fill: rgba(30, 55, 72, 0.5);
+}
+
+.fun-hero__star-label {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  margin: 0;
+  padding: 0;
+  font-family: Outfit, system-ui, sans-serif;
+  font-size: 0.48rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: rgba(255, 250, 240, 0.62);
+  pointer-events: none;
+  white-space: nowrap;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+
+body[data-theme="zen"] .fun-hero__star-label {
+  color: rgba(24, 40, 48, 0.62);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.fun-hero__sky-credit-wrap {
+  position: absolute;
+  right: clamp(0.75rem, 2vw, 1.5rem);
+  bottom: clamp(4.5rem, 12vh, 7rem);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.45rem;
+  max-width: min(42rem, 92vw);
+  pointer-events: none;
+}
+
+.fun-hero__moon-phase {
+  flex: 0 0 auto;
+  width: 0.95rem;
+  height: 0.95rem;
+  border-radius: 50%;
+  background: #ece8dc;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+  --shadow-x: calc((0.5 - var(--moon-phase, 0.5)) * 1.1rem);
+  box-shadow:
+    inset var(--shadow-x) 0 0 0 #1a2030,
+    0 0 6px rgba(220, 225, 240, 0.35);
+}
+
+body[data-theme="zen"] .fun-hero__moon-phase {
+  background: #d8dde4;
+  box-shadow:
+    inset var(--shadow-x) 0 0 0 rgba(30, 45, 55, 0.85),
+    0 0 4px rgba(74, 144, 164, 0.25);
+}
+
+.fun-hero__sky-credit {
+  position: static;
+  right: auto;
+  bottom: auto;
+  margin: 0;
+  max-width: none;
+  flex: 1 1 auto;
+  text-align: right;
+  font-family: Outfit, system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: rgba(255, 250, 240, 0.55);
+  pointer-events: none;
+}
+
+.fun-hero__landmark-hint {
+  position: absolute;
+  left: 50%;
+  bottom: -0.15rem;
+  z-index: 4;
+  transform: translate(-50%, 100%);
+  padding: 0.1rem 0.35rem;
+  font-family: Outfit, system-ui, sans-serif;
+  font-size: 0.48rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 236, 200, 0.88);
+  background: rgba(8, 16, 24, 0.65);
+  border: 1px solid rgba(255, 210, 120, 0.25);
+  border-radius: 0.3rem;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+body[data-theme="zen"] .fun-hero__landmark-hint {
+  color: rgba(24, 40, 48, 0.85);
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(74, 144, 164, 0.28);
+}
+
 .fun-hero__milkyway {
   position: absolute;
   width: min(72vw, 38rem);
@@ -558,20 +684,18 @@ body[data-theme="zen"] .fun-hero__milkyway {
   background: #d8d0c4;
 }
 
-.fun-hero__sky-credit {
+/* Standalone credit (fallback starfield without wrap) */
+.fun-hero__sky-credit:not(.fun-hero__sky-credit-wrap *) {
   position: absolute;
   right: clamp(0.75rem, 2vw, 1.5rem);
   bottom: clamp(4.5rem, 12vh, 7rem);
   z-index: 4;
-  margin: 0;
   max-width: min(42rem, 92vw);
-  text-align: right;
-  font-family: Outfit, system-ui, sans-serif;
-  font-size: 0.68rem;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  color: rgba(255, 250, 240, 0.55);
-  pointer-events: none;
+}
+
+.fun-hero__sky-credit-wrap .fun-hero__sky-credit {
+  position: static;
+  max-width: none;
 }
 
 body[data-theme="zen"] .fun-hero__sky-credit {

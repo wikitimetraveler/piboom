@@ -67,4 +67,28 @@ describe('FunHomeSky', () => {
     const label = FunHomeSky.moonPhaseLabel(new Date('2026-08-31T02:00:00Z'));
     expect(label.length).toBeGreaterThan(3);
   });
+
+  test('moonPhaseFraction stays in 0..1', () => {
+    const f = FunHomeSky.moonPhaseFraction(new Date('2026-08-31T02:00:00Z'));
+    expect(f).toBeGreaterThanOrEqual(0);
+    expect(f).toBeLessThanOrEqual(1);
+  });
+
+  test('projectHorizon returns arc points and cardinals', () => {
+    const hz = FunHomeSky.projectHorizon({ fovAz: 160, minAlt: 4, maxAlt: 88 });
+    expect(hz.points.length).toBeGreaterThan(10);
+    expect(Array.isArray(hz.cardinals)).toBe(true);
+  });
+
+  test('resolveObserver falls back without geolocation', () => {
+    const prev = globalThis.navigator;
+    globalThis.navigator = {};
+    return new Promise((resolve) => {
+      FunHomeSky.resolveObserver((obs) => {
+        expect(obs.lat).toBeCloseTo(FunHomeSky.DEFAULT_OBSERVER.lat, 3);
+        globalThis.navigator = prev;
+        resolve();
+      });
+    });
+  });
 });
