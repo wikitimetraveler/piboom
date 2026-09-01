@@ -131,6 +131,15 @@
         ['Altair', 'Vega'],
       ],
     },
+    {
+      id: 'scorpius',
+      label: 'Scorpius',
+      pairs: [
+        ['Antares', 'Shaula'],
+        ['Antares', 'Sargas'],
+        ['Shaula', 'Sargas'],
+      ],
+    },
   ];
 
   function moonPhaseLabel(date) {
@@ -184,11 +193,28 @@
     const label = sky.observer.label || 'observer';
     const when = sky.date;
     const hh = when.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-    const timeWord = sky.usedEveningFallback ? `tonight ${hh}` : 'now';
+    let timeWord = 'now';
+    if (sky.scrubbed) timeWord = hh + ' local';
+    else if (sky.usedEveningFallback) timeWord = 'tonight ' + hh;
     const phase = moonPhaseLabel(sky.date);
     const up = (sky.planets || []).map((p) => p.name);
     const planets = up.length ? up.join(' · ') : 'no naked-eye planets up';
     return `Sky · ${label} · ${timeWord} · ${phase} · ${planets}`;
+  }
+
+  /** Map scrubber index 19–28 → local hour (24+ wraps to 0–4). */
+  function scrubIndexToHour(index) {
+    const i = Number(index);
+    if (!Number.isFinite(i)) return 21;
+    if (i >= 24) return i - 24;
+    return i;
+  }
+
+  /** Build a local Date at hour:minute on the same calendar day as base. */
+  function buildLocalSkyDate(base, hourLocal, minuteLocal) {
+    const d = base instanceof Date ? new Date(base.getTime()) : new Date();
+    d.setHours(hourLocal, minuteLocal || 0, 0, 0);
+    return d;
   }
 
   /** Illuminated fraction 0 (new) → 1 (full) for moon disc art. */
@@ -496,9 +522,14 @@
   function projectSky(date, observer, opts) {
     const obs = observer || DEFAULT_OBSERVER;
     const input = date instanceof Date ? date : new Date();
-    const skyDate = resolveSkyDate(input, obs);
-    const lst = localSiderealDegrees(skyDate, obs.lon);
     const projOpts = opts || {};
+    const forceTime = !!projOpts.forceTime;
+    const skyDate = forceTime
+      ? input instanceof Date
+        ? new Date(input.getTime())
+        : new Date()
+      : resolveSkyDate(input, obs);
+    const lst = localSiderealDegrees(skyDate, obs.lon);
 
     const stars = [];
     for (let i = 0; i < BRIGHT_STARS.length; i += 1) {
@@ -557,7 +588,8 @@
       planets,
       milkyWay: milkyWayBand(skyDate, obs, projOpts),
       sunAlt: sunAa.alt,
-      usedEveningFallback: skyDate.getTime() !== input.getTime(),
+      usedEveningFallback: !forceTime && skyDate.getTime() !== input.getTime(),
+      scrubbed: forceTime,
     };
   }
 
@@ -582,6 +614,8 @@
     projectHorizon,
     resolveObserver,
     formatSkyCaption,
+    scrubIndexToHour,
+    buildLocalSkyDate,
     OBSERVER_STORAGE_KEY,
     galacticToEquatorial,
     milkyWayBand,

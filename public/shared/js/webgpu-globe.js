@@ -212,6 +212,18 @@
       lon: 106,
       zoom: 2.05,
     },
+    earth: {
+      label: 'Hampton Falls, NH',
+      lat: 42.898,
+      lon: -70.864,
+      zoom: 2.15,
+    },
+    saturn: {
+      label: 'Ring plane · Cassini gap',
+      lat: 0,
+      lon: 0,
+      zoom: 1.55,
+    },
   };
 
   const LAVA_SEEDS = [

@@ -133,7 +133,41 @@
   /**
    * Paint tonight's sky for a given observer (stars, MW, planets, constellations).
    */
-  function renderHeroSky(observer) {
+  let heroSkyState = { observer: null, scrubIndex: null };
+
+  function resolveSkyInput(Sky, observer, scrubIndex) {
+    const obs = observer || (Sky && Sky.DEFAULT_OBSERVER);
+    const now = new Date();
+    if (scrubIndex == null || !Sky || typeof Sky.scrubIndexToHour !== 'function') {
+      return { obs, date: now, forceTime: false };
+    }
+    const hour = Sky.scrubIndexToHour(scrubIndex);
+    const date =
+      typeof Sky.buildLocalSkyDate === 'function'
+        ? Sky.buildLocalSkyDate(now, hour, 0)
+        : now;
+    if (scrubIndex >= 24) date.setDate(date.getDate() + 1);
+    return { obs, date, forceTime: true };
+  }
+
+  function defaultScrubIndex(Sky, observer) {
+    const { date } = resolveSkyInput(Sky, observer, null);
+    const sky = Sky.projectSky(date, observer);
+    let h = sky.date.getHours();
+    if (h >= 19) return h;
+    if (h <= 4) return h + 24;
+    return 21;
+  }
+
+  function formatScrubLabel(Sky, index) {
+    const h = Sky.scrubIndexToHour(index);
+    const hour12 = h % 12 || 12;
+    const ampm = h < 12 ? 'AM' : 'PM';
+    const nextDay = Number(index) >= 24 ? ' · +1d' : '';
+    return hour12 + ':00 ' + ampm + nextDay;
+  }
+
+  function renderHeroSky(observer, opts) {
     const host = document.getElementById('funHeroStars');
     if (!host) return;
     host.replaceChildren();
@@ -145,14 +179,25 @@
       return;
     }
 
+    const scrubFromOpts = opts && Object.prototype.hasOwnProperty.call(opts, 'scrubIndex')
+      ? opts.scrubIndex
+      : heroSkyState.scrubIndex;
+    if (scrubFromOpts != null) heroSkyState.scrubIndex = scrubFromOpts;
+    if (observer) heroSkyState.observer = observer;
+    const obs = observer || heroSkyState.observer || Sky.DEFAULT_OBSERVER;
+    heroSkyState.observer = obs;
+
     const mobile = window.matchMedia('(max-width: 991.98px)').matches;
     const projOpts = {
       fovAz: mobile ? 140 : 160,
       minAlt: 4,
       maxAlt: 88,
     };
-    const obs = observer || Sky.DEFAULT_OBSERVER;
-    const sky = Sky.projectSky(new Date(), obs, projOpts);
+    const skyInput = resolveSkyInput(Sky, obs, heroSkyState.scrubIndex);
+    const sky = Sky.projectSky(skyInput.date, skyInput.obs, {
+      ...projOpts,
+      forceTime: skyInput.forceTime,
+    });
 
     const horizonSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     horizonSvg.setAttribute('class', 'fun-hero__horizon');
@@ -268,27 +313,80 @@
       creditWrap.className = 'fun-hero__sky-credit-wrap';
       host.parentElement && host.parentElement.appendChild(creditWrap);
     }
-    creditWrap.replaceChildren();
 
+    let moonDisc = creditWrap.querySelector('.fun-hero__moon-phase');
     if (typeof Sky.moonPhaseFraction === 'function') {
       const phase = Sky.moonPhaseFraction(sky.date);
-      const disc = document.createElement('span');
-      disc.className = 'fun-hero__moon-phase';
-      disc.setAttribute('aria-hidden', 'true');
-      disc.style.setProperty('--moon-phase', phase.toFixed(3));
+      if (!moonDisc) {
+        moonDisc = document.createElement('span');
+        moonDisc.className = 'fun-hero__moon-phase';
+        moonDisc.setAttribute('aria-hidden', 'true');
+        creditWrap.insertBefore(moonDisc, creditWrap.firstChild);
+      }
+      moonDisc.style.setProperty('--moon-phase', phase.toFixed(3));
       const waxing = phase <= 0.5;
-      disc.style.setProperty('--moon-wax', waxing ? '1' : '0');
-      creditWrap.appendChild(disc);
+      moonDisc.style.setProperty('--moon-wax', waxing ? '1' : '0');
     }
 
-    const credit = document.createElement('p');
-    credit.id = 'funHeroSkyCredit';
-    credit.className = 'fun-hero__sky-credit';
+    let credit = document.getElementById('funHeroSkyCredit');
+    if (!credit) {
+      credit = document.createElement('p');
+      credit.id = 'funHeroSkyCredit';
+      credit.className = 'fun-hero__sky-credit';
+      const scrub = document.getElementById('funHeroSkyScrub');
+      if (scrub) creditWrap.insertBefore(credit, scrub);
+      else creditWrap.appendChild(credit);
+    }
     credit.textContent =
       typeof Sky.formatSkyCaption === 'function'
         ? Sky.formatSkyCaption(sky)
         : 'Sky · Hampton Falls, NH';
-    creditWrap.appendChild(credit);
+
+    let scrubRow = document.getElementById('funHeroSkyScrub');
+    if (!scrubRow) {
+      scrubRow = document.createElement('div');
+      scrubRow.id = 'funHeroSkyScrub';
+      scrubRow.className = 'fun-hero__sky-scrub';
+      const lab = document.createElement('label');
+      lab.className = 'fun-hero__sky-scrub-label';
+      lab.setAttribute('for', 'funHeroSkyScrubInput');
+      lab.textContent = 'Evening';
+      scrubRow.appendChild(lab);
+      const input = document.createElement('input');
+      input.type = 'range';
+      input.id = 'funHeroSkyScrubInput';
+      input.className = 'fun-hero__sky-scrub-input';
+      input.min = '19';
+      input.max = '28';
+      input.step = '1';
+      input.setAttribute('aria-label', 'Scrub evening sky time');
+      scrubRow.appendChild(input);
+      const val = document.createElement('span');
+      val.id = 'funHeroSkyScrubVal';
+      val.className = 'fun-hero__sky-scrub-val';
+      val.setAttribute('aria-hidden', 'true');
+      scrubRow.appendChild(val);
+      creditWrap.appendChild(scrubRow);
+
+      input.addEventListener('input', () => {
+        heroSkyState.scrubIndex = Number(input.value);
+        const valEl = document.getElementById('funHeroSkyScrubVal');
+        if (valEl) valEl.textContent = formatScrubLabel(Sky, heroSkyState.scrubIndex);
+        renderHeroSky(heroSkyState.observer, { scrubIndex: heroSkyState.scrubIndex });
+      });
+    }
+
+    const scrubInput = document.getElementById('funHeroSkyScrubInput');
+    const scrubVal = document.getElementById('funHeroSkyScrubVal');
+    if (heroSkyState.scrubIndex == null) {
+      heroSkyState.scrubIndex = defaultScrubIndex(Sky, obs);
+    }
+    if (scrubInput) {
+      scrubInput.value = String(heroSkyState.scrubIndex);
+    }
+    if (scrubVal) {
+      scrubVal.textContent = formatScrubLabel(Sky, heroSkyState.scrubIndex);
+    }
   }
 
   /** Geolocated tonight sky, or Hampton Falls fallback. */

@@ -91,4 +91,26 @@ describe('FunHomeSky', () => {
       });
     });
   });
+
+  test('scrubIndexToHour maps evening slider indices', () => {
+    expect(FunHomeSky.scrubIndexToHour(21)).toBe(21);
+    expect(FunHomeSky.scrubIndexToHour(24)).toBe(0);
+    expect(FunHomeSky.scrubIndexToHour(28)).toBe(4);
+  });
+
+  test('buildLocalSkyDate sets local hours on a copy', () => {
+    const base = new Date('2026-08-31T14:00:00');
+    const d = FunHomeSky.buildLocalSkyDate(base, 22, 30);
+    expect(d.getHours()).toBe(22);
+    expect(d.getMinutes()).toBe(30);
+    expect(base.getHours()).toBe(14);
+  });
+
+  test('projectSky forceTime skips evening fallback', () => {
+    const noon = new Date('2026-06-21T12:00:00');
+    const sky = FunHomeSky.projectSky(noon, FunHomeSky.DEFAULT_OBSERVER, { forceTime: true });
+    expect(sky.scrubbed).toBe(true);
+    expect(sky.usedEveningFallback).toBe(false);
+    expect(sky.date.getHours()).toBe(12);
+  });
 });

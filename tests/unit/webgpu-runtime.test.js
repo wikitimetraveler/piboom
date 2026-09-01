@@ -116,11 +116,13 @@ describe('WebGpuGlobe', () => {
     expect(sync.sunDir.x).toBeGreaterThan(0);
   });
 
-  test('LANDMARKS include Moon, Mars, and Jupiter zoom targets', () => {
+  test('LANDMARKS include Moon, Mars, Jupiter, Earth, and Saturn zoom targets', () => {
     expect(WebGpuGlobe.LANDMARKS.moon.lat).toBeCloseTo(-9.5, 5);
     expect(WebGpuGlobe.LANDMARKS.moon.href).toMatch(/lane-museum/);
     expect(WebGpuGlobe.LANDMARKS.mars.label).toBe('Olympus Mons');
     expect(WebGpuGlobe.LANDMARKS.jupiter.label).toBe('Great Red Spot');
+    expect(WebGpuGlobe.LANDMARKS.earth.label).toMatch(/Hampton/);
+    expect(WebGpuGlobe.LANDMARKS.saturn.label).toMatch(/Cassini/);
   });
 
   test('capFirmsPoints drops bad coords and respects max', () => {

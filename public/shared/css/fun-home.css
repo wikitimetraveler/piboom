@@ -535,11 +535,62 @@ body[data-theme="zen"] .fun-hero__star-label {
   bottom: clamp(4.5rem, 12vh, 7rem);
   z-index: 4;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
-  gap: 0.45rem;
+  gap: 0.35rem 0.45rem;
   max-width: min(42rem, 92vw);
   pointer-events: none;
+}
+
+.fun-hero__sky-scrub {
+  flex: 1 1 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  pointer-events: auto;
+  margin-top: 0.1rem;
+}
+
+.fun-hero__sky-scrub-label {
+  margin: 0;
+  font-family: Outfit, system-ui, sans-serif;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 250, 240, 0.45);
+}
+
+body[data-theme="zen"] .fun-hero__sky-scrub-label {
+  color: rgba(30, 55, 72, 0.48);
+}
+
+.fun-hero__sky-scrub-input {
+  width: min(9rem, 28vw);
+  height: 0.35rem;
+  margin: 0;
+  accent-color: rgba(255, 210, 120, 0.85);
+  cursor: pointer;
+}
+
+body[data-theme="zen"] .fun-hero__sky-scrub-input {
+  accent-color: rgba(74, 144, 164, 0.75);
+}
+
+.fun-hero__sky-scrub-val {
+  min-width: 3.6rem;
+  font-family: Outfit, system-ui, sans-serif;
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: rgba(255, 250, 240, 0.5);
+  text-align: right;
+}
+
+body[data-theme="zen"] .fun-hero__sky-scrub-val {
+  color: rgba(30, 55, 72, 0.52);
 }
 
 .fun-hero__moon-phase {
