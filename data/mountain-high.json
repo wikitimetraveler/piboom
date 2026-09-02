@@ -1,0 +1,114 @@
+{
+  "brand": {
+    "name": "Mountain High Medicinals",
+    "tagline": "Types on the table. Call the mountain. Locksmith on the side.",
+    "guideName": "Sage",
+    "guideTitle": "Budtender · educator · lockout buddy",
+    "guidePortrait": "/mountain-high/assets/sage-portrait.svg",
+    "welcomeScript": "Hey — I'm Sage. This is a 21-and-over prototype for Mountain High Medicinals. Flip a type card for a little history, wander the lab, or call if you need a locksmith in Long Beach or L.A."
+  },
+  "shop": {
+    "name": "Mountain High Medicinals",
+    "phone": "+1 909-219-1370",
+    "phoneLabel": "(909) 219-1370",
+    "note": "Prototype shop card — no storefront address, hours, license, or menu on file yet. Call or text the number on the card."
+  },
+  "locksmith": {
+    "name": "Mobile locksmith",
+    "areas": ["Long Beach", "Los Angeles"],
+    "areaLine": "Long Beach and L.A.",
+    "phone": "+1 909-219-1370",
+    "phoneLabel": "(909) 219-1370",
+    "note": "Same number as the card. Call or text for lockouts and keys in Long Beach and Los Angeles. We do not list a shop pin until he sends an address."
+  },
+  "disclaimer": "21+ adults only. Educational geography and plant-type talk — not medical advice, not cultivation advice, not a live menu.",
+  "types": [
+    {
+      "id": "indica",
+      "name": "Indica",
+      "kicker": "Type",
+      "tagline": "Broad leaf, mountain nights",
+      "tags": ["Hindu Kush", "Afghani"],
+      "swatch": "#7b3cff",
+      "history": "The word indica has been used for short, broad-leaf plants tied to highland Central Asia. Think resin-rich mountain populations and short seasons — culture and botany, not a dosing chart.",
+      "examples": ["Hindu Kush", "Afghani"],
+      "originNote": "Classic pins sit on the Hindu Kush range and northern Afghanistan."
+    },
+    {
+      "id": "sativa",
+      "name": "Sativa",
+      "kicker": "Type",
+      "tagline": "Tall, narrow, trade-route famous",
+      "tags": ["Thai", "Durban", "Mexican"],
+      "swatch": "#c8ff4a",
+      "history": "Sativa, in shop talk, usually means taller, narrower-leaf expressions from warmer latitudes. Names like Thai, Durban, Colombian, Mexican, Jamaican, and Acapulco Gold are trade and landrace stories — not grow recipes.",
+      "examples": ["Thai", "Durban / South African", "Colombian", "Mexican", "Acapulco Gold", "Jamaican", "Panama", "Malawi"],
+      "originNote": "Pins run from Southeast Asia to southern Africa, the Caribbean, and highland Mexico."
+    },
+    {
+      "id": "hybrid",
+      "name": "Hybrid",
+      "kicker": "Type",
+      "tagline": "Where lineages meet",
+      "tags": ["landrace mix", "subcontinent"],
+      "swatch": "#ff7a2d",
+      "history": "Most modern shop flower is a hybrid of older regional lines. The Indian subcontinent, for example, holds a long cultural record that spans fiber, ritual, and mixed highland expressions — a reminder that types blur at the edges.",
+      "examples": ["Indian subcontinent"],
+      "originNote": "See hybrid-landrace pins on the Origins map — educational geography only."
+    },
+    {
+      "id": "hemp",
+      "name": "Hemp",
+      "kicker": "Type",
+      "tagline": "Fiber, seed, old ritual",
+      "tags": ["China", "fiber"],
+      "swatch": "#3d8f4a",
+      "history": "Hemp is the fiber-and-seed side of the cannabis story. East Asia — especially the Yellow River basin — has deep archaeological and historical records of hemp for cloth, seed, and ceremony.",
+      "examples": ["Chinese hemp"],
+      "originNote": "Not a high-THC shop type. History of use, not a grow guide."
+    },
+    {
+      "id": "ruderalis",
+      "name": "Ruderalis",
+      "kicker": "Type",
+      "tagline": "Short season, weedy north",
+      "tags": ["steppe", "auto-flower lore"],
+      "swatch": "#8ec8ff",
+      "history": "C. ruderalis is tied to short-season northern latitudes — roadside and steppe habitats across southern Russia and east-central Europe. Breeders later borrowed the day-neutral habit. We talk history, not how to breed.",
+      "examples": ["Ruderalis belt"],
+      "originNote": "The Origins map marks the ruderalis belt as geography, not a product list."
+    }
+  ],
+  "lab": [
+    {
+      "href": "/entertainment/blacklight-poster.html?poster=/mountain-high/assets/hero-card.png&artist=Mountain%20High&album=Medicinals",
+      "icon": "bi-lightbulb",
+      "label": "Black Light Poster",
+      "title": "Same WebGPU path as this hero"
+    },
+    {
+      "href": "/entertainment/poster-generator.html",
+      "icon": "bi-palette",
+      "label": "Poster Generator",
+      "title": "Commission more blacklight art"
+    },
+    {
+      "href": "/entertainment/blacklight.html",
+      "icon": "bi-lightning",
+      "label": "Black Light Zone",
+      "title": "Neon room"
+    },
+    {
+      "href": "/entertainment/visualizer.html",
+      "icon": "bi-soundwave",
+      "label": "Visualizer",
+      "title": "Psychedelic audio visualizer"
+    },
+    {
+      "href": "/entertainment/art-gallery.html",
+      "icon": "bi-image",
+      "label": "Art Gallery",
+      "title": "Entertainment art gallery"
+    }
+  ]
+}

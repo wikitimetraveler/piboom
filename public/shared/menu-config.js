@@ -91,6 +91,7 @@
     { href: '/planetarium/', icon: 'bi-stars', label: 'Planetarium' },
     { href: '/entertainment/blacklight.html', icon: 'bi-lightning', label: 'Black Light Zone' },
     { href: '/entertainment/blacklight-poster.html', icon: 'bi-lightbulb', label: 'Black Light Poster' },
+    { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Sage, locksmith Long Beach & L.A.' },
     { href: '/entertainment/poster-generator.html', icon: 'bi-palette', label: 'Poster Generator' },
     { href: '/entertainment/art-gallery.html', icon: 'bi-image', label: 'Art Gallery' },
     { href: '/entertainment/ouija-board.html', icon: 'bi-magic', label: 'Ouija Board' },
@@ -107,6 +108,7 @@
     { href: '/planetarium/', icon: 'bi-stars', label: 'Planetarium', title: 'Full-sky planetarium — stars, planets, constellations' },
     { href: '/entertainment/blacklight.html', icon: 'bi-lightning', label: 'Black Light Zone', title: 'Black light neon scene' },
     { href: '/entertainment/blacklight-poster.html', icon: 'bi-lightbulb', label: 'Black Light Poster', title: 'Sound-reactive black-light poster' },
+    { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Sage, locksmith Long Beach & L.A.' },
     { href: '/entertainment/poster-generator.html', icon: 'bi-palette', label: 'Poster Generator', title: 'Generate psychedelic posters' },
     { href: '/entertainment/art-gallery.html', icon: 'bi-image', label: 'Art Gallery', title: 'Entertainment art gallery' },
     { href: '/entertainment/ouija-board.html', icon: 'bi-magic', label: 'Ouija Board', title: 'Spirit board experience' },
@@ -241,6 +243,7 @@
 
   /** Nature hub tool grid */
   const NATURE_TOOLS = [
+    { href: '/nature/cannabis-origins.html', icon: 'bi-globe2', label: 'Cannabis Origins', title: 'Password-gated landrace map' },
     { href: '/nature/tree-discovery.html', icon: 'bi-tree', label: 'Tree Discovery', title: 'Discover trees' },
     { href: '/nature/tree-collection.html', icon: 'bi-collection', label: 'Tree Collection', title: 'Your tree collection' },
     { href: '/nature/critter-discovery.html', icon: 'bi-bug', label: 'Critter Discovery', title: 'Discover critters' },

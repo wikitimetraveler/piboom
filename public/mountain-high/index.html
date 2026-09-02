@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Mountain High Medicinals · 21+</title>
+  <meta name="description" content="Mountain High Medicinals prototype — cannabis type cards, WebGPU hero, Sage, locksmith in Long Beach and L.A. 21+."/>
+  <meta name="robots" content="noindex, nofollow"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Source+Sans+3:wght@500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/dist/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/mountain-high/css/mhm.css"/>
+  <script src="/shared/menu-config.js"></script>
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/demo-users.js"></script>
+  <script src="/shared/user-selector.js"></script>
+</head>
+<body class="mhm-page" data-age="pending">
+  <script>
+    window.MHM_DEV = /[?&]dev=1(?:&|$)/.test(location.search);
+    if (window.MHM_DEV) document.documentElement.classList.add('mhm-dev');
+  </script>
+  <modern-navbar></modern-navbar>
+
+  <div class="mhm-float-wrap" aria-hidden="true">
+    <canvas id="mhmLeafCanvas"></canvas>
+    <div id="mhmFloatLayer" class="mhm-float-layer"></div>
+  </div>
+
+  <aside id="mhmGate" class="mhm-gate" role="dialog" aria-labelledby="mhmGateTitle" aria-modal="true">
+    <div class="mhm-gate-card">
+      <p class="mhm-gate-kicker">Medicinals</p>
+      <h1 id="mhmGateTitle">Mountain High</h1>
+      <p>This prototype is for adults 21 and over. Cannabis type talk is educational — not medical, not a menu.</p>
+      <p id="mhmGateDenied" hidden>Come back when you are 21.</p>
+      <div class="mhm-gate-actions">
+        <button type="button" class="mhm-btn mhm-btn-primary" id="mhmAgeYes">I am 21 or older</button>
+        <button type="button" class="mhm-btn" id="mhmAgeNo">I am under 21</button>
+      </div>
+    </div>
+  </aside>
+
+  <div id="mhmApp" class="mhm-app" hidden>
+    <header class="mhm-hero" id="mhmHero">
+      <div class="mhm-hero-stage">
+        <canvas id="mhmCanvas" role="img" aria-label="WebGPU Mountain High poster"></canvas>
+        <div class="mhm-hero-fallback" id="mhmFallback" hidden></div>
+      </div>
+      <div class="mhm-hero-copy">
+        <div class="mhm-hookah" aria-hidden="true">
+          <svg viewBox="0 0 120 220" fill="none">
+            <ellipse cx="60" cy="208" rx="28" ry="6" fill="#000" opacity=".35"/>
+            <path d="M36 150 Q36 200 60 208 Q84 200 84 150 Z" fill="#1a0a30" stroke="#c9a84c" stroke-width="1.4"/>
+            <path d="M42 168 Q60 158 78 168" stroke="#7b3cff" stroke-width="2" opacity=".55"/>
+            <rect x="56" y="78" width="8" height="74" rx="3" fill="#c9a84c"/>
+            <path d="M48 78 H72 L78 92 H42 Z" fill="#e8d5a3"/>
+            <ellipse cx="60" cy="70" rx="16" ry="10" fill="#2a1810" stroke="#c9a84c" stroke-width="1.2"/>
+            <ellipse cx="60" cy="64" rx="11" ry="6" fill="#5a2a10"/>
+            <circle cx="60" cy="58" r="4" fill="#ff6a1a" opacity=".85"/>
+            <path d="M64 118 C96 108 108 140 92 168" stroke="#c9a84c" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <circle cx="90" cy="172" r="6" fill="#e8d5a3"/>
+            <path class="mhm-hookah-smoke" d="M52 48 Q44 28 50 12" stroke="#9dffc4" stroke-width="2" fill="none" opacity=".45"/>
+            <path class="mhm-hookah-smoke" d="M60 46 Q62 22 56 6" stroke="#c8b6ff" stroke-width="1.6" fill="none" opacity=".35"/>
+            <path class="mhm-hookah-smoke" d="M68 50 Q78 30 72 8" stroke="#9dffc4" stroke-width="1.4" fill="none" opacity=".3"/>
+          </svg>
+        </div>
+        <div class="mhm-brand-block">
+          <p class="mhm-medicinals">Medicinals</p>
+          <h1 class="mhm-script">Mountain High</h1>
+          <a class="mhm-phone mhm-btn mhm-btn-primary" href="tel:+19092191370">(909) 219-1370</a>
+          <p class="mhm-status mhm-dev-only" id="mhmStatus" hidden>Starting WebGPU…</p>
+          <div class="mhm-gate-actions justify-content-center">
+            <button type="button" class="mhm-btn mhm-btn-ghost mhm-dev-only" id="mhmMic" hidden>Start mic</button>
+            <a class="mhm-btn mhm-btn-ghost" href="sms:+19092191370">Text the card</a>
+          </div>
+          <a href="#mhmTypes" class="mhm-scroll-cue" id="mhmScrollCue">
+            <span>Flip the types</span>
+            <i class="bi bi-chevron-down" aria-hidden="true"></i>
+          </a>
+        </div>
+        <div class="mhm-hookah mhm-hookah--right" aria-hidden="true">
+          <svg viewBox="0 0 120 220" fill="none">
+            <ellipse cx="60" cy="208" rx="28" ry="6" fill="#000" opacity=".35"/>
+            <path d="M36 150 Q36 200 60 208 Q84 200 84 150 Z" fill="#1a0a30" stroke="#c9a84c" stroke-width="1.4"/>
+            <path d="M42 168 Q60 158 78 168" stroke="#7b3cff" stroke-width="2" opacity=".55"/>
+            <rect x="56" y="78" width="8" height="74" rx="3" fill="#c9a84c"/>
+            <path d="M48 78 H72 L78 92 H42 Z" fill="#e8d5a3"/>
+            <ellipse cx="60" cy="70" rx="16" ry="10" fill="#2a1810" stroke="#c9a84c" stroke-width="1.2"/>
+            <ellipse cx="60" cy="64" rx="11" ry="6" fill="#5a2a10"/>
+            <circle cx="60" cy="58" r="4" fill="#ff6a1a" opacity=".85"/>
+            <path d="M64 118 C96 108 108 140 92 168" stroke="#c9a84c" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <circle cx="90" cy="172" r="6" fill="#e8d5a3"/>
+            <path class="mhm-hookah-smoke" d="M52 48 Q44 28 50 12" stroke="#9dffc4" stroke-width="2" fill="none" opacity=".45"/>
+            <path class="mhm-hookah-smoke" d="M60 46 Q62 22 56 6" stroke="#c8b6ff" stroke-width="1.6" fill="none" opacity=".35"/>
+            <path class="mhm-hookah-smoke" d="M68 50 Q78 30 72 8" stroke="#9dffc4" stroke-width="1.4" fill="none" opacity=".3"/>
+          </svg>
+        </div>
+      </div>
+    </header>
+
+    <section class="mhm-section" id="mhmTypes">
+      <div class="mhm-section-head">
+        <h2>The types</h2>
+        <p>Flip a card — indica, sativa, hybrid, hemp, ruderalis. A bit of history on the back, same idea as the donut case.</p>
+      </div>
+      <div class="mhm-grid" id="mhmTypeGrid"></div>
+    </section>
+
+    <section class="mhm-section" id="mhmOrigins">
+      <div class="mhm-section-head">
+        <h2><i class="bi bi-globe2"></i> Cannabis Origins</h2>
+        <p>Landrace geography on the page — no extra password. Tap a name or pin. Educational only, not cultivation advice.</p>
+      </div>
+      <div class="mhm-origins-layout">
+        <ul class="mhm-origins-list" id="cannabisOriginsList"></ul>
+        <div class="mhm-origins-map-wrap">
+          <div id="cannabisOriginsMap" class="mhm-origins-map" role="img" aria-label="Map of cannabis landrace origin regions"></div>
+          <p id="cannabisOriginsMapStatus" class="mhm-origins-map-status">Loading origins map…</p>
+          <button type="button" class="mhm-origins-map-reset" id="cannabisOriginsMapReset" hidden>
+            <i class="bi bi-arrow-clockwise"></i> Show all pins
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="mhm-section" id="mhmLab">
+      <div class="mhm-section-head">
+        <h2>The Lab</h2>
+        <p>Blacklight stack — GPU toys from the entertainment side.</p>
+      </div>
+      <div class="mhm-lab-grid" id="mhmLabGrid"></div>
+    </section>
+
+    <aside class="mhm-guide mhm-guide--dock is-compact" id="mhmGuide" aria-label="Sage guide">
+      <div class="mhm-guide-card">
+        <button type="button" class="mhm-guide-portrait-btn" id="mhmGuideExpand" aria-label="Sage — expand dock">
+          <img
+            class="mhm-guide-portrait"
+            src="/mountain-high/assets/sage-portrait.svg"
+            width="56"
+            height="56"
+            alt="Sage"
+          />
+        </button>
+        <div class="mhm-guide-meta">
+          <h2 class="h5 mb-0">Sage</h2>
+          <p class="mb-1">Budtender · educator · lockout buddy</p>
+          <p class="mhm-status mhm-dev-only mb-0" id="mhmHeygenStatus" hidden></p>
+        </div>
+        <div class="mhm-guide-actions">
+          <button type="button" class="mhm-btn mhm-btn-sm" id="mhmMeetSage" title="Hear welcome" aria-label="Hear welcome">
+            <i class="bi bi-play-fill" aria-hidden="true"></i>
+            <span class="mhm-guide-action-label">Hear welcome</span>
+          </button>
+          <button type="button" class="mhm-btn mhm-btn-sm" id="mhmAskSage" aria-label="Ask Sage">
+            <i class="bi bi-chat-dots-fill" aria-hidden="true"></i>
+            <span class="mhm-guide-action-label">Ask Sage</span>
+          </button>
+          <button type="button" class="mhm-btn mhm-btn-sm mhm-dev-only" id="mhmHeygenLive" hidden aria-label="Live Sage">
+            <i class="bi bi-camera-video-fill" aria-hidden="true"></i>
+            <span class="mhm-guide-action-label">Live Sage</span>
+          </button>
+          <button type="button" class="mhm-btn mhm-btn-sm" id="mhmGuideCollapse" title="Collapse Sage dock" aria-label="Collapse Sage dock">
+            <i class="bi bi-chevron-down" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+      <div class="mhm-heygen-wrap">
+        <div id="mhmHeygenMedia" class="mhm-heygen-media" hidden></div>
+      </div>
+    </aside>
+
+    <footer class="mhm-footer" id="mhmFooter">
+      <p class="mhm-footer-lock" id="mhmFooterLock">
+        <i class="bi bi-key-fill" aria-hidden="true"></i>
+        Also a <strong>locksmith</strong> — same number —
+        <a href="tel:+19092191370">(909) 219-1370</a>
+        · Long Beach &amp; L.A. lockouts &amp; keys
+      </p>
+      <p class="mhm-footer-note">21+ prototype · Mountain High Medicinals · Sage by HeyGen · Development by David Lane</p>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/livekit-client@2.15.8/dist/livekit-client.umd.min.js"></script>
+  <script src="/shared/tts.js"></script>
+  <script src="/shared/js/webgpu-runtime.js?v=2"></script>
+  <script src="/shared/js/webgpu-blacklight-poster.js?v=4"></script>
+  <script src="/mountain-high/js/mhm-age-gate.js"></script>
+  <script src="/mountain-high/js/mhm-leaves.js"></script>
+  <script src="/mountain-high/js/mhm-float.js"></script>
+  <script src="/mountain-high/js/mhm-hero-gpu.js"></script>
+  <script src="/mountain-high/js/mhm-types.js"></script>
+  <script src="/mountain-high/js/mhm-heygen.js"></script>
+  <script src="/mountain-high/js/mhm-dock.js"></script>
+  <script type="module" src="/mountain-high/js/mhm-guide-chat.js"></script>
+  <script src="/family/js/lane-family-google-maps.js"></script>
+  <script src="/shared/google-advanced-markers.js"></script>
+  <script src="/nature/js/cannabis-origins-map.js"></script>
+  <script>
+    (function () {
+      const MHM_DEV = window.MHM_DEV;
+      if (MHM_DEV) document.body.classList.add('mhm-dev');
+
+      let booted = false;
+      async function bootApp() {
+        if (booted) return;
+        booted = true;
+
+        try {
+          await window.MhmTypes.mount(document.getElementById('mhmTypeGrid'));
+        } catch (err) {
+          const grid = document.getElementById('mhmTypeGrid');
+          if (grid) grid.textContent = err.message || 'Types failed to load.';
+        }
+
+        try {
+          const res = await fetch('/data/mountain-high.json', { cache: 'no-store' });
+          const catalog = await res.json();
+          const lab = document.getElementById('mhmLabGrid');
+          if (lab && Array.isArray(catalog.lab)) {
+            lab.innerHTML = catalog.lab.map((item) => (
+              '<a href="' + item.href + '"><i class="bi ' + item.icon + '"></i><strong>' + item.label + '</strong><span>' + (item.title || '') + '</span></a>'
+            )).join('');
+          }
+        } catch (_) {
+          /* lab optional */
+        }
+
+        if (window.CannabisOriginsMap?.init) {
+          window.CannabisOriginsMap.init();
+        }
+
+        if (MHM_DEV) {
+          document.getElementById('mhmStatus')?.removeAttribute('hidden');
+          document.getElementById('mhmMic')?.removeAttribute('hidden');
+          document.getElementById('mhmHeygenLive')?.removeAttribute('hidden');
+          document.getElementById('mhmHeygenStatus')?.removeAttribute('hidden');
+        }
+
+        const hero = await window.MhmHeroGpu.mount({
+          canvas: document.getElementById('mhmCanvas'),
+          fallback: document.getElementById('mhmFallback'),
+          status: document.getElementById('mhmStatus'),
+          posterUrl: '/mountain-high/assets/hero-card.png',
+          devMode: MHM_DEV,
+        });
+
+        document.getElementById('mhmMic')?.addEventListener('click', () => {
+          if (!hero?.toggleMic) return;
+          hero.toggleMic().then((on) => {
+            const btn = document.getElementById('mhmMic');
+            if (btn) {
+              btn.textContent = on ? 'Stop mic' : 'Start mic';
+              btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+            }
+          }).catch((err) => {
+            if (!MHM_DEV) return;
+            const status = document.getElementById('mhmStatus');
+            if (status) {
+              status.textContent = err.message || 'Mic denied';
+              status.hidden = false;
+            }
+          });
+        });
+      }
+
+      function startFloats() {
+        if (window.MhmFloat) {
+          window.MhmFloat.mount({
+            canvas: document.getElementById('mhmLeafCanvas'),
+            layer: document.getElementById('mhmFloatLayer'),
+          });
+        }
+      }
+
+      function whenUnlocked() {
+        if (document.body.dataset.age === 'ok') bootApp();
+      }
+
+      window.addEventListener('mhm-age-ok', bootApp);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          startFloats();
+          whenUnlocked();
+        });
+      } else {
+        startFloats();
+        whenUnlocked();
+      }
+    })();
+  </script>
+</body>
+</html>

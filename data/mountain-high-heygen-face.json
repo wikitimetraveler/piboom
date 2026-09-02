@@ -1,0 +1,10 @@
+{
+  "name": "Sage",
+  "avatarFile": "AVATAR-SAGE.md",
+  "avatarId": null,
+  "groupId": null,
+  "voiceId": null,
+  "voiceName": null,
+  "greeting": "Hey — Sage here. Twenty-one and over. Flip a type or ask me about locksmiths in Long Beach and L.A.",
+  "status": "streaming-uses-env-defaults"
+}
