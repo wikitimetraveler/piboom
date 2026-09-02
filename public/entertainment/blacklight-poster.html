@@ -92,7 +92,10 @@
     <div class="blp-stage">
       <canvas id="blpCanvas" role="img" aria-label="WebGPU black light poster"></canvas>
     </div>
-    <p class="mt-3 mb-0">
+    <p class="mhm-return-link mt-3 mb-0">
+      <a href="/mountain-high/">← Mountain High Medicinals</a> · The Lab
+    </p>
+    <p class="mt-2 mb-0" style="text-align:center;font-size:0.88rem;">
       <a href="/">Home globe</a>
       ·
       <a href="/entertainment/poster-generator.html">AI Poster Generator</a>
@@ -101,7 +104,7 @@
     </p>
   </main>
   <script src="/shared/js/webgpu-runtime.js?v=2"></script>
-  <script src="/shared/js/webgpu-blacklight-poster.js?v=4"></script>
+  <script src="/shared/js/webgpu-blacklight-poster.js?v=7"></script>
   <script>
     (function () {
       const els = {
@@ -193,7 +196,9 @@
         raf = requestAnimationFrame(tickAudio);
         const data = new Uint8Array(analyser.frequencyBinCount);
         analyser.getByteFrequencyData(data);
-        view.setBands(window.WebGpuBlacklightPoster.fftBands(data));
+        view.setBands(window.WebGpuBlacklightPoster.boostBands(
+          window.WebGpuBlacklightPoster.fftBands(data)
+        ));
       }
 
       async function toggleMic() {
@@ -206,7 +211,7 @@
           analyser = null;
           els.mic.setAttribute('aria-pressed', 'false');
           els.mic.textContent = 'Start mic';
-          if (view) view.setBands({ bass: 0.05, mids: 0.1, highs: 0.06 });
+          if (view) view.setBands({ bass: 0.1, mids: 0.14, highs: 0.1 });
           setStatus('Mic off — poster still computing.');
           return;
         }

@@ -74,7 +74,10 @@
           <a class="mhm-phone mhm-btn mhm-btn-primary" href="tel:+19092191370">(909) 219-1370</a>
           <p class="mhm-status mhm-dev-only" id="mhmStatus" hidden>Starting WebGPU…</p>
           <div class="mhm-gate-actions justify-content-center">
-            <button type="button" class="mhm-btn mhm-btn-ghost mhm-dev-only" id="mhmMic" hidden>Start mic</button>
+            <button type="button" class="mhm-btn mhm-btn-ghost" id="mhmMic" aria-pressed="false" aria-label="Sound reactive — mic drives the poster">
+              <i class="bi bi-mic-fill" aria-hidden="true"></i>
+              <span id="mhmMicLabel">Sound reactive</span>
+            </button>
             <a class="mhm-btn mhm-btn-ghost" href="sms:+19092191370">Text the card</a>
           </div>
           <a href="#mhmTypes" class="mhm-scroll-cue" id="mhmScrollCue">
@@ -188,7 +191,7 @@
   <script src="https://cdn.jsdelivr.net/npm/livekit-client@2.15.8/dist/livekit-client.umd.min.js"></script>
   <script src="/shared/tts.js"></script>
   <script src="/shared/js/webgpu-runtime.js?v=2"></script>
-  <script src="/shared/js/webgpu-blacklight-poster.js?v=4"></script>
+  <script src="/shared/js/webgpu-blacklight-poster.js?v=7"></script>
   <script src="/mountain-high/js/mhm-age-gate.js"></script>
   <script src="/mountain-high/js/mhm-leaves.js"></script>
   <script src="/mountain-high/js/mhm-float.js"></script>
@@ -236,9 +239,24 @@
 
         if (MHM_DEV) {
           document.getElementById('mhmStatus')?.removeAttribute('hidden');
-          document.getElementById('mhmMic')?.removeAttribute('hidden');
           document.getElementById('mhmHeygenLive')?.removeAttribute('hidden');
           document.getElementById('mhmHeygenStatus')?.removeAttribute('hidden');
+        }
+
+        function setMicUi(on, errMsg) {
+          const btn = document.getElementById('mhmMic');
+          const label = document.getElementById('mhmMicLabel');
+          if (!btn || !label) return;
+          const icon = btn.querySelector('i');
+          if (errMsg) {
+            label.textContent = errMsg;
+            btn.setAttribute('aria-pressed', 'false');
+            if (icon) icon.className = 'bi bi-mic-fill';
+            return;
+          }
+          label.textContent = on ? 'Listening…' : 'Sound reactive';
+          btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+          if (icon) icon.className = on ? 'bi bi-mic-mute-fill' : 'bi bi-mic-fill';
         }
 
         const hero = await window.MhmHeroGpu.mount({
@@ -250,19 +268,24 @@
         });
 
         document.getElementById('mhmMic')?.addEventListener('click', () => {
-          if (!hero?.toggleMic) return;
+          if (!hero?.toggleMic) {
+            setMicUi(false, 'GPU not ready');
+            return;
+          }
+          window.ensureAudioUnlock?.();
           hero.toggleMic().then((on) => {
-            const btn = document.getElementById('mhmMic');
-            if (btn) {
-              btn.textContent = on ? 'Stop mic' : 'Start mic';
-              btn.setAttribute('aria-pressed', on ? 'true' : 'false');
-            }
+            setMicUi(on);
           }).catch((err) => {
-            if (!MHM_DEV) return;
-            const status = document.getElementById('mhmStatus');
-            if (status) {
-              status.textContent = err.message || 'Mic denied';
-              status.hidden = false;
+            const msg = err?.name === 'NotAllowedError'
+              ? 'Mic blocked — tap to retry'
+              : (err.message || 'Mic unavailable');
+            setMicUi(false, msg);
+            if (MHM_DEV) {
+              const status = document.getElementById('mhmStatus');
+              if (status) {
+                status.textContent = msg;
+                status.hidden = false;
+              }
             }
           });
         });

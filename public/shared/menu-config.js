@@ -78,6 +78,7 @@
     { href: '/music/musical-google-earth-files.html', icon: 'bi-cloud-arrow-down', label: 'Google Earth KML' },
     { href: '/music/my-grateful-dead-shows.html', icon: 'bi-calendar-event', label: 'Grateful Dead Shows' },
     { href: '/music/sample-detector.html', icon: 'bi-magnet', label: 'Sample Detector' },
+    { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Sage, locksmith Long Beach & L.A.' },
     { divider: true },
     { href: '/#headingMusic', icon: 'bi-grid-3x3-gap', label: 'All Music Tools' },
   ];
@@ -243,7 +244,8 @@
 
   /** Nature hub tool grid */
   const NATURE_TOOLS = [
-    { href: '/nature/cannabis-origins.html', icon: 'bi-globe2', label: 'Cannabis Origins', title: 'Password-gated landrace map' },
+    { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Sage, embedded origins map' },
+    { href: '/nature/cannabis-origins.html', icon: 'bi-globe2', label: 'Cannabis Origins', title: 'Password-gated landrace map (standalone)' },
     { href: '/nature/tree-discovery.html', icon: 'bi-tree', label: 'Tree Discovery', title: 'Discover trees' },
     { href: '/nature/tree-collection.html', icon: 'bi-collection', label: 'Tree Collection', title: 'Your tree collection' },
     { href: '/nature/critter-discovery.html', icon: 'bi-bug', label: 'Critter Discovery', title: 'Discover critters' },
@@ -280,6 +282,7 @@
     { href: '/music/musical-google-earth-files.html', icon: 'bi-cloud-arrow-down', label: 'Google Earth KML', title: 'Network links and downloads for Google Earth Pro' },
     { href: '/music/my-grateful-dead-shows.html', icon: 'bi-calendar-event', label: 'Grateful Dead Shows', title: 'Grateful Dead show archive' },
     { href: '/music/sample-detector.html', icon: 'bi-magnet', label: 'Sample Detector', title: 'Detect samples and covers' },
+    { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Sage, locksmith Long Beach & L.A.' },
   ];
 
   /** Public /finance pages (no login). Keep in sync with server.js FINANCE_PUBLIC_PAGES. */

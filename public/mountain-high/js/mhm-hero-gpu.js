@@ -61,8 +61,8 @@
     function idleBands() {
       const t = performance.now() / 1000;
       view.setBands({
-        bass: 0.12 + 0.1 * Math.sin(t * 0.7),
-        mids: 0.1 + 0.12 * Math.sin(t * 1.15 + 1),
+        bass: 0.1 + 0.08 * Math.sin(t * 0.7),
+        mids: 0.12 + 0.1 * Math.sin(t * 1.15 + 1),
         highs: 0.08 + 0.08 * Math.sin(t * 1.8 + 2),
       });
       idle = requestAnimationFrame(idleBands);
@@ -73,7 +73,8 @@
       raf = requestAnimationFrame(tickMic);
       const data = new Uint8Array(analyser.frequencyBinCount);
       analyser.getByteFrequencyData(data);
-      view.setBands(root.WebGpuBlacklightPoster.fftBands(data));
+      const raw = root.WebGpuBlacklightPoster.fftBands(data);
+      view.setBands(root.WebGpuBlacklightPoster.boostBands(raw));
     }
 
     async function toggleMic() {

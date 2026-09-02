@@ -57,8 +57,36 @@ fn fbm(p0: vec2f) -> f32 {
   return v;
 }
 
+fn vibrance(c: vec3f, amount: f32) -> vec3f {
+  let l = dot(c, vec3f(0.299, 0.587, 0.114));
+  return mix(vec3f(l), c, 1.0 + amount);
+}
+
+// Gentle liquid glass — quiet at rest, bass adds ripple; center stays readable.
+fn liquidOffset(p: vec2f, seed: f32, t: f32, bass: f32) -> vec2f {
+  let motion = select(1.0, 0.12, u.reduced > 0.5);
+  let strength = (0.011 + bass * 0.032) * motion;
+
+  let rippleX = sin(p.y * 4.4 + t * 1.05 + seed * 6.28)
+    + sin((p.x * 1.6 + p.y * 2.1) + t * 0.72) * 0.45;
+  let rippleY = cos(p.x * 3.9 - t * 0.92 + seed * 4.2)
+    + cos((p.x * 2.2 - p.y * 1.4) - t * 0.58) * 0.4;
+  let n = fbm(p * 1.75 + vec2f(t * 0.07 + seed, -t * 0.055 + seed * 1.3));
+
+  var off = vec2f(rippleX + (n - 0.5) * 0.55, rippleY + (n - 0.5) * 0.48) * strength;
+
+  // Ease distortion near center so logo / phone on the card stay legible.
+  let centerGuard = smoothstep(0.06, 0.48, length(p * vec2f(1.0, 1.12)));
+  return off * centerGuard;
+}
+
+fn liquidUv(uv: vec2f, p: vec2f, seed: f32, t: f32) -> vec2f {
+  return saturate(uv + liquidOffset(p, seed, t, u.bass));
+}
+
 fn proceduralInk(uv: vec2f, p: vec2f, seed: f32, t: f32, audio: f32, pulse: f32) -> vec3f {
-  var q = p * (1.6 + seed * 0.8);
+  let luv = liquidUv(uv, p, seed, t);
+  var q = (luv * 2.0 - 1.0) * (1.6 + seed * 0.8);
   q = q + vec2f(fbm(q + seed * 3.1), fbm(q + vec2f(2.1, seed))) * (0.45 + u.bass * 0.35);
   let flow = fbm(q * 2.2 + vec2f(t * 0.35 + seed, -t * 0.22));
   let rings = sin(length(p) * (14.0 + seed * 10.0) - t * 2.2 + audio * 5.0);
@@ -73,9 +101,10 @@ fn proceduralInk(uv: vec2f, p: vec2f, seed: f32, t: f32, audio: f32, pulse: f32)
   var ink = mix(magenta, cyan, 0.5 + 0.5 * spiral);
   ink = mix(ink, lime, 0.25 + 0.35 * rings);
   ink = mix(ink, orange, flow * 0.4);
-  ink = ink * (0.4 + 0.6 * flow);
-  ink = ink + lime * stars * (1.1 + u.highs);
+  ink = ink * (0.55 + 0.55 * flow);
+  ink = ink + lime * stars * (1.35 + u.highs * 0.65);
   ink = ink * pulse;
+  ink = vibrance(ink, 0.35 + audio * 0.25);
 
   let topBar = smoothstep(0.14, 0.09, uv.y) * smoothstep(0.03, 0.08, uv.y);
   let botBar = smoothstep(0.86, 0.91, uv.y) * smoothstep(0.97, 0.92, uv.y);
@@ -87,24 +116,23 @@ fn proceduralInk(uv: vec2f, p: vec2f, seed: f32, t: f32, audio: f32, pulse: f32)
 }
 
 fn gpuizePhoto(uv: vec2f, p: vec2f, seed: f32, t: f32, audio: f32) -> vec3f {
-  // Warp sample UVs like globe continent fbm so the GPT image is computed, not blitted.
-  let warp = vec2f(
-    fbm(p * 2.4 + vec2f(seed, t * 0.15)),
-    fbm(p * 2.4 + vec2f(t * 0.12, seed + 1.7))
-  );
-  let suv = saturate(uv + (warp - 0.5) * (0.045 + u.bass * 0.06));
+  // Liquid UV sample — sticker hues stay; gentle bass-reactive ripple.
+  let suv = liquidUv(uv, p, seed, t);
   var src = textureSampleLevel(posterTex, posterSamp, suv, 0.0).rgb;
 
   let luma = dot(src, vec3f(0.299, 0.587, 0.114));
   let sat = distance(src, vec3f(luma));
-  let neon = saturate((sat - 0.06) * 2.6 + (max(src.r, max(src.g, src.b)) - luma) * 1.5);
-  let room = mix(0.12, 0.28, u.mids);
+  let neon = saturate((sat - 0.03) * 3.8 + (max(src.r, max(src.g, src.b)) - luma) * 2.4);
+  let room = mix(0.52, 0.88, u.mids);
   var col = src * room;
-  let glow = vec3f(0.95, 0.15, 0.85) * src.r
-    + vec3f(0.15, 0.95, 0.45) * src.g
-    + vec3f(0.2, 0.55, 1.0) * src.b;
-  col = col + glow * neon * (0.4 + u.bass * 1.15);
-  col = col + src * (0.35 + audio * 0.55);
+
+  let glow = vec3f(1.0, 0.1, 0.92) * src.r
+    + vec3f(0.1, 1.0, 0.58) * src.g
+    + vec3f(0.22, 0.72, 1.0) * src.b;
+
+  col = col + glow * neon * (0.85 + u.bass * 1.35);
+  col = col + src * neon * (0.42 + audio * 0.75);
+  col = vibrance(col, 0.38 + audio * 0.45 + u.bass * 0.22);
   return saturate(col);
 }
 
@@ -121,7 +149,7 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
   let seed = u.seed;
   let t = select(u.time * 0.28, 0.45, u.reduced > 0.5);
   let audio = u.bass * 0.55 + u.mids * 0.35 + u.highs * 0.28;
-  let pulse = 0.55 + audio * 0.9;
+  let pulse = 0.48 + audio * 1.25;
 
   var col = vec3f(0.02, 0.0, 0.05);
   let frame = max(abs(p.x) * 0.72, abs(p.y) * 0.95);
@@ -136,10 +164,10 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
   let cyan = vec3f(0.05, 0.95, 1.0);
   let lime = vec3f(0.35, 1.0, 0.12);
   let flow = fbm(p * 2.2 + vec2f(t * 0.35 + seed, -t * 0.22));
-  let glow = magenta * u.bass * 0.55 + cyan * u.mids * 0.4 + lime * u.highs * 0.35;
-  ink = ink + glow * (0.22 + flow * 0.35);
-  let flicker = 1.0 + sin(u.time * 26.0 + uv.y * 36.0) * u.highs * 0.16;
-  ink = saturate(ink * flicker);
+  let glow = magenta * u.bass * 0.95 + cyan * u.mids * 0.72 + lime * u.highs * 0.62;
+  ink = ink + glow * (0.45 + flow * 0.55);
+  let flicker = 1.0 + sin(u.time * 26.0 + uv.y * 36.0) * u.highs * 0.18;
+  ink = vibrance(saturate(ink * flicker), 0.22 + audio * 0.38);
 
   col = mix(col, ink, inPoster);
   let rim = smoothstep(1.08, 0.88, frame) * (1.0 - inPoster);
@@ -172,10 +200,40 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
       }
       return c ? s / (c * 255) : 0;
     };
+    const peak = (a, b) => {
+      let m = 0;
+      const end = Math.min(n - 1, b);
+      for (let i = Math.max(0, a); i <= end; i += 1) {
+        m = Math.max(m, arr[i] || 0);
+      }
+      return m / 255;
+    };
+    const bassEnd = Math.max(2, Math.floor(n * 0.08));
+    const midStart = Math.floor(n * 0.08);
+    const midEnd = Math.floor(n * 0.35);
     return {
-      bass: avg(0, Math.max(2, Math.floor(n * 0.08))),
-      mids: avg(Math.floor(n * 0.08), Math.floor(n * 0.35)),
+      bass: avg(0, bassEnd) * 0.35 + peak(0, bassEnd) * 0.65,
+      mids: avg(midStart, midEnd),
       highs: avg(Math.floor(n * 0.35), n - 1),
+    };
+  }
+
+  /** Map mic FFT to wash intensity — louder input = brighter UV glow (never dimmer than quiet idle). */
+  function boostBands(raw, opts) {
+    const gain = (opts && opts.gain) || 4.8;
+    const floor = (opts && opts.floor) || 0.05;
+    const ceiling = (opts && opts.ceiling) || 1;
+    const curve = (opts && opts.curve) || 0.72;
+    function lift(v) {
+      const x = Math.min(1, Math.max(0, Number(v) || 0));
+      const boosted = Math.pow(x * gain, curve);
+      return Math.min(ceiling, floor + boosted * (1 - floor));
+    }
+    const src = raw || {};
+    return {
+      bass: lift(src.bass),
+      mids: lift(src.mids),
+      highs: lift(src.highs),
     };
   }
 
@@ -233,7 +291,7 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
     let texW = 0;
     let texH = 0;
     const start = performance.now();
-    const bands = { bass: 0.05, mids: 0.1, highs: 0.06 };
+    const bands = { bass: 0.1, mids: 0.14, highs: 0.1 };
     let seed = hashString((opts && opts.seedKey) || 'Zed|Studio Console');
     let mode = 0;
     let posterTex = createPlaceholderTex(device);
@@ -399,5 +457,5 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
     };
   }
 
-  root.WebGpuBlacklightPoster = { mount, fftBands, hashString };
+  root.WebGpuBlacklightPoster = { mount, fftBands, boostBands, hashString };
 })(typeof globalThis !== 'undefined' ? globalThis : window);

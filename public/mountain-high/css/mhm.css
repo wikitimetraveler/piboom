@@ -182,6 +182,11 @@ body.mhm-page {
   animation-timing-function: linear, ease-in-out;
 }
 
+.mhm-float--leaf {
+  animation-name: mhm-float-fall, mhm-leaf-sway;
+  animation-timing-function: linear, ease-in-out;
+}
+
 @keyframes mhm-float-fall {
   0% {
     transform: translate3d(0, 0, 0) rotate(0deg);
@@ -212,13 +217,30 @@ body.mhm-page {
 @keyframes mhm-bear-dance {
   0%,
   100% {
-    rotate: -8deg;
+    rotate: -10deg;
+    scale: 1;
   }
   25% {
-    rotate: 12deg;
+    rotate: 14deg;
+    scale: 1.06;
+  }
+  50% {
+    rotate: -6deg;
+    scale: 0.98;
   }
   75% {
-    rotate: -14deg;
+    rotate: 16deg;
+    scale: 1.05;
+  }
+}
+
+@keyframes mhm-leaf-sway {
+  0%,
+  100% {
+    rotate: -12deg;
+  }
+  50% {
+    rotate: 12deg;
   }
 }
 
@@ -344,6 +366,12 @@ html.mhm-dev .mhm-dev-only {
 body.mhm-dev .mhm-dev-only[hidden],
 html.mhm-dev .mhm-dev-only[hidden] {
   display: none !important;
+}
+
+.mhm-btn[aria-pressed="true"] {
+  border-color: var(--mhm-lime);
+  color: var(--mhm-lime);
+  box-shadow: 0 0 18px rgba(157, 255, 196, 0.22);
 }
 
 .mhm-status {
