@@ -153,6 +153,27 @@ function renderRatios(ratios, count = 0) {
   ratioShell.innerHTML = chips.join('');
 }
 
+const OSM_MAPLIBRE_STYLE = {
+  version: 8,
+  sources: {
+    'osm-tiles': {
+      type: 'raster',
+      tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+      tileSize: 256,
+      attribution: '© OpenStreetMap contributors',
+    },
+  },
+  layers: [
+    {
+      id: 'osm-tiles',
+      type: 'raster',
+      source: 'osm-tiles',
+      minzoom: 0,
+      maxzoom: 19,
+    },
+  ],
+};
+
 function initMap() {
   if (!window.maplibregl) {
     mapMeta.textContent = 'Map library unavailable.';
@@ -161,7 +182,7 @@ function initMap() {
 
   mapInstance = new maplibregl.Map({
     container: 'mapCanvas',
-    style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+    style: OSM_MAPLIBRE_STYLE,
     center: [-98.5795, 39.8283],
     zoom: 3.5,
     pitch: 45,
