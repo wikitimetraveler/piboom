@@ -43,7 +43,6 @@ Hybrid vector RAG + GraphRAG details: `docs/VECTOR_RAG.md`.
 | Variable | Purpose |
 |----------|---------|
 | `NASA_API_KEY` | NASA FIRMS fire data (active fires) |
-| `AIRNOW_API_KEY` | EPA AirNow air quality API ([docs.airnowapi.org](https://docs.airnowapi.org/)) — proxied at `/api/airnow/*` (planetarium sidebar) |
 
 Home WebGPU NASA globe textures (optional local assets): run `npm run fetch:nasa-blue-marble` to download public-domain Blue Marble + city lights + LRO Moon color map into `public/shared/textures/earth/` and `public/shared/textures/moon/` (2048×1024). No API key. If missing, compute globes fall back to procedural surfaces. Live FIRMS points on Earth still use `NASA_API_KEY` + the disasters DB.
 
