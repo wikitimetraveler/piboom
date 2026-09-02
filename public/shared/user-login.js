@@ -41,6 +41,35 @@ const FINANCE_SESSION_COOKIE_NAME = 'dc_finance_session';
 const FINANCE_SESSION_COOKIE_VALUE = '1';
 const FINANCE_SESSION_MAX_AGE_SEC = 60 * 60 * 24 * 30;
 
+/** Watch-together uses its own name gate — preserve these on Worksheets logout. */
+const THEATER_SESSION_KEYS = [
+  'dc_watch_together_unlock_v1',
+  'dc_watch_together_name_v1',
+  'wtLivekitIdentity',
+];
+
+function isWatchTogetherPath() {
+  try {
+    return window.location.pathname.startsWith('/watch-together');
+  } catch (_) {
+    return false;
+  }
+}
+
+function clearSessionStorageExceptTheater() {
+  try {
+    const preserve = new Set(THEATER_SESSION_KEYS);
+    const keys = [];
+    for (let i = 0; i < sessionStorage.length; i += 1) {
+      const key = sessionStorage.key(i);
+      if (key) keys.push(key);
+    }
+    keys.forEach((key) => {
+      if (!preserve.has(key)) sessionStorage.removeItem(key);
+    });
+  } catch (_) {}
+}
+
 function setFinanceSessionCookie() {
   try {
     document.cookie = `${FINANCE_SESSION_COOKIE_NAME}=${FINANCE_SESSION_COOKIE_VALUE}; Path=/; Max-Age=${FINANCE_SESSION_MAX_AGE_SEC}; SameSite=Lax`;
@@ -461,7 +490,7 @@ async function logout() {
   } catch (_) {}
   localStorage.removeItem('loggedInUserId');
   localStorage.removeItem('currentUserId');
-  sessionStorage.clear();
+  clearSessionStorageExceptTheater();
   clearFinanceSessionCookie();
   window.location.reload();
 }
@@ -518,6 +547,11 @@ function updateNavbarUserDisplay() {
 
 // Initialize on page load
 window.addEventListener('DOMContentLoaded', () => {
+  if (isWatchTogetherPath()) {
+    updateNavbarUserDisplay();
+    return;
+  }
+
   const params = new URLSearchParams(window.location.search);
   const returnToRaw = params.get('returnTo');
   const financeLogin = params.get('financeLogin') === '1';

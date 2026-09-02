@@ -165,22 +165,10 @@
       : 'Archive needs S3 dest (LIVEKIT_EGRESS_S3_*). Use Record couches for a local mix.';
   }
 
-  function loggedInUser() {
-    if (typeof window.getLoggedInUser === 'function') return window.getLoggedInUser();
-    return null;
-  }
-
   function displayName() {
     const entered = window.WatchTogetherGate?.getName?.();
     if (entered) return entered;
-    const user = loggedInUser();
-    if (user?.name) return String(user.name).trim();
     return 'Guest';
-  }
-
-  function userId() {
-    const user = loggedInUser();
-    return user?.id || null;
   }
 
   function expectedTime(state, now) {
@@ -1081,7 +1069,7 @@
     const result = await window.WatchTogetherSync.connect({
       code,
       name: selfName,
-      userId: userId(),
+      userId: null,
       lat: null,
       lng: null,
       handlers: {
@@ -1503,7 +1491,7 @@
         return;
       }
       const overlay = gate.buildNamePrompt({
-        suggested: loggedInUser()?.name || '',
+        suggested: displayName() === 'Guest' ? '' : displayName(),
         onUnlock: resolve,
       });
       host.appendChild(overlay);

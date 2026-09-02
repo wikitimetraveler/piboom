@@ -12,10 +12,7 @@
   }
 
   function suggestedName() {
-    const stored = window.WatchTogetherGate?.getName?.() || '';
-    if (stored) return stored;
-    const loggedIn = typeof window.getLoggedInUser === 'function' ? window.getLoggedInUser() : null;
-    return loggedIn?.name ? String(loggedIn.name).trim() : '';
+    return window.WatchTogetherGate?.getName?.() || '';
   }
 
   enterBtn?.addEventListener('click', () => {

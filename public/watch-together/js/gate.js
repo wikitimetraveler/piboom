@@ -1,5 +1,5 @@
 /**
- * Password / code gate for Watch together (sessionStorage unlock, server verify).
+ * Display-name gate for Watch together (sessionStorage only — not Worksheets login).
  */
 (function (global) {
   'use strict';
@@ -87,7 +87,7 @@
     overlay.innerHTML =
       '<form class="wt-gate-card" id="wtGateForm">' +
       '<h2>What should we call you?</h2>' +
-      '<p>Your couch goes live. They hear you. They see you. Mute anytime. This name shows in chat, on your camera, and on the map.</p>' +
+      '<p>Your couch goes live. They hear you. They see you. Mute anytime. This name shows in chat, on your camera, and on the map. <strong>No password</strong> — not Worksheets or Encompass login.</p>' +
       '<div class="wt-field"><label for="wtGateName">Your name</label><input id="wtGateName" name="name" autocomplete="nickname" maxlength="24" required></div>' +
       '<p class="wt-gate-error" id="wtGateError" role="alert"></p>' +
       '<div class="wt-gate-actions">' +
@@ -115,6 +115,7 @@
         return;
       }
       setName(name);
+      markUnlocked();
       overlay.remove();
       if (typeof onUnlock === 'function') onUnlock({ name });
     });
