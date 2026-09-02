@@ -17,7 +17,7 @@
       studioFace = data && typeof data === 'object' ? data : null;
       const faceName = String(studioFace?.name || 'Zed').trim() || 'Zed';
       const label = document.getElementById('planHeygenLabel');
-      if (label) label.textContent = faceName + ' · HeyGen';
+      if (label) label.textContent = faceName + ' · alien presenter';
       return studioFace;
     } catch (_) {
       studioFace = null;
@@ -44,7 +44,7 @@
     }
     if (wrap) wrap.classList.remove('plan-heygen--live');
     const btn = document.getElementById('planHeygenToggle');
-    if (btn) btn.textContent = 'Show Zed (HeyGen)';
+    if (btn) btn.textContent = 'Show Zed · alien presenter';
     setStatus('');
   }
 
