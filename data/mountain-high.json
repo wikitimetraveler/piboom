@@ -109,6 +109,12 @@
       "icon": "bi-image",
       "label": "Art Gallery",
       "title": "Entertainment art gallery"
+    },
+    {
+      "href": "/music/album-discovery.html",
+      "icon": "bi-disc",
+      "label": "Album Discovery",
+      "title": "Search bands, photograph jackets, build your collection"
     }
   ]
 }
