@@ -329,6 +329,68 @@ body.plan-page {
   color: rgba(200, 210, 230, 0.45);
 }
 
+.plan-air-body {
+  margin: 0;
+  font-size: 0.82rem;
+  color: rgba(232, 236, 244, 0.82);
+  line-height: 1.45;
+}
+
+.plan-air-caption {
+  margin: 0.35rem 0 0;
+  font-size: 0.68rem;
+  color: rgba(200, 210, 230, 0.48);
+}
+
+.plan-aqi {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.4rem;
+  height: 2.4rem;
+  margin-bottom: 0.45rem;
+  border-radius: 0.45rem;
+  font-family: Outfit, system-ui, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.plan-aqi--good {
+  background: rgba(0, 176, 80, 0.22);
+  color: #7dffb0;
+}
+
+.plan-aqi--moderate {
+  background: rgba(255, 204, 0, 0.18);
+  color: #ffe07a;
+}
+
+.plan-aqi--usg {
+  background: rgba(255, 128, 0, 0.2);
+  color: #ffb36a;
+}
+
+.plan-aqi--unhealthy {
+  background: rgba(255, 0, 0, 0.18);
+  color: #ff8a8a;
+}
+
+.plan-aqi--very-unhealthy {
+  background: rgba(143, 63, 151, 0.22);
+  color: #d8a0e0;
+}
+
+.plan-aqi--hazardous {
+  background: rgba(126, 0, 35, 0.28);
+  color: #ff9ab8;
+}
+
+.plan-aqi--unknown {
+  background: rgba(120, 160, 220, 0.12);
+  color: rgba(200, 210, 230, 0.55);
+}
+
 .plan-asterisms {
   margin: 0;
   padding: 0;

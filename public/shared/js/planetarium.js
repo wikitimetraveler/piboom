@@ -300,6 +300,59 @@
     if (els.facing) state.facing = els.facing.value || 'south';
   }
 
+  function formatAirCaption(summary) {
+    if (!summary || !summary.aqi) return 'No current AQI for this location';
+    const area = summary.reportingArea ? summary.reportingArea + ' · ' : '';
+    const cat = summary.category || 'AQI';
+    return area + 'AQI ' + summary.aqi + ' · ' + cat;
+  }
+
+  function aqiBandClass(aqi) {
+    const n = Number(aqi);
+    if (!Number.isFinite(n)) return 'plan-aqi--unknown';
+    if (n <= 50) return 'plan-aqi--good';
+    if (n <= 100) return 'plan-aqi--moderate';
+    if (n <= 150) return 'plan-aqi--usg';
+    if (n <= 200) return 'plan-aqi--unhealthy';
+    if (n <= 300) return 'plan-aqi--very-unhealthy';
+    return 'plan-aqi--hazardous';
+  }
+
+  async function fetchAirQuality(state, els) {
+    if (!els.airBody || !els.airCaption) return;
+    els.airBody.textContent = 'Loading EPA AirNow…';
+    els.airCaption.textContent = '';
+    try {
+      const url =
+        '/api/airnow/observation/latlong/current?lat=' +
+        encodeURIComponent(state.observer.lat) +
+        '&lon=' +
+        encodeURIComponent(state.observer.lon) +
+        '&distance=25';
+      const res = await fetch(url);
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 503 && data.error === 'AIRNOW_NOT_CONFIGURED') {
+        els.airBody.textContent = 'AirNow not configured on server (AIRNOW_API_KEY).';
+        return;
+      }
+      if (!res.ok || !data.summary) {
+        els.airBody.textContent = 'No AirNow observation for this location right now.';
+        return;
+      }
+      const summary = data.summary;
+      els.airBody.textContent = formatAirCaption(summary);
+      els.airCaption.textContent =
+        (summary.parameter || 'AQI') +
+        (summary.dateObserved ? ' · observed ' + summary.dateObserved : '');
+      if (els.airChip) {
+        els.airChip.textContent = String(summary.aqi);
+        els.airChip.className = 'plan-aqi ' + aqiBandClass(summary.aqi);
+      }
+    } catch {
+      els.airBody.textContent = 'Could not reach AirNow.';
+    }
+  }
+
   function paint(state, els) {
     const Sky = root.FunHomeSky;
     if (!Sky) return;
@@ -310,6 +363,7 @@
     sky.scrubbed = true;
     renderSkyDome(els.sky, sky, Sky, state);
     renderPlanetTable(els.planetBody, sky.planets);
+    fetchAirQuality(state, els);
     if (els.status) els.status.textContent = '';
   }
 
@@ -325,6 +379,9 @@
       location: document.getElementById('planLocation'),
       planetBody: document.getElementById('planPlanetBody'),
       asterisms: document.getElementById('planAsterisms'),
+      airBody: document.getElementById('planAirBody'),
+      airCaption: document.getElementById('planAirCaption'),
+      airChip: document.getElementById('planAirChip'),
       now: document.getElementById('planNow'),
       tonight: document.getElementById('planTonight'),
       geolocate: document.getElementById('planGeolocate'),
