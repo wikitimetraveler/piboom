@@ -27,8 +27,7 @@
   <modern-navbar></modern-navbar>
 
   <div class="mhm-float-wrap" aria-hidden="true">
-    <canvas id="mhmLeafCanvas"></canvas>
-    <div id="mhmFloatLayer" class="mhm-float-layer"></div>
+    <div class="mhm-float-layer" id="mhmFloatLayer"></div>
   </div>
 
   <aside id="mhmGate" class="mhm-gate" role="dialog" aria-labelledby="mhmGateTitle" aria-modal="true">
@@ -47,8 +46,16 @@
   <div id="mhmApp" class="mhm-app" hidden>
     <header class="mhm-hero" id="mhmHero">
       <div class="mhm-hero-stage">
+        <img
+          class="mhm-hero-card"
+          id="mhmHeroCard"
+          src="/mountain-high/assets/hero-card.png"
+          alt="Mountain High Medicinals — business card art"
+          width="1200"
+          height="1200"
+        />
         <canvas id="mhmCanvas" role="img" aria-label="WebGPU Mountain High poster"></canvas>
-        <div class="mhm-hero-fallback" id="mhmFallback" hidden></div>
+        <div class="mhm-hero-fallback" id="mhmFallback" hidden aria-hidden="true"></div>
       </div>
       <div class="mhm-hero-copy">
         <div class="mhm-hookah" aria-hidden="true">
@@ -191,11 +198,12 @@
   <script src="https://cdn.jsdelivr.net/npm/livekit-client@2.15.8/dist/livekit-client.umd.min.js"></script>
   <script src="/shared/tts.js"></script>
   <script src="/shared/js/webgpu-runtime.js?v=2"></script>
-  <script src="/shared/js/webgpu-blacklight-poster.js?v=7"></script>
+  <script src="/shared/js/webgpu-blacklight-poster.js?v=10"></script>
   <script src="/mountain-high/js/mhm-age-gate.js"></script>
-  <script src="/mountain-high/js/mhm-leaves.js"></script>
+  <script src="/mountain-high/js/mhm-leaf-icon.js"></script>
   <script src="/mountain-high/js/mhm-float.js"></script>
   <script src="/mountain-high/js/mhm-hero-gpu.js"></script>
+  <script src="/mountain-high/js/mhm-leaf-icon.js"></script>
   <script src="/mountain-high/js/mhm-types.js"></script>
   <script src="/mountain-high/js/mhm-heygen.js"></script>
   <script src="/mountain-high/js/mhm-dock.js"></script>
@@ -262,6 +270,7 @@
         const hero = await window.MhmHeroGpu.mount({
           canvas: document.getElementById('mhmCanvas'),
           fallback: document.getElementById('mhmFallback'),
+          cardEl: document.getElementById('mhmHeroCard'),
           status: document.getElementById('mhmStatus'),
           posterUrl: '/mountain-high/assets/hero-card.png',
           devMode: MHM_DEV,
@@ -294,7 +303,6 @@
       function startFloats() {
         if (window.MhmFloat) {
           window.MhmFloat.mount({
-            canvas: document.getElementById('mhmLeafCanvas'),
             layer: document.getElementById('mhmFloatLayer'),
           });
         }

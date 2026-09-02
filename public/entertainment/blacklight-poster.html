@@ -104,7 +104,7 @@
     </p>
   </main>
   <script src="/shared/js/webgpu-runtime.js?v=2"></script>
-  <script src="/shared/js/webgpu-blacklight-poster.js?v=7"></script>
+  <script src="/shared/js/webgpu-blacklight-poster.js?v=10"></script>
   <script>
     (function () {
       const els = {
@@ -134,7 +134,11 @@
       function loadImage(url) {
         return new Promise((resolve, reject) => {
           const img = new Image();
-          img.crossOrigin = 'anonymous';
+          const sameOrigin =
+            url.startsWith('/') ||
+            url.startsWith(window.location.origin) ||
+            !/^https?:\/\//i.test(url);
+          if (!sameOrigin) img.crossOrigin = 'anonymous';
           img.onload = () => resolve(img);
           img.onerror = () => reject(new Error('Could not load image'));
           img.src = url;
@@ -196,8 +200,11 @@
         raf = requestAnimationFrame(tickAudio);
         const data = new Uint8Array(analyser.frequencyBinCount);
         analyser.getByteFrequencyData(data);
-        view.setBands(window.WebGpuBlacklightPoster.boostBands(
-          window.WebGpuBlacklightPoster.fftBands(data)
+        view.setBands(window.WebGpuBlacklightPoster.mergeBands(
+          window.WebGpuBlacklightPoster.boostBands(
+            window.WebGpuBlacklightPoster.fftBands(data)
+          ),
+          window.WebGpuBlacklightPoster.AUDIO_FLOOR
         ));
       }
 
@@ -251,7 +258,9 @@
         }
         const poster = params.get('poster');
         if (poster) {
-          applyPoster(poster, 'Linked image').catch(() => reseed());
+          applyPoster(poster, 'Mountain High card').catch((err) => {
+            setStatus(err.message || 'Could not load linked poster — check the image path.');
+          });
           return;
         }
         reseed();

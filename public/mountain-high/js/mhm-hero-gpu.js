@@ -5,29 +5,57 @@
 (function (root) {
   'use strict';
 
+  const POSTER_URL = '/mountain-high/assets/hero-card.png';
+
   function loadImage(url) {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      img.crossOrigin = 'anonymous';
+      const src = url || POSTER_URL;
+      const sameOrigin =
+        src.startsWith('/') ||
+        src.startsWith(window.location.origin) ||
+        !/^https?:\/\//i.test(src);
+      if (!sameOrigin) img.crossOrigin = 'anonymous';
       img.onload = () => resolve(img);
       img.onerror = () => reject(new Error('Could not load hero card'));
-      img.src = url;
+      img.src = src;
     });
+  }
+
+  function showCardLayers(opts) {
+    const card = opts.cardEl;
+    const fallback = opts.fallback;
+    if (card) card.hidden = false;
+    if (fallback) fallback.hidden = true;
+  }
+
+  function showStaticFallback(opts) {
+    const card = opts.cardEl;
+    const canvas = opts.canvas;
+    const fallback = opts.fallback;
+    if (card) card.hidden = false;
+    if (canvas) canvas.style.opacity = '0';
+    if (fallback) fallback.hidden = false;
   }
 
   async function mount(opts) {
     const canvas = opts.canvas;
     const fallback = opts.fallback;
+    const cardEl = opts.cardEl || document.getElementById('mhmHeroCard');
     const status = opts.status;
     const devMode = Boolean(opts.devMode);
+    const posterUrl = opts.posterUrl || POSTER_URL;
+
     function setStatus(text) {
       if (!status || !devMode) return;
       status.textContent = text;
       status.hidden = !text;
     }
 
+    showCardLayers({ cardEl, fallback });
+
     if (!root.WebGpuBlacklightPoster || !canvas) {
-      if (fallback) fallback.hidden = false;
+      showStaticFallback({ cardEl, canvas, fallback });
       setStatus('WebGPU unavailable — static card.');
       return null;
     }
@@ -38,18 +66,27 @@
     });
 
     if (!view) {
-      if (fallback) fallback.hidden = false;
+      showStaticFallback({ cardEl, canvas, fallback });
       setStatus('WebGPU unavailable in this browser — same requirement as the home globe.');
       return null;
     }
 
+    let posterReady = false;
     try {
-      const img = await loadImage(opts.posterUrl || '/mountain-high/assets/hero-card.png');
+      const img = await loadImage(posterUrl);
       view.setPosterImage(img);
+      posterReady = true;
+      if (cardEl) cardEl.hidden = true;
+      canvas.style.opacity = '1';
+      if (fallback) fallback.hidden = true;
       setStatus('WebGPU compute live — their card is the albedo. Mic optional.');
-    } catch (_) {
-      view.generateProcedural({ artist: 'Mountain High', album: 'Medicinals' });
-      setStatus('GPU procedural live — card image missed. Try a refresh.');
+    } catch (err) {
+      showStaticFallback({ cardEl, canvas, fallback });
+      setStatus((err && err.message) || 'Static card — GPU texture missed.');
+    }
+
+    if (!posterReady) {
+      return { view: null, toggleMic: null, posterReady: false };
     }
 
     let audioCtx = null;
@@ -58,13 +95,16 @@
     let raf = 0;
     let idle = 0;
 
+    let lastIdleBands = { bass: 0.02, mids: 0.025, highs: 0.015 };
+
     function idleBands() {
       const t = performance.now() / 1000;
-      view.setBands({
-        bass: 0.1 + 0.08 * Math.sin(t * 0.7),
-        mids: 0.12 + 0.1 * Math.sin(t * 1.15 + 1),
-        highs: 0.08 + 0.08 * Math.sin(t * 1.8 + 2),
-      });
+      lastIdleBands = {
+        bass: 0.02 + 0.02 * Math.sin(t * 0.7),
+        mids: 0.025 + 0.025 * Math.sin(t * 1.15 + 1),
+        highs: 0.015 + 0.015 * Math.sin(t * 1.8 + 2),
+      };
+      view.setBands(lastIdleBands);
       idle = requestAnimationFrame(idleBands);
     }
 
@@ -74,7 +114,17 @@
       const data = new Uint8Array(analyser.frequencyBinCount);
       analyser.getByteFrequencyData(data);
       const raw = root.WebGpuBlacklightPoster.fftBands(data);
-      view.setBands(root.WebGpuBlacklightPoster.boostBands(raw));
+      const boosted = root.WebGpuBlacklightPoster.boostBands(raw, {
+        gain: 9.5,
+        curve: 0.52,
+        floor: 0.14,
+      });
+      const lifted = {
+        bass: Math.min(1, boosted.bass * 1.4),
+        mids: Math.min(1, boosted.mids * 1.35),
+        highs: Math.min(1, boosted.highs * 1.35),
+      };
+      view.setBands(root.WebGpuBlacklightPoster.mergeBands(lifted, lastIdleBands));
     }
 
     async function toggleMic() {
@@ -93,7 +143,8 @@
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 256;
+      analyser.fftSize = 512;
+      analyser.smoothingTimeConstant = 0.55;
       audioCtx.createMediaStreamSource(stream).connect(analyser);
       micStream = stream;
       setStatus('Listening — bass / mids / highs wash the card.');
@@ -102,9 +153,9 @@
     }
 
     idleBands();
-    root.MhmHero = { view, toggleMic };
-    return { view, toggleMic };
+    root.MhmHero = { view, toggleMic, posterReady: true };
+    return { view, toggleMic, posterReady: true };
   }
 
-  root.MhmHeroGpu = { mount };
+  root.MhmHeroGpu = { mount, POSTER_URL };
 })(typeof globalThis !== 'undefined' ? globalThis : window);

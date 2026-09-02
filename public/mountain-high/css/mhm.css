@@ -121,6 +121,23 @@ body.mhm-page {
   width: 100%;
   height: 100%;
   display: block;
+  position: relative;
+  z-index: 2;
+}
+
+.mhm-hero-card {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  z-index: 1;
+  background: #030008;
+}
+
+.mhm-hero-card[hidden] {
+  display: none;
 }
 
 .mhm-hero-fallback {

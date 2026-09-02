@@ -116,24 +116,26 @@ fn proceduralInk(uv: vec2f, p: vec2f, seed: f32, t: f32, audio: f32, pulse: f32)
 }
 
 fn gpuizePhoto(uv: vec2f, p: vec2f, seed: f32, t: f32, audio: f32) -> vec3f {
-  // Liquid UV sample — sticker hues stay; gentle bass-reactive ripple.
-  let suv = liquidUv(uv, p, seed, t);
-  var src = textureSampleLevel(posterTex, posterSamp, suv, 0.0).rgb;
+  // Sticker albedo at rest; mic lifts UV wash via react (never dims below src).
+  let wash = u.bass * 0.62 + u.mids * 0.38 + u.highs * 0.32;
+  let react = saturate((wash - 0.045) * 2.8);
+  let off = liquidOffset(p, seed, t, u.bass * (0.35 + react * 1.15));
+  let suv = saturate(uv + off);
+  let src = textureSampleLevel(posterTex, posterSamp, suv, 0.0).rgb;
 
   let luma = dot(src, vec3f(0.299, 0.587, 0.114));
   let sat = distance(src, vec3f(luma));
-  let neon = saturate((sat - 0.03) * 3.8 + (max(src.r, max(src.g, src.b)) - luma) * 2.4);
-  let room = mix(0.52, 0.88, u.mids);
-  var col = src * room;
+  let neon = saturate((sat - 0.05) * 3.2 + (max(src.r, max(src.g, src.b)) - luma) * 1.6);
 
   let glow = vec3f(1.0, 0.1, 0.92) * src.r
     + vec3f(0.1, 1.0, 0.58) * src.g
     + vec3f(0.22, 0.72, 1.0) * src.b;
 
-  col = col + glow * neon * (0.85 + u.bass * 1.35);
-  col = col + src * neon * (0.42 + audio * 0.75);
-  col = vibrance(col, 0.38 + audio * 0.45 + u.bass * 0.22);
-  return saturate(col);
+  let accent = glow * neon * react * 0.78;
+  var col = src + accent;
+  col = col + src * neon * react * 0.42;
+  col = mix(src, vibrance(col, 0.12 + react * 0.62), react * 0.88);
+  return saturate(max(col, src));
 }
 
 @compute @workgroup_size(8, 8, 1)
@@ -165,9 +167,26 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
   let lime = vec3f(0.35, 1.0, 0.12);
   let flow = fbm(p * 2.2 + vec2f(t * 0.35 + seed, -t * 0.22));
   let glow = magenta * u.bass * 0.95 + cyan * u.mids * 0.72 + lime * u.highs * 0.62;
-  ink = ink + glow * (0.45 + flow * 0.55);
-  let flicker = 1.0 + sin(u.time * 26.0 + uv.y * 36.0) * u.highs * 0.18;
-  ink = vibrance(saturate(ink * flicker), 0.22 + audio * 0.38);
+  let wash = u.bass * 0.62 + u.mids * 0.38 + u.highs * 0.32;
+  let react = saturate((wash - 0.045) * 2.8);
+  if (u.mode > 0.5) {
+    ink = ink + glow * react * (0.24 + flow * 0.32);
+  } else {
+    ink = ink + glow * (0.45 + flow * 0.55);
+  }
+  let flicker = 1.0 + max(0.0, sin(u.time * 26.0 + uv.y * 36.0)) * u.highs * 0.28;
+  if (u.mode > 0.5) {
+    let flick = mix(1.0, flicker, react * 0.82);
+    let boosted = vibrance(saturate(ink * flick), 0.08 + audio * react * 0.48);
+    ink = mix(ink, boosted, react * 0.88);
+  } else {
+    ink = vibrance(saturate(ink * flicker), 0.22 + audio * 0.38);
+  }
+  if (u.mode > 0.5) {
+    let suv0 = saturate(uv + liquidOffset(p, seed, t, u.bass * (0.35 + react * 1.15)));
+    let src0 = textureSampleLevel(posterTex, posterSamp, suv0, 0.0).rgb;
+    ink = max(ink, src0);
+  }
 
   col = mix(col, ink, inPoster);
   let rim = smoothstep(1.08, 0.88, frame) * (1.0 - inPoster);
@@ -218,10 +237,13 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
     };
   }
 
-  /** Map mic FFT to wash intensity — louder input = brighter UV glow (never dimmer than quiet idle). */
+  /** Rest baseline — mic wash never drops below idle brightness. */
+  const AUDIO_FLOOR = { bass: 0.1, mids: 0.12, highs: 0.08 };
+
+  /** Map mic FFT to wash intensity — louder input = brighter UV glow only. */
   function boostBands(raw, opts) {
     const gain = (opts && opts.gain) || 4.8;
-    const floor = (opts && opts.floor) || 0.05;
+    const floor = (opts && opts.floor) || 0.08;
     const ceiling = (opts && opts.ceiling) || 1;
     const curve = (opts && opts.curve) || 0.72;
     function lift(v) {
@@ -234,6 +256,17 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
       bass: lift(src.bass),
       mids: lift(src.mids),
       highs: lift(src.highs),
+    };
+  }
+
+  /** Never let live bands fall below rest / idle (sound reactive = brighten only). */
+  function mergeBands(next, floor) {
+    const f = floor || AUDIO_FLOOR;
+    const n = next || {};
+    return {
+      bass: Math.max(Number(f.bass) || 0, Number(n.bass) || 0),
+      mids: Math.max(Number(f.mids) || 0, Number(n.mids) || 0),
+      highs: Math.max(Number(f.highs) || 0, Number(n.highs) || 0),
     };
   }
 
@@ -457,5 +490,12 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
     };
   }
 
-  root.WebGpuBlacklightPoster = { mount, fftBands, boostBands, hashString };
+  root.WebGpuBlacklightPoster = {
+    mount,
+    fftBands,
+    boostBands,
+    mergeBands,
+    AUDIO_FLOOR,
+    hashString,
+  };
 })(typeof globalThis !== 'undefined' ? globalThis : window);

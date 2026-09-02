@@ -14,8 +14,9 @@
   }
 
   function leafSvg() {
-    return `<svg class="mhm-leaf-mark" viewBox="0 0 72 72" aria-hidden="true">
-      <path fill="currentColor" d="M36 6c3 12 14 18 8 28 16-2 18 12 6 16 10 8 2 16-8 10 2 12-8 16-10 8-2 8-12 4-10-8-10 6-18-2-8-10-12-4-10-18 6-16-6-10 5-16 8-28 2 12 13 18 8 28z"/>
+    return root.MhmLeafIcon?.svgMarkup({ className: 'mhm-leaf-mark' })
+      || `<svg class="mhm-leaf-mark" viewBox="0 0 100 100" aria-hidden="true">
+      <path fill="currentColor" d="M50 4C51.5 14 53 20 50 26C58 16 68 18 76 28C71 34 66 40 69 48C79 46 87 54 90 64C80 64 70 67 64 74C62 81 57 88 50 96C43 88 38 81 36 74C30 67 20 64 10 64C13 54 21 46 31 48C34 40 29 34 24 28C32 18 42 16 50 26C47 20 48.5 14 50 4Z"/>
     </svg>`;
   }
 
