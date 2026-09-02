@@ -117,6 +117,40 @@ body.plan-page {
   overflow: hidden;
 }
 
+.plan-stage--fullscreen {
+  border-radius: 0;
+  min-height: 100vh;
+}
+
+.plan-stage__fs {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid rgba(200, 210, 230, 0.35);
+  border-radius: 999px;
+  background: rgba(8, 12, 22, 0.72);
+  color: rgba(255, 250, 240, 0.9);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+
+.plan-stage__fs:hover {
+  border-color: rgba(255, 210, 120, 0.55);
+  color: #ffe8b0;
+}
+
+.plan-stage--fullscreen .plan-stage__fs {
+  top: 1rem;
+  right: 1rem;
+}
+
 .plan-sky {
   position: absolute;
   inset: 0;
@@ -362,6 +396,104 @@ body.plan-page {
   margin: 0 0 0.5rem;
   font-size: 0.82rem;
   color: rgba(157, 255, 196, 0.85);
+}
+
+.plan-btn--sm {
+  font-size: 0.72rem;
+  padding: 0.32rem 0.65rem;
+}
+
+.plan-btn--carl {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.plan-carl-lead {
+  margin: 0 0 0.65rem;
+  font-size: 0.78rem;
+  color: rgba(232, 236, 244, 0.68);
+}
+
+.plan-carl-welcome__avatar {
+  display: inline-block;
+  font-size: 2.5rem;
+  margin-bottom: 0.35rem;
+  filter: drop-shadow(0 0 8px rgba(120, 255, 220, 0.45));
+}
+
+.plan-heygen {
+  margin-bottom: 0.5rem;
+  padding: 0.55rem;
+  border: 1px dashed rgba(120, 255, 220, 0.22);
+  border-radius: 0.5rem;
+  background: rgba(6, 14, 24, 0.55);
+}
+
+.plan-heygen--live {
+  border-style: solid;
+  border-color: rgba(120, 255, 220, 0.45);
+}
+
+.plan-heygen__media {
+  margin-bottom: 0.45rem;
+  border-radius: 0.45rem;
+  overflow: hidden;
+  background: #04060e;
+  min-height: 7rem;
+}
+
+.plan-heygen__video {
+  display: block;
+  width: 100%;
+  max-height: 12rem;
+  object-fit: cover;
+}
+
+.plan-heygen__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.plan-heygen__label {
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(120, 255, 220, 0.65);
+}
+
+.plan-heygen__status {
+  margin: 0.35rem 0 0;
+  font-size: 0.72rem;
+  color: rgba(200, 210, 230, 0.55);
+  min-height: 1rem;
+}
+
+.plan-roadmap summary {
+  cursor: pointer;
+  font-family: Outfit, system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(200, 210, 230, 0.55);
+  list-style: none;
+}
+
+.plan-roadmap summary::-webkit-details-marker {
+  display: none;
+}
+
+.plan-roadmap-list {
+  margin: 0.65rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.76rem;
+  color: rgba(232, 236, 244, 0.65);
+}
+
+.plan-roadmap-list li {
+  padding: 0.15rem 0;
 }
 
 @keyframes plan-twinkle {

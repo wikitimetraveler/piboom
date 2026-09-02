@@ -300,6 +300,60 @@
     if (els.facing) state.facing = els.facing.value || 'south';
   }
 
+  let _liveState = null;
+  let _liveSky = null;
+
+  function getSkyContext() {
+    const Sky = root.FunHomeSky;
+    if (!_liveState || !Sky) return {};
+    const sky = _liveSky;
+    return {
+      observerLabel: _liveState.observer.label,
+      lat: _liveState.observer.lat.toFixed(2) + '°',
+      lon: _liveState.observer.lon.toFixed(2) + '°',
+      dateLocal: formatDateInput(_liveState.date) + ' ' + formatTimeInput(_liveState.date),
+      facing: _liveState.facing || 'south',
+      moonPhase: Sky.moonPhaseLabel(_liveState.date),
+      caption: sky ? Sky.formatSkyCaption(sky) : '',
+      planets: formatPlanetRows(sky?.planets || []).map((p) => ({
+        name: p.name,
+        alt: p.alt,
+        az: p.az,
+      })),
+      asterisms: (Sky.SKY_ASTERISMS || []).map((a) => a.label),
+      twilight: sky ? twilightLabel(sky.sunAlt) : '',
+    };
+  }
+
+  function bindFullscreen(els) {
+    const stage = document.querySelector('.plan-stage');
+    const btn = document.getElementById('planFullscreen');
+    if (!stage || !btn) return;
+
+    btn.addEventListener('click', () => {
+      if (document.fullscreenElement === stage) {
+        document.exitFullscreen?.().catch(() => {});
+      } else {
+        stage.requestFullscreen?.().catch(() => {
+          if (els.status) els.status.textContent = 'Fullscreen not supported in this browser';
+        });
+      }
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+      const on = document.fullscreenElement === stage;
+      stage.classList.toggle('plan-stage--fullscreen', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btn.innerHTML = on
+        ? '<i class="bi bi-fullscreen-exit" aria-hidden="true"></i> Exit'
+        : '<i class="bi bi-arrows-fullscreen" aria-hidden="true"></i> Full screen';
+      if (els.status && on) els.status.textContent = 'Full screen — press Esc to exit';
+      else if (els.status && !on && els.status.textContent.includes('Full screen')) {
+        els.status.textContent = '';
+      }
+    });
+  }
+
   function paint(state, els) {
     const Sky = root.FunHomeSky;
     if (!Sky) return;
@@ -308,9 +362,11 @@
       forceTime: true,
     });
     sky.scrubbed = true;
+    _liveState = state;
+    _liveSky = sky;
     renderSkyDome(els.sky, sky, Sky, state);
     renderPlanetTable(els.planetBody, sky.planets);
-    if (els.status) els.status.textContent = '';
+    if (els.status && !document.fullscreenElement) els.status.textContent = '';
   }
 
   function initPage() {
@@ -409,6 +465,8 @@
         if (els.status) els.status.textContent = url;
       });
     }
+
+    bindFullscreen(els);
   }
 
   if (typeof document !== 'undefined') {
@@ -428,5 +486,6 @@
     formatAltAz,
     twilightLabel,
     projOptsFor,
+    getSkyContext,
   };
 })(typeof globalThis !== 'undefined' ? globalThis : window);

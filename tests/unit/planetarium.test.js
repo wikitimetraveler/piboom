@@ -55,4 +55,8 @@ describe('Planetarium', () => {
     expect(Planetarium.twilightLabel(5)).toMatch(/Daylight/);
     expect(Planetarium.twilightLabel(-20)).toBe('');
   });
+
+  test('getSkyContext is exported', () => {
+    expect(typeof Planetarium.getSkyContext).toBe('function');
+  });
 });
