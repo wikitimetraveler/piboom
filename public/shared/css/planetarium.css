@@ -492,8 +492,149 @@ body.plan-page {
   color: rgba(232, 236, 244, 0.65);
 }
 
-.plan-roadmap-list li {
-  padding: 0.15rem 0;
+.plan-roadmap-note {
+  margin-top: 0.65rem;
+  font-size: 0.76rem;
+  color: rgba(232, 236, 244, 0.65);
+}
+
+.plan-panel-lead {
+  margin: 0 0 0.55rem;
+  font-size: 0.74rem;
+  color: rgba(232, 236, 244, 0.58);
+}
+
+.plan-compass {
+  position: absolute;
+  top: 0.65rem;
+  left: 0.65rem;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.plan-compass__ring {
+  position: relative;
+  width: 3.25rem;
+  height: 3.25rem;
+  border: 2px solid rgba(255, 210, 120, 0.45);
+  border-radius: 50%;
+  background: rgba(6, 10, 18, 0.72);
+}
+
+.plan-compass__needle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2px;
+  height: 42%;
+  margin-left: -1px;
+  transform-origin: center bottom;
+  transform: translate(-50%, -100%) rotate(var(--plan-heading, 0deg));
+  background: linear-gradient(180deg, #ff6b6b, rgba(255, 107, 107, 0.2));
+  border-radius: 1px;
+}
+
+.plan-compass__label {
+  position: absolute;
+  left: 50%;
+  top: 0.35rem;
+  transform: translateX(-50%);
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: rgba(255, 210, 120, 0.85);
+}
+
+.plan-compass__hint {
+  margin: 0.25rem 0 0;
+  font-size: 0.62rem;
+  color: rgba(232, 236, 244, 0.55);
+}
+
+.plan-compass-status {
+  margin: 0.45rem 0 0;
+  font-size: 0.72rem;
+  color: rgba(157, 255, 196, 0.75);
+  min-height: 1rem;
+}
+
+.plan-search-label {
+  display: block;
+  margin: 0;
+}
+
+.plan-search-label .form-control {
+  background: #0c1220;
+  border-color: rgba(120, 160, 220, 0.28);
+  color: #e8ecf4;
+  font-size: 0.82rem;
+}
+
+.plan-catalog-hits,
+.plan-iss-list,
+.plan-events-list,
+.plan-deepsky-list {
+  margin: 0.55rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.76rem;
+}
+
+.plan-catalog-hits li,
+.plan-iss-list li,
+.plan-events-list li,
+.plan-deepsky-list li {
+  padding: 0.28rem 0;
+  border-bottom: 1px solid rgba(120, 160, 220, 0.08);
+}
+
+.plan-empty {
+  color: rgba(200, 210, 230, 0.45);
+  font-style: italic;
+}
+
+.plan-catalog-hit,
+.plan-deepsky-hit {
+  display: block;
+  width: 100%;
+  padding: 0.25rem 0;
+  border: 0;
+  background: transparent;
+  color: rgba(232, 236, 244, 0.85);
+  text-align: left;
+  cursor: pointer;
+}
+
+.plan-catalog-hit:hover,
+.plan-deepsky-hit:hover {
+  color: rgba(255, 210, 120, 0.95);
+}
+
+.plan-event-kind {
+  display: inline-block;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.1rem 0.35rem;
+  border-radius: 999px;
+  margin-right: 0.25rem;
+  background: rgba(120, 160, 220, 0.2);
+  color: rgba(200, 220, 255, 0.85);
+}
+
+.plan-event-kind--eclipse {
+  background: rgba(255, 120, 80, 0.25);
+  color: rgba(255, 200, 170, 0.95);
+}
+
+.plan-event-kind--meteor {
+  background: rgba(180, 120, 255, 0.22);
+}
+
+.plan-event-kind--conjunction,
+.plan-event-kind--opposition {
+  background: rgba(255, 210, 120, 0.18);
+  color: rgba(255, 230, 180, 0.9);
 }
 
 @keyframes plan-twinkle {

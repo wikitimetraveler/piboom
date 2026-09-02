@@ -1,0 +1,22 @@
+[
+  { "id": "M1", "type": "messier", "name": "Crab Nebula", "nick": "Crab", "ra": 83.633, "dec": 22.015, "mag": 8.4 },
+  { "id": "M13", "type": "messier", "name": "Hercules Globular Cluster", "nick": "Great Cluster", "ra": 250.423, "dec": 36.461, "mag": 5.8 },
+  { "id": "M27", "type": "messier", "name": "Dumbbell Nebula", "nick": "Dumbbell", "ra": 56.75, "dec": 22.721, "mag": 7.4 },
+  { "id": "M31", "type": "messier", "name": "Andromeda Galaxy", "nick": "Andromeda", "ra": 10.685, "dec": 41.269, "mag": 3.4 },
+  { "id": "M33", "type": "messier", "name": "Triangulum Galaxy", "nick": "Triangulum", "ra": 23.462, "dec": 30.66, "mag": 5.7 },
+  { "id": "M42", "type": "messier", "name": "Orion Nebula", "nick": "Orion Nebula", "ra": 83.822, "dec": -5.391, "mag": 4.0 },
+  { "id": "M44", "type": "messier", "name": "Beehive Cluster", "nick": "Praesepe", "ra": 130.1, "dec": 19.667, "mag": 3.7 },
+  { "id": "M45", "type": "messier", "name": "Pleiades", "nick": "Seven Sisters", "ra": 56.871, "dec": 24.105, "mag": 1.6 },
+  { "id": "M51", "type": "messier", "name": "Whirlpool Galaxy", "nick": "Whirlpool", "ra": 202.469, "dec": 47.195, "mag": 8.4 },
+  { "id": "M57", "type": "messier", "name": "Ring Nebula", "nick": "Ring", "ra": 283.396, "dec": 33.029, "mag": 8.8 },
+  { "id": "M81", "type": "messier", "name": "Bode Galaxy", "nick": "Bode", "ra": 148.888, "dec": 69.065, "mag": 6.9 },
+  { "id": "M82", "type": "messier", "name": "Cigar Galaxy", "nick": "Cigar", "ra": 148.968, "dec": 69.68, "mag": 8.4 },
+  { "id": "M92", "type": "messier", "name": "Hercules Cluster", "nick": "M92", "ra": 259.281, "dec": 43.136, "mag": 6.4 },
+  { "id": "M104", "type": "messier", "name": "Sombrero Galaxy", "nick": "Sombrero", "ra": 189.997, "dec": -11.623, "mag": 8.0 },
+  { "id": "Sirius", "type": "star", "name": "Sirius", "hip": "HIP32349", "ra": 101.287, "dec": -16.716, "mag": -1.46 },
+  { "id": "Vega", "type": "star", "name": "Vega", "hip": "HIP91262", "ra": 279.235, "dec": 38.784, "mag": 0.03 },
+  { "id": "Arcturus", "type": "star", "name": "Arcturus", "hip": "HIP69673", "ra": 213.915, "dec": 19.182, "mag": -0.05 },
+  { "id": "Betelgeuse", "type": "star", "name": "Betelgeuse", "hip": "HIP27989", "ra": 88.793, "dec": 7.407, "mag": 0.42 },
+  { "id": "Polaris", "type": "star", "name": "Polaris", "hip": "HIP11767", "ra": 37.954, "dec": 89.264, "mag": 1.98 },
+  { "id": "Algol", "type": "star", "name": "Algol", "hip": "HIP14576", "ra": 47.042, "dec": 40.956, "mag": 2.09 }
+]

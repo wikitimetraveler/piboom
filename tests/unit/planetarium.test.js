@@ -59,4 +59,14 @@ describe('Planetarium', () => {
   test('getSkyContext is exported', () => {
     expect(typeof Planetarium.getSkyContext).toBe('function');
   });
+
+  test('isDarkSky treats civil twilight as not dark', () => {
+    expect(Planetarium.isDarkSky(-5)).toBe(false);
+    expect(Planetarium.isDarkSky(-8)).toBe(true);
+  });
+
+  test('projOptsFor uses compass azimuth when compass mode on', () => {
+    const opts = Planetarium.projOptsFor({ facing: 'south', compassMode: true, compassAz: 95 });
+    expect(opts.centerAz).toBe(95);
+  });
 });

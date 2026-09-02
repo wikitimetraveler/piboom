@@ -1,0 +1,58 @@
+[
+  {
+    "id": "mars-opposition-2026",
+    "type": "opposition",
+    "title": "Mars at opposition",
+    "date": "2026-02-19",
+    "note": "Mars brightest and up all night — orange beacon in the east after dusk."
+  },
+  {
+    "id": "total-solar-2026",
+    "type": "eclipse",
+    "title": "Total solar eclipse",
+    "date": "2026-08-12",
+    "note": "Totality path crosses Greenland, Iceland, and Spain — not visible from the US."
+  },
+  {
+    "id": "jupiter-venus-2026",
+    "type": "conjunction",
+    "title": "Jupiter–Venus conjunction",
+    "date": "2026-08-27",
+    "note": "Two brightest planets within 2° in the western sky after sunset."
+  },
+  {
+    "id": "saturn-opposition-2026",
+    "type": "opposition",
+    "title": "Saturn at opposition",
+    "date": "2026-09-21",
+    "note": "Rings tilt favorably — golden steady light in the evening sky."
+  },
+  {
+    "id": "orionids-peak-2026",
+    "type": "meteor",
+    "title": "Orionid meteor shower peak",
+    "date": "2026-10-21",
+    "note": "Watch Orion after midnight — moon-free windows are best."
+  },
+  {
+    "id": "leonids-peak-2026",
+    "type": "meteor",
+    "title": "Leonid meteor shower peak",
+    "date": "2026-11-17",
+    "note": "Radiant rises after midnight in Leo."
+  },
+  {
+    "id": "geminids-peak-2026",
+    "type": "meteor",
+    "title": "Geminid meteor shower peak",
+    "date": "2026-12-13",
+    "note": "Often the year's richest shower — allow 20 minutes for dark adaptation."
+  },
+  {
+    "id": "lunar-eclipse-2027",
+    "type": "eclipse",
+    "title": "Total lunar eclipse",
+    "date": "2027-03-03",
+    "note": "Visible across the Americas — copper Moon in Earth's shadow."
+  }
+]

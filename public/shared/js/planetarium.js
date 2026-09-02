@@ -101,14 +101,29 @@
 
   function projOptsFor(state) {
     const mobile = root.matchMedia && root.matchMedia('(max-width: 991.98px)').matches;
+    let centerAz = FACING[state.facing] || 180;
+    if (state.compassMode && Number.isFinite(state.compassAz)) {
+      centerAz = state.compassAz;
+    } else if (Number.isFinite(state.centerAzOverride)) {
+      centerAz = state.centerAzOverride;
+    }
     return {
       fovAz: mobile ? 150 : 175,
       minAlt: 3,
       maxAlt: 89,
-      centerAz: FACING[state.facing] || 180,
+      centerAz,
       yScale: 88,
       yMax: 92,
     };
+  }
+
+  function objectAltAz(ra, dec, observer, date, Sky) {
+    const lst = Sky.localSiderealDegrees(date, observer.lon);
+    return Sky.equatorialToAltAz(ra, dec, observer.lat, lst);
+  }
+
+  function isDarkSky(sunAlt) {
+    return Number(sunAlt) < -6;
   }
 
   function renderSkyDome(host, sky, Sky, state) {
@@ -233,6 +248,20 @@
       caption.appendChild(twEl);
     }
     host.appendChild(caption);
+
+    if (state.compassMode && Number.isFinite(state.compassAz)) {
+      const compass = document.createElement('div');
+      compass.className = 'plan-compass';
+      compass.setAttribute('aria-hidden', 'true');
+      compass.innerHTML =
+        '<div class="plan-compass__ring"><span class="plan-compass__needle" style="--plan-heading:' +
+        state.compassAz.toFixed(1) +
+        'deg"></span><span class="plan-compass__label">N</span></div>' +
+        '<p class="plan-compass__hint">' +
+        Math.round(state.compassAz) +
+        '° · hold phone level</p>';
+      host.appendChild(compass);
+    }
   }
 
   function renderPlanetTable(tbody, planets) {
@@ -322,6 +351,8 @@
       })),
       asterisms: (Sky.SKY_ASTERISMS || []).map((a) => a.label),
       twilight: sky ? twilightLabel(sky.sunAlt) : '',
+      compassMode: !!_liveState.compassMode,
+      compassAz: Number.isFinite(_liveState.compassAz) ? Math.round(_liveState.compassAz) : null,
     };
   }
 
@@ -393,6 +424,9 @@
       observer: Sky.DEFAULT_OBSERVER,
       date: buildSkyDate(urlState.dateParts, urlState.timeParts, new Date()),
       facing: urlState.facing || 'south',
+      compassMode: false,
+      compassAz: null,
+      centerAzOverride: null,
     };
     if (urlState.observer) state.observer = urlState.observer;
 
@@ -418,7 +452,11 @@
     ['change', 'input'].forEach((ev) => {
       if (els.date) els.date.addEventListener(ev, () => refresh(true));
       if (els.time) els.time.addEventListener(ev, () => refresh(true));
-      if (els.facing) els.facing.addEventListener(ev, () => refresh(true));
+      if (els.facing) els.facing.addEventListener(ev, () => {
+        state.centerAzOverride = null;
+        state.compassMode = false;
+        refresh(true);
+      });
     });
 
     if (els.now) {
@@ -467,6 +505,31 @@
     }
 
     bindFullscreen(els);
+
+    root.Planetarium._live = {
+      getState: () => state,
+      refresh,
+      paint: () => paint(state, els),
+    };
+    root.Planetarium.enableCompass = function (on) {
+      state.compassMode = !!on;
+      if (!on) state.compassAz = null;
+      refresh(true);
+    };
+    root.Planetarium.setCompassAz = function (az) {
+      if (!state.compassMode) return;
+      state.compassAz = ((Number(az) % 360) + 360) % 360;
+      refresh(true);
+    };
+    root.Planetarium.centerOnAz = function (az) {
+      state.compassMode = false;
+      state.compassAz = null;
+      state.centerAzOverride = ((Number(az) % 360) + 360) % 360;
+      refresh(true);
+    };
+    root.Planetarium.objectAltAz = function (ra, dec) {
+      return objectAltAz(ra, dec, state.observer, state.date, Sky);
+    };
   }
 
   if (typeof document !== 'undefined') {
@@ -487,5 +550,11 @@
     twilightLabel,
     projOptsFor,
     getSkyContext,
+    objectAltAz,
+    isDarkSky,
+    _live: null,
+    enableCompass: () => {},
+    setCompassAz: () => {},
+    centerOnAz: () => {},
   };
 })(typeof globalThis !== 'undefined' ? globalThis : window);
