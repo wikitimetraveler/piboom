@@ -782,6 +782,52 @@ body[data-theme="zen"] .fun-hero__sky-planet {
   color: #fff;
 }
 
+.fun-hero__sky-handoff {
+  position: absolute;
+  left: 50%;
+  bottom: 1.35rem;
+  z-index: 5;
+  transform: translateX(-50%);
+  max-width: calc(100% - 0.5rem);
+  padding: 0.28rem 0.55rem;
+  font-family: Outfit, system-ui, sans-serif;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-decoration: none;
+  text-align: center;
+  color: rgba(255, 245, 220, 0.98);
+  background: rgba(8, 16, 28, 0.82);
+  border: 1px solid rgba(255, 200, 110, 0.45);
+  border-radius: 0.4rem;
+  pointer-events: auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fun-hero__sky-handoff:hover {
+  background: rgba(20, 32, 48, 0.95);
+  border-color: rgba(255, 220, 140, 0.7);
+  color: #fff;
+}
+
+.fun-hero__sky-handoff--up {
+  border-color: rgba(120, 220, 170, 0.5);
+}
+
+.fun-hero__sky-handoff--down {
+  border-color: rgba(180, 160, 140, 0.4);
+  color: rgba(230, 220, 200, 0.85);
+}
+
+body[data-theme="zen"] .fun-hero__sky-handoff {
+  color: rgba(20, 36, 44, 0.92);
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(74, 144, 164, 0.4);
+}
+
 body[data-theme="zen"] .fun-hero__landmark-link {
   color: rgba(24, 40, 48, 0.9);
   background: rgba(255, 255, 255, 0.82);

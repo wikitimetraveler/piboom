@@ -540,6 +540,7 @@
       category: 'encompass',
       featured: true,
       featuredOrder: 5,
+      authRequired: true,
       problem: 'Curated calculator and Encompass tool entry point.',
       consultingBlurb: 'Bootstrap hub with shared calculationEngine and finance auth guard.',
       stack: ['calculationEngine', 'Bootstrap', 'Worksheets'],

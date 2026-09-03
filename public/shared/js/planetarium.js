@@ -24,7 +24,7 @@
     return pad2(d.getHours()) + ':' + pad2(d.getMinutes());
   }
 
-  /** Parse ?date=&time=&lat=&lon=&face= URL params into partial state. */
+  /** Parse ?date=&time=&lat=&lon=&face=&body=&select= URL params into partial state. */
   function parseParams(search) {
     const params = new URLSearchParams(search || '');
     const out = {};
@@ -49,6 +49,10 @@
     if (face && Object.prototype.hasOwnProperty.call(FACING, face)) {
       out.facing = face;
     }
+    const body = params.get('body');
+    if (body) out.body = String(body).toLowerCase();
+    const select = params.get('select');
+    if (select) out.select = String(select);
     return out;
   }
 
@@ -70,8 +74,35 @@
     params.set('time', formatTimeInput(state.date));
     params.set('lat', String(state.observer.lat));
     params.set('lon', String(state.observer.lon));
+    if (state.observer.label) params.set('label', String(state.observer.label).slice(0, 80));
     if (state.facing && state.facing !== 'south') params.set('face', state.facing);
+    const sel = state.selection;
+    if (sel) {
+      if (sel.type === 'planet' && sel.id) params.set('body', sel.id);
+      else if (sel.id || sel.name) params.set('select', String(sel.id || sel.name));
+    }
     return base + '?' + params.toString();
+  }
+
+  function normalizeSelection(sel) {
+    if (!sel || typeof sel !== 'object') return null;
+    const type = sel.type || 'catalog';
+    const id = sel.id != null ? String(sel.id) : sel.name ? String(sel.name) : '';
+    if (!id && !sel.name) return null;
+    return {
+      type,
+      id: id || String(sel.name),
+      name: String(sel.name || id),
+      alt: Number.isFinite(sel.alt) ? sel.alt : null,
+      az: Number.isFinite(sel.az) ? sel.az : null,
+      ra: Number.isFinite(sel.ra) ? sel.ra : null,
+      dec: Number.isFinite(sel.dec) ? sel.dec : null,
+    };
+  }
+
+  function selectionKey(sel) {
+    if (!sel) return '';
+    return String(sel.type || '') + ':' + String(sel.id || sel.name || '').toLowerCase();
   }
 
   function formatAltAz(alt, az) {
@@ -183,6 +214,9 @@
         seg.setAttribute('x2', ln.x2.toFixed(2));
         seg.setAttribute('y2', ln.y2.toFixed(2));
         seg.setAttribute('data-asterism', ln.id);
+        if (state.selection && state.selection.type === 'asterism' && state.selection.id === ln.id) {
+          seg.setAttribute('class', 'is-selected');
+        }
         svg.appendChild(seg);
       });
       host.appendChild(svg);
@@ -193,12 +227,25 @@
     const starCap = mobile ? 48 : 80;
     const ranked = sky.stars.slice().sort((a, b) => a.mag - b.mag).slice(0, starCap);
     let labelsLeft = mobile ? 8 : 14;
+    const selKey = selectionKey(state.selection);
     ranked.forEach((s, i) => {
-      const el = document.createElement('span');
+      const el = document.createElement('button');
+      el.type = 'button';
       el.className = 'plan-sky__star';
       if (s.bright) el.classList.add('plan-sky__star--bright');
       if (s.flare) el.classList.add('plan-sky__star--flare');
+      if (selKey === selectionKey({ type: 'star', id: s.name, name: s.name })) {
+        el.classList.add('is-selected');
+      }
       el.title = s.name;
+      el.setAttribute('aria-label', 'Select ' + s.name);
+      el.setAttribute('data-sky-type', 'star');
+      el.setAttribute('data-sky-id', s.name);
+      el.setAttribute('data-sky-name', s.name);
+      el.setAttribute('data-alt', String(s.alt));
+      el.setAttribute('data-az', String(s.az));
+      if (Number.isFinite(s.ra)) el.setAttribute('data-ra', String(s.ra));
+      if (Number.isFinite(s.dec)) el.setAttribute('data-dec', String(s.dec));
       el.style.left = s.x.toFixed(2) + '%';
       el.style.top = s.y.toFixed(2) + '%';
       el.style.width = s.size.toFixed(1) + 'px';
@@ -218,13 +265,41 @@
     });
 
     sky.planets.forEach((p) => {
-      const el = document.createElement('span');
+      const el = document.createElement('button');
+      el.type = 'button';
       el.className = 'plan-sky__planet plan-sky__planet--' + p.id;
+      if (selKey === selectionKey({ type: 'planet', id: p.id, name: p.name })) {
+        el.classList.add('is-selected');
+      }
       el.title = p.name + ' · ' + formatAltAz(p.alt, p.az);
+      el.setAttribute('aria-label', 'Select ' + p.name);
+      el.setAttribute('data-sky-type', 'planet');
+      el.setAttribute('data-sky-id', p.id);
+      el.setAttribute('data-sky-name', p.name);
+      el.setAttribute('data-alt', String(p.alt));
+      el.setAttribute('data-az', String(p.az));
       el.style.left = p.x.toFixed(2) + '%';
       el.style.top = p.y.toFixed(2) + '%';
       frag.appendChild(el);
     });
+
+    if (
+      state.selection &&
+      (state.selection.type === 'catalog' || state.selection.type === 'deepsky') &&
+      Number.isFinite(state.selection.alt) &&
+      Number.isFinite(state.selection.az)
+    ) {
+      const xy = Sky.projectAltAz(state.selection.alt, state.selection.az, opts);
+      if (xy) {
+        const mark = document.createElement('span');
+        mark.className = 'plan-sky__marker is-selected';
+        mark.setAttribute('aria-hidden', 'true');
+        mark.title = state.selection.name;
+        mark.style.left = xy.x.toFixed(2) + '%';
+        mark.style.top = xy.y.toFixed(2) + '%';
+        frag.appendChild(mark);
+      }
+    }
 
     host.appendChild(frag);
 
@@ -264,7 +339,7 @@
     }
   }
 
-  function renderPlanetTable(tbody, planets) {
+  function renderPlanetTable(tbody, planets, selection) {
     if (!tbody) return;
     tbody.replaceChildren();
     const rows = formatPlanetRows(planets);
@@ -277,8 +352,20 @@
       tbody.appendChild(tr);
       return;
     }
+    const selKey = selectionKey(selection);
     rows.forEach((p) => {
       const tr = document.createElement('tr');
+      tr.className = 'plan-planets__row';
+      tr.setAttribute('role', 'button');
+      tr.tabIndex = 0;
+      tr.setAttribute('data-sky-type', 'planet');
+      tr.setAttribute('data-sky-id', p.id);
+      tr.setAttribute('data-sky-name', p.name);
+      tr.setAttribute('data-alt', String(p.alt));
+      tr.setAttribute('data-az', String(p.az));
+      if (selKey === selectionKey({ type: 'planet', id: p.id, name: p.name })) {
+        tr.classList.add('is-selected');
+      }
       tr.innerHTML =
         '<td>' +
         p.name +
@@ -291,14 +378,43 @@
     });
   }
 
-  function renderAsterismList(ul, Sky) {
+  function renderAsterismList(ul, Sky, selection) {
     if (!ul || !Sky.SKY_ASTERISMS) return;
     ul.replaceChildren();
+    const selKey = selectionKey(selection);
     Sky.SKY_ASTERISMS.forEach((a) => {
       const li = document.createElement('li');
-      li.textContent = a.label;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'plan-asterism-hit';
+      btn.textContent = a.label;
+      btn.setAttribute('data-sky-type', 'asterism');
+      btn.setAttribute('data-sky-id', a.id);
+      btn.setAttribute('data-sky-name', a.label);
+      if (selKey === selectionKey({ type: 'asterism', id: a.id, name: a.label })) {
+        btn.classList.add('is-selected');
+      }
+      li.appendChild(btn);
       ul.appendChild(li);
     });
+  }
+
+  function asterismCentroid(Sky, sky, asterismId) {
+    const a = (Sky.SKY_ASTERISMS || []).find((x) => x.id === asterismId);
+    if (!a || !sky) return null;
+    const names = new Set();
+    (a.pairs || []).forEach((pair) => {
+      pair.forEach((n) => names.add(n));
+    });
+    const hits = (sky.stars || []).filter((s) => names.has(s.name));
+    if (!hits.length) return null;
+    let alt = 0;
+    let az = 0;
+    hits.forEach((s) => {
+      alt += s.alt;
+      az += s.az;
+    });
+    return { alt: alt / hits.length, az: az / hits.length };
   }
 
   function syncControls(els, state) {
@@ -336,6 +452,7 @@
     const Sky = root.FunHomeSky;
     if (!_liveState || !Sky) return {};
     const sky = _liveSky;
+    const sel = _liveState.selection;
     return {
       observerLabel: _liveState.observer.label,
       lat: _liveState.observer.lat.toFixed(2) + '°',
@@ -353,6 +470,18 @@
       twilight: sky ? twilightLabel(sky.sunAlt) : '',
       compassMode: !!_liveState.compassMode,
       compassAz: Number.isFinite(_liveState.compassAz) ? Math.round(_liveState.compassAz) : null,
+      selection: sel
+        ? {
+            type: sel.type,
+            id: sel.id,
+            name: sel.name,
+            alt: sel.alt != null ? Math.round(sel.alt) : null,
+            az: sel.az != null ? Math.round(sel.az) : null,
+            ra: sel.ra,
+            dec: sel.dec,
+          }
+        : null,
+      refreshedAt: new Date().toISOString(),
     };
   }
 
@@ -396,8 +525,16 @@
     _liveState = state;
     _liveSky = sky;
     renderSkyDome(els.sky, sky, Sky, state);
-    renderPlanetTable(els.planetBody, sky.planets);
-    if (els.status && !document.fullscreenElement) els.status.textContent = '';
+    renderPlanetTable(els.planetBody, sky.planets, state.selection);
+    renderAsterismList(els.asterisms, Sky, state.selection);
+    if (els.status && !document.fullscreenElement && state.selection) {
+      const s = state.selection;
+      const where =
+        Number.isFinite(s.alt) && Number.isFinite(s.az) ? ' · ' + formatAltAz(s.alt, s.az) : '';
+      els.status.textContent = 'Selected ' + s.name + where;
+    } else if (els.status && !document.fullscreenElement) {
+      els.status.textContent = '';
+    }
   }
 
   function initPage() {
@@ -427,10 +564,9 @@
       compassMode: false,
       compassAz: null,
       centerAzOverride: null,
+      selection: null,
     };
     if (urlState.observer) state.observer = urlState.observer;
-
-    renderAsterismList(els.asterisms, Sky);
 
     function refresh(fromControls) {
       if (fromControls) readControls(els, state);
@@ -438,15 +574,150 @@
       paint(state, els);
     }
 
+    function selectSkyObject(raw, opts) {
+      const options = opts || {};
+      const sel = normalizeSelection(raw);
+      state.selection = sel;
+      if (sel && Number.isFinite(sel.az) && options.center !== false) {
+        state.compassMode = false;
+        state.compassAz = null;
+        state.centerAzOverride = ((Number(sel.az) % 360) + 360) % 360;
+      }
+      refresh(false);
+      return sel;
+    }
+
+    function selectionFromDataset(el) {
+      if (!el || !el.getAttribute) return null;
+      const type = el.getAttribute('data-sky-type');
+      const id = el.getAttribute('data-sky-id');
+      const name = el.getAttribute('data-sky-name') || id;
+      if (!type || !id) return null;
+      const alt = Number(el.getAttribute('data-alt'));
+      const az = Number(el.getAttribute('data-az'));
+      const ra = Number(el.getAttribute('data-ra'));
+      const dec = Number(el.getAttribute('data-dec'));
+      return {
+        type,
+        id,
+        name,
+        alt: Number.isFinite(alt) ? alt : null,
+        az: Number.isFinite(az) ? az : null,
+        ra: Number.isFinite(ra) ? ra : null,
+        dec: Number.isFinite(dec) ? dec : null,
+      };
+    }
+
+    function applyUrlSelection() {
+      if (urlState.body) {
+        const planet = (_liveSky && _liveSky.planets || []).find((p) => p.id === urlState.body);
+        if (planet) {
+          selectSkyObject(
+            {
+              type: 'planet',
+              id: planet.id,
+              name: planet.name,
+              alt: planet.alt,
+              az: planet.az,
+            },
+            { center: true }
+          );
+          return;
+        }
+      }
+      if (urlState.select) {
+        const key = String(urlState.select).toLowerCase();
+        const star = (_liveSky && _liveSky.stars || []).find(
+          (s) => s.name.toLowerCase() === key
+        );
+        if (star) {
+          selectSkyObject(
+            {
+              type: 'star',
+              id: star.name,
+              name: star.name,
+              alt: star.alt,
+              az: star.az,
+              ra: star.ra,
+              dec: star.dec,
+            },
+            { center: true }
+          );
+          return;
+        }
+        const aster = (Sky.SKY_ASTERISMS || []).find(
+          (a) => a.id === key || a.label.toLowerCase() === key
+        );
+        if (aster) {
+          const c = asterismCentroid(Sky, _liveSky, aster.id);
+          selectSkyObject(
+            {
+              type: 'asterism',
+              id: aster.id,
+              name: aster.label,
+              alt: c ? c.alt : null,
+              az: c ? c.az : null,
+            },
+            { center: !!c }
+          );
+        }
+      }
+    }
+
     function boot(observer) {
       if (observer && !urlState.observer) state.observer = observer;
       refresh(false);
+      applyUrlSelection();
     }
 
     if (urlState.observer) {
       boot(state.observer);
     } else {
       Sky.resolveObserver(boot);
+    }
+
+    if (els.sky) {
+      els.sky.addEventListener('click', (event) => {
+        const hit = event.target.closest('[data-sky-type]');
+        if (!hit || !els.sky.contains(hit)) return;
+        event.preventDefault();
+        selectSkyObject(selectionFromDataset(hit), { center: true });
+      });
+    }
+
+    if (els.planetBody) {
+      els.planetBody.addEventListener('click', (event) => {
+        const row = event.target.closest('[data-sky-type="planet"]');
+        if (!row) return;
+        selectSkyObject(selectionFromDataset(row), { center: true });
+      });
+      els.planetBody.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        const row = event.target.closest('[data-sky-type="planet"]');
+        if (!row) return;
+        event.preventDefault();
+        selectSkyObject(selectionFromDataset(row), { center: true });
+      });
+    }
+
+    if (els.asterisms) {
+      els.asterisms.addEventListener('click', (event) => {
+        const btn = event.target.closest('[data-sky-type="asterism"]');
+        if (!btn) return;
+        const id = btn.getAttribute('data-sky-id');
+        const name = btn.getAttribute('data-sky-name') || id;
+        const c = asterismCentroid(Sky, _liveSky, id);
+        selectSkyObject(
+          {
+            type: 'asterism',
+            id,
+            name,
+            alt: c ? c.alt : null,
+            az: c ? c.az : null,
+          },
+          { center: !!c }
+        );
+      });
     }
 
     ['change', 'input'].forEach((ev) => {
@@ -506,11 +777,17 @@
 
     bindFullscreen(els);
 
+    if (root.WebGpuPlanetariumSky && typeof root.WebGpuPlanetariumSky.mount === 'function') {
+      root.WebGpuPlanetariumSky.mount({ canvasId: 'planSkyGpu' }).catch(() => {});
+    }
+
     root.Planetarium._live = {
       getState: () => state,
       refresh,
       paint: () => paint(state, els),
+      selectSkyObject,
     };
+    root.Planetarium.selectSkyObject = selectSkyObject;
     root.Planetarium.enableCompass = function (on) {
       state.compassMode = !!on;
       if (!on) state.compassAz = null;
@@ -532,14 +809,6 @@
     };
   }
 
-  if (typeof document !== 'undefined') {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initPage);
-    } else {
-      initPage();
-    }
-  }
-
   root.Planetarium = {
     FACING,
     parseParams,
@@ -552,9 +821,20 @@
     getSkyContext,
     objectAltAz,
     isDarkSky,
+    normalizeSelection,
+    selectionKey,
     _live: null,
     enableCompass: () => {},
     setCompassAz: () => {},
     centerOnAz: () => {},
+    selectSkyObject: () => null,
   };
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initPage);
+    } else {
+      initPage();
+    }
+  }
 })(typeof globalThis !== 'undefined' ? globalThis : window);

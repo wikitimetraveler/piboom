@@ -18,28 +18,44 @@ describe('FunHomeSky centerAz', () => {
 });
 
 describe('Planetarium', () => {
-  test('parseParams reads date, time, lat, lon, and facing', () => {
+  test('parseParams reads date, time, lat, lon, facing, body, and select', () => {
     const parsed = Planetarium.parseParams(
-      '?date=2026-08-31&time=22:30&lat=42.9&lon=-70.86&face=east'
+      '?date=2026-08-31&time=22:30&lat=42.9&lon=-70.86&face=east&body=mars&select=Vega'
     );
     expect(parsed.dateParts).toEqual({ y: 2026, m: 8, d: 31 });
     expect(parsed.timeParts).toEqual({ h: 22, m: 30 });
     expect(parsed.observer.lat).toBeCloseTo(42.9, 1);
     expect(parsed.facing).toBe('east');
+    expect(parsed.body).toBe('mars');
+    expect(parsed.select).toBe('Vega');
   });
 
-  test('buildShareUrl encodes observer and time', () => {
+  test('buildShareUrl encodes observer, time, and selection', () => {
     const url = Planetarium.buildShareUrl(
       {
         date: new Date(2026, 7, 31, 22, 15),
         observer: { lat: 42.898, lon: -70.864, label: 'Hampton Falls, NH' },
         facing: 'south',
+        selection: { type: 'planet', id: 'jupiter', name: 'Jupiter' },
       },
       'https://example.com'
     );
     expect(url).toContain('date=2026-08-31');
     expect(url).toContain('time=22%3A15');
     expect(url).toContain('lat=42.898');
+    expect(url).toContain('body=jupiter');
+  });
+
+  test('normalizeSelection and selectionKey are stable', () => {
+    const sel = Planetarium.normalizeSelection({
+      type: 'star',
+      id: 'Vega',
+      name: 'Vega',
+      alt: 40,
+      az: 210,
+    });
+    expect(sel.type).toBe('star');
+    expect(Planetarium.selectionKey(sel)).toBe('star:vega');
   });
 
   test('formatPlanetRows sorts by altitude descending', () => {
@@ -68,5 +84,22 @@ describe('Planetarium', () => {
   test('projOptsFor uses compass azimuth when compass mode on', () => {
     const opts = Planetarium.projOptsFor({ facing: 'south', compassMode: true, compassAz: 95 });
     expect(opts.centerAz).toBe(95);
+  });
+});
+
+describe('FunHomeSky.buildPlanetariumUrl', () => {
+  test('encodes observer date and optional body', () => {
+    const url = FunHomeSky.buildPlanetariumUrl(
+      {
+        date: new Date(2026, 7, 31, 21, 0),
+        observer: { lat: 42.9, lon: -70.86, label: 'Hampton Falls' },
+        body: 'mars',
+      },
+      'https://example.com'
+    );
+    expect(url).toContain('/planetarium/?');
+    expect(url).toContain('date=2026-08-31');
+    expect(url).toContain('body=mars');
+    expect(url).toContain('lat=42.9');
   });
 });

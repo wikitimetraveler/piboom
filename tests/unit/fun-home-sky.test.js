@@ -113,4 +113,29 @@ describe('FunHomeSky', () => {
     expect(sky.usedEveningFallback).toBe(false);
     expect(sky.date.getHours()).toBe(12);
   });
+
+  test('subsolarPoint and sunDirBody are unit-length and finite', () => {
+    const when = new Date('2026-06-21T16:00:00Z');
+    const ss = FunHomeSky.subsolarPoint(when);
+    expect(Number.isFinite(ss.lat)).toBe(true);
+    expect(ss.lat).toBeGreaterThan(15);
+    expect(ss.lat).toBeLessThan(25);
+    const dir = FunHomeSky.sunDirBody(when);
+    const len = Math.sqrt(dir.x * dir.x + dir.y * dir.y + dir.z * dir.z);
+    expect(len).toBeCloseTo(1, 5);
+    expect(dir.y).toBeGreaterThan(0);
+  });
+
+  test('buildPlanetariumUrl encodes body', () => {
+    const url = FunHomeSky.buildPlanetariumUrl(
+      {
+        date: new Date(2026, 7, 31, 21, 0),
+        observer: FunHomeSky.DEFAULT_OBSERVER,
+        body: 'mars',
+      },
+      ''
+    );
+    expect(url).toContain('/planetarium/?');
+    expect(url).toContain('body=mars');
+  });
 });

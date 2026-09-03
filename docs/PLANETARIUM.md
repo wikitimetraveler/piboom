@@ -1,0 +1,38 @@
+# Planetarium
+
+Full-sky dome at [`/planetarium/`](/planetarium/) — date/time sky from `FunHomeSky`, Carl (AstroAI) voice guide, optional Zed HeyGen face, catalog search, ISS passes, and static eclipse/meteor events.
+
+## Surfaces
+
+| Piece | Path / URL |
+|-------|------------|
+| Dome UI | `/planetarium/` |
+| Carl chat | `POST /api/planetarium/assistant/chat` |
+| ISS passes | `GET /api/planetarium/iss-passes?lat=&lon=` |
+| Events / meteors | `GET /api/planetarium/events?from=` |
+| Catalog search | `GET /api/planetarium/catalog/search?q=` |
+| Catalog data | `data/planetarium/catalog-index.json` |
+| Events data | `data/planetarium/sky-events.json`, `meteor-showers.json` |
+
+## Client modules
+
+- `public/shared/js/fun-home-sky.js` — stars, planets, asterisms, share URL helper
+- `public/shared/js/planetarium.js` — dome paint, selection, `getSkyContext()`
+- `public/shared/js/webgpu-planetarium-sky.js` — optional WebGPU / 2D backdrop
+- `public/planetarium/js/planetarium-guide.js` — Carl widget (fresh `skyContext` each turn)
+- `public/planetarium/js/planetarium-heygen.js` — Zed streaming tile + short handoff before Carl’s answer
+- `public/planetarium/js/planetarium-extras.js` — compass, catalog, ISS, events, deep sky
+
+## Deep links
+
+Share / home CTA params: `date`, `time`, `lat`, `lon`, `label`, `face`, `body` (planet id), `select` (star / asterism name).
+
+Home hero **Open full sky** builds these via `FunHomeSky.buildPlanetariumUrl`.
+
+## Carl context
+
+Each chat turn sends live `getSkyContext()` (observer, date, facing, planets, twilight, **selection**, `refreshedAt`). Changing date / facing shows “Sky updated — Ask Carl for a fresh read.”
+
+## Out of scope
+
+Air quality (AQI) overlays belong on Unified Disasters, not the dome.

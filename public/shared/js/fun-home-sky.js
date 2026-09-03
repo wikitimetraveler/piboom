@@ -217,6 +217,33 @@
     return d;
   }
 
+  function pad2Url(n) {
+    return String(n).padStart(2, '0');
+  }
+
+  /** Deep link into /planetarium/ for a date + observer (+ optional body/select). */
+  function buildPlanetariumUrl(opts, origin) {
+    const o = opts || {};
+    const date = o.date instanceof Date ? o.date : new Date();
+    const observer = o.observer || DEFAULT_OBSERVER;
+    const base = (origin || '') + '/planetarium/';
+    const params = new URLSearchParams();
+    params.set(
+      'date',
+      date.getFullYear() + '-' + pad2Url(date.getMonth() + 1) + '-' + pad2Url(date.getDate())
+    );
+    params.set('time', pad2Url(date.getHours()) + ':' + pad2Url(date.getMinutes()));
+    if (Number.isFinite(observer.lat) && Number.isFinite(observer.lon)) {
+      params.set('lat', String(Number(observer.lat.toFixed(4))));
+      params.set('lon', String(Number(observer.lon.toFixed(4))));
+    }
+    if (observer.label) params.set('label', String(observer.label).slice(0, 80));
+    if (o.facing && o.facing !== 'south') params.set('face', o.facing);
+    if (o.body) params.set('body', String(o.body));
+    if (o.select) params.set('select', String(o.select));
+    return base + '?' + params.toString();
+  }
+
   /** Illuminated fraction 0 (new) → 1 (full) for moon disc art. */
   function moonPhaseFraction(date) {
     const sunLon = sunEclipticLon(date);
@@ -422,6 +449,31 @@
     return eclipticToEquatorial(sunEclipticLon(date), 0, date);
   }
 
+  /** Subsolar lat/lon (degrees) for Earth terminator / local solar time. */
+  function subsolarPoint(date) {
+    const when = date instanceof Date ? date : new Date();
+    const sun = sunEquatorial(when);
+    const gmst = gmstDegrees(when);
+    let lon = sun.ra - gmst;
+    lon = ((lon + 540) % 360) - 180;
+    return { lat: sun.dec, lon: lon };
+  }
+
+  /**
+   * Body-frame sun direction matching webgpu-globe lonLatFromNormal
+   * (x=cos lat cos lon, y=sin lat, z=cos lat sin lon).
+   */
+  function sunDirBody(date) {
+    const ss = subsolarPoint(date);
+    const lat = (ss.lat * Math.PI) / 180;
+    const lon = (ss.lon * Math.PI) / 180;
+    const x = Math.cos(lat) * Math.cos(lon);
+    const y = Math.sin(lat);
+    const z = Math.cos(lat) * Math.sin(lon);
+    const len = Math.sqrt(x * x + y * y + z * z) || 1;
+    return { x: x / len, y: y / len, z: z / len, lat: ss.lat, lon: ss.lon };
+  }
+
   /** Approximate Moon ecliptic lon (degrees). */
   function moonEcliptic(date) {
     const d = daysSinceJ2000(date);
@@ -551,6 +603,8 @@
         y: xy.y,
         alt: aa.alt,
         az: aa.az,
+        ra: s.ra,
+        dec: s.dec,
       });
     }
 
@@ -609,6 +663,8 @@
     projectAltAz,
     sunEquatorial,
     sunEclipticLon,
+    subsolarPoint,
+    sunDirBody,
     planetEquatorial,
     resolveSkyDate,
     projectSky,
@@ -620,6 +676,7 @@
     formatSkyCaption,
     scrubIndexToHour,
     buildLocalSkyDate,
+    buildPlanetariumUrl,
     OBSERVER_STORAGE_KEY,
     galacticToEquatorial,
     milkyWayBand,

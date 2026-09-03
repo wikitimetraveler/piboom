@@ -12,7 +12,7 @@
     { href: '/finance/disasters-unified.html', icon: 'bi-shield-exclamation', label: 'Unified Disasters', domain: 'disasters', title: 'Unified Disasters — hazard monitoring and pipeline risk', demoOnly: false },
     { href: '/nature/nature-hub.html', icon: 'bi-tree-fill', label: 'Nature', domain: 'nature', title: 'Trees, critters, field guide', demoOnly: false },
     { href: '/family/lane-family.html', icon: 'bi-house-heart', label: 'Lane Family', domain: 'family', title: 'Lane Family hub — tree, museum, and tools', demoOnly: false },
-    { href: '/finance/index.html', icon: 'bi-bank', label: 'Worksheets', domain: 'finance', title: 'Worksheets — Encompass, calculators, unit tests', demoOnly: false },
+    { href: '/finance/index.html', icon: 'bi-bank', label: 'Worksheets', domain: 'finance', title: 'Worksheets — Encompass, calculators, unit tests', demoOnly: false, requiresAuth: true },
     { href: '/finance/encompass-hub.html', icon: 'bi-columns-gap', label: 'Encompass Hub', domain: 'encompass', title: 'Encompass Hub, pipeline, loan APIs', demoOnly: true },
   ];
 
@@ -214,12 +214,12 @@
   }
 
   /**
-   * Worksheets navbar: short essentials when logged out; every mortgage app
+   * Worksheets navbar: disaster suite only when logged out; every mortgage app
    * (Encompass Hub, AI Assistant, tools, calculators) when logged in.
    */
   function getFinanceNavItems(loggedIn) {
     const authed = typeof loggedIn === 'boolean' ? loggedIn : isUserLoggedIn();
-    if (!authed) return NAV_FINANCE.slice();
+    if (!authed) return filterToolsByAuth(NAV_FINANCE, false);
     return dedupeMenuItems([
       { href: '/finance/encompass-hub.html', icon: 'bi-columns-gap', label: 'Encompass Hub' },
       { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass AI Assistant' },
@@ -285,30 +285,23 @@
     { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Sage, locksmith Long Beach & L.A.' },
   ];
 
-  /** Public /finance pages (no login). Keep in sync with server.js FINANCE_PUBLIC_PAGES. */
+  /** Public /finance pages (no login). Keep in sync with lib/finance-session.js FINANCE_PUBLIC_PAGES. */
   const FINANCE_PUBLIC_PATHS = [
-    '/finance/index.html',
-    '/finance/fha-streamline-calculator.html',
-    '/finance/fha-streamline-loan-amount-calculator.html',
-    '/finance/fha-streamline-ntb-calculator.html',
-    '/finance/asset-qualifier-calculator.html',
-    '/finance/dti-calculator.html',
-    '/finance/cashout-refinance-calculator.html',
-    '/finance/amortization-schedule-calculator.html',
-    '/finance/closing-cost-calculator.html',
-    '/finance/ltv-calculator.html',
-    '/finance/va-irrrl-calculator.html',
     '/finance/disasters-unified.html',
     '/finance/disasters-webcams.html',
     '/finance/disasters-encompass-map.html',
   ];
 
-  /** Get home domain tiles, optionally filtered for demo mode */
-  function getDomainTiles(demoMode) {
+  /** Get home domain tiles, optionally filtered for demo mode + login */
+  function getDomainTiles(demoMode, loggedIn) {
+    const authed = typeof loggedIn === 'boolean' ? loggedIn : isUserLoggedIn();
+    let tiles;
     if (demoMode) {
-      return DOMAIN_TILES.filter(t => t.demoOnly);
+      tiles = DOMAIN_TILES.filter(t => t.demoOnly);
+    } else {
+      tiles = DOMAIN_TILES.filter(t => !t.demoOnly);
     }
-    return DOMAIN_TILES.filter(t => !t.demoOnly);
+    return filterToolsByAuth(tiles, authed);
   }
 
   function makeToolId(item, href) {
@@ -398,7 +391,7 @@
     const opts = options || {};
     const loggedIn = typeof opts.loggedIn === 'boolean' ? opts.loggedIn : isUserLoggedIn();
     const groups = [
-      { items: getDomainTiles(demoMode), category: 'Domain' },
+      { items: getDomainTiles(demoMode, loggedIn), category: 'Domain' },
       { items: FINANCE_TOOLS, category: 'Worksheets' },
       { items: ENCOMPASS_TOOLS, category: 'Encompass' },
       { items: ENTERTAINMENT_TOOLS, category: 'Entertainment' },

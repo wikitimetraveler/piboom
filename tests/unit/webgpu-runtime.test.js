@@ -5,6 +5,7 @@ import '../../public/shared/js/webgpu-runtime.js';
 import '../../public/shared/js/webgpu-globe.js';
 import '../../public/shared/js/webgpu-blacklight-poster.js';
 import '../../public/shared/js/webgpu-knowledge-constellation.js';
+import '../../public/shared/js/webgpu-planetarium-sky.js';
 import '../../public/finance/js/disasters-unified/webgpu-heat-overlay.js';
 
 const {
@@ -12,6 +13,7 @@ const {
   WebGpuGlobe,
   WebGpuBlacklightPoster,
   WebGpuKnowledgeConstellation,
+  WebGpuPlanetariumSky,
   DuWebGpuHeat,
 } = globalThis;
 
@@ -116,13 +118,18 @@ describe('WebGpuGlobe', () => {
     expect(sync.sunDir.x).toBeGreaterThan(0);
   });
 
-  test('LANDMARKS include Moon, Mars, Jupiter, Earth, and Saturn zoom targets', () => {
+  test('LANDMARKS include Moon, Mars, Jupiter, Earth, Saturn, and outer-body targets', () => {
     expect(WebGpuGlobe.LANDMARKS.moon.lat).toBeCloseTo(-9.5, 5);
     expect(WebGpuGlobe.LANDMARKS.moon.href).toMatch(/lane-museum/);
     expect(WebGpuGlobe.LANDMARKS.mars.label).toBe('Olympus Mons');
     expect(WebGpuGlobe.LANDMARKS.jupiter.label).toBe('Great Red Spot');
     expect(WebGpuGlobe.LANDMARKS.earth.label).toMatch(/Hampton/);
     expect(WebGpuGlobe.LANDMARKS.saturn.label).toMatch(/Cassini/);
+    expect(WebGpuGlobe.LANDMARKS.mercury.label).toMatch(/Caloris/);
+    expect(WebGpuGlobe.LANDMARKS.venus.label).toMatch(/Maxwell/);
+    expect(WebGpuGlobe.LANDMARKS.neptune.label).toMatch(/Dark Spot/);
+    expect(WebGpuGlobe.LANDMARKS.pluto.label).toMatch(/Sputnik/);
+    expect(typeof WebGpuGlobe.applySunFromDate).toBe('function');
   });
 
   test('capFirmsPoints drops bad coords and respects max', () => {
@@ -188,6 +195,13 @@ describe('WebGpuKnowledgeConstellation', () => {
     expect(laid[0].x).toBeLessThan(1);
     expect(laid[0].y).toBeGreaterThan(0);
     expect(laid[0].y).toBeLessThan(1);
+  });
+});
+
+describe('WebGpuPlanetariumSky', () => {
+  test('exports mount and compute shader', () => {
+    expect(typeof WebGpuPlanetariumSky.mount).toBe('function');
+    expect(WebGpuPlanetariumSky.COMPUTE_WGSL).toMatch(/@compute/);
   });
 });
 

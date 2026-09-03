@@ -192,12 +192,25 @@
 
   /** Hero globe landmarks — click enlarged pane again to zoom. */
   const LANDMARKS = {
+    mercury: {
+      label: 'Caloris Basin',
+      lat: 30.5,
+      lon: -170.4,
+      zoom: 2.15,
+    },
+    venus: {
+      label: 'Maxwell Montes',
+      lat: 65.2,
+      lon: 3.0,
+      zoom: 2.2,
+    },
     moon: {
       label: 'Lane crater',
       lat: LANE_CRATER.lat,
       lon: LANE_CRATER.lon,
       zoom: 2.35,
       href: LANE_CRATER.href,
+      linkLabel: 'Lane Museum →',
       immediate: true,
     },
     mars: {
@@ -223,6 +236,18 @@
       lat: 0,
       lon: 0,
       zoom: 1.55,
+    },
+    neptune: {
+      label: 'Great Dark Spot · Voyager',
+      lat: -22,
+      lon: 60,
+      zoom: 2.05,
+    },
+    pluto: {
+      label: 'Sputnik Planitia',
+      lat: 18,
+      lon: 178,
+      zoom: 2.2,
     },
   };
 
@@ -503,19 +528,19 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
       albedo = day;
       if (isEarth) {
         let lights = textureSampleLevel(nightTex, earthSamp, euv, 0.0).rgb;
-        let ndl = max(dot(n, lightDir), 0.0);
+        let ndl = max(dot(nLocal, lightDir), 0.0);
         let nightSide = pow(1.0 - ndl, 1.6);
         albedo = albedo * (0.22 + 0.88 * ndl);
         albedo = albedo + lights * nightSide * (0.55 + 0.85 * dark);
       } else {
-        let ndl = max(dot(n, lightDir), 0.0);
+        let ndl = max(dot(nLocal, lightDir), 0.0);
         albedo = albedo * (0.18 + 0.92 * ndl);
       }
     } else if (isMoon) {
-      let ndl = max(dot(n, lightDir), 0.0);
+      let ndl = max(dot(nLocal, lightDir), 0.0);
       albedo = albedo * (0.18 + 0.92 * ndl);
     } else {
-      let ndl = max(dot(n, lightDir), 0.0);
+      let ndl = max(dot(nLocal, lightDir), 0.0);
       let nightSide = pow(1.0 - ndl, 1.6);
       let city = step(0.86, hash21(floor(lonLat * vec2f(48.0, 48.0)))) * step(0.5, albedo.g);
       let neon = mix(vec3f(0.55, 0.85, 0.90), vec3f(0.92, 0.32, 0.72), dark);
@@ -720,6 +745,19 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
       root.FunHomeHeroSync.sunDir = { ...DEFAULT_SUN_DIR };
     }
     return root.FunHomeHeroSync;
+  }
+
+  /** Drive Earth terminator from a sky date (body-frame sun; nLocal lighting). */
+  function applySunFromDate(date) {
+    const sync = ensureHeroSync();
+    const Sky = root.FunHomeSky;
+    if (Sky && typeof Sky.sunDirBody === 'function') {
+      const dir = Sky.sunDirBody(date instanceof Date ? date : new Date());
+      if (dir && Number.isFinite(dir.x)) sync.sunDir = dir;
+      return sync.sunDir;
+    }
+    sync.sunDir = { ...DEFAULT_SUN_DIR };
+    return sync.sunDir;
   }
 
   async function mount(opts) {
@@ -1001,6 +1039,7 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
     latLonToUv,
     capFirmsPoints,
     ensureHeroSync,
+    applySunFromDate,
     resolveBody,
     visualScale,
     BODIES,

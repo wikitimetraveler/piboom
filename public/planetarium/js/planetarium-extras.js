@@ -130,6 +130,20 @@
         '</small>';
       btn.addEventListener('click', () => {
         if (pos && pos.alt > 0) root.Planetarium?.centerOnAz?.(pos.az);
+        if (typeof root.Planetarium?.selectSkyObject === 'function') {
+          root.Planetarium.selectSkyObject(
+            {
+              type: 'catalog',
+              id: item.id,
+              name: item.name,
+              alt: pos ? pos.alt : null,
+              az: pos ? pos.az : null,
+              ra: item.ra,
+              dec: item.dec,
+            },
+            { center: false }
+          );
+        }
         stopCompass();
         const status = document.getElementById('planStatus');
         if (status) status.textContent = 'Centered on ' + item.name;
@@ -189,6 +203,20 @@
         '</small></button>';
       li.querySelector('button')?.addEventListener('click', () => {
         root.Planetarium?.centerOnAz?.(item.az);
+        if (typeof root.Planetarium?.selectSkyObject === 'function') {
+          root.Planetarium.selectSkyObject(
+            {
+              type: 'deepsky',
+              id: item.id,
+              name: item.name,
+              alt: item.alt,
+              az: item.az,
+              ra: item.ra,
+              dec: item.dec,
+            },
+            { center: false }
+          );
+        }
       });
       host.appendChild(li);
     });
@@ -217,6 +245,8 @@
           mag: item.mag,
           alt: Math.round(pos.alt),
           az: Math.round(pos.az),
+          ra: item.ra,
+          dec: item.dec,
         };
       })
       .filter(Boolean)
@@ -238,10 +268,20 @@
           '&lon=' +
           encodeURIComponent(obs.lon)
       );
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       host.replaceChildren();
-      if (!data.success || !data.passes?.length) {
-        host.innerHTML = '<li class="plan-empty">No ISS passes in the next ~2 weeks.</li>';
+      if (!res.ok || data.success === false) {
+        host.innerHTML =
+          '<li class="plan-empty">' +
+          (data.error
+            ? 'ISS feed unavailable — ' + String(data.error).slice(0, 120)
+            : 'ISS feed unavailable — try again later.') +
+          '</li>';
+        return;
+      }
+      if (!data.passes?.length) {
+        host.innerHTML =
+          '<li class="plan-empty">No ISS passes predicted for this location in the next couple of weeks. Check back after changing location or date.</li>';
         return;
       }
       data.passes.slice(0, 4).forEach((pass) => {
@@ -256,7 +296,8 @@
         host.appendChild(li);
       });
     } catch (_) {
-      host.innerHTML = '<li class="plan-empty">ISS feed unavailable — try again later.</li>';
+      host.innerHTML =
+        '<li class="plan-empty">ISS feed unavailable — network or upstream error. Try again later.</li>';
     }
   }
 
@@ -268,8 +309,15 @@
     host.innerHTML = '<li class="plan-empty">Loading events…</li>';
     try {
       const res = await fetch('/api/planetarium/events?from=' + encodeURIComponent(from));
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       host.replaceChildren();
+      if (!res.ok || data.success === false) {
+        host.innerHTML =
+          '<li class="plan-empty">' +
+          (data.error ? 'Events unavailable — ' + String(data.error).slice(0, 120) : 'Events unavailable.') +
+          '</li>';
+        return;
+      }
       const rows = [];
       (data.events || []).forEach((ev) => {
         rows.push({ when: ev.date, title: ev.title, note: ev.note, kind: ev.type });
@@ -284,7 +332,10 @@
       });
       rows.sort((a, b) => String(a.when).localeCompare(String(b.when)));
       if (!rows.length) {
-        host.innerHTML = '<li class="plan-empty">No upcoming events in range.</li>';
+        host.innerHTML =
+          '<li class="plan-empty">No eclipses, conjunctions, or meteor peaks near ' +
+          from +
+          '. Try <strong>Tonight 9 PM</strong> or pick another date.</li>';
         return;
       }
       rows.slice(0, 8).forEach((row) => {
@@ -299,12 +350,12 @@
           '</strong> ' +
           row.title +
           '<br><small>' +
-          row.note +
+          (row.note || '') +
           '</small>';
         host.appendChild(li);
       });
     } catch (_) {
-      host.innerHTML = '<li class="plan-empty">Events unavailable.</li>';
+      host.innerHTML = '<li class="plan-empty">Events unavailable — try again later.</li>';
     }
   }
 

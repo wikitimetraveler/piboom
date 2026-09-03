@@ -5,12 +5,14 @@ import { verifyWatchTogetherAccess } from '../lib/watch-together-auth.js';
 import {
   getLivekitConfig,
   getLivekitStatusExtras,
+  getLivekitRoomMetadata,
   listRoomParticipantCount,
   livekitIdentity,
   mintLivekitAccessToken,
   occupancyUnavailableError,
   startAudioOnlyRoomEgress,
   stopLivekitEgress,
+  updateLivekitRoomMetadata,
 } from './livekit.service.js';
 import { getGoogleBrowserApiKey, getGoogleServerApiKey } from '../lib/google-api-key.js';
 import { mbGet } from './musicbrainz.service.js';
@@ -323,6 +325,75 @@ export function publicPlaybackState(state) {
     updatedAt: Number(state?.updatedAt) || Date.now(),
     host: state?.host && typeof state.host === 'object' ? state.host : null,
   };
+}
+
+/**
+ * LiveKit room.metadata clock — same shared room idea as Studio.
+ * @param {unknown} raw
+ */
+export function parseWatchTogetherClock(raw) {
+  if (raw == null || raw === '') return null;
+  let data = raw;
+  if (typeof raw === 'string') {
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  }
+  if (!data || typeof data !== 'object') return null;
+  const media = data.media;
+  if (!media || typeof media !== 'object' || !media.kind) return null;
+  if (media.kind === 'youtube' && !media.youtubeId) return null;
+  if (media.kind === 'file' && !media.src) return null;
+  return {
+    media,
+    playing: Boolean(data.playing),
+    position: clampPosition(data.position),
+    updatedAt: Number(data.updatedAt) || 0,
+    host: data.host && typeof data.host === 'object' ? data.host : null,
+  };
+}
+
+export function adoptSharedClock(state, incoming, now = Date.now()) {
+  const current = state && typeof state === 'object' ? state : createRoomState(now);
+  if (!incoming?.media) return current;
+  const incomingAt = Number(incoming.updatedAt) || 0;
+  const localAt = Number(current.updatedAt) || 0;
+  if (current.media && incomingAt > 0 && localAt > 0 && incomingAt < localAt) {
+    return current;
+  }
+  return {
+    media: incoming.media,
+    playing: Boolean(incoming.playing),
+    position: clampPosition(incoming.position),
+    updatedAt: incomingAt || now,
+    chat: Array.isArray(current.chat) ? current.chat : [],
+    draw: Array.isArray(current.draw) ? current.draw : [],
+    host: incoming.host === undefined ? current.host || null : incoming.host,
+  };
+}
+
+/** Pull the LiveKit clock into this process so any host sees the same reel. */
+export async function hydrateWatchTogetherClock() {
+  try {
+    const incoming = parseWatchTogetherClock(await getLivekitRoomMetadata(LIVEKIT_ROOM_NAME));
+    if (incoming) room = adoptSharedClock(room, incoming);
+  } catch {
+    /* keep in-memory clock */
+  }
+  return getWatchTogetherSnapshot();
+}
+
+/** Publish the movie clock onto the LiveKit room so late joiners see it. */
+export async function persistWatchTogetherClock(snapshot) {
+  const clock = publicPlaybackState(snapshot || room);
+  if (!clock.media) return false;
+  try {
+    return Boolean(await updateLivekitRoomMetadata(LIVEKIT_ROOM_NAME, JSON.stringify(clock)));
+  } catch {
+    return false;
+  }
 }
 
 export function sanitizeName(name) {
@@ -688,6 +759,10 @@ export default {
   publicViewer,
   buildViewerRecord,
   handleWatchIntent,
+  parseWatchTogetherClock,
+  adoptSharedClock,
+  hydrateWatchTogetherClock,
+  persistWatchTogetherClock,
   getWatchTogetherSnapshot,
   getWatchTogetherStatus,
   mintWatchTogetherLivekitToken,

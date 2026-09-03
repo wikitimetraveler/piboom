@@ -19,25 +19,28 @@ describe('menu-config auth filtering', () => {
     MENU_CONFIG = loadMenuConfig();
   });
 
-  test('pathRequiresAuth treats Worksheets and disasters as public and Encompass as gated', () => {
-    expect(MENU_CONFIG.pathRequiresAuth('/finance/index.html')).toBe(false);
-    expect(MENU_CONFIG.pathRequiresAuth('/finance/fha-streamline-calculator.html')).toBe(false);
+  test('pathRequiresAuth gates mortgage pages; disaster suite and GSE stay public', () => {
+    expect(MENU_CONFIG.pathRequiresAuth('/finance/index.html')).toBe(true);
+    expect(MENU_CONFIG.pathRequiresAuth('/finance/fha-streamline-calculator.html')).toBe(true);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/disasters-unified.html')).toBe(false);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/disasters-webcams.html')).toBe(false);
+    expect(MENU_CONFIG.pathRequiresAuth('/finance/disasters-encompass-map.html')).toBe(false);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/encompass-hub.html')).toBe(true);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/unit-tests.html')).toBe(true);
     expect(MENU_CONFIG.pathRequiresAuth('/gse-analyzer.html')).toBe(false);
   });
 
-  test('filterToolsByAuth hides login-required tools when logged out', () => {
+  test('filterToolsByAuth logged-out visible set is disaster suite + GSE only', () => {
     const visible = MENU_CONFIG.filterToolsByAuth(MENU_CONFIG.ENCOMPASS_TOOLS, false);
     const hrefs = visible.map((t) => t.href);
     expect(hrefs).toContain('/finance/disasters-unified.html');
-    expect(hrefs).toContain('/finance/index.html');
+    expect(hrefs).toContain('/finance/disasters-encompass-map.html');
     expect(hrefs).toContain('/gse-analyzer.html');
+    expect(hrefs).not.toContain('/finance/index.html');
     expect(hrefs).not.toContain('/finance/encompass-assistant.html');
     expect(hrefs).not.toContain('/finance/unit-tests.html');
     expect(hrefs).not.toContain('/finance/loan-batch-update.html');
+    expect(hrefs).not.toContain('/finance/fha-streamline-calculator.html');
   });
 
   test('filterToolsByAuth shows all tools when logged in', () => {
@@ -50,10 +53,16 @@ describe('menu-config auth filtering', () => {
     expect(MENU_CONFIG.pathRequiresAuth('/finance/processor-assignment-mock.html')).toBe(true);
   });
 
-  test('getFinanceNavItems expands to every mortgage app when logged in', () => {
+  test('getFinanceNavItems scrubs mortgage apps when logged out and expands when logged in', () => {
     const loggedOut = MENU_CONFIG.getFinanceNavItems(false);
     const loggedIn = MENU_CONFIG.getFinanceNavItems(true);
-    expect(loggedOut).toEqual(MENU_CONFIG.NAV_FINANCE);
+    expect(loggedOut).not.toEqual(MENU_CONFIG.NAV_FINANCE);
+    const outHrefs = loggedOut.filter((t) => t.href).map((t) => t.href);
+    expect(outHrefs).toContain('/finance/disasters-unified.html');
+    expect(outHrefs).not.toContain('/finance/encompass-hub.html');
+    expect(outHrefs).not.toContain('/finance/unit-tests.html');
+    expect(outHrefs).not.toContain('/finance/index.html');
+
     const hrefs = loggedIn.filter((t) => t.href).map((t) => t.href);
     expect(hrefs).toEqual(
       expect.arrayContaining([
@@ -74,10 +83,13 @@ describe('menu-config auth filtering', () => {
     );
   });
 
-  test('getMortgageTools returns calculators plus full Encompass set when logged in', () => {
+  test('getMortgageTools returns disasters only when logged out; full set when logged in', () => {
     const loggedOut = MENU_CONFIG.getMortgageTools(false);
     const loggedIn = MENU_CONFIG.getMortgageTools(true);
-    expect(loggedOut.map((t) => t.href)).not.toContain('/finance/encompass-assistant.html');
+    const outHrefs = loggedOut.map((t) => t.href);
+    expect(outHrefs).toContain('/finance/disasters-unified.html');
+    expect(outHrefs).not.toContain('/finance/encompass-assistant.html');
+    expect(outHrefs).not.toContain('/finance/dti-calculator.html');
     expect(loggedIn.map((t) => t.href)).toEqual(
       expect.arrayContaining([
         '/finance/encompass-hub.html',
@@ -87,5 +99,13 @@ describe('menu-config auth filtering', () => {
       ]),
     );
     expect(loggedIn.length).toBeGreaterThan(loggedOut.length);
+  });
+
+  test('getDomainTiles hides Worksheets tile when logged out', () => {
+    const loggedOut = MENU_CONFIG.getDomainTiles(false, false);
+    const loggedIn = MENU_CONFIG.getDomainTiles(false, true);
+    expect(loggedOut.map((t) => t.href)).not.toContain('/finance/index.html');
+    expect(loggedOut.map((t) => t.href)).toContain('/finance/disasters-unified.html');
+    expect(loggedIn.map((t) => t.href)).toContain('/finance/index.html');
   });
 });

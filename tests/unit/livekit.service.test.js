@@ -9,6 +9,9 @@ import {
   setLivekitTokenFactory,
   setLivekitEgressClientFactory,
   setLivekitOccupancyFactory,
+  setLivekitRoomMetadataStore,
+  getLivekitRoomMetadata,
+  updateLivekitRoomMetadata,
   startAudioOnlyRoomEgress,
   stopLivekitEgress,
   sanitizeParticipantName,
@@ -35,6 +38,7 @@ describe('livekit.service', () => {
     setLivekitTokenFactory(null);
     setLivekitEgressClientFactory(null);
     setLivekitOccupancyFactory(null);
+    setLivekitRoomMetadataStore(null);
   });
 
   afterEach(() => {
@@ -45,6 +49,7 @@ describe('livekit.service', () => {
     setLivekitTokenFactory(null);
     setLivekitEgressClientFactory(null);
     setLivekitOccupancyFactory(null);
+    setLivekitRoomMetadataStore(null);
   });
 
   test('getLivekitConfig requires url key and secret', () => {
@@ -160,6 +165,19 @@ describe('livekit.service', () => {
   test('listRoomParticipantCount returns a real zero when the room is empty', async () => {
     setLivekitOccupancyFactory(async () => 0);
     await expect(listRoomParticipantCount('watch-together-theater')).resolves.toBe(0);
+  });
+
+  test('room metadata store reads and writes a shared clock blob', async () => {
+    const store = { data: {} };
+    setLivekitRoomMetadataStore({
+      read: async (name) => store.data[name] || null,
+      write: async (name, value) => {
+        store.data[name] = value;
+      },
+    });
+    expect(await getLivekitRoomMetadata('watch-together-theater')).toBeNull();
+    await expect(updateLivekitRoomMetadata('watch-together-theater', '{"playing":true}')).resolves.toBe(true);
+    expect(await getLivekitRoomMetadata('watch-together-theater')).toBe('{"playing":true}');
   });
 
   test('stopLivekitEgress uses injected client', async () => {

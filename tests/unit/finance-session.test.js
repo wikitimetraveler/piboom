@@ -39,8 +39,10 @@ describe('finance-session', () => {
     expect(financeSessionClearCookieHeader()).toMatch(/Max-Age=0/);
   });
 
-  test('financePathNeedsSession allows public disasters page and hazard geo assets', () => {
+  test('financePathNeedsSession allows public disaster suite and hazard geo assets', () => {
     expect(financePathNeedsSession('/finance/disasters-unified.html')).toBe(false);
+    expect(financePathNeedsSession('/finance/disasters-webcams.html')).toBe(false);
+    expect(financePathNeedsSession('/finance/disasters-encompass-map.html')).toBe(false);
     expect(financePathNeedsSession('/finance/assets/geo/us-states.geojson')).toBe(false);
     expect(financePathNeedsSession('/finance/assets/geo/us-states.topojson')).toBe(false);
     expect(financePathNeedsSession('/finance/assets/geo/counties/CA.geojson')).toBe(false);
@@ -48,7 +50,13 @@ describe('finance-session', () => {
     expect(financePathNeedsSession('/finance/js/disasters-unified/geo-data.js')).toBe(false);
   });
 
-  test('financePathNeedsSession still gates private finance HTML', () => {
+  test('financePathNeedsSession gates Worksheets hub, calculators, and Encompass HTML', () => {
+    expect(financePathNeedsSession('/finance')).toBe(true);
+    expect(financePathNeedsSession('/finance/')).toBe(true);
+    expect(financePathNeedsSession('/finance/index.html')).toBe(true);
+    expect(financePathNeedsSession('/finance/fha-streamline-calculator.html')).toBe(true);
+    expect(financePathNeedsSession('/finance/dti-calculator.html')).toBe(true);
+    expect(financePathNeedsSession('/finance/va-irrrl-calculator.html')).toBe(true);
     expect(financePathNeedsSession('/finance/encompass-hub.html')).toBe(true);
     expect(financePathNeedsSession('/finance/unit-tests.html')).toBe(true);
   });

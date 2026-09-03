@@ -8,18 +8,8 @@
 (function (global) {
   'use strict';
 
+  /** Keep in sync with lib/finance-session.js FINANCE_PUBLIC_PAGES (disaster suite only). */
   const FINANCE_PUBLIC_PATHS = {
-    '/finance/index.html': true,
-    '/finance/fha-streamline-calculator.html': true,
-    '/finance/fha-streamline-loan-amount-calculator.html': true,
-    '/finance/fha-streamline-ntb-calculator.html': true,
-    '/finance/asset-qualifier-calculator.html': true,
-    '/finance/dti-calculator.html': true,
-    '/finance/cashout-refinance-calculator.html': true,
-    '/finance/amortization-schedule-calculator.html': true,
-    '/finance/closing-cost-calculator.html': true,
-    '/finance/ltv-calculator.html': true,
-    '/finance/va-irrrl-calculator.html': true,
     '/finance/disasters-unified.html': true,
     '/finance/disasters-webcams.html': true,
     '/finance/disasters-encompass-map.html': true,
@@ -34,7 +24,7 @@
 
   const TOOL_INDEX = [
     // Worksheets (calculators & disasters; paths remain /finance/)
-    { name: 'Worksheets Hub', url: '/finance/index.html', category: 'Worksheets', keywords: 'calculator hub worksheets', requiresAuth: false },
+    { name: 'Worksheets Hub', url: '/finance/index.html', category: 'Worksheets', keywords: 'calculator hub worksheets', requiresAuth: true },
     { name: 'Encompass Assistant', url: '/finance/encompass-assistant.html', category: 'Encompass', keywords: 'AI robot mortgage API', requiresAuth: true },
     { name: 'Encompass Hub', url: '/finance/encompass-hub.html', category: 'Encompass', keywords: 'pipeline loans API', requiresAuth: true },
     { name: 'Loan batch update', url: '/finance/loan-batch-update.html', category: 'Encompass', keywords: 'batch update loanBatch custom fields filter', requiresAuth: true },
@@ -53,16 +43,16 @@
     { name: 'Enhanced Conditions', url: '/finance/enhanced-conditions.html', category: 'Encompass', keywords: 'enhanced conditions CRUD types templates loan conditions personas live API', requiresAuth: true },
     { name: 'Enhanced Conditions Expert', url: '/finance/enhanced-conditions-expert.html', category: 'Encompass', keywords: 'enhanced conditions expert AI types templates personas handoff postman', requiresAuth: true },
     { name: 'TPO Connect', url: '/finance/tpo-connect.html', category: 'Encompass', keywords: 'TPO third party originator correspondent wholesale SSF guest LoanContractTPO iframe token exchange postman externalOrganizations tpoFees externalUsers', requiresAuth: true },
-    { name: 'FHA Streamline', url: '/finance/fha-streamline-calculator.html', category: 'Worksheets', keywords: 'FHA refinance', requiresAuth: false },
-    { name: 'FHA Loan Amount', url: '/finance/fha-streamline-loan-amount-calculator.html', category: 'Worksheets', keywords: 'FHA streamline loan amount', requiresAuth: false },
-    { name: 'FHA NTB', url: '/finance/fha-streamline-ntb-calculator.html', category: 'Worksheets', keywords: 'FHA streamline net tangible benefit', requiresAuth: false },
-    { name: 'Asset Qualifier', url: '/finance/asset-qualifier-calculator.html', category: 'Worksheets', keywords: 'asset retirement', requiresAuth: false },
-    { name: 'DTI Calculator', url: '/finance/dti-calculator.html', category: 'Worksheets', keywords: 'debt income ratio', requiresAuth: false },
-    { name: 'Cash-Out Refinance', url: '/finance/cashout-refinance-calculator.html', category: 'Worksheets', keywords: 'cash out refinance', requiresAuth: false },
-    { name: 'Amortization Schedule', url: '/finance/amortization-schedule-calculator.html', category: 'Worksheets', keywords: 'amortization schedule', requiresAuth: false },
-    { name: 'Closing Cost Calculator', url: '/finance/closing-cost-calculator.html', category: 'Worksheets', keywords: 'closing fees', requiresAuth: false },
-    { name: 'LTV Calculator', url: '/finance/ltv-calculator.html', category: 'Worksheets', keywords: 'loan to value', requiresAuth: false },
-    { name: 'VA IRRRL', url: '/finance/va-irrrl-calculator.html', category: 'Worksheets', keywords: 'VA refinance', requiresAuth: false },
+    { name: 'FHA Streamline', url: '/finance/fha-streamline-calculator.html', category: 'Worksheets', keywords: 'FHA refinance', requiresAuth: true },
+    { name: 'FHA Loan Amount', url: '/finance/fha-streamline-loan-amount-calculator.html', category: 'Worksheets', keywords: 'FHA streamline loan amount', requiresAuth: true },
+    { name: 'FHA NTB', url: '/finance/fha-streamline-ntb-calculator.html', category: 'Worksheets', keywords: 'FHA streamline net tangible benefit', requiresAuth: true },
+    { name: 'Asset Qualifier', url: '/finance/asset-qualifier-calculator.html', category: 'Worksheets', keywords: 'asset retirement', requiresAuth: true },
+    { name: 'DTI Calculator', url: '/finance/dti-calculator.html', category: 'Worksheets', keywords: 'debt income ratio', requiresAuth: true },
+    { name: 'Cash-Out Refinance', url: '/finance/cashout-refinance-calculator.html', category: 'Worksheets', keywords: 'cash out refinance', requiresAuth: true },
+    { name: 'Amortization Schedule', url: '/finance/amortization-schedule-calculator.html', category: 'Worksheets', keywords: 'amortization schedule', requiresAuth: true },
+    { name: 'Closing Cost Calculator', url: '/finance/closing-cost-calculator.html', category: 'Worksheets', keywords: 'closing fees', requiresAuth: true },
+    { name: 'LTV Calculator', url: '/finance/ltv-calculator.html', category: 'Worksheets', keywords: 'loan to value', requiresAuth: true },
+    { name: 'VA IRRRL', url: '/finance/va-irrrl-calculator.html', category: 'Worksheets', keywords: 'VA refinance', requiresAuth: true },
     { name: 'Disasters Unified', url: '/finance/disasters-unified.html', category: 'Worksheets', keywords: 'FEMA disaster', requiresAuth: false },
     { name: 'Encompass map', url: '/finance/disasters-encompass-map.html', category: 'Worksheets', keywords: 'disaster encompass map loans proximity', requiresAuth: false },
     { name: 'The Parser', url: '/finance/tool2.html', category: 'Encompass', keywords: 'JSON parser', requiresAuth: true },

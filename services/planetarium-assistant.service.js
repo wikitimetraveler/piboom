@@ -17,6 +17,7 @@ export function buildSystemPrompt(skyContext = {}) {
   if (ctx.dateLocal) lines.push(`Sky time (local): ${ctx.dateLocal}`);
   if (ctx.facing) lines.push(`Facing: ${ctx.facing}`);
   if (ctx.moonPhase) lines.push(`Moon phase: ${ctx.moonPhase}`);
+  if (ctx.twilight) lines.push(`Twilight: ${ctx.twilight}`);
   if (ctx.caption) lines.push(`Sky summary: ${ctx.caption}`);
   if (Array.isArray(ctx.planets) && ctx.planets.length) {
     lines.push(
@@ -27,6 +28,17 @@ export function buildSystemPrompt(skyContext = {}) {
   if (Array.isArray(ctx.asterisms) && ctx.asterisms.length) {
     lines.push('Asterisms drawn: ' + ctx.asterisms.join(', '));
   }
+  if (ctx.selection && typeof ctx.selection === 'object') {
+    const s = ctx.selection;
+    const bits = [
+      s.type || 'object',
+      s.name || s.id,
+      Number.isFinite(s.alt) ? `${s.alt}° alt` : null,
+      Number.isFinite(s.az) ? `${s.az}° az` : null,
+    ].filter(Boolean);
+    lines.push('Selected on dome: ' + bits.join(' · '));
+  }
+  if (ctx.refreshedAt) lines.push(`Context stamped: ${ctx.refreshedAt}`);
 
   const skyBlock = lines.length ? lines.join('\n') : 'No live sky context — answer generally for mid-northern latitudes.';
 
@@ -42,14 +54,16 @@ ${skyBlock}
 
 ## Expertise
 - Bright stars, asterisms (Orion, Big Dipper, Cassiopeia, Summer Triangle, Scorpius), Milky Way band, naked-eye planets.
+- Catalog objects (Messier / named stars) the visitor may have selected on the dome.
 - Altitude/azimuth, twilight, moon phases, seasonal sky changes, Jonathan Homer Lane / Hampton Falls default lore when relevant.
 - Distinguish documented fact from folklore. Say when something is approximate (low-precision ephemeris on this page).
 
 ## Rules
 1. Prefer the live sky context above when the visitor asks "what's up tonight" or "what am I seeing".
-2. If they change date/time in the UI, they may ask again — trust the newest context in their message if provided.
-3. Invite one natural follow-up (e.g. "Want Orion's belt or Jupiter's moons?").
-4. You appear alongside the alien presenter Zed on video — you are Carl the voice/expert; Zed is the face.`;
+2. If a dome selection is listed, treat that object as the visitor's focus unless they clearly ask about something else.
+3. If they change date/time/facing in the UI, trust the newest context stamp — do not reuse an older sky from chat history.
+4. Invite one natural follow-up (e.g. "Want Orion's belt or Jupiter's moons?").
+5. You appear alongside the alien presenter Zed on video — you are Carl the voice/expert; Zed is the face.`;
 }
 
 export async function chatWithCarl({

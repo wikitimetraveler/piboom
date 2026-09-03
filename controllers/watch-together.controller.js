@@ -4,9 +4,10 @@
 import { verifyWatchTogetherAccess } from '../lib/watch-together-auth.js';
 import { getGoogleBrowserApiKey } from '../lib/google-api-key.js';
 import {
-  getWatchTogetherSnapshot,
   getWatchTogetherStatus,
   handleWatchIntent,
+  hydrateWatchTogetherClock,
+  persistWatchTogetherClock,
   mintWatchTogetherLivekitToken,
   startWatchTogetherAudioEgress,
   stopWatchTogetherAudioEgress,
@@ -48,7 +49,8 @@ export async function getWatchTogetherState(req, res) {
   if (!verifyWatchTogetherAccess(code).valid) {
     return res.status(401).json({ ok: false, error: 'invalid-code' });
   }
-  res.json({ ok: true, ...getWatchTogetherSnapshot() });
+  const snapshot = await hydrateWatchTogetherClock();
+  res.json({ ok: true, ...snapshot });
 }
 
 export async function postWatchTogetherIntent(req, res) {
@@ -64,6 +66,13 @@ export async function postWatchTogetherIntent(req, res) {
     });
     if (!result.ok) {
       return res.status(400).json({ ok: false, error: result.reason || 'bad-intent' });
+    }
+    if (result.kind === 'playback') {
+      try {
+        await persistWatchTogetherClock(result.snapshot);
+      } catch {
+        /* LiveKit clock is best-effort — the JSON snapshot still returns */
+      }
     }
     return res.json({ ok: true, ...result });
   } catch (e) {

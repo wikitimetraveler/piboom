@@ -189,6 +189,7 @@ class ModernNavbar extends HTMLElement {
     const compact = this.hasAttribute('compact');
     const demoMode = this.isDemoMode();
     const cfg = window.MENU_CONFIG || {};
+    const financeLoggedIn = this.isUserLoggedIn();
     const navFinance = this.getFinanceNavItems();
     const navMusic = cfg.NAV_MUSIC || [];
     const navEnt = cfg.NAV_ENTERTAINMENT || [];
@@ -514,7 +515,8 @@ class ModernNavbar extends HTMLElement {
                 </a>
               </li>
 
-              <!-- Worksheets dropdown (Hub + essentials; /finance/ URLs) -->
+              <!-- Worksheets dropdown — only when logged in (mortgage behind finance firewall) -->
+              ${financeLoggedIn ? `
               <li class="nav-item dropdown" id="navFinanceDropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" aria-haspopup="true" aria-expanded="false" aria-label="Worksheets menu">
                   <i class="bi-bank"></i> Worksheets
@@ -523,6 +525,7 @@ class ModernNavbar extends HTMLElement {
                   ${this.renderDropdownItems(navFinance)}
                 </div>
               </li>
+              ` : ''}
 
               <li class="nav-item">
                 <a class="nav-link" href="/gse-analyzer.html" title="Fannie / Freddie / FHFA scenario research (not pricing or approval)">
@@ -577,15 +580,26 @@ class ModernNavbar extends HTMLElement {
   }
 
   attachEventListeners() {
-    // Scroll effect
-    window.addEventListener('scroll', () => {
-      const navbar = this.shadowRoot.querySelector('.modern-navbar');
-      if (window.scrollY > 50) {
-        navbar.classList.add('scrolled');
-      } else {
-        navbar.classList.remove('scrolled');
-      }
-    });
+    // Global listeners once; shadow handlers re-bound after each render/login refresh
+    if (!this._globalNavBound) {
+      this._globalNavBound = true;
+      window.addEventListener('scroll', () => {
+        const navbar = this.shadowRoot.querySelector('.modern-navbar');
+        if (window.scrollY > 50) {
+          navbar?.classList.add('scrolled');
+        } else {
+          navbar?.classList.remove('scrolled');
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!this.contains(e.target)) {
+          this.shadowRoot.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.remove('show'));
+          this.shadowRoot.querySelectorAll('.dropdown-toggle').forEach(t => t.setAttribute('aria-expanded', 'false'));
+          this.shadowRoot.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
+        }
+      });
+    }
 
     // Mobile toggle
     const toggler = this.shadowRoot.querySelector('.navbar-toggler');
@@ -617,15 +631,6 @@ class ModernNavbar extends HTMLElement {
         toggle?.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
         dropdown.classList.toggle('open', !isOpen);
       });
-    });
-
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', (e) => {
-      if (!this.contains(e.target)) {
-        this.shadowRoot.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.remove('show'));
-        this.shadowRoot.querySelectorAll('.dropdown-toggle').forEach(t => t.setAttribute('aria-expanded', 'false'));
-        this.shadowRoot.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
-      }
     });
 
     // Search button (triggers global tool search)
@@ -694,10 +699,11 @@ class ModernNavbar extends HTMLElement {
     }
   }
 
-  // Public method to update user display (can be called from outside)
+  // Public method to update after login (re-render so Worksheets dropdown appears)
   refresh() {
+    this.render();
+    this.attachEventListeners();
     this.updateUserDisplay();
-    this.refreshFinanceDropdown();
   }
 }
 

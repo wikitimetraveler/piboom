@@ -18,6 +18,10 @@ import {
   buildViewerRecord,
   handleWatchIntent,
   resetWatchTogetherRoom,
+  parseWatchTogetherClock,
+  adoptSharedClock,
+  hydrateWatchTogetherClock,
+  persistWatchTogetherClock,
   getWatchTogetherSnapshot,
   getWatchTogetherStatus,
   mintWatchTogetherLivekitToken,
@@ -29,6 +33,7 @@ import {
   DRIFT_PLAYING_S,
   DRIFT_PAUSED_S,
 } from '../../services/watch-together.service.js';
+import { setLivekitRoomMetadataStore } from '../../services/livekit.service.js';
 
 describe('watch-together.service', () => {
   test('extractYouTubeId reads watch, short, embed, and raw ids', () => {
@@ -240,6 +245,94 @@ describe('watch-together.service', () => {
     expect(second.snapshot.playing).toBe(true);
     const seek = handleWatchIntent({ type: 'seek', position: 40 }, { name: 'Bo', id: 'b1' });
     expect(seek.ok).toBe(true);
+  });
+
+  test('parseWatchTogetherClock reads a LiveKit metadata snapshot', () => {
+    expect(parseWatchTogetherClock('not-json')).toBeNull();
+    expect(parseWatchTogetherClock({ playing: true })).toBeNull();
+    const clock = parseWatchTogetherClock(JSON.stringify({
+      media: { kind: 'youtube', youtubeId: 'dQw4w9wgGcQ' },
+      playing: true,
+      position: 12,
+      updatedAt: 5000,
+    }));
+    expect(clock.media.youtubeId).toBe('dQw4w9wgGcQ');
+    expect(clock.playing).toBe(true);
+    expect(clock.position).toBe(12);
+  });
+
+  test('adoptSharedClock keeps the newer reel and ignores an empty incoming clock', () => {
+    const local = {
+      ...createRoomState(4_000),
+      media: { kind: 'youtube', youtubeId: 'aaaaaaaaaaa' },
+      updatedAt: 4_000,
+    };
+    expect(adoptSharedClock(local, null)).toBe(local);
+    const next = adoptSharedClock(local, {
+      media: { kind: 'youtube', youtubeId: 'dQw4w9wgGcQ' },
+      playing: true,
+      position: 8,
+      updatedAt: 9_000,
+    });
+    expect(next.media.youtubeId).toBe('dQw4w9wgGcQ');
+    expect(next.playing).toBe(true);
+    const stale = adoptSharedClock(next, {
+      media: { kind: 'youtube', youtubeId: 'bbbbbbbbbbb' },
+      updatedAt: 1_000,
+    });
+    expect(stale.media.youtubeId).toBe('dQw4w9wgGcQ');
+  });
+
+  test('hydrateWatchTogetherClock pulls the LiveKit room clock onto this process', async () => {
+    const store = {};
+    setLivekitRoomMetadataStore({
+      read: async (name) => store[name] || null,
+      write: async (name, value) => {
+        store[name] = value;
+      },
+    });
+    resetWatchTogetherRoom(1_000);
+    store[LIVEKIT_ROOM_NAME] = JSON.stringify({
+      media: { kind: 'youtube', youtubeId: 'dQw4w9wgGcQ' },
+      playing: true,
+      position: 12,
+      updatedAt: 5_000,
+    });
+    try {
+      const snap = await hydrateWatchTogetherClock();
+      expect(snap.media.youtubeId).toBe('dQw4w9wgGcQ');
+      expect(snap.playing).toBe(true);
+      expect(snap.position).toBe(12);
+      expect(getWatchTogetherSnapshot().media.youtubeId).toBe('dQw4w9wgGcQ');
+    } finally {
+      setLivekitRoomMetadataStore(null);
+      resetWatchTogetherRoom(1_000);
+    }
+  });
+
+  test('persistWatchTogetherClock writes the movie onto the LiveKit room', async () => {
+    const store = {};
+    setLivekitRoomMetadataStore({
+      read: async (name) => store[name] || null,
+      write: async (name, value) => {
+        store[name] = value;
+      },
+    });
+    resetWatchTogetherRoom(1_000);
+    try {
+      const ok = await persistWatchTogetherClock({
+        media: { kind: 'youtube', youtubeId: 'dQw4w9wgGcQ', url: 'https://youtu.be/dQw4w9wgGcQ' },
+        playing: true,
+        position: 3,
+        updatedAt: 9_000,
+      });
+      expect(ok).toBe(true);
+      expect(JSON.parse(store[LIVEKIT_ROOM_NAME]).media.youtubeId).toBe('dQw4w9wgGcQ');
+      expect(JSON.parse(store[LIVEKIT_ROOM_NAME]).playing).toBe(true);
+    } finally {
+      setLivekitRoomMetadataStore(null);
+      resetWatchTogetherRoom(1_000);
+    }
   });
 
   test('LiveKit room name is dedicated to the theater', () => {

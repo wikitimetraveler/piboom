@@ -12,6 +12,8 @@ let livekitTokenFactory = null;
 let livekitEgressClientFactory = null;
 /** @type {null | ((roomName: string) => Promise<number>)} */
 let livekitOccupancyFactory = null;
+/** @type {null | { read?: Function, write?: Function }} */
+let livekitRoomMetadataStore = null;
 
 export function setLivekitTokenFactory(factory) {
   livekitTokenFactory = typeof factory === 'function' ? factory : null;
@@ -23,6 +25,10 @@ export function setLivekitEgressClientFactory(factory) {
 
 export function setLivekitOccupancyFactory(factory) {
   livekitOccupancyFactory = typeof factory === 'function' ? factory : null;
+}
+
+export function setLivekitRoomMetadataStore(store) {
+  livekitRoomMetadataStore = store && typeof store === 'object' ? store : null;
 }
 
 export function getLivekitConfig() {
@@ -182,6 +188,71 @@ export async function mintLivekitAccessToken({
   };
 }
 
+async function roomServiceClient() {
+  const config = getLivekitConfig();
+  if (!config.configured) return null;
+  const { RoomServiceClient } = await import('livekit-server-sdk');
+  return new RoomServiceClient(livekitHttpUrl(config.url), config.apiKey, config.apiSecret);
+}
+
+/**
+ * Shared room blob (theater clock, etc.). Empty / missing room → null.
+ * @param {string} roomName
+ * @returns {Promise<string | null>}
+ */
+export async function getLivekitRoomMetadata(roomName) {
+  const safeRoom = String(roomName || '').trim();
+  if (!safeRoom) return null;
+  if (livekitRoomMetadataStore?.read) {
+    const raw = await livekitRoomMetadataStore.read(safeRoom);
+    return raw == null ? null : String(raw);
+  }
+  const svc = await roomServiceClient();
+  if (!svc) return null;
+  try {
+    const rooms = await svc.listRooms([safeRoom]);
+    const room = Array.isArray(rooms)
+      ? rooms.find((row) => row?.name === safeRoom) || rooms[0]
+      : rooms;
+    const meta = room?.metadata;
+    return meta == null || meta === '' ? null : String(meta);
+  } catch (err) {
+    if (isMissingRoomError(err)) return null;
+    return null;
+  }
+}
+
+/**
+ * Write room metadata. Creates the LiveKit room when it does not exist yet
+ * so a late joiner still sees the same clock.
+ * @param {string} roomName
+ * @param {string} metadata
+ * @returns {Promise<boolean>}
+ */
+export async function updateLivekitRoomMetadata(roomName, metadata) {
+  const safeRoom = String(roomName || '').trim();
+  if (!safeRoom) return false;
+  const payload = String(metadata || '');
+  if (livekitRoomMetadataStore?.write) {
+    await livekitRoomMetadataStore.write(safeRoom, payload);
+    return true;
+  }
+  const svc = await roomServiceClient();
+  if (!svc) return false;
+  try {
+    await svc.updateRoomMetadata(safeRoom, payload);
+    return true;
+  } catch (err) {
+    if (!isMissingRoomError(err)) return false;
+    try {
+      await svc.createRoom({ name: safeRoom, metadata: payload });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}
+
 export async function listRoomParticipantCount(roomName) {
   if (livekitOccupancyFactory) {
     try {
@@ -296,6 +367,9 @@ export default {
   setLivekitTokenFactory,
   setLivekitEgressClientFactory,
   setLivekitOccupancyFactory,
+  setLivekitRoomMetadataStore,
+  getLivekitRoomMetadata,
+  updateLivekitRoomMetadata,
   listRoomParticipantCount,
   startAudioOnlyRoomEgress,
   stopLivekitEgress,

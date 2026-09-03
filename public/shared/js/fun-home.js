@@ -387,6 +387,14 @@
     if (scrubVal) {
       scrubVal.textContent = formatScrubLabel(Sky, heroSkyState.scrubIndex);
     }
+    syncPlanetariumCta();
+    if (window.WebGpuGlobe && typeof window.WebGpuGlobe.applySunFromDate === 'function') {
+      window.WebGpuGlobe.applySunFromDate(skyInput.date);
+    }
+    const enlarged = document.querySelector('.fun-hero__pane--planet.is-enlarged');
+    if (enlarged) {
+      syncSkyHandoff(enlarged, enlarged.getAttribute('data-body'));
+    }
   }
 
   /** Geolocated tonight sky, or Hampton Falls fallback. */
@@ -1086,6 +1094,10 @@
     document.querySelectorAll('.fun-hero__landmark-hint').forEach((el) => el.remove());
   }
 
+  function clearSkyHandoffs() {
+    document.querySelectorAll('.fun-hero__sky-handoff').forEach((el) => el.remove());
+  }
+
   function syncLandmarkHint(pane, body, zoomed) {
     clearLandmarkHints();
     if (!pane || !body || zoomed || !pane.classList.contains('is-enlarged')) return;
@@ -1109,8 +1121,64 @@
     const link = document.createElement('a');
     link.className = 'fun-hero__landmark-link';
     link.href = landmark.href;
-    link.textContent = 'Lane Museum →';
-    link.setAttribute('aria-label', 'Open Lane Museum lunar exhibit');
+    link.textContent = landmark.linkLabel || landmark.label + ' →';
+    link.setAttribute('aria-label', landmark.linkLabel || ('Open ' + landmark.label));
+    pane.appendChild(link);
+  }
+
+  /** Live alt/az for a hero body from FunHomeSky (null if not in sky model). */
+  function skyStatusForBody(bodyId) {
+    const Sky = window.FunHomeSky;
+    if (!Sky || !bodyId || bodyId === 'earth' || bodyId === 'crystal') return null;
+    const { date } = resolveSkyInput(Sky, heroSkyState.observer, heroSkyState.scrubIndex);
+    const obs = heroSkyState.observer || Sky.DEFAULT_OBSERVER;
+    const sky = Sky.projectSky(date, obs, { forceTime: true });
+    const hit = (sky.planets || []).find((p) => p.id === bodyId);
+    if (!hit) return { tracked: false, name: bodyId };
+    return {
+      tracked: true,
+      name: hit.name,
+      alt: hit.alt,
+      az: hit.az,
+      up: hit.alt > 0,
+      date,
+      observer: obs,
+    };
+  }
+
+  function syncSkyHandoff(pane, bodyId) {
+    clearSkyHandoffs();
+    if (!pane || !bodyId || !pane.classList.contains('is-enlarged')) return;
+    const Sky = window.FunHomeSky;
+    if (!Sky || typeof Sky.buildPlanetariumUrl !== 'function') return;
+
+    const status = skyStatusForBody(bodyId);
+    const { date } = resolveSkyInput(Sky, heroSkyState.observer, heroSkyState.scrubIndex);
+    const obs = heroSkyState.observer || Sky.DEFAULT_OBSERVER;
+    const url = Sky.buildPlanetariumUrl({
+      date,
+      observer: obs,
+      body: bodyId === 'earth' ? undefined : bodyId,
+    });
+
+    const link = document.createElement('a');
+    link.className = 'fun-hero__sky-handoff';
+    link.href = url;
+
+    if (!status || !status.tracked) {
+      link.textContent = 'View in sky';
+      link.title = 'Open planetarium';
+    } else if (status.up) {
+      link.textContent =
+        'View in sky · ' + Math.round(status.alt) + '° alt · ' + Math.round(status.az) + '° az';
+      link.title = status.name + ' is above the horizon — open planetarium';
+      link.classList.add('fun-hero__sky-handoff--up');
+    } else {
+      link.textContent = 'Not up now · ' + Math.round(status.alt) + '° · open sky';
+      link.title = status.name + ' is below the horizon at this sky time';
+      link.classList.add('fun-hero__sky-handoff--down');
+    }
+    link.setAttribute('aria-label', link.title || 'Open planetarium');
     pane.appendChild(link);
   }
 
@@ -1123,6 +1191,7 @@
     });
     clearLandmarkLinks();
     clearLandmarkHints();
+    clearSkyHandoffs();
     pane.classList.add('is-enlarged');
     window.dispatchEvent(new Event('resize'));
 
@@ -1138,7 +1207,30 @@
     } else {
       syncLandmarkHint(pane, body, false);
     }
+    syncPlanetariumCta(body);
+    syncSkyHandoff(pane, body);
     return pane;
+  }
+
+  function syncPlanetariumCta(bodyId) {
+    const link = document.getElementById('funPlanetariumCta');
+    const Sky = window.FunHomeSky;
+    if (!link || !Sky || typeof Sky.buildPlanetariumUrl !== 'function') return;
+    const { date } = resolveSkyInput(Sky, heroSkyState.observer, heroSkyState.scrubIndex);
+    const url = Sky.buildPlanetariumUrl({
+      date,
+      observer: heroSkyState.observer || Sky.DEFAULT_OBSERVER,
+      facing: 'south',
+      body: bodyId || undefined,
+    });
+    link.href = url;
+    if (bodyId) {
+      link.setAttribute('aria-label', 'Open full sky focused on ' + bodyId);
+      link.title = 'Open planetarium · ' + bodyId;
+    } else {
+      link.setAttribute('aria-label', 'Open full sky planetarium');
+      link.title = 'Open planetarium';
+    }
   }
 
   function initSkyPlanetLinks(mounts) {
@@ -1153,7 +1245,20 @@
       const body = dot.getAttribute('data-planet');
       if (!body) return;
       enlargePlanetPane(body, panes, mounts, { lookAt: body === 'moon' });
+      syncPlanetariumCta(body);
+      if (event.metaKey || event.ctrlKey) {
+        const Sky = window.FunHomeSky;
+        if (Sky && typeof Sky.buildPlanetariumUrl === 'function') {
+          const { date } = resolveSkyInput(Sky, heroSkyState.observer, heroSkyState.scrubIndex);
+          window.location.href = Sky.buildPlanetariumUrl({
+            date,
+            observer: heroSkyState.observer || Sky.DEFAULT_OBSERVER,
+            body,
+          });
+        }
+      }
     });
+    syncPlanetariumCta();
   }
 
   function initGlobeEnlarge(mounts) {
@@ -1164,10 +1269,12 @@
 
     panes.forEach((pane) => {
       pane.addEventListener('click', (event) => {
+        if (event.target.closest('.fun-hero__sky-handoff, .fun-hero__landmark-link')) return;
         event.preventDefault();
         event.stopPropagation();
         const body = pane.getAttribute('data-body');
         if (!body) return;
+        syncPlanetariumCta(body);
         const already = pane.classList.contains('is-enlarged');
         const zoomed = pane._landmarkZoomed;
         const lm = landmarks[body];
@@ -1181,8 +1288,10 @@
         });
         clearLandmarkLinks();
         clearLandmarkHints();
+        clearSkyHandoffs();
         pane.classList.add('is-enlarged');
         window.dispatchEvent(new Event('resize'));
+        syncSkyHandoff(pane, body);
 
         if (!lm || !api) return;
 
@@ -1258,7 +1367,15 @@
 
     if (typeof Globe.ensureHeroSync === 'function') {
       const sync = Globe.ensureHeroSync();
-      if (Globe.DEFAULT_SUN_DIR) sync.sunDir = { ...Globe.DEFAULT_SUN_DIR };
+      if (typeof Globe.applySunFromDate === 'function') {
+        const Sky = window.FunHomeSky;
+        const skyInput = Sky
+          ? resolveSkyInput(Sky, heroSkyState.observer, heroSkyState.scrubIndex)
+          : { date: new Date() };
+        Globe.applySunFromDate(skyInput.date);
+      } else if (Globe.DEFAULT_SUN_DIR) {
+        sync.sunDir = { ...Globe.DEFAULT_SUN_DIR };
+      }
     }
 
     const ids = Globe.HERO_BODIES || ['earth', 'moon', 'mars'];

@@ -131,7 +131,11 @@
     }).catch(() => {});
   }
 
-  root.PlanetariumHeygen = { toggle: toggleHeygen, speak, stop: stopHeygen };
+  function isLive() {
+    return Boolean(heygenRoom && heygenSessionId);
+  }
+
+  root.PlanetariumHeygen = { toggle: toggleHeygen, speak, stop: stopHeygen, isLive };
 
   document.getElementById('planHeygenToggle')?.addEventListener('click', () => {
     toggleHeygen().catch((err) => setStatus(err.message || 'HeyGen failed'));

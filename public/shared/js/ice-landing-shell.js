@@ -267,20 +267,8 @@
         });
     };
 
+    /** Keep in sync with lib/finance-session.js FINANCE_PUBLIC_PAGES (disaster suite only). */
     const PUBLIC_FINANCE_PATHS = {
-      '/finance': true,
-      '/finance/': true,
-      '/finance/index.html': true,
-      '/finance/fha-streamline-calculator.html': true,
-      '/finance/fha-streamline-loan-amount-calculator.html': true,
-      '/finance/fha-streamline-ntb-calculator.html': true,
-      '/finance/asset-qualifier-calculator.html': true,
-      '/finance/dti-calculator.html': true,
-      '/finance/cashout-refinance-calculator.html': true,
-      '/finance/amortization-schedule-calculator.html': true,
-      '/finance/closing-cost-calculator.html': true,
-      '/finance/ltv-calculator.html': true,
-      '/finance/va-irrrl-calculator.html': true,
       '/finance/disasters-unified.html': true,
       '/finance/disasters-webcams.html': true,
       '/finance/disasters-encompass-map.html': true,

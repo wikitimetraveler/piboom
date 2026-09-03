@@ -1,5 +1,6 @@
 /**
  * Watch together realtime — LiveKit first (same keys as Studio), Socket.IO fallback.
+ * One LiveKit room holds the movie clock (room.metadata + data packets), like Studio's stage.
  * Data packets carry control intents. Participant metadata carries map location.
  * Volume is never published.
  */
@@ -60,7 +61,50 @@
     audioUnlockBound: false,
     micError: '',
     handlers: {},
+    lastSnapshot: null,
   };
+
+  function parseClockSnapshot(raw) {
+    if (raw == null || raw === '') return null;
+    let data = raw;
+    if (typeof raw === 'string') {
+      try {
+        data = JSON.parse(raw);
+      } catch {
+        return null;
+      }
+    }
+    if (!data || typeof data !== 'object') return null;
+    const media = data.media;
+    if (!media || !media.kind) return null;
+    if (media.kind === 'youtube' && !media.youtubeId) return null;
+    if (media.kind === 'file' && !media.src) return null;
+    return {
+      media,
+      playing: Boolean(data.playing),
+      position: Number(data.position) || 0,
+      updatedAt: Number(data.updatedAt) || Date.now(),
+      host: data.host && typeof data.host === 'object' ? data.host : null,
+      chat: Array.isArray(data.chat) ? data.chat : undefined,
+      draw: Array.isArray(data.draw) ? data.draw : undefined,
+    };
+  }
+
+  function rememberSnapshot(snapshot) {
+    if (!snapshot?.media) return;
+    state.lastSnapshot = snapshot;
+  }
+
+  function emitPlaybackSnapshot(snapshot, asState) {
+    if (!snapshot) return;
+    rememberSnapshot(snapshot);
+    emit(asState ? 'state' : 'playback', snapshot);
+  }
+
+  async function republishClock() {
+    if (!state.lastSnapshot) return;
+    await publishData({ type: 'playback', snapshot: state.lastSnapshot }, true);
+  }
 
   function emit(name, payload) {
     const fn = state.handlers[name];
@@ -161,7 +205,7 @@
     if (msg.type === 'chat') emit('chat', msg.message || msg);
     else if (msg.type === 'draw') emit('draw', msg.stroke || msg);
     else if (msg.type === 'clear-draw') emit('clear-draw');
-    else if (msg.type === 'playback' && msg.snapshot) emit('playback', msg.snapshot);
+    else if (msg.type === 'playback' && msg.snapshot) emitPlaybackSnapshot(msg.snapshot, false);
     else emit('intent', msg);
   }
 
@@ -354,7 +398,15 @@
           }
     );
     room.on(LK.RoomEvent.DataReceived, handleData);
-    room.on(LK.RoomEvent.ParticipantConnected, publishViewers);
+    room.on(LK.RoomEvent.ParticipantConnected, () => {
+      publishViewers();
+      void republishClock();
+    });
+    if (LK.RoomEvent.RoomMetadataChanged) {
+      room.on(LK.RoomEvent.RoomMetadataChanged, (metadata) => {
+        emitPlaybackSnapshot(parseClockSnapshot(metadata), false);
+      });
+    }
     room.on(LK.RoomEvent.ParticipantDisconnected, publishViewers);
     room.on(LK.RoomEvent.ParticipantMetadataChanged, publishViewers);
     room.on(LK.RoomEvent.TrackSubscribed, (track, publication, participant) => {
@@ -425,11 +477,12 @@
     const coords = parseCoords(opts.lat, opts.lng);
     await setMetadata(coords || {});
     publishViewers();
+    emitPlaybackSnapshot(parseClockSnapshot(room.metadata), true);
     const snapRes = await fetch(
       '/api/watch-together/state?code=' + encodeURIComponent(opts.code)
     );
     const snap = await snapRes.json().catch(() => null);
-    if (snap?.ok) emit('state', snap);
+    if (snap?.ok) emitPlaybackSnapshot(snap, true);
     return true;
   }
 
@@ -506,6 +559,7 @@
       const saved = await persistIntent(payload);
       const snapshot = saved?.snapshot;
       if (snapshot) {
+        rememberSnapshot(snapshot);
         await publishData({ type: 'playback', snapshot }, true);
         emit('playback', snapshot);
         return;

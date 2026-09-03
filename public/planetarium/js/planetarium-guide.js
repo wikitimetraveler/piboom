@@ -11,6 +11,8 @@ const WELCOME = `<div class="plan-carl-welcome">
   <small class="text-muted">Try: "What's that bright thing in the south?" or "Tell me about Orion tonight."</small>
 </div>`;
 
+const ZED_HANDOFF = 'Carl has the sky on this one.';
+
 function forSpeech(text) {
   return String(text || '')
     .replace(/[*_`#~>]/g, ' ')
@@ -20,17 +22,32 @@ function forSpeech(text) {
     .slice(0, 900);
 }
 
-function speakReply(text) {
+async function speakReply(text) {
   const clean = forSpeech(text);
   if (!clean) return;
   if (typeof window.speakWithGoogle === 'function') {
     window.speakWithGoogle(clean, 'en-US-Standard-D');
   }
-  window.PlanetariumHeygen?.speak?.(clean);
+  const heygen = window.PlanetariumHeygen;
+  if (heygen?.isLive?.() && typeof heygen.speak === 'function') {
+    try {
+      await heygen.speak(ZED_HANDOFF);
+      await heygen.speak(clean);
+    } catch (_) {
+      /* TTS optional */
+    }
+    return;
+  }
+  heygen?.speak?.(clean);
 }
 
+/** Fresh dome snapshot every Carl turn (date, facing, selection). */
 function getSkyContext() {
-  return window.Planetarium?.getSkyContext?.() || {};
+  const live = window.Planetarium?.getSkyContext?.() || {};
+  return {
+    ...live,
+    clientSentAt: new Date().toISOString(),
+  };
 }
 
 function openChat(prefill, { startVoice = false } = {}) {
@@ -58,6 +75,24 @@ function openChat(prefill, { startVoice = false } = {}) {
   }
 }
 
+function noteSkyControlsChanged() {
+  const status = document.getElementById('planStatus');
+  if (status && !document.fullscreenElement) {
+    status.textContent = 'Sky updated — Ask Carl for a fresh read.';
+  }
+}
+
+function bindSkyContextRefresh() {
+  ['planDate', 'planTime', 'planFacing', 'planNow', 'planTonight', 'planGeolocate'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const ev = el.tagName === 'BUTTON' ? 'click' : 'change';
+    el.addEventListener(ev, () => {
+      window.setTimeout(noteSkyControlsChanged, 40);
+    });
+  });
+}
+
 function initChat() {
   const widget = new AIChatWidget({
     apiEndpoint: '/api/planetarium/assistant/chat',
@@ -83,6 +118,7 @@ function initChat() {
     openChat(null, { startVoice: true });
   });
   window.PlanetariumAskCarl = (msg) => openChat(msg, { startVoice: !msg });
+  bindSkyContextRefresh();
 }
 
 if (document.readyState === 'loading') {
