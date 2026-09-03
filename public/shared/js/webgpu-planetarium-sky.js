@@ -61,22 +61,18 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
   var col = vec3f(0.02, 0.035, 0.07);
   col += vec3f(0.01, 0.02, 0.04) * (1.0 - uv.y);
 
-  // Soft Milky Way band (diagonal ellipse)
+  // Soft Milky Way band only — catalog stars come from FunHomeSky (no pixel lattice)
   let mwUv = vec2f((uv.x - 0.5) * aspect, uv.y - 0.42);
-  let rot = mat2x2(vec2f(0.87, -0.49), vec2f(0.49, 0.87));
-  let mwP = rot * mwUv;
+  let c = cos(-0.48);
+  let s = sin(-0.48);
+  let mwP = vec2f(c * mwUv.x - s * mwUv.y, s * mwUv.x + c * mwUv.y);
   let band = exp(-pow(mwP.y * 3.4, 2.0)) * smoothstep(1.15, 0.15, abs(mwP.x));
-  let dust = fbm(mwP * vec2f(3.2, 8.0) + vec2f(u.seed, u.time * 0.02));
-  col += vec3f(0.22, 0.24, 0.34) * band * (0.45 + dust * 0.7);
+  let dust = fbm(mwP * vec2f(3.2, 8.0) + vec2f(u.seed, u.time * 0.015));
+  col += vec3f(0.16, 0.18, 0.28) * band * (0.32 + dust * 0.5);
 
-  // Sparse twinkle field
-  let cell = floor(uv * vec2f(90.0 * aspect, 70.0));
-  let h = hash21(cell + vec2f(u.seed * 17.0, 3.1));
-  let tw = select(0.0, 1.0, h > 0.985);
-  let phase = hash21(cell + vec2f(2.7, u.seed));
-  let motion = select(1.0, 0.0, u.reduced > 0.5);
-  let pulse = 0.55 + 0.45 * sin(u.time * (1.2 + phase) + phase * 6.28) * motion;
-  col += vec3f(0.85, 0.9, 1.0) * tw * pulse * 0.55;
+  // Very soft airglow — no discrete star points (those looked like a square grid)
+  let air = fbm(uv * vec2f(3.5 * aspect, 2.8) + vec2f(u.time * 0.01, u.seed));
+  col += vec3f(0.04, 0.05, 0.09) * air * 0.35;
 
   textureStore(outTex, vec2i(id.xy), vec4f(col, 1.0));
 }
@@ -127,16 +123,7 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
       ctx.arc(0, 0, Math.max(w, h) * 0.35, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
-      if (!Runtime.prefersReducedMotion()) {
-        const seed = (t * 0.001) % 1000;
-        for (let i = 0; i < 40; i += 1) {
-          const x = ((Math.sin(seed + i * 12.1) * 0.5 + 0.5) * w);
-          const y = ((Math.cos(seed * 0.7 + i * 7.3) * 0.5 + 0.5) * h * 0.85);
-          const a = 0.25 + 0.35 * Math.abs(Math.sin(seed + i));
-          ctx.fillStyle = 'rgba(230, 235, 255,' + a.toFixed(2) + ')';
-          ctx.fillRect(x, y, 1.2, 1.2);
-        }
-      }
+      // No discrete star dots here — FunHomeSky owns the catalog points.
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);

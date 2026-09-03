@@ -1499,6 +1499,11 @@ body[data-theme="dark"] .fun-hero__brand {
   transform: translateY(-2px);
 }
 
+.fun-btn--ambience[aria-pressed='true'] {
+  border-color: rgba(74, 144, 164, 0.55);
+  box-shadow: 0 0 16px rgba(74, 144, 164, 0.28);
+}
+
 .fun-hero__scroll-cue {
   position: absolute;
   left: 50%;
