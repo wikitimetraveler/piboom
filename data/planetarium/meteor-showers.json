@@ -5,6 +5,8 @@
     "peak": "01-03",
     "zhr": 110,
     "radiant": "Boötes",
+    "ra": 230.0,
+    "dec": 49.0,
     "note": "Brief sharp peak — best after midnight."
   },
   {
@@ -13,6 +15,8 @@
     "peak": "04-22",
     "zhr": 18,
     "radiant": "Lyra",
+    "ra": 271.0,
+    "dec": 34.0,
     "note": "Near Vega — watch for bright fireballs."
   },
   {
@@ -21,6 +25,8 @@
     "peak": "08-12",
     "zhr": 100,
     "radiant": "Perseus",
+    "ra": 46.0,
+    "dec": 58.0,
     "note": "Classic summer shower — moon phase matters."
   },
   {
@@ -29,6 +35,8 @@
     "peak": "10-21",
     "zhr": 20,
     "radiant": "Orion",
+    "ra": 95.0,
+    "dec": 16.0,
     "note": "Halley's Comet debris — fast meteors."
   },
   {
@@ -37,6 +45,8 @@
     "peak": "11-17",
     "zhr": 15,
     "radiant": "Leo",
+    "ra": 152.0,
+    "dec": 22.0,
     "note": "Storm years are rare — steady most seasons."
   },
   {
@@ -45,6 +55,8 @@
     "peak": "12-13",
     "zhr": 150,
     "radiant": "Gemini",
+    "ra": 112.0,
+    "dec": 33.0,
     "note": "Often the year's best — dress warm."
   }
 ]

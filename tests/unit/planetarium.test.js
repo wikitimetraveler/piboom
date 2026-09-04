@@ -20,7 +20,7 @@ describe('FunHomeSky centerAz', () => {
 describe('Planetarium', () => {
   test('parseParams reads date, time, lat, lon, facing, body, and select', () => {
     const parsed = Planetarium.parseParams(
-      '?date=2026-08-31&time=22:30&lat=42.9&lon=-70.86&face=east&body=mars&select=Vega'
+      '?date=2026-08-31&time=22:30&lat=42.9&lon=-70.86&face=east&body=mars&select=Vega&view=horizon'
     );
     expect(parsed.dateParts).toEqual({ y: 2026, m: 8, d: 31 });
     expect(parsed.timeParts).toEqual({ h: 22, m: 30 });
@@ -28,6 +28,7 @@ describe('Planetarium', () => {
     expect(parsed.facing).toBe('east');
     expect(parsed.body).toBe('mars');
     expect(parsed.select).toBe('Vega');
+    expect(parsed.view).toBe('horizon');
   });
 
   test('buildShareUrl encodes observer, time, and selection', () => {
@@ -76,14 +77,45 @@ describe('Planetarium', () => {
     expect(typeof Planetarium.getSkyContext).toBe('function');
   });
 
+  test('renderPickHud no-ops without a HUD element', () => {
+    expect(typeof Planetarium.renderPickHud).toBe('function');
+    expect(() => Planetarium.renderPickHud({ type: 'planet', name: 'Mars', alt: 20, az: 180 })).not.toThrow();
+  });
+
   test('isDarkSky treats civil twilight as not dark', () => {
     expect(Planetarium.isDarkSky(-5)).toBe(false);
     expect(Planetarium.isDarkSky(-8)).toBe(true);
   });
 
   test('projOptsFor uses compass azimuth when compass mode on', () => {
-    const opts = Planetarium.projOptsFor({ facing: 'south', compassMode: true, compassAz: 95 });
+    const opts = Planetarium.projOptsFor({
+      facing: 'south',
+      compassMode: true,
+      compassAz: 95,
+      domeMode: false,
+    });
     expect(opts.centerAz).toBe(95);
+    expect(opts.projection).not.toBe('zenith');
+  });
+
+  test('projOptsFor uses a wide theater window', () => {
+    const opts = Planetarium.projOptsFor({ facing: 'south' });
+    expect(opts.projection).not.toBe('zenith');
+    expect(opts.centerAz).toBe(180);
+    expect(opts.fovAz).toBeGreaterThan(140);
+  });
+
+  test('buildShareUrl records horizon view when look-up is off', () => {
+    const url = Planetarium.buildShareUrl(
+      {
+        date: new Date(2026, 7, 31, 21, 0),
+        observer: { lat: 42.9, lon: -70.86, label: 'Hampton Falls' },
+        facing: 'south',
+        domeMode: false,
+      },
+      'https://example.com'
+    );
+    expect(url).toContain('view=horizon');
   });
 });
 

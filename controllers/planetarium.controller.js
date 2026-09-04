@@ -9,18 +9,26 @@ import planetariumEventsService from '../services/planetarium-events.service.js'
 const router = Router();
 
 router.get('/health', (_req, res) => {
-  res.json({ ok: true, features: ['iss-passes', 'events', 'catalog'] });
+  res.json({
+    ok: true,
+    features: ['iss-passes', 'iss-tle', 'events', 'catalog', 'astronomy-engine'],
+  });
 });
 
 router.get('/iss-passes', async (req, res) => {
   try {
     const lat = req.query.lat;
     const lon = req.query.lon;
-    const result = await planetariumIssService.fetchIssPasses(lat, lon);
+    const at = req.query.at;
+    const result = await planetariumIssService.fetchIssPasses(lat, lon, globalThis.fetch, { at });
     res.json({ success: true, ...result });
   } catch (error) {
     const status =
-      error.code === 'INVALID_COORDS' ? 400 : error.code === 'ISS_UPSTREAM' ? 502 : 500;
+      error.code === 'INVALID_COORDS'
+        ? 400
+        : error.code === 'ISS_UPSTREAM' || error.code === 'ISS_TLE_UPSTREAM'
+          ? 502
+          : 500;
     res.status(status).json({ success: false, error: error.message });
   }
 });

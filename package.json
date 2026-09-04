@@ -78,7 +78,8 @@
     "render:newport-pier-reel:local": "node scripts/tools/render-newport-pier-reel-local.mjs",
     "publish:newport-pier-reel": "npm run render:newport-pier-reel && node scripts/tools/copy-newport-pier-reel.mjs",
     "ensure-audio:ice-rag": "npm run ensure-audio --prefix video/ice-rag",
-    "publish:ice-rag-reel": "node scripts/tools/publish-ice-rag-reel.mjs"
+    "publish:ice-rag-reel": "node scripts/tools/publish-ice-rag-reel.mjs",
+    "build:planetarium-catalog": "node scripts/tools/build-planetarium-catalog.mjs"
   },
   "dependencies": {
     "@google-cloud/speech": "^5.0.0",
@@ -88,6 +89,7 @@
     "@langchain/openai": "^1.2.12",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@xmldom/xmldom": "^0.8.11",
+    "astronomy-engine": "^2.1.19",
     "axios": "^1.6.0",
     "bcryptjs": "^3.0.3",
     "cheerio": "^1.1.2",
@@ -102,8 +104,10 @@
     "openai": "^4.20.0",
     "pg": "^8.16.3",
     "play-sound": "^1.1.6",
+    "satellite.js": "^7.1.0",
     "socket.io": "^4.7.5",
     "spotify-web-api-node": "^5.0.2",
+    "three": "^0.170.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

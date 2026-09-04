@@ -111,3 +111,7 @@ StarBand/
 
 # Enhanced Conditions dry-run CDO + handoff outputs (local only; may be large / tenant-specific)
 data/encompass-conditions/
+
+# Planetarium catalog build cache
+data/planetarium/.cache/
+

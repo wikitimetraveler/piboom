@@ -3,59 +3,137 @@
  * Development work by David Lane
  */
 body.plan-page {
-  background: #060912;
-  color: #e8ecf4;
+  --plan-ink: #e8ecf4;
+  --plan-muted: rgba(232, 236, 244, 0.62);
+  --plan-gold: #ffd278;
+  --plan-gold-soft: rgba(255, 210, 120, 0.18);
+  --plan-glass: rgba(8, 12, 22, 0.72);
+  --plan-line: rgba(160, 190, 235, 0.2);
+  --plan-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(40, 58, 110, 0.35), transparent 55%),
+    #05070f;
+  color: var(--plan-ink);
   min-height: 100vh;
+  font-family: Outfit, system-ui, sans-serif;
+}
+
+.plan-skip {
+  position: absolute;
+  left: 0.75rem;
+  top: 0.75rem;
+  z-index: 80;
+  transform: translateY(-160%);
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  background: #ffe8b0;
+  color: #1a1208;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.plan-skip:focus {
+  transform: none;
 }
 
 .plan-wrap {
-  max-width: 1200px;
+  max-width: 1560px;
   margin: 0 auto;
-  padding: 1rem 1rem 3rem;
+  padding: 0.75rem 1rem 5.5rem;
 }
 
-.plan-header {
-  margin-bottom: 1rem;
+.plan-masthead {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.75rem 1.25rem;
+  align-items: end;
+  margin-bottom: 0.75rem;
 }
 
-.plan-header h1 {
-  font-family: Outfit, system-ui, sans-serif;
-  font-size: clamp(1.35rem, 3vw, 1.85rem);
+.plan-kicker {
+  margin: 0 0 0.15rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  margin: 0 0 0.35rem;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 210, 120, 0.7);
 }
 
-.plan-header p {
+.plan-masthead h1 {
+  font-family: Fraunces, Georgia, serif;
+  font-size: clamp(1.7rem, 3.4vw, 2.35rem);
+  font-weight: 560;
+  letter-spacing: -0.02em;
+  line-height: 1;
   margin: 0;
-  font-size: 0.92rem;
-  color: rgba(232, 236, 244, 0.65);
-  max-width: 42rem;
+}
+
+.plan-masthead__lede {
+  margin: 0;
+  max-width: 36rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--plan-muted);
+}
+
+.plan-masthead__meta {
+  text-align: right;
+  min-width: 12rem;
+}
+
+.plan-location,
+.plan-status {
+  margin: 0;
+  font-size: 0.78rem;
+}
+
+.plan-location {
+  color: rgba(200, 214, 236, 0.72);
+}
+
+.plan-status {
+  min-height: 1.15rem;
+  color: rgba(157, 255, 196, 0.88);
 }
 
 .plan-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(220px, 280px);
-  gap: 1rem;
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  gap: 0.9rem;
+  align-items: stretch;
 }
 
-@media (max-width: 991.98px) {
-  .plan-layout {
-    grid-template-columns: 1fr;
-  }
+.plan-theater {
+  min-width: 0;
 }
 
 .plan-controls {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.65rem 1rem;
+  gap: 0.55rem 0.75rem;
+  align-items: stretch;
+  margin-bottom: 0.7rem;
+}
+
+.plan-cluster {
+  display: flex;
+  flex-wrap: wrap;
   align-items: end;
-  margin-bottom: 0.85rem;
-  padding: 0.85rem 1rem;
-  background: rgba(12, 18, 32, 0.85);
-  border: 1px solid rgba(120, 160, 220, 0.18);
-  border-radius: 0.65rem;
+  gap: 0.45rem 0.55rem;
+  padding: 0.55rem 0.7rem 0.6rem;
+  background: var(--plan-glass);
+  border: 1px solid var(--plan-line);
+  border-radius: 0.85rem;
+  backdrop-filter: blur(16px);
+}
+
+.plan-cluster__label {
+  flex: 0 0 100%;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 210, 120, 0.62);
 }
 
 .plan-controls label {
@@ -63,7 +141,7 @@ body.plan-page {
   flex-direction: column;
   gap: 0.2rem;
   margin: 0;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 600;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -72,11 +150,11 @@ body.plan-page {
 
 .plan-controls .form-control,
 .plan-controls select.form-control {
-  min-width: 8.5rem;
+  min-width: 7.6rem;
   background: #0c1220;
   border-color: rgba(120, 160, 220, 0.28);
   color: #e8ecf4;
-  font-size: 0.88rem;
+  font-size: 0.86rem;
 }
 
 .plan-controls .form-control:focus {
@@ -95,10 +173,28 @@ body.plan-page {
   cursor: pointer;
 }
 
+.plan-btn:hover {
+  filter: brightness(1.06);
+}
+
+.plan-btn:focus-visible,
+.plan-tab:focus-visible,
+.plan-dock__btn:focus-visible,
+.plan-stage__fs:focus-visible {
+  outline: 2px solid #ffe8b0;
+  outline-offset: 2px;
+}
+
 .plan-btn--ghost {
   background: transparent;
   border: 1px solid rgba(200, 210, 230, 0.28);
   color: rgba(232, 236, 244, 0.85);
+}
+
+.plan-btn--ghost:hover {
+  border-color: rgba(255, 210, 120, 0.5);
+  color: #ffe8b0;
+  filter: none;
 }
 
 .plan-btn:disabled {
@@ -108,18 +204,36 @@ body.plan-page {
 
 .plan-stage {
   position: relative;
-  min-height: min(72vh, 640px);
+  min-height: clamp(28rem, calc(100dvh - 15.5rem), 46rem);
   background:
     radial-gradient(ellipse 120% 80% at 50% 100%, rgba(20, 30, 55, 0.55) 0%, transparent 55%),
     linear-gradient(180deg, #04060e 0%, #0a1020 45%, #121828 100%);
   border: 1px solid rgba(120, 160, 220, 0.2);
-  border-radius: 0.75rem;
+  border-radius: 1rem;
   overflow: hidden;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
 }
 
-.plan-stage--fullscreen {
+.plan-stage--dome {
+  width: auto;
+  height: auto;
+  aspect-ratio: auto;
+  margin-inline: 0;
+}
+
+.plan-stage--fullscreen,
+.plan-stage--immersive {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  min-height: 100dvh;
+  aspect-ratio: auto;
+  margin: 0;
   border-radius: 0;
-  min-height: 100vh;
+  border: 0;
 }
 
 .plan-stage__fs {
@@ -144,6 +258,75 @@ body.plan-page {
 .plan-stage__fs:hover {
   border-color: rgba(255, 210, 120, 0.55);
   color: #ffe8b0;
+}
+
+.plan-hint {
+  position: absolute;
+  left: 50%;
+  top: 0.75rem;
+  z-index: 3;
+  transform: translateX(-50%);
+  max-width: calc(100% - 8.5rem);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(200, 210, 230, 0.2);
+  background: rgba(8, 12, 22, 0.62);
+  color: rgba(255, 250, 240, 0.78);
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  transition: opacity 0.5s var(--plan-ease);
+}
+
+.plan-hint p {
+  margin: 0;
+  text-align: center;
+}
+
+.plan-hint.is-gone {
+  opacity: 0;
+}
+
+.plan-pick {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 3.4rem;
+  z-index: 4;
+  min-width: 11.5rem;
+  max-width: min(18rem, calc(100% - 1.5rem));
+  padding: 0.7rem 0.8rem 0.75rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(255, 210, 120, 0.28);
+  background: rgba(8, 12, 22, 0.82);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.plan-pick[hidden] {
+  display: none;
+}
+
+.plan-pick__kicker {
+  margin: 0 0 0.1rem;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 210, 120, 0.7);
+}
+
+.plan-pick__name {
+  margin: 0;
+  font-family: Fraunces, Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 560;
+  line-height: 1.15;
+}
+
+.plan-pick__meta {
+  margin: 0.2rem 0 0.55rem;
+  font-size: 0.74rem;
+  color: rgba(220, 228, 242, 0.7);
 }
 
 /* Hidden YouTube audio host — keep a real 200×113 box so playback continues */
@@ -173,6 +356,11 @@ body.plan-page {
   right: 1rem;
 }
 
+.plan-stage--fullscreen .plan-hint,
+.plan-stage--immersive .plan-hint {
+  display: none;
+}
+
 .plan-sky {
   position: absolute;
   inset: 0;
@@ -182,16 +370,177 @@ body.plan-page {
 .plan-sky-gpu {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  width: 100% !important;
+  height: 100% !important;
   z-index: 1;
   pointer-events: none;
   display: block;
-  background: #04060e;
+  background: transparent;
+}
+
+.plan-stage--gl .plan-sky-gpu {
+  pointer-events: auto;
+  cursor: grab;
+  z-index: 1;
+}
+
+.plan-stage--gl .plan-sky-gpu:active {
+  cursor: grabbing;
+}
+
+.plan-stage--gl .plan-sky {
+  pointer-events: none;
+  z-index: 2;
+}
+
+.plan-dome-rim {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.plan-stage--dome .plan-dome-rim {
+  display: none;
+}
+
+/* Largest square that fits the stage — compass sits on this, not a collapsed ring. */
+.plan-dome-rose {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: 1 / 1;
+  margin: auto;
+  transform: rotate(calc(180deg - var(--dome-az, 180) * 1deg));
+}
+
+.plan-dome-rim__ring {
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  border: 2px solid rgba(210, 190, 140, 0.45);
+  box-shadow:
+    0 0 0 200vmax rgba(3, 5, 10, 0.92),
+    inset 0 0 48px rgba(0, 0, 0, 0.35);
+}
+
+.plan-dome-cardinal {
+  position: absolute;
+  z-index: 1;
+  font-family: Outfit, system-ui, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: rgba(255, 230, 180, 0.88);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.85);
+}
+
+.plan-dome-cardinal--n { top: 0.55rem; left: 50%; transform: translate(-50%, 0) rotate(calc(var(--dome-az, 180) * 1deg - 180deg)); }
+.plan-dome-cardinal--s { bottom: 0.55rem; left: 50%; transform: translate(-50%, 0) rotate(calc(var(--dome-az, 180) * 1deg - 180deg)); }
+.plan-dome-cardinal--e { right: 0.65rem; top: 50%; transform: translate(0, -50%) rotate(calc(var(--dome-az, 180) * 1deg - 180deg)); }
+.plan-dome-cardinal--w { left: 0.65rem; top: 50%; transform: translate(0, -50%) rotate(calc(var(--dome-az, 180) * 1deg - 180deg)); }
+
+.plan-stage--dome .plan-pick {
+  left: 0.75rem;
+  transform: none;
+  bottom: 3.4rem;
+}
+
+.plan-stage:not(.plan-stage--dome) .plan-dome-rim {
+  display: none;
 }
 
 .plan-stage--gpu .plan-sky__milkyway {
   opacity: 0.35;
+}
+
+.plan-fov {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 160, 220, 0.25);
+  color: rgba(200, 215, 240, 0.85);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.plan-speed-label {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.7rem;
+  color: rgba(200, 210, 230, 0.7);
+}
+
+.plan-speed-label .form-control {
+  min-width: 5.5rem;
+}
+
+.plan-btn.is-active {
+  border-color: rgba(255, 210, 120, 0.55);
+  color: #ffe8b0;
+}
+
+.plan-iss-hit,
+.plan-deepsky-hit,
+.plan-catalog-hit,
+.plan-asterism-hit {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  padding: 0.35rem 0;
+  cursor: pointer;
+}
+
+.plan-iss-hit:hover,
+.plan-deepsky-hit:hover {
+  color: #ffe8b0;
+}
+
+/* Night vision — red desk for dark-adapted eyes */
+body.plan-night-vision.plan-page,
+body.plan-night-vision .plan-wrap {
+  background: #100404 !important;
+  color: #ffb0a0 !important;
+}
+
+body.plan-night-vision .plan-btn,
+body.plan-night-vision .plan-btn--ghost,
+body.plan-night-vision .plan-panel,
+body.plan-night-vision .plan-cluster,
+body.plan-night-vision .plan-tab,
+body.plan-night-vision .plan-dock,
+body.plan-night-vision .plan-pick,
+body.plan-night-vision .form-control,
+body.plan-night-vision .plan-status,
+body.plan-night-vision .plan-masthead,
+body.plan-night-vision .plan-footer-links a {
+  border-color: rgba(255, 80, 60, 0.35) !important;
+  color: #ffc8b8 !important;
+  background: rgba(40, 8, 6, 0.85) !important;
+  box-shadow: none !important;
+}
+
+body.plan-night-vision .plan-btn:not(.plan-btn--ghost) {
+  background: #8a2018 !important;
+  color: #ffe8e0 !important;
+}
+
+body.plan-night-vision .plan-stage {
+  border-color: rgba(255, 80, 60, 0.3);
+  filter: sepia(0.35) hue-rotate(-25deg) saturate(1.4);
+}
+
+body.plan-night-vision .plan-dome-rim__ring {
+  border-color: rgba(255, 120, 90, 0.4);
 }
 
 .plan-sky__horizon,
@@ -385,6 +734,10 @@ body.plan-page {
   pointer-events: none;
 }
 
+.plan-stage:has(#planPickHud:not([hidden])) .plan-caption {
+  padding-left: min(13rem, 42%);
+}
+
 .plan-caption__moon {
   flex: 0 0 auto;
   width: 1.1rem;
@@ -418,14 +771,83 @@ body.plan-page {
 .plan-sidebar {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.65rem;
+  min-height: 0;
+}
+
+.plan-sidebar__head {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.plan-sidebar__title {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 210, 120, 0.7);
+}
+
+.plan-sidebar__close {
+  border: 0;
+  background: transparent;
+  color: rgba(232, 236, 244, 0.75);
+  font-size: 1.1rem;
+  padding: 0.15rem 0.35rem;
+}
+
+.plan-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.3rem;
+  padding: 0.3rem;
+  border-radius: 0.85rem;
+  border: 1px solid var(--plan-line);
+  background: var(--plan-glass);
+}
+
+.plan-tab {
+  border: 0;
+  border-radius: 0.65rem;
+  background: transparent;
+  color: rgba(220, 228, 242, 0.68);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.42rem 0.2rem;
+}
+
+.plan-tab.is-active {
+  background: rgba(255, 210, 120, 0.16);
+  color: #ffe8b0;
+}
+
+.plan-tabpane {
+  display: none;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.plan-tabpane.is-active {
+  display: flex;
+}
+
+.plan-tabpane[hidden] {
+  display: none !important;
+}
+
+.plan-sidebar-backdrop {
+  display: none;
 }
 
 .plan-panel {
   padding: 0.75rem 0.85rem;
-  background: rgba(12, 18, 32, 0.85);
-  border: 1px solid rgba(120, 160, 220, 0.18);
-  border-radius: 0.65rem;
+  background: var(--plan-glass);
+  border: 1px solid var(--plan-line);
+  border-radius: 0.75rem;
+  backdrop-filter: blur(14px);
 }
 
 .plan-panel h2 {
@@ -485,13 +907,6 @@ body.plan-page {
 
 .plan-footer-links a {
   color: rgba(255, 210, 120, 0.85);
-}
-
-.plan-status {
-  min-height: 1.2rem;
-  margin: 0 0 0.5rem;
-  font-size: 0.82rem;
-  color: rgba(157, 255, 196, 0.85);
 }
 
 .plan-btn--sm {
@@ -766,6 +1181,10 @@ body.plan-page {
   color: rgba(255, 230, 180, 0.9);
 }
 
+.plan-dock {
+  display: none;
+}
+
 @keyframes plan-twinkle {
   0%,
   100% {
@@ -776,8 +1195,116 @@ body.plan-page {
   }
 }
 
+@media (max-width: 991.98px) {
+  .plan-masthead {
+    grid-template-columns: 1fr;
+  }
+
+  .plan-masthead__meta {
+    text-align: left;
+  }
+
+  .plan-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .plan-stage {
+    min-height: clamp(22rem, calc(100dvh - 18rem), 34rem);
+  }
+
+  .plan-btn__text {
+    display: none;
+  }
+
+  .plan-sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    background: rgba(4, 6, 14, 0.55);
+  }
+
+  .plan-sidebar-backdrop[hidden] {
+    display: none;
+  }
+
+  .plan-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 41;
+    width: min(22rem, 92vw);
+    padding: 1rem 0.85rem 5.5rem;
+    overflow: auto;
+    background: rgba(6, 9, 18, 0.96);
+    border-left: 1px solid var(--plan-line);
+    transform: translateX(104%);
+    transition: transform 0.28s var(--plan-ease);
+  }
+
+  .plan-sidebar.is-open {
+    transform: none;
+  }
+
+  .plan-sidebar__head {
+    display: flex;
+  }
+
+  .plan-dock {
+    position: fixed;
+    left: 50%;
+    bottom: 0.7rem;
+    z-index: 30;
+    display: flex;
+    gap: 0.4rem;
+    transform: translateX(-50%);
+    padding: 0.35rem;
+    border-radius: 999px;
+    border: 1px solid var(--plan-line);
+    background: rgba(8, 12, 22, 0.88);
+    backdrop-filter: blur(16px);
+  }
+
+  .plan-dock__btn {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+    min-width: 4.4rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: rgba(232, 236, 244, 0.88);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.7rem;
+  }
+
+  .plan-dock__btn i {
+    font-size: 1.05rem;
+  }
+
+  .plan-dock__btn[aria-pressed='true'],
+  .plan-dock__btn.is-active {
+    color: #ffe8b0;
+    background: rgba(255, 210, 120, 0.12);
+  }
+
+  body.plan-desk-open {
+    overflow: hidden;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .plan-sky__star {
     animation: none;
+  }
+
+  .plan-hint,
+  .plan-sidebar {
+    transition: none;
   }
 }

@@ -1,6 +1,8 @@
 # Planetarium
 
-Full-sky dome at [`/planetarium/`](/planetarium/) — date/time sky from `FunHomeSky`, Carl (AstroAI) voice guide, optional Zed HeyGen face, catalog search, ISS passes, and static eclipse/meteor events.
+Full-sky **360° WebGL dome** at [`/planetarium/`](/planetarium/) — astronomy-engine ephemeris, Hipparcos mag≤6 star field, IAU constellation lines, Carl (AstroAI) voice guide, optional Zed HeyGen face, catalog search, ISS TLE passes, and static eclipse/meteor events.
+
+The home hero still uses the lightweight [`FunHomeSky`](../public/shared/js/fun-home-sky.js) sketch; the planetarium page does **not** depend on that ephemeris for planets.
 
 ## Surfaces
 
@@ -8,32 +10,52 @@ Full-sky dome at [`/planetarium/`](/planetarium/) — date/time sky from `FunHom
 |-------|------------|
 | Dome UI | `/planetarium/` |
 | Carl chat | `POST /api/planetarium/assistant/chat` |
-| ISS passes | `GET /api/planetarium/iss-passes?lat=&lon=` |
+| ISS passes + position | `GET /api/planetarium/iss-passes?lat=&lon=&at=` |
 | Events / meteors | `GET /api/planetarium/events?from=` |
 | Catalog search | `GET /api/planetarium/catalog/search?q=` |
-| Catalog data | `data/planetarium/catalog-index.json` |
+| Star catalog | `data/planetarium/bright-stars.json` |
+| Constellation lines | `data/planetarium/constellation-lines.json` |
 | Events data | `data/planetarium/sky-events.json`, `meteor-showers.json` |
 
 ## Client modules
 
-- `public/shared/js/fun-home-sky.js` — stars, planets, asterisms, share URL helper
-- `public/shared/js/planetarium.js` — dome paint, selection, `getSkyContext()`
-- `public/shared/js/webgpu-planetarium-sky.js` — optional WebGPU / 2D backdrop
-- `public/planetarium/js/planetarium-guide.js` — Carl widget (fresh `skyContext` each turn)
-- `public/planetarium/js/planetarium-heygen.js` — Zed Avatar Realtime tile + short handoff before Carl’s answer
-- `public/planetarium/js/planetarium-extras.js` — compass, catalog, ISS, events, deep sky
-- `public/shared/js/celestial-ambience.js` — generative drone bed (not loaded on planetarium; home plays Children of the Sun instead)
-- `public/planetarium/js/planetarium-sky-song.js` — **Spirit in the Sky** only (Norman Greenbaum, 1969) via hidden YouTube audio `YqYN-1vMM9k` (no on-page video tile). Starts at 0:15 on page load; the **Spirit in the Sky** control toggles play/pause. If the browser blocks autoplay, the first click on the page unlocks audio.
+- `public/planetarium/js/celestial-engine.js` — astronomy-engine wrapper (Sun→Neptune + Moon, refraction on)
+- `public/planetarium/js/planetarium-gl.js` — Three.js inner-sky sphere (drag / zoom / pick)
+- `public/planetarium/js/planetarium-boot.js` — loads GL then starts the page
+- `public/shared/js/planetarium.js` — controls, share URLs, Carl `getSkyContext()`, DOM fallback dome
+- `public/shared/js/fun-home-sky.js` — home hero only (also geolocation helpers reused by the desk)
+- `public/shared/js/webgpu-planetarium-sky.js` — optional wash if WebGL mount fails
+- `public/planetarium/js/planetarium-guide.js` — Carl widget + “show me Jupiter” slew
+- `public/planetarium/js/planetarium-heygen.js` — Zed Avatar Realtime tile
+- `public/planetarium/js/planetarium-extras.js` — compass, catalog, ISS, events, deep-sky markers
+- `public/planetarium/js/planetarium-sky-song.js` — Spirit in the Sky (YouTube audio)
+
+## Rebuild catalogs
+
+```bash
+npm run build:planetarium-catalog
+# or with fresh download:
+node scripts/tools/build-planetarium-catalog.mjs --fetch
+```
+
+Sources: ofrohn/d3-celestial stars.6 + constellation lines (BSD-3).
 
 ## Deep links
 
-Share / home CTA params: `date`, `time`, `lat`, `lon`, `label`, `face`, `body` (planet id), `select` (star / asterism name).
+Share / home CTA params: `date`, `time`, `lat`, `lon`, `label`, `face`, `body` (planet id), `select` (constellation / asterism name), `view` (`dome` default, or `horizon`).
 
-Home hero **Open full sky** builds these via `FunHomeSky.buildPlanetariumUrl`.
+## Controls
+
+- **Look up** — zenith view in the wide theater (default). Click again to return overhead after a slew, or toggle off for a horizon window
+- **Play / Speed** — animate clock at 1× / 60× / 3600× (honors `prefers-reduced-motion`)
+- **Lines** — toggle IAU constellation figures
+- **Night vision** — red desk theme
+- Drag to spin the dome; wheel to change FOV (up to 180° in look-up)
+- Click ISS pass rows to jump sky time to pass start
 
 ## Carl context
 
-Each chat turn sends live `getSkyContext()` (observer, date, facing, planets, twilight, **selection**, `refreshedAt`). Changing date / facing shows “Sky updated — Ask Carl for a fresh read.”
+Each chat turn sends live `getSkyContext()` (observer, date, facing, planets, twilight, selection, engine). Phrases like “show me Mars” or “find M42” slew the dome client-side before Carl answers.
 
 ## Out of scope
 

@@ -256,8 +256,8 @@
   /** Horizon arc + cardinal labels in hero projection space. */
   function projectHorizon(opts) {
     const projOpts = opts || {};
-    const fovAz = projOpts.fovAz || 160;
-    const minAlt = projOpts.minAlt || 4;
+    const fovAz = projOpts.projection === 'zenith' ? 360 : projOpts.fovAz || 160;
+    const minAlt = projOpts.projection === 'zenith' ? 0 : projOpts.minAlt || 4;
     const centerAz = Number.isFinite(projOpts.centerAz) ? projOpts.centerAz : 180;
     const points = [];
     const startAz = centerAz - fovAz / 2;
@@ -397,10 +397,22 @@
    * Top of hero ≈ zenith; bottom of star mask ≈ horizon.
    */
   function projectAltAz(alt, az, opts) {
+    const centerAz = Number.isFinite(opts && opts.centerAz) ? opts.centerAz : 180;
+    if (opts && opts.projection === 'zenith') {
+      if (alt < -1) return null;
+      const r = ((90 - Math.max(alt, 0)) / 90) * 48;
+      let dAz = az - centerAz;
+      while (dAz > 180) dAz -= 360;
+      while (dAz < -180) dAz += 360;
+      const rad = (dAz * Math.PI) / 180;
+      const x = 50 + r * Math.sin(rad);
+      const y = 50 + r * Math.cos(rad);
+      if (x < 0 || x > 100 || y < 0 || y > 100) return null;
+      return { x, y };
+    }
     const fovAz = (opts && opts.fovAz) || 160;
     const minAlt = (opts && opts.minAlt) || 2;
     const maxAlt = (opts && opts.maxAlt) || 88;
-    const centerAz = Number.isFinite(opts && opts.centerAz) ? opts.centerAz : 180;
     const yScale = (opts && opts.yScale) || 78;
     const yMax = (opts && opts.yMax) || 82;
     if (alt < minAlt || alt > maxAlt) return null;

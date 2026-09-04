@@ -29,6 +29,15 @@ describe('FunHomeSky', () => {
     expect(zenith.y).toBeLessThan(30);
   });
 
+  test('zenith projection puts overhead at center and facing at the bottom', () => {
+    const overhead = FunHomeSky.projectAltAz(90, 180, { projection: 'zenith', centerAz: 180 });
+    const southHorizon = FunHomeSky.projectAltAz(0, 180, { projection: 'zenith', centerAz: 180 });
+    expect(overhead.x).toBeCloseTo(50, 0);
+    expect(overhead.y).toBeCloseTo(50, 0);
+    expect(southHorizon.x).toBeCloseTo(50, 0);
+    expect(southHorizon.y).toBeGreaterThan(90);
+  });
+
   test('projectSky returns stars, planets, and milky way samples', () => {
     const sky = FunHomeSky.projectSky(new Date('2026-08-31T02:00:00Z'));
     expect(sky.stars.length).toBeGreaterThan(5);
