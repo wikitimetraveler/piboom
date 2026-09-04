@@ -29,6 +29,7 @@
   <div class="mhm-float-wrap" aria-hidden="true">
     <div class="mhm-float-layer" id="mhmFloatLayer"></div>
   </div>
+  <div class="mhm-strobe" id="mhmStrobe" hidden aria-hidden="true"></div>
 
   <aside id="mhmGate" class="mhm-gate" role="dialog" aria-labelledby="mhmGateTitle" aria-modal="true">
     <div class="mhm-gate-card">
@@ -85,6 +86,10 @@
               <i class="bi bi-mic-fill" aria-hidden="true"></i>
               <span id="mhmMicLabel">Sound reactive</span>
             </button>
+            <button type="button" class="mhm-btn mhm-btn-ghost" id="mhmStrobeToggle" aria-pressed="false" title="Turn strobe on — flashing light">
+              <i class="bi bi-lightning-charge" aria-hidden="true"></i>
+              <span data-strobe-label>Strobe</span>
+            </button>
             <a class="mhm-btn mhm-btn-ghost" href="sms:+19092191370">Text the card</a>
           </div>
           <a href="#mhmTypes" class="mhm-scroll-cue" id="mhmScrollCue">
@@ -137,10 +142,57 @@
       </div>
     </section>
 
+    <section class="mhm-section" id="mhmBags">
+      <div class="mhm-section-head">
+        <p class="mhm-mockup-banner">Concept packaging · MOCKUPS ONLY · not for sale · not a live menu</p>
+        <h2>Bag mockups</h2>
+        <p>
+          Two satchels, two medical pouches — indoor room story and outdoor sun story.
+          Flip a card for cultivation talk as shoppers hear it (consistency vs season and place).
+          Not a grow guide, not inventory.
+        </p>
+      </div>
+      <div class="mhm-grid mhm-bag-grid" id="mhmBagGrid"></div>
+    </section>
+
     <section class="mhm-section" id="mhmLab">
       <div class="mhm-section-head">
         <h2>The Lab</h2>
-        <p>Blacklight stack — GPU toys from the entertainment side.</p>
+        <p>Sticker and t-shirt plates with the card art. Scan the QR — it opens this Mountain High page. Blacklight toys below.</p>
+      </div>
+      <div class="mhm-merch-grid" id="mhmMerchGrid">
+        <article class="mhm-merch mhm-merch--sticker">
+          <p class="mhm-mockup-banner">Lab sticker · MOCKUP · QR to this page</p>
+          <div class="mhm-merch-stage">
+            <img
+              class="mhm-merch-art lane-lightbox-ignore"
+              src="/mountain-high/assets/lab/sticker.jpg"
+              alt="Mountain High lab sticker mockup — not for sale"
+              width="800"
+              height="800"
+              data-lane-lightbox-ignore="1"
+            />
+            <div class="mhm-merch-qr" id="mhmMerchQrSticker" aria-label="QR code to Mountain High"></div>
+          </div>
+          <h3>Lab sticker</h3>
+          <p class="mhm-tagline">Die-cut card art. Scan to this page.</p>
+        </article>
+        <article class="mhm-merch mhm-merch--shirt">
+          <p class="mhm-mockup-banner">Lab t-shirt · MOCKUP · QR to this page</p>
+          <div class="mhm-merch-stage">
+            <img
+              class="mhm-merch-art lane-lightbox-ignore"
+              src="/mountain-high/assets/lab/tshirt.jpg"
+              alt="Mountain High lab t-shirt mockup — not for sale"
+              width="900"
+              height="1200"
+              data-lane-lightbox-ignore="1"
+            />
+            <div class="mhm-merch-qr" id="mhmMerchQrShirt" aria-label="QR code to Mountain High"></div>
+          </div>
+          <h3>Lab t-shirt</h3>
+          <p class="mhm-tagline">Chest print plus QR to this page.</p>
+        </article>
       </div>
       <div class="mhm-lab-grid" id="mhmLabGrid"></div>
     </section>
@@ -206,6 +258,11 @@
   <script src="/mountain-high/js/mhm-hero-gpu.js"></script>
   <script src="/mountain-high/js/mhm-leaf-icon.js"></script>
   <script src="/mountain-high/js/mhm-types.js"></script>
+  <script src="/mountain-high/js/mhm-bags.js"></script>
+  <script src="/mountain-high/js/mhm-strobe.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
+  <script src="/family/js/lane-public-origin.js"></script>
+  <script src="/mountain-high/js/mhm-lab-merch.js"></script>
   <script src="/shared/js/heygen-live-tile.js"></script>
   <script src="/mountain-high/js/mhm-heygen.js"></script>
   <script src="/mountain-high/js/mhm-dock.js"></script>
@@ -239,9 +296,34 @@
               '<a href="' + item.href + '"><i class="bi ' + item.icon + '"></i><strong>' + item.label + '</strong><span>' + (item.title || '') + '</span></a>'
             )).join('');
           }
+          window.MhmLabMerch?.mount({
+            sticker: document.getElementById('mhmMerchQrSticker'),
+            shirt: document.getElementById('mhmMerchQrShirt'),
+            catalog,
+          });
+          try {
+            await window.MhmBags.mount(document.getElementById('mhmBagGrid'), catalog.bags);
+          } catch (bagErr) {
+            const bags = document.getElementById('mhmBagGrid');
+            if (bags) bags.textContent = bagErr.message || 'Bag mockups failed to load.';
+          }
         } catch (_) {
-          /* lab optional */
+          window.MhmLabMerch?.mount({
+            sticker: document.getElementById('mhmMerchQrSticker'),
+            shirt: document.getElementById('mhmMerchQrShirt'),
+          });
+          try {
+            await window.MhmBags.mount(document.getElementById('mhmBagGrid'));
+          } catch (bagErr) {
+            const bags = document.getElementById('mhmBagGrid');
+            if (bags) bags.textContent = bagErr.message || 'Bag mockups failed to load.';
+          }
         }
+
+        window.MhmStrobe?.init({
+          toggle: document.getElementById('mhmStrobeToggle'),
+          overlay: document.getElementById('mhmStrobe'),
+        });
 
         if (window.CannabisOriginsMap?.init) {
           window.CannabisOriginsMap.init();

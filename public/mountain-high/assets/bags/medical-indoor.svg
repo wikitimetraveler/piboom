@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 480" role="img" aria-labelledby="miTitle miDesc">
+  <title id="miTitle">Mountain High indoor medical pouch  mockup</title>
+  <desc id="miDesc">Concept medical pouch. Not for sale. Not a live menu.</desc>
+  <defs>
+    <linearGradient id="miBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#141028"/>
+      <stop offset="100%" stop-color="#050010"/>
+    </linearGradient>
+    <linearGradient id="miPouch" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f4efe4"/>
+      <stop offset="100%" stop-color="#d8c8a8"/>
+    </linearGradient>
+  </defs>
+  <rect width="360" height="480" rx="18" fill="url(#miBg)"/>
+  <ellipse cx="180" cy="432" rx="100" ry="14" fill="#000" opacity=".4"/>
+  <rect x="86" y="88" width="188" height="28" rx="8" fill="#c9a84c"/>
+  <rect x="78" y="108" width="204" height="300" rx="16" fill="url(#miPouch)" stroke="#7b3cff" stroke-width="3"/>
+  <rect x="98" y="128" width="164" height="88" rx="8" fill="#12081f"/>
+  <text x="180" y="158" text-anchor="middle" fill="#e8d5a3" font-family="Arial, sans-serif" font-size="11" letter-spacing="3">MOUNTAIN HIGH</text>
+  <text x="180" y="178" text-anchor="middle" fill="#9dffc4" font-family="Arial, sans-serif" font-size="18" font-weight="700">MEDICAL POUCH</text>
+  <text x="180" y="200" text-anchor="middle" fill="#c8b6ff" font-family="Arial, sans-serif" font-size="12">INDOOR · INDICA</text>
+  <rect x="98" y="228" width="164" height="96" rx="8" fill="#fbf7ee" stroke="#c9a84c"/>
+  <text x="180" y="254" text-anchor="middle" fill="#3a2410" font-family="Arial, sans-serif" font-size="11">CONCEPT LABEL</text>
+  <text x="180" y="276" text-anchor="middle" fill="#111" font-family="Arial, sans-serif" font-size="13" font-weight="700">Room-grown lot story</text>
+  <text x="180" y="298" text-anchor="middle" fill="#444" font-family="Arial, sans-serif" font-size="11">Even canopy · not a dose</text>
+  <text x="180" y="318" text-anchor="middle" fill="#7b3cff" font-family="Arial, sans-serif" font-size="11">MOCKUP · NO LICENSE</text>
+  <g transform="rotate(-18 180 250)">
+    <rect x="40" y="228" width="280" height="42" fill="#ff7a2d"/>
+    <text x="180" y="258" text-anchor="middle" fill="#111" font-family="Impact, Arial Black, sans-serif" font-size="30" letter-spacing="5">MOCKUP</text>
+  </g>
+  <text x="180" y="458" text-anchor="middle" fill="#9dffc4" font-family="Arial, sans-serif" font-size="13" letter-spacing="2">NOT FOR SALE · NOT A MENU</text>
+</svg>

@@ -29,10 +29,28 @@
     return document.getElementById('planHeygenMedia');
   }
 
+  function friendlyError(raw) {
+    const text = String(raw || '');
+    if (/streaming\.new|avatar-realtime|resource_not_found|404/i.test(text)) {
+      return 'Live stream is not on this HeyGen plan — Zed still speaks.';
+    }
+    return text;
+  }
+
+  function speakTts(text) {
+    const line = String(text || '').trim();
+    if (!line) return Promise.resolve();
+    if (typeof root.speakWithGoogle === 'function') {
+      return root.speakWithGoogle(line, 'en-US-Neural2-D', { rate: 0.92 }).catch(() => {});
+    }
+    return Promise.resolve();
+  }
+
   function clearMedia() {
     const media = mediaHost();
     const video = media?.querySelector('video');
     root.HeygenLiveTile?.destroyHls(video);
+    root.HeygenLiveTile?.stopAudio?.();
     if (heygenRoom && typeof heygenRoom.disconnect === 'function') {
       heygenRoom.disconnect().catch(() => {});
     }
@@ -48,7 +66,18 @@
     const media = mediaHost();
     const wrap = document.getElementById('planHeygenWrap');
     if (!media || !data?.url) return;
-    heygenSessionId = data.sessionId;
+    heygenSessionId = data.sessionId || (data.fallback || data.playback === 'poster' ? 'poster' : null);
+    if (root.HeygenLiveTile?.isPoster?.(data) || data.playback === 'poster') {
+      if (heygenRoom && typeof heygenRoom.disconnect === 'function') {
+        await heygenRoom.disconnect().catch(() => {});
+      }
+      heygenRoom = { kind: 'poster' };
+      media.hidden = false;
+      wrap?.classList.add('plan-heygen--live');
+      root.HeygenLiveTile.attachPoster(media, data.url, 'plan-heygen__video', 'Zed');
+      if (data.audioUrl) root.HeygenLiveTile.playAudio?.(data.audioUrl);
+      return;
+    }
     if (root.HeygenLiveTile?.isHls(data)) {
       if (heygenRoom && typeof heygenRoom.disconnect === 'function') {
         await heygenRoom.disconnect().catch(() => {});
@@ -74,7 +103,7 @@
   }
 
   async function stopHeygen() {
-    if (heygenSessionId) {
+    if (heygenSessionId && heygenSessionId !== 'poster') {
       await fetch('/api/heygen/streaming/stop', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -112,11 +141,40 @@
       body: JSON.stringify(facePayload(face, { text: greeting })),
     });
     const data = await res.json();
+    if (data?.url && (data.fallback || data.playback === 'poster' || root.HeygenLiveTile?.isPoster?.(data))) {
+      await attachSession(data);
+      const btn = document.getElementById('planHeygenToggle');
+      if (btn) btn.textContent = 'Hide Zed';
+      setStatus(`${faceName} on voice — live lip-sync is not on this HeyGen plan.`);
+      if (!data.audioUrl) await speakTts(greeting);
+      return;
+    }
     if (!res.ok || !data.url) {
+      const media = mediaHost();
+      const wrap = document.getElementById('planHeygenWrap');
+      if (media) {
+        media.hidden = false;
+        wrap?.classList.add('plan-heygen--live');
+        media.innerHTML =
+          '<div class="plan-heygen__standin" role="img" aria-label="Zed">' +
+          '<span>ZED</span><small>alien presenter</small></div>';
+        heygenRoom = { kind: 'poster' };
+        heygenSessionId = 'poster';
+        const btn = document.getElementById('planHeygenToggle');
+        if (btn) btn.textContent = 'Hide Zed';
+        setStatus(
+          friendlyError(data.error) ||
+            (face?.avatarId
+              ? 'HeyGen streaming unavailable — Zed can still talk through Carl.'
+              : `${faceName} needs avatar IDs — see AVATAR-ZED.md.`)
+        );
+        await speakTts(greeting);
+        return;
+      }
       setStatus(
-        data.error ||
+        friendlyError(data.error) ||
           (face?.avatarId
-            ? 'HeyGen streaming unavailable — check HEYGEN_API_KEY.'
+            ? 'HeyGen streaming unavailable — Zed can still talk through Carl.'
             : `${faceName} needs avatar IDs — see AVATAR-ZED.md.`)
       );
       return;
@@ -144,7 +202,14 @@
       body: JSON.stringify(facePayload(studioFace, { sessionId: heygenSessionId, text: clean })),
     });
     const data = await res.json().catch(() => ({}));
+    if (data?.audioUrl && root.HeygenLiveTile?.playAudio) {
+      root.HeygenLiveTile.playAudio(data.audioUrl);
+      return;
+    }
     if (data?.url) await attachSession(data);
+    if (heygenSessionId === 'poster' || heygenRoom?.kind === 'poster') {
+      await speakTts(clean);
+    }
   }
 
   function isLive() {

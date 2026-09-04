@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 480" role="img" aria-labelledby="soTitle soDesc">
+  <title id="soTitle">Mountain High outdoor satchel  mockup</title>
+  <desc id="soDesc">Concept canvas satchel. Not for sale.</desc>
+  <defs>
+    <linearGradient id="soBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2a1808"/>
+      <stop offset="100%" stop-color="#0a0604"/>
+    </linearGradient>
+    <linearGradient id="soCloth" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#c4a15a"/>
+      <stop offset="50%" stop-color="#8a6a32"/>
+      <stop offset="100%" stop-color="#5a4218"/>
+    </linearGradient>
+    <linearGradient id="soSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6ec8ff"/>
+      <stop offset="100%" stop-color="#ffb14a"/>
+    </linearGradient>
+  </defs>
+  <rect width="360" height="480" rx="18" fill="url(#soBg)"/>
+  <ellipse cx="180" cy="430" rx="110" ry="16" fill="#000" opacity=".4"/>
+  <path d="M78 168 H282 L268 392 H92 Z" fill="url(#soCloth)" stroke="#e8d5a3" stroke-width="3"/>
+  <path d="M92 168 H268 L252 92 H108 Z" fill="#6a4a1c" stroke="#ffd27a" stroke-width="2.4"/>
+  <rect x="158" y="118" width="44" height="28" rx="4" fill="#e8d5a3"/>
+  <circle cx="180" cy="132" r="6" fill="#3a2410"/>
+  <rect x="118" y="196" width="124" height="88" rx="10" fill="url(#soSky)"/>
+  <path d="M118 260 L150 228 L176 248 L210 214 L242 260 Z" fill="#3d6b2e"/>
+  <path d="M140 248 L168 220 L196 248" fill="#2a1810"/>
+  <circle cx="214" cy="214" r="10" fill="#ffe08a"/>
+  <text x="180" y="318" text-anchor="middle" fill="#1a1208" font-family="Georgia, serif" font-size="26" font-style="italic">Mountain High</text>
+  <text x="180" y="342" text-anchor="middle" fill="#2a1810" font-family="Arial, sans-serif" font-size="11" letter-spacing="4">MEDICINALS</text>
+  <text x="180" y="368" text-anchor="middle" fill="#1a1208" font-family="Arial, sans-serif" font-size="12" letter-spacing="2">OUTDOOR SATCHEL</text>
+  <g transform="rotate(-22 180 240)">
+    <rect x="46" y="208" width="268" height="44" fill="#ffd27a" opacity=".94"/>
+    <text x="180" y="239" text-anchor="middle" fill="#111" font-family="Impact, Arial Black, sans-serif" font-size="32" letter-spacing="6">MOCKUP</text>
+  </g>
+  <text x="180" y="458" text-anchor="middle" fill="#ff7a2d" font-family="Arial, sans-serif" font-size="13" letter-spacing="2">NOT FOR SALE</text>
+</svg>

@@ -146,14 +146,16 @@ body.plan-page {
   color: #ffe8b0;
 }
 
+/* Hidden YouTube audio host — keep a real 200×113 box so playback continues */
 .plan-sky-song-host {
-  position: absolute;
+  position: fixed;
   left: 0;
-  bottom: 0;
-  z-index: 0;
+  top: 0;
+  z-index: -1;
   width: 200px;
   height: 113px;
   overflow: hidden;
+  opacity: 0;
   pointer-events: none;
 }
 
@@ -162,6 +164,8 @@ body.plan-page {
   width: 200px;
   height: 113px;
   border: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .plan-stage--fullscreen .plan-stage__fs {
@@ -545,6 +549,33 @@ body.plan-page {
   width: 100%;
   max-height: 12rem;
   object-fit: cover;
+}
+
+.plan-heygen__standin {
+  display: grid;
+  place-items: center;
+  min-height: 10rem;
+  padding: 1rem;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(80, 255, 210, 0.18), transparent 55%),
+    linear-gradient(180deg, #0a1624, #04060e);
+  color: #9dffc4;
+  text-align: center;
+}
+
+.plan-heygen__standin span {
+  font-family: Outfit, system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  font-size: 1.35rem;
+}
+
+.plan-heygen__standin small {
+  display: block;
+  margin-top: 0.25rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(232, 236, 244, 0.55);
 }
 
 .plan-heygen__actions {

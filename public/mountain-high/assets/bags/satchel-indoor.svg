@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 480" role="img" aria-labelledby="siTitle siDesc">
+  <title id="siTitle">Mountain High indoor satchel  mockup</title>
+  <desc id="siDesc">Concept canvas satchel. Not for sale.</desc>
+  <defs>
+    <linearGradient id="siBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a0a3a"/>
+      <stop offset="100%" stop-color="#050010"/>
+    </linearGradient>
+    <linearGradient id="siCloth" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3a2a18"/>
+      <stop offset="55%" stop-color="#2a1c10"/>
+      <stop offset="100%" stop-color="#1a1008"/>
+    </linearGradient>
+    <radialGradient id="siLed" cx="50%" cy="42%" r="40%">
+      <stop offset="0%" stop-color="#c8ff4a" stop-opacity=".9"/>
+      <stop offset="45%" stop-color="#7b3cff" stop-opacity=".55"/>
+      <stop offset="100%" stop-color="#12081f" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="360" height="480" rx="18" fill="url(#siBg)"/>
+  <ellipse cx="180" cy="430" rx="110" ry="16" fill="#000" opacity=".45"/>
+  <path d="M78 168 H282 L268 392 H92 Z" fill="url(#siCloth)" stroke="#c9a84c" stroke-width="3"/>
+  <path d="M92 168 H268 L252 92 H108 Z" fill="#2a1810" stroke="#e8d5a3" stroke-width="2.4"/>
+  <rect x="158" y="118" width="44" height="28" rx="4" fill="#c9a84c"/>
+  <circle cx="180" cy="132" r="6" fill="#1a1008"/>
+  <ellipse cx="180" cy="248" rx="62" ry="70" fill="url(#siLed)"/>
+  <path d="M180 198 C188 214 196 226 180 242 C164 226 172 214 180 198Z" fill="#9dffc4"/>
+  <text x="180" y="318" text-anchor="middle" fill="#e8d5a3" font-family="Georgia, serif" font-size="26" font-style="italic">Mountain High</text>
+  <text x="180" y="342" text-anchor="middle" fill="#9dffc4" font-family="Arial, sans-serif" font-size="11" letter-spacing="4">MEDICINALS</text>
+  <text x="180" y="368" text-anchor="middle" fill="#c8ff4a" font-family="Arial, sans-serif" font-size="12" letter-spacing="2">INDOOR SATCHEL</text>
+  <g transform="rotate(-22 180 240)">
+    <rect x="46" y="208" width="268" height="44" fill="#9dffc4" opacity=".92"/>
+    <text x="180" y="239" text-anchor="middle" fill="#111" font-family="Impact, Arial Black, sans-serif" font-size="32" letter-spacing="6">MOCKUP</text>
+  </g>
+  <text x="180" y="458" text-anchor="middle" fill="#ff7a2d" font-family="Arial, sans-serif" font-size="13" letter-spacing="2">NOT FOR SALE</text>
+</svg>

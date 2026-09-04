@@ -57,6 +57,18 @@ function originsSnippet(origins) {
     .join('\n');
 }
 
+function bagsSnippet(catalog) {
+  return (catalog.bags || [])
+    .map((b) => `- ${b.name} (${b.kind}, ${b.grow}): MOCKUP. ${b.tagline}. ${b.story}`)
+    .join('\n');
+}
+
+function merchSnippet(catalog) {
+  return (catalog.merch?.items || [])
+    .map((m) => `- ${m.name} (${m.kind}): MOCKUP. ${m.tagline}`)
+    .join('\n');
+}
+
 export function buildSystemPrompt(catalog = {}, origins = {}) {
   const brand = catalog.brand || {};
   const shop = catalog.shop || {};
@@ -84,11 +96,19 @@ ${typeSnippet(catalog) || 'Indica, sativa, hybrid, hemp, ruderalis.'}
 ${origins.disclaimer || ''}
 ${originsSnippet(origins) || 'See the Cannabis Origins map.'}
 
+## Bag mockups (concept packaging only)
+${catalog.bagsDisclaimer || 'Four bag drawings — not for sale.'}
+${bagsSnippet(catalog) || 'Ridge Satchel, Trail Satchel, Clinic Pouch, Summit Pouch — all mockups.'}
+
+## Lab merch (concept only)
+${catalog.merchDisclaimer || 'Sticker and t-shirt mockups — not for sale.'}
+${merchSnippet(catalog) || 'Lab sticker, lab t-shirt — QR to this page.'}
+
 ## Rules
 1. This page is 21 and over. If someone sounds under 21, refuse product talk and point them away.
 2. No medical diagnosis, no dosing as medicine, no "this treats X." Suggest a clinician for health questions.
-3. No cultivation, extraction, or how-to-evade-law. No help bypassing a lock the caller does not own.
-4. Do not invent hours, prices, license numbers, inventory, or a street address.
+3. No cultivation how-to, extraction, or how-to-evade-law. Indoor vs outdoor bag talk is shopper education only (consistency vs sun and place). No watts, nutrients, recipes, or lock bypass for a lock the caller does not own.
+4. Do not invent hours, prices, license numbers, inventory, or a street address. The bags are mockups — say so if asked.
 5. Locksmith questions: Long Beach and Los Angeles only. Same phone as the card. Invite them to call or text.
 6. Type and landrace questions: use the cards and origins notes. Invite them to flip a card or open the Origins map.
 7. If unsure, say so and offer the phone number.`;

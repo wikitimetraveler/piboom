@@ -5,7 +5,30 @@
     "guideName": "Sage",
     "guideTitle": "Budtender · educator · lockout buddy",
     "guidePortrait": "/mountain-high/assets/sage-portrait.svg",
-    "welcomeScript": "Hey — I'm Sage. This is a 21-and-over prototype for Mountain High Medicinals. Flip a type card for a little history, wander the lab, or call if you need a locksmith in Long Beach or L.A."
+    "welcomeScript": "Hey — I'm Sage. This is a 21-and-over prototype for Mountain High Medicinals. Flip a type card for a little history, wander the lab, or call if you need a locksmith in Long Beach or L.A.",
+    "publicSiteUrl": "https://www.thelanefamily.us"
+  },
+  "merchDisclaimer": "Lab sticker and t-shirt mockups — concept merch only, not for sale. QR opens this Mountain High page.",
+  "merch": {
+    "pagePath": "/mountain-high/",
+    "items": [
+      {
+        "id": "sticker",
+        "name": "Lab sticker",
+        "kind": "sticker",
+        "tagline": "Die-cut card art · scan back to this page",
+        "image": "/mountain-high/assets/lab/sticker.jpg",
+        "mockup": true
+      },
+      {
+        "id": "tshirt",
+        "name": "Lab t-shirt",
+        "kind": "tshirt",
+        "tagline": "Chest print · QR to this page",
+        "image": "/mountain-high/assets/lab/tshirt.jpg",
+        "mockup": true
+      }
+    ]
   },
   "shop": {
     "name": "Mountain High Medicinals",
@@ -21,7 +44,66 @@
     "phoneLabel": "(909) 219-1370",
     "note": "Same number as the card. Call or text for lockouts and keys in Long Beach and Los Angeles. We do not list a shop pin until he sends an address."
   },
-  "disclaimer": "21+ adults only. Educational geography and plant-type talk — not medical advice, not cultivation advice, not a live menu.",
+  "disclaimer": "21+ adults only. Educational geography and plant-type talk — not medical advice, not a grow guide, not a live menu. Bag art is concept mockups only.",
+  "bagsDisclaimer": "Four packaging mockups with flower stills — not inventory, not for sale, no prices, no license on the pouch. Indoor vs outdoor talk is shopper education (consistency vs sun and place), not how to grow.",
+  "bags": [
+    {
+      "id": "satchel-indoor",
+      "name": "Ridge Satchel",
+      "kind": "satchel",
+      "grow": "indoor",
+      "kicker": "Mockup · satchel",
+      "tagline": "Indoor sativa carry bag",
+      "tags": ["satchel", "indoor", "sativa", "MOCKUP"],
+      "swatch": "#c8ff4a",
+      "mockup": true,
+      "image": "/mountain-high/assets/bags/satchel-indoor.jpg",
+      "story": "A small flap satchel mockup for the everyday jar story. This is a drawing of a bag, not a SKU. Indoor lots are the shop talk about even color and a calendar that does not wait on summer.",
+      "cultivationNote": "Indoor, in this mockup, means room-grown under electric light: tighter, more repeatable-looking flower in the jar. We are not listing watts, nutrients, or a recipe."
+    },
+    {
+      "id": "satchel-outdoor",
+      "name": "Trail Satchel",
+      "kind": "satchel",
+      "grow": "outdoor",
+      "kicker": "Mockup · satchel",
+      "tagline": "Outdoor sativa carry bag",
+      "tags": ["satchel", "outdoor", "sativa", "MOCKUP"],
+      "swatch": "#ffd27a",
+      "mockup": true,
+      "image": "/mountain-high/assets/bags/satchel-outdoor.jpg",
+      "story": "Same satchel shape, sun-grown art. Outdoor flower follows season, hillside, and night swing — more place in the jar, more variation from lot to lot.",
+      "cultivationNote": "Outdoor here is the sun-and-season story: full-spectrum light and altitude show up as character. Still a mockup. Still not a grow guide."
+    },
+    {
+      "id": "medical-indoor",
+      "name": "Clinic Pouch",
+      "kind": "medical",
+      "grow": "indoor",
+      "kicker": "Mockup · medical",
+      "tagline": "Indoor indica pouch look",
+      "tags": ["medical", "indoor", "indica", "MOCKUP"],
+      "swatch": "#7b3cff",
+      "mockup": true,
+      "image": "/mountain-high/assets/bags/medical-indoor.jpg",
+      "story": "A labeled medicinal-style pouch — concept only. No dose, no claim, no live menu. Indoor indica on the art is a type-and-room story, not a prescription.",
+      "cultivationNote": "Indoor rooms keep climate off the weather map, so shoppers often hear about consistency. After harvest, shops talk about cure — we do not give times or temps."
+    },
+    {
+      "id": "medical-outdoor",
+      "name": "Summit Pouch",
+      "kind": "medical",
+      "grow": "outdoor",
+      "kicker": "Mockup · medical",
+      "tagline": "Outdoor indica pouch look",
+      "tags": ["medical", "outdoor", "indica", "MOCKUP"],
+      "swatch": "#3d8f4a",
+      "mockup": true,
+      "image": "/mountain-high/assets/bags/medical-outdoor.jpg",
+      "story": "Same medical pouch idea, highland outdoor art. Broad-leaf mountain nights on the label, still a mockup, still not medicine in a bag.",
+      "cultivationNote": "Outdoor indica talk on this card is terroir and short highland seasons — culture and botany. Call a clinician for health questions. Do not treat this pouch as product on a shelf."
+    }
+  ],
   "types": [
     {
       "id": "indica",

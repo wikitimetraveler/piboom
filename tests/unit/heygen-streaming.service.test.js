@@ -43,6 +43,8 @@ describe('heygen streaming session', () => {
       expect(body.avatar_id).toBe('avatar_test');
       expect(body.voice_id).toBe('voice_test');
       expect(body.text).toBe('Ready.');
+      expect(body.max_duration_seconds).toBeUndefined();
+      expect(Object.keys(body).sort()).toEqual(['avatar_id', 'text', 'type', 'voice_id']);
       return {
         ok: true,
         json: async () => ({
@@ -140,6 +142,40 @@ describe('heygen streaming session', () => {
     expect(session.avatarId).toBe('zed_look_explicit');
   });
 
+  test('createHeygenStreamingSession falls back to a look poster when realtime 404s', async () => {
+    global.fetch = async (url, opts) => {
+      const path = String(url);
+      if (path.includes('/v3/avatar-realtime') && opts?.method === 'POST') {
+        return {
+          ok: false,
+          status: 404,
+          json: async () => ({ error: { code: 'resource_not_found', message: 'Not found.' } }),
+        };
+      }
+      if (path.includes('/v3/avatars/looks/avatar_test')) {
+        return {
+          ok: true,
+          json: async () => ({
+            data: { id: 'avatar_test', preview_image_url: 'https://files.heygen.ai/zed.webp' },
+          }),
+        };
+      }
+      if (path.includes('/v3/voices/speech')) {
+        return {
+          ok: true,
+          json: async () => ({ data: { audio_url: 'https://files.heygen.ai/zed.wav' } }),
+        };
+      }
+      throw new Error(`unexpected fetch ${path}`);
+    };
+    const session = await createHeygenStreamingSession();
+    expect(session.playback).toBe('poster');
+    expect(session.fallback).toBe(true);
+    expect(session.url).toBe('https://files.heygen.ai/zed.webp');
+    expect(session.sessionId).toBe('poster-avatar_test');
+    expect(session.audioUrl).toBe('https://files.heygen.ai/zed.wav');
+  });
+
   test('speakHeygenStreamingSession posts a text delta', async () => {
     global.fetch = async (url, opts) => {
       expect(String(url)).toContain('/v3/avatar-realtime/sess-1/text');
@@ -180,6 +216,69 @@ describe('heygen streaming session', () => {
     expect(result.data.recreated).toBe(true);
     expect(result.session.sessionId).toBe('sess-2');
     expect(result.session.url).toContain('sess-2.m3u8');
+  });
+
+  test('createHeygenStreamingSession falls back to poster voice when realtime avatar is missing', async () => {
+    global.fetch = async (url, opts) => {
+      const path = String(url);
+      if (path.includes('/v3/avatar-realtime') && opts?.method === 'POST') {
+        return {
+          ok: false,
+          status: 404,
+          json: async () => ({ error: { code: 'resource_not_found', message: 'Not found.' } }),
+        };
+      }
+      if (path.includes('/v3/avatars/looks/')) {
+        return {
+          ok: true,
+          json: async () => ({ data: { preview_image_url: 'https://cdn.example/zed.webp' } }),
+        };
+      }
+      if (path.includes('/v3/voices/speech')) {
+        expect(JSON.parse(opts.body).text).toBe('Signal acquired.');
+        return {
+          ok: true,
+          json: async () => ({ data: { audio_url: 'https://cdn.example/zed.wav', duration: 1.2 } }),
+        };
+      }
+      throw new Error(`unexpected fetch ${path}`);
+    };
+    const session = await createHeygenStreamingSession({ text: 'Signal acquired.' });
+    expect(session.playback).toBe('poster');
+    expect(session.fallback).toBe(true);
+    expect(session.url).toBe('https://cdn.example/zed.webp');
+    expect(session.audioUrl).toBe('https://cdn.example/zed.wav');
+    expect(session.sessionId).toBe('poster-avatar_test');
+  });
+
+  test('speakHeygenStreamingSession uses Starfish speech for poster sessions', async () => {
+    global.fetch = async (url, opts) => {
+      expect(String(url)).toContain('/v3/voices/speech');
+      expect(JSON.parse(opts.body)).toMatchObject({
+        text: 'Carl has the sky on this one.',
+        voice_id: 'voice_zed',
+      });
+      return {
+        ok: true,
+        json: async () => ({ data: { audio_url: 'https://cdn.example/line.wav' } }),
+      };
+    };
+    const result = await speakHeygenStreamingSession('poster-zed', 'Carl has the sky on this one.', {
+      avatarId: 'zed',
+      voiceId: 'voice_zed',
+    });
+    expect(result.data.fallback).toBe(true);
+    expect(result.session.audioUrl).toContain('line.wav');
+    expect(result.session.playback).toBe('poster');
+  });
+
+  test('stopHeygenStreamingSession skips poster sessions', async () => {
+    global.fetch = async () => {
+      throw new Error('should not call HeyGen for poster stop');
+    };
+    const data = await stopHeygenStreamingSession('poster-zed');
+    expect(data.skipped).toBe(true);
+    expect(data.poster).toBe(true);
   });
 
   test('stopHeygenStreamingSession cancels the realtime session', async () => {

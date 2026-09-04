@@ -415,6 +415,87 @@ html.mhm-dev .mhm-dev-only[hidden] {
   max-width: 38rem;
 }
 
+.mhm-mockup-banner {
+  display: inline-block;
+  margin: 0 0 0.65rem;
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid #ff7a2d;
+  background: rgba(255, 122, 45, 0.16);
+  color: #ffd27a;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mhm-bag-grid {
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.mhm-bag {
+  min-height: 420px;
+}
+
+.mhm-bag .mhm-card-inner,
+.mhm-bag .mhm-face {
+  min-height: 420px;
+}
+
+.mhm-bag-face {
+  padding-top: 0.7rem;
+}
+
+.mhm-bag-art {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 12px;
+  margin-bottom: 0.45rem;
+  background: #050010;
+  pointer-events: none;
+}
+
+.mhm-bag-stamp {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  z-index: 2;
+  margin: 0;
+  padding: 0.12rem 0.45rem;
+  border-radius: 4px;
+  background: #ff7a2d;
+  color: #111;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.mhm-strobe {
+  position: fixed;
+  inset: 0;
+  z-index: 64;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background: transparent;
+}
+
+body.mhm-strobe-on .mhm-strobe {
+  animation: mhm-strobe 0.1s linear infinite;
+}
+
+@keyframes mhm-strobe {
+  0%, 12% { background: rgba(255, 255, 255, 0.88); }
+  13%, 100% { background: transparent; }
+}
+
+#mhmStrobeToggle[aria-pressed='true'] {
+  border-color: #ffd27a;
+  color: #ffd27a;
+  box-shadow: 0 0 18px rgba(255, 210, 122, 0.35);
+}
+
 .mhm-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
@@ -467,6 +548,15 @@ html.mhm-dev .mhm-dev-only[hidden] {
 .mhm-face--back {
   transform: rotateY(180deg);
   overflow: hidden;
+  pointer-events: none;
+}
+
+.mhm-card.is-flipped .mhm-face--front {
+  pointer-events: none;
+}
+
+.mhm-card.is-flipped .mhm-face--back {
+  pointer-events: auto;
 }
 
 .mhm-leaf-mark {
@@ -475,6 +565,7 @@ html.mhm-dev .mhm-dev-only[hidden] {
   margin: 0.2rem auto 0.7rem;
   color: var(--mhm-type, #9dffc4);
   filter: drop-shadow(0 0 12px color-mix(in srgb, var(--mhm-type) 55%, transparent));
+  pointer-events: none;
 }
 
 .mhm-card-kicker {
@@ -706,6 +797,75 @@ html.mhm-dev .mhm-dev-only[hidden] {
 .lock-card {
   display: grid;
   gap: 0.35rem;
+}
+
+.mhm-merch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin: 1.15rem 0 1.4rem;
+}
+
+.mhm-merch {
+  border: 1px solid var(--mhm-line);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #1a0f2c, #0c0716);
+  padding: 0.85rem 0.9rem 1rem;
+  box-shadow: 0 0 24px rgba(123, 60, 255, 0.12);
+}
+
+.mhm-merch h3 {
+  font-size: 1.25rem;
+  margin: 0.55rem 0 0.15rem;
+}
+
+.mhm-merch .mhm-mockup-banner {
+  margin-bottom: 0.65rem;
+}
+
+.mhm-merch-stage {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #050010;
+}
+
+.mhm-merch-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.mhm-merch-qr {
+  position: absolute;
+  z-index: 2;
+  padding: 4px;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(5, 0, 16, 0.55);
+}
+
+.mhm-merch-qr img,
+.mhm-merch-qr canvas,
+.mhm-merch-qr table {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.mhm-merch--sticker .mhm-merch-qr {
+  right: 17%;
+  bottom: 15%;
+  width: 18%;
+  aspect-ratio: 1;
+}
+
+.mhm-merch--shirt .mhm-merch-qr {
+  left: 54%;
+  top: 46%;
+  width: 11%;
+  aspect-ratio: 1;
 }
 
 .mhm-lab-grid {
@@ -955,11 +1115,13 @@ body.mhm-page[data-age="ok"] {
   .mhm-card-inner,
   .mhm-hookah-smoke,
   .mhm-float,
-  .mhm-scroll-cue {
+  .mhm-scroll-cue,
+  body.mhm-strobe-on .mhm-strobe {
     transition: none;
     animation: none;
   }
-  .mhm-float-wrap {
+  .mhm-float-wrap,
+  .mhm-strobe {
     display: none;
   }
 }

@@ -109,6 +109,16 @@
     const media = mediaHost();
     if (!media || !data?.url) return;
     heygenSessionId = data.sessionId;
+    if (root.HeygenLiveTile?.isPoster?.(data) || data.playback === 'poster') {
+      if (heygenRoom && typeof heygenRoom.disconnect === 'function') {
+        await heygenRoom.disconnect().catch(() => {});
+      }
+      heygenRoom = { kind: 'poster' };
+      media.hidden = false;
+      root.HeygenLiveTile.attachPoster(media, data.url, 'mhm-heygen__video', 'Sage');
+      if (data.audioUrl) root.HeygenLiveTile.playAudio?.(data.audioUrl);
+      return;
+    }
     if (root.HeygenLiveTile?.isHls(data)) {
       if (heygenRoom && typeof heygenRoom.disconnect === 'function') {
         await heygenRoom.disconnect().catch(() => {});
@@ -174,7 +184,11 @@
     await attachSession(data);
     const btn = document.getElementById('mhmHeygenLive');
     if (btn) btn.textContent = 'Hide Sage';
-    setStatus('Sage live on HeyGen.');
+    setStatus(
+      data.fallback || data.playback === 'poster'
+        ? 'Sage on voice — live stream is not on this HeyGen plan.'
+        : 'Sage live on HeyGen.'
+    );
   }
 
   async function toggleStream() {

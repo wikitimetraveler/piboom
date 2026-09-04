@@ -272,12 +272,6 @@ function streamingVoiceId() {
   return String(process.env.HEYGEN_STREAMING_VOICE_ID || process.env.HEYGEN_VOICE_ID || '').trim();
 }
 
-function streamingMaxSeconds() {
-  const n = Number(process.env.HEYGEN_STREAMING_MAX_SECONDS);
-  if (Number.isFinite(n)) return Math.min(3600, Math.max(30, Math.round(n)));
-  return 180;
-}
-
 function streamingPollMs() {
   const n = Number(process.env.HEYGEN_STREAMING_POLL_MS);
   if (Number.isFinite(n)) return Math.min(5000, Math.max(0, Math.round(n)));
@@ -294,6 +288,56 @@ function mapRealtimeSession(data, avatarId) {
     playback: url ? 'hls' : null,
     avatarId,
   };
+}
+
+function isPosterSessionId(sessionId) {
+  return String(sessionId || '').startsWith('poster-');
+}
+
+function isMissingRealtimeAvatar(err) {
+  if (err?.status !== 404) return false;
+  const code = String(err?.details?.error?.code || '').toLowerCase();
+  const message = String(err?.message || '').toLowerCase();
+  return code === 'resource_not_found' || message.includes('not found') || message.includes('404');
+}
+
+async function createPosterVoiceSession({ avatar, voice, text }) {
+  let previewUrl = null;
+  try {
+    const look = await heygenRequest(`/v3/avatars/looks/${encodeURIComponent(avatar)}`);
+    previewUrl = look?.preview_image_url || look?.image_url || null;
+  } catch (_) {
+    previewUrl = null;
+  }
+  let audioUrl = null;
+  try {
+    const speech = await generateSpeech({ text, voiceId: voice });
+    audioUrl = speech?.audio_url || null;
+  } catch (_) {
+    audioUrl = null;
+  }
+  if (!previewUrl && !audioUrl) {
+    const err = new Error('HeyGen Avatar Realtime is not available for this look');
+    err.status = 404;
+    err.code = 'HEYGEN_REALTIME_UNAVAILABLE';
+    throw err;
+  }
+  return {
+    sessionId: `poster-${avatar}`,
+    url: previewUrl,
+    accessToken: null,
+    playback: 'poster',
+    fallback: true,
+    audioUrl,
+    avatarId: avatar
+  };
+}
+
+function isRealtimeUnavailable(err) {
+  if (!err) return false;
+  if (err.status === 404) return true;
+  const code = String(err.details?.error?.code || err.code || '').toLowerCase();
+  return code === 'resource_not_found' || code === 'avatar_not_found';
 }
 
 async function waitForRealtimeStream(streamId, { intervalMs = streamingPollMs(), timeoutMs = 90000 } = {}) {
@@ -343,23 +387,27 @@ export async function createHeygenStreamingSession({
     throw err;
   }
   const seed = String(text || '').trim() || 'Ready.';
-  const created = await heygenRequest('/v3/avatar-realtime', {
-    method: 'POST',
-    body: {
-      type: 'text_stream',
-      avatar_id: avatar,
-      voice_id: voice,
-      text: seed.slice(0, 2000),
-      max_duration_seconds: streamingMaxSeconds()
-    }
-  });
-  const streamId = created?.stream_id || created?.session_id || created?.sessionId;
-  if (!streamId) throw new Error('HeyGen realtime session did not return stream_id');
-  const ready =
-    created?.hls_url || created?.url
-      ? created
-      : await waitForRealtimeStream(streamId);
-  return mapRealtimeSession({ ...created, ...ready, stream_id: streamId }, avatar);
+  try {
+    const created = await heygenRequest('/v3/avatar-realtime', {
+      method: 'POST',
+      body: {
+        type: 'text_stream',
+        avatar_id: avatar,
+        voice_id: voice,
+        text: seed.slice(0, 2000)
+      }
+    });
+    const streamId = created?.stream_id || created?.session_id || created?.sessionId;
+    if (!streamId) throw new Error('HeyGen realtime session did not return stream_id');
+    const ready =
+      created?.hls_url || created?.url
+        ? created
+        : await waitForRealtimeStream(streamId);
+    return mapRealtimeSession({ ...created, ...ready, stream_id: streamId }, avatar);
+  } catch (err) {
+    if (!isRealtimeUnavailable(err) && !isMissingRealtimeAvatar(err)) throw err;
+    return createPosterVoiceSession({ avatar, voice, text: seed });
+  }
 }
 
 /** v3 create already starts playback; kept so older callers do not hit sunset /v1/streaming.start. */
@@ -374,6 +422,22 @@ export async function speakHeygenStreamingSession(sessionId, text, { avatarId, v
   const script = String(text || '').trim();
   if (!id) throw new Error('sessionId is required');
   if (!script) throw new Error('text is required');
+  const voice = String(voiceId || streamingVoiceId()).trim();
+  if (isPosterSessionId(id) || id === 'poster') {
+    if (!voice) throw new Error('voiceId is required');
+    const speech = await generateSpeech({ text: script, voiceId: voice });
+    return {
+      data: { fallback: true },
+      session: {
+        sessionId: id,
+        url: null,
+        playback: 'poster',
+        fallback: true,
+        audioUrl: speech.audio_url,
+        avatarId: avatarId || (id.startsWith('poster-') ? id.slice(7) : null)
+      }
+    };
+  }
   try {
     const data = await heygenRequest(`/v3/avatar-realtime/${encodeURIComponent(id)}/text`, {
       method: 'POST',
@@ -391,6 +455,9 @@ export async function speakHeygenStreamingSession(sessionId, text, { avatarId, v
 export async function stopHeygenStreamingSession(sessionId) {
   const id = String(sessionId || '').trim();
   if (!id) throw new Error('sessionId is required');
+  if (isPosterSessionId(id) || id === 'poster') {
+    return { cancelled: false, skipped: true, poster: true };
+  }
   try {
     return await heygenRequest(`/v3/avatar-realtime/${encodeURIComponent(id)}/cancel`, {
       method: 'POST',

@@ -11,19 +11,14 @@ This is a **real disco MP3**, free to use. It is **not** The Trammps’ copyrigh
 
 Served at: `/shared/audio/im-on-fire.mp3`
 
-## Home + planetarium — Spirit in the Sky
+## Home — Children of the Sun
 
-Norman Greenbaum’s **Spirit in the Sky** is still under copyright. Do **not** commit a commercial rip to this repo unless you have redistribution rights.
+Billy Thorpe’s **Children of the Sun** (1979) is still under copyright. Do **not** commit a commercial rip.
 
-To play it on `/` and `/planetarium/`:
+Home (`/`) plays it as hidden YouTube audio (`voAR07ezBts`) via `public/shared/js/fun-home-sky-song.js`. The **Children of the Sun** control toggles play/pause. The iframe is not shown.
 
-1. Buy or rip **your own licensed copy**.
-2. Save it as:
+## Planetarium — Spirit in the Sky
 
-```
-public/shared/audio/spirit-in-the-sky.mp3
-```
+Norman Greenbaum’s **Spirit in the Sky** (1969) is still under copyright. Do **not** commit a commercial rip.
 
-3. Reload home or planetarium — the Ambient / Spirit control will loop it (louder volume). If the file is missing, the generative celestial bed still plays.
-
-Served at: `/shared/audio/spirit-in-the-sky.mp3` (optional; gitignored if you keep it local-only).
+Planetarium (`/planetarium/`) plays it as hidden YouTube audio (`YqYN-1vMM9k`) via `public/planetarium/js/planetarium-sky-song.js`. The iframe is not shown.

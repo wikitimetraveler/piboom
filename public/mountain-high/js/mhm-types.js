@@ -66,24 +66,16 @@
       const hear = ev.target.closest('[data-hear]');
       const ask = ev.target.closest('[data-ask]');
       const mapBtn = ev.target.closest('[data-map]');
-      const back = ev.target.closest('.mhm-flip-back');
       const card = ev.target.closest('.mhm-card');
       if (hear) {
-        ev.stopPropagation();
         const type = types.find((t) => t.id === hear.getAttribute('data-hear'));
         if (type && typeof root.MhmAskSage === 'function') {
           root.MhmSpeakSage?.(type.history);
         }
-        return;
-      }
-      if (ask) {
-        ev.stopPropagation();
+      } else if (ask) {
         const type = types.find((t) => t.id === ask.getAttribute('data-ask'));
         root.MhmAskSage?.(`Tell me about ${type?.name || 'this type'} — history only, no grow tips.`);
-        return;
-      }
-      if (mapBtn) {
-        ev.stopPropagation();
+      } else if (mapBtn) {
         const type = types.find((t) => t.id === mapBtn.getAttribute('data-map'));
         document.getElementById('mhmOrigins')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         const first = (type?.examples || [])[0];
@@ -94,12 +86,6 @@
           });
           if (id) window.setTimeout(() => window.CannabisOriginsMapInstance.focusPin(id), 500);
         }
-        return;
-      }
-      if (back) {
-        ev.stopPropagation();
-        if (card) flipCard(card, false);
-        return;
       }
       if (card) flipCard(card);
     });

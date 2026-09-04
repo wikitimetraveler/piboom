@@ -1662,13 +1662,27 @@
       body: JSON.stringify(body),
     });
     const data = await res.json();
+    if (data?.url && (data.fallback || data.playback === 'poster' || window.HeygenLiveTile?.isPoster?.(data))) {
+      const host = els.heygenMedia || els.heygenTile;
+      if (!els.heygenTile || !host) return;
+      els.heygenTile.hidden = false;
+      window.HeygenLiveTile.attachPoster(host, data.url, 'st-heygen-video', faceName);
+      state.heygenRoom = { kind: 'poster' };
+      state.heygenSessionId = data.sessionId || 'poster';
+      appendReed(`${faceName} is on voice — live stream is not on this HeyGen plan.`);
+      return;
+    }
     if (!res.ok || !data.url) {
       const missingCatalog = !face?.avatarId;
+      const raw = String(data.error || '');
+      const sunset = /streaming\.new|avatar-realtime|404/i.test(raw);
       appendReed(
-        data.error
+        sunset
+          ? `${faceName} live stream is not on this HeyGen plan — Reed still talks here.`
+          : (data.error
           || (missingCatalog
             ? `${faceName} needs HeyGen IDs — run npm run create:zed-heygen-avatar or set HEYGEN_STREAMING_AVATAR_ID.`
-            : 'HeyGen streaming needs HEYGEN_API_KEY and a streaming avatar id.')
+            : 'HeyGen streaming needs HEYGEN_API_KEY and a streaming avatar id.'))
       );
       return;
     }

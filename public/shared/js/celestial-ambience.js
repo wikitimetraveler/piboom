@@ -8,7 +8,7 @@
 
   const STORAGE_KEY = 'celestialAmbienceMuted';
   const MASTER_GAIN = 0.36;
-  const BUTTON_SELECTOR = '[data-celestial-ambience], #funAmbienceToggle';
+  const BUTTON_SELECTOR = '[data-celestial-ambience]';
 
   let ctx = null;
   let master = null;

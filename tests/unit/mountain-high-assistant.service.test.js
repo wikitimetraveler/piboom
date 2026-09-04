@@ -59,4 +59,45 @@ describe('mountain-high-assistant.service', () => {
     expect(catalog.locksmith.areas).toEqual(['Long Beach', 'Los Angeles']);
     expect(catalog.shop.phone).toBe('+1 909-219-1370');
   });
+
+  test('catalog bag mockups are two satchels and two medical pouches', async () => {
+    const catalog = JSON.parse(await readFile(CATALOG_PATH, 'utf8'));
+    expect(catalog.bags).toHaveLength(4);
+    expect(catalog.bags.map((b) => b.id)).toEqual([
+      'satchel-indoor',
+      'satchel-outdoor',
+      'medical-indoor',
+      'medical-outdoor',
+    ]);
+    catalog.bags.forEach((bag) => {
+      expect(bag.mockup).toBe(true);
+      expect(bag.image).toMatch(/\/mountain-high\/assets\/bags\//);
+      expect(bag.cultivationNote).toBeTruthy();
+      expect(bag.story).toBeTruthy();
+    });
+    expect(catalog.bags.filter((b) => b.kind === 'satchel')).toHaveLength(2);
+    expect(catalog.bags.filter((b) => b.kind === 'medical')).toHaveLength(2);
+    expect(catalog.bags.filter((b) => b.grow === 'indoor')).toHaveLength(2);
+    expect(catalog.bags.filter((b) => b.grow === 'outdoor')).toHaveLength(2);
+  });
+
+  test('catalog lab merch is a sticker and a t-shirt mockup', async () => {
+    const catalog = JSON.parse(await readFile(CATALOG_PATH, 'utf8'));
+    expect(catalog.merch.pagePath).toBe('/mountain-high/');
+    expect(catalog.merch.items.map((m) => m.id)).toEqual(['sticker', 'tshirt']);
+    catalog.merch.items.forEach((item) => {
+      expect(item.mockup).toBe(true);
+      expect(item.image).toMatch(/\/mountain-high\/assets\/lab\//);
+    });
+  });
+
+  test('Sage prompt marks bag art as mockups and still forbids grow recipes', async () => {
+    const catalog = JSON.parse(await readFile(CATALOG_PATH, 'utf8'));
+    const prompt = buildSystemPrompt(catalog, { entries: [] });
+    expect(prompt).toMatch(/Ridge Satchel/);
+    expect(prompt).toMatch(/Clinic Pouch/);
+    expect(prompt).toMatch(/Lab sticker/);
+    expect(prompt).toMatch(/mockup/i);
+    expect(prompt).toMatch(/No cultivation how-to/i);
+  });
 });

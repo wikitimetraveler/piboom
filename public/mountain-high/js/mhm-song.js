@@ -1,26 +1,25 @@
 /**
- * Planetarium soundtrack — Norman Greenbaum, Spirit in the Sky (1969).
- * Hidden YouTube audio (no local copy of the recording).
+ * Mountain High soundtrack — Pink Floyd, Let's Roll Another One (1967).
+ * Released as Candy and a Currant Bun. Hidden YouTube audio (no local rip).
  * Development work by David Lane
  */
 (function (root) {
   'use strict';
 
-  const VIDEO_ID = 'YqYN-1vMM9k';
-  const ARTIST = 'Norman Greenbaum';
-  const TITLE = 'Spirit in the Sky';
-  const YEAR = 1969;
+  const VIDEO_ID = 'seoMh-NmTPw';
+  const ARTIST = 'Pink Floyd';
+  const TITLE = 'Roll Another One';
+  const YEAR = 1967;
   const DEFAULT_VOLUME = 100;
-  /** Play on planetarium load; the Spirit button then toggles it. */
+  /** Play after the 21+ gate; the Roll Another One button then toggles it. */
   const AUTOPLAY_ON_LOAD = true;
-  /** Official MV cold open + extra delay (12s + 2s + 1s) — land on the guitar. */
-  const SKIP_SECONDS = 15;
+  const SKIP_SECONDS = 0;
   const DUCK_WHILE_PLAYING = 0;
-  const MUTE_KEY = 'planSkySongMuted';
-  const VOLUME_KEY = 'planSkySongVolume';
-  const TOGGLE_SELECTOR = '#planSkySongToggle, #planAmbienceToggle';
-  const VOLUME_SELECTOR = '#planSkySongVolume';
-  const HOST_ID = 'planSkySongPlayer';
+  const MUTE_KEY = 'mhmSongMuted';
+  const VOLUME_KEY = 'mhmSongVolume';
+  const TOGGLE_SELECTOR = '#mhmSongToggle';
+  const VOLUME_SELECTOR = '#mhmSongVolume';
+  const HOST_ID = 'mhmSongPlayer';
 
   let player = null;
   let playing = false;
@@ -31,7 +30,7 @@
   let createSeq = 0;
   let gestureBound = false;
   let skipTimer = null;
-  let introCleared = false;
+  let introCleared = SKIP_SECONDS <= 0;
 
   function clampVolume(value) {
     const n = Number(value);
@@ -75,7 +74,6 @@
   function applyPlayerVolume(target, value) {
     const vol = clampVolume(value);
     if (!target) return vol;
-    // Never unmute while still in the cold-open intro window.
     if (!introCleared || needsIntroSkip(currentTimeOf(target))) {
       silenceUntilSkip(target);
       return vol;
@@ -122,11 +120,11 @@
     document.querySelectorAll(TOGGLE_SELECTOR).forEach((btn) => {
       btn.setAttribute('aria-pressed', on ? 'true' : 'false');
       btn.innerHTML = on
-        ? '<i class="bi bi-pause-fill" aria-hidden="true"></i> Spirit in the Sky'
-        : '<i class="bi bi-play-fill" aria-hidden="true"></i> Spirit in the Sky';
+        ? '<i class="bi bi-pause-fill" aria-hidden="true"></i><span> Roll Another One</span>'
+        : '<i class="bi bi-play-fill" aria-hidden="true"></i><span> Roll Another One</span>';
       btn.title = on
-        ? 'Pause Spirit in the Sky'
-        : 'Play Spirit in the Sky — Norman Greenbaum, 1969';
+        ? 'Pause Roll Another One'
+        : 'Play Roll Another One — Pink Floyd, 1967';
     });
     const slider = document.querySelector(VOLUME_SELECTOR);
     if (slider && String(slider.value) !== String(volume)) {
@@ -173,7 +171,7 @@
     if (typeof document === 'undefined') return null;
     let host = document.getElementById(HOST_ID);
     if (host) return host;
-    const wrap = document.getElementById('planSkySongHost');
+    const wrap = document.getElementById('mhmSongHost');
     if (!wrap) return null;
     wrap.setAttribute('aria-hidden', 'true');
     host = document.createElement('div');
@@ -195,12 +193,13 @@
   }
 
   function needsIntroSkip(time) {
+    if (SKIP_SECONDS <= 0) return false;
     const n = Number(time);
     return !Number.isFinite(n) || n < SKIP_SECONDS - 0.05;
   }
 
   function silenceUntilSkip(target) {
-    if (!target) return SKIP_SECONDS;
+    if (SKIP_SECONDS <= 0 || !target) return SKIP_SECONDS;
     try {
       if (typeof target.mute === 'function') target.mute();
       if (typeof target.setVolume === 'function') target.setVolume(0);
@@ -211,8 +210,7 @@
   }
 
   function skipIntro(target) {
-    if (!target) return SKIP_SECONDS;
-    if (!needsIntroSkip(currentTimeOf(target))) {
+    if (!target || SKIP_SECONDS <= 0 || !needsIntroSkip(currentTimeOf(target))) {
       introCleared = true;
       return SKIP_SECONDS;
     }
@@ -244,6 +242,10 @@
   }
 
   function startSkipWatch(target) {
+    if (SKIP_SECONDS <= 0) {
+      markSongAudible(target);
+      return;
+    }
     stopSkipWatch();
     if (!target || typeof root.setInterval !== 'function') return;
     let ticks = 0;
@@ -274,14 +276,13 @@
 
   function startAtSkip(target) {
     if (!target) return;
-    introCleared = false;
-    silenceUntilSkip(target);
+    introCleared = SKIP_SECONDS <= 0;
+    if (SKIP_SECONDS > 0) silenceUntilSkip(target);
     try {
       if (typeof target.loadVideoById === 'function') {
-        target.loadVideoById({
-          videoId: VIDEO_ID,
-          startSeconds: SKIP_SECONDS,
-        });
+        const payload = { videoId: VIDEO_ID };
+        if (SKIP_SECONDS > 0) payload.startSeconds = SKIP_SECONDS;
+        target.loadVideoById(payload);
       } else if (typeof target.playVideo === 'function') {
         target.playVideo();
         skipIntro(target);
@@ -312,7 +313,6 @@
     const origin = root.location && root.location.origin;
     const playerVars = {
       autoplay: 1,
-      start: SKIP_SECONDS,
       controls: 0,
       disablekb: 1,
       fs: 0,
@@ -321,6 +321,7 @@
       playsinline: 1,
       enablejsapi: 1,
     };
+    if (SKIP_SECONDS > 0) playerVars.start = SKIP_SECONDS;
     if (origin && /^https?:/i.test(origin)) playerVars.origin = origin;
     return new Promise((resolve) => {
       const next = new YT.Player(HOST_ID, {
@@ -398,7 +399,7 @@
   function stop() {
     wantedOn = false;
     playing = false;
-    introCleared = false;
+    introCleared = SKIP_SECONDS <= 0;
     stopSkipWatch();
     duckAmbience(false);
     if (player && typeof player.pauseVideo === 'function') {
@@ -462,7 +463,7 @@
     setMuted(false);
     if (typeof document === 'undefined') return;
 
-    document.querySelectorAll('#planSkySongToggle, #planAmbienceToggle').forEach((btn) => {
+    document.querySelectorAll(TOGGLE_SELECTOR).forEach((btn) => {
       if (btn._skySongBound) return;
       btn._skySongBound = true;
       btn.addEventListener('click', (event) => {
@@ -488,7 +489,7 @@
     }
   }
 
-  root.PlanetariumSkySong = {
+  root.FunHomeSkySong = {
     VIDEO_ID,
     ARTIST,
     TITLE,

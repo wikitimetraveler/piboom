@@ -389,7 +389,28 @@ body.fun-logged-in .fun-secret-link.is-visible {
   50% { transform: scale(1.3) rotate(180deg); }
 }
 
-/* Hero — copy plate on the left, 3D orb on the right */
+/* Hidden YouTube audio host — keep a real 200×113 box so playback continues */
+.fun-sky-song-host {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: -1;
+  width: 200px;
+  height: 113px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.fun-sky-song-host iframe {
+  display: block;
+  width: 200px;
+  height: 113px;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .fun-hero {
   position: relative;
   text-align: center;

@@ -82,7 +82,7 @@
     if (!el || el.nodeType !== 1) return true;
     return Boolean(
       el.closest(
-        'button, a, [data-lane-lightbox-ignore], .lane-lightbox-ignore, #loginModal, .login-user-card, .collection-media-root, modern-navbar, .lane-pdf-lightbox, .lunar-lightbox, .lane-image-lightbox, nav, .navbar'
+        'button, a, [data-lane-lightbox-ignore], .lane-lightbox-ignore, .mhm-card, #loginModal, .login-user-card, .collection-media-root, modern-navbar, .lane-pdf-lightbox, .lunar-lightbox, .lane-image-lightbox, nav, .navbar'
       )
     );
   }
