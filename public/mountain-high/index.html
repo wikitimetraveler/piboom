@@ -30,6 +30,7 @@
     <div class="mhm-float-layer" id="mhmFloatLayer"></div>
   </div>
   <div class="mhm-strobe" id="mhmStrobe" hidden aria-hidden="true"></div>
+  <div class="mhm-song-host" id="mhmSongHost" aria-hidden="true"></div>
 
   <aside id="mhmGate" class="mhm-gate" role="dialog" aria-labelledby="mhmGateTitle" aria-modal="true">
     <div class="mhm-gate-card">
@@ -89,6 +90,10 @@
             <button type="button" class="mhm-btn mhm-btn-ghost" id="mhmStrobeToggle" aria-pressed="false" title="Turn strobe on — flashing light">
               <i class="bi bi-lightning-charge" aria-hidden="true"></i>
               <span data-strobe-label>Strobe</span>
+            </button>
+            <button type="button" class="mhm-btn mhm-btn-ghost" id="mhmSongToggle" aria-pressed="true" title="Pause Panama Red">
+              <i class="bi bi-pause-fill" aria-hidden="true"></i>
+              <span> Panama Red</span>
             </button>
             <a class="mhm-btn mhm-btn-ghost" href="sms:+19092191370">Text the card</a>
           </div>
@@ -260,6 +265,7 @@
   <script src="/mountain-high/js/mhm-types.js"></script>
   <script src="/mountain-high/js/mhm-bags.js"></script>
   <script src="/mountain-high/js/mhm-strobe.js"></script>
+  <script src="/mountain-high/js/mhm-song.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
   <script src="/family/js/lane-public-origin.js"></script>
   <script src="/mountain-high/js/mhm-lab-merch.js"></script>

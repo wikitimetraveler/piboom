@@ -1,17 +1,17 @@
 /**
- * Mountain High soundtrack — Pink Floyd, Let's Roll Another One (1967).
- * Released as Candy and a Currant Bun. Hidden YouTube audio (no local rip).
+ * Mountain High soundtrack — New Riders of the Purple Sage, Panama Red (1973).
+ * Hidden YouTube audio (no local copy of the recording).
  * Development work by David Lane
  */
 (function (root) {
   'use strict';
 
-  const VIDEO_ID = 'seoMh-NmTPw';
-  const ARTIST = 'Pink Floyd';
-  const TITLE = 'Roll Another One';
-  const YEAR = 1967;
+  const VIDEO_ID = 'Tt6Do5fo4k8';
+  const ARTIST = 'New Riders of the Purple Sage';
+  const TITLE = 'Panama Red';
+  const YEAR = 1973;
   const DEFAULT_VOLUME = 100;
-  /** Play after the 21+ gate; the Roll Another One button then toggles it. */
+  /** Play after the 21+ gate; the Panama Red button then toggles it. */
   const AUTOPLAY_ON_LOAD = true;
   const SKIP_SECONDS = 0;
   const DUCK_WHILE_PLAYING = 0;
@@ -120,11 +120,11 @@
     document.querySelectorAll(TOGGLE_SELECTOR).forEach((btn) => {
       btn.setAttribute('aria-pressed', on ? 'true' : 'false');
       btn.innerHTML = on
-        ? '<i class="bi bi-pause-fill" aria-hidden="true"></i><span> Roll Another One</span>'
-        : '<i class="bi bi-play-fill" aria-hidden="true"></i><span> Roll Another One</span>';
+        ? '<i class="bi bi-pause-fill" aria-hidden="true"></i><span> Panama Red</span>'
+        : '<i class="bi bi-play-fill" aria-hidden="true"></i><span> Panama Red</span>';
       btn.title = on
-        ? 'Pause Roll Another One'
-        : 'Play Roll Another One — Pink Floyd, 1967';
+        ? 'Pause Panama Red'
+        : 'Play Panama Red — New Riders of the Purple Sage, 1973';
     });
     const slider = document.querySelector(VOLUME_SELECTOR);
     if (slider && String(slider.value) !== String(volume)) {
@@ -489,7 +489,16 @@
     }
   }
 
-  root.FunHomeSkySong = {
+  let booted = false;
+
+  function bootWhenAllowed() {
+    if (booted) return;
+    if (typeof document === 'undefined' || document.body?.dataset?.age !== 'ok') return;
+    booted = true;
+    init();
+  }
+
+  root.MhmSong = {
     VIDEO_ID,
     ARTIST,
     TITLE,
@@ -514,10 +523,11 @@
   };
 
   if (typeof document !== 'undefined') {
+    root.addEventListener('mhm-age-ok', bootWhenAllowed);
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
+      document.addEventListener('DOMContentLoaded', bootWhenAllowed);
     } else {
-      init();
+      bootWhenAllowed();
     }
   }
 })(typeof globalThis !== 'undefined' ? globalThis : window);

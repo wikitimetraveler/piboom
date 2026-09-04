@@ -472,6 +472,27 @@ html.mhm-dev .mhm-dev-only[hidden] {
   letter-spacing: 0.12em;
 }
 
+.mhm-song-host {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: -1;
+  width: 200px;
+  height: 113px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mhm-song-host iframe {
+  display: block;
+  width: 200px;
+  height: 113px;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .mhm-strobe {
   position: fixed;
   inset: 0;

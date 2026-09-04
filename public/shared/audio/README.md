@@ -17,6 +17,12 @@ Billy Thorpe’s **Children of the Sun** (1979) is still under copyright. Do **n
 
 Home (`/`) plays it as hidden YouTube audio (`voAR07ezBts`) via `public/shared/js/fun-home-sky-song.js`. The **Children of the Sun** control toggles play/pause. The iframe is not shown.
 
+## Mountain High — Panama Red
+
+New Riders of the Purple Sage’s **Panama Red** (1973) is still under copyright. Do **not** commit a commercial rip.
+
+Mountain High (`/mountain-high/`) plays it as hidden YouTube audio (`Tt6Do5fo4k8`) via `public/mountain-high/js/mhm-song.js` after the 21+ gate. The **Panama Red** control toggles play/pause. The iframe is not shown.
+
 ## Planetarium — Spirit in the Sky
 
 Norman Greenbaum’s **Spirit in the Sky** (1969) is still under copyright. Do **not** commit a commercial rip.
