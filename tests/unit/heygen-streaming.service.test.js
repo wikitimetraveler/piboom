@@ -1,7 +1,11 @@
 /**
  * Development work by David Lane
  */
-import { createHeygenStreamingSession } from '../../services/heygen.service.js';
+import {
+  createHeygenStreamingSession,
+  speakHeygenStreamingSession,
+  stopHeygenStreamingSession,
+} from '../../services/heygen.service.js';
 
 describe('heygen streaming session', () => {
   const originalFetch = global.fetch;
@@ -10,8 +14,12 @@ describe('heygen streaming session', () => {
   beforeEach(() => {
     saved.HEYGEN_API_KEY = process.env.HEYGEN_API_KEY;
     saved.HEYGEN_STREAMING_AVATAR_ID = process.env.HEYGEN_STREAMING_AVATAR_ID;
+    saved.HEYGEN_STREAMING_VOICE_ID = process.env.HEYGEN_STREAMING_VOICE_ID;
+    saved.HEYGEN_STREAMING_POLL_MS = process.env.HEYGEN_STREAMING_POLL_MS;
     process.env.HEYGEN_API_KEY = 'test-key';
     process.env.HEYGEN_STREAMING_AVATAR_ID = 'avatar_test';
+    process.env.HEYGEN_STREAMING_VOICE_ID = 'voice_test';
+    process.env.HEYGEN_STREAMING_POLL_MS = '0';
   });
 
   afterEach(() => {
@@ -20,28 +28,73 @@ describe('heygen streaming session', () => {
     else process.env.HEYGEN_API_KEY = saved.HEYGEN_API_KEY;
     if (saved.HEYGEN_STREAMING_AVATAR_ID === undefined) delete process.env.HEYGEN_STREAMING_AVATAR_ID;
     else process.env.HEYGEN_STREAMING_AVATAR_ID = saved.HEYGEN_STREAMING_AVATAR_ID;
+    if (saved.HEYGEN_STREAMING_VOICE_ID === undefined) delete process.env.HEYGEN_STREAMING_VOICE_ID;
+    else process.env.HEYGEN_STREAMING_VOICE_ID = saved.HEYGEN_STREAMING_VOICE_ID;
+    if (saved.HEYGEN_STREAMING_POLL_MS === undefined) delete process.env.HEYGEN_STREAMING_POLL_MS;
+    else process.env.HEYGEN_STREAMING_POLL_MS = saved.HEYGEN_STREAMING_POLL_MS;
   });
 
-  test('createHeygenStreamingSession maps LiveKit url and token', async () => {
+  test('createHeygenStreamingSession maps HLS url from Avatar Realtime', async () => {
     global.fetch = async (url, opts) => {
-      expect(String(url)).toContain('/v1/streaming.new');
+      expect(String(url)).toContain('/v3/avatar-realtime');
+      expect(String(url)).not.toContain('/v1/streaming');
       const body = JSON.parse(opts.body);
-      expect(body.avatar_name).toBe('avatar_test');
+      expect(body.type).toBe('text_stream');
+      expect(body.avatar_id).toBe('avatar_test');
+      expect(body.voice_id).toBe('voice_test');
+      expect(body.text).toBe('Ready.');
       return {
         ok: true,
         json: async () => ({
           data: {
-            session_id: 'sess-1',
-            url: 'wss://heygen.livekit.cloud',
-            access_token: 'lk-token',
+            stream_id: 'sess-1',
+            status: 'streaming',
+            hls_url: 'https://cdn.heygen.com/live/sess-1.m3u8',
           },
         }),
       };
     };
     const session = await createHeygenStreamingSession();
     expect(session.sessionId).toBe('sess-1');
-    expect(session.url).toBe('wss://heygen.livekit.cloud');
-    expect(session.accessToken).toBe('lk-token');
+    expect(session.url).toBe('https://cdn.heygen.com/live/sess-1.m3u8');
+    expect(session.playback).toBe('hls');
+    expect(session.accessToken).toBeNull();
+  });
+
+  test('createHeygenStreamingSession polls until HLS is ready', async () => {
+    let gets = 0;
+    global.fetch = async (url, opts) => {
+      const path = String(url);
+      if (opts?.method === 'POST') {
+        expect(path).toContain('/v3/avatar-realtime');
+        return {
+          ok: true,
+          json: async () => ({ data: { stream_id: 'sess-poll', status: 'pending' } }),
+        };
+      }
+      gets += 1;
+      expect(path).toContain('/v3/avatar-realtime/sess-poll');
+      if (gets === 1) {
+        return {
+          ok: true,
+          json: async () => ({ data: { stream_id: 'sess-poll', status: 'pending' } }),
+        };
+      }
+      return {
+        ok: true,
+        json: async () => ({
+          data: {
+            stream_id: 'sess-poll',
+            status: 'streaming',
+            hls_url: 'https://cdn.heygen.com/live/sess-poll.m3u8',
+          },
+        }),
+      };
+    };
+    const session = await createHeygenStreamingSession();
+    expect(session.sessionId).toBe('sess-poll');
+    expect(session.url).toContain('sess-poll.m3u8');
+    expect(gets).toBe(2);
   });
 
   test('createHeygenStreamingSession requires an avatar id', async () => {
@@ -52,21 +105,28 @@ describe('heygen streaming session', () => {
     });
   });
 
-  test('createHeygenStreamingSession uses explicit avatarId and voiceId over env', async () => {
-    delete process.env.HEYGEN_STREAMING_AVATAR_ID;
+  test('createHeygenStreamingSession requires a voice id', async () => {
     delete process.env.HEYGEN_STREAMING_VOICE_ID;
+    delete process.env.HEYGEN_VOICE_ID;
+    await expect(createHeygenStreamingSession()).rejects.toMatchObject({
+      code: 'HEYGEN_STREAMING_VOICE_REQUIRED',
+    });
+  });
+
+  test('createHeygenStreamingSession uses explicit avatarId, voiceId, and text', async () => {
     global.fetch = async (url, opts) => {
-      expect(String(url)).toContain('/v1/streaming.new');
+      expect(String(url)).toContain('/v3/avatar-realtime');
       const body = JSON.parse(opts.body);
-      expect(body.avatar_name).toBe('zed_look_explicit');
-      expect(body.voice).toEqual({ voice_id: 'voice_zed_explicit' });
+      expect(body.avatar_id).toBe('zed_look_explicit');
+      expect(body.voice_id).toBe('voice_zed_explicit');
+      expect(body.text).toBe('Signal acquired.');
       return {
         ok: true,
         json: async () => ({
           data: {
-            session_id: 'sess-zed',
-            url: 'wss://heygen.livekit.cloud',
-            access_token: 'lk-zed',
+            stream_id: 'sess-zed',
+            status: 'streaming',
+            hls_url: 'https://cdn.heygen.com/live/sess-zed.m3u8',
           },
         }),
       };
@@ -74,8 +134,61 @@ describe('heygen streaming session', () => {
     const session = await createHeygenStreamingSession({
       avatarId: 'zed_look_explicit',
       voiceId: 'voice_zed_explicit',
+      text: 'Signal acquired.',
     });
     expect(session.sessionId).toBe('sess-zed');
     expect(session.avatarId).toBe('zed_look_explicit');
+  });
+
+  test('speakHeygenStreamingSession posts a text delta', async () => {
+    global.fetch = async (url, opts) => {
+      expect(String(url)).toContain('/v3/avatar-realtime/sess-1/text');
+      expect(JSON.parse(opts.body)).toEqual({ delta: 'Hello sky', final: false });
+      return { ok: true, json: async () => ({ data: { ok: true, buffered_bytes: 9 } }) };
+    };
+    const result = await speakHeygenStreamingSession('sess-1', 'Hello sky');
+    expect(result.data.ok).toBe(true);
+  });
+
+  test('speakHeygenStreamingSession recreates after 410', async () => {
+    global.fetch = async (url, opts) => {
+      const path = String(url);
+      if (path.includes('/text')) {
+        return {
+          ok: false,
+          status: 410,
+          json: async () => ({ error: { message: 'stream closed' } }),
+        };
+      }
+      const body = JSON.parse(opts.body);
+      expect(body.text).toBe('Carl has the sky on this one.');
+      return {
+        ok: true,
+        json: async () => ({
+          data: {
+            stream_id: 'sess-2',
+            status: 'streaming',
+            hls_url: 'https://cdn.heygen.com/live/sess-2.m3u8',
+          },
+        }),
+      };
+    };
+    const result = await speakHeygenStreamingSession('sess-old', 'Carl has the sky on this one.', {
+      avatarId: 'zed',
+      voiceId: 'voice',
+    });
+    expect(result.data.recreated).toBe(true);
+    expect(result.session.sessionId).toBe('sess-2');
+    expect(result.session.url).toContain('sess-2.m3u8');
+  });
+
+  test('stopHeygenStreamingSession cancels the realtime session', async () => {
+    global.fetch = async (url, opts) => {
+      expect(String(url)).toContain('/v3/avatar-realtime/sess-1/cancel');
+      expect(opts.method).toBe('POST');
+      return { ok: true, json: async () => ({ data: { cancelled: true } }) };
+    };
+    const data = await stopHeygenStreamingSession('sess-1');
+    expect(data.cancelled).toBe(true);
   });
 });

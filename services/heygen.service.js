@@ -4,6 +4,7 @@
 /**
  * HeyGen v3 API service — avatar video generation.
  * Docs: https://developers.heygen.com (v3; v1/v2 sunset Oct 31, 2026).
+ * Live face tiles use POST /v3/avatar-realtime (Interactive Avatar /v1/streaming.* sunset Mar 31, 2026).
  * Requires HEYGEN_API_KEY in the environment.
  */
 
@@ -271,50 +272,134 @@ function streamingVoiceId() {
   return String(process.env.HEYGEN_STREAMING_VOICE_ID || process.env.HEYGEN_VOICE_ID || '').trim();
 }
 
+function streamingMaxSeconds() {
+  const n = Number(process.env.HEYGEN_STREAMING_MAX_SECONDS);
+  if (Number.isFinite(n)) return Math.min(3600, Math.max(30, Math.round(n)));
+  return 180;
+}
+
+function streamingPollMs() {
+  const n = Number(process.env.HEYGEN_STREAMING_POLL_MS);
+  if (Number.isFinite(n)) return Math.min(5000, Math.max(0, Math.round(n)));
+  return 2000;
+}
+
+function mapRealtimeSession(data, avatarId) {
+  const sessionId = data?.stream_id || data?.session_id || data?.sessionId || null;
+  const url = data?.hls_url || data?.url || null;
+  return {
+    sessionId,
+    url,
+    accessToken: data?.access_token || data?.accessToken || null,
+    playback: url ? 'hls' : null,
+    avatarId,
+  };
+}
+
+async function waitForRealtimeStream(streamId, { intervalMs = streamingPollMs(), timeoutMs = 90000 } = {}) {
+  const deadline = Date.now() + timeoutMs;
+  for (;;) {
+    const data = await heygenRequest(`/v3/avatar-realtime/${encodeURIComponent(streamId)}`);
+    const status = String(data?.status || '').toLowerCase();
+    const hls = data?.hls_url || data?.url || null;
+    if ((status === 'streaming' || status === 'ready') && hls) {
+      return { ...data, stream_id: data?.stream_id || streamId, hls_url: hls };
+    }
+    if (status === 'error' || status === 'failed') {
+      throw new Error(data?.error_message || 'HeyGen realtime session failed');
+    }
+    if (status === 'completed') {
+      throw new Error('HeyGen realtime session ended before playback started');
+    }
+    if (Date.now() > deadline) {
+      const err = new Error('Timed out waiting for HeyGen realtime stream');
+      err.code = 'HEYGEN_STREAMING_TIMEOUT';
+      throw err;
+    }
+    await new Promise((r) => setTimeout(r, intervalMs));
+  }
+}
+
 /**
- * HeyGen Interactive Avatar — LiveKit session from HeyGen Cloud.
- * Separate from StarBand rooms; the desk attaches the returned URL/token as a tile.
+ * HeyGen Avatar Realtime — HLS talking-head session (v3).
+ * Replaces sunset Interactive Avatar POST /v1/streaming.new (March 31, 2026).
  */
-export async function createHeygenStreamingSession({ avatarId, voiceId, quality = 'medium' } = {}) {
+export async function createHeygenStreamingSession({
+  avatarId,
+  voiceId,
+  text,
+  quality: _quality = 'medium'
+} = {}) {
   const avatar = String(avatarId || streamingAvatarId()).trim();
   if (!avatar) {
     const err = new Error('HEYGEN_STREAMING_AVATAR_ID is not configured');
     err.code = 'HEYGEN_STREAMING_AVATAR_REQUIRED';
     throw err;
   }
-  const body = { quality, avatar_name: avatar, version: 'v2' };
   const voice = String(voiceId || streamingVoiceId()).trim();
-  if (voice) body.voice = { voice_id: voice };
-  const data = await heygenRequest('/v1/streaming.new', { method: 'POST', body });
-  return {
-    sessionId: data?.session_id || data?.sessionId || null,
-    url: data?.url || null,
-    accessToken: data?.access_token || data?.accessToken || null,
-    avatarId: avatar,
-  };
+  if (!voice) {
+    const err = new Error('HEYGEN_STREAMING_VOICE_ID is not configured');
+    err.code = 'HEYGEN_STREAMING_VOICE_REQUIRED';
+    throw err;
+  }
+  const seed = String(text || '').trim() || 'Ready.';
+  const created = await heygenRequest('/v3/avatar-realtime', {
+    method: 'POST',
+    body: {
+      type: 'text_stream',
+      avatar_id: avatar,
+      voice_id: voice,
+      text: seed.slice(0, 2000),
+      max_duration_seconds: streamingMaxSeconds()
+    }
+  });
+  const streamId = created?.stream_id || created?.session_id || created?.sessionId;
+  if (!streamId) throw new Error('HeyGen realtime session did not return stream_id');
+  const ready =
+    created?.hls_url || created?.url
+      ? created
+      : await waitForRealtimeStream(streamId);
+  return mapRealtimeSession({ ...created, ...ready, stream_id: streamId }, avatar);
 }
 
+/** v3 create already starts playback; kept so older callers do not hit sunset /v1/streaming.start. */
 export async function startHeygenStreamingSession(sessionId) {
   const id = String(sessionId || '').trim();
   if (!id) throw new Error('sessionId is required');
-  return heygenRequest('/v1/streaming.start', { method: 'POST', body: { session_id: id } });
+  return { ok: true, skipped: true, sessionId: id };
 }
 
-export async function speakHeygenStreamingSession(sessionId, text) {
+export async function speakHeygenStreamingSession(sessionId, text, { avatarId, voiceId } = {}) {
   const id = String(sessionId || '').trim();
   const script = String(text || '').trim();
   if (!id) throw new Error('sessionId is required');
   if (!script) throw new Error('text is required');
-  return heygenRequest('/v1/streaming.task', {
-    method: 'POST',
-    body: { session_id: id, text: script.slice(0, 2000), task_type: 'talk' },
-  });
+  try {
+    const data = await heygenRequest(`/v3/avatar-realtime/${encodeURIComponent(id)}/text`, {
+      method: 'POST',
+      body: { delta: script.slice(0, 2000), final: false }
+    });
+    return { data };
+  } catch (e) {
+    const expired = e.status === 410 || e.status === 404;
+    if (!expired || !avatarId || !voiceId) throw e;
+    const session = await createHeygenStreamingSession({ avatarId, voiceId, text: script });
+    return { data: { recreated: true }, session };
+  }
 }
 
 export async function stopHeygenStreamingSession(sessionId) {
   const id = String(sessionId || '').trim();
   if (!id) throw new Error('sessionId is required');
-  return heygenRequest('/v1/streaming.stop', { method: 'POST', body: { session_id: id } });
+  try {
+    return await heygenRequest(`/v3/avatar-realtime/${encodeURIComponent(id)}/cancel`, {
+      method: 'POST',
+      body: {}
+    });
+  } catch (e) {
+    if (e.status === 404 || e.status === 410) return { cancelled: false, skipped: true };
+    throw e;
+  }
 }
 
 /**

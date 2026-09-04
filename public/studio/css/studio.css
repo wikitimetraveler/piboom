@@ -898,11 +898,14 @@ body.st-page.is-recording .st-glow {
   border-color: #f0d78a;
 }
 
-.st-tile video {
+.st-tile video,
+.st-heygen-frame video,
+.st-heygen-video {
   width: 100%;
   height: 120px;
   object-fit: cover;
   background: #000;
+  display: block;
 }
 
 .st-tile span,

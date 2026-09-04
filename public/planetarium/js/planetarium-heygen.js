@@ -25,66 +25,42 @@
     }
   }
 
-  async function stopHeygen() {
-    if (heygenRoom) {
-      await fetch('/api/heygen/streaming/stop', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId: heygenSessionId }),
-      }).catch(() => {});
-      await heygenRoom.disconnect().catch(() => {});
-      heygenRoom = null;
-      heygenSessionId = null;
+  function mediaHost() {
+    return document.getElementById('planHeygenMedia');
+  }
+
+  function clearMedia() {
+    const media = mediaHost();
+    const video = media?.querySelector('video');
+    root.HeygenLiveTile?.destroyHls(video);
+    if (heygenRoom && typeof heygenRoom.disconnect === 'function') {
+      heygenRoom.disconnect().catch(() => {});
     }
-    const media = document.getElementById('planHeygenMedia');
-    const wrap = document.getElementById('planHeygenWrap');
+    heygenRoom = null;
     if (media) {
       media.replaceChildren();
       media.hidden = true;
     }
-    if (wrap) wrap.classList.remove('plan-heygen--live');
-    const btn = document.getElementById('planHeygenToggle');
-    if (btn) btn.textContent = 'Show Zed · alien presenter';
-    setStatus('');
+    document.getElementById('planHeygenWrap')?.classList.remove('plan-heygen--live');
   }
 
-  function setStatus(msg) {
-    const el = document.getElementById('planHeygenStatus');
-    if (el) el.textContent = msg || '';
-  }
-
-  async function startHeygen() {
-    const LK = root.LivekitClient;
-    const face = studioFace || (await loadStudioFace());
-    const faceName = String(face?.name || 'Zed').trim() || 'Zed';
-    const body = {};
-    if (face?.avatarId) body.avatarId = face.avatarId;
-    if (face?.voiceId) body.voiceId = face.voiceId;
-
-    const res = await fetch('/api/heygen/streaming/start', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    const data = await res.json();
-    if (!res.ok || !data.url || !data.accessToken) {
-      setStatus(
-        data.error ||
-          (face?.avatarId
-            ? 'HeyGen streaming unavailable — check HEYGEN_API_KEY.'
-            : `${faceName} needs avatar IDs — see AVATAR-ZED.md.`)
-      );
-      return;
-    }
-    if (!LK) {
-      setStatus('LiveKit client missing on page.');
-      return;
-    }
-
-    const media = document.getElementById('planHeygenMedia');
+  async function attachSession(data) {
+    const media = mediaHost();
     const wrap = document.getElementById('planHeygenWrap');
-    if (!media) return;
-
+    if (!media || !data?.url) return;
+    heygenSessionId = data.sessionId;
+    if (root.HeygenLiveTile?.isHls(data)) {
+      if (heygenRoom && typeof heygenRoom.disconnect === 'function') {
+        await heygenRoom.disconnect().catch(() => {});
+      }
+      heygenRoom = { kind: 'hls' };
+      media.hidden = false;
+      wrap?.classList.add('plan-heygen--live');
+      root.HeygenLiveTile.attachHls(media, data.url, 'plan-heygen__video');
+      return;
+    }
+    const LK = root.LivekitClient;
+    if (!LK) throw new Error('LiveKit client missing on page.');
     const faceRoom = new LK.Room({ adaptiveStream: true, dynacast: true });
     faceRoom.on(LK.RoomEvent.TrackSubscribed, (track) => {
       media.hidden = false;
@@ -95,26 +71,64 @@
     });
     await faceRoom.connect(data.url, data.accessToken);
     heygenRoom = faceRoom;
-    heygenSessionId = data.sessionId;
+  }
 
+  async function stopHeygen() {
+    if (heygenSessionId) {
+      await fetch('/api/heygen/streaming/stop', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId: heygenSessionId }),
+      }).catch(() => {});
+    }
+    clearMedia();
+    heygenSessionId = null;
     const btn = document.getElementById('planHeygenToggle');
-    if (btn) btn.textContent = 'Hide Zed';
-    setStatus(`${faceName} live — Carl speaks through this tile.`);
+    if (btn) btn.textContent = 'Show Zed · alien presenter';
+    setStatus('');
+  }
 
+  function setStatus(msg) {
+    const el = document.getElementById('planHeygenStatus');
+    if (el) el.textContent = msg || '';
+  }
+
+  function facePayload(face, extra) {
+    const body = extra && typeof extra === 'object' ? { ...extra } : {};
+    if (face?.avatarId) body.avatarId = face.avatarId;
+    if (face?.voiceId) body.voiceId = face.voiceId;
+    return body;
+  }
+
+  async function startHeygen() {
+    const face = studioFace || (await loadStudioFace());
+    const faceName = String(face?.name || 'Zed').trim() || 'Zed';
     const greeting =
       String(face?.greeting || '').trim() ||
       'Signal acquired. Carl and I are watching the sky with you.';
-    if (data.sessionId) {
-      fetch('/api/heygen/streaming/speak', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId: data.sessionId, text: greeting }),
-      }).catch(() => {});
+    const res = await fetch('/api/heygen/streaming/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(facePayload(face, { text: greeting })),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.url) {
+      setStatus(
+        data.error ||
+          (face?.avatarId
+            ? 'HeyGen streaming unavailable — check HEYGEN_API_KEY.'
+            : `${faceName} needs avatar IDs — see AVATAR-ZED.md.`)
+      );
+      return;
     }
+    await attachSession(data);
+    const btn = document.getElementById('planHeygenToggle');
+    if (btn) btn.textContent = 'Hide Zed';
+    setStatus(`${faceName} live — Carl speaks through this tile.`);
   }
 
   async function toggleHeygen() {
-    if (heygenRoom) {
+    if (heygenRoom || heygenSessionId) {
       await stopHeygen();
       return;
     }
@@ -124,15 +138,17 @@
   async function speak(text) {
     const clean = String(text || '').trim().slice(0, 900);
     if (!clean || !heygenSessionId) return;
-    await fetch('/api/heygen/streaming/speak', {
+    const res = await fetch('/api/heygen/streaming/speak', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sessionId: heygenSessionId, text: clean }),
-    }).catch(() => {});
+      body: JSON.stringify(facePayload(studioFace, { sessionId: heygenSessionId, text: clean })),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (data?.url) await attachSession(data);
   }
 
   function isLive() {
-    return Boolean(heygenRoom && heygenSessionId);
+    return Boolean(heygenSessionId);
   }
 
   root.PlanetariumHeygen = { toggle: toggleHeygen, speak, stop: stopHeygen, isLive };

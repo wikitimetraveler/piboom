@@ -16,6 +16,7 @@
   <script src="/shared/demo-users.js"></script>
   <script src="/shared/user-selector.js"></script>
   <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.20/dist/hls.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/livekit-client@2.15.8/dist/livekit-client.umd.min.js"></script>
   <script src="/shared/js/livekit-talk-audio.js"></script>
 </head>
@@ -139,7 +140,7 @@
         <div class="st-stage" id="stStage"></div>
         <p class="st-on-stage" id="stOnStage">On stage: —</p>
         <div class="st-heygen-frame" id="stHeygenTile" hidden>
-          <p class="st-heygen-caption">Face tile · Zed (HeyGen room, not StarBand)</p>
+          <p class="st-heygen-caption">Face tile · Zed (HeyGen live, not StarBand)</p>
           <div id="stHeygenMedia"></div>
         </div>
         <p class="st-status" id="stPresence">On the reel: no one yet.</p>
@@ -155,6 +156,7 @@
   </main>
   <script src="/studio/js/studio-autotune.js"></script>
   <script src="/studio/js/studio-booth.js"></script>
+  <script src="/shared/js/heygen-live-tile.js"></script>
   <script src="/studio/js/studio-desk.js"></script>
 </body>
 </html>

@@ -94,18 +94,62 @@
     }
   }
 
+  function mediaHost() {
+    return document.getElementById('mhmHeygenMedia');
+  }
+
+  function facePayload(extra) {
+    const body = extra && typeof extra === 'object' ? { ...extra } : {};
+    if (face?.avatarId) body.avatarId = face.avatarId;
+    if (face?.voiceId) body.voiceId = face.voiceId;
+    return body;
+  }
+
+  async function attachSession(data) {
+    const media = mediaHost();
+    if (!media || !data?.url) return;
+    heygenSessionId = data.sessionId;
+    if (root.HeygenLiveTile?.isHls(data)) {
+      if (heygenRoom && typeof heygenRoom.disconnect === 'function') {
+        await heygenRoom.disconnect().catch(() => {});
+      }
+      heygenRoom = { kind: 'hls' };
+      media.hidden = false;
+      root.HeygenLiveTile.attachHls(media, data.url, 'mhm-heygen__video');
+      return;
+    }
+    const LK = root.LivekitClient;
+    if (!LK) {
+      setStatus('LiveKit client missing.');
+      return;
+    }
+    const room = new LK.Room({ adaptiveStream: true, dynacast: true });
+    room.on(LK.RoomEvent.TrackSubscribed, (track) => {
+      media.hidden = false;
+      const el = track.attach();
+      el.className = 'mhm-heygen__video';
+      media.replaceChildren(el);
+    });
+    await room.connect(data.url, data.accessToken);
+    heygenRoom = room;
+  }
+
   async function stopStream() {
-    if (heygenRoom) {
+    if (heygenSessionId) {
       await fetch('/api/heygen/streaming/stop', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId: heygenSessionId }),
       }).catch(() => {});
-      await heygenRoom.disconnect().catch(() => {});
-      heygenRoom = null;
-      heygenSessionId = null;
     }
-    const media = document.getElementById('mhmHeygenMedia');
+    const media = mediaHost();
+    const video = media?.querySelector('video');
+    root.HeygenLiveTile?.destroyHls(video);
+    if (heygenRoom && typeof heygenRoom.disconnect === 'function') {
+      await heygenRoom.disconnect().catch(() => {});
+    }
+    heygenRoom = null;
+    heygenSessionId = null;
     if (media) {
       media.replaceChildren();
       media.hidden = true;
@@ -116,52 +160,25 @@
   }
 
   async function startStream() {
-    const LK = root.LivekitClient;
-    const body = {};
-    if (face?.avatarId) body.avatarId = face.avatarId;
-    if (face?.voiceId) body.voiceId = face.voiceId;
+    const greeting = face?.greeting || 'Hey — Sage here. Flip a type or ask about a lockout.';
     const res = await fetch('/api/heygen/streaming/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify(facePayload({ text: greeting })),
     });
     const data = await res.json();
-    if (!res.ok || !data.url || !data.accessToken) {
+    if (!res.ok || !data.url) {
       setStatus(data.error || 'HeyGen streaming needs HEYGEN_API_KEY — TTS still works.');
       return;
     }
-    if (!LK) {
-      setStatus('LiveKit client missing.');
-      return;
-    }
-    const media = document.getElementById('mhmHeygenMedia');
-    const room = new LK.Room({ adaptiveStream: true, dynacast: true });
-    room.on(LK.RoomEvent.TrackSubscribed, (track) => {
-      if (media) {
-        media.hidden = false;
-        const el = track.attach();
-        el.className = 'mhm-heygen__video';
-        media.replaceChildren(el);
-      }
-    });
-    await room.connect(data.url, data.accessToken);
-    heygenRoom = room;
-    heygenSessionId = data.sessionId;
+    await attachSession(data);
     const btn = document.getElementById('mhmHeygenLive');
     if (btn) btn.textContent = 'Hide Sage';
     setStatus('Sage live on HeyGen.');
-    const greeting = face?.greeting || 'Hey — Sage here. Flip a type or ask about a lockout.';
-    if (data.sessionId) {
-      fetch('/api/heygen/streaming/speak', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId: data.sessionId, text: greeting }),
-      }).catch(() => {});
-    }
   }
 
   async function toggleStream() {
-    if (heygenRoom) {
+    if (heygenRoom || heygenSessionId) {
       await stopStream();
       return;
     }
@@ -171,11 +188,13 @@
   async function speak(text) {
     const clean = String(text || '').trim().slice(0, 900);
     if (!clean || !heygenSessionId) return;
-    await fetch('/api/heygen/streaming/speak', {
+    const res = await fetch('/api/heygen/streaming/speak', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sessionId: heygenSessionId, text: clean }),
-    }).catch(() => {});
+      body: JSON.stringify(facePayload({ sessionId: heygenSessionId, text: clean })),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (data?.url) await attachSession(data);
   }
 
   root.MhmHeygen = { playIntro, toggleStream, speak, stop: stopStream };

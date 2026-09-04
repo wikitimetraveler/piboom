@@ -37,10 +37,31 @@ export function extractAlbumInfoFromText(text) {
   return info;
 }
 
-export function clampMaxAlbums(value, fallback = 5) {
+export const MAX_SHELF_ALBUMS = 45;
+export const SHELF_VISION_BATCH = 6;
+
+export function clampMaxAlbums(value, fallback = MAX_SHELF_ALBUMS) {
   const n = Number.parseInt(value, 10);
   if (!Number.isFinite(n)) return fallback;
-  return Math.min(5, Math.max(1, n));
+  return Math.min(MAX_SHELF_ALBUMS, Math.max(1, n));
+}
+
+export function clampShelfBatch(value, fallback = SHELF_VISION_BATCH) {
+  const n = Number.parseInt(value, 10);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(SHELF_VISION_BATCH, Math.max(1, n));
+}
+
+export function albumIdentityKey(album) {
+  const title = String(album?.albumName || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+  const artist = String(album?.artistName || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+  return `${artist}::${title}`;
 }
 
 export function normalizeAlbumEntry(raw, index = 0) {
@@ -124,10 +145,19 @@ Rules:
 - If title and artist are unreadable, return {}.`;
 }
 
-export function buildShelfVisionPrompt(maxAlbums = 5) {
-  const cap = clampMaxAlbums(maxAlbums);
-  return `This photo may show multiple vinyl album covers laid out together (up to ${cap}). Read every distinct jacket you can see clearly.
+export function buildShelfVisionPrompt(maxAlbums = SHELF_VISION_BATCH, alreadyFound = []) {
+  const batch = clampShelfBatch(maxAlbums);
+  const found = Array.isArray(alreadyFound) ? alreadyFound.filter(Boolean) : [];
+  const skipBlock =
+    found.length > 0
+      ? `\nAlready identified (do not repeat these):\n${found
+          .slice(0, MAX_SHELF_ALBUMS)
+          .map((line) => `- ${line}`)
+          .join('\n')}\n`
+      : '';
 
+  return `This photo may show many vinyl album covers. Read the next batch of distinct jackets you can see clearly (up to ${batch} in this response).
+${skipBlock}
 Return JSON only:
 {
   "albums": [
@@ -137,17 +167,20 @@ Return JSON only:
       "artistName": "artist printed on the cover",
       "year": "four-digit year only if printed",
       "confidence": "high|medium|low",
-      "position": "left-to-right position label"
+      "position": "left-to-right / row position label"
     }
-  ]
+  ],
+  "moreRemain": true
 }
 
 Rules:
-- Return at most ${cap} albums.
+- Return at most ${batch} NEW albums in this response.
+- Set moreRemain to true if you can still see additional readable jackets not listed above; otherwise false.
 - Order albums left-to-right, then top-to-bottom.
-- Skip duplicates and unreadable covers.
+- Skip duplicates, spines-only if unreadable, and covers already listed.
 - Use only text visible on each jacket. Do not guess year, genre, history, condition, or market value.
-- If only one album is visible, still return an albums array with one item.`;
+- If only one new album is visible, still return an albums array with one item.
+- If none remain, return {"albums":[],"moreRemain":false}.`;
 }
 
 export async function identifySingleAlbumFromImage(openai, model, imageData) {
@@ -177,33 +210,85 @@ export async function identifySingleAlbumFromImage(openai, model, imageData) {
   };
 }
 
-export async function identifyShelfAlbumsFromImage(openai, model, imageData, maxAlbums = 5) {
-  const cap = clampMaxAlbums(maxAlbums);
-  const completion = await openai.chat.completions.create({
-    model,
-    messages: [
-      {
-        role: 'system',
-        content: 'You read album jackets in a photo. List only covers whose title and artist you can see. Never invent year, genre, history, condition, or collector value.',
-      },
-      {
-        role: 'user',
-        content: [
-          { type: 'text', text: buildShelfVisionPrompt(cap) },
-          { type: 'image_url', image_url: { url: imageData } },
-        ],
-      },
-    ],
-    max_tokens: 900,
-    temperature: 0,
-  });
-
-  const aiResponse = completion.choices[0]?.message?.content || '';
-  const albums = parseVisionAlbumsFromText(aiResponse).slice(0, cap);
-  return { aiResponse, albums };
+export function parseShelfBatchMeta(text) {
+  if (!text || typeof text !== 'string') return { moreRemain: false };
+  try {
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return { moreRemain: false };
+    const parsed = JSON.parse(jsonMatch[0]);
+    if (typeof parsed.moreRemain === 'boolean') return { moreRemain: parsed.moreRemain };
+    if (Array.isArray(parsed.albums) && parsed.albums.length >= SHELF_VISION_BATCH) {
+      return { moreRemain: true };
+    }
+  } catch {
+    /* ignore */
+  }
+  return { moreRemain: false };
 }
 
-export async function identifyStackAlbumsFromImages(openai, model, images, maxAlbums = 5) {
+export async function identifyShelfAlbumsFromImage(
+  openai,
+  model,
+  imageData,
+  maxAlbums = MAX_SHELF_ALBUMS,
+  batchSize = SHELF_VISION_BATCH
+) {
+  const cap = clampMaxAlbums(maxAlbums);
+  const batch = clampShelfBatch(batchSize);
+  const albums = [];
+  const seen = new Set();
+  const responses = [];
+  let rounds = 0;
+  const maxRounds = Math.ceil(cap / batch) + 1;
+
+  while (albums.length < cap && rounds < maxRounds) {
+    rounds += 1;
+    const alreadyFound = albums.map((a) => `${a.artistName} — ${a.albumName}`);
+    const completion = await openai.chat.completions.create({
+      model,
+      messages: [
+        {
+          role: 'system',
+          content:
+            'You read album jackets in a photo. List only covers whose title and artist you can see. Never invent year, genre, history, condition, or collector value. Work in small batches and never repeat albums already listed.',
+        },
+        {
+          role: 'user',
+          content: [
+            { type: 'text', text: buildShelfVisionPrompt(batch, alreadyFound) },
+            { type: 'image_url', image_url: { url: imageData } },
+          ],
+        },
+      ],
+      max_tokens: 1200,
+      temperature: 0,
+    });
+
+    const aiResponse = completion.choices[0]?.message?.content || '';
+    responses.push(aiResponse);
+    const batchAlbums = parseVisionAlbumsFromText(aiResponse);
+    let added = 0;
+    for (const album of batchAlbums) {
+      if (albums.length >= cap) break;
+      const key = albumIdentityKey(album);
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      albums.push({ ...album, index: albums.length + 1 });
+      added += 1;
+    }
+
+    const { moreRemain } = parseShelfBatchMeta(aiResponse);
+    if (added === 0 || !moreRemain) break;
+  }
+
+  return {
+    aiResponse: responses.join('\n---\n'),
+    albums,
+    meta: { rounds, batch, requested: cap, identified: albums.length },
+  };
+}
+
+export async function identifyStackAlbumsFromImages(openai, model, images, maxAlbums = MAX_SHELF_ALBUMS) {
   const cap = clampMaxAlbums(maxAlbums);
   const queue = images.slice(0, cap);
   const albums = [];

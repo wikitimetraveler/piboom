@@ -1251,7 +1251,7 @@
             </div>
           </div>
 
-          <!-- Multi-album shelf identify (up to 5) -->
+          <!-- Multi-album shelf identify (up to 6) -->
           <div id="multiSearchMode" class="text-center mb-3" style="display: none;">
             <div class="mb-3">
               <label for="multiAlbumImageInput" class="btn btn-lg btn-warning" style="cursor: pointer;">
@@ -1261,14 +1261,14 @@
             </div>
             <div id="multiImageStatus" class="camera-status camera-status--info" style="display: inline-flex;">
               <i class="bi-collection"></i>
-              <span>Lay up to 5 album covers in frame, then upload one shelf photo.</span>
+              <span>Lay up to 6 album covers in frame, then upload one shelf photo.</span>
             </div>
             <div class="camera-instructions">
               <strong>Jacket read — not an appraisal:</strong>
               <ul>
                 <li>Covers spread so each title and artist is readable.</li>
                 <li>Straight-on light; skip unreadable jackets.</li>
-                <li>Up to <strong>5</strong> distinct albums in one shot.</li>
+                <li>Up to <strong>6</strong> distinct albums in one shot.</li>
               </ul>
             </div>
             <div id="multiImagePreview" style="display: none; margin-top: 15px;">
@@ -1280,7 +1280,7 @@
               </div>
               <div class="mt-3">
                 <button class="btn btn-warning btn-lg" onclick="analyzeMultiAlbumImage()">
-                  <i class="bi-magic"></i> Identify Up To 5 Albums
+                  <i class="bi-magic"></i> Identify Up To 6 Albums
                 </button>
                 <button class="btn btn-secondary" onclick="clearMultiImageUpload()">
                   <i class="bi-x-circle"></i> Clear & Choose Another
@@ -2362,7 +2362,7 @@ function handleMultiImageUpload(event) {
     const img = document.getElementById('multiPreviewImg');
     img.src = multiImageData;
     document.getElementById('multiImagePreview').style.display = 'block';
-    updateMultiImageStatus('Shelf photo ready. Tap Identify Up To 5 Albums.', 'success');
+    updateMultiImageStatus('Shelf photo ready. Tap Identify Up To 6 Albums.', 'success');
 
     img.onload = function() {
       document.getElementById('multiImageDimensions').textContent =
@@ -2379,7 +2379,7 @@ function clearMultiImageUpload() {
   document.getElementById('multiImagePreview').style.display = 'none';
   document.getElementById('multiPreviewImg').src = '';
   clearMultiResults(false);
-  updateMultiImageStatus('Lay up to 5 album covers in frame, then upload one shelf photo.', 'info');
+  updateMultiImageStatus('Lay up to 6 album covers in frame, then upload one shelf photo.', 'info');
 }
 
 function clearMultiResults(resetImage = true) {
@@ -2477,7 +2477,7 @@ async function analyzeMultiAlbumImage() {
       body: JSON.stringify({
         mode: 'shelf',
         imageData: multiImageData,
-        maxAlbums: 5,
+        maxAlbums: 6,
       }),
     });
 

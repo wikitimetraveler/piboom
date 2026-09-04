@@ -20,8 +20,10 @@ Full-sky dome at [`/planetarium/`](/planetarium/) — date/time sky from `FunHom
 - `public/shared/js/planetarium.js` — dome paint, selection, `getSkyContext()`
 - `public/shared/js/webgpu-planetarium-sky.js` — optional WebGPU / 2D backdrop
 - `public/planetarium/js/planetarium-guide.js` — Carl widget (fresh `skyContext` each turn)
-- `public/planetarium/js/planetarium-heygen.js` — Zed streaming tile + short handoff before Carl’s answer
+- `public/planetarium/js/planetarium-heygen.js` — Zed Avatar Realtime tile + short handoff before Carl’s answer
 - `public/planetarium/js/planetarium-extras.js` — compass, catalog, ISS, events, deep sky
+- `public/shared/js/celestial-ambience.js` — generative drone bed (home only)
+- `public/planetarium/js/planetarium-sky-song.js` — **Spirit in the Sky** only (Norman Greenbaum, 1969) via hidden YouTube embed `YqYN-1vMM9k`. Starts at 0:15 on page load; the **Spirit in the Sky** control toggles play/pause. If the browser blocks autoplay, the first click on the page unlocks audio.
 
 ## Deep links
 

@@ -336,8 +336,10 @@ body[data-theme="dark"] .fun-card__title {
   font-size: 1rem;
 }
 
-.fun-secret-link {
-  display: flex;
+/* Login-only: leftover sparkle/localStorage reveals cannot override this. */
+.fun-secret-link,
+.fun-secret-link.is-visible {
+  display: none !important;
   align-items: center;
   gap: 0.5rem;
   background: rgba(74, 144, 164, 0.1);
@@ -349,6 +351,11 @@ body[data-theme="dark"] .fun-card__title {
   font-size: 0.875rem;
   transition: all 0.3s ease;
   border: 1px solid var(--fun-border);
+}
+
+body.fun-logged-in .fun-secret-link,
+body.fun-logged-in .fun-secret-link.is-visible {
+  display: flex !important;
   animation: fadeInSlide 0.5s ease;
 }
 

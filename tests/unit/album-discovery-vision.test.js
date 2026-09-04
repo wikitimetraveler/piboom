@@ -9,11 +9,12 @@ import {
 } from '../../services/album-discovery-vision.service.js';
 
 describe('album-discovery-vision.service', () => {
-  test('clampMaxAlbums bounds 1–5', () => {
+  test('clampMaxAlbums bounds 1–6', () => {
     expect(clampMaxAlbums(0)).toBe(1);
     expect(clampMaxAlbums(3)).toBe(3);
-    expect(clampMaxAlbums(99)).toBe(5);
-    expect(clampMaxAlbums('bad', 5)).toBe(5);
+    expect(clampMaxAlbums(6)).toBe(6);
+    expect(clampMaxAlbums(99)).toBe(6);
+    expect(clampMaxAlbums('bad', 6)).toBe(6);
   });
 
   test('parseVisionAlbumsFromText reads albums array', () => {
@@ -71,7 +72,7 @@ describe('album-discovery-vision.service', () => {
 
   test('vision prompts ask for jacket text only', () => {
     const single = buildSingleAlbumVisionPrompt();
-    const shelf = buildShelfVisionPrompt(5);
+    const shelf = buildShelfVisionPrompt(6);
     expect(single).not.toMatch(/VG\+|estimatedValue|assume VG/i);
     expect(shelf).not.toMatch(/VG\+|estimatedValue|assume VG/i);
     expect(single).toMatch(/only text you can read/i);

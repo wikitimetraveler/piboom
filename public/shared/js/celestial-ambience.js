@@ -7,8 +7,8 @@
   'use strict';
 
   const STORAGE_KEY = 'celestialAmbienceMuted';
-  const MASTER_GAIN = 0.11;
-  const BUTTON_SELECTOR = '[data-celestial-ambience], #planAmbienceToggle, #funAmbienceToggle';
+  const MASTER_GAIN = 0.36;
+  const BUTTON_SELECTOR = '[data-celestial-ambience], #funAmbienceToggle';
 
   let ctx = null;
   let master = null;
@@ -16,9 +16,20 @@
   let timers = [];
   let playing = false;
   let unlocked = false;
+  let duckLevel = 1;
 
   function prefersReducedMotion() {
     return !!(root.matchMedia && root.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
+
+  function clampDuck(level) {
+    const n = Number(level);
+    if (!Number.isFinite(n)) return 1;
+    return Math.max(0, Math.min(1, n));
+  }
+
+  function effectiveGain() {
+    return MASTER_GAIN * clampDuck(duckLevel);
   }
 
   function isMuted() {
@@ -216,10 +227,21 @@
     const t = ac.currentTime;
     master.gain.cancelScheduledValues(t);
     master.gain.setValueAtTime(Math.max(master.gain.value, 0.0001), t);
-    master.gain.exponentialRampToValueAtTime(MASTER_GAIN, t + 2.4);
+    master.gain.exponentialRampToValueAtTime(Math.max(effectiveGain(), 0.0001), t + 2.4);
     unlocked = true;
     syncButtons();
     return true;
+  }
+
+  function setDuck(level) {
+    duckLevel = clampDuck(level);
+    if (!ctx || !master || !playing || isMuted()) return duckLevel;
+    const t = ctx.currentTime;
+    const target = Math.max(effectiveGain(), 0.0001);
+    master.gain.cancelScheduledValues(t);
+    master.gain.setValueAtTime(Math.max(master.gain.value, 0.0001), t);
+    master.gain.exponentialRampToValueAtTime(target, t + 0.55);
+    return duckLevel;
   }
 
   function stop(fade) {
@@ -290,15 +312,19 @@
       if (document.hidden) {
         master.gain.setTargetAtTime(0.0001, ctx.currentTime, 0.4);
       } else if (!isMuted()) {
-        master.gain.setTargetAtTime(MASTER_GAIN, ctx.currentTime, 0.8);
+        master.gain.setTargetAtTime(Math.max(effectiveGain(), 0.0001), ctx.currentTime, 0.8);
       }
     });
   }
 
   root.CelestialAmbience = {
+    MASTER_GAIN,
     start,
     stop,
     toggle,
+    setDuck,
+    getDuck: () => clampDuck(duckLevel),
+    effectiveGain,
     isMuted,
     isPlaying: () => playing,
     init,

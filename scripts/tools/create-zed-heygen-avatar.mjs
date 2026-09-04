@@ -145,8 +145,8 @@ async function main() {
   });
   process.stdout.write(`Updated ${FACE_JSON}\n`);
 
-  process.stdout.write('\nZed avatar ready. Open /studio/desk.html and click Zed face.\n');
-  process.stdout.write('Note: Interactive Avatar streaming may require a HeyGen Live Avatar entitlement.\n');
+  process.stdout.write('\nZed avatar ready. Open /studio/desk.html and click Zed face, or /planetarium/ Show Zed.\n');
+  process.stdout.write('Live tile uses HeyGen Avatar Realtime (HLS), not the sunset Interactive Avatar API.\n');
 }
 
 main().catch((err) => {

@@ -5,7 +5,6 @@
   'use strict';
 
   const THEME_KEY = 'funHomeTheme';
-  const WORK_REVEAL_KEY = 'mortgageLinkRevealed';
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Theme toggle
@@ -485,16 +484,28 @@
   function isFunHomeLoggedIn() {
     if (typeof window.isLoggedIn === 'function') return !!window.isLoggedIn();
     try {
-      return localStorage.getItem('loggedInUserId') !== null;
+      const id = localStorage.getItem('loggedInUserId');
+      return !!(id && String(id).trim());
     } catch (_) {
       return false;
     }
+  }
+
+  function syncFunHomeLoggedInState() {
+    const show = isFunHomeLoggedIn();
+    document.body.classList.toggle('fun-logged-in', show);
+    try {
+      localStorage.removeItem('mortgageLinkRevealed');
+    } catch (_) {}
+    return show;
   }
 
   function renderFunAuthButton() {
     const btn = document.getElementById('funAuthBtn');
     if (!btn) return null;
 
+    syncFunHomeLoggedInState();
+    syncGatedFeatured();
     if (isFunHomeLoggedIn()) {
       const user = typeof window.getLoggedInUser === 'function' ? window.getLoggedInUser() : null;
       const name = user && user.name ? user.name.split(' ').slice(-1)[0] : 'Account';
@@ -531,6 +542,7 @@
     });
 
     window.addEventListener('user-logged-in', renderFunAuthButton);
+    window.addEventListener('user-logged-out', renderFunAuthButton);
     window.addEventListener('pageshow', renderFunAuthButton);
     window.addEventListener('focus', renderFunAuthButton);
     window.addEventListener('storage', (event) => {
@@ -540,74 +552,29 @@
     });
   }
 
-  // Secret 5-click mechanism to reveal mortgage work link
+  // Mortgage Work is login-only — never show it to logged-out visitors
   function initSecretMortgageLink() {
-    const sparkle = document.getElementById('secretSparkle');
     const secretLink = document.getElementById('secretMortgageLink');
-    if (!sparkle || !secretLink) return;
-
-    let clickCount = 0;
-    let resetTimer = null;
-    const CLICK_TIMEOUT = 3000; // Reset after 3 seconds of no clicks
-    const REQUIRED_CLICKS = 5;
-
-    sparkle.style.cursor = 'pointer';
-
-    sparkle.addEventListener('click', (e) => {
-      e.preventDefault();
-      clickCount++;
-
-      // Add click animation
-      sparkle.classList.remove('clicking');
-      void sparkle.offsetWidth; // Force reflow
-      sparkle.classList.add('clicking');
-
-      // Clear existing reset timer
-      if (resetTimer) {
-        clearTimeout(resetTimer);
-      }
-
-      // Check if we've reached the required clicks
-      if (clickCount >= REQUIRED_CLICKS) {
-        // Reveal the secret link!
-        secretLink.style.display = 'flex';
-        
-        // Optional: Save to localStorage so it stays revealed
-        try {
-          localStorage.setItem(WORK_REVEAL_KEY, 'true');
-        } catch (_) {}
-
-        // Console message
-        console.log('🔓 Secret mortgage work link revealed!');
-        
-        // Reset click count
-        clickCount = 0;
-      } else {
-        // Set timer to reset click count
-        resetTimer = setTimeout(() => {
-          clickCount = 0;
-        }, CLICK_TIMEOUT);
-
-        // Give subtle feedback on progress
-        if (clickCount === 3) {
-          console.log('🤔 Keep clicking...');
-        }
-      }
-    });
+    if (!secretLink) return;
 
     function syncSecretMortgageVisibility() {
-      try {
-        if (isFunHomeLoggedIn() || localStorage.getItem(WORK_REVEAL_KEY) === 'true') {
-          secretLink.style.display = 'flex';
-        }
-      } catch (_) {
-        if (isFunHomeLoggedIn()) secretLink.style.display = 'flex';
-      }
+      const show = syncFunHomeLoggedInState();
+      secretLink.hidden = !show;
+      secretLink.setAttribute('aria-hidden', show ? 'false' : 'true');
+      secretLink.classList.toggle('is-visible', show);
+      secretLink.style.removeProperty('display');
     }
 
     syncSecretMortgageVisibility();
     window.addEventListener('user-logged-in', syncSecretMortgageVisibility);
+    window.addEventListener('user-logged-out', syncSecretMortgageVisibility);
     window.addEventListener('pageshow', syncSecretMortgageVisibility);
+    window.addEventListener('focus', syncSecretMortgageVisibility);
+    window.addEventListener('storage', (event) => {
+      if (!event.key || event.key === 'loggedInUserId' || event.key === 'currentUserId') {
+        syncSecretMortgageVisibility();
+      }
+    });
   }
 
   // Easter egg: Konami code for extra sparkles

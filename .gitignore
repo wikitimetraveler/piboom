@@ -99,6 +99,8 @@ scripts/__pycache__/
 # music/*.mp3
 # music/*.wav
 # music/*.flac
+# Local licensed copy — do not commit Norman Greenbaum commercial rip
+public/shared/audio/spirit-in-the-sky.mp3
 
 # Studio bounced releases (local WAV/WebM; metadata in Postgres)
 data/studio-releases/*

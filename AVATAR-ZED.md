@@ -31,4 +31,4 @@ Cyberpunk humanoid alien co-host for Browser Studio (`/studio/desk.html`). Named
 ## Studio
 - Catalog: `data/studio-heygen-face.json`
 - Render: `npm run create:zed-heygen-avatar` (requires `HEYGEN_API_KEY`)
-- Live tile: `/studio/desk.html` — **Zed** face button (separate HeyGen LiveKit room from StarBand)
+- Live tile: `/studio/desk.html` and `/planetarium/` — **Zed** face (HeyGen Avatar Realtime HLS, separate from StarBand)

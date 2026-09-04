@@ -147,9 +147,9 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | POST | `/api/watch-together/egress/stop` | Stop theater mic archive |
 | GET | `/api/wolfman/health` | Wolfman Dave LiveKit booth status |
 | POST | `/api/wolfman/livekit-token` | Mint JWT for `music-wolfman-lobby` (dispatches `WolfmanDave`) |
-| POST | `/api/heygen/streaming/start` | HeyGen Interactive Avatar LiveKit session |
-| POST | `/api/heygen/streaming/speak` | Speak on an open streaming session |
-| POST | `/api/heygen/streaming/stop` | Stop streaming avatar |
+| POST | `/api/heygen/streaming/start` | HeyGen Avatar Realtime HLS session (v3; Interactive Avatar `/v1/streaming.new` sunset) |
+| POST | `/api/heygen/streaming/speak` | Append speech text on an open realtime session |
+| POST | `/api/heygen/streaming/stop` | Cancel realtime avatar session |
 | POST | `/api/studio/listen/unlock` | Listening-room password (default `reel1`) |
 | * | `/api/voice/*` | Voice (init, start, stop, speak, etc.) |
 | * | `/api/music-research/*` | Knowledge graph, Wikipedia, MusicBrainz, etc. |

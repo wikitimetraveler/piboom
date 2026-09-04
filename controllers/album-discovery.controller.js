@@ -378,10 +378,10 @@ export async function identifyAlbumFromImage(req, res) {
   }
 }
 
-// Identify up to 5 albums from shelf photo or image stack
+// Identify up to 6 albums from shelf photo or image stack
 export async function identifyAlbumsFromImages(req, res) {
   try {
-    const { imageData, images, mode = 'shelf', maxAlbums = 5 } = req.body;
+    const { imageData, images, mode = 'shelf', maxAlbums = 6 } = req.body;
     const cap = clampMaxAlbums(maxAlbums);
     const model = resolveOpenAiVisionModel('ALBUM_VISION_MODEL');
 

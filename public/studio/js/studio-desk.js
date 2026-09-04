@@ -1618,7 +1618,7 @@
       const faceName = String(state.studioFace?.name || 'Zed').trim() || 'Zed';
       if (els.heygenFace) els.heygenFace.textContent = `${faceName} face`;
       const caption = document.querySelector('.st-heygen-caption');
-      if (caption) caption.textContent = `Face tile · ${faceName} (HeyGen room, not StarBand)`;
+      if (caption) caption.textContent = `Face tile · ${faceName} (HeyGen live, not StarBand)`;
       return state.studioFace;
     } catch (_) {
       state.studioFace = null;
@@ -1628,13 +1628,17 @@
 
   async function toggleReedFace() {
     const LK = window.LivekitClient;
-    if (state.heygenRoom) {
+    if (state.heygenRoom || state.heygenSessionId) {
       await fetch('/api/heygen/streaming/stop', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId: state.heygenSessionId }),
       }).catch(() => {});
-      await state.heygenRoom.disconnect();
+      if (state.heygenRoom && typeof state.heygenRoom.disconnect === 'function') {
+        await state.heygenRoom.disconnect();
+      }
+      const host = els.heygenMedia || els.heygenTile;
+      window.HeygenLiveTile?.destroyHls(host?.querySelector('video'));
       state.heygenRoom = null;
       state.heygenSessionId = null;
       if (els.heygenTile) {
@@ -1647,7 +1651,9 @@
     }
     const face = state.studioFace || (await loadStudioFace());
     const faceName = String(face?.name || 'Zed').trim() || 'Zed';
-    const body = {};
+    const greeting = String(face?.greeting || '').trim()
+      || 'Signal acquired. Console is live — arm a track when you are ready.';
+    const body = { text: greeting };
     if (face?.avatarId) body.avatarId = face.avatarId;
     if (face?.voiceId) body.voiceId = face.voiceId;
     const res = await fetch('/api/heygen/streaming/start', {
@@ -1656,7 +1662,7 @@
       body: JSON.stringify(body),
     });
     const data = await res.json();
-    if (!res.ok || !data.url || !data.accessToken) {
+    if (!res.ok || !data.url) {
       const missingCatalog = !face?.avatarId;
       appendReed(
         data.error
@@ -1666,15 +1672,22 @@
       );
       return;
     }
+    const host = els.heygenMedia || els.heygenTile;
+    if (!els.heygenTile || !host) return;
+    els.heygenTile.hidden = false;
+    if (window.HeygenLiveTile?.isHls(data)) {
+      window.HeygenLiveTile.attachHls(host, data.url, 'st-heygen-video');
+      state.heygenRoom = { kind: 'hls' };
+      state.heygenSessionId = data.sessionId;
+      appendReed(`${faceName} is a HeyGen live tile — separate from the StarBand room.`);
+      return;
+    }
     if (!LK) {
       appendReed('LiveKit client missing');
       return;
     }
     const faceRoom = new LK.Room({ adaptiveStream: true, dynacast: true });
     faceRoom.on(LK.RoomEvent.TrackSubscribed, (track) => {
-      const host = els.heygenMedia || els.heygenTile;
-      if (!els.heygenTile || !host) return;
-      els.heygenTile.hidden = false;
       const el = track.attach();
       el.style.maxWidth = '100%';
       host.appendChild(el);
@@ -1682,19 +1695,7 @@
     await faceRoom.connect(data.url, data.accessToken);
     state.heygenRoom = faceRoom;
     state.heygenSessionId = data.sessionId;
-    appendReed(`${faceName} is a HeyGen LiveKit tile — separate from the StarBand room.`);
-    const greeting = String(face?.greeting || '').trim()
-      || 'Signal acquired. Console is live — arm a track when you are ready.';
-    if (data.sessionId) {
-      fetch('/api/heygen/streaming/speak', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId: data.sessionId,
-          text: greeting,
-        }),
-      }).catch(() => {});
-    }
+    appendReed(`${faceName} is a HeyGen live tile — separate from the StarBand room.`);
   }
 
   async function askReed(event) {
