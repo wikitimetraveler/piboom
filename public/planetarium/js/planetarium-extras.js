@@ -434,7 +434,8 @@
   }
 
   function setDeskTab(id) {
-    const next = id === 'tonight' || id === 'discover' ? id : 'guide';
+    const next =
+      id === 'tonight' || id === 'discover' || id === 'more' ? id : 'guide';
     document.querySelectorAll('[data-plan-tab]').forEach((tab) => {
       const on = tab.getAttribute('data-plan-tab') === next;
       tab.classList.toggle('is-active', on);
@@ -445,6 +446,11 @@
       pane.classList.toggle('is-active', on);
       pane.hidden = !on;
     });
+    const title = document.getElementById('planSheetTitle');
+    if (title) {
+      const labels = { guide: 'Carl', tonight: 'Tonight', discover: 'Find', more: 'More' };
+      title.textContent = labels[next] || 'Field';
+    }
     try {
       sessionStorage.setItem('planDeskTab', next);
     } catch (_) {
@@ -456,11 +462,13 @@
     const sidebar = document.getElementById('planSidebar');
     const backdrop = document.getElementById('planSidebarBackdrop');
     const dock = document.getElementById('planDockDesk');
+    const moreBtn = document.getElementById('planDockMore');
     if (!sidebar) return;
     sidebar.classList.toggle('is-open', !!open);
     document.body.classList.toggle('plan-desk-open', !!open);
     if (backdrop) backdrop.hidden = !open;
     if (dock) dock.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (moreBtn) moreBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
   }
 
   function syncDockPlay() {
@@ -486,12 +494,15 @@
   }
 
   function bindDeskChrome() {
+    const fieldApp =
+      !!(root.__PLANETARIUM_FIELD || document.body?.classList.contains('plan-field'));
+
     document.querySelectorAll('[data-plan-tab]').forEach((tab) => {
       tab.addEventListener('click', () => setDeskTab(tab.getAttribute('data-plan-tab')));
     });
     try {
       const saved = sessionStorage.getItem('planDeskTab');
-      if (saved) setDeskTab(saved);
+      if (saved && !fieldApp) setDeskTab(saved);
     } catch (_) {
       /* private mode */
     }
@@ -502,9 +513,12 @@
     });
     document.getElementById('planSidebarClose')?.addEventListener('click', () => setDeskOpen(false));
     document.getElementById('planSidebarBackdrop')?.addEventListener('click', () => setDeskOpen(false));
-    document.getElementById('planDockCarl')?.addEventListener('click', () => {
-      document.getElementById('planAskCarl')?.click();
-    });
+    // Theater dock Carl only — Field dock is wired in planetarium-field.js
+    if (!fieldApp) {
+      document.getElementById('planDockCarl')?.addEventListener('click', () => {
+        document.getElementById('planAskCarl')?.click();
+      });
+    }
     document.getElementById('planDockPlay')?.addEventListener('click', () => {
       document.getElementById('planPlay')?.click();
       setTimeout(syncDockPlay, 0);
@@ -527,7 +541,7 @@
       if (ev.key === '/' && !/input|textarea|select/i.test(ev.target.tagName)) {
         ev.preventDefault();
         setDeskTab('discover');
-        if (window.matchMedia('(max-width: 991.98px)').matches) setDeskOpen(true);
+        if (fieldApp || window.matchMedia('(max-width: 991.98px)').matches) setDeskOpen(true);
         document.getElementById('planCatalogSearch')?.focus();
       }
     });
@@ -537,7 +551,7 @@
     } catch (_) {
       /* private mode */
     }
-    ['pointerdown', 'wheel'].forEach((ev) => {
+    ['pointerdown', 'wheel', 'touchstart'].forEach((ev) => {
       document.getElementById('planSkyGpu')?.addEventListener(ev, dismissHint, { once: true, passive: true });
     });
     setTimeout(dismissHint, 7000);

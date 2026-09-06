@@ -24,7 +24,11 @@
     return pad2(d.getHours()) + ':' + pad2(d.getMinutes());
   }
 
-  /** Parse ?date=&time=&lat=&lon=&face=&body=&select=&view= URL params into partial state. */
+  function isFieldApp() {
+    return !!(root.__PLANETARIUM_FIELD || (typeof document !== 'undefined' && document.body?.classList.contains('plan-field')));
+  }
+
+  /** Parse ?date=&time=&lat=&lon=&face=&body=&select=&view=&app= URL params into partial state. */
   function parseParams(search) {
     const params = new URLSearchParams(search || '');
     const out = {};
@@ -55,6 +59,7 @@
     if (select) out.select = String(select);
     const view = String(params.get('view') || '').toLowerCase();
     if (view === 'horizon' || view === 'dome') out.view = view;
+    if (String(params.get('app') || '').toLowerCase() === 'field') out.app = 'field';
     return out;
   }
 
@@ -70,7 +75,8 @@
   }
 
   function buildShareUrl(state, origin) {
-    const base = (origin || '') + '/planetarium/';
+    const field = isFieldApp() || state.app === 'field';
+    const base = (origin || '') + (field ? '/planetarium/field.html' : '/planetarium/');
     const params = new URLSearchParams();
     params.set('date', formatDateInput(state.date));
     params.set('time', formatTimeInput(state.date));
@@ -79,6 +85,7 @@
     if (state.observer.label) params.set('label', String(state.observer.label).slice(0, 80));
     if (state.facing && state.facing !== 'south') params.set('face', state.facing);
     if (state.domeMode === false) params.set('view', 'horizon');
+    if (field) params.set('app', 'field');
     const sel = state.selection;
     if (sel) {
       if (sel.type === 'planet' && sel.id) params.set('body', sel.id);
@@ -131,6 +138,27 @@
     radiant: 'Meteor radiant',
   };
 
+  const WORLD_BODY_IDS = new Set([
+    'mercury',
+    'venus',
+    'earth',
+    'moon',
+    'mars',
+    'jupiter',
+    'saturn',
+    'uranus',
+    'neptune',
+    'pluto',
+  ]);
+
+  function worldHomeUrl(bodyId) {
+    const Sky = root.FunHomeSky;
+    if (Sky && typeof Sky.buildWorldUrl === 'function') {
+      return Sky.buildWorldUrl({ id: bodyId });
+    }
+    return '/planetarium/worlds/body.html?id=' + encodeURIComponent(bodyId);
+  }
+
   function renderPickHud(selection) {
     const doc = typeof document !== 'undefined' ? document : null;
     const hud = doc && doc.getElementById('planPickHud');
@@ -149,6 +177,24 @@
           ? formatAltAz(selection.alt, selection.az)
           : '';
       meta.textContent = where ? kind + ' · ' + where : kind;
+    }
+    const worldLink = doc.getElementById('planPickWorld');
+    const worldLabel = doc.getElementById('planPickWorldLabel');
+    const bodyId = String(selection.id || selection.name || '')
+      .trim()
+      .toLowerCase();
+    const isWorld =
+      (selection.type === 'planet' || selection.type === 'moon') && WORLD_BODY_IDS.has(bodyId);
+    if (worldLink) {
+      if (isWorld) {
+        worldLink.hidden = false;
+        worldLink.href = worldHomeUrl(bodyId);
+        const label = selection.name || bodyId;
+        if (worldLabel) worldLabel.textContent = 'Open ' + label;
+        worldLink.setAttribute('aria-label', 'Open ' + label + ' world page');
+      } else {
+        worldLink.hidden = true;
+      }
     }
     hud.hidden = false;
   }
@@ -403,8 +449,16 @@
         tr.classList.add('is-selected');
       }
       tr.innerHTML =
-        '<td>' +
+        '<td><span class="plan-planets__name">' +
         p.name +
+        '</span>' +
+        (WORLD_BODY_IDS.has(String(p.id).toLowerCase())
+          ? ' <a class="plan-planets__world" href="' +
+            worldHomeUrl(p.id) +
+            '" title="Open ' +
+            p.name +
+            ' world page">home</a>'
+          : '') +
         '</td><td>' +
         p.alt +
         '°</td><td>' +
@@ -840,6 +894,11 @@
 
     const urlState = parseParams(root.location && root.location.search);
     const defaultObs = (Engine && Engine.DEFAULT_OBSERVER) || Sky.DEFAULT_OBSERVER;
+    const fieldApp = isFieldApp();
+    let domeMode;
+    if (urlState.view === 'dome') domeMode = true;
+    else if (urlState.view === 'horizon') domeMode = false;
+    else domeMode = !fieldApp;
     const state = {
       observer: defaultObs,
       date: buildSkyDate(urlState.dateParts, urlState.timeParts, new Date()),
@@ -858,7 +917,8 @@
       constellationData: [],
       domeMarkers: [],
       issPos: null,
-      domeMode: urlState.view !== 'horizon',
+      domeMode,
+      app: fieldApp || urlState.app === 'field' ? 'field' : 'theater',
     };
     if (urlState.observer) state.observer = urlState.observer;
 
@@ -879,9 +939,14 @@
       }
       const hint = document.getElementById('planHint');
       if (hint && hint.querySelector('p')) {
-        hint.querySelector('p').textContent = state.domeMode
-          ? 'Looking up · Drag to spin the dome · Scroll to zoom'
-          : 'Horizon view · Drag to look around · Scroll to zoom';
+        if (isFieldApp()) {
+          hint.querySelector('p').textContent =
+            'Hold the phone like a window. Drag to pan. Pinch to zoom. Face locks to the real horizon.';
+        } else {
+          hint.querySelector('p').textContent = state.domeMode
+            ? 'Looking up · Drag to spin the dome · Scroll to zoom'
+            : 'Horizon view · Drag to look around · Scroll to zoom';
+        }
       }
     }
 
@@ -1116,8 +1181,9 @@
     async function start() {
       // Paint a usable sky immediately (DOM / CelestialEngine) before WebGL upgrade.
       function afterBoot() {
-        // If the sun is up and no explicit URL time was given, snap to tonight 9 PM
-        // so the first view isn't a washed daylight slab.
+        // Theater: if sun is up and no URL time, snap to tonight 9 PM.
+        // Field defaults to Now — daylight is fine; observers check "is it dark yet?"
+        if (isFieldApp()) return;
         if (!urlState.dateParts && !urlState.timeParts && Engine) {
           const sun = Engine.sunAltAz(state.date, state.observer);
           if (sun && sun.alt > -6) {
@@ -1190,12 +1256,14 @@
 
     if (els.planetBody) {
       els.planetBody.addEventListener('click', (event) => {
+        if (event.target.closest('a.plan-planets__world')) return;
         const row = event.target.closest('[data-sky-type="planet"]');
         if (!row) return;
         selectSkyObject(selectionFromDataset(row), { center: true });
       });
       els.planetBody.addEventListener('keydown', (event) => {
         if (event.key !== 'Enter' && event.key !== ' ') return;
+        if (event.target.closest('a.plan-planets__world')) return;
         const row = event.target.closest('[data-sky-type="planet"]');
         if (!row) return;
         event.preventDefault();
@@ -1329,11 +1397,14 @@
         els.linesToggle.classList.toggle('is-active', next);
       });
     }
-    if (els.nightVision) {
+    if (els.nightVision && !isFieldApp()) {
       els.nightVision.addEventListener('click', () => {
         const on = document.body.classList.toggle('plan-night-vision');
         els.nightVision.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
+    } else if (els.nightVision && isFieldApp()) {
+      document.body.classList.add('plan-night-vision');
+      els.nightVision.setAttribute('aria-pressed', 'true');
     }
     if (els.lookUp) {
       els.lookUp.addEventListener('click', () => {

@@ -31,6 +31,12 @@ describe('Planetarium', () => {
     expect(parsed.view).toBe('horizon');
   });
 
+  test('parseParams reads app=field', () => {
+    const parsed = Planetarium.parseParams('?app=field&view=horizon&lat=42.9&lon=-70.86');
+    expect(parsed.app).toBe('field');
+    expect(parsed.view).toBe('horizon');
+  });
+
   test('buildShareUrl encodes observer, time, and selection', () => {
     const url = Planetarium.buildShareUrl(
       {
@@ -41,10 +47,28 @@ describe('Planetarium', () => {
       },
       'https://example.com'
     );
+    expect(url).toContain('/planetarium/?');
     expect(url).toContain('date=2026-08-31');
     expect(url).toContain('time=22%3A15');
     expect(url).toContain('lat=42.898');
     expect(url).toContain('body=jupiter');
+    expect(url).not.toContain('app=field');
+  });
+
+  test('buildShareUrl uses Field path when app=field', () => {
+    const url = Planetarium.buildShareUrl(
+      {
+        date: new Date(2026, 7, 31, 21, 0),
+        observer: { lat: 42.9, lon: -70.86, label: 'Hampton Falls' },
+        facing: 'south',
+        domeMode: false,
+        app: 'field',
+      },
+      'https://example.com'
+    );
+    expect(url).toContain('/planetarium/field.html?');
+    expect(url).toContain('app=field');
+    expect(url).toContain('view=horizon');
   });
 
   test('normalizeSelection and selectionKey are stable', () => {

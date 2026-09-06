@@ -144,6 +144,8 @@ function createApi() {
   let lastX = 0;
   let lastY = 0;
   let moved = false;
+  let pinchDist = 0;
+  let pinching = false;
   let onSelect = null;
   let onViewChange = null;
   let engine = null;
@@ -167,7 +169,11 @@ function createApi() {
     if (w === lastW && h === lastH && h > 120) return;
     lastW = w;
     lastH = h;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const fieldApp =
+      typeof document !== 'undefined' &&
+      (document.body?.classList.contains('plan-field') || window.__PLANETARIUM_FIELD);
+    const dprCap = fieldApp ? 1.5 : 2;
+    const dpr = Math.min(window.devicePixelRatio || 1, dprCap);
     renderer.setPixelRatio(dpr);
     renderer.setSize(w, h, false);
     canvas.style.width = '100%';
@@ -726,6 +732,7 @@ function createApi() {
   }
 
   function onPointerDown(e) {
+    if (pinching) return;
     dragging = true;
     moved = false;
     lastX = e.clientX;
@@ -734,7 +741,7 @@ function createApi() {
   }
 
   function onPointerMove(e) {
-    if (!dragging) return;
+    if (!dragging || pinching) return;
     const dx = e.clientX - lastX;
     const dy = e.clientY - lastY;
     if (Math.abs(dx) + Math.abs(dy) > 3) moved = true;
@@ -765,6 +772,48 @@ function createApi() {
     const step = domeMode ? 5 : 4;
     fov = clampFov(fov + (e.deltaY > 0 ? step : -step));
     notifyView();
+  }
+
+  function touchDistance(touches) {
+    if (!touches || touches.length < 2) return 0;
+    const a = touches[0];
+    const b = touches[1];
+    const dx = a.clientX - b.clientX;
+    const dy = a.clientY - b.clientY;
+    return Math.hypot(dx, dy);
+  }
+
+  function onTouchStart(e) {
+    if (e.touches.length >= 2) {
+      pinching = true;
+      dragging = false;
+      pinchDist = touchDistance(e.touches);
+      e.preventDefault();
+    }
+  }
+
+  function onTouchMove(e) {
+    if (!pinching || e.touches.length < 2) return;
+    e.preventDefault();
+    const dist = touchDistance(e.touches);
+    if (!pinchDist) {
+      pinchDist = dist;
+      return;
+    }
+    const delta = dist - pinchDist;
+    if (Math.abs(delta) > 2) {
+      const step = domeMode ? 0.08 : 0.07;
+      fov = clampFov(fov - delta * step);
+      pinchDist = dist;
+      notifyView();
+    }
+  }
+
+  function onTouchEnd(e) {
+    if (e.touches.length < 2) {
+      pinching = false;
+      pinchDist = 0;
+    }
   }
 
   async function loadCatalogs() {
@@ -889,6 +938,10 @@ function createApi() {
     canvas.addEventListener('pointerup', onPointerUp);
     canvas.addEventListener('pointercancel', onPointerUp);
     canvas.addEventListener('wheel', onWheel, { passive: false });
+    canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+    canvas.addEventListener('touchend', onTouchEnd);
+    canvas.addEventListener('touchcancel', onTouchEnd);
     window.addEventListener('resize', resize);
     if (typeof ResizeObserver === 'function') {
       const ro = new ResizeObserver(() => resize());
@@ -1035,6 +1088,10 @@ function createApi() {
       canvas.removeEventListener('pointerup', onPointerUp);
       canvas.removeEventListener('pointercancel', onPointerUp);
       canvas.removeEventListener('wheel', onWheel);
+      canvas.removeEventListener('touchstart', onTouchStart);
+      canvas.removeEventListener('touchmove', onTouchMove);
+      canvas.removeEventListener('touchend', onTouchEnd);
+      canvas.removeEventListener('touchcancel', onTouchEnd);
     }
     window.removeEventListener('resize', resize);
     if (canvas && canvas._planRo) {

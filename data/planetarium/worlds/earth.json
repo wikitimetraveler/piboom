@@ -1,0 +1,34 @@
+{
+  "id": "earth",
+  "name": "Earth",
+  "kicker": "Blue Marble home",
+  "lede": "The only world we know with liquid oceans, a protective ozone layer, and a living biosphere — viewed here as NASA's Blue Marble.",
+  "credit": "NASA Visible Earth · Blue Marble",
+  "texture": "/shared/textures/earth/blue-marble.jpg",
+  "physical": {
+    "radiusKm": 6371,
+    "dayHours": 24,
+    "yearDays": 365.256,
+    "moons": 1,
+    "tiltDeg": 23.4
+  },
+  "landmark": {
+    "label": "Hampton Falls, NH",
+    "lat": 42.898,
+    "lon": -70.864,
+    "zoom": 2.15,
+    "blurb": "Default observer for the DevConnect Labs sky — Lane family country on the New Hampshire Seacoast."
+  },
+  "missions": [
+    { "name": "Apollo", "year": 1968, "note": "Earthrise and whole-Earth photography from lunar distance." },
+    { "name": "Landsat", "year": 1972, "note": "Long-running Earth-observation series for land cover and climate." },
+    { "name": "ISS", "year": 2000, "note": "Continuous crewed laboratory in low Earth orbit; visible as a bright moving star." }
+  ],
+  "researchNotes": [
+    "Earth's axial tilt drives seasons. A roughly 24-hour rotation and a 365.25-day orbit set the calendar used by this planetarium.",
+    "The Blue Marble composite shows oceans, clouds, and continents under sunlight. Night lights on companion maps reveal human settlement patterns.",
+    "From Hampton Falls, NH — the default sky desk — you can open the full planetarium dome to see tonight's planets and constellations."
+  ],
+  "folklore": "Every culture has origin stories for Earth and sky. On this page we stick to NASA Visible Earth imagery and modern ephemeris.",
+  "carlFocus": "Treat Earth as home base. Mention Hampton Falls when relevant, seasons from axial tilt, and inviting the visitor into the planetarium dome."
+}

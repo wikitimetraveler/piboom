@@ -1,0 +1,562 @@
+/**
+ * Planetarium Field — night-safe handheld sky instrument
+ * Development work by David Lane
+ * Scoped to body.plan-field; does not restyle the theater.
+ */
+
+html.plan-field-html,
+body.plan-field {
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background: #000;
+  overscroll-behavior: none;
+}
+
+body.plan-field.plan-page {
+  --plan-field-ink: #07040a;
+  --plan-field-phosphor: #ff6a4a;
+  --plan-field-dim: #3a120e;
+  --plan-field-gold: #e8c36a;
+  --plan-field-sheet: #12080a;
+  --plan-field-ui-opacity: 0.7;
+  --plan-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  font-family: Outfit, system-ui, sans-serif;
+  font-size: 16px;
+  color: #ffc8b8;
+  background: #000;
+}
+
+body.plan-field[data-night='dim'] {
+  --plan-field-phosphor: #c9a090;
+  --plan-field-dim: #1a1210;
+  --plan-field-sheet: #141010;
+  color: rgba(232, 220, 210, 0.92);
+}
+
+body.plan-field[data-night='deep'] {
+  --plan-field-phosphor: #ff5535;
+  --plan-field-dim: #2a0a08;
+  --plan-field-sheet: #0c0404;
+  color: #ff9a88;
+}
+
+/* Never CSS-filter the WebGL sky on Field */
+body.plan-field.plan-night-vision .plan-stage,
+body.plan-field .plan-stage--field {
+  filter: none !important;
+}
+
+body.plan-field.plan-night-vision.plan-page,
+body.plan-field.plan-night-vision .plan-wrap {
+  background: #000 !important;
+  color: inherit !important;
+}
+
+.plan-field .plan-stage--field {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  min-height: 100dvh;
+  border: 0;
+  border-radius: 0;
+  background: #000;
+  overflow: hidden;
+}
+
+.plan-field .plan-sky-gpu,
+.plan-field .plan-sky {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.plan-field .plan-dome-rim {
+  pointer-events: none;
+}
+
+/* —— HUD —— */
+.plan-field-hud {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding:
+    max(0.5rem, env(safe-area-inset-top, 0px))
+    max(0.65rem, env(safe-area-inset-right, 0px))
+    0.35rem
+    max(0.65rem, env(safe-area-inset-left, 0px));
+  pointer-events: none;
+  opacity: var(--plan-field-ui-opacity, 0.7);
+}
+
+.plan-field-hud > * {
+  pointer-events: auto;
+}
+
+.plan-field-hud__when {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.4rem;
+  margin: 0;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid rgba(255, 106, 74, 0.35);
+  border-radius: 999px;
+  background: rgba(7, 4, 10, 0.88);
+  color: inherit;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.plan-field-hud__loc,
+.plan-field-hud__status {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.plan-field-hud__status:empty,
+.plan-field-hud__sep:has(+ .plan-field-hud__status:empty) {
+  display: none;
+}
+
+.plan-field-hud__tools {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex: 0 0 auto;
+}
+
+.plan-field-fov {
+  padding: 0.4rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 106, 74, 0.3);
+  background: rgba(7, 4, 10, 0.88);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--plan-field-phosphor);
+  cursor: pointer;
+  user-select: none;
+}
+
+.plan-field-zenith {
+  min-width: 3.5rem;
+  min-height: 2.75rem;
+  padding: 0.4rem 0.65rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(255, 106, 74, 0.4);
+  background: rgba(7, 4, 10, 0.9);
+  color: var(--plan-field-phosphor);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.plan-field-zenith.is-active,
+.plan-field-zenith[aria-pressed='true'] {
+  background: rgba(255, 106, 74, 0.18);
+  color: #ffe0d4;
+}
+
+/* —— Pick card above dock —— */
+.plan-field .plan-pick {
+  left: 0.65rem;
+  right: 0.65rem;
+  bottom: calc(4.75rem + env(safe-area-inset-bottom, 0px));
+  width: auto;
+  max-width: none;
+  border-color: rgba(255, 106, 74, 0.35);
+  background: rgba(18, 8, 10, 0.94);
+  opacity: var(--plan-field-ui-opacity, 0.7);
+}
+
+.plan-field .plan-pick__name {
+  font-family: Fraunces, Georgia, serif;
+  color: var(--plan-field-gold);
+}
+
+.plan-field-heading {
+  position: absolute;
+  left: 50%;
+  bottom: calc(9.5rem + env(safe-area-inset-bottom, 0px));
+  z-index: 8;
+  transform: translateX(-50%);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 106, 74, 0.4);
+  background: rgba(7, 4, 10, 0.9);
+  color: var(--plan-field-phosphor);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  opacity: var(--plan-field-ui-opacity, 0.7);
+}
+
+.plan-field .plan-hint {
+  top: calc(4.25rem + env(safe-area-inset-top, 0px));
+  opacity: var(--plan-field-ui-opacity, 0.7);
+}
+
+/* —— Dock —— */
+.plan-field-dock {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.2rem;
+  width: min(26rem, calc(100vw - 1rem));
+  transform: translateX(-50%);
+  padding:
+    0.4rem 0.35rem
+    max(0.55rem, env(safe-area-inset-bottom, 0px));
+  border: 1px solid rgba(255, 106, 74, 0.35);
+  border-bottom: 0;
+  border-radius: 1.15rem 1.15rem 0 0;
+  background: rgba(7, 4, 10, 0.96);
+  opacity: var(--plan-field-ui-opacity, 0.7);
+}
+
+.plan-field-dock__btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  min-height: 3.5rem;
+  min-width: 0;
+  padding: 0.35rem 0.2rem;
+  border: 0;
+  border-radius: 0.85rem;
+  background: transparent;
+  color: rgba(255, 200, 184, 0.88);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: none;
+  cursor: pointer;
+}
+
+.plan-field-dock__btn i {
+  font-size: 1.25rem;
+  color: var(--plan-field-phosphor);
+}
+
+.plan-field-dock__btn--carl {
+  min-height: 3.85rem;
+  background: rgba(255, 106, 74, 0.14);
+  color: #ffe8e0;
+}
+
+.plan-field-dock__btn[aria-pressed='true'],
+.plan-field-dock__btn.is-active {
+  background: rgba(255, 106, 74, 0.2);
+  color: #fff0ea;
+}
+
+.plan-field-dock__btn:focus-visible,
+.plan-field-zenith:focus-visible,
+.plan-field-hud__when:focus-visible {
+  outline: 2px solid var(--plan-field-phosphor);
+  outline-offset: 2px;
+}
+
+/* —— Bottom sheets (override theater right-edge desk) —— */
+.plan-field .plan-sidebar-backdrop {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.plan-field .plan-sidebar-backdrop[hidden] {
+  display: none;
+}
+
+.plan-field .plan-sidebar.plan-sheet {
+  position: fixed;
+  top: auto;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 41;
+  width: 100%;
+  max-width: none;
+  height: min(70dvh, 36rem);
+  max-height: 92dvh;
+  padding:
+    0.35rem 0.9rem
+    calc(1rem + env(safe-area-inset-bottom, 0px));
+  overflow: auto;
+  border: 1px solid rgba(255, 106, 74, 0.28);
+  border-bottom: 0;
+  border-radius: 1.1rem 1.1rem 0 0;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(255, 106, 74, 0.06), transparent 45%),
+    var(--plan-field-sheet);
+  transform: translateY(104%);
+  transition: transform 0.22s var(--plan-ease);
+  opacity: 1;
+}
+
+.plan-field .plan-sidebar.plan-sheet.is-open {
+  transform: none;
+}
+
+.plan-field .plan-sidebar.plan-sheet[data-sheet-size='sm'] {
+  height: min(42dvh, 22rem);
+}
+
+.plan-field .plan-sidebar.plan-sheet[data-sheet-size='lg'] {
+  height: min(92dvh, 48rem);
+}
+
+.plan-field .plan-sheet__grab {
+  width: 2.5rem;
+  height: 0.28rem;
+  margin: 0.2rem auto 0.55rem;
+  border-radius: 999px;
+  background: rgba(255, 106, 74, 0.45);
+}
+
+.plan-field .plan-sidebar__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+}
+
+.plan-field .plan-sidebar__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--plan-field-phosphor);
+}
+
+.plan-field .plan-sidebar__close {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 106, 74, 0.12);
+  color: var(--plan-field-phosphor);
+}
+
+.plan-field .plan-panel {
+  background: rgba(58, 18, 14, 0.35);
+  border-color: rgba(255, 106, 74, 0.22);
+}
+
+.plan-field .plan-panel h2 {
+  font-size: 1rem;
+  color: var(--plan-field-gold);
+}
+
+.plan-field .plan-planets th,
+.plan-field .plan-planets td,
+.plan-field .plan-asterisms li,
+.plan-field .plan-deepsky-list li,
+.plan-field .plan-catalog-hits li,
+.plan-field .plan-iss-list li,
+.plan-field .plan-events-list li {
+  min-height: 2.75rem;
+  font-size: 0.95rem;
+}
+
+.plan-field .plan-catalog-hits button,
+.plan-field .plan-iss-hit,
+.plan-field .plan-deepsky-hit,
+.plan-field .plan-asterisms button {
+  min-height: 2.75rem;
+  font-size: 0.95rem;
+}
+
+.plan-field .form-control {
+  min-height: 2.75rem;
+  font-size: 1.05rem;
+  background: #0c0404;
+  border-color: rgba(255, 106, 74, 0.35);
+  color: #ffe8e0;
+}
+
+.plan-field .plan-btn {
+  min-height: 2.75rem;
+}
+
+.plan-field .plan-btn--carl {
+  width: 100%;
+  min-height: 3.25rem;
+  font-size: 1rem;
+}
+
+.plan-field-time-row,
+.plan-field-place-row,
+.plan-field-night-levels,
+.plan-field-animate__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.75rem;
+}
+
+.plan-field-time-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+  margin-bottom: 0.75rem;
+}
+
+.plan-field-time-inputs label,
+.plan-field-bright-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255, 180, 160, 0.7);
+}
+
+.plan-field-bright-label input[type='range'] {
+  width: 100%;
+  accent-color: var(--plan-field-phosphor);
+}
+
+.plan-field-night-levels .is-active {
+  background: rgba(255, 106, 74, 0.22) !important;
+  border-color: var(--plan-field-phosphor) !important;
+}
+
+.plan-field-animate summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--plan-field-phosphor);
+  margin-bottom: 0.45rem;
+}
+
+.plan-field .plan-footer-links a {
+  color: var(--plan-field-phosphor);
+}
+
+/* —— First-run calibrate —— */
+.plan-field-calibrate {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 1rem;
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.plan-field-calibrate[hidden] {
+  display: none;
+}
+
+.plan-field-calibrate__card {
+  width: min(24rem, 100%);
+  padding: 1.25rem 1.1rem 1.1rem;
+  border-radius: 1.1rem;
+  border: 1px solid rgba(255, 106, 74, 0.4);
+  background: var(--plan-field-sheet);
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.plan-field-calibrate__card h2 {
+  margin: 0;
+  font-family: Fraunces, Georgia, serif;
+  font-size: 1.35rem;
+  color: var(--plan-field-gold);
+}
+
+.plan-field-calibrate__card p {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  color: rgba(255, 200, 184, 0.82);
+}
+
+.plan-field-calibrate__card .plan-btn {
+  width: 100%;
+}
+
+/* —— Landscape: side rail —— */
+@media (orientation: landscape) and (max-height: 520px) {
+  .plan-field-dock {
+    left: auto;
+    right: 0;
+    top: 50%;
+    bottom: auto;
+    width: auto;
+    transform: translateY(-50%);
+    grid-template-columns: 1fr;
+    padding:
+      0.35rem
+      max(0.4rem, env(safe-area-inset-right, 0px))
+      0.35rem
+      0.35rem;
+    border-radius: 1rem 0 0 1rem;
+    border-bottom: 1px solid rgba(255, 106, 74, 0.35);
+  }
+
+  .plan-field-dock__btn {
+    min-width: 3.25rem;
+    min-height: 3rem;
+  }
+
+  .plan-field-dock__btn span {
+    font-size: 0.58rem;
+  }
+
+  .plan-field .plan-pick {
+    left: 0.5rem;
+    right: auto;
+    bottom: auto;
+    top: calc(4rem + env(safe-area-inset-top, 0px));
+    width: min(16rem, 46vw);
+  }
+
+  .plan-field-heading {
+    bottom: auto;
+    top: calc(4rem + env(safe-area-inset-top, 0px));
+    left: auto;
+    right: 4.5rem;
+    transform: none;
+  }
+
+  .plan-field .plan-sidebar.plan-sheet {
+    height: min(88dvh, 100%);
+    max-width: min(22rem, 55vw);
+    left: auto;
+    right: 0;
+    border-radius: 1rem 0 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plan-field .plan-sidebar.plan-sheet {
+    transition: none;
+  }
+}

@@ -32,4 +32,29 @@ describe('planetarium-assistant.service', () => {
     const prompt = buildSystemPrompt({});
     expect(prompt).toContain('No live sky context');
   });
+
+  test('buildSystemPrompt embeds world dossier', () => {
+    const prompt = buildSystemPrompt({
+      worldId: 'mars',
+      world: {
+        id: 'mars',
+        name: 'Mars',
+        kicker: 'Red planet',
+        lede: 'A cold desert world.',
+        credit: 'NASA / JPL · Viking',
+        physical: { radiusKm: 3390, dayHours: 24.6, yearDays: 687, moons: 2, tiltDeg: 25.2 },
+        landmark: { label: 'Olympus Mons', blurb: 'Tallest volcano.' },
+        missions: [{ name: 'Viking 1 & 2', year: 1976, note: 'First soft landings.' }],
+        researchNotes: ['A Martian day is a sol.'],
+        folklore: 'Canal myths are folklore.',
+        carlFocus: 'Highlight Olympus Mons.',
+      },
+    });
+    expect(prompt).toContain('Open planet world dossier');
+    expect(prompt).toContain('Mars');
+    expect(prompt).toContain('Olympus Mons');
+    expect(prompt).toContain('Viking');
+    expect(prompt).toContain('Canal myths');
+    expect(prompt).toContain('Highlight Olympus Mons');
+  });
 });

@@ -1,0 +1,32 @@
+{
+  "id": "pluto",
+  "name": "Pluto",
+  "kicker": "Kuiper Belt world",
+  "lede": "A heart-shaped nitrogen plain and towering mountains of water ice — New Horizons made this dwarf planet unforgettable.",
+  "credit": "NASA / JPL · Pluto",
+  "texture": "/shared/textures/planets/pluto.jpg",
+  "physical": {
+    "radiusKm": 1188,
+    "dayHours": -153.3,
+    "yearDays": 90560,
+    "moons": 5,
+    "tiltDeg": 119.6
+  },
+  "landmark": {
+    "label": "Sputnik Planitia",
+    "lat": 18,
+    "lon": 178,
+    "zoom": 2.2,
+    "blurb": "The bright western lobe of Pluto's heart — a vast nitrogen-ice plain with convective cells and no impact craters."
+  },
+  "missions": [
+    { "name": "New Horizons", "year": 2015, "note": "Historic flyby of Pluto–Charon; later visited Kuiper Belt object Arrokoth." }
+  ],
+  "researchNotes": [
+    "Pluto is a dwarf planet in the Kuiper Belt. Its atmosphere is thin nitrogen with methane and carbon monoxide; haze layers were imaged by New Horizons.",
+    "Sputnik Planitia is geologically young. Surrounding water-ice mountains can rise several kilometers. Charon is so large that the pair orbits a barycenter outside Pluto.",
+    "The IAU reclassified Pluto in 2006. It remains a premier laboratory for icy-world geology — reclassification did not erase New Horizons science."
+  ],
+  "folklore": "Named for the Roman underworld god. Disney's dog and planet-status debates are pop culture; Sputnik Planitia is spacecraft geology.",
+  "carlFocus": "Lead with Sputnik Planitia and New Horizons. Be clear it is a dwarf planet without dismissing the science. Mention Charon when asked about moons."
+}

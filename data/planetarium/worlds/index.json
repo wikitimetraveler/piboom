@@ -1,0 +1,16 @@
+{
+  "bodies": [
+    "mercury",
+    "venus",
+    "earth",
+    "moon",
+    "mars",
+    "jupiter",
+    "saturn",
+    "uranus",
+    "neptune",
+    "pluto"
+  ],
+  "title": "Planet worlds",
+  "lede": "NASA globes, research desks, and Carl AstroAI — one home page per body."
+}

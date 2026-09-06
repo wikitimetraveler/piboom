@@ -1,0 +1,34 @@
+{
+  "id": "saturn",
+  "name": "Saturn",
+  "kicker": "Ringed giant",
+  "lede": "Pale gold cloud bands wrapped by ice-and-rock rings — the icon of the outer solar system.",
+  "credit": "NASA / JPL · Voyager",
+  "texture": "/shared/textures/planets/saturn.jpg",
+  "physical": {
+    "radiusKm": 58232,
+    "dayHours": 10.7,
+    "yearDays": 10759,
+    "moons": 146,
+    "tiltDeg": 26.7
+  },
+  "landmark": {
+    "label": "Ring plane · Cassini gap",
+    "lat": 0,
+    "lon": 0,
+    "zoom": 1.55,
+    "blurb": "The Cassini Division separates the bright A and B rings — a gap cleared and sculpted by orbital resonances with moons."
+  },
+  "missions": [
+    { "name": "Pioneer 11", "year": 1979, "note": "First flyby through the Saturn system." },
+    { "name": "Voyager 1 & 2", "year": 1980, "note": "Ring structure and moon discoveries in stunning detail." },
+    { "name": "Cassini–Huygens", "year": 2004, "note": "Thirteen-year orbiter plus Titan landing; Grand Finale plunge in 2017." }
+  ],
+  "researchNotes": [
+    "Saturn's rings are mostly water ice with rocky impurities, organized into thousands of ringlets. The Cassini Division is the most famous gap.",
+    "Axial tilt near 27° gives dramatic ring seasons — edge-on from Earth every ~15 years, then opening to a wide ellipse.",
+    "Titan has a thick nitrogen atmosphere and lakes of hydrocarbons. Enceladus vents water vapor from a subsurface ocean."
+  ],
+  "folklore": "Named for the Roman god of agriculture and time. Ring myths of solid discs were overturned by spectroscopy and spacecraft.",
+  "carlFocus": "Talk rings, Cassini Division, Titan and Enceladus. Keep Cassini–Huygens as the cornerstone mission story."
+}

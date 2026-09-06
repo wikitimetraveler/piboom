@@ -1,0 +1,34 @@
+{
+  "id": "venus",
+  "name": "Venus",
+  "kicker": "Earth's veiled twin",
+  "lede": "A greenhouse runaway under a thick CO₂ sky — radar peels back the clouds to reveal a volcanic highland world.",
+  "credit": "NASA / JPL · Magellan",
+  "texture": "/shared/textures/planets/venus.jpg",
+  "physical": {
+    "radiusKm": 6052,
+    "dayHours": -5832.5,
+    "yearDays": 224.7,
+    "moons": 0,
+    "tiltDeg": 177.4
+  },
+  "landmark": {
+    "label": "Maxwell Montes",
+    "lat": 65.2,
+    "lon": 3.0,
+    "zoom": 2.2,
+    "blurb": "The highest mountain range on Venus, rising about 11 km above the mean planetary radius in Ishtar Terra."
+  },
+  "missions": [
+    { "name": "Venera landers", "year": 1970, "note": "Soviet surface images and pressure/temperature data before landers failed in the heat." },
+    { "name": "Magellan", "year": 1990, "note": "Global synthetic-aperture radar map of nearly the entire surface." },
+    { "name": "Parker Solar Probe", "year": 2020, "note": "Visible-light images of Venus's nightside glow during gravity assists." }
+  ],
+  "researchNotes": [
+    "Venus is similar in size to Earth but rotates retrograde and very slowly. Surface pressure is about 92 bar, and mean surface temperature exceeds 460 °C.",
+    "Magellan radar revealed continents, rift valleys, and volcanic plains. Maxwell Montes is the tallest highland; many features are named for women in mythology and history.",
+    "The dense atmosphere and sulfuric acid clouds hide the surface in visible light — radar and infrared are the primary remote-sensing tools."
+  ],
+  "folklore": "Named for the Roman goddess of love. Evening and morning star lore is observational astronomy, not a second planet.",
+  "carlFocus": "Stress Magellan radar, Maxwell Montes, runaway greenhouse, and retrograde spin. Distinguish myth names from spacecraft facts."
+}

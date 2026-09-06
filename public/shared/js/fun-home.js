@@ -1062,7 +1062,7 @@
   }
 
   function clearSkyHandoffs() {
-    document.querySelectorAll('.fun-hero__sky-handoff').forEach((el) => el.remove());
+    document.querySelectorAll('.fun-hero__sky-handoff, .fun-hero__world-handoff').forEach((el) => el.remove());
   }
 
   function syncLandmarkHint(pane, body, zoomed) {
@@ -1128,6 +1128,20 @@
       body: bodyId === 'earth' ? undefined : bodyId,
     });
 
+    const wrap = document.createElement('div');
+    wrap.className = 'fun-hero__handoff-stack';
+
+    if (typeof Sky.buildWorldUrl === 'function') {
+      const world = document.createElement('a');
+      world.className = 'fun-hero__world-handoff';
+      world.href = Sky.buildWorldUrl({ id: bodyId });
+      const label = bodyId.charAt(0).toUpperCase() + bodyId.slice(1);
+      world.textContent = 'Open ' + label;
+      world.title = 'Open ' + label + ' world page — globe, research, Carl';
+      world.setAttribute('aria-label', world.title);
+      wrap.appendChild(world);
+    }
+
     const link = document.createElement('a');
     link.className = 'fun-hero__sky-handoff';
     link.href = url;
@@ -1146,7 +1160,8 @@
       link.classList.add('fun-hero__sky-handoff--down');
     }
     link.setAttribute('aria-label', link.title || 'Open planetarium');
-    pane.appendChild(link);
+    wrap.appendChild(link);
+    pane.appendChild(wrap);
   }
 
   function enlargePlanetPane(body, panes, mounts, opts) {
@@ -1215,7 +1230,9 @@
       syncPlanetariumCta(body);
       if (event.metaKey || event.ctrlKey) {
         const Sky = window.FunHomeSky;
-        if (Sky && typeof Sky.buildPlanetariumUrl === 'function') {
+        if (Sky && typeof Sky.buildWorldUrl === 'function') {
+          window.location.href = Sky.buildWorldUrl({ id: body });
+        } else if (Sky && typeof Sky.buildPlanetariumUrl === 'function') {
           const { date } = resolveSkyInput(Sky, heroSkyState.observer, heroSkyState.scrubIndex);
           window.location.href = Sky.buildPlanetariumUrl({
             date,
@@ -1236,7 +1253,7 @@
 
     panes.forEach((pane) => {
       pane.addEventListener('click', (event) => {
-        if (event.target.closest('.fun-hero__sky-handoff, .fun-hero__landmark-link')) return;
+        if (event.target.closest('.fun-hero__sky-handoff, .fun-hero__world-handoff, .fun-hero__landmark-link, .fun-hero__handoff-stack')) return;
         event.preventDefault();
         event.stopPropagation();
         const body = pane.getAttribute('data-body');

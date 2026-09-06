@@ -37,7 +37,7 @@ export function extractAlbumInfoFromText(text) {
   return info;
 }
 
-export const MAX_SHELF_ALBUMS = 45;
+export const MAX_SHELF_ALBUMS = 6;
 export const SHELF_VISION_BATCH = 6;
 
 export function clampMaxAlbums(value, fallback = MAX_SHELF_ALBUMS) {
@@ -87,20 +87,44 @@ export function normalizeAlbumEntry(raw, index = 0) {
   };
 }
 
+export function extractJsonObject(text) {
+  if (!text || typeof text !== 'string') return null;
+  let from = 0;
+  while (from < text.length) {
+    const start = text.indexOf('{', from);
+    if (start < 0) return null;
+    let depth = 0;
+    let closedAt = -1;
+    for (let i = start; i < text.length; i += 1) {
+      const ch = text[i];
+      if (ch === '{') depth += 1;
+      else if (ch === '}') {
+        depth -= 1;
+        if (depth === 0) {
+          closedAt = i;
+          break;
+        }
+      }
+    }
+    if (closedAt < 0) return null;
+    try {
+      return JSON.parse(text.slice(start, closedAt + 1));
+    } catch {
+      from = start + 1;
+    }
+  }
+  return null;
+}
+
 export function parseVisionSingleAlbum(text) {
   if (!text || typeof text !== 'string') return null;
 
-  try {
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      const parsed = JSON.parse(jsonMatch[0]);
-      if (Array.isArray(parsed.albums) && parsed.albums.length === 1) {
-        return normalizeAlbumEntry(parsed.albums[0], 0);
-      }
-      return normalizeAlbumEntry(parsed, 0);
+  const parsed = extractJsonObject(text);
+  if (parsed) {
+    if (Array.isArray(parsed.albums) && parsed.albums.length === 1) {
+      return normalizeAlbumEntry(parsed.albums[0], 0);
     }
-  } catch {
-    // fall through to text extraction
+    return normalizeAlbumEntry(parsed, 0);
   }
 
   return normalizeAlbumEntry(extractAlbumInfoFromText(text), 0);
@@ -109,25 +133,20 @@ export function parseVisionSingleAlbum(text) {
 export function parseVisionAlbumsFromText(text) {
   if (!text || typeof text !== 'string') return [];
 
-  try {
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      const parsed = JSON.parse(jsonMatch[0]);
-      if (Array.isArray(parsed.albums)) {
-        return parsed.albums
-          .map((item, i) => normalizeAlbumEntry(item, i))
-          .filter(Boolean);
-      }
-      if (Array.isArray(parsed)) {
-        return parsed
-          .map((item, i) => normalizeAlbumEntry(item, i))
-          .filter(Boolean);
-      }
-      const single = normalizeAlbumEntry(parsed, 0);
-      return single ? [single] : [];
+  const parsed = extractJsonObject(text);
+  if (parsed) {
+    if (Array.isArray(parsed.albums)) {
+      return parsed.albums
+        .map((item, i) => normalizeAlbumEntry(item, i))
+        .filter(Boolean);
     }
-  } catch {
-    // fall through
+    if (Array.isArray(parsed)) {
+      return parsed
+        .map((item, i) => normalizeAlbumEntry(item, i))
+        .filter(Boolean);
+    }
+    const single = normalizeAlbumEntry(parsed, 0);
+    return single ? [single] : [];
   }
 
   const single = normalizeAlbumEntry(extractAlbumInfoFromText(text), 0);
@@ -135,14 +154,15 @@ export function parseVisionAlbumsFromText(text) {
 }
 
 export function buildSingleAlbumVisionPrompt() {
-  return `Read this album jacket. Return JSON only:
-{"albumName":"title printed on the cover","artistName":"artist printed on the cover","year":"four-digit year only if printed on the jacket","confidence":"high|medium|low"}
+  return `Identify the album in this photo from the cover artwork and any readable title or artist text. Return JSON only:
+{"albumName":"album title","artistName":"artist name","year":"four-digit year only if printed on the jacket","confidence":"high|medium|low"}
 
 Rules:
-- Use only text you can read on the cover or spine.
-- Do not guess year, genre, history, condition, pressing, or market value.
-- If the year is not printed, omit year or use "".
-- If title and artist are unreadable, return {}.`;
+- Identify the release from the cover art even if the lettering is stylized or partly obscured.
+- Prefer printed title and artist when they are readable.
+- Do not guess market value, condition, pressing, or collector grade.
+- If the year is not printed on the jacket, omit year or use "".
+- If you cannot identify the album, return {}.`;
 }
 
 export function buildShelfVisionPrompt(maxAlbums = SHELF_VISION_BATCH, alreadyFound = []) {
@@ -156,15 +176,15 @@ export function buildShelfVisionPrompt(maxAlbums = SHELF_VISION_BATCH, alreadyFo
           .join('\n')}\n`
       : '';
 
-  return `This photo may show many vinyl album covers. Read the next batch of distinct jackets you can see clearly (up to ${batch} in this response).
+  return `This photo may show several vinyl or CD album covers. Identify the next batch of distinct albums you can recognize (up to ${batch} in this response).
 ${skipBlock}
 Return JSON only:
 {
   "albums": [
     {
       "index": 1,
-      "albumName": "title printed on the cover",
-      "artistName": "artist printed on the cover",
+      "albumName": "album title",
+      "artistName": "artist name",
       "year": "four-digit year only if printed",
       "confidence": "high|medium|low",
       "position": "left-to-right / row position label"
@@ -175,10 +195,11 @@ Return JSON only:
 
 Rules:
 - Return at most ${batch} NEW albums in this response.
-- Set moreRemain to true if you can still see additional readable jackets not listed above; otherwise false.
+- Identify each release from cover art plus any readable title/artist text.
+- Set moreRemain to true if additional identifiable covers remain; otherwise false.
 - Order albums left-to-right, then top-to-bottom.
-- Skip duplicates, spines-only if unreadable, and covers already listed.
-- Use only text visible on each jacket. Do not guess year, genre, history, condition, or market value.
+- Skip duplicates, unreadable spines, and covers already listed.
+- Do not guess market value, condition, pressing, or collector grade.
 - If only one new album is visible, still return an albums array with one item.
 - If none remain, return {"albums":[],"moreRemain":false}.`;
 }
@@ -189,7 +210,7 @@ export async function identifySingleAlbumFromImage(openai, model, imageData) {
     messages: [
       {
         role: 'system',
-        content: 'You read album jackets. Report only title and artist you can see, and a year only if it is printed. Never invent genre, history, condition, pressing, or collector value. If unsure, use confidence low or return nothing.',
+        content: 'You identify album covers from photos. Return the album title and artist from artwork and readable text. Include a year only if it is printed on the jacket. Never invent market value, condition, pressing, or collector grade. If you cannot identify the album, return nothing.',
       },
       {
         role: 'user',
@@ -212,16 +233,11 @@ export async function identifySingleAlbumFromImage(openai, model, imageData) {
 
 export function parseShelfBatchMeta(text) {
   if (!text || typeof text !== 'string') return { moreRemain: false };
-  try {
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return { moreRemain: false };
-    const parsed = JSON.parse(jsonMatch[0]);
-    if (typeof parsed.moreRemain === 'boolean') return { moreRemain: parsed.moreRemain };
-    if (Array.isArray(parsed.albums) && parsed.albums.length >= SHELF_VISION_BATCH) {
-      return { moreRemain: true };
-    }
-  } catch {
-    /* ignore */
+  const parsed = extractJsonObject(text);
+  if (!parsed) return { moreRemain: false };
+  if (typeof parsed.moreRemain === 'boolean') return { moreRemain: parsed.moreRemain };
+  if (Array.isArray(parsed.albums) && parsed.albums.length >= SHELF_VISION_BATCH) {
+    return { moreRemain: true };
   }
   return { moreRemain: false };
 }
@@ -250,7 +266,7 @@ export async function identifyShelfAlbumsFromImage(
         {
           role: 'system',
           content:
-            'You read album jackets in a photo. List only covers whose title and artist you can see. Never invent year, genre, history, condition, or collector value. Work in small batches and never repeat albums already listed.',
+            'You identify album covers in a photo. List title and artist for each cover you can recognize from artwork or readable text. Never invent market value, condition, pressing, or collector grade. Work in small batches and never repeat albums already listed.',
         },
         {
           role: 'user',

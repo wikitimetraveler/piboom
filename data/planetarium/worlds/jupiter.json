@@ -1,0 +1,34 @@
+{
+  "id": "jupiter",
+  "name": "Jupiter",
+  "kicker": "King of the giants",
+  "lede": "A hydrogen–helium storm world with a centuries-old Great Red Spot and a family of Galilean moons.",
+  "credit": "NASA / JPL · Voyager",
+  "texture": "/shared/textures/planets/jupiter.jpg",
+  "physical": {
+    "radiusKm": 69911,
+    "dayHours": 9.9,
+    "yearDays": 4332.6,
+    "moons": 95,
+    "tiltDeg": 3.1
+  },
+  "landmark": {
+    "label": "Great Red Spot",
+    "lat": -22,
+    "lon": 106,
+    "zoom": 2.05,
+    "blurb": "A persistent high-pressure storm in the southern hemisphere, observed for centuries and still larger than Earth."
+  },
+  "missions": [
+    { "name": "Pioneer 10 & 11", "year": 1973, "note": "First flybys through the outer solar system." },
+    { "name": "Voyager 1 & 2", "year": 1979, "note": "Detailed imaging of belts, the Red Spot, and the Galilean moons." },
+    { "name": "Juno", "year": 2016, "note": "Polar orbiter mapping gravity, magnetosphere, and deep atmosphere." }
+  ],
+  "researchNotes": [
+    "Jupiter is the most massive planet. Its rapid rotation flattens the globe and drives strong zonal winds that paint the familiar belts and zones.",
+    "The Great Red Spot is an anticyclone. It has shrunk over the last century but remains a defining feature of the southern hemisphere.",
+    "Io, Europa, Ganymede, and Callisto — the Galilean moons — are worlds in their own right: volcanoes, subsurface oceans, and ancient cratered crusts."
+  ],
+  "folklore": "Named for the king of Roman gods. Astrology's Jupiter is symbolism; the storm and moons are spacecraft fact.",
+  "carlFocus": "Lead with the Great Red Spot, fast spin, and Galilean moons. Mention Voyager and Juno when asked about exploration."
+}

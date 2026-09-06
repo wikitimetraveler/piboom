@@ -1,0 +1,32 @@
+{
+  "id": "uranus",
+  "name": "Uranus",
+  "kicker": "Sideways ice giant",
+  "lede": "A pale cyan world tipped nearly on its side — extreme seasons and faint dark rings.",
+  "credit": "NASA / JPL · Voyager",
+  "texture": "/shared/textures/planets/uranus.jpg",
+  "physical": {
+    "radiusKm": 25362,
+    "dayHours": -17.2,
+    "yearDays": 30685,
+    "moons": 28,
+    "tiltDeg": 97.8
+  },
+  "landmark": {
+    "label": "Equator · ring plane",
+    "lat": 0,
+    "lon": 0,
+    "zoom": 1.85,
+    "blurb": "Uranus rolls on its side: the equator and faint rings are nearly perpendicular to the orbital plane."
+  },
+  "missions": [
+    { "name": "Voyager 2", "year": 1986, "note": "Only spacecraft flyby — imaged rings, moons, and a nearly featureless disk at the time." }
+  ],
+  "researchNotes": [
+    "Uranus is an ice giant: water, ammonia, and methane ices over a rocky core, with hydrogen–helium atmosphere. Methane absorbs red light, giving the cyan hue.",
+    "Obliquity near 98° means each pole gets decades of continuous sunlight, then decades of night, across the 84-year orbit.",
+    "Faint rings and a suite of icy moons (Miranda, Ariel, Titania, Oberon, Umbriel) were revealed or refined by Voyager 2."
+  ],
+  "folklore": "Named for the Greek sky god Ouranos — unusual among planets for using a Greek rather than Roman name in English.",
+  "carlFocus": "Stress the tipped axis, ice-giant composition, Voyager 2 as the only flyby, and faint rings — not a second Neptune twin."
+}

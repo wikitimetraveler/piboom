@@ -4,14 +4,44 @@
  */
 import AIChatWidget from '/shared/ai-chat-widget.js';
 
-const WELCOME = `<div class="plan-carl-welcome">
+const WELCOME_THEATER = `<div class="plan-carl-welcome">
   <span class="plan-carl-welcome__avatar" aria-hidden="true">👽</span>
   <p>I'm <strong>Carl</strong>, your AstroAI guide — constellations, planets, moon phases, and what's up tonight.</p>
   <p class="small text-muted mb-0">Zed (our alien presenter) lip-syncs on video when HeyGen is live. Tap <strong>Ask Carl</strong> and speak — voice is on by default.</p>
   <small class="text-muted">Try: "What's that bright thing in the south?" or "Tell me about Orion tonight."</small>
 </div>`;
 
+const WELCOME_FIELD = `<div class="plan-carl-welcome">
+  <span class="plan-carl-welcome__avatar" aria-hidden="true">🔭</span>
+  <p>I'm <strong>Carl</strong>, your field AstroAI guide — tap a star or planet, then ask.</p>
+  <p class="small text-muted mb-0">Voice is on by default. Face locks the sky to your phone heading outdoors.</p>
+  <small class="text-muted">Try: "Show me Jupiter" or "What's that bright thing in the south?"</small>
+</div>`;
+
+const WELCOME_WORLD = `<div class="plan-carl-welcome">
+  <span class="plan-carl-welcome__avatar" aria-hidden="true">🪐</span>
+  <p>I'm <strong>Carl</strong>, your AstroAI guide for this world page — globe, missions, and research notes.</p>
+  <p class="small text-muted mb-0">Voice is on by default. Ask about the landmark, spacecraft history, or how this body looks in tonight's sky.</p>
+  <small class="text-muted">Try: "Tell me about the landmark" or "What missions visited here?"</small>
+</div>`;
+
 const ZED_HANDOFF = 'Carl has the sky on this one.';
+
+function isWorldPage() {
+  return !!(window.__PLANETARIUM_WORLD || document.body?.classList.contains('plan-world-page'));
+}
+
+function worldIdFromPage() {
+  const w = window.__PLANETARIUM_WORLD;
+  if (w && typeof w === 'object' && w.id) return String(w.id);
+  try {
+    const id = new URLSearchParams(window.location.search).get('id') ||
+      new URLSearchParams(window.location.search).get('body');
+    return id ? String(id).toLowerCase() : 'mars';
+  } catch (_) {
+    return 'mars';
+  }
+}
 
 function forSpeech(text) {
   return String(text || '')
@@ -41,8 +71,14 @@ async function speakReply(text) {
   heygen?.speak?.(clean);
 }
 
-/** Fresh dome snapshot every Carl turn (date, facing, selection). */
+/** Fresh dome / world snapshot every Carl turn. */
 function getSkyContext() {
+  if (isWorldPage() && typeof window.__PLANETARIUM_WORLD?.getSkyContext === 'function') {
+    return {
+      ...window.__PLANETARIUM_WORLD.getSkyContext(),
+      clientSentAt: new Date().toISOString(),
+    };
+  }
   const live = window.Planetarium?.getSkyContext?.() || {};
   return {
     ...live,
@@ -206,14 +242,19 @@ function bindSkyContextRefresh() {
 }
 
 function initChat() {
+  const fieldApp = !!(window.__PLANETARIUM_FIELD || document.body?.classList.contains('plan-field'));
+  const worldApp = isWorldPage();
+  const worldId = worldApp ? worldIdFromPage() : null;
   const widget = new AIChatWidget({
     apiEndpoint: '/api/planetarium/assistant/chat',
     userId: 'planetarium-guest',
-    sessionId: 'planetarium-carl',
-    title: 'Carl · AstroAI',
-    buttonTitle: 'Ask Carl about the sky',
-    inputPlaceholder: 'What is up tonight? Show me Jupiter…',
-    welcomeHtml: WELCOME,
+    sessionId: worldApp ? 'planetarium-carl-' + worldId : 'planetarium-carl',
+    title: worldApp ? 'Carl · ' + (window.__PLANETARIUM_WORLD?.name || worldId || 'World') : 'Carl · AstroAI',
+    buttonTitle: worldApp ? 'Ask Carl about this world' : 'Ask Carl about the sky',
+    inputPlaceholder: worldApp
+      ? 'Tell me about this world…'
+      : 'What is up tonight? Show me Jupiter…',
+    welcomeHtml: worldApp ? WELCOME_WORLD : fieldApp ? WELCOME_FIELD : WELCOME_THEATER,
     getContext: () => ({ skyContext: getSkyContext() }),
     onMessageSent: () => {
       if (typeof window.aiChatWidget?.open === 'function') window.aiChatWidget.open();
@@ -229,10 +270,12 @@ function initChat() {
   if (typeof widget.sendMessage === 'function') {
     const origSend = widget.sendMessage.bind(widget);
     widget.sendMessage = async (msg) => {
-      try {
-        await trySlewFromText(msg);
-      } catch (_) {
-        /* slew optional */
+      if (!worldApp) {
+        try {
+          await trySlewFromText(msg);
+        } catch (_) {
+          /* slew optional */
+        }
       }
       return origSend(msg);
     };
@@ -242,7 +285,7 @@ function initChat() {
     openChat(null, { startVoice: true });
   });
   window.PlanetariumAskCarl = (msg) => openChat(msg, { startVoice: !msg });
-  bindSkyContextRefresh();
+  if (!worldApp) bindSkyContextRefresh();
 }
 
 if (document.readyState === 'loading') {

@@ -1150,10 +1150,10 @@
               <span>No image selected yet. Upload an album cover to begin.</span>
             </div>
             <div class="camera-instructions">
-              <strong>Photo identify reads the jacket only:</strong>
+              <strong>Identify the album from this photo:</strong>
               <ul>
                 <li>Clear, straight-on shot of the whole cover.</li>
-                <li>Title and artist must be readable — no guessed value or history.</li>
+                <li>Title and artist should be visible — glare and extreme angles make it harder.</li>
                 <li>File size under 10 MB.</li>
               </ul>
             </div>
@@ -1167,7 +1167,7 @@
                 <div style="margin-top: 10px; color: #666; font-size: 0.9rem;">
                   <i class="bi-info-circle"></i> <span id="imageDimensions"></span>
                   <div style="margin-top: 5px; color: #4CAF50; font-weight: 600;">
-                    <i class="bi-crop"></i> Green box shows AI analysis area (square crop)
+                    <i class="bi-crop"></i> Green box shows the identify area (square crop)
                   </div>
                 </div>
               </div>
@@ -1194,7 +1194,7 @@
             </div>
             <div id="cameraStatus" class="camera-status camera-status--info" style="display: none;" aria-live="polite"></div>
             <div class="camera-instructions">
-              <strong>Jacket read — not an appraisal:</strong>
+              <strong>Point the camera at the album cover:</strong>
               <ul>
                 <li>Fill the green square with the cover; avoid glare.</li>
                 <li>Steady the album so title and artist are readable.</li>
@@ -1218,7 +1218,7 @@
                 </div>
               </div>
               <p class="text-muted mt-2" style="font-size: 1rem;">
-                <i class="bi-info-circle"></i> <strong>Center album cover in the green square</strong> - AI will analyze this area
+                <i class="bi-info-circle"></i> <strong>Center the album cover in the green square</strong> — Identify Album uses this area
               </p>
             </div>
             
@@ -1233,7 +1233,7 @@
                 <div style="margin-top: 10px; color: #666; font-size: 0.9rem;">
                   <i class="bi-camera"></i> <span id="capturedDimensions"></span>
                   <div style="margin-top: 5px; color: #4CAF50; font-weight: 600;">
-                    <i class="bi-crop"></i> Green box shows what AI will analyze
+                    <i class="bi-crop"></i> Green box shows the identify area
                   </div>
                 </div>
               </div>
@@ -1264,9 +1264,9 @@
               <span>Lay up to 6 album covers in frame, then upload one shelf photo.</span>
             </div>
             <div class="camera-instructions">
-              <strong>Jacket read — not an appraisal:</strong>
+              <strong>Identify each cover in the photo:</strong>
               <ul>
-                <li>Covers spread so each title and artist is readable.</li>
+                <li>Covers spread so each title and artist is visible.</li>
                 <li>Straight-on light; skip unreadable jackets.</li>
                 <li>Up to <strong>6</strong> distinct albums in one shot.</li>
               </ul>
@@ -2662,7 +2662,7 @@ function captureFromCamera() {
   
   // Play a camera shutter sound effect (optional)
   playShutterSound();
-  updateCameraStatus('', 'info');
+  updateCameraStatus('Photo captured. Tap Identify Album.', 'success');
 }
 
 // Retake photo (go back to camera preview)
@@ -2700,49 +2700,105 @@ function playShutterSound() {
   }
 }
 
+function cropImageDataToCenteredSquare(dataUrl, fraction) {
+  const ratio = Number(fraction);
+  const cropFraction = Number.isFinite(ratio) && ratio > 0 && ratio <= 1 ? ratio : 0.85;
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = function() {
+      const size = Math.min(img.naturalWidth, img.naturalHeight) * cropFraction;
+      if (!size) {
+        resolve(dataUrl);
+        return;
+      }
+      const sx = (img.naturalWidth - size) / 2;
+      const sy = (img.naturalHeight - size) / 2;
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(size));
+      canvas.height = canvas.width;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, sx, sy, size, size, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL('image/jpeg', 0.9));
+    };
+    img.onerror = function() {
+      reject(new Error('Could not crop image'));
+    };
+    img.src = dataUrl;
+  });
+}
+
+function updateIdentifyStatus(message, type = 'info') {
+  if (currentInputMode === 'camera') {
+    updateCameraStatus(message, type);
+  } else if (currentInputMode === 'image') {
+    updateImageStatus(message, type);
+  }
+}
+
+function escapeJsSingleQuoted(value) {
+  return String(value || '')
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'");
+}
+
 // Analyze album image using AI
 async function analyzeAlbumImage() {
   if (!uploadedImageData) {
+    updateIdentifyStatus('Capture or upload a cover first.', 'warning');
     return;
   }
   
-  // Show loading state
   document.getElementById('loadingState').style.display = 'block';
+  updateIdentifyStatus('Identifying album…', 'info');
   
   try {
+    const cropFraction = currentInputMode === 'camera' ? 0.7 : 0.85;
+    let imageData = uploadedImageData;
+    try {
+      imageData = await cropImageDataToCenteredSquare(uploadedImageData, cropFraction);
+    } catch (cropError) {
+      console.warn('Cover crop skipped:', cropError);
+    }
+
     const response = await fetch('/api/album-discovery/identify-image', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ 
-        imageData: uploadedImageData 
+        imageData
       })
     });
     
-    const data = await response.json();
+    const data = await response.json().catch(() => ({}));
     
-    // Hide loading state
     document.getElementById('loadingState').style.display = 'none';
+
+    if (!response.ok) {
+      const msg = data.message || 'Identify is briefly unavailable. Try again.';
+      updateIdentifyStatus(msg, 'error');
+      return;
+    }
     
     if (data.success && data.albumName && data.artistName) {
-      // Display the identified album info
       displayIdentifiedAlbum(data);
+      updateIdentifyStatus(`Identified: ${data.albumName} — ${data.artistName}`, 'success');
       
-      // Set the artist and search for their albums
       currentArtist = data.artistName;
       document.getElementById('kgBand').value = data.artistName;
       
-      // Wait a bit then search for all albums by this artist
       setTimeout(() => {
         searchAlbums();
       }, 1500);
       
+    } else {
+      updateIdentifyStatus(data.message || 'Could not identify this album. Try a closer, straighter shot.', 'warning');
     }
     
   } catch (error) {
     console.error('Error analyzing image:', error);
     document.getElementById('loadingState').style.display = 'none';
+    updateIdentifyStatus('Could not identify this album. Try again.', 'error');
   }
 }
 
@@ -2750,22 +2806,29 @@ async function analyzeAlbumImage() {
 function displayIdentifiedAlbum(data) {
   const kgCard = document.getElementById('kgCard');
   const yearLabel = coverYearLabel(data.year);
+  const genreLabel = coverYearLabel(data.genre);
   const conf = String(data.confidence || '').toLowerCase();
   const review = conf === 'low' ? '<span class="badge badge-warning">Review — low confidence</span>' : '';
+  const matched = data.matched
+    ? '<span class="badge badge-success">Catalog match</span>'
+    : '<span class="badge badge-secondary">From photo</span>';
+  const coverSrc = uploadedImageData || data.coverArt;
+  const mbId = data.musicBrainzId || '';
   kgCard.innerHTML = `
     <div class="kg-result-card" style="background: var(--lf-bg-elevated, #fffcf7); padding: 20px; border-radius: 2px; border: 1px solid rgba(28,27,25,0.12);">
       <div class="row g-0">
         <div class="col-md-3">
-          <img src="${uploadedImageData}" class="img-fluid rounded-start" alt="${escapeMultiHtml(data.albumName)}" style="width: 100%; height: 200px; object-fit: cover;">
+          <img src="${coverSrc}" class="img-fluid rounded-start" alt="${escapeMultiHtml(data.albumName)}" style="width: 100%; height: 200px; object-fit: cover;">
         </div>
         <div class="col-md-9">
           <div class="card-body">
-            <h4 class="card-title">Read from this photo ${review}</h4>
+            <h4 class="card-title">Identified album ${matched} ${review}</h4>
             <h5 class="card-title">${escapeMultiHtml(data.albumName)}</h5>
             <p class="card-text"><strong>Artist:</strong> ${escapeMultiHtml(data.artistName)}</p>
-            ${yearLabel ? `<p class="card-text"><strong>Year on jacket:</strong> ${escapeMultiHtml(yearLabel)}</p>` : '<p class="card-text text-muted">Year not printed on this jacket.</p>'}
-            <p class="card-text"><small class="text-muted">Cover read only — verify title and artist before saving. No appraisal, genre, or history is invented from the photo.</small></p>
-            <button class="btn btn-success btn-lg mt-3" onclick="showAddModal('${data.artistName.replace(/'/g, "\\'")}', '${data.albumName.replace(/'/g, "\\'")}', '${yearLabel}', '', '${uploadedImageData}', null, true, null)">
+            ${yearLabel ? `<p class="card-text"><strong>Year:</strong> ${escapeMultiHtml(yearLabel)}</p>` : ''}
+            ${genreLabel ? `<p class="card-text"><strong>Genre:</strong> ${escapeMultiHtml(genreLabel)}</p>` : ''}
+            <p class="card-text"><small class="text-muted">Confirm title and artist before saving.</small></p>
+            <button class="btn btn-success btn-lg mt-3" onclick="showAddModal('${escapeJsSingleQuoted(data.artistName)}', '${escapeJsSingleQuoted(data.albumName)}', '${escapeJsSingleQuoted(yearLabel)}', '${escapeJsSingleQuoted(genreLabel)}', '${escapeJsSingleQuoted(coverSrc)}', ${mbId ? `'${escapeJsSingleQuoted(mbId)}'` : 'null'}, true, null)">
               <i class="bi-plus-circle"></i> Add to My Collection
             </button>
             <button class="btn btn-outline-primary btn-lg mt-3 ml-2" onclick="addAnotherAlbum()" id="addAnotherBtn" style="display: none;">
@@ -2776,6 +2839,7 @@ function displayIdentifiedAlbum(data) {
       </div>
     </div>
   `;
+  kgCard.style.display = 'block';
 }
 
 // Add another album - clears current and goes back to camera/upload

@@ -1,0 +1,19 @@
+{
+  "name": "Planetarium Field",
+  "short_name": "Field Sky",
+  "description": "Handheld sky instrument for outdoor observing — Hipparcos stars, planets, ISS, Carl voice guide.",
+  "start_url": "/planetarium/field.html",
+  "scope": "/planetarium/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#000000",
+  "theme_color": "#07040A",
+  "icons": [
+    {
+      "src": "/planetarium/icons/field-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

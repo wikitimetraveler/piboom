@@ -244,6 +244,17 @@
     return base + '?' + params.toString();
   }
 
+  /** Deep link into a planet world home page (`/planetarium/worlds/body.html?id=`). */
+  function buildWorldUrl(opts, origin) {
+    const o = opts || {};
+    const id = String(o.id || o.body || '')
+      .trim()
+      .toLowerCase();
+    const base = (origin || '') + '/planetarium/worlds/body.html';
+    if (!id) return base;
+    return base + '?id=' + encodeURIComponent(id);
+  }
+
   /** Illuminated fraction 0 (new) → 1 (full) for moon disc art. */
   function moonPhaseFraction(date) {
     const sunLon = sunEclipticLon(date);
@@ -689,6 +700,7 @@
     scrubIndexToHour,
     buildLocalSkyDate,
     buildPlanetariumUrl,
+    buildWorldUrl,
     OBSERVER_STORAGE_KEY,
     galacticToEquatorial,
     milkyWayBand,

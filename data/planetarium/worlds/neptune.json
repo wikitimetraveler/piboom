@@ -1,0 +1,32 @@
+{
+  "id": "neptune",
+  "name": "Neptune",
+  "kicker": "Deep blue giant",
+  "lede": "The windiest known planet — methane-blue clouds, dark storms, and the captured moon Triton.",
+  "credit": "NASA / JPL · Voyager",
+  "texture": "/shared/textures/planets/neptune.jpg",
+  "physical": {
+    "radiusKm": 24622,
+    "dayHours": 16.1,
+    "yearDays": 60190,
+    "moons": 16,
+    "tiltDeg": 28.3
+  },
+  "landmark": {
+    "label": "Great Dark Spot · Voyager",
+    "lat": -22,
+    "lon": 60,
+    "zoom": 2.05,
+    "blurb": "A large southern storm imaged by Voyager 2 in 1989; later Hubble views showed it had faded while new dark spots appeared."
+  },
+  "missions": [
+    { "name": "Voyager 2", "year": 1989, "note": "Only spacecraft visit — Great Dark Spot, rings, and Triton flyby." }
+  ],
+  "researchNotes": [
+    "Neptune is an ice giant like Uranus but more dynamically active. Wind speeds can exceed 2,000 km/h — among the strongest measured in the solar system.",
+    "The Great Dark Spot of 1989 was comparable in scale to Earth. Hubble later found that such storms come and go over years.",
+    "Triton orbits retrograde and shows nitrogen geysers — strong evidence it was captured from the Kuiper Belt."
+  ],
+  "folklore": "Named for the Roman god of the sea. Discovery involved mathematics (Adams / Le Verrier) as much as the telescope — a triumph of celestial mechanics.",
+  "carlFocus": "Cover Voyager's Great Dark Spot, extreme winds, Triton capture story, and that Neptune was predicted before it was seen."
+}

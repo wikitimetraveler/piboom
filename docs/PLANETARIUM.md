@@ -2,13 +2,18 @@
 
 Full-sky **360° WebGL dome** at [`/planetarium/`](/planetarium/) — astronomy-engine ephemeris, Hipparcos mag≤6 star field, IAU constellation lines, Carl (AstroAI) voice guide, optional Zed HeyGen face, catalog search, ISS TLE passes, and static eclipse/meteor events.
 
-The home hero still uses the lightweight [`FunHomeSky`](../public/shared/js/fun-home-sky.js) sketch; the planetarium page does **not** depend on that ephemeris for planets.
+**Planet worlds** — graphics-first body home pages at [`/planetarium/worlds/`](/planetarium/worlds/) (shared template [`body.html?id=mars`](/planetarium/worlds/body.html?id=mars)): WebGPU NASA globe, research desk from static dossiers, and Carl with world-dossier context.
+
+The home hero still uses the lightweight [`FunHomeSky`](../public/shared/js/fun-home-sky.js) sketch; the planetarium page does **not** depend on that ephemeris for planets. Enlarged hero globes link to **Open {Planet}** (world page) and **View in sky** (dome).
 
 ## Surfaces
 
 | Piece | Path / URL |
 |-------|------------|
-| Dome UI | `/planetarium/` |
+| Theater (lie-back dome) | `/planetarium/` |
+| **Field** (phone outdoor instrument) | `/planetarium/field.html` — horizon + night chrome by default; Face / Find / Carl / Tonight / More dock; lite PWA manifest |
+| **Planet worlds hub** | `/planetarium/worlds/` |
+| **Planet world page** | `/planetarium/worlds/body.html?id=mars` (mercury–pluto + moon) |
 | Carl chat | `POST /api/planetarium/assistant/chat` |
 | ISS passes + position | `GET /api/planetarium/iss-passes?lat=&lon=&at=` |
 | Events / meteors | `GET /api/planetarium/events?from=` |
@@ -16,6 +21,18 @@ The home hero still uses the lightweight [`FunHomeSky`](../public/shared/js/fun-
 | Star catalog | `data/planetarium/bright-stars.json` |
 | Constellation lines | `data/planetarium/constellation-lines.json` |
 | Events data | `data/planetarium/sky-events.json`, `meteor-showers.json` |
+| World dossiers | `data/planetarium/worlds/{id}.json`, `index.json` |
+
+### Theater vs Field
+
+| | Theater | Field |
+|---|---------|-------|
+| Default view | Look-up dome | Horizon |
+| Night chrome | Opt-in | On (Dim / Red / Deep) — UI only, sky unfiltered |
+| Primary chrome | Masthead + control clusters + right desk | Full-bleed sky + bottom dock + sheets |
+| Compass / AR | Discover tab | **Face** dock slot |
+| HeyGen Zed / Spirit in the Sky | Yes | No |
+| Share `app=` | (theater) | `app=field` reopens Field |
 
 ## Client modules
 
@@ -23,12 +40,17 @@ The home hero still uses the lightweight [`FunHomeSky`](../public/shared/js/fun-
 - `public/planetarium/js/planetarium-gl.js` — Three.js inner-sky sphere (drag / zoom / pick)
 - `public/planetarium/js/planetarium-boot.js` — loads GL then starts the page
 - `public/shared/js/planetarium.js` — controls, share URLs, Carl `getSkyContext()`, DOM fallback dome
-- `public/shared/js/fun-home-sky.js` — home hero only (also geolocation helpers reused by the desk)
+- `public/shared/js/fun-home-sky.js` — home hero only (also geolocation helpers reused by the desk); `buildPlanetariumUrl` / `buildWorldUrl`
 - `public/shared/js/webgpu-planetarium-sky.js` — optional wash if WebGL mount fails
-- `public/planetarium/js/planetarium-guide.js` — Carl widget + “show me Jupiter” slew
+- `public/planetarium/js/planetarium-guide.js` — Carl widget + “show me Jupiter” slew (world pages skip slew)
 - `public/planetarium/js/planetarium-heygen.js` — Zed Avatar Realtime tile
 - `public/planetarium/js/planetarium-extras.js` — compass, catalog, ISS, events, deep-sky markers
-- `public/planetarium/js/planetarium-sky-song.js` — Spirit in the Sky (YouTube audio)
+- `public/planetarium/js/planetarium-field.js` — Field dock, bottom sheets, night levels, first-run calibrate
+- `public/shared/css/planetarium-field.css` — Field night instrument chrome (does not restyle theater)
+- `public/planetarium/js/planetarium-sky-song.js` — Spirit in the Sky (YouTube audio; theater only)
+- `public/planetarium/js/planetarium-world.js` — body home page globe + research desk
+- `public/planetarium/js/planetarium-worlds-hub.js` — worlds hub card grid
+- `public/shared/css/planetarium-world.css` — worlds hub / body page chrome
 
 ## Rebuild catalogs
 
@@ -42,7 +64,11 @@ Sources: ofrohn/d3-celestial stars.6 + constellation lines (BSD-3).
 
 ## Deep links
 
-Share / home CTA params: `date`, `time`, `lat`, `lon`, `label`, `face`, `body` (planet id), `select` (constellation / asterism name), `view` (`dome` default, or `horizon`).
+Share / home CTA params: `date`, `time`, `lat`, `lon`, `label`, `face`, `body` (planet id), `select` (constellation / asterism name), `view` (`dome` default on theater, `horizon` default on Field), `app=field` (Field share links).
+
+World pages: `id` (or `body`) on `/planetarium/worlds/body.html` — e.g. `?id=mars`.
+
+Home hero: enlarge a globe → **Open {Planet}** world page + **View in sky** dome; Ctrl/Meta+click a sky planet dot opens the world page.
 
 ## Controls
 
@@ -52,10 +78,11 @@ Share / home CTA params: `date`, `time`, `lat`, `lon`, `label`, `face`, `body` (
 - **Night vision** — red desk theme
 - Drag to spin the dome; wheel to change FOV (up to 180° in look-up)
 - Click ISS pass rows to jump sky time to pass start
+- Planet pick HUD / Tonight table: **Open {Planet} home** when the selection is a known world body
 
 ## Carl context
 
-Each chat turn sends live `getSkyContext()` (observer, date, facing, planets, twilight, selection, engine). Phrases like “show me Mars” or “find M42” slew the dome client-side before Carl answers.
+Each chat turn sends live `getSkyContext()` (observer, date, facing, planets, twilight, selection, engine). On world pages, context also includes the open `world` dossier excerpt; session id is `planetarium-carl-{id}`. Phrases like “show me Mars” or “find M42” slew the dome client-side before Carl answers (theater / Field only).
 
 ## Out of scope
 

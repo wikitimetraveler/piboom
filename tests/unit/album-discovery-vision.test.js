@@ -70,12 +70,21 @@ describe('album-discovery-vision.service', () => {
     expect(info.estimatedValue).toBeNull();
   });
 
-  test('vision prompts ask for jacket text only', () => {
+  test('vision prompts identify the album from cover art', () => {
     const single = buildSingleAlbumVisionPrompt();
     const shelf = buildShelfVisionPrompt(6);
     expect(single).not.toMatch(/VG\+|estimatedValue|assume VG/i);
     expect(shelf).not.toMatch(/VG\+|estimatedValue|assume VG/i);
-    expect(single).toMatch(/only text you can read/i);
-    expect(single).toMatch(/Do not guess/i);
+    expect(single).toMatch(/Identify the album/i);
+    expect(single).toMatch(/cover art/i);
+    expect(single).not.toMatch(/only text you can read/i);
+    expect(shelf).toMatch(/Identify the next batch/i);
+  });
+
+  test('parseVisionSingleAlbum reads fenced JSON with extra braces in prose', () => {
+    const text = 'Sure. Here is the cover: {not json} then\n```json\n{"albumName":"Rumours","artistName":"Fleetwood Mac","year":"1977"}\n```';
+    const album = parseVisionSingleAlbum(text);
+    expect(album.albumName).toBe('Rumours');
+    expect(album.artistName).toBe('Fleetwood Mac');
   });
 });

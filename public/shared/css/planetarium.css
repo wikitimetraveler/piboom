@@ -329,6 +329,29 @@ body.plan-page {
   color: rgba(220, 228, 242, 0.7);
 }
 
+.plan-pick__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.plan-planets__world {
+  margin-left: 0.35rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--plan-gold);
+  text-decoration: none;
+}
+
+.plan-planets__world:hover,
+.plan-planets__world:focus-visible {
+  text-decoration: underline;
+  color: #ffe8b0;
+}
+
 /* Hidden YouTube audio host — keep a real 200×113 box so playback continues */
 .plan-sky-song-host {
   position: fixed;

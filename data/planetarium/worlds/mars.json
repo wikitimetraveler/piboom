@@ -1,0 +1,34 @@
+{
+  "id": "mars",
+  "name": "Mars",
+  "kicker": "Red planet",
+  "lede": "A cold desert world of giant volcanoes, canyon systems, and rovers still working the surface.",
+  "credit": "NASA / JPL · Viking",
+  "texture": "/shared/textures/planets/mars.jpg",
+  "physical": {
+    "radiusKm": 3390,
+    "dayHours": 24.6,
+    "yearDays": 687,
+    "moons": 2,
+    "tiltDeg": 25.2
+  },
+  "landmark": {
+    "label": "Olympus Mons",
+    "lat": 18.65,
+    "lon": -133.8,
+    "zoom": 2.2,
+    "blurb": "The tallest known volcano in the solar system — a shield about 22 km high and hundreds of kilometers across."
+  },
+  "missions": [
+    { "name": "Viking 1 & 2", "year": 1976, "note": "First successful soft landings with imaging and surface experiments." },
+    { "name": "Curiosity", "year": 2012, "note": "Gale crater rover studying habitability and organic chemistry." },
+    { "name": "Perseverance", "year": 2021, "note": "Jezero crater sample caching for a future Mars Sample Return." }
+  ],
+  "researchNotes": [
+    "A Martian day (sol) is about 24 hours 40 minutes. Axial tilt near Earth's gives seasons, though the year lasts nearly two Earth years.",
+    "Olympus Mons and the Tharsis volcanoes dwarf terrestrial peaks. Valles Marineris stretches thousands of kilometers as a vast canyon system.",
+    "Two small moons, Phobos and Deimos, are irregular and likely captured asteroids. Dust storms can grow planet-wide and alter surface temperatures."
+  ],
+  "folklore": "Canal myths from early telescopes and war-of-the-worlds fiction are cultural history — spacecraft show dry channels carved by ancient water, not engineering.",
+  "carlFocus": "Highlight Olympus Mons, sols vs Earth days, Viking-to-Perseverance heritage, and clear canal myth from geology."
+}

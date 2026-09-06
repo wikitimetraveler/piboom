@@ -147,4 +147,14 @@ describe('FunHomeSky', () => {
     expect(url).toContain('/planetarium/?');
     expect(url).toContain('body=mars');
   });
+
+  test('buildWorldUrl encodes body id', () => {
+    expect(FunHomeSky.buildWorldUrl({ id: 'mars' }, '')).toBe(
+      '/planetarium/worlds/body.html?id=mars'
+    );
+    expect(FunHomeSky.buildWorldUrl({ body: 'Jupiter' }, '')).toBe(
+      '/planetarium/worlds/body.html?id=jupiter'
+    );
+    expect(FunHomeSky.buildWorldUrl({}, '')).toBe('/planetarium/worlds/body.html');
+  });
 });

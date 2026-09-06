@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en" class="plan-field-html">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <meta name="theme-color" content="#07040A"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+  <meta name="description" content="Planetarium Field — handheld sky instrument for outdoor observing"/>
+  <title>Planetarium Field | DevConnect Labs</title>
+  <link rel="manifest" href="/planetarium/field.webmanifest"/>
+  <link rel="apple-touch-icon" href="/planetarium/icons/field-icon.svg"/>
+  <link rel="icon" href="/planetarium/icons/field-icon.svg" type="image/svg+xml"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/shared/css/planetarium.css?v=24"/>
+  <link rel="stylesheet" href="/shared/css/planetarium-field.css?v=1"/>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "/shared/js/vendor/three.module.js"
+    }
+  }
+  </script>
+  <script>
+    window.__PLANETARIUM_DEFER_INIT = true;
+    window.__PLANETARIUM_FIELD = true;
+  </script>
+</head>
+<body class="plan-page plan-field plan-night-vision" data-night="red">
+  <a class="plan-skip" href="#planSkyGpu">Skip to sky</a>
+
+  <header class="plan-field-hud" aria-label="Sky status">
+    <button type="button" class="plan-field-hud__when" id="planHudWhen" title="Open time controls">
+      <span id="planLocation" class="plan-field-hud__loc">Fixing location…</span>
+      <span class="plan-field-hud__sep" aria-hidden="true">·</span>
+      <span id="planStatus" class="plan-field-hud__status" role="status" aria-live="polite"></span>
+    </button>
+    <div class="plan-field-hud__tools">
+      <span class="plan-field-fov" id="planFov" aria-live="polite">70° FOV</span>
+      <button type="button" class="plan-field-zenith" id="planLookUp" aria-pressed="false" title="Look straight up">
+        Zenith
+      </button>
+    </div>
+  </header>
+
+  <div class="plan-stage plan-stage--field" id="planStage" aria-label="Sky field">
+    <div class="plan-hint" id="planHint">
+      <p>Hold the phone like a window. Drag to pan. Pinch to zoom. Face locks to the real horizon.</p>
+    </div>
+    <div class="plan-pick" id="planPickHud" hidden>
+      <p class="plan-pick__kicker">Selected</p>
+      <h3 class="plan-pick__name" id="planPickName"></h3>
+      <p class="plan-pick__meta" id="planPickMeta"></p>
+      <div class="plan-pick__actions">
+        <button type="button" class="plan-btn plan-btn--sm" id="planPickAsk">
+          <i class="bi bi-mic-fill" aria-hidden="true"></i> Ask Carl
+        </button>
+        <a class="plan-btn plan-btn--sm plan-btn--ghost" id="planPickWorld" hidden href="/planetarium/worlds/">
+          <i class="bi bi-globe2" aria-hidden="true"></i> <span id="planPickWorldLabel">Open world</span>
+        </a>
+      </div>
+    </div>
+    <div class="plan-field-heading" id="planFieldHeading" hidden aria-live="polite"></div>
+    <canvas class="plan-sky-gpu" id="planSkyGpu" aria-label="Interactive sky dome"></canvas>
+    <div class="plan-sky" id="planSky"></div>
+    <div class="plan-dome-rim" id="planDomeRim" aria-hidden="true">
+      <div class="plan-dome-rose">
+        <div class="plan-dome-rim__ring"></div>
+        <span class="plan-dome-cardinal plan-dome-cardinal--n">N</span>
+        <span class="plan-dome-cardinal plan-dome-cardinal--e">E</span>
+        <span class="plan-dome-cardinal plan-dome-cardinal--s">S</span>
+        <span class="plan-dome-cardinal plan-dome-cardinal--w">W</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="plan-sidebar-backdrop" id="planSidebarBackdrop" hidden></div>
+  <aside class="plan-sidebar plan-sheet" id="planSidebar" aria-label="Field sheets">
+    <div class="plan-sheet__grab" aria-hidden="true"></div>
+    <div class="plan-sidebar__head">
+      <p class="plan-sidebar__title" id="planSheetTitle">Field</p>
+      <button type="button" class="plan-sidebar__close" id="planSidebarClose" aria-label="Close sheet">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <!-- Hidden tabs so extras.js setDeskTab still works -->
+    <div class="visually-hidden" aria-hidden="true">
+      <button type="button" class="plan-tab is-active" role="tab" id="planTabGuide" aria-selected="true" data-plan-tab="guide">Guide</button>
+      <button type="button" class="plan-tab" role="tab" id="planTabTonight" aria-selected="false" data-plan-tab="tonight">Tonight</button>
+      <button type="button" class="plan-tab" role="tab" id="planTabDiscover" aria-selected="false" data-plan-tab="discover">Discover</button>
+      <button type="button" class="plan-tab" role="tab" id="planTabMore" aria-selected="false" data-plan-tab="more">More</button>
+    </div>
+
+    <div class="plan-tabpane is-active" id="planPaneGuide" role="tabpanel" data-plan-pane="guide" aria-labelledby="planTabGuide">
+      <section class="plan-panel plan-carl-panel" aria-labelledby="planCarlHeading">
+        <h2 id="planCarlHeading">Carl · AstroAI</h2>
+        <p class="plan-carl-lead">Voice sky guide with live dome context. Tap a star, then ask.</p>
+        <button type="button" class="plan-btn plan-btn--carl" id="planAskCarl">
+          <i class="bi bi-mic-fill" aria-hidden="true"></i> Ask Carl · voice on
+        </button>
+      </section>
+    </div>
+
+    <div class="plan-tabpane" id="planPaneTonight" role="tabpanel" data-plan-pane="tonight" aria-labelledby="planTabTonight" hidden>
+      <section class="plan-panel" aria-labelledby="planPlanetsHeading">
+        <h2 id="planPlanetsHeading">Planets up</h2>
+        <table class="plan-planets">
+          <thead>
+            <tr>
+              <th scope="col">Body</th>
+              <th scope="col">Alt</th>
+              <th scope="col">Az</th>
+            </tr>
+          </thead>
+          <tbody id="planPlanetBody"></tbody>
+        </table>
+      </section>
+      <section class="plan-panel" aria-labelledby="planAsterismsHeading">
+        <h2 id="planAsterismsHeading">Constellations</h2>
+        <ul class="plan-asterisms" id="planAsterisms"></ul>
+      </section>
+      <section class="plan-panel" aria-labelledby="planDeepSkyHeading">
+        <h2 id="planDeepSkyHeading">Deep sky tonight</h2>
+        <p class="plan-panel-lead">Messier targets above 15° when the sky is dark enough.</p>
+        <ul class="plan-deepsky-list" id="planDeepSky"></ul>
+      </section>
+    </div>
+
+    <div class="plan-tabpane" id="planPaneDiscover" role="tabpanel" data-plan-pane="discover" aria-labelledby="planTabDiscover" hidden>
+      <section class="plan-panel" aria-labelledby="planCatalogHeading">
+        <h2 id="planCatalogHeading">Catalog search</h2>
+        <label class="plan-search-label">
+          <span class="visually-hidden">Search stars and Messier objects</span>
+          <input type="search" id="planCatalogSearch" class="form-control" placeholder="M31, Vega, Orion Nebula…" autocomplete="off" inputmode="search"/>
+        </label>
+        <ul class="plan-catalog-hits" id="planCatalogHits"></ul>
+      </section>
+      <section class="plan-panel" aria-labelledby="planIssHeading">
+        <h2 id="planIssHeading">ISS passes</h2>
+        <ul class="plan-iss-list" id="planIssList"></ul>
+      </section>
+      <section class="plan-panel" aria-labelledby="planEventsHeading">
+        <h2 id="planEventsHeading">Eclipses &amp; meteors</h2>
+        <ul class="plan-events-list" id="planEventsList"></ul>
+      </section>
+    </div>
+
+    <div class="plan-tabpane" id="planPaneMore" role="tabpanel" data-plan-pane="more" aria-labelledby="planTabMore" hidden>
+      <section class="plan-panel" aria-labelledby="planTimeHeading">
+        <h2 id="planTimeHeading">Time</h2>
+        <div class="plan-field-time-row">
+          <button type="button" class="plan-btn" id="planNow">Now</button>
+          <button type="button" class="plan-btn plan-btn--ghost" id="planTonight">Tonight 9 PM</button>
+        </div>
+        <div class="plan-field-time-inputs">
+          <label>
+            Date
+            <input type="date" id="planDate" class="form-control"/>
+          </label>
+          <label>
+            Time
+            <input type="time" id="planTime" class="form-control" step="60"/>
+          </label>
+        </div>
+        <details class="plan-field-animate">
+          <summary>Animate clock</summary>
+          <div class="plan-field-animate__row">
+            <button type="button" class="plan-btn plan-btn--ghost" id="planPlay" aria-pressed="false">
+              <i class="bi bi-play-fill" aria-hidden="true"></i> Play
+            </button>
+            <label class="plan-speed-label">
+              Speed
+              <select id="planSpeed" class="form-control">
+                <option value="1">1×</option>
+                <option value="60" selected>60×</option>
+                <option value="3600">3600×</option>
+              </select>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <section class="plan-panel" aria-labelledby="planPlaceHeading">
+        <h2 id="planPlaceHeading">Place</h2>
+        <div class="plan-field-place-row">
+          <button type="button" class="plan-btn plan-btn--ghost" id="planGeolocate">
+            <i class="bi bi-geo-alt" aria-hidden="true"></i> My location
+          </button>
+          <button type="button" class="plan-btn plan-btn--ghost" id="planShare">
+            <i class="bi bi-link-45deg" aria-hidden="true"></i> Copy link
+          </button>
+        </div>
+        <label>
+          <span id="planFacingCaption">Facing</span>
+          <select id="planFacing" class="form-control">
+            <option value="south">South</option>
+            <option value="east">East</option>
+            <option value="west">West</option>
+            <option value="north">North</option>
+          </select>
+        </label>
+        <button type="button" class="plan-btn plan-btn--ghost plan-btn--sm" id="planCompassToggle" aria-pressed="false">
+          Compass / AR facing
+        </button>
+        <p class="plan-compass-status" id="planCompassStatus" role="status"></p>
+      </section>
+
+      <section class="plan-panel" aria-labelledby="planNightKitHeading">
+        <h2 id="planNightKitHeading">Night kit</h2>
+        <div class="plan-field-night-levels" role="group" aria-label="Night chrome level">
+          <button type="button" class="plan-btn plan-btn--ghost plan-btn--sm" data-night-level="dim">Dim</button>
+          <button type="button" class="plan-btn plan-btn--ghost plan-btn--sm is-active" data-night-level="red">Red</button>
+          <button type="button" class="plan-btn plan-btn--ghost plan-btn--sm" data-night-level="deep">Deep</button>
+        </div>
+        <label class="plan-field-bright-label">
+          UI brightness
+          <input type="range" id="planFieldBrightness" min="10" max="100" value="70" step="5"/>
+        </label>
+        <button type="button" class="plan-btn plan-btn--ghost is-active" id="planLinesToggle" aria-pressed="true" title="Toggle constellation lines">
+          <i class="bi bi-share" aria-hidden="true"></i> Constellation lines
+        </button>
+        <button type="button" class="visually-hidden" id="planNightVision" aria-pressed="true" tabindex="-1">Night</button>
+        <p class="plan-roadmap-note">Add to Home Screen for a black bezel and no browser chrome.</p>
+        <p class="plan-footer-links mb-0">
+          <a href="/planetarium/">Open Theater</a>
+        </p>
+      </section>
+    </div>
+  </aside>
+
+  <nav class="plan-field-dock" aria-label="Field tools">
+    <button type="button" class="plan-field-dock__btn" id="planDockFace" aria-pressed="false">
+      <i class="bi bi-compass" aria-hidden="true"></i>
+      <span>Face</span>
+    </button>
+    <button type="button" class="plan-field-dock__btn" id="planDockFind">
+      <i class="bi bi-search" aria-hidden="true"></i>
+      <span>Find</span>
+    </button>
+    <button type="button" class="plan-field-dock__btn plan-field-dock__btn--carl" id="planDockCarl">
+      <i class="bi bi-mic-fill" aria-hidden="true"></i>
+      <span>Carl</span>
+    </button>
+    <button type="button" class="plan-field-dock__btn" id="planDockTonight">
+      <i class="bi bi-moon-stars" aria-hidden="true"></i>
+      <span>Tonight</span>
+    </button>
+    <button type="button" class="plan-field-dock__btn" id="planDockMore" aria-controls="planSidebar" aria-expanded="false">
+      <i class="bi bi-three-dots" aria-hidden="true"></i>
+      <span>More</span>
+    </button>
+  </nav>
+
+  <div class="plan-field-calibrate" id="planFieldCalibrate" hidden>
+    <div class="plan-field-calibrate__card" role="dialog" aria-labelledby="planCalibrateTitle">
+      <h2 id="planCalibrateTitle">Calibrate for tonight</h2>
+      <p>One-handed sky instrument. Location and Face work best outdoors.</p>
+      <button type="button" class="plan-btn" id="planCalibrateLocate">Use my location</button>
+      <button type="button" class="plan-btn plan-btn--ghost" id="planCalibrateFace">Face the sky</button>
+      <button type="button" class="plan-btn plan-btn--ghost" id="planCalibrateSkip">Skip</button>
+    </div>
+  </div>
+
+  <script src="/shared/tts.js"></script>
+  <script src="/shared/speech-recognition.js"></script>
+  <script src="/shared/js/astronomy.browser.min.js"></script>
+  <script src="/planetarium/js/celestial-engine.js?v=1"></script>
+  <script src="/shared/js/webgpu-runtime.js"></script>
+  <script src="/shared/js/webgpu-planetarium-sky.js?v=3"></script>
+  <script src="/shared/js/fun-home-sky.js?v=7"></script>
+  <script src="/shared/js/planetarium.js?v=19"></script>
+  <script type="module" src="/planetarium/js/planetarium-boot.js?v=15"></script>
+  <script type="module" src="/planetarium/js/planetarium-guide.js?v=3"></script>
+  <script src="/planetarium/js/planetarium-extras.js?v=4"></script>
+  <script src="/planetarium/js/planetarium-field.js?v=1"></script>
+</body>
+</html>

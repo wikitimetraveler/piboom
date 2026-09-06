@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="Planetarium Field">
+  <rect width="192" height="192" fill="#07040A"/>
+  <circle cx="96" cy="96" r="70" fill="none" stroke="#FF6A4A" stroke-width="6"/>
+  <circle cx="96" cy="96" r="4" fill="#FF6A4A"/>
+  <path d="M96 26 L96 46 M96 146 L96 166 M26 96 L46 96 M146 96 L166 96" stroke="#FF6A4A" stroke-width="5" stroke-linecap="round"/>
+  <text x="96" y="38" text-anchor="middle" fill="#FF6A4A" font-family="system-ui,sans-serif" font-size="18" font-weight="700">N</text>
+</svg>

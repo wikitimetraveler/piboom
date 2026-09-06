@@ -237,6 +237,12 @@
       lon: 0,
       zoom: 1.55,
     },
+    uranus: {
+      label: 'Equator · ring plane',
+      lat: 0,
+      lon: 0,
+      zoom: 1.85,
+    },
     neptune: {
       label: 'Great Dark Spot · Voyager',
       lat: -22,

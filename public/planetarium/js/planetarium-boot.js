@@ -4,7 +4,7 @@
  */
 async function start() {
   try {
-    await import('/planetarium/js/planetarium-gl.js?v=14');
+    await import('/planetarium/js/planetarium-gl.js?v=15');
   } catch (err) {
     console.warn('PlanetariumGL module failed to load', err);
   }

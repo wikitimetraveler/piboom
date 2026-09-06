@@ -11,7 +11,7 @@ await jest.unstable_mockModule('../../services/musicbrainz.service.js', () => ({
   MUSICBRAINZ_USER_AGENT: 'test-agent'
 }));
 
-const { getAlbums } = await import('../../controllers/album-discovery.controller.js');
+const { getAlbums, matchIdentifiedAlbumOnMusicBrainz } = await import('../../controllers/album-discovery.controller.js');
 
 describe('getAlbums', () => {
   beforeEach(() => {
@@ -80,5 +80,48 @@ describe('getAlbums', () => {
         message: expect.stringMatching(/try again/i)
       })
     );
+  });
+
+  test('matchIdentifiedAlbumOnMusicBrainz confirms title and artist', async () => {
+    mbGet.mockResolvedValue({
+      data: {
+        'release-groups': [
+          {
+            id: 'rg-abbey',
+            title: 'Abbey Road',
+            'first-release-date': '1969-09-26',
+            tags: [{ name: 'rock' }],
+            'primary-type': 'Album',
+            'artist-credit': [{ name: 'The Beatles' }]
+          }
+        ]
+      }
+    });
+
+    const match = await matchIdentifiedAlbumOnMusicBrainz('Abbey Road', 'The Beatles');
+    expect(mbGet).toHaveBeenCalledWith(
+      '/release-group',
+      expect.objectContaining({
+        query: 'releasegroup:"Abbey Road" AND artist:"The Beatles"'
+      })
+    );
+    expect(match).toEqual(
+      expect.objectContaining({
+        title: 'Abbey Road',
+        artist: 'The Beatles',
+        year: '1969',
+        musicBrainzId: 'rg-abbey'
+      })
+    );
+  });
+
+  test('matchIdentifiedAlbumOnMusicBrainz returns null when no release groups', async () => {
+    mbGet.mockResolvedValue({ data: { 'release-groups': [] } });
+    await expect(matchIdentifiedAlbumOnMusicBrainz('Nope', 'Nobody')).resolves.toBeNull();
+  });
+
+  test('matchIdentifiedAlbumOnMusicBrainz returns null without a title', async () => {
+    await expect(matchIdentifiedAlbumOnMusicBrainz('', 'The Beatles')).resolves.toBeNull();
+    expect(mbGet).not.toHaveBeenCalled();
   });
 });

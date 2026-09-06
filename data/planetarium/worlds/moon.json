@@ -1,0 +1,36 @@
+{
+  "id": "moon",
+  "name": "Moon",
+  "kicker": "Lane crater · far side",
+  "lede": "Earth's companion — maria, highlands, and a far-side crater named for Jonathan Homer Lane of Hampton Falls.",
+  "credit": "Lane crater · Jonathan Homer Lane",
+  "texture": "/shared/textures/moon/moon-color.jpg",
+  "physical": {
+    "radiusKm": 1737,
+    "dayHours": 655.7,
+    "yearDays": 27.3,
+    "moons": 0,
+    "tiltDeg": 6.7
+  },
+  "landmark": {
+    "label": "Lane crater",
+    "lat": -9.5,
+    "lon": 132.36,
+    "zoom": 2.35,
+    "href": "/family/lane-museum.html?lunar=1",
+    "linkLabel": "Lane Museum",
+    "blurb": "IAU-named crater on the lunar far side (1970), about 54 km across, honoring physicist Jonathan Homer Lane."
+  },
+  "missions": [
+    { "name": "Apollo 11–17", "year": 1969, "note": "Crewed landings returned samples and planted laser retroreflectors still used today." },
+    { "name": "Lunar Reconnaissance Orbiter", "year": 2009, "note": "High-resolution maps of both near and far sides." },
+    { "name": "Artemis", "year": 2020, "note": "NASA program returning crews to lunar orbit and the surface." }
+  ],
+  "researchNotes": [
+    "The Moon is tidally locked: we always see the same near side. The far side was first imaged by Luna 3 (1959) and mapped in detail by later orbiters.",
+    "Lane crater sits on the far side near the equator. It is named for Jonathan Homer Lane (1819–1880), astrophysicist linked to Hampton Falls, New Hampshire.",
+    "Phases change with the Sun–Moon–Earth angle. Synodic month is about 29.5 days — the rhythm behind tonight's moon phase on the dome."
+  ],
+  "folklore": "Moon lore and werewolf tales are storytelling. The crater name Lane is an IAU scientific dedication, not folklore.",
+  "carlFocus": "Lead with Lane crater and Jonathan Homer Lane when asked. Cover phases, tidal locking, and Apollo / LRO facts. Offer the Lane Museum link."
+}

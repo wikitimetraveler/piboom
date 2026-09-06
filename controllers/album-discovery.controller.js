@@ -267,6 +267,32 @@ export async function getAlbums(req, res) {
   }
 }
 
+export async function matchIdentifiedAlbumOnMusicBrainz(albumName, artistName) {
+  const title = quoteMusicBrainzTerm(albumName);
+  const artist = quoteMusicBrainzTerm(artistName);
+  if (!title || !artist) return null;
+
+  const response = await mbGet('/release-group', {
+    query: `releasegroup:"${title}" AND artist:"${artist}"`,
+    limit: 5
+  });
+  const groups = response.data?.['release-groups'] || [];
+  if (!groups.length) return null;
+  return mapReleaseGroups(groups, groups[0]?.['artist-credit']?.[0]?.name || artistName)[0] || null;
+}
+
+function catalogYear(year) {
+  const s = String(year || '').trim();
+  if (!s || /^(unknown|n\/a|none)$/i.test(s)) return '';
+  return s;
+}
+
+function catalogGenre(genre) {
+  const s = String(genre || '').trim();
+  if (!s || /^(unknown|n\/a|none)$/i.test(s)) return '';
+  return s;
+}
+
 // Search for a specific album by name
 export async function searchAlbum(req, res) {
   try {
@@ -357,15 +383,25 @@ export async function identifyAlbumFromImage(req, res) {
     console.log('🤖 AI Response:', aiResponse);
 
     if (album) {
+      let match = null;
+      try {
+        match = await matchIdentifiedAlbumOnMusicBrainz(album.albumName, album.artistName);
+      } catch (lookupError) {
+        console.warn('MusicBrainz confirm after cover identify failed:', lookupError.message);
+      }
+
       return res.json({
         success: true,
-        albumName: album.albumName,
-        artistName: album.artistName,
-        year: album.year,
-        genre: album.genre,
-        description: album.description,
-        estimatedValue: album.estimatedValue,
+        albumName: match?.title || album.albumName,
+        artistName: match?.artist || album.artistName,
+        year: catalogYear(match?.year) || album.year || '',
+        genre: catalogGenre(match?.genre),
+        description: '',
+        estimatedValue: null,
         confidence: album.confidence,
+        musicBrainzId: match?.musicBrainzId || null,
+        coverArt: match?.coverArt || null,
+        matched: Boolean(match),
       });
     }
 
