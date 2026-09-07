@@ -17,11 +17,17 @@ Billy Thorpe’s **Children of the Sun** (1979) is still under copyright. Do **n
 
 Home (`/`) plays it as hidden YouTube audio (`voAR07ezBts`) via `public/shared/js/fun-home-sky-song.js`. The **Children of the Sun** control toggles play/pause. The iframe is not shown.
 
-## Mountain High — Panama Red
+## Mountain High — Panama Red, Homegrown, Roll Another Number
 
-New Riders of the Purple Sage’s **Panama Red** (1973) is still under copyright. Do **not** commit a commercial rip.
+New Riders of the Purple Sage’s **Panama Red** (1973), Neil Young’s **Homegrown**, and **Roll Another Number (For the Road)** are still under copyright. Do **not** commit commercial rips.
 
-Mountain High (`/mountain-high/`) plays it as hidden YouTube audio (`Tt6Do5fo4k8`) via `public/mountain-high/js/mhm-song.js` after the 21+ gate. The **Panama Red** control toggles play/pause. The iframe is not shown.
+Mountain High (`/mountain-high/`) plays them as hidden YouTube audio via `public/mountain-high/js/mhm-song.js` after the 21+ gate:
+
+- Panama Red — `Tt6Do5fo4k8`
+- Homegrown (Farm Aid 1986) — `1eetrxNlR-M`
+- Roll Another Number (Live) — `c8p04GHC8sY`
+
+The **song** control toggles play/pause. **Next** cycles the three sources. The iframe is not shown.
 
 ## Planetarium — Spirit in the Sky
 

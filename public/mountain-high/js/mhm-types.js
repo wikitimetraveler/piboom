@@ -45,8 +45,8 @@
             ${examples ? `<p><strong>On the map:</strong> ${esc(examples)}</p>` : ''}
           </div>
           <div class="mhm-back-actions">
-            <button type="button" class="mhm-btn mhm-btn-sm mhm-hear" data-hear="${esc(type.id)}">Hear Sage</button>
-            <button type="button" class="mhm-btn mhm-btn-ghost mhm-btn-sm mhm-ask" data-ask="${esc(type.id)}">Ask Sage</button>
+            <button type="button" class="mhm-btn mhm-btn-sm mhm-hear" data-hear="${esc(type.id)}">Hear Jill</button>
+            <button type="button" class="mhm-btn mhm-btn-ghost mhm-btn-sm mhm-ask" data-ask="${esc(type.id)}">Ask Jill</button>
             <button type="button" class="mhm-btn mhm-btn-sm mhm-map" data-map="${esc(type.id)}">Show on map</button>
             <button type="button" class="mhm-btn mhm-btn-ghost mhm-btn-sm mhm-flip-back">Flip back</button>
           </div>
@@ -69,12 +69,12 @@
       const card = ev.target.closest('.mhm-card');
       if (hear) {
         const type = types.find((t) => t.id === hear.getAttribute('data-hear'));
-        if (type && typeof root.MhmAskSage === 'function') {
-          root.MhmSpeakSage?.(type.history);
+        if (type && typeof root.MhmAskJill === 'function') {
+          root.MhmSpeakJill?.(type.history);
         }
       } else if (ask) {
         const type = types.find((t) => t.id === ask.getAttribute('data-ask'));
-        root.MhmAskSage?.(`Tell me about ${type?.name || 'this type'} — history only, no grow tips.`);
+        root.MhmAskJill?.(`Tell me about ${type?.name || 'this type'} — history and botany, no grow recipes.`);
       } else if (mapBtn) {
         const type = types.find((t) => t.id === mapBtn.getAttribute('data-map'));
         document.getElementById('mhmOrigins')?.scrollIntoView({ behavior: 'smooth', block: 'start' });

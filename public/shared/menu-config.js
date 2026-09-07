@@ -78,7 +78,7 @@
     { href: '/music/musical-google-earth-files.html', icon: 'bi-cloud-arrow-down', label: 'Google Earth KML' },
     { href: '/music/my-grateful-dead-shows.html', icon: 'bi-calendar-event', label: 'Grateful Dead Shows' },
     { href: '/music/sample-detector.html', icon: 'bi-magnet', label: 'Sample Detector' },
-    { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Sage, locksmith Long Beach & L.A.' },
+    { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Jill, locksmith Long Beach & L.A.' },
     { divider: true },
     { href: '/#headingMusic', icon: 'bi-grid-3x3-gap', label: 'All Music Tools' },
   ];
@@ -90,10 +90,11 @@
     { href: '/entertainment/player.html', icon: 'bi-volume-up', label: 'The Boombox' },
     { href: '/entertainment/visualizer.html', icon: 'bi-palette-fill', label: 'Psychedelic Visualizer' },
     { href: '/planetarium/', icon: 'bi-stars', label: 'Planetarium' },
+    { href: '/planetarium/field.html', icon: 'bi-phone', label: 'Field app', title: 'Phone outdoor sky — horizon, Face compass, night chrome' },
     { href: '/planetarium/worlds/', icon: 'bi-globe2', label: 'Planet worlds', title: 'NASA globe home pages — research desk + Carl' },
     { href: '/entertainment/blacklight.html', icon: 'bi-lightning', label: 'Black Light Zone' },
     { href: '/entertainment/blacklight-poster.html', icon: 'bi-lightbulb', label: 'Black Light Poster' },
-    { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Sage, locksmith Long Beach & L.A.' },
+    { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Jill, locksmith Long Beach & L.A.' },
     { href: '/entertainment/poster-generator.html', icon: 'bi-palette', label: 'Poster Generator' },
     { href: '/entertainment/art-gallery.html', icon: 'bi-image', label: 'Art Gallery' },
     { href: '/entertainment/ouija-board.html', icon: 'bi-magic', label: 'Ouija Board' },
@@ -108,10 +109,11 @@
     { href: '/entertainment/player.html', icon: 'bi-volume-up', label: 'The Boombox', title: 'Boombox audio player' },
     { href: '/entertainment/visualizer.html', icon: 'bi-palette-fill', label: 'Psychedelic Visualizer', title: 'Psychedelic visualizer' },
     { href: '/planetarium/', icon: 'bi-stars', label: 'Planetarium', title: 'Full-sky planetarium — stars, planets, constellations' },
+    { href: '/planetarium/field.html', icon: 'bi-phone', label: 'Field app', title: 'Phone outdoor sky — horizon, Face compass, night chrome' },
     { href: '/planetarium/worlds/', icon: 'bi-globe2', label: 'Planet worlds', title: 'NASA globe home pages — research desk + Carl AstroAI' },
     { href: '/entertainment/blacklight.html', icon: 'bi-lightning', label: 'Black Light Zone', title: 'Black light neon scene' },
     { href: '/entertainment/blacklight-poster.html', icon: 'bi-lightbulb', label: 'Black Light Poster', title: 'Sound-reactive black-light poster' },
-    { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Sage, locksmith Long Beach & L.A.' },
+    { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Jill, locksmith Long Beach & L.A.' },
     { href: '/entertainment/poster-generator.html', icon: 'bi-palette', label: 'Poster Generator', title: 'Generate psychedelic posters' },
     { href: '/entertainment/art-gallery.html', icon: 'bi-image', label: 'Art Gallery', title: 'Entertainment art gallery' },
     { href: '/entertainment/ouija-board.html', icon: 'bi-magic', label: 'Ouija Board', title: 'Spirit board experience' },
@@ -246,7 +248,7 @@
 
   /** Nature hub tool grid */
   const NATURE_TOOLS = [
-    { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Sage, embedded origins map' },
+    { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Jill, embedded origins map' },
     { href: '/nature/cannabis-origins.html', icon: 'bi-globe2', label: 'Cannabis Origins', title: 'Password-gated landrace map (standalone)' },
     { href: '/nature/tree-discovery.html', icon: 'bi-tree', label: 'Tree Discovery', title: 'Discover trees' },
     { href: '/nature/tree-collection.html', icon: 'bi-collection', label: 'Tree Collection', title: 'Your tree collection' },
@@ -284,7 +286,7 @@
     { href: '/music/musical-google-earth-files.html', icon: 'bi-cloud-arrow-down', label: 'Google Earth KML', title: 'Network links and downloads for Google Earth Pro' },
     { href: '/music/my-grateful-dead-shows.html', icon: 'bi-calendar-event', label: 'Grateful Dead Shows', title: 'Grateful Dead show archive' },
     { href: '/music/sample-detector.html', icon: 'bi-magnet', label: 'Sample Detector', title: 'Detect samples and covers' },
-    { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Sage, locksmith Long Beach & L.A.' },
+    { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Jill, locksmith Long Beach & L.A.' },
   ];
 
   /** Public /finance pages (no login). Keep in sync with lib/finance-session.js FINANCE_PUBLIC_PAGES. */

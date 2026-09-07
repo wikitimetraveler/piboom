@@ -1,12 +1,12 @@
 /**
- * Sage chat + Google TTS
+ * Jill chat + Google TTS (same female Neural2-F voice as before)
  * Development work by David Lane
  */
 import AIChatWidget from '/shared/ai-chat-widget.js';
 
-const AVATAR = '/mountain-high/assets/sage-portrait.svg';
-const SAGE_TTS = 'en-US-Neural2-F';
-const SAGE_OPTS = { preferFemale: true, gender: 'female', pitch: 1.5, speakingRate: 0.98 };
+const AVATAR = '/mountain-high/assets/jill-portrait.svg';
+const JILL_TTS = 'en-US-Neural2-F';
+const JILL_OPTS = { preferFemale: true, gender: 'female', pitch: 1.5, speakingRate: 0.98 };
 
 function forSpeech(text) {
   return String(text || '')
@@ -26,7 +26,7 @@ function unlockTts() {
   }
 }
 
-async function speakSage(text) {
+async function speakJill(text) {
   const clean = forSpeech(text);
   if (!clean) return;
   unlockTts();
@@ -35,7 +35,7 @@ async function speakSage(text) {
   }
   if (typeof window.speakWithGoogle === 'function') {
     try {
-      await window.speakWithGoogle(clean, SAGE_TTS, SAGE_OPTS);
+      await window.speakWithGoogle(clean, JILL_TTS, JILL_OPTS);
       return;
     } catch (_) {
       /* fall through */
@@ -70,13 +70,13 @@ function initChat() {
   const widget = new AIChatWidget({
     apiEndpoint: '/api/mountain-high/assistant/chat',
     userId: 'mhm-guest',
-    sessionId: 'mountain-high-sage',
-    title: 'Sage',
-    buttonTitle: 'Ask Sage',
-    inputPlaceholder: 'Ask about types, the origins map, or a lockout in Long Beach / L.A.…',
+    sessionId: 'mountain-high-jill',
+    title: 'Jill',
+    buttonTitle: 'Ask Jill',
+    inputPlaceholder: 'Ask about types, homegrown vs indoor, the origins map, or a lockout in Long Beach / L.A.…',
     avatarUrl: AVATAR,
     welcomeHtml: `<img src="${AVATAR}" alt="" style="width:64px;height:64px;border-radius:50%;margin-bottom:8px;border:2px solid #e8d5a3"/>
-      <p>Hey — I'm <strong>Sage</strong>. Twenty-one and over. Flip a type card, or ask about locksmiths in <strong>Long Beach and L.A.</strong></p>
+      <p>Hey — I'm <strong>Jill</strong>. Hippie botanist, grow expert, twenty-one and over. Flip a type card, or ask about locksmiths in <strong>Long Beach and L.A.</strong></p>
       <small class="text-muted">Try: "What's the difference between indica and sativa?" or "Do you cover Long Beach?"</small>`,
     getContext: () => ({ page: 'mountain-high', age: '21+' }),
     onOpen: () => unlockTts(),
@@ -85,15 +85,15 @@ function initChat() {
         typeof response === 'string'
           ? response
           : response?.response || response?.reply || response?.message || '';
-      speakSage(text);
+      speakJill(text);
     },
   });
 
   window.aiChatWidget = widget;
-  window.MhmAskSage = openChat;
-  window.MhmSpeakSage = speakSage;
+  window.MhmAskJill = openChat;
+  window.MhmSpeakJill = speakJill;
 
-  document.getElementById('mhmAskSage')?.addEventListener('click', () => {
+  document.getElementById('mhmAskJill')?.addEventListener('click', () => {
     document.getElementById('mhmGuide')?.classList.remove('is-compact');
     openChat();
   });

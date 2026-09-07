@@ -1,15 +1,41 @@
 /**
- * Mountain High soundtrack — New Riders of the Purple Sage, Panama Red (1973).
- * Hidden YouTube audio (no local copy of the recording).
+ * Mountain High soundtrack — Panama Red, Homegrown, Roll Another Number.
+ * Hidden YouTube audio (no local copy of the recordings).
  * Development work by David Lane
  */
 (function (root) {
   'use strict';
 
-  const VIDEO_ID = 'Tt6Do5fo4k8';
-  const ARTIST = 'New Riders of the Purple Sage';
-  const TITLE = 'Panama Red';
-  const YEAR = 1973;
+  const TRACKS = [
+    {
+      id: 'panama-red',
+      videoId: 'Tt6Do5fo4k8',
+      artist: 'New Riders of the Purple Sage',
+      title: 'Panama Red',
+      shortTitle: 'Panama Red',
+      year: 1973,
+    },
+    {
+      id: 'homegrown',
+      videoId: '1eetrxNlR-M',
+      artist: 'Neil Young',
+      title: 'Homegrown',
+      shortTitle: 'Homegrown',
+      year: 1977,
+    },
+    {
+      id: 'roll-another',
+      videoId: 'c8p04GHC8sY',
+      artist: 'Neil Young',
+      title: 'Roll Another Number',
+      shortTitle: 'Roll Another',
+      year: 1975,
+    },
+  ];
+  let currentIndex = 0;
+  function currentTrack() {
+    return TRACKS[currentIndex] || TRACKS[0];
+  }
   const DEFAULT_VOLUME = 100;
   /** Play after the 21+ gate; the Panama Red button then toggles it. */
   const AUTOPLAY_ON_LOAD = true;
@@ -18,6 +44,7 @@
   const MUTE_KEY = 'mhmSongMuted';
   const VOLUME_KEY = 'mhmSongVolume';
   const TOGGLE_SELECTOR = '#mhmSongToggle';
+  const NEXT_SELECTOR = '#mhmSongNext';
   const VOLUME_SELECTOR = '#mhmSongVolume';
   const HOST_ID = 'mhmSongPlayer';
 
@@ -111,20 +138,25 @@
   function isToggleEvent(event) {
     const target = event && event.target;
     if (!target || typeof target.closest !== 'function') return false;
-    return Boolean(target.closest(TOGGLE_SELECTOR));
+    return Boolean(target.closest(TOGGLE_SELECTOR) || target.closest(NEXT_SELECTOR));
   }
 
   function syncButtons() {
     if (typeof document === 'undefined') return;
     const on = songShouldBeOn();
+    const track = currentTrack();
+    const label = track.shortTitle || track.title;
     document.querySelectorAll(TOGGLE_SELECTOR).forEach((btn) => {
       btn.setAttribute('aria-pressed', on ? 'true' : 'false');
       btn.innerHTML = on
-        ? '<i class="bi bi-pause-fill" aria-hidden="true"></i><span> Panama Red</span>'
-        : '<i class="bi bi-play-fill" aria-hidden="true"></i><span> Panama Red</span>';
+        ? `<i class="bi bi-pause-fill" aria-hidden="true"></i><span> ${label}</span>`
+        : `<i class="bi bi-play-fill" aria-hidden="true"></i><span> ${label}</span>`;
       btn.title = on
-        ? 'Pause Panama Red'
-        : 'Play Panama Red — New Riders of the Purple Sage, 1973';
+        ? `Pause ${track.title}`
+        : `Play ${track.title} — ${track.artist}, ${track.year}`;
+    });
+    document.querySelectorAll(NEXT_SELECTOR).forEach((btn) => {
+      btn.title = `Next soundtrack — ${TRACKS.map((t) => t.shortTitle || t.title).join(', ')}`;
     });
     const slider = document.querySelector(VOLUME_SELECTOR);
     if (slider && String(slider.value) !== String(volume)) {
@@ -280,7 +312,7 @@
     if (SKIP_SECONDS > 0) silenceUntilSkip(target);
     try {
       if (typeof target.loadVideoById === 'function') {
-        const payload = { videoId: VIDEO_ID };
+        const payload = { videoId: currentTrack().videoId };
         if (SKIP_SECONDS > 0) payload.startSeconds = SKIP_SECONDS;
         target.loadVideoById(payload);
       } else if (typeof target.playVideo === 'function') {
@@ -325,7 +357,7 @@
     if (origin && /^https?:/i.test(origin)) playerVars.origin = origin;
     return new Promise((resolve) => {
       const next = new YT.Player(HOST_ID, {
-        videoId: VIDEO_ID,
+        videoId: currentTrack().videoId,
         width: '200',
         height: '113',
         playerVars,
@@ -370,7 +402,7 @@
             ) {
               playing = false;
               if (!isMuted() && event.data === YT.PlayerState.ENDED) {
-                startAtSkip(player);
+                next();
                 return;
               }
               restoreAmbience();
@@ -381,6 +413,15 @@
       });
       player = next;
     });
+  }
+
+  function next() {
+    currentIndex = (currentIndex + 1) % TRACKS.length;
+    if (player && songShouldBeOn()) {
+      kickPlayback(player);
+    }
+    syncButtons();
+    return currentTrack();
   }
 
   async function start() {
@@ -473,6 +514,23 @@
       });
     });
 
+    document.querySelectorAll(NEXT_SELECTOR).forEach((btn) => {
+      if (btn._skySongNextBound) return;
+      btn._skySongNextBound = true;
+      btn.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setMuted(false);
+        wantedOn = true;
+        if (!player) {
+          currentIndex = (currentIndex + 1) % TRACKS.length;
+          start().catch(() => {});
+          return;
+        }
+        next();
+      });
+    });
+
     const slider = document.querySelector(VOLUME_SELECTOR);
     if (slider && !slider._skySongBound) {
       slider._skySongBound = true;
@@ -499,10 +557,19 @@
   }
 
   root.MhmSong = {
-    VIDEO_ID,
-    ARTIST,
-    TITLE,
-    YEAR,
+    get VIDEO_ID() {
+      return currentTrack().videoId;
+    },
+    get ARTIST() {
+      return currentTrack().artist;
+    },
+    get TITLE() {
+      return currentTrack().title;
+    },
+    get YEAR() {
+      return currentTrack().year;
+    },
+    TRACKS,
     DEFAULT_VOLUME,
     AUTOPLAY_ON_LOAD,
     SKIP_SECONDS,
@@ -515,6 +582,7 @@
     start,
     stop,
     toggle,
+    next,
     setVolume,
     getVolume: () => volume,
     isMuted,

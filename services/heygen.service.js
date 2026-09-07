@@ -210,6 +210,15 @@ export async function createPromptAvatar({
 }
 
 /**
+ * One avatar look, including `preview_image_url` once HeyGen finishes rendering it.
+ * @param {string} lookId
+ */
+export async function getAvatarLook(lookId) {
+  if (!lookId) throw new Error('lookId is required');
+  return heygenRequest(`/v3/avatars/looks/${encodeURIComponent(lookId)}`);
+}
+
+/**
  * Create an avatar video from a script.
  * @param {object} opts
  * @param {string} opts.avatarId - HeyGen avatar ID (video avatar or photo avatar look ID)
@@ -304,7 +313,7 @@ function isMissingRealtimeAvatar(err) {
 async function createPosterVoiceSession({ avatar, voice, text }) {
   let previewUrl = null;
   try {
-    const look = await heygenRequest(`/v3/avatars/looks/${encodeURIComponent(avatar)}`);
+    const look = await getAvatarLook(avatar);
     previewUrl = look?.preview_image_url || look?.image_url || null;
   } catch (_) {
     previewUrl = null;

@@ -5,6 +5,12 @@
  * Usage:
  *   npm run create:zed-heygen-avatar
  *   node scripts/tools/create-zed-heygen-avatar.mjs --voice-id <id>
+ *
+ * Add a look to the existing Zed character instead of a new one:
+ *   node scripts/tools/create-zed-heygen-avatar.mjs --reuse-group --orientation vertical --pose close_up --backdrop sky
+ *
+ * List voice candidates without spending credits:
+ *   node scripts/tools/create-zed-heygen-avatar.mjs --voices 8
  */
 import 'dotenv/config';
 import { readFile, writeFile } from 'node:fs/promises';
@@ -13,6 +19,7 @@ import { fileURLToPath } from 'node:url';
 import {
   heygenConfigured,
   createPromptAvatar,
+  getAvatarLook,
   listVoices
 } from '../../services/heygen.service.js';
 
@@ -24,18 +31,51 @@ const FACE_JSON = path.join(ROOT, 'data/studio-heygen-face.json');
 const APPEARANCE_PROMPT =
   'Young-adult humanoid alien presenter, half-body. Iridescent teal-grey skin with faint circuit-like facial markings. Large dark almond eyes with a cyan catchlight. Short silver-white undercut, one neon-magenta streak. Subtle cranial ridges and slightly pointed ears. Black high-collar jacket with chrome zipper and a thin LED rim at the collar. Neon rain night-city bokeh in magenta and teal. Cool, still expression, cinematic cyberpunk lighting.';
 
+/** Sky backdrop keeps Zed on-theme for the planetarium surfaces. */
+const APPEARANCE_PROMPT_SKY =
+  'Young-adult humanoid alien presenter, close-up head and shoulders, centered in a vertical frame. Iridescent teal-grey skin with faint circuit-like facial markings. Large dark almond eyes with a cyan catchlight. Short silver-white undercut, one neon-magenta streak. Subtle cranial ridges and slightly pointed ears. Black high-collar jacket with chrome zipper and a thin LED rim at the collar. Behind him a deep night sky with a soft starfield and faint magenta-teal nebula glow — no city, no rain. Cool, still expression, cinematic low-key lighting with a cyan rim light.';
+
 const GREETING =
   "Signal acquired. Console is live — arm a track when you're ready.";
 
-function voiceIdArg() {
-  const idx = process.argv.indexOf('--voice-id');
+/** HeyGen orientation enum -> AVATAR-ZED.md Looks key. */
+const LOOK_KEYS = { horizontal: 'landscape', vertical: 'portrait', square: 'square' };
+
+function argVal(flag) {
+  const idx = process.argv.indexOf(flag);
   if (idx === -1 || !process.argv[idx + 1]) return null;
-  return String(process.argv[idx + 1]).trim();
+  const next = String(process.argv[idx + 1]).trim();
+  return next.startsWith('--') ? null : next;
 }
 
-async function pickCyberpunkEnglishVoice() {
-  const voices = await listVoices({ maxPages: 3 });
-  const scored = voices
+function hasFlag(flag) {
+  return process.argv.includes(flag);
+}
+
+function voiceIdArg() {
+  return argVal('--voice-id');
+}
+
+/** Group ID recorded in AVATAR-ZED.md, so new looks join the same character. */
+async function readGroupIdFromAvatarMd() {
+  const md = await readFile(AVATAR_MD, 'utf8');
+  const match = md.match(/- Group ID:\s*(\S+)/);
+  return match ? match[1] : null;
+}
+
+async function rankCyberpunkEnglishVoices() {
+  const pages = Number(argVal('--voice-pages')) || 3;
+  const grep = argVal('--voice-grep');
+  const filter = grep ? new RegExp(grep, 'i') : null;
+  const designedOnly = hasFlag('--voice-designed');
+  const voices = await listVoices({ maxPages: pages });
+  return voices
+    .filter((v) => !filter || filter.test(String(v.name || v.voice_name || '')))
+    .filter((v) => {
+      if (!designedOnly) return true;
+      const preview = String(v.preview_audio || v.preview_audio_url || v.sample_url || '');
+      return preview.includes('voice-design');
+    })
     .map((v) => {
       const name = String(v.name || v.voice_name || '').toLowerCase();
       const gender = String(v.gender || v.sex || '').toLowerCase();
@@ -54,48 +94,101 @@ async function pickCyberpunkEnglishVoice() {
       if (/cool|calm|deep|smooth|neutral|dry|tech|robot|synthetic|processed|narrator|dj|console/.test(name)) {
         score += 5;
       }
+      // Zed reads telemetry, not headlines — favour a processed, unhurried delivery.
+      if (/robot|synthetic|processed|android|cyber|machine|monotone|dry|deep|low/.test(name)) score += 4;
       if (/warm|cheerful|bubbly|playful|child|grandma|news anchor/.test(name)) score -= 3;
       return {
         voiceId: v.voice_id || v.id,
         voiceName: v.name || v.voice_name || v.voice_id || v.id,
+        gender: v.gender || v.sex || '',
+        language: v.language || v.locale || '',
+        previewUrl: v.preview_audio || v.preview_audio_url || v.sample_url || '',
         score
       };
     })
     .filter((v) => v.voiceId && v.score > 0)
     .sort((a, b) => b.score - a.score);
+}
 
-  const best = scored[0];
+async function pickCyberpunkEnglishVoice() {
+  const best = (await rankCyberpunkEnglishVoices())[0];
   if (!best) throw new Error('No suitable English HeyGen voices available for Zed');
   return best;
 }
 
-async function updateAvatarMd({ groupId, lookId, voiceId, voiceName }) {
+/** Merge one orientation into the Looks line; other orientations keep their own look IDs. */
+function mergeLooksLine(line, lookKey, lookId) {
+  const looks = {};
+  String(line || '')
+    .replace(/^- Looks:\s*/, '')
+    .split(',')
+    .forEach((part) => {
+      const [key, value] = part.split('=').map((piece) => (piece || '').trim());
+      if (key && value) looks[key] = value;
+    });
+  if (lookId) looks[lookKey] = lookId;
+  const pairs = ['landscape', 'portrait', 'square']
+    .filter((key) => looks[key])
+    .map((key) => `${key}=${looks[key]}`);
+  return `- Looks: ${pairs.join(', ')}`;
+}
+
+async function updateAvatarMd({ groupId, lookId, lookKey, voiceId, voiceName }) {
   let md = await readFile(AVATAR_MD, 'utf8');
   const now = new Date().toISOString();
+  if (groupId) md = md.replace(/- Group ID:.*/, `- Group ID: ${groupId}`);
   md = md
-    .replace(/- Group ID:.*/, `- Group ID: ${groupId || ''}`)
     .replace(/- Voice ID:.*/, `- Voice ID: ${voiceId}`)
     .replace(/- Voice Name:.*/, `- Voice Name: ${voiceName}`)
     .replace(/- Voice Designed:.*/, `- Voice Designed: false`)
-    .replace(/- Looks:.*/, `- Looks: landscape=${lookId}, portrait=${lookId}, square=${lookId}`)
+    .replace(/- Looks:.*/, (line) => mergeLooksLine(line, lookKey, lookId))
     .replace(/- Last Synced:.*/, `- Last Synced: ${now}`)
     .replace(/- Status:.*/, `- Status: heygen-ready`);
   await writeFile(AVATAR_MD, md, 'utf8');
 }
 
-async function updateFaceCatalog({ lookId, groupId, voiceId, voiceName }) {
+async function updateFaceCatalog({ lookId, lookKey, groupId, voiceId, voiceName }) {
   const catalog = JSON.parse(await readFile(FACE_JSON, 'utf8'));
   Object.assign(catalog, {
     name: 'Zed',
     avatarFile: 'AVATAR-ZED.md',
-    avatarId: lookId,
-    groupId: groupId || null,
     voiceId,
     voiceName,
     greeting: GREETING,
     status: 'heygen-ready'
   });
+  if (groupId) catalog.groupId = groupId;
+  // Landscape stays the desk/theater tile; portrait serves phone-shaped surfaces.
+  if (lookId && lookKey === 'portrait') catalog.portraitAvatarId = lookId;
+  else if (lookId) catalog.avatarId = lookId;
   await writeFile(FACE_JSON, JSON.stringify(catalog, null, 2) + '\n', 'utf8');
+}
+
+/** Voice already recorded in AVATAR-ZED.md, for runs that only add a look. */
+async function readVoiceFromAvatarMd() {
+  const md = await readFile(AVATAR_MD, 'utf8');
+  const id = md.match(/- Voice ID:\s*(\S+)/);
+  const name = md.match(/- Voice Name:\s*(.+)/);
+  if (!id) return null;
+  return { voiceId: id[1], voiceName: (name?.[1] || id[1]).trim() };
+}
+
+async function resolveVoice() {
+  const forced = voiceIdArg();
+  if (forced) {
+    process.stdout.write(`  voice (--voice-id): ${forced}\n`);
+    return { voiceId: forced, voiceName: argVal('--voice-name') || forced };
+  }
+  if (hasFlag('--keep-voice')) {
+    const current = await readVoiceFromAvatarMd();
+    if (!current) throw new Error('--keep-voice needs a Voice ID in AVATAR-ZED.md');
+    process.stdout.write(`  voice (kept): ${current.voiceName}\n`);
+    return current;
+  }
+  process.stdout.write('Picking cool English voice for Zed…\n');
+  const picked = await pickCyberpunkEnglishVoice();
+  process.stdout.write(`  voice: ${picked.voiceName} (${picked.voiceId})\n`);
+  return picked;
 }
 
 async function main() {
@@ -104,34 +197,81 @@ async function main() {
     process.exit(1);
   }
 
-  process.stdout.write('Creating Zed prompt avatar (Cyberpunk)…\n');
+  const previewLookId = argVal('--preview');
+  if (previewLookId) {
+    const look = await getAvatarLook(previewLookId);
+    const url = look?.preview_image_url || look?.image_url || '';
+    process.stdout.write(`  status: ${look?.status || '(unknown)'}\n`);
+    process.stdout.write(`  preview: ${url || '(not rendered yet)'}\n`);
+    const saveTo = argVal('--save');
+    if (url && saveTo) {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Preview download failed (${res.status})`);
+      await writeFile(saveTo, Buffer.from(await res.arrayBuffer()));
+      process.stdout.write(`  saved: ${saveTo}\n`);
+    }
+    return;
+  }
+
+  if (hasFlag('--voices')) {
+    const limit = Number(argVal('--voices')) || 8;
+    const ranked = await rankCyberpunkEnglishVoices();
+    ranked.slice(0, limit).forEach((voice, i) => {
+      process.stdout.write(`${i + 1}. ${voice.voiceName} — ${voice.gender || 'unspecified'} · ${voice.language || 'unknown'}\n`);
+      process.stdout.write(`   id: ${voice.voiceId}\n`);
+      if (voice.previewUrl) process.stdout.write(`   preview: ${voice.previewUrl}\n`);
+    });
+    return;
+  }
+
+  const orientation = argVal('--orientation') || 'horizontal';
+  const lookKey = LOOK_KEYS[orientation];
+  if (!lookKey) {
+    console.error(`--orientation must be one of: ${Object.keys(LOOK_KEYS).join(', ')}`);
+    process.exit(1);
+  }
+
+  if (hasFlag('--voice-only')) {
+    const voice = await resolveVoice();
+    await updateAvatarMd({ lookKey, voiceId: voice.voiceId, voiceName: voice.voiceName });
+    await updateFaceCatalog({ voiceId: voice.voiceId, voiceName: voice.voiceName });
+    process.stdout.write(`Updated voice in ${AVATAR_MD} and ${FACE_JSON}\n`);
+    return;
+  }
+
+  const pose = argVal('--pose') || 'half_body';
+  const backdrop = argVal('--backdrop') || 'city';
+  const prompt = argVal('--prompt') || (backdrop === 'sky' ? APPEARANCE_PROMPT_SKY : APPEARANCE_PROMPT);
+  const groupId = hasFlag('--reuse-group') ? await readGroupIdFromAvatarMd() : argVal('--group-id');
+  if (hasFlag('--reuse-group') && !groupId) {
+    console.error('--reuse-group found no Group ID in AVATAR-ZED.md');
+    process.exit(1);
+  }
+
+  process.stdout.write(
+    `Creating Zed prompt avatar (Cyberpunk, ${lookKey}, ${pose}, ${backdrop} backdrop)…\n`
+  );
+  if (groupId) process.stdout.write('  joining existing Zed character\n');
   const created = await createPromptAvatar({
-    name: 'Zed — cyberpunk alien',
-    prompt: APPEARANCE_PROMPT,
+    name: lookKey === 'landscape' ? 'Zed — cyberpunk alien' : `Zed — cyberpunk alien (${lookKey})`,
+    prompt,
+    avatarGroupId: groupId || undefined,
     age: 'Young Adult',
     gender: 'Unspecified',
     ethnicity: 'Unspecified',
     style: 'Cyberpunk',
-    orientation: 'horizontal',
-    pose: 'half_body'
+    orientation,
+    pose
   });
   process.stdout.write(`  look_id: ${created.lookId}\n`);
-  process.stdout.write(`  group_id: ${created.groupId || '(none)'}\n`);
+  process.stdout.write(`  group_id: ${created.groupId || groupId || '(none)'}\n`);
 
-  const forcedVoiceId = voiceIdArg();
-  let voice;
-  if (forcedVoiceId) {
-    voice = { voiceId: forcedVoiceId, voiceName: forcedVoiceId };
-    process.stdout.write(`  voice (--voice-id): ${forcedVoiceId}\n`);
-  } else {
-    process.stdout.write('Picking cool English voice for Zed…\n');
-    voice = await pickCyberpunkEnglishVoice();
-    process.stdout.write(`  voice: ${voice.voiceName} (${voice.voiceId})\n`);
-  }
+  const voice = await resolveVoice();
 
   await updateAvatarMd({
-    groupId: created.groupId,
+    groupId: created.groupId || groupId,
     lookId: created.lookId,
+    lookKey,
     voiceId: voice.voiceId,
     voiceName: voice.voiceName
   });
@@ -139,7 +279,8 @@ async function main() {
 
   await updateFaceCatalog({
     lookId: created.lookId,
-    groupId: created.groupId,
+    lookKey,
+    groupId: created.groupId || groupId,
     voiceId: voice.voiceId,
     voiceName: voice.voiceName
   });

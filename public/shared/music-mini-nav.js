@@ -20,7 +20,7 @@
     { href: '/music/musical-google-earth-files.html', label: 'Google Earth KML', icon: 'bi-cloud-arrow-down', title: 'KML for Google Earth Pro' },
     { href: '/music/my-grateful-dead-shows.html', label: 'Dead Shows', icon: 'bi-calendar-event', title: 'Grateful Dead shows' },
     { href: '/music/sample-detector.html', label: 'Sample Detector', icon: 'bi-magnet', title: 'Sample detector' },
-    { href: '/mountain-high/', label: 'Mountain High', icon: 'bi-mountain', title: 'Mountain High Medicinals — 21+ type cards, Sage' },
+    { href: '/mountain-high/', label: 'Mountain High', icon: 'bi-mountain', title: 'Mountain High Medicinals — 21+ type cards, Jill' },
   ];
 
   function getNavItems() {

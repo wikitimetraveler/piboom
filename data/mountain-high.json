@@ -2,11 +2,36 @@
   "brand": {
     "name": "Mountain High Medicinals",
     "tagline": "Types on the table. Call the mountain. Locksmith on the side.",
-    "guideName": "Sage",
-    "guideTitle": "Budtender · educator · lockout buddy",
-    "guidePortrait": "/mountain-high/assets/sage-portrait.svg",
-    "welcomeScript": "Hey — I'm Sage. This is a 21-and-over prototype for Mountain High Medicinals. Flip a type card for a little history, wander the lab, or call if you need a locksmith in Long Beach or L.A.",
+    "guideName": "Jill",
+    "guideTitle": "Hippie botanist · grow expert",
+    "guidePortrait": "/mountain-high/assets/jill-portrait.svg",
+    "welcomeScript": "Hey — I'm Jill. Hippie botanist, grow expert, 21 and over. Flip a type card for a little history, wander the lab, or call if you need a locksmith in Long Beach or L.A.",
     "publicSiteUrl": "https://www.thelanefamily.us"
+  },
+  "soundtrack": {
+    "note": "Hidden YouTube audio after the 21+ gate. No local rips.",
+    "tracks": [
+      {
+        "id": "panama-red",
+        "artist": "New Riders of the Purple Sage",
+        "title": "Panama Red",
+        "year": 1973
+      },
+      {
+        "id": "homegrown",
+        "artist": "Neil Young",
+        "title": "Homegrown",
+        "year": 1977,
+        "hook": "Homegrown's alright with me"
+      },
+      {
+        "id": "roll-another",
+        "artist": "Neil Young",
+        "title": "Roll Another Number (For the Road)",
+        "year": 1975,
+        "hook": "roll another one"
+      }
+    ]
   },
   "merchDisclaimer": "Lab sticker and t-shirt mockups — concept merch only, not for sale. QR opens this Mountain High page.",
   "merch": {

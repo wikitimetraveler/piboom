@@ -1,5 +1,5 @@
 /**
- * Sage — Mountain High Medicinals guide (types, origins, locksmith).
+ * Jill — Mountain High Medicinals guide (hippie botanist, grow expert, locksmith).
  * Development work by David Lane
  */
 import { readFile } from 'node:fs/promises';
@@ -14,8 +14,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CATALOG_PATH = path.join(__dirname, '../data/mountain-high.json');
 const ORIGINS_PATH = path.join(__dirname, '../public/data/cannabis-origins.json');
 
-export const GUIDE_NAME = 'Sage';
-export const AVATAR_NAME = 'Sage';
+export const GUIDE_NAME = 'Jill';
+export const AVATAR_NAME = 'Jill';
 
 let catalogCache = null;
 let catalogLoadedAt = 0;
@@ -69,16 +69,23 @@ function merchSnippet(catalog) {
     .join('\n');
 }
 
+function soundtrackSnippet(catalog) {
+  return (catalog.soundtrack?.tracks || [])
+    .map((t) => `- ${t.artist}: ${t.title} (${t.year})${t.hook ? ` — ${t.hook}` : ''}`)
+    .join('\n');
+}
+
 export function buildSystemPrompt(catalog = {}, origins = {}) {
   const brand = catalog.brand || {};
   const shop = catalog.shop || {};
   const lock = catalog.locksmith || {};
   const areas = Array.isArray(lock.areas) ? lock.areas.join(' and ') : lock.areaLine || 'Long Beach and Los Angeles';
 
-  return `You are ${brand.guideName || GUIDE_NAME}, ${brand.guideTitle || 'guide'} for Mountain High Medicinals — a 21+ prototype page.
+  return `You are ${brand.guideName || GUIDE_NAME}, ${brand.guideTitle || 'hippie botanist and grow expert'} for Mountain High Medicinals — a 21+ prototype page.
 
 ## Personality
-- Warm, dry, unhurried. Southern California cadence (Long Beach / L.A.).
+- Laid-back hippie botanist. Warm, unhurried, a little cosmic. Southern California cadence (Long Beach / L.A.).
+- Grow-expert voice: plant types, landrace geography, indoor vs outdoor character in the jar as shoppers hear it. Never watts, nutrients, recipes, or how-to-cultivate.
 - Every reply is read aloud (and may lip-sync on a HeyGen face), so use two or three short paragraphs. No markdown bullets, hashes, or URLs.
 
 ## Ground truth
@@ -104,6 +111,11 @@ ${bagsSnippet(catalog) || 'Ridge Satchel, Trail Satchel, Clinic Pouch, Summit Po
 ${catalog.merchDisclaimer || 'Sticker and t-shirt mockups — not for sale.'}
 ${merchSnippet(catalog) || 'Lab sticker, lab t-shirt — QR to this page.'}
 
+## Soundtrack (hidden YouTube after the gate)
+${catalog.soundtrack?.note || ''}
+${soundtrackSnippet(catalog) || 'Panama Red, Homegrown, Roll Another Number.'}
+You may nod to those records. Do not invent setlists or quote long lyrics.
+
 ## Rules
 1. This page is 21 and over. If someone sounds under 21, refuse product talk and point them away.
 2. No medical diagnosis, no dosing as medicine, no "this treats X." Suggest a clinician for health questions.
@@ -114,11 +126,11 @@ ${merchSnippet(catalog) || 'Lab sticker, lab t-shirt — QR to this page.'}
 7. If unsure, say so and offer the phone number.`;
 }
 
-export async function chatWithSage({
+export async function chatWithJill({
   message,
   history = [],
   userId = 'mhm-guest',
-  sessionId = 'mountain-high-sage',
+  sessionId = 'mountain-high-jill',
 }) {
   const openaiKey = (process.env.OPENAI_API_KEY || '').trim();
   if (!openaiKey) {
@@ -147,7 +159,7 @@ export async function chatWithSage({
     'My hookah just burped — ask me that one more time?';
 
   try {
-    await persistConversationTurn(userId, sessionId, String(message), reply, 'sage');
+    await persistConversationTurn(userId, sessionId, String(message), reply, 'jill');
   } catch (_) {
     /* memory optional */
   }
@@ -159,7 +171,7 @@ export async function chatWithSage({
   };
 }
 
-export async function getSageCatalogSummary() {
+export async function getJillCatalogSummary() {
   const catalog = await loadCatalog();
   return {
     brand: catalog.brand?.name || 'Mountain High Medicinals',
@@ -174,7 +186,7 @@ export default {
   GUIDE_NAME,
   AVATAR_NAME,
   buildSystemPrompt,
-  chatWithSage,
-  getSageCatalogSummary,
+  chatWithJill,
+  getJillCatalogSummary,
   loadCatalog,
 };

@@ -974,8 +974,25 @@
               : 25;
           GL.setView(state.centerAzOverride, tilt, true);
         }
+        refresh(false);
+        return sel;
       }
-      refresh(false);
+      // Canvas / sky pick: HUD only — never rebuild the dome (that was the left-shift flash)
+      renderPickHud(sel);
+      if (els.planetBody && _liveSky) {
+        renderPlanetTable(els.planetBody, _liveSky.planets || _liveSky.allBodies || [], sel);
+      }
+      if (els.status && sel) {
+        const where =
+          Number.isFinite(sel.alt) && Number.isFinite(sel.az) ? ' · ' + formatAltAz(sel.alt, sel.az) : '';
+        els.status.textContent = 'Selected ' + sel.name + where;
+      } else if (els.status && !state.playing) {
+        els.status.textContent = '';
+      }
+      const GL = root.PlanetariumGL;
+      if (GL && GL.ok && typeof GL.setSelection === 'function') {
+        GL.setSelection(sel);
+      }
       return sel;
     }
 
@@ -1110,7 +1127,8 @@
       const result = await GL.mount({
         canvas: 'planSkyGpu',
         engine: Engine || root.CelestialEngine,
-        onSelect: (hit) => selectSkyObject(hit, { center: true }),
+        // Pick updates the HUD only — no slew (sliding on every star click is distracting)
+        onSelect: (hit) => selectSkyObject(hit, { center: false }),
         onViewChange: (v) => {
           state.cameraAz = v.az;
           if (typeof v.domeMode === 'boolean') state.domeMode = v.domeMode;
@@ -1250,7 +1268,7 @@
         const hit = event.target.closest('[data-sky-type]');
         if (!hit || !els.sky.contains(hit)) return;
         event.preventDefault();
-        selectSkyObject(selectionFromDataset(hit), { center: true });
+        selectSkyObject(selectionFromDataset(hit), { center: false });
       });
     }
 

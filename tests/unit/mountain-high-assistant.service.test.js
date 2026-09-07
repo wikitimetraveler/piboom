@@ -13,8 +13,8 @@ const CATALOG_PATH = path.join(process.cwd(), 'data/mountain-high.json');
 
 describe('mountain-high-assistant.service', () => {
   test('guide names', () => {
-    expect(GUIDE_NAME).toBe('Sage');
-    expect(AVATAR_NAME).toBe('Sage');
+    expect(GUIDE_NAME).toBe('Jill');
+    expect(AVATAR_NAME).toBe('Jill');
   });
 
   test('buildSystemPrompt embeds types, 21+, and Long Beach / L.A. locksmith', async () => {
@@ -29,7 +29,7 @@ describe('mountain-high-assistant.service', () => {
         },
       ],
     });
-    expect(prompt).toContain('Sage');
+    expect(prompt).toContain('Jill');
     expect(prompt).toContain('21');
     expect(prompt).toContain('Indica');
     expect(prompt).toContain('Sativa');
@@ -91,7 +91,7 @@ describe('mountain-high-assistant.service', () => {
     });
   });
 
-  test('Sage prompt marks bag art as mockups and still forbids grow recipes', async () => {
+  test('Jill prompt marks bag art as mockups and still forbids grow recipes', async () => {
     const catalog = JSON.parse(await readFile(CATALOG_PATH, 'utf8'));
     const prompt = buildSystemPrompt(catalog, { entries: [] });
     expect(prompt).toMatch(/Ridge Satchel/);
@@ -99,5 +99,8 @@ describe('mountain-high-assistant.service', () => {
     expect(prompt).toMatch(/Lab sticker/);
     expect(prompt).toMatch(/mockup/i);
     expect(prompt).toMatch(/No cultivation how-to/i);
+    expect(prompt).toMatch(/Homegrown/);
+    expect(prompt).toMatch(/Roll Another Number/);
+    expect(prompt).toMatch(/hippie botanist/i);
   });
 });

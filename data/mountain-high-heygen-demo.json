@@ -1,21 +1,21 @@
 {
-  "id": "mountain-high-sage-intro",
-  "title": "Mountain High — Meet Sage",
+  "id": "mountain-high-jill-intro",
+  "title": "Mountain High — Meet Jill",
   "ctaLabel": "Flip the type cards",
   "ctaHref": "/mountain-high/#mhmTypes",
   "brand": {
     "attribution": "Avatar narration powered by HeyGen",
     "developmentBy": "David E Lane"
   },
-  "heygenScriptShort": "Hey — I'm Sage. Welcome to Mountain High Medicinals. This page is 21 and over. Flip a type card for indica, sativa, hybrid, hemp, or ruderalis. If you need a locksmith, we cover Long Beach and L.A. Same number on the card.",
+  "heygenScriptShort": "Hey — I'm Jill. Welcome to Mountain High Medicinals. Hippie botanist, grow expert, 21 and over. Flip a type card for indica, sativa, hybrid, hemp, or ruderalis. If you need a locksmith, we cover Long Beach and L.A. Same number on the card.",
   "heygenVideoLocalShort": null,
   "heygenVideoUrlShort": null,
-  "heygenMotionPrompt": "calm nod, warm budtender speaking to camera, soft mountain-night light",
+  "heygenMotionPrompt": "calm nod, hippie botanist speaking to camera, woman's voice, soft mountain-night light",
   "heygenExpressiveness": "low",
   "avatar": {
-    "name": "Sage",
-    "file": "AVATAR-SAGE.md",
-    "portrait": "/mountain-high/assets/sage-portrait.svg",
+    "name": "Jill",
+    "file": "AVATAR-JILL.md",
+    "portrait": "/mountain-high/assets/jill-portrait.svg",
     "status": "prototype-tts-fallback"
   },
   "heygenAvatarId": null,

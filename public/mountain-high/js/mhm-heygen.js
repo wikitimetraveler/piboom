@@ -1,5 +1,5 @@
 /**
- * Sage HeyGen — welcome popup + optional streaming face
+ * Jill HeyGen — welcome popup + optional streaming face
  * Development work by David Lane
  */
 (function (root) {
@@ -52,7 +52,7 @@
     const bodyInner = videoUrl
       ? `<video class="mhm-heygen-demo-video" controls playsinline autoplay src="${esc(videoUrl)}"></video>`
       : `<div>
-          <p><strong>Sage’s HeyGen clip isn’t cached yet.</strong> Streaming face still works if the key is set. TTS reads the script now.</p>
+          <p><strong>Jill’s HeyGen clip isn’t cached yet.</strong> Streaming face still works if the key is set. TTS reads the script now.</p>
           ${script ? `<p>${esc(script)}</p>` : ''}
         </div>`;
     const rootEl = document.createElement('div');
@@ -64,7 +64,7 @@
       <div class="mhm-heygen-demo-backdrop"></div>
       <div class="mhm-heygen-demo-panel">
         <header class="d-flex justify-content-between align-items-center mb-2">
-          <h2 class="h5 mb-0">${esc(demo?.title || 'Meet Sage')}</h2>
+          <h2 class="h5 mb-0">${esc(demo?.title || 'Meet Jill')}</h2>
           <button type="button" class="btn-close btn-close-white" data-mhm-heygen-close aria-label="Close"></button>
         </header>
         ${bodyInner}
@@ -73,8 +73,8 @@
     document.body.appendChild(rootEl);
     rootEl.querySelector('[data-mhm-heygen-close]')?.addEventListener('click', closeModal);
     rootEl.querySelector('.mhm-heygen-demo-backdrop')?.addEventListener('click', closeModal);
-    if (!videoUrl && script && typeof root.MhmSpeakSage === 'function') {
-      root.MhmSpeakSage(script);
+    if (!videoUrl && script && typeof root.MhmSpeakJill === 'function') {
+      root.MhmSpeakJill(script);
     }
   }
 
@@ -115,7 +115,7 @@
       }
       heygenRoom = { kind: 'poster' };
       media.hidden = false;
-      root.HeygenLiveTile.attachPoster(media, data.url, 'mhm-heygen__video', 'Sage');
+      root.HeygenLiveTile.attachPoster(media, data.url, 'mhm-heygen__video', 'Jill');
       if (data.audioUrl) root.HeygenLiveTile.playAudio?.(data.audioUrl);
       return;
     }
@@ -165,12 +165,12 @@
       media.hidden = true;
     }
     const btn = document.getElementById('mhmHeygenLive');
-    if (btn) btn.textContent = 'Live Sage';
+    if (btn) btn.textContent = 'Live Jill';
     setStatus('');
   }
 
   async function startStream() {
-    const greeting = face?.greeting || 'Hey — Sage here. Flip a type or ask about a lockout.';
+    const greeting = face?.greeting || 'Hey — Jill here. Flip a type or ask about a lockout.';
     const res = await fetch('/api/heygen/streaming/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -183,11 +183,11 @@
     }
     await attachSession(data);
     const btn = document.getElementById('mhmHeygenLive');
-    if (btn) btn.textContent = 'Hide Sage';
+    if (btn) btn.textContent = 'Hide Jill';
     setStatus(
       data.fallback || data.playback === 'poster'
-        ? 'Sage on voice — live stream is not on this HeyGen plan.'
-        : 'Sage live on HeyGen.'
+        ? 'Jill on voice — live stream is not on this HeyGen plan.'
+        : 'Jill live on HeyGen.'
     );
   }
 
@@ -215,7 +215,7 @@
 
   function boot() {
     loadFace();
-    document.getElementById('mhmMeetSage')?.addEventListener('click', () => playIntro());
+    document.getElementById('mhmMeetJill')?.addEventListener('click', () => playIntro());
     document.getElementById('mhmHeygenLive')?.addEventListener('click', () =>
       toggleStream().catch((err) => setStatus(err.message || 'HeyGen failed'))
     );

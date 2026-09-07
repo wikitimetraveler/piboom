@@ -1,8 +1,8 @@
 # Planetarium
 
-Full-sky **360° WebGL dome** at [`/planetarium/`](/planetarium/) — astronomy-engine ephemeris, Hipparcos mag≤6 star field, IAU constellation lines, Carl (AstroAI) voice guide, optional Zed HeyGen face, catalog search, ISS TLE passes, and static eclipse/meteor events.
+Full-sky **360° WebGL dome** at [`/planetarium/`](/planetarium/) — astronomy-engine ephemeris, Hipparcos mag≤6.5 star field (J2000 precessed to of-date via EQJ→HOR), IAU constellation lines, Carl (AstroAI) voice guide, optional Zed HeyGen face, catalog search, ISS TLE passes, and static eclipse/meteor events.
 
-**Planet worlds** — graphics-first body home pages at [`/planetarium/worlds/`](/planetarium/worlds/) (shared template [`body.html?id=mars`](/planetarium/worlds/body.html?id=mars)): WebGPU NASA globe, research desk from static dossiers, and Carl with world-dossier context.
+**Planet worlds** — graphics-first body home pages at [`/planetarium/worlds/`](/planetarium/worlds/) (shared template [`body.html?id=mars`](/planetarium/worlds/body.html?id=mars)): circular WebGPU NASA **sphere** (not a rectangular stage), interactive equirectangular **surface map** (pan / click / site pins → `lookAt`), research desk from static dossiers, and Carl with world-dossier context.
 
 The home hero still uses the lightweight [`FunHomeSky`](../public/shared/js/fun-home-sky.js) sketch; the planetarium page does **not** depend on that ephemeris for planets. Enlarged hero globes link to **Open {Planet}** (world page) and **View in sky** (dome).
 
@@ -34,10 +34,19 @@ The home hero still uses the lightweight [`FunHomeSky`](../public/shared/js/fun-
 | HeyGen Zed / Spirit in the Sky | Yes | No |
 | Share `app=` | (theater) | `app=field` reopens Field |
 
+## Sky frames (theater GL)
+
+- **Stars / constellation lines** — Hipparcos J2000 RA/Dec rigidly rotated with `Rotation_EQJ_HOR` (precession + nutation). No atmospheric refraction on the star field.
+- **Planets / Moon / Sun** — `Equator(..., ofdate=true)` then `Horizon(..., 'normal')` (refraction on).
+- **Look-up** — equidistant fisheye projector (cube map → full-sky disc); FOV up to **180°** (default ~160°).
+- **Horizon / Field** — perspective camera (FOV capped ~110°).
+- **Milky Way** — galactic-plane band (`Rotation_EQJ_GAL`), not an altitude wash.
+- Hero SVG fallback still uses lightweight [`FunHomeSky`](../public/shared/js/fun-home-sky.js) math (approximate; not the GL path).
+
 ## Client modules
 
-- `public/planetarium/js/celestial-engine.js` — astronomy-engine wrapper (Sun→Neptune + Moon, refraction on)
-- `public/planetarium/js/planetarium-gl.js` — Three.js inner-sky sphere (drag / zoom / pick)
+- `public/planetarium/js/celestial-engine.js` — astronomy-engine wrapper (Sun→Neptune + Moon; `j2000ToAltAz` / `eqjToEnuMatrix` for stars; refraction on planets)
+- `public/planetarium/js/planetarium-gl.js` — Three.js inner-sky sphere; Look-up fisheye; drag / zoom / angular pick
 - `public/planetarium/js/planetarium-boot.js` — loads GL then starts the page
 - `public/shared/js/planetarium.js` — controls, share URLs, Carl `getSkyContext()`, DOM fallback dome
 - `public/shared/js/fun-home-sky.js` — home hero only (also geolocation helpers reused by the desk); `buildPlanetariumUrl` / `buildWorldUrl`
@@ -76,7 +85,7 @@ Home hero: enlarge a globe → **Open {Planet}** world page + **View in sky** do
 - **Play / Speed** — animate clock at 1× / 60× / 3600× (honors `prefers-reduced-motion`)
 - **Lines** — toggle IAU constellation figures
 - **Night vision** — red desk theme
-- Drag to spin the dome; wheel to change FOV (up to 180° in look-up)
+- Drag to spin the dome; wheel to change FOV (Look-up fisheye up to 180°; horizon/Field perspective to ~110°)
 - Click ISS pass rows to jump sky time to pass start
 - Planet pick HUD / Tonight table: **Open {Planet} home** when the selection is a known world body
 

@@ -44,9 +44,11 @@
         a.href = bodyUrl(d.id);
         a.setAttribute('aria-label', 'Open ' + d.name + ' world page');
         a.innerHTML =
+          '<span class="pw-hub-card__orb">' +
           '<img class="pw-hub-card__thumb" src="' +
           String(d.texture || '').replace(/"/g, '') +
           '" alt="" loading="lazy" width="512" height="512"/>' +
+          '</span>' +
           '<span class="pw-hub-card__label">' +
           '<span class="pw-hub-card__kicker">' +
           (d.kicker || 'World') +

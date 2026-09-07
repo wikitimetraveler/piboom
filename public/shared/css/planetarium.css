@@ -289,7 +289,7 @@ body.plan-page {
 
 .plan-pick {
   position: absolute;
-  left: 0.75rem;
+  left: 50%;
   bottom: 3.4rem;
   z-index: 4;
   min-width: 11.5rem;
@@ -300,6 +300,7 @@ body.plan-page {
   background: rgba(8, 12, 22, 0.82);
   backdrop-filter: blur(14px);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  transform: translateX(-50%);
 }
 
 .plan-pick[hidden] {
@@ -468,8 +469,8 @@ body.plan-page {
 .plan-dome-cardinal--w { left: 0.65rem; top: 50%; transform: translate(0, -50%) rotate(calc(var(--dome-az, 180) * 1deg - 180deg)); }
 
 .plan-stage--dome .plan-pick {
-  left: 0.75rem;
-  transform: none;
+  left: 50%;
+  transform: translateX(-50%);
   bottom: 3.4rem;
 }
 
@@ -758,7 +759,8 @@ body.plan-night-vision .plan-dome-rim__ring {
 }
 
 .plan-stage:has(#planPickHud:not([hidden])) .plan-caption {
-  padding-left: min(13rem, 42%);
+  /* Keep caption centered — don't shove sky chrome left/right on pick */
+  padding-left: 0.85rem;
 }
 
 .plan-caption__moon {

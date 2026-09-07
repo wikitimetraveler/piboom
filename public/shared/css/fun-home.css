@@ -2080,9 +2080,70 @@ body[data-theme="dark"] .fun-card:hover {
 
 .fun-card__desc {
   color: var(--fun-text-soft);
-  margin-bottom: 2rem;
+  margin-bottom: 0.85rem;
   line-height: 1.7;
   font-size: 1rem;
+}
+
+.fun-card__features {
+  list-style: none;
+  margin: 0 0 0.9rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.fun-card__features li {
+  position: relative;
+  padding-left: 1rem;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--fun-text-soft);
+}
+
+.fun-card__features li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: var(--fun-card-accent, var(--fun-accent));
+  opacity: 0.85;
+}
+
+.fun-card__stack {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0 0 1.25rem;
+  padding: 0;
+}
+
+.fun-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.22rem 0.55rem;
+  font-family: Outfit, var(--fun-font-body), system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--fun-card-accent, var(--fun-accent)) 72%, #102830);
+  background: color-mix(in srgb, var(--fun-card-accent, var(--fun-accent)) 12%, rgba(255, 255, 255, 0.72));
+  border: 1px solid color-mix(in srgb, var(--fun-card-accent, var(--fun-accent)) 38%, rgba(16, 40, 48, 0.14));
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+body[data-theme="dark"] .fun-chip {
+  color: color-mix(in srgb, var(--fun-card-accent, var(--fun-accent)) 55%, #f4faff);
+  background: color-mix(in srgb, var(--fun-card-accent, var(--fun-accent)) 18%, rgba(8, 16, 24, 0.72));
+  border-color: color-mix(in srgb, var(--fun-card-accent, var(--fun-accent)) 42%, rgba(255, 255, 255, 0.16));
 }
 
 .fun-card__link-ar {

@@ -1,5 +1,5 @@
 /**
- * Sage assistant API for Mountain High Medicinals
+ * Jill assistant API for Mountain High Medicinals
  * Development work by David Lane
  */
 import { Router } from 'express';
@@ -18,7 +18,7 @@ function resolveUserId(req) {
 }
 
 function resolveSessionId(req) {
-  return String(req.body?.sessionId || req.query?.sessionId || 'mountain-high-sage').slice(0, 255);
+  return String(req.body?.sessionId || req.query?.sessionId || 'mountain-high-jill').slice(0, 255);
 }
 
 function resolveHistory(req) {
@@ -32,7 +32,7 @@ function resolveHistory(req) {
 
 router.get('/health', async (_req, res) => {
   try {
-    const summary = await mountainHighAssistantService.getSageCatalogSummary();
+    const summary = await mountainHighAssistantService.getJillCatalogSummary();
     res.json({
       ok: true,
       openaiConfigured: Boolean((process.env.OPENAI_API_KEY || '').trim()),
@@ -45,7 +45,7 @@ router.get('/health', async (_req, res) => {
 
 router.get('/summary', async (_req, res) => {
   try {
-    res.json(await mountainHighAssistantService.getSageCatalogSummary());
+    res.json(await mountainHighAssistantService.getJillCatalogSummary());
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -83,7 +83,7 @@ router.post('/chat', async (req, res) => {
     if (!message || !String(message).trim()) {
       return res.status(400).json({ error: 'Message is required' });
     }
-    const result = await mountainHighAssistantService.chatWithSage({
+    const result = await mountainHighAssistantService.chatWithJill({
       message,
       history: resolveHistory(req),
       userId: resolveUserId(req),
@@ -99,7 +99,7 @@ router.post('/chat', async (req, res) => {
     });
   } catch (error) {
     const status = error.code === 'OPENAI_NOT_CONFIGURED' ? 503 : 500;
-    console.error('Sage assistant chat error:', error);
+    console.error('Jill assistant chat error:', error);
     res.status(status).json({ error: error.message || 'Chat failed' });
   }
 });

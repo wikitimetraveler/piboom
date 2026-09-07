@@ -23,4 +23,20 @@ describe('MhmSong', () => {
     expect(MhmSong.needsIntroSkip(0)).toBe(false);
     expect(MhmSong.needsIntroSkip(12)).toBe(false);
   });
+
+  test('playlist also includes Neil Young Homegrown and Roll Another Number', () => {
+    expect(MhmSong.TRACKS.map((t) => t.id)).toEqual(['panama-red', 'homegrown', 'roll-another']);
+    expect(MhmSong.TRACKS[1]).toMatchObject({
+      artist: 'Neil Young',
+      title: 'Homegrown',
+      videoId: '1eetrxNlR-M',
+      year: 1977,
+    });
+    expect(MhmSong.TRACKS[2]).toMatchObject({
+      artist: 'Neil Young',
+      title: 'Roll Another Number',
+      videoId: 'c8p04GHC8sY',
+      year: 1975,
+    });
+  });
 });

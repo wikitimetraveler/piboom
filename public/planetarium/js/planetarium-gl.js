@@ -1,6 +1,7 @@
 /**
  * PlanetariumGL — full-sky Three.js dome (inner sphere, drag/zoom/pick).
- * Falls back gracefully when WebGL is unavailable (ok=false).
+ * Look-up uses equidistant fisheye; horizon / Field use perspective.
+ * Stars: Hipparcos J2000 rigidly rotated via EQJ→ENU (matches of-date planets).
  * Development work by David Lane
  */
 import * as THREE from 'three';
@@ -9,13 +10,14 @@ const SKY_R = 100;
 const MIN_FOV = 20;
 const MAX_FOV = 110;
 const MIN_DOME_FOV = 20;
-const MAX_DOME_FOV = 110;
+const MAX_DOME_FOV = 180;
 const DEFAULT_FOV = 75;
 const HORIZON_ALT = 38;
 const HORIZON_FOV = 75;
 const DOME_ALT = 89;
-const DOME_FOV = 95;
+const DOME_FOV = 160;
 const DEG = Math.PI / 180;
+const HORIZON_CLIP = -8;
 
 const PLANET_COLORS = {
   moon: 0xf2f0e8,
@@ -90,8 +92,6 @@ function bvToColor(bv, target) {
 }
 
 function twilightSkyColor(sunAlt, target) {
-  // Planetarium projector mode: keep the dome dark so stars stay readable.
-  // Daylight only adds a slight cool wash — never a solid blue fill.
   if (sunAlt > 0) {
     target.setRGB(0.04, 0.055, 0.1);
   } else if (sunAlt > -6) {
@@ -107,6 +107,12 @@ function twilightSkyColor(sunAlt, target) {
   return target;
 }
 
+function magToPointSize(mag) {
+  const m = Number.isFinite(Number(mag)) ? Number(mag) : 5;
+  // Flux-ish: size ∝ 10^(−0.2 m), clamped to screen pixels
+  return Math.max(1.6, Math.min(14, 9 * Math.pow(10, -0.2 * (m - 0.5))));
+}
+
 function createApi() {
   let canvas = null;
   let renderer = null;
@@ -120,6 +126,7 @@ function createApi() {
   let planetGroup = null;
   let markerGroup = null;
   let issMesh = null;
+  let sunLight = null;
   let raf = 0;
   let dead = false;
   let ok = false;
@@ -127,6 +134,8 @@ function createApi() {
   let lastW = 0;
   let lastH = 0;
   let starsCatalog = [];
+  let starEqj = null;
+  let lineEqj = null;
   let constellations = [];
   let showLines = true;
   let cameraAz = 180;
@@ -153,12 +162,15 @@ function createApi() {
   let pickables = [];
   let textureLoader = null;
   let planetTextures = Object.create(null);
+  let gsapTween = null;
   const tmp = new THREE.Vector3();
+  const tmpB = new THREE.Vector3();
   const lookFwd = new THREE.Vector3();
   const lookRight = new THREE.Vector3();
   const lookUpV = new THREE.Vector3();
   const tmpColor = new THREE.Color();
   const skyColor = new THREE.Color();
+  const pickDir = new THREE.Vector3();
 
   function resize() {
     if (!renderer || !canvas || !camera) return;
@@ -191,7 +203,7 @@ function createApi() {
 
   function applyCamera() {
     if (!camera) return;
-    camera.fov = Math.max(MIN_FOV, Math.min(MAX_FOV, fov));
+    camera.fov = Math.max(MIN_FOV, Math.min(domeMode ? MAX_DOME_FOV : MAX_FOV, fov));
     camera.position.set(0, 0, 0);
     lookBasis(cameraAlt, cameraAz, lookFwd, lookRight, lookUpV);
     camera.up.copy(lookUpV);
@@ -210,6 +222,7 @@ function createApi() {
   }
 
   function notifyView() {
+    markCubeDirty();
     if (typeof onViewChange === 'function') {
       onViewChange({ az: cameraAz, alt: cameraAlt, fov, domeMode });
     }
@@ -230,7 +243,11 @@ function createApi() {
 
   function setupFisheye() {
     try {
-      cubeRT = new THREE.WebGLCubeRenderTarget(768, {
+      const fieldApp =
+        typeof document !== 'undefined' &&
+        (document.body?.classList.contains('plan-field') || window.__PLANETARIUM_FIELD);
+      const cubeSize = fieldApp || reducedMotion ? 512 : 768;
+      cubeRT = new THREE.WebGLCubeRenderTarget(cubeSize, {
         generateMipmaps: true,
         minFilter: THREE.LinearMipmapLinearFilter,
       });
@@ -302,18 +319,10 @@ function createApi() {
 
   function captureCube() {
     if (!cubeCam || !renderer || !scene) return;
-    const starSize = starPoints && starPoints.material ? starPoints.material.size : 0;
-    const bright = starPoints && starPoints.userData && starPoints.userData.brightPoints;
-    const brightSize = bright && bright.material ? bright.material.size : 0;
-    if (starPoints && starPoints.material) starPoints.material.size = 11;
-    if (bright && bright.material) bright.material.size = 20;
     cubeCam.update(renderer, scene);
-    if (starPoints && starPoints.material && starSize) starPoints.material.size = starSize;
-    if (bright && bright.material && brightSize) bright.material.size = brightSize;
     cubeDirty = false;
   }
 
-  /** Soft circular glow — PointsMaterial is square without a map. */
   function makeStarTexture() {
     const size = 64;
     const c = document.createElement('canvas');
@@ -336,12 +345,6 @@ function createApi() {
   function buildStars(list) {
     starsCatalog = list || [];
     if (starPoints) {
-      const bright = starPoints.userData && starPoints.userData.brightPoints;
-      if (bright) {
-        starPoints.remove(bright);
-        bright.geometry.dispose();
-        bright.material.dispose();
-      }
       scene.remove(starPoints);
       starPoints.geometry.dispose();
       if (starPoints.material.map) starPoints.material.map.dispose();
@@ -350,71 +353,80 @@ function createApi() {
     }
     const n = starsCatalog.length;
     if (!n) return;
+    starEqj = new Float32Array(n * 3);
     const positions = new Float32Array(n * 3);
     const colors = new Float32Array(n * 3);
-    const brightIdx = [];
+    const sizes = new Float32Array(n);
+    const Eng = engine;
     for (let i = 0; i < n; i += 1) {
+      const s = starsCatalog[i];
+      let eqj;
+      if (Eng && typeof Eng.eqjUnitFromRaDec === 'function') {
+        eqj = Eng.eqjUnitFromRaDec(s.ra, s.dec);
+      } else {
+        const ra = s.ra * DEG;
+        const dec = s.dec * DEG;
+        const cc = Math.cos(dec);
+        eqj = { x: cc * Math.cos(ra), y: cc * Math.sin(ra), z: Math.sin(dec) };
+      }
+      starEqj[i * 3] = eqj.x;
+      starEqj[i * 3 + 1] = eqj.y;
+      starEqj[i * 3 + 2] = eqj.z;
       positions[i * 3] = 0;
       positions[i * 3 + 1] = -SKY_R;
       positions[i * 3 + 2] = 0;
-      bvToColor(starsCatalog[i].bv, tmpColor);
+      bvToColor(s.bv, tmpColor);
       colors[i * 3] = tmpColor.r;
       colors[i * 3 + 1] = tmpColor.g;
       colors[i * 3 + 2] = tmpColor.b;
-      if (Number(starsCatalog[i].mag) <= 2.0) brightIdx.push(i);
+      sizes[i] = magToPointSize(s.mag);
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    geo.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
     const starMap = makeStarTexture();
-    // sizeAttenuation:false → size is screen pixels (visible at any sky radius)
-    const mat = new THREE.PointsMaterial({
-      size: 5,
-      map: starMap,
-      vertexColors: true,
+    const mat = new THREE.ShaderMaterial({
+      uniforms: {
+        uMap: { value: starMap },
+        uOpacity: { value: 1 },
+        uSizeScale: { value: 1 },
+      },
+      vertexShader: `
+        attribute float aSize;
+        attribute vec3 color;
+        varying vec3 vColor;
+        varying float vAlpha;
+        uniform float uSizeScale;
+        void main() {
+          vColor = color;
+          vAlpha = position.y > -150.0 ? 1.0 : 0.0;
+          vec4 mv = modelViewMatrix * vec4(position, 1.0);
+          gl_Position = projectionMatrix * mv;
+          gl_PointSize = aSize * uSizeScale;
+        }
+      `,
+      fragmentShader: `
+        uniform sampler2D uMap;
+        uniform float uOpacity;
+        varying vec3 vColor;
+        varying float vAlpha;
+        void main() {
+          if (vAlpha < 0.5) discard;
+          vec4 tex = texture2D(uMap, gl_PointCoord);
+          if (tex.a < 0.04) discard;
+          gl_FragColor = vec4(vColor, tex.a * uOpacity);
+        }
+      `,
       transparent: true,
-      opacity: 1,
       depthWrite: false,
       depthTest: false,
       blending: THREE.AdditiveBlending,
-      sizeAttenuation: false,
     });
     starPoints = new THREE.Points(geo, mat);
     starPoints.frustumCulled = false;
     starPoints.renderOrder = 2;
     scene.add(starPoints);
-
-    if (brightIdx.length) {
-      const bPos = new Float32Array(brightIdx.length * 3);
-      const bCol = new Float32Array(brightIdx.length * 3);
-      for (let j = 0; j < brightIdx.length; j += 1) {
-        const i = brightIdx[j];
-        bPos[j * 3 + 1] = -SKY_R;
-        bCol[j * 3] = colors[i * 3];
-        bCol[j * 3 + 1] = colors[i * 3 + 1];
-        bCol[j * 3 + 2] = colors[i * 3 + 2];
-      }
-      const bGeo = new THREE.BufferGeometry();
-      bGeo.setAttribute('position', new THREE.BufferAttribute(bPos, 3));
-      bGeo.setAttribute('color', new THREE.BufferAttribute(bCol, 3));
-      const bMat = new THREE.PointsMaterial({
-        size: 10,
-        map: starMap,
-        vertexColors: true,
-        transparent: true,
-        opacity: 1,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-        sizeAttenuation: false,
-      });
-      const brightPoints = new THREE.Points(bGeo, bMat);
-      brightPoints.name = 'brightStars';
-      brightPoints.frustumCulled = false;
-      brightPoints.renderOrder = 3;
-      scene.add(brightPoints);
-      starPoints.userData.brightPoints = brightPoints;
-      starPoints.userData.brightIdx = brightIdx;
-    }
   }
 
   function buildConstellationLines(data) {
@@ -426,17 +438,38 @@ function createApi() {
       lineObj = null;
     }
     const segs = [];
+    const Eng = engine;
     for (let c = 0; c < constellations.length; c += 1) {
       const lines = constellations[c].lines || [];
       for (let i = 0; i < lines.length; i += 1) {
+        const a = lines[i][0];
+        const b = lines[i][1];
+        let ea;
+        let eb;
+        if (Eng && typeof Eng.eqjUnitFromRaDec === 'function') {
+          ea = Eng.eqjUnitFromRaDec(a[0], a[1]);
+          eb = Eng.eqjUnitFromRaDec(b[0], b[1]);
+        } else {
+          const raA = a[0] * DEG;
+          const decA = a[1] * DEG;
+          const ca = Math.cos(decA);
+          ea = { x: ca * Math.cos(raA), y: ca * Math.sin(raA), z: Math.sin(decA) };
+          const raB = b[0] * DEG;
+          const decB = b[1] * DEG;
+          const cb = Math.cos(decB);
+          eb = { x: cb * Math.cos(raB), y: cb * Math.sin(raB), z: Math.sin(decB) };
+        }
         segs.push({
           id: constellations[c].id,
           name: constellations[c].name,
-          a: lines[i][0],
-          b: lines[i][1],
+          a,
+          b,
+          ea,
+          eb,
         });
       }
     }
+    lineEqj = segs;
     const positions = new Float32Array(segs.length * 6);
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -453,48 +486,61 @@ function createApi() {
     scene.add(lineObj);
   }
 
+  function rotateEqjToEnu(rot, ex, ey, ez, out) {
+    out.set(
+      rot[0][0] * ex + rot[1][0] * ey + rot[2][0] * ez,
+      rot[0][1] * ex + rot[1][1] * ey + rot[2][1] * ez,
+      rot[0][2] * ex + rot[1][2] * ey + rot[2][2] * ez
+    );
+    return out;
+  }
+
   function updateEquatorialLayer(date, observer) {
-    if (!engine || !starPoints) return;
+    if (!engine || !starPoints || !starEqj) return;
+    let rot;
+    if (typeof engine.eqjToEnuMatrix === 'function') {
+      rot = engine.eqjToEnuMatrix(date, observer).rot;
+    } else {
+      return;
+    }
+    const floorSin = Math.sin(HORIZON_CLIP * DEG);
     const pos = starPoints.geometry.attributes.position.array;
-    for (let i = 0; i < starsCatalog.length; i += 1) {
-      const s = starsCatalog[i];
-      const aa = engine.equatorialToAltAz(s.ra, s.dec, date, observer);
-      if (aa.alt < -8) {
-        pos[i * 3] = 0;
-        pos[i * 3 + 1] = -SKY_R * 2;
-        pos[i * 3 + 2] = 0;
+    const n = starsCatalog.length;
+    for (let i = 0; i < n; i += 1) {
+      const i3 = i * 3;
+      rotateEqjToEnu(rot, starEqj[i3], starEqj[i3 + 1], starEqj[i3 + 2], tmp);
+      if (tmp.y < floorSin) {
+        pos[i3] = 0;
+        pos[i3 + 1] = -SKY_R * 2;
+        pos[i3 + 2] = 0;
       } else {
-        altAzToVec3(aa.alt, aa.az, tmp).multiplyScalar(SKY_R);
-        pos[i * 3] = tmp.x;
-        pos[i * 3 + 1] = tmp.y;
-        pos[i * 3 + 2] = tmp.z;
+        tmp.multiplyScalar(SKY_R);
+        pos[i3] = tmp.x;
+        pos[i3 + 1] = tmp.y;
+        pos[i3 + 2] = tmp.z;
       }
     }
     starPoints.geometry.attributes.position.needsUpdate = true;
     ready = true;
 
-    const brightPoints = starPoints.userData && starPoints.userData.brightPoints;
-    const brightIdx = starPoints.userData && starPoints.userData.brightIdx;
-    if (brightPoints && brightIdx && brightIdx.length) {
-      const bp = brightPoints.geometry.attributes.position.array;
-      for (let j = 0; j < brightIdx.length; j += 1) {
-        const i = brightIdx[j];
-        bp[j * 3] = pos[i * 3];
-        bp[j * 3 + 1] = pos[i * 3 + 1];
-        bp[j * 3 + 2] = pos[i * 3 + 2];
-      }
-      brightPoints.geometry.attributes.position.needsUpdate = true;
-    }
-
-    if (lineObj && lineObj.userData.segs) {
-      const segs = lineObj.userData.segs;
+    if (lineObj && lineEqj && lineEqj.length) {
       const lp = lineObj.geometry.attributes.position.array;
-      for (let i = 0; i < segs.length; i += 1) {
-        const seg = segs[i];
-        const a = engine.equatorialToAltAz(seg.a[0], seg.a[1], date, observer);
-        const b = engine.equatorialToAltAz(seg.b[0], seg.b[1], date, observer);
+      const clipFn = engine.clipHorizonSegment;
+      for (let i = 0; i < lineEqj.length; i += 1) {
+        const seg = lineEqj[i];
+        rotateEqjToEnu(rot, seg.ea.x, seg.ea.y, seg.ea.z, tmp);
+        rotateEqjToEnu(rot, seg.eb.x, seg.eb.y, seg.eb.z, tmpB);
         const base = i * 6;
-        if (a.alt < -8 || b.alt < -8) {
+        let clipped = null;
+        if (typeof clipFn === 'function') {
+          clipped = clipFn(tmp.x, tmp.y, tmp.z, tmpB.x, tmpB.y, tmpB.z, HORIZON_CLIP);
+        } else if (tmp.y >= floorSin && tmpB.y >= floorSin) {
+          clipped = {
+            a: { x: tmp.x, y: tmp.y, z: tmp.z },
+            b: { x: tmpB.x, y: tmpB.y, z: tmpB.z },
+          };
+        }
+        if (!clipped) {
           lp[base] = 0;
           lp[base + 1] = -SKY_R * 2;
           lp[base + 2] = 0;
@@ -502,17 +548,23 @@ function createApi() {
           lp[base + 4] = -SKY_R * 2;
           lp[base + 5] = 0;
         } else {
-          altAzToVec3(a.alt, a.az, tmp).multiplyScalar(SKY_R * 0.98);
-          lp[base] = tmp.x;
-          lp[base + 1] = tmp.y;
-          lp[base + 2] = tmp.z;
-          altAzToVec3(b.alt, b.az, tmp).multiplyScalar(SKY_R * 0.98);
-          lp[base + 3] = tmp.x;
-          lp[base + 4] = tmp.y;
-          lp[base + 5] = tmp.z;
+          const s = SKY_R * 0.98;
+          lp[base] = clipped.a.x * s;
+          lp[base + 1] = clipped.a.y * s;
+          lp[base + 2] = clipped.a.z * s;
+          lp[base + 3] = clipped.b.x * s;
+          lp[base + 4] = clipped.b.y * s;
+          lp[base + 5] = clipped.b.z * s;
         }
       }
       lineObj.geometry.attributes.position.needsUpdate = true;
+    }
+
+    if (milkyWay && milkyWay.material && milkyWay.material.uniforms?.uEnuToGal) {
+      if (typeof engine.enuToGalMatrixFlat === 'function') {
+        const flat = engine.enuToGalMatrixFlat(date, observer);
+        milkyWay.material.uniforms.uEnuToGal.value.fromArray(flat);
+      }
     }
   }
 
@@ -520,11 +572,20 @@ function createApi() {
     let mesh = planetGroup.getObjectByName('planet-' + id);
     if (mesh) return mesh;
     const geo = new THREE.SphereGeometry(1, 24, 16);
-    const mat = new THREE.MeshBasicMaterial({
-      color: PLANET_COLORS[id] || 0xffffff,
-      transparent: true,
-      opacity: 0.95,
-    });
+    let mat;
+    if (id === 'moon') {
+      mat = new THREE.MeshLambertMaterial({
+        color: PLANET_COLORS.moon,
+        transparent: true,
+        opacity: 0.98,
+      });
+    } else {
+      mat = new THREE.MeshBasicMaterial({
+        color: PLANET_COLORS[id] || 0xffffff,
+        transparent: true,
+        opacity: 0.95,
+      });
+    }
     mesh = new THREE.Mesh(geo, mat);
     mesh.name = 'planet-' + id;
     mesh.userData.skyType = 'planet';
@@ -561,9 +622,15 @@ function createApi() {
     return mesh;
   }
 
-  function updatePlanets(bodies, selection) {
+  function updatePlanets(bodies, selection, sunAlt, sunAz) {
     pickables = [];
     const seen = Object.create(null);
+    if (sunLight && Number.isFinite(sunAlt) && Number.isFinite(sunAz)) {
+      altAzToVec3(sunAlt, sunAz, tmp);
+      sunLight.position.copy(tmp).multiplyScalar(200);
+      sunLight.target.position.set(0, 0, 0);
+      sunLight.target.updateMatrixWorld();
+    }
     (bodies || []).forEach((p) => {
       if (p.alt < -1) return;
       const mesh = ensurePlanetMesh(p.id);
@@ -578,15 +645,20 @@ function createApi() {
       mesh.userData.ra = p.ra;
       mesh.userData.dec = p.dec;
       mesh.visible = true;
-      if (p.id === 'moon' && Number.isFinite(p.phaseFraction) && mesh.material) {
-        const lit = 0.35 + 0.65 * p.phaseFraction;
-        mesh.material.opacity = Math.min(1, lit);
+      if (p.id === 'moon') {
+        // Face the observer so Lambert terminator reads correctly
+        mesh.lookAt(0, 0, 0);
+        if (mesh.material) mesh.material.opacity = 0.98;
       }
       const sel =
         selection &&
         selection.type === 'planet' &&
         String(selection.id).toLowerCase() === p.id;
-      mesh.scale.multiplyScalar(sel ? 1.35 : 1);
+      // Outline-only selection — scaling pops the fisheye and feels like a slide
+      if (mesh.material && mesh.material.emissive) {
+        mesh.material.emissive.setHex(sel ? 0x445566 : 0x000000);
+      }
+      mesh.userData.selected = !!sel;
       pickables.push(mesh);
     });
     planetGroup.children.forEach((ch) => {
@@ -654,16 +726,12 @@ function createApi() {
     twilightSkyColor(sunAlt, skyColor);
     if (atmos && atmos.material) {
       atmos.material.color.copy(skyColor);
-      // Keep atmosphere subtle — never a solid wash that hides stars
       atmos.material.opacity = sunAlt > 0 ? 0.35 : sunAlt > -6 ? 0.4 : 0.5;
     }
     if (renderer) renderer.setClearColor(skyColor, 1);
-    if (starPoints && starPoints.material) {
-      // Stars stay bright in projector mode even during local daylight
+    if (starPoints && starPoints.material && starPoints.material.uniforms) {
       const op = sunAlt > 0 ? 0.75 : sunAlt > -6 ? 0.85 : 1;
-      starPoints.material.opacity = op;
-      const bright = starPoints.userData && starPoints.userData.brightPoints;
-      if (bright && bright.material) bright.material.opacity = op;
+      starPoints.material.uniforms.uOpacity.value = op;
     }
     if (milkyWay && milkyWay.material && milkyWay.material.uniforms) {
       milkyWay.material.uniforms.uOpacity.value = sunAlt > 0 ? 0.08 : sunAlt > -6 ? 0.12 : 0.22;
@@ -675,57 +743,136 @@ function createApi() {
     raf = requestAnimationFrame(tick);
     if (document.hidden) return;
     applyCamera();
-    renderer.render(scene, camera);
+    if (domeMode && fisheyeScene && fisheyeCamera && cubeCam) {
+      if (cubeDirty) captureCube();
+      syncFisheyeUniforms();
+      renderer.render(fisheyeScene, fisheyeCamera);
+    } else {
+      renderer.render(scene, camera);
+    }
   }
 
-  function pickRay(clientX, clientY, raycaster) {
+  function ndcFromClient(clientX, clientY) {
     const rect = canvas.getBoundingClientRect();
     const x = ((clientX - rect.left) / rect.width) * 2 - 1;
     const y = -((clientY - rect.top) / rect.height) * 2 + 1;
-    raycaster.setFromCamera({ x, y }, camera);
-    return true;
+    return { x, y, aspect: rect.width / Math.max(rect.height, 1) };
+  }
+
+  /** Invert equidistant fisheye (same as fragment shader). */
+  function fisheyePickDir(clientX, clientY, out) {
+    const ndc = ndcFromClient(clientX, clientY);
+    let px = ndc.x;
+    let py = ndc.y;
+    if (ndc.aspect > 1) px *= ndc.aspect;
+    else py /= Math.max(ndc.aspect, 1e-4);
+    const pLen = Math.hypot(px, py);
+    if (pLen > 1.05) return null;
+    if (engine && typeof engine.fisheyeScreenToDir === 'function') {
+      const d = engine.fisheyeScreenToDir(px, py, fov, cameraAlt, cameraAz);
+      out.set(d.x, d.y, d.z).normalize();
+      return out;
+    }
+    const r = Math.min(pLen, 1);
+    const ang = r * (fov * DEG * 0.5);
+    lookBasis(cameraAlt, cameraAz, lookFwd, lookRight, lookUpV);
+    const invR = pLen > 1e-5 ? 1 / pLen : 0;
+    const s = Math.sin(ang) * invR;
+    out
+      .copy(lookFwd)
+      .multiplyScalar(Math.cos(ang))
+      .addScaledVector(lookRight, px * s)
+      .addScaledVector(lookUpV, py * s)
+      .normalize();
+    return out;
+  }
+
+  function angularNearestHit(dir) {
+    let best = null;
+    let bestAng = 0.035; // ~2°
+    const tryObj = (obj) => {
+      if (!obj || !obj.visible) return;
+      tmp.copy(obj.position).normalize();
+      const ang = Math.acos(Math.min(1, Math.max(-1, tmp.dot(dir))));
+      if (ang < bestAng) {
+        bestAng = ang;
+        best = obj;
+      }
+    };
+    for (let i = 0; i < pickables.length; i += 1) tryObj(pickables[i]);
+    if (starPoints && starsCatalog.length) {
+      const pos = starPoints.geometry.attributes.position.array;
+      for (let i = 0; i < starsCatalog.length; i += 1) {
+        const i3 = i * 3;
+        if (pos[i3 + 1] < -SKY_R) continue;
+        tmp.set(pos[i3], pos[i3 + 1], pos[i3 + 2]).normalize();
+        const ang = Math.acos(Math.min(1, Math.max(-1, tmp.dot(dir))));
+        const mag = Number(starsCatalog[i].mag);
+        const thresh = mag <= 2 ? 0.04 : mag <= 4 ? 0.025 : 0.018;
+        if (ang < Math.min(bestAng, thresh)) {
+          bestAng = ang;
+          best = { __starIdx: i };
+        }
+      }
+    }
+    return best;
+  }
+
+  function hitToSelection(hit) {
+    if (!hit) return null;
+    if (hit.__starIdx != null) {
+      const s = starsCatalog[hit.__starIdx];
+      if (!s || !engine || !lastSnap) return null;
+      const aa =
+        typeof engine.j2000ToAltAz === 'function'
+          ? engine.j2000ToAltAz(s.ra, s.dec, lastSnap.date, lastSnap.observer)
+          : engine.equatorialToAltAz(s.ra, s.dec, lastSnap.date, lastSnap.observer);
+      return {
+        type: 'star',
+        id: s.n || 'HIP' + s.hip,
+        name: s.n || 'HIP ' + s.hip,
+        alt: aa.alt,
+        az: aa.az,
+        ra: s.ra,
+        dec: s.dec,
+      };
+    }
+    let obj = hit;
+    while (obj && !obj.userData?.skyType && obj.parent) obj = obj.parent;
+    if (!obj || !obj.userData?.skyType) return null;
+    return {
+      type: obj.userData.skyType,
+      id: obj.userData.skyId,
+      name: obj.userData.name || obj.userData.skyId,
+      alt: obj.userData.alt,
+      az: obj.userData.az,
+      ra: obj.userData.ra,
+      dec: obj.userData.dec,
+    };
   }
 
   function pick(clientX, clientY) {
     if (!renderer || !camera) return null;
+
+    if (domeMode && fisheyeMat) {
+      if (!fisheyePickDir(clientX, clientY, pickDir)) return null;
+      return hitToSelection(angularNearestHit(pickDir));
+    }
+
     const raycaster = new THREE.Raycaster();
     raycaster.params.Points = { threshold: 1.8 };
-    if (!pickRay(clientX, clientY, raycaster)) return null;
+    const ndc = ndcFromClient(clientX, clientY);
+    raycaster.setFromCamera({ x: ndc.x, y: ndc.y }, camera);
 
-    const hits = raycaster.intersectObjects(pickables, true);
-    if (hits.length) {
-      let obj = hits[0].object;
-      while (obj && !obj.userData.skyType && obj.parent) obj = obj.parent;
-      if (obj && obj.userData.skyType) {
-        return {
-          type: obj.userData.skyType,
-          id: obj.userData.skyId,
-          name: obj.userData.name || obj.userData.skyId,
-          alt: obj.userData.alt,
-          az: obj.userData.az,
-          ra: obj.userData.ra,
-          dec: obj.userData.dec,
-        };
-      }
-    }
+    // Prefer angular nearest among pickables for giant planet meshes
+    pickDir.copy(raycaster.ray.direction).normalize();
+    const near = angularNearestHit(pickDir);
+    if (near) return hitToSelection(near);
 
     if (starPoints && engine && lastSnap) {
       const starHits = raycaster.intersectObject(starPoints);
       if (starHits.length) {
-        const idx = starHits[0].index;
-        const s = starsCatalog[idx];
-        if (s) {
-          const aa = engine.equatorialToAltAz(s.ra, s.dec, lastSnap.date, lastSnap.observer);
-          return {
-            type: 'star',
-            id: s.n || 'HIP' + s.hip,
-            name: s.n || 'HIP ' + s.hip,
-            alt: aa.alt,
-            az: aa.az,
-            ra: s.ra,
-            dec: s.dec,
-          };
-        }
+        return hitToSelection({ __starIdx: starHits[0].index });
       }
     }
     return null;
@@ -744,10 +891,18 @@ function createApi() {
     if (!dragging || pinching) return;
     const dx = e.clientX - lastX;
     const dy = e.clientY - lastY;
-    if (Math.abs(dx) + Math.abs(dy) > 3) moved = true;
+    // Don't pan until past click-slop — otherwise every star tap nudges the dome
+    if (!moved) {
+      if (Math.abs(dx) + Math.abs(dy) < 8) return;
+      moved = true;
+      // Reset origin so crossing the slop doesn't apply as one big pan jump
+      lastX = e.clientX;
+      lastY = e.clientY;
+      return;
+    }
     lastX = e.clientX;
     lastY = e.clientY;
-    const sens = (domeMode ? fov / 140 : fov / 70);
+    const sens = domeMode ? fov / 140 : fov / 70;
     cameraAz = ((cameraAz - dx * 0.18 * sens) % 360 + 360) % 360;
     cameraAlt = clampAlt(cameraAlt + dy * 0.15 * sens);
     notifyView();
@@ -865,6 +1020,12 @@ function createApi() {
     camera.position.set(0, 0, 0);
     textureLoader = new THREE.TextureLoader();
 
+    sunLight = new THREE.DirectionalLight(0xfff2d6, 1.15);
+    sunLight.position.set(50, 80, -40);
+    scene.add(sunLight);
+    scene.add(sunLight.target);
+    scene.add(new THREE.AmbientLight(0x304060, 0.22));
+
     const atmosGeo = new THREE.SphereGeometry(SKY_R * 1.05, 32, 16);
     const atmosMat = new THREE.MeshBasicMaterial({
       color: 0x0a1020,
@@ -884,6 +1045,7 @@ function createApi() {
       side: THREE.BackSide,
       uniforms: {
         uOpacity: { value: 0.22 },
+        uEnuToGal: { value: new THREE.Matrix3() },
       },
       vertexShader: `
         varying vec3 vDir;
@@ -894,10 +1056,13 @@ function createApi() {
       `,
       fragmentShader: `
         uniform float uOpacity;
+        uniform mat3 uEnuToGal;
         varying vec3 vDir;
         void main() {
-          float band = exp(-pow(vDir.y * 2.2 + 0.15, 2.0)) * 0.55;
-          float dust = fract(sin(dot(vDir.xz, vec2(12.9898, 78.233))) * 43758.5453);
+          vec3 g = normalize(uEnuToGal * normalize(vDir));
+          float b = asin(clamp(g.z, -1.0, 1.0));
+          float band = exp(-pow(b * 3.2, 2.0)) * 0.7;
+          float dust = fract(sin(dot(g.xy, vec2(12.9898, 78.233))) * 43758.5453);
           float a = band * (0.35 + dust * 0.4) * uOpacity;
           gl_FragColor = vec4(0.55, 0.6, 0.85, a);
         }
@@ -906,7 +1071,6 @@ function createApi() {
     milkyWay = new THREE.Mesh(mwGeo, mwMat);
     scene.add(milkyWay);
 
-    // Horizon ring
     const ringPts = [];
     for (let i = 0; i <= 64; i += 1) {
       const az = (i / 64) * Math.PI * 2;
@@ -931,6 +1095,8 @@ function createApi() {
     markerGroup = new THREE.Group();
     scene.add(markerGroup);
 
+    setupFisheye();
+
     canvas.style.pointerEvents = 'auto';
     canvas.style.touchAction = 'none';
     canvas.addEventListener('pointerdown', onPointerDown);
@@ -954,6 +1120,10 @@ function createApi() {
     dead = false;
     lastW = 0;
     lastH = 0;
+    if (domeMode) {
+      cameraAlt = DOME_ALT;
+      fov = DOME_FOV;
+    }
     resize();
     applyCamera();
     if (engine && typeof engine.skySnapshot === 'function') {
@@ -982,7 +1152,7 @@ function createApi() {
     lastSnap = snap;
     extras = extras || {};
     updateEquatorialLayer(snap.date, snap.observer);
-    updatePlanets(snap.allBodies || snap.planets || [], snap.selection);
+    updatePlanets(snap.allBodies || snap.planets || [], snap.selection, snap.sunAlt, snap.sunAz);
     updateMarkers(extras.markers || []);
     updateIss(extras.iss || null);
     updateAtmosphere(snap.sunAlt);
@@ -993,17 +1163,45 @@ function createApi() {
     markCubeDirty();
   }
 
+  /** Highlight only — no star rebuild, no camera move, no cube flash. */
+  function setSelection(selection) {
+    if (!ok || !lastSnap) return;
+    updatePlanets(
+      lastSnap.allBodies || lastSnap.planets || [],
+      selection,
+      lastSnap.sunAlt,
+      lastSnap.sunAz
+    );
+    // Planets sit in the live scene; fisheye needs a quiet cube refresh only if a planet is selected
+    if (selection && selection.type === 'planet') markCubeDirty();
+  }
+
+  function killTween() {
+    if (gsapTween && typeof gsapTween.kill === 'function') gsapTween.kill();
+    gsapTween = null;
+  }
+
+  function unwrapAz(from, to) {
+    if (engine && typeof engine.unwrapAzTarget === 'function') {
+      return engine.unwrapAzTarget(from, to);
+    }
+    let d = ((Number(to) - Number(from)) % 360 + 540) % 360 - 180;
+    return Number(from) + d;
+  }
+
   function setView(az, alt, animate) {
-    const targetAz = ((Number(az) % 360) + 360) % 360;
+    const targetAzNorm = ((Number(az) % 360) + 360) % 360;
     const targetAlt = Number.isFinite(Number(alt)) ? clampAlt(Number(alt)) : cameraAlt;
+    const targetAz = unwrapAz(cameraAz, targetAzNorm);
+    killTween();
     if (!animate || reducedMotion || typeof window.gsap === 'undefined') {
-      cameraAz = targetAz;
+      cameraAz = targetAzNorm;
       cameraAlt = targetAlt;
       notifyView();
       return;
     }
     const state = { az: cameraAz, alt: cameraAlt };
-    window.gsap.to(state, {
+    gsapTween = window.gsap.to(state, {
       az: targetAz,
       alt: targetAlt,
       duration: 0.45,
@@ -1044,17 +1242,21 @@ function createApi() {
   function lookUp(opts) {
     const options = opts || {};
     domeMode = true;
-    const targetAz = Number.isFinite(options.az) ? ((options.az % 360) + 360) % 360 : cameraAz;
+    const targetAzNorm = Number.isFinite(options.az)
+      ? ((options.az % 360) + 360) % 360
+      : cameraAz;
+    const targetAz = unwrapAz(cameraAz, targetAzNorm);
     const animate = options.animate !== false && !reducedMotion && typeof window.gsap !== 'undefined';
+    killTween();
     if (!animate) {
-      cameraAz = targetAz;
+      cameraAz = targetAzNorm;
       cameraAlt = DOME_ALT;
       fov = DOME_FOV;
       notifyView();
       return;
     }
     const state = { az: cameraAz, alt: cameraAlt, fov };
-    window.gsap.to(state, {
+    gsapTween = window.gsap.to(state, {
       az: targetAz,
       alt: DOME_ALT,
       fov: DOME_FOV,
@@ -1081,6 +1283,7 @@ function createApi() {
   function dispose() {
     dead = true;
     ok = false;
+    killTween();
     cancelAnimationFrame(raf);
     if (canvas) {
       canvas.removeEventListener('pointerdown', onPointerDown);
@@ -1126,6 +1329,7 @@ function createApi() {
     },
     mount,
     render,
+    setSelection,
     setView,
     setFov,
     setDomeMode,
@@ -1136,6 +1340,7 @@ function createApi() {
     dispose,
     MIN_FOV,
     MAX_FOV,
+    MAX_DOME_FOV,
     DOME_ALT,
     DOME_FOV,
     HORIZON_ALT,
