@@ -1147,14 +1147,17 @@ body.plan-night-vision .plan-dome-rim__ring {
 .plan-heygen-demo-modal--splash {
   z-index: 4000;
   padding: 0;
+  display: block;
   background: #04060e;
   pointer-events: auto;
   visibility: visible;
 }
 
 .plan-heygen-demo-modal--splash .plan-heygen-demo-video {
-  width: 100vw;
-  height: 100vh;
+  display: block;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
   object-fit: contain;
   border-radius: 0;
   background: #04060e;
@@ -1164,7 +1167,7 @@ body.plan-night-vision .plan-dome-rim__ring {
 .plan-heygen-skip,
 .plan-heygen-play {
   position: fixed;
-  z-index: 5001;
+  z-index: 2147483000;
   border: 0;
   border-radius: 999px;
   font-weight: 700;
@@ -1172,15 +1175,20 @@ body.plan-night-vision .plan-dome-rim__ring {
   text-transform: uppercase;
   cursor: pointer;
   pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .plan-heygen-skip {
-  top: 1rem;
-  right: 1rem;
-  padding: 0.45rem 1rem;
-  background: rgba(4, 8, 18, 0.72);
+  top: max(12px, env(safe-area-inset-top, 0px));
+  left: max(12px, env(safe-area-inset-left, 0px));
+  right: auto;
+  min-height: 44px;
+  min-width: 72px;
+  padding: 0.65rem 1.1rem;
+  background: rgba(4, 8, 18, 0.88);
   color: #ffe8b0;
-  border: 1px solid rgba(255, 210, 120, 0.45);
+  border: 1px solid rgba(255, 210, 120, 0.55);
 }
 
 .plan-heygen-play {
@@ -1204,7 +1212,9 @@ body.is-intro-splash .plan-skip {
 }
 
 html.is-intro-splash #planHeygenDemoModal,
-body.is-intro-splash #planHeygenDemoModal {
+html.is-intro-splash #planHeygenClose,
+body.is-intro-splash #planHeygenDemoModal,
+body.is-intro-splash #planHeygenClose {
   visibility: visible !important;
   pointer-events: auto !important;
 }

@@ -28,7 +28,11 @@ describe('HeyGen intro splash', () => {
     expect(src).not.toContain('SPLASH_CLIP');
     expect(src).not.toContain('bindSplashClip');
     expect(src).toMatch(/function stopIntro\([\s\S]*markHeard\(/);
-    expect(src).toContain('>Close</button>');
+    expect(src).toContain("closeBtn.textContent = 'Close'");
+    expect(src).toContain('pointerdown');
+    expect(src).toContain('video.muted = true');
+    expect(src).not.toContain('planHeygenPlay');
+    expect(src).not.toContain('mhmHeygenPlay');
     await expectFile('public/mountain-high/assets/video/hippie-botanist-intro.mp4');
   });
 
@@ -45,7 +49,10 @@ describe('HeyGen intro splash', () => {
     expect(src).not.toContain('SPLASH_CLIP');
     expect(src).not.toContain('bindSplashClip');
     expect(src).toMatch(/function stopIntro\([\s\S]*markHeard\(/);
-    expect(src).toContain('>Close</button>');
+    expect(src).toContain("closeBtn.textContent = 'Close'");
+    expect(src).toContain('pointerdown');
+    expect(src).toContain('video.muted = true');
+    expect(src).not.toContain('planHeygenPlay');
     await expectFile('public/planetarium/assets/video/alienigena-zigzag-intro.mp4');
   });
 });

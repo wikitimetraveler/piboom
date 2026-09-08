@@ -60,19 +60,33 @@
     document.body.classList.remove('is-intro-splash');
   }
 
-  function kickPlayback(video, playBtn) {
+  function kickPlayback(video) {
     if (!video || typeof video.play !== 'function') return;
+    video.playsInline = true;
     video.playbackRate = 1;
-    try {
-      const attempt = video.play();
-      if (attempt && typeof attempt.catch === 'function') {
-        attempt.catch(() => {
-          if (playBtn) playBtn.hidden = false;
-        });
+    video.muted = true;
+    video.defaultMuted = true;
+    video.setAttribute('muted', '');
+    video.setAttribute('autoplay', '');
+    const playNow = () => {
+      try {
+        const attempt = video.play();
+        if (attempt && typeof attempt.then === 'function') {
+          attempt
+            .then(() => {
+              video.muted = false;
+            })
+            .catch(() => {
+              video.muted = true;
+              video.play().catch(() => {});
+            });
+        }
+      } catch (_) {
+        video.muted = true;
+        video.play().catch(() => {});
       }
-    } catch (_) {
-      if (playBtn) playBtn.hidden = false;
-    }
+    };
+    playNow();
   }
 
   function syncIntroToggle() {
@@ -95,6 +109,7 @@
       }
     }
     modal?.remove();
+    document.getElementById('planHeygenClose')?.remove();
   }
 
   function stopIntro() {
@@ -103,6 +118,18 @@
     closeIntroModal();
     releasePage();
     syncIntroToggle();
+  }
+
+  function bindClose(btn) {
+    if (!btn) return;
+    const close = (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      ev.stopImmediatePropagation?.();
+      stopIntro();
+    };
+    btn.addEventListener('pointerdown', close);
+    btn.addEventListener('click', close);
   }
 
   function showIntroModal(url) {
@@ -114,30 +141,27 @@
     rootEl.setAttribute('aria-modal', 'true');
     rootEl.setAttribute('aria-label', 'Zigzag intro');
     rootEl.innerHTML =
-      '<video class="plan-heygen-demo-video" playsinline autoplay src="' +
+      '<video class="plan-heygen-demo-video" playsinline webkit-playsinline autoplay src="' +
       esc(url) +
-      '"></video>' +
-      '<button type="button" class="plan-heygen-play" hidden>Play</button>' +
-      '<button type="button" class="plan-heygen-skip" data-plan-heygen-close>Close</button>';
+      '"></video>';
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.id = 'planHeygenClose';
+    closeBtn.className = 'plan-heygen-skip';
+    closeBtn.textContent = 'Close';
+    closeBtn.setAttribute('aria-label', 'Close intro');
     document.body.appendChild(rootEl);
-    rootEl.addEventListener('click', (ev) => {
-      if (!ev.target.closest('[data-plan-heygen-close]')) return;
-      ev.preventDefault();
-      ev.stopPropagation();
-      stopIntro();
-    });
+    document.body.appendChild(closeBtn);
+    bindClose(closeBtn);
     const video = rootEl.querySelector('video');
-    const playBtn = rootEl.querySelector('.plan-heygen-play');
-    if (playBtn) {
-      playBtn.addEventListener('click', (ev) => {
-        ev.stopPropagation();
-        playBtn.hidden = true;
-        kickPlayback(video);
-      });
-    }
     if (video) {
+      video.setAttribute('playsinline', '');
+      video.setAttribute('webkit-playsinline', 'true');
+      video.setAttribute('muted', '');
+      video.muted = true;
+      video.controls = false;
       video.addEventListener('ended', stopIntro);
-      kickPlayback(video, playBtn);
+      kickPlayback(video);
     }
   }
 

@@ -82,6 +82,7 @@
       }
     }
     modal?.remove();
+    document.getElementById('mhmHeygenClose')?.remove();
   }
 
   function stopSpeech() {
@@ -123,19 +124,33 @@
     document.body.classList.remove('is-intro-splash');
   }
 
-  function kickPlayback(video, playBtn) {
+  function kickPlayback(video) {
     if (!video || typeof video.play !== 'function') return;
+    video.playsInline = true;
     video.playbackRate = 1;
-    try {
-      const attempt = video.play();
-      if (attempt && typeof attempt.catch === 'function') {
-        attempt.catch(() => {
-          if (playBtn) playBtn.hidden = false;
-        });
+    video.muted = true;
+    video.defaultMuted = true;
+    video.setAttribute('muted', '');
+    video.setAttribute('autoplay', '');
+    const playNow = () => {
+      try {
+        const attempt = video.play();
+        if (attempt && typeof attempt.then === 'function') {
+          attempt
+            .then(() => {
+              video.muted = false;
+            })
+            .catch(() => {
+              video.muted = true;
+              video.play().catch(() => {});
+            });
+        }
+      } catch (_) {
+        video.muted = true;
+        video.play().catch(() => {});
       }
-    } catch (_) {
-      if (playBtn) playBtn.hidden = false;
-    }
+    };
+    playNow();
   }
 
   function introVideoUrl(demo) {
@@ -153,6 +168,18 @@
     syncToggles();
   }
 
+  function bindClose(btn) {
+    if (!btn) return;
+    const close = (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      ev.stopImmediatePropagation?.();
+      stopIntro();
+    };
+    btn.addEventListener('pointerdown', close);
+    btn.addEventListener('click', close);
+  }
+
   function showModal(demo, videoUrl) {
     closeModal();
     const url = videoUrl || INTRO_FALLBACK;
@@ -162,28 +189,25 @@
     rootEl.setAttribute('role', 'dialog');
     rootEl.setAttribute('aria-modal', 'true');
     rootEl.setAttribute('aria-label', demo?.title || 'Meet Bud Master');
-    rootEl.innerHTML = `<video class="mhm-heygen-demo-video" playsinline autoplay src="${esc(url)}"></video>
-        <button type="button" class="mhm-heygen-play" hidden>Play</button>
-        <button type="button" class="mhm-heygen-skip" data-mhm-heygen-close>Close</button>`;
+    rootEl.innerHTML = `<video class="mhm-heygen-demo-video" playsinline webkit-playsinline autoplay src="${esc(url)}"></video>`;
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.id = 'mhmHeygenClose';
+    closeBtn.className = 'mhm-heygen-skip';
+    closeBtn.textContent = 'Close';
+    closeBtn.setAttribute('aria-label', 'Close intro');
     document.body.appendChild(rootEl);
-    rootEl.addEventListener('click', (ev) => {
-      if (!ev.target.closest('[data-mhm-heygen-close]')) return;
-      ev.preventDefault();
-      ev.stopPropagation();
-      stopIntro();
-    });
+    document.body.appendChild(closeBtn);
+    bindClose(closeBtn);
     const video = rootEl.querySelector('video');
-    const playBtn = rootEl.querySelector('.mhm-heygen-play');
-    if (playBtn) {
-      playBtn.addEventListener('click', (ev) => {
-        ev.stopPropagation();
-        playBtn.hidden = true;
-        kickPlayback(video);
-      });
-    }
     if (video) {
+      video.setAttribute('playsinline', '');
+      video.setAttribute('webkit-playsinline', 'true');
+      video.setAttribute('muted', '');
+      video.muted = true;
+      video.controls = false;
       video.addEventListener('ended', stopIntro);
-      kickPlayback(video, playBtn);
+      kickPlayback(video);
     }
   }
 

@@ -1072,14 +1072,17 @@ body.mhm-page[data-age="ok"] {
 .mhm-heygen-demo-modal--splash {
   z-index: 4000;
   padding: 0;
+  display: block;
   background: #000;
   pointer-events: auto;
   visibility: visible;
 }
 
 .mhm-heygen-demo-modal--splash .mhm-heygen-demo-video {
-  width: 100vw;
-  height: 100vh;
+  display: block;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
   object-fit: contain;
   border-radius: 0;
   background: #000;
@@ -1089,7 +1092,7 @@ body.mhm-page[data-age="ok"] {
 .mhm-heygen-skip,
 .mhm-heygen-play {
   position: fixed;
-  z-index: 5001;
+  z-index: 2147483000;
   border: 0;
   border-radius: 999px;
   font-weight: 700;
@@ -1097,15 +1100,20 @@ body.mhm-page[data-age="ok"] {
   text-transform: uppercase;
   cursor: pointer;
   pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .mhm-heygen-skip {
-  top: 1rem;
-  right: 1rem;
-  padding: 0.45rem 1rem;
-  background: rgba(8, 4, 18, 0.72);
+  top: max(12px, env(safe-area-inset-top, 0px));
+  left: max(12px, env(safe-area-inset-left, 0px));
+  right: auto;
+  min-height: 44px;
+  min-width: 72px;
+  padding: 0.65rem 1.1rem;
+  background: rgba(8, 4, 18, 0.88);
   color: #e8d5a3;
-  border: 1px solid rgba(232, 213, 163, 0.45);
+  border: 1px solid rgba(232, 213, 163, 0.55);
 }
 
 .mhm-heygen-play {
@@ -1131,7 +1139,9 @@ body.is-intro-splash .mhm-guide {
 }
 
 html.is-intro-splash #mhmHeygenDemoModal,
-body.is-intro-splash #mhmHeygenDemoModal {
+html.is-intro-splash #mhmHeygenClose,
+body.is-intro-splash #mhmHeygenDemoModal,
+body.is-intro-splash #mhmHeygenClose {
   visibility: visible !important;
   pointer-events: auto !important;
 }
@@ -1218,10 +1228,28 @@ body.mhm-page .ai-chat-button {
   display: none !important;
 }
 
-body.mhm-page .ai-chat-panel {
+body.mhm-page .ai-chat-panel:not(.open) {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+body.mhm-page .ai-chat-panel.open {
+  display: flex !important;
+  visibility: visible !important;
   z-index: 1400 !important;
+  left: auto;
+  right: 0;
   bottom: calc(5.75rem + env(safe-area-inset-bottom, 0px));
-  height: min(600px, calc(100vh - 7.25rem));
+  height: min(600px, calc(100dvh - 7.25rem - env(safe-area-inset-bottom, 0px)));
+}
+
+@media (max-width: 575.98px) {
+  body.mhm-page .ai-chat-panel.open {
+    left: 0;
+    width: 100%;
+    height: min(70dvh, calc(100dvh - 6.5rem - env(safe-area-inset-bottom, 0px)));
+  }
 }
 
 body.mhm-page .ai-chat-header {
