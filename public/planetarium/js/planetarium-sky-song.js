@@ -11,7 +11,7 @@
   const TITLE = 'Spirit in the Sky';
   const YEAR = 1969;
   const DEFAULT_VOLUME = 100;
-  /** Stay off until Play — Alienigena's first-visit intro needs the speakers. */
+  /** Stay off until Play — Zigzag's first-visit intro needs the speakers. */
   const AUTOPLAY_ON_LOAD = false;
   /** Official MV cold open + extra delay (12s + 2s + 1s) — land on the guitar. */
   const SKIP_SECONDS = 15;

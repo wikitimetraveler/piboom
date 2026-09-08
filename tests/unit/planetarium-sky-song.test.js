@@ -34,7 +34,7 @@ describe('PlanetariumSkySong', () => {
     expect(PlanetariumSkySong.VIDEO_ID).toBe('YqYN-1vMM9k');
   });
 
-  test('song stays off on load so Alienigena can intro', () => {
+  test('song stays off on load so Zigzag can intro', () => {
     expect(PlanetariumSkySong.AUTOPLAY_ON_LOAD).toBe(false);
   });
 

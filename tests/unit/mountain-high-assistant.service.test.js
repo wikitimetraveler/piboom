@@ -111,7 +111,7 @@ describe('mountain-high-assistant.service', () => {
     const face = JSON.parse(
       await readFile(path.join(process.cwd(), 'data/mountain-high-heygen-face.json'), 'utf8')
     );
-    expect(studio.name).toBe('Alienigena');
+    expect(studio.name).toBe('Zigzag');
     expect(face.name).toBe('Bud Master');
     expect(face.avatarId).toBeTruthy();
     expect(studio.avatarId).toBeTruthy();

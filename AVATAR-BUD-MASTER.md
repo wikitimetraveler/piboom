@@ -29,4 +29,4 @@ Hippie botanist for Mountain High Medicinals. Named character — not the agent,
 - Local intro: `public/mountain-high/assets/video/hippie-botanist-intro.mp4`
 
 TTS stays `en-US-Neural2-F` (female). Do not switch to a male voice.
-Do not fall back to the Alienigena / studio streaming IDs.
+Do not fall back to the Zigzag / studio streaming IDs.

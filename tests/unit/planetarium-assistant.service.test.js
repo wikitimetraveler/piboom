@@ -6,7 +6,7 @@ import { buildSystemPrompt, GUIDE_NAME, AVATAR_NAME } from '../../services/plane
 describe('planetarium-assistant.service', () => {
   test('guide and avatar names', () => {
     expect(GUIDE_NAME).toBe('Carl');
-    expect(AVATAR_NAME).toBe('Alienigena');
+    expect(AVATAR_NAME).toBe('Zigzag');
   });
 
   test('buildSystemPrompt embeds live sky context', () => {
@@ -22,7 +22,7 @@ describe('planetarium-assistant.service', () => {
       asterisms: ['Orion', 'Big Dipper'],
     });
     expect(prompt).toContain('Carl');
-    expect(prompt).toContain('Alienigena');
+    expect(prompt).toContain('Zigzag');
     expect(prompt).toContain('Hampton Falls, NH');
     expect(prompt).toContain('Jupiter high in the south');
     expect(prompt).toContain('Orion');

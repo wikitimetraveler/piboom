@@ -7,7 +7,7 @@ import AIChatWidget from '/shared/ai-chat-widget.js';
 const WELCOME_THEATER = `<div class="plan-carl-welcome">
   <span class="plan-carl-welcome__avatar" aria-hidden="true">👽</span>
   <p>I'm <strong>Carl</strong>, your AstroAI guide — constellations, planets, moon phases, and what's up tonight.</p>
-  <p class="small text-muted mb-0">Alienigena (our alien presenter) lip-syncs on video when HeyGen is live. Tap <strong>Ask Carl</strong> and speak — voice is on by default.</p>
+  <p class="small text-muted mb-0">Zigzag (our alien presenter) lip-syncs on video when HeyGen is live. Tap <strong>Ask Carl</strong> and speak — voice is on by default.</p>
   <small class="text-muted">Try: "What's that bright thing in the south?" or "Tell me about Orion tonight."</small>
 </div>`;
 

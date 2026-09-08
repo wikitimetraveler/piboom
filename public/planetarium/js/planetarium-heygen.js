@@ -1,5 +1,5 @@
 /**
- * Alienigena HeyGen live tile for planetarium Carl sessions
+ * Zigzag HeyGen live tile for planetarium Carl sessions
  * Development work by David Lane
  */
 (function (root) {
@@ -130,7 +130,7 @@
     rootEl.className = splash ? 'plan-heygen-demo-modal plan-heygen-demo-modal--splash' : 'plan-heygen-demo-modal';
     rootEl.setAttribute('role', 'dialog');
     rootEl.setAttribute('aria-modal', 'true');
-    rootEl.setAttribute('aria-label', 'Alienigena intro');
+    rootEl.setAttribute('aria-label', 'Zigzag intro');
     rootEl.innerHTML = splash
       ? '<video class="plan-heygen-demo-video" playsinline autoplay src="' +
         esc(url) +
@@ -140,7 +140,7 @@
       : '<div class="plan-heygen-demo-backdrop" data-plan-heygen-close></div>' +
         '<div class="plan-heygen-demo-panel">' +
         '<header class="d-flex justify-content-between align-items-center mb-2">' +
-        '<h2 class="h5 mb-0">Alienigena</h2>' +
+        '<h2 class="h5 mb-0">Zigzag</h2>' +
         '<button type="button" class="btn-close btn-close-white" data-plan-heygen-close aria-label="Close intro"></button>' +
         '</header>' +
         '<video class="plan-heygen-demo-video" controls playsinline autoplay src="' +
@@ -190,7 +190,7 @@
       if (!res.ok) return null;
       const data = await res.json();
       studioFace = data && typeof data === 'object' ? data : null;
-      const faceName = String(studioFace?.name || 'Alienigena').trim() || 'Alienigena';
+      const faceName = String(studioFace?.name || 'Zigzag').trim() || 'Zigzag';
       const label = document.getElementById('planHeygenLabel');
       if (label) label.textContent = faceName + ' · alien presenter';
       return studioFace;
@@ -207,7 +207,7 @@
   function friendlyError(raw) {
     const text = String(raw || '');
     if (/streaming\.new|avatar-realtime|resource_not_found|404/i.test(text)) {
-      return 'Live stream is not on this HeyGen plan — Alienigena still speaks.';
+      return 'Live stream is not on this HeyGen plan — Zigzag still speaks.';
     }
     return text;
   }
@@ -249,7 +249,7 @@
       heygenRoom = { kind: 'poster' };
       media.hidden = false;
       wrap?.classList.add('plan-heygen--live');
-      root.HeygenLiveTile.attachPoster(media, data.url, 'plan-heygen__video', 'Alienigena');
+      root.HeygenLiveTile.attachPoster(media, data.url, 'plan-heygen__video', 'Zigzag');
       if (data.audioUrl) root.HeygenLiveTile.playAudio?.(data.audioUrl);
       return;
     }
@@ -288,7 +288,7 @@
     clearMedia();
     heygenSessionId = null;
     const btn = document.getElementById('planHeygenToggle');
-    if (btn) btn.textContent = 'Show Alienigena · alien presenter';
+    if (btn) btn.textContent = 'Show Zigzag · alien presenter';
     setStatus('');
   }
 
@@ -307,7 +307,7 @@
 
   async function startHeygen() {
     const face = studioFace || (await loadStudioFace());
-    const faceName = String(face?.name || 'Alienigena').trim() || 'Alienigena';
+    const faceName = String(face?.name || 'Zigzag').trim() || 'Zigzag';
     const greeting =
       String(face?.greeting || '').trim() ||
       'Signal acquired. Carl and I are watching the sky with you.';
@@ -320,7 +320,7 @@
     if (data?.url && (data.fallback || data.playback === 'poster' || root.HeygenLiveTile?.isPoster?.(data))) {
       await attachSession(data);
       const btn = document.getElementById('planHeygenToggle');
-      if (btn) btn.textContent = 'Hide Alienigena';
+      if (btn) btn.textContent = 'Hide Zigzag';
       setStatus(`${faceName} on voice — live lip-sync is not on this HeyGen plan.`);
       if (!data.audioUrl) await speakTts(greeting);
       return;
@@ -332,18 +332,18 @@
         media.hidden = false;
         wrap?.classList.add('plan-heygen--live');
         media.innerHTML =
-          '<div class="plan-heygen__standin" role="img" aria-label="Alienigena">' +
-          '<img src="/planetarium/assets/alienigena-portrait.webp" alt="Alienigena" width="160" height="160"/>' +
+          '<div class="plan-heygen__standin" role="img" aria-label="Zigzag">' +
+          '<img src="/planetarium/assets/alienigena-portrait.webp" alt="Zigzag" width="160" height="160"/>' +
           '<small>alien presenter</small></div>';
         heygenRoom = { kind: 'poster' };
         heygenSessionId = 'poster';
         const btn = document.getElementById('planHeygenToggle');
-        if (btn) btn.textContent = 'Hide Alienigena';
+        if (btn) btn.textContent = 'Hide Zigzag';
         setStatus(
           friendlyError(data.error) ||
             (face?.avatarId
-              ? 'HeyGen streaming unavailable — Alienigena can still talk through Carl.'
-              : `${faceName} needs avatar IDs — see AVATAR-ALIENIGENA.md.`)
+              ? 'HeyGen streaming unavailable — Zigzag can still talk through Carl.'
+              : `${faceName} needs avatar IDs — see AVATAR-ZIGZAG.md.`)
         );
         await speakTts(greeting);
         return;
@@ -351,14 +351,14 @@
       setStatus(
         friendlyError(data.error) ||
           (face?.avatarId
-            ? 'HeyGen streaming unavailable — Alienigena can still talk through Carl.'
-              : `${faceName} needs avatar IDs — see AVATAR-ALIENIGENA.md.`)
+            ? 'HeyGen streaming unavailable — Zigzag can still talk through Carl.'
+              : `${faceName} needs avatar IDs — see AVATAR-ZIGZAG.md.`)
       );
       return;
     }
     await attachSession(data);
     const btn = document.getElementById('planHeygenToggle');
-    if (btn) btn.textContent = 'Hide Alienigena';
+    if (btn) btn.textContent = 'Hide Zigzag';
     setStatus(`${faceName} live — Carl speaks through this tile.`);
   }
 

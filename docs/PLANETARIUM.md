@@ -1,6 +1,6 @@
 # Planetarium
 
-Full-sky **360° WebGL dome** at [`/planetarium/`](/planetarium/) — astronomy-engine ephemeris, Hipparcos mag≤6.5 star field (J2000 precessed to of-date via EQJ→HOR), IAU constellation lines, Carl (AstroAI) voice guide, optional Alienigena HeyGen face, catalog search, ISS TLE passes, and static eclipse/meteor events.
+Full-sky **360° WebGL dome** at [`/planetarium/`](/planetarium/) — astronomy-engine ephemeris, Hipparcos mag≤6.5 star field (J2000 precessed to of-date via EQJ→HOR), IAU constellation lines, Carl (AstroAI) voice guide, optional Zigzag HeyGen face, catalog search, ISS TLE passes, and static eclipse/meteor events.
 
 **Planet worlds** — graphics-first body home pages at [`/planetarium/worlds/`](/planetarium/worlds/) (shared template [`body.html?id=mars`](/planetarium/worlds/body.html?id=mars)): circular WebGPU NASA **sphere** (not a rectangular stage), interactive equirectangular **surface map** (pan / click / site pins → `lookAt`), research desk from static dossiers, and Carl with world-dossier context.
 
@@ -31,7 +31,7 @@ The home hero still uses the lightweight [`FunHomeSky`](../public/shared/js/fun-
 | Night chrome | Opt-in | On (Dim / Red / Deep) — UI only, sky unfiltered |
 | Primary chrome | Masthead + control clusters + right desk | Full-bleed sky + bottom dock + sheets |
 | Compass / AR | Discover tab | **Face** dock slot |
-| HeyGen Alienigena / Spirit in the Sky | Yes | No |
+| HeyGen Zigzag / Spirit in the Sky | Yes | No |
 | Share `app=` | (theater) | `app=field` reopens Field |
 
 ## Sky frames (theater GL)
@@ -52,7 +52,7 @@ The home hero still uses the lightweight [`FunHomeSky`](../public/shared/js/fun-
 - `public/shared/js/fun-home-sky.js` — home hero only (also geolocation helpers reused by the desk); `buildPlanetariumUrl` / `buildWorldUrl`
 - `public/shared/js/webgpu-planetarium-sky.js` — optional wash if WebGL mount fails
 - `public/planetarium/js/planetarium-guide.js` — Carl widget + “show me Jupiter” slew (world pages skip slew)
-- `public/planetarium/js/planetarium-heygen.js` — Alienigena Avatar Realtime tile
+- `public/planetarium/js/planetarium-heygen.js` — Zigzag Avatar Realtime tile
 - `public/planetarium/js/planetarium-extras.js` — compass, catalog, ISS, events, deep-sky markers
 - `public/planetarium/js/planetarium-field.js` — Field dock, bottom sheets, night levels, first-run calibrate
 - `public/shared/css/planetarium-field.css` — Field night instrument chrome (does not restyle theater)

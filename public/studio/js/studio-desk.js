@@ -1615,7 +1615,7 @@
       if (!res.ok) return null;
       const data = await res.json();
       state.studioFace = data && typeof data === 'object' ? data : null;
-      const faceName = String(state.studioFace?.name || 'Alienigena').trim() || 'Alienigena';
+      const faceName = String(state.studioFace?.name || 'Zigzag').trim() || 'Zigzag';
       if (els.heygenFace) els.heygenFace.textContent = `${faceName} face`;
       const caption = document.querySelector('.st-heygen-caption');
       if (caption) caption.textContent = `Face tile · ${faceName} (HeyGen live, not StarBand)`;
@@ -1650,7 +1650,7 @@
       return;
     }
     const face = state.studioFace || (await loadStudioFace());
-    const faceName = String(face?.name || 'Alienigena').trim() || 'Alienigena';
+    const faceName = String(face?.name || 'Zigzag').trim() || 'Zigzag';
     const greeting = String(face?.greeting || '').trim()
       || 'Signal acquired. Console is live — arm a track when you are ready.';
     const body = { text: greeting };
@@ -1681,7 +1681,7 @@
           ? `${faceName} live stream is not on this HeyGen plan — Reed still talks here.`
           : (data.error
           || (missingCatalog
-            ? `${faceName} needs HeyGen IDs — see AVATAR-ALIENIGENA.md or set HEYGEN_STREAMING_AVATAR_ID.`
+            ? `${faceName} needs HeyGen IDs — see AVATAR-ZIGZAG.md or set HEYGEN_STREAMING_AVATAR_ID.`
             : 'HeyGen streaming needs HEYGEN_API_KEY and a streaming avatar id.'))
       );
       return;

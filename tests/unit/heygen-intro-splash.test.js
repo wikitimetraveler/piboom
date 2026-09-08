@@ -32,7 +32,7 @@ describe('HeyGen intro splash', () => {
     await expectFile('public/mountain-high/assets/video/hippie-botanist-intro.mp4');
   });
 
-  test('Planetarium splash plays a slow first third of Alienigena', async () => {
+  test('Planetarium splash plays a slow first third of Zigzag', async () => {
     const src = await readFile(path.join(root, 'public/planetarium/js/planetarium-heygen.js'), 'utf8');
     const face = JSON.parse(
       await readFile(path.join(root, 'data/studio-heygen-face.json'), 'utf8')
