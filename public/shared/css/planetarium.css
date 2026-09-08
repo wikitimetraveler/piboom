@@ -1148,6 +1148,8 @@ body.plan-night-vision .plan-dome-rim__ring {
   z-index: 4000;
   padding: 0;
   background: #04060e;
+  pointer-events: auto;
+  visibility: visible;
 }
 
 .plan-heygen-demo-modal--splash .plan-heygen-demo-video {
@@ -1156,18 +1158,20 @@ body.plan-night-vision .plan-dome-rim__ring {
   object-fit: contain;
   border-radius: 0;
   background: #04060e;
+  pointer-events: none;
 }
 
 .plan-heygen-skip,
 .plan-heygen-play {
-  position: absolute;
-  z-index: 2;
+  position: fixed;
+  z-index: 5001;
   border: 0;
   border-radius: 999px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   cursor: pointer;
+  pointer-events: auto;
 }
 
 .plan-heygen-skip {
@@ -1197,6 +1201,12 @@ body.is-intro-splash modern-navbar,
 body.is-intro-splash .plan-skip {
   visibility: hidden !important;
   pointer-events: none;
+}
+
+html.is-intro-splash #planHeygenDemoModal,
+body.is-intro-splash #planHeygenDemoModal {
+  visibility: visible !important;
+  pointer-events: auto !important;
 }
 
 .plan-heygen-demo-backdrop {

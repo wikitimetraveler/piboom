@@ -14,8 +14,6 @@
   const HEARD_KEY = 'plan_alien_heard_v1';
   const INTRO_FALLBACK = '/planetarium/assets/video/alienigena-zigzag-intro.mp4';
   const DEMO_RE = /[?&](?:demo=heygen|reel=1)(?:&|$)/;
-  const SPLASH_CLIP = 1 / 3;
-  const SPLASH_RATE = 0.7;
 
   function esc(value) {
     return String(value || '')
@@ -64,6 +62,7 @@
 
   function kickPlayback(video, playBtn) {
     if (!video || typeof video.play !== 'function') return;
+    video.playbackRate = 1;
     try {
       const attempt = video.play();
       if (attempt && typeof attempt.catch === 'function') {
@@ -74,23 +73,6 @@
     } catch (_) {
       if (playBtn) playBtn.hidden = false;
     }
-  }
-
-  function bindSplashClip(video) {
-    video.playbackRate = SPLASH_RATE;
-    const stopAtThird = () => {
-      const dur = Number(video.duration);
-      if (!Number.isFinite(dur) || dur <= 0) return;
-      if (video.currentTime >= dur * SPLASH_CLIP) {
-        video.removeEventListener('timeupdate', stopAtThird);
-        stopIntro();
-      }
-    };
-    video.addEventListener('loadedmetadata', () => {
-      video.playbackRate = SPLASH_RATE;
-    });
-    video.addEventListener('timeupdate', stopAtThird);
-    video.addEventListener('ended', stopIntro);
   }
 
   function syncIntroToggle() {
@@ -123,44 +105,38 @@
     syncIntroToggle();
   }
 
-  function showIntroModal(url, { splash = false } = {}) {
+  function showIntroModal(url) {
     closeIntroModal();
     const rootEl = document.createElement('div');
     rootEl.id = 'planHeygenDemoModal';
-    rootEl.className = splash ? 'plan-heygen-demo-modal plan-heygen-demo-modal--splash' : 'plan-heygen-demo-modal';
+    rootEl.className = 'plan-heygen-demo-modal plan-heygen-demo-modal--splash';
     rootEl.setAttribute('role', 'dialog');
     rootEl.setAttribute('aria-modal', 'true');
     rootEl.setAttribute('aria-label', 'Zigzag intro');
-    rootEl.innerHTML = splash
-      ? '<video class="plan-heygen-demo-video" playsinline autoplay src="' +
-        esc(url) +
-        '"></video>' +
-        '<button type="button" class="plan-heygen-play" hidden>Play</button>' +
-        '<button type="button" class="plan-heygen-skip" data-plan-heygen-close>Skip</button>'
-      : '<div class="plan-heygen-demo-backdrop" data-plan-heygen-close></div>' +
-        '<div class="plan-heygen-demo-panel">' +
-        '<header class="d-flex justify-content-between align-items-center mb-2">' +
-        '<h2 class="h5 mb-0">Zigzag</h2>' +
-        '<button type="button" class="btn-close btn-close-white" data-plan-heygen-close aria-label="Close intro"></button>' +
-        '</header>' +
-        '<video class="plan-heygen-demo-video" controls playsinline autoplay src="' +
-        esc(url) +
-        '"></video></div>';
+    rootEl.innerHTML =
+      '<video class="plan-heygen-demo-video" playsinline autoplay src="' +
+      esc(url) +
+      '"></video>' +
+      '<button type="button" class="plan-heygen-play" hidden>Play</button>' +
+      '<button type="button" class="plan-heygen-skip" data-plan-heygen-close>Close</button>';
     document.body.appendChild(rootEl);
-    rootEl.querySelectorAll('[data-plan-heygen-close]').forEach((el) => {
-      el.addEventListener('click', stopIntro);
+    rootEl.addEventListener('click', (ev) => {
+      if (!ev.target.closest('[data-plan-heygen-close]')) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      stopIntro();
     });
     const video = rootEl.querySelector('video');
     const playBtn = rootEl.querySelector('.plan-heygen-play');
     if (playBtn) {
-      playBtn.addEventListener('click', () => {
+      playBtn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
         playBtn.hidden = true;
         kickPlayback(video);
       });
     }
     if (video) {
-      if (splash) bindSplashClip(video);
-      else video.addEventListener('ended', stopIntro);
+      video.addEventListener('ended', stopIntro);
       kickPlayback(video, playBtn);
     }
   }
@@ -170,7 +146,7 @@
     root.PlanetariumSkySong?.stop?.();
     introOn = true;
     if (splash) holdPage();
-    showIntroModal(introVideoUrl(studioFace), { splash });
+    showIntroModal(introVideoUrl(studioFace));
     syncIntroToggle();
     if (!studioFace) loadStudioFace();
     return true;

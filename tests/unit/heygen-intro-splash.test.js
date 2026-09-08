@@ -11,7 +11,7 @@ async function expectFile(rel) {
 }
 
 describe('HeyGen intro splash', () => {
-  test('Mountain High splash plays a slow first third of Bud Master', async () => {
+  test('Mountain High splash plays the full Bud Master clip at full speed', async () => {
     const src = await readFile(path.join(root, 'public/mountain-high/js/mhm-heygen.js'), 'utf8');
     const demo = JSON.parse(
       await readFile(path.join(root, 'data/mountain-high-heygen-demo.json'), 'utf8')
@@ -24,15 +24,15 @@ describe('HeyGen intro splash', () => {
     expect(src).toContain("INTRO_FALLBACK = '/mountain-high/assets/video/hippie-botanist-intro.mp4'");
     expect(src).toContain('playIntro({ splash: true })');
     expect(src).toContain('mhm-heygen-demo-modal--splash');
-    expect(src).toContain('SPLASH_CLIP = 1 / 3');
-    expect(src).toContain('SPLASH_RATE = 0.7');
-    expect(src).toContain('bindSplashClip');
+    expect(src).toContain('playbackRate = 1');
+    expect(src).not.toContain('SPLASH_CLIP');
+    expect(src).not.toContain('bindSplashClip');
     expect(src).toMatch(/function stopIntro\([\s\S]*markHeard\(/);
-    expect(src).toContain('Skip');
+    expect(src).toContain('>Close</button>');
     await expectFile('public/mountain-high/assets/video/hippie-botanist-intro.mp4');
   });
 
-  test('Planetarium splash plays a slow first third of Zigzag', async () => {
+  test('Planetarium splash plays the full Zigzag clip at full speed', async () => {
     const src = await readFile(path.join(root, 'public/planetarium/js/planetarium-heygen.js'), 'utf8');
     const face = JSON.parse(
       await readFile(path.join(root, 'data/studio-heygen-face.json'), 'utf8')
@@ -41,11 +41,11 @@ describe('HeyGen intro splash', () => {
     expect(src).toContain("INTRO_FALLBACK = '/planetarium/assets/video/alienigena-zigzag-intro.mp4'");
     expect(src).toContain('playIntro({ splash: true })');
     expect(src).toContain('plan-heygen-demo-modal--splash');
-    expect(src).toContain('SPLASH_CLIP = 1 / 3');
-    expect(src).toContain('SPLASH_RATE = 0.7');
-    expect(src).toContain('bindSplashClip');
+    expect(src).toContain('playbackRate = 1');
+    expect(src).not.toContain('SPLASH_CLIP');
+    expect(src).not.toContain('bindSplashClip');
     expect(src).toMatch(/function stopIntro\([\s\S]*markHeard\(/);
-    expect(src).toContain('Skip');
+    expect(src).toContain('>Close</button>');
     await expectFile('public/planetarium/assets/video/alienigena-zigzag-intro.mp4');
   });
 });

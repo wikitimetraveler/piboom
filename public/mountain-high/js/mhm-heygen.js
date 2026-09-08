@@ -11,8 +11,6 @@
   const HEARD_KEY = 'mhm_bud_heard_v1';
   const INTRO_FALLBACK = '/mountain-high/assets/video/hippie-botanist-intro.mp4';
   const TOGGLE_SELECTOR = '#mhmBudToggle, #mhmMeetJill';
-  const SPLASH_CLIP = 1 / 3;
-  const SPLASH_RATE = 0.7;
   let cachedDemo = null;
   let face = null;
   let heygenRoom = null;
@@ -127,6 +125,7 @@
 
   function kickPlayback(video, playBtn) {
     if (!video || typeof video.play !== 'function') return;
+    video.playbackRate = 1;
     try {
       const attempt = video.play();
       if (attempt && typeof attempt.catch === 'function') {
@@ -137,23 +136,6 @@
     } catch (_) {
       if (playBtn) playBtn.hidden = false;
     }
-  }
-
-  function bindSplashClip(video) {
-    video.playbackRate = SPLASH_RATE;
-    const stopAtThird = () => {
-      const dur = Number(video.duration);
-      if (!Number.isFinite(dur) || dur <= 0) return;
-      if (video.currentTime >= dur * SPLASH_CLIP) {
-        video.removeEventListener('timeupdate', stopAtThird);
-        stopIntro();
-      }
-    };
-    video.addEventListener('loadedmetadata', () => {
-      video.playbackRate = SPLASH_RATE;
-    });
-    video.addEventListener('timeupdate', stopAtThird);
-    video.addEventListener('ended', stopIntro);
   }
 
   function introVideoUrl(demo) {
@@ -171,43 +153,36 @@
     syncToggles();
   }
 
-  function showModal(demo, videoUrl, { splash = false } = {}) {
+  function showModal(demo, videoUrl) {
     closeModal();
     const url = videoUrl || INTRO_FALLBACK;
     const rootEl = document.createElement('div');
     rootEl.id = 'mhmHeygenDemoModal';
-    rootEl.className = splash ? 'mhm-heygen-demo-modal mhm-heygen-demo-modal--splash' : 'mhm-heygen-demo-modal';
+    rootEl.className = 'mhm-heygen-demo-modal mhm-heygen-demo-modal--splash';
     rootEl.setAttribute('role', 'dialog');
     rootEl.setAttribute('aria-modal', 'true');
     rootEl.setAttribute('aria-label', demo?.title || 'Meet Bud Master');
-    rootEl.innerHTML = splash
-      ? `<video class="mhm-heygen-demo-video" playsinline autoplay src="${esc(url)}"></video>
+    rootEl.innerHTML = `<video class="mhm-heygen-demo-video" playsinline autoplay src="${esc(url)}"></video>
         <button type="button" class="mhm-heygen-play" hidden>Play</button>
-        <button type="button" class="mhm-heygen-skip" data-mhm-heygen-close>Skip</button>`
-      : `<div class="mhm-heygen-demo-backdrop" data-mhm-heygen-close></div>
-      <div class="mhm-heygen-demo-panel">
-        <header class="d-flex justify-content-between align-items-center mb-2">
-          <h2 class="h5 mb-0">${esc(demo?.title || 'Meet Bud Master')}</h2>
-          <button type="button" class="btn-close btn-close-white" data-mhm-heygen-close aria-label="Close intro"></button>
-        </header>
-        <video class="mhm-heygen-demo-video" controls playsinline autoplay src="${esc(url)}"></video>
-        <p class="small mt-2 mb-0">${esc(demo?.brand?.attribution || 'HeyGen')} · ${esc(demo?.brand?.developmentBy || 'David E Lane')}</p>
-      </div>`;
+        <button type="button" class="mhm-heygen-skip" data-mhm-heygen-close>Close</button>`;
     document.body.appendChild(rootEl);
-    rootEl.querySelectorAll('[data-mhm-heygen-close]').forEach((el) => {
-      el.addEventListener('click', stopIntro);
+    rootEl.addEventListener('click', (ev) => {
+      if (!ev.target.closest('[data-mhm-heygen-close]')) return;
+      ev.preventDefault();
+      ev.stopPropagation();
+      stopIntro();
     });
     const video = rootEl.querySelector('video');
     const playBtn = rootEl.querySelector('.mhm-heygen-play');
     if (playBtn) {
-      playBtn.addEventListener('click', () => {
+      playBtn.addEventListener('click', (ev) => {
+        ev.stopPropagation();
         playBtn.hidden = true;
         kickPlayback(video);
       });
     }
     if (video) {
-      if (splash) bindSplashClip(video);
-      else video.addEventListener('ended', stopIntro);
+      video.addEventListener('ended', stopIntro);
       kickPlayback(video, playBtn);
     }
   }
@@ -217,7 +192,7 @@
     root.MhmSong?.stop?.();
     introOn = true;
     if (splash) holdPage();
-    showModal(cachedDemo, introVideoUrl(cachedDemo), { splash });
+    showModal(cachedDemo, introVideoUrl(cachedDemo));
     syncToggles();
     if (!cachedDemo) loadDemo();
     return true;

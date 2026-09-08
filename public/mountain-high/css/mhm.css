@@ -1073,6 +1073,8 @@ body.mhm-page[data-age="ok"] {
   z-index: 4000;
   padding: 0;
   background: #000;
+  pointer-events: auto;
+  visibility: visible;
 }
 
 .mhm-heygen-demo-modal--splash .mhm-heygen-demo-video {
@@ -1081,18 +1083,20 @@ body.mhm-page[data-age="ok"] {
   object-fit: contain;
   border-radius: 0;
   background: #000;
+  pointer-events: none;
 }
 
 .mhm-heygen-skip,
 .mhm-heygen-play {
-  position: absolute;
-  z-index: 2;
+  position: fixed;
+  z-index: 5001;
   border: 0;
   border-radius: 999px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   cursor: pointer;
+  pointer-events: auto;
 }
 
 .mhm-heygen-skip {
@@ -1117,11 +1121,19 @@ body.mhm-page[data-age="ok"] {
 html.is-intro-splash .mhm-app,
 html.is-intro-splash modern-navbar,
 html.is-intro-splash .mhm-float-wrap,
+html.is-intro-splash .mhm-guide,
 body.is-intro-splash .mhm-app,
 body.is-intro-splash modern-navbar,
-body.is-intro-splash .mhm-float-wrap {
+body.is-intro-splash .mhm-float-wrap,
+body.is-intro-splash .mhm-guide {
   visibility: hidden !important;
   pointer-events: none;
+}
+
+html.is-intro-splash #mhmHeygenDemoModal,
+body.is-intro-splash #mhmHeygenDemoModal {
+  visibility: visible !important;
+  pointer-events: auto !important;
 }
 
 .mhm-heygen-demo-backdrop {
