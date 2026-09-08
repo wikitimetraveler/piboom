@@ -66,27 +66,41 @@
     video.playbackRate = 1;
     video.muted = true;
     video.defaultMuted = true;
+    video.autoplay = true;
     video.setAttribute('muted', '');
     video.setAttribute('autoplay', '');
-    const playNow = () => {
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', 'true');
+    const tryPlay = () => {
+      if (!introOn || !video.isConnected || video.ended) return;
       try {
         const attempt = video.play();
-        if (attempt && typeof attempt.then === 'function') {
-          attempt
-            .then(() => {
-              video.muted = false;
-            })
-            .catch(() => {
-              video.muted = true;
-              video.play().catch(() => {});
-            });
+        if (attempt && typeof attempt.catch === 'function') {
+          attempt.catch(() => {
+            video.muted = true;
+            video.play().catch(() => {});
+          });
         }
       } catch (_) {
         video.muted = true;
         video.play().catch(() => {});
       }
     };
-    playNow();
+    video.addEventListener('canplay', tryPlay);
+    video.addEventListener('loadeddata', tryPlay);
+    video.addEventListener('playing', () => {
+      if (!introOn || !video.muted) return;
+      video.muted = false;
+    }, { once: true });
+    let resumeTries = 0;
+    video.addEventListener('pause', () => {
+      if (!introOn || video.ended || !video.isConnected || resumeTries > 6) return;
+      resumeTries += 1;
+      video.muted = true;
+      tryPlay();
+    });
+    tryPlay();
+    [120, 400, 1000, 2000].forEach((ms) => root.setTimeout(tryPlay, ms));
   }
 
   function syncIntroToggle() {
@@ -141,7 +155,7 @@
     rootEl.setAttribute('aria-modal', 'true');
     rootEl.setAttribute('aria-label', 'Zigzag intro');
     rootEl.innerHTML =
-      '<video class="plan-heygen-demo-video" playsinline webkit-playsinline autoplay src="' +
+      '<video class="plan-heygen-demo-video" muted autoplay playsinline webkit-playsinline preload="auto" src="' +
       esc(url) +
       '"></video>';
     const closeBtn = document.createElement('button');

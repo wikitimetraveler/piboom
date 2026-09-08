@@ -52,6 +52,8 @@ describe('HeyGen intro splash', () => {
     expect(src).toContain("closeBtn.textContent = 'Close'");
     expect(src).toContain('pointerdown');
     expect(src).toContain('video.muted = true');
+    expect(src).toContain('muted autoplay playsinline');
+    expect(src).toContain('tryPlay');
     expect(src).not.toContain('planHeygenPlay');
     await expectFile('public/planetarium/assets/video/alienigena-zigzag-intro.mp4');
   });
