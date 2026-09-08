@@ -436,6 +436,7 @@ class ModernNavbar extends HTMLElement {
         
         /* Bootstrap Icons CDN compatibility */
         @import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css');
+        @import url('/shared/bi-mountain.css');
         
         /* Encompass dark mode - when body has encompass-dark-mode */
         :host-context(body.encompass-dark-mode) .modern-navbar {

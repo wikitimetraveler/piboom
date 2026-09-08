@@ -13,8 +13,8 @@ const CATALOG_PATH = path.join(process.cwd(), 'data/mountain-high.json');
 
 describe('mountain-high-assistant.service', () => {
   test('guide names', () => {
-    expect(GUIDE_NAME).toBe('Jill');
-    expect(AVATAR_NAME).toBe('Jill');
+    expect(GUIDE_NAME).toBe('Bud Master');
+    expect(AVATAR_NAME).toBe('Bud Master');
   });
 
   test('buildSystemPrompt embeds types, 21+, and Long Beach / L.A. locksmith', async () => {
@@ -29,7 +29,7 @@ describe('mountain-high-assistant.service', () => {
         },
       ],
     });
-    expect(prompt).toContain('Jill');
+    expect(prompt).toContain('Bud Master');
     expect(prompt).toContain('21');
     expect(prompt).toContain('Indica');
     expect(prompt).toContain('Sativa');
@@ -91,7 +91,7 @@ describe('mountain-high-assistant.service', () => {
     });
   });
 
-  test('Jill prompt marks bag art as mockups and still forbids grow recipes', async () => {
+  test('Bud Master prompt marks bag art as mockups and still forbids grow recipes', async () => {
     const catalog = JSON.parse(await readFile(CATALOG_PATH, 'utf8'));
     const prompt = buildSystemPrompt(catalog, { entries: [] });
     expect(prompt).toMatch(/Ridge Satchel/);
@@ -102,5 +102,20 @@ describe('mountain-high-assistant.service', () => {
     expect(prompt).toMatch(/Homegrown/);
     expect(prompt).toMatch(/Roll Another Number/);
     expect(prompt).toMatch(/hippie botanist/i);
+  });
+
+  test('Bud Master HeyGen look is not the planetarium alien look', async () => {
+    const studio = JSON.parse(
+      await readFile(path.join(process.cwd(), 'data/studio-heygen-face.json'), 'utf8')
+    );
+    const face = JSON.parse(
+      await readFile(path.join(process.cwd(), 'data/mountain-high-heygen-face.json'), 'utf8')
+    );
+    expect(studio.name).toBe('Alienigena');
+    expect(face.name).toBe('Bud Master');
+    expect(face.avatarId).toBeTruthy();
+    expect(studio.avatarId).toBeTruthy();
+    expect(face.avatarId).not.toBe(studio.avatarId);
+    expect(face.avatarId).not.toBe(studio.portraitAvatarId);
   });
 });

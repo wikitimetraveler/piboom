@@ -4,7 +4,7 @@
   "scenes": [
     {
       "id": "s0",
-      "kicker": "LOS AI Labs",
+      "kicker": "Lane AI Labs",
       "title": "Hybrid RAG for Encompass",
       "body": "Two knowledge stores ground the assistants: ICE artifacts plus Developer Connect docs. Keyword JSON always works; pgvector adds semantic recall when Postgres and OpenAI are available.",
       "chip": "retrieval · not execution"

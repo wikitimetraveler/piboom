@@ -1,5 +1,5 @@
 /**
- * Sticky Jill dock — compact / expand (Glazed Pip pattern)
+ * Sticky Bud Master dock — compact / expand (Glazed Pip pattern)
  * Development work by David Lane
  */
 (function (root) {
@@ -21,8 +21,8 @@
       guide.classList.add('is-compact');
     });
 
-    root.addEventListener('mhm-age-ok', () => {
-      guide.classList.add('is-compact');
+    root.addEventListener('mhm-age-confirmed', () => {
+      guide.classList.remove('is-compact');
     });
   }
 

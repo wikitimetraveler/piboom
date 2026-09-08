@@ -1,6 +1,6 @@
 # Encompass ICE RAG — HyperFrames Video Script
 
-**Target:** Technical architecture explainer (LOS AI Labs)  
+**Target:** Technical architecture explainer (Lane AI Labs)  
 **Duration:** ~90 seconds  
 **Format:** HyperFrames HTML composition + Google TTS (no avatar body)  
 **Project:** `video/ice-rag/`  

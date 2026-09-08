@@ -18,7 +18,7 @@ import {
   isRagArchitectureQuestion
 } from '../lib/knowledge/rag-explain-prompt.js';
 
-const GSE_SYSTEM_PROMPT = `You are the GSE / Agency Loan Program Expert for DevConnect Labs (LOS AI Labs).
+const GSE_SYSTEM_PROMPT = `You are the GSE / Agency Loan Program Expert for DevConnect Labs (Lane AI Labs).
 
 ## Expertise
 - Fannie Mae, Freddie Mac, FHA, VA, USDA product fit (decision support only — not DU/LPA/TOTAL/GUS)

@@ -1,5 +1,5 @@
 /**
- * Jill — Mountain High Medicinals guide (hippie botanist, grow expert, locksmith).
+ * Bud Master — Mountain High Medicinals guide (hippie botanist, grow expert, locksmith).
  * Development work by David Lane
  */
 import { readFile } from 'node:fs/promises';
@@ -14,8 +14,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CATALOG_PATH = path.join(__dirname, '../data/mountain-high.json');
 const ORIGINS_PATH = path.join(__dirname, '../public/data/cannabis-origins.json');
 
-export const GUIDE_NAME = 'Jill';
-export const AVATAR_NAME = 'Jill';
+export const GUIDE_NAME = 'Bud Master';
+export const AVATAR_NAME = 'Bud Master';
 
 let catalogCache = null;
 let catalogLoadedAt = 0;
@@ -111,7 +111,7 @@ ${bagsSnippet(catalog) || 'Ridge Satchel, Trail Satchel, Clinic Pouch, Summit Po
 ${catalog.merchDisclaimer || 'Sticker and t-shirt mockups — not for sale.'}
 ${merchSnippet(catalog) || 'Lab sticker, lab t-shirt — QR to this page.'}
 
-## Soundtrack (hidden YouTube after the gate)
+## Soundtrack (hidden YouTube — Play button only, never over Bud Master's intro)
 ${catalog.soundtrack?.note || ''}
 ${soundtrackSnippet(catalog) || 'Panama Red, Homegrown, Roll Another Number.'}
 You may nod to those records. Do not invent setlists or quote long lyrics.
@@ -130,7 +130,7 @@ export async function chatWithJill({
   message,
   history = [],
   userId = 'mhm-guest',
-  sessionId = 'mountain-high-jill',
+    sessionId = 'mountain-high-bud',
 }) {
   const openaiKey = (process.env.OPENAI_API_KEY || '').trim();
   if (!openaiKey) {
@@ -159,7 +159,7 @@ export async function chatWithJill({
     'My hookah just burped — ask me that one more time?';
 
   try {
-    await persistConversationTurn(userId, sessionId, String(message), reply, 'jill');
+    await persistConversationTurn(userId, sessionId, String(message), reply, 'bud-master');
   } catch (_) {
     /* memory optional */
   }

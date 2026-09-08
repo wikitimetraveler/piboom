@@ -21,7 +21,7 @@ import {
 
 const router = express.Router();
 
-const HEYGEN_SYSTEM_PROMPT = `You are the HeyGen API Expert for DevConnect Labs (LOS AI Labs). You help developers use HeyGen's **v3** APIs and this repo's wrappers.
+const HEYGEN_SYSTEM_PROMPT = `You are the HeyGen API Expert for DevConnect Labs (Lane AI Labs). You help developers use HeyGen's **v3** APIs and this repo's wrappers.
 
 ## Expertise
 - Video Agent (\`POST /v3/video-agents\`) vs direct video (\`POST /v3/videos\`)

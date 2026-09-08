@@ -14,6 +14,7 @@ body.plan-page {
     radial-gradient(ellipse 80% 50% at 50% -10%, rgba(40, 58, 110, 0.35), transparent 55%),
     #05070f;
   color: var(--plan-ink);
+  color-scheme: dark;
   min-height: 100vh;
   font-family: Outfit, system-ui, sans-serif;
 }
@@ -160,6 +161,47 @@ body.plan-page {
 .plan-controls .form-control:focus {
   border-color: rgba(255, 210, 120, 0.55);
   box-shadow: 0 0 0 0.15rem rgba(255, 210, 120, 0.12);
+}
+
+.plan-page input[type='date'],
+.plan-page input[type='time'] {
+  color-scheme: dark;
+  accent-color: var(--plan-gold);
+  cursor: pointer;
+}
+
+.plan-controls input[type='date'].form-control {
+  min-width: 10.75rem;
+}
+
+.plan-controls input[type='time'].form-control {
+  min-width: 8.75rem;
+}
+
+.plan-page input[type='date']::-webkit-datetime-edit,
+.plan-page input[type='date']::-webkit-datetime-edit-fields-wrapper,
+.plan-page input[type='date']::-webkit-datetime-edit-text,
+.plan-page input[type='date']::-webkit-datetime-edit-month-field,
+.plan-page input[type='date']::-webkit-datetime-edit-day-field,
+.plan-page input[type='date']::-webkit-datetime-edit-year-field,
+.plan-page input[type='time']::-webkit-datetime-edit,
+.plan-page input[type='time']::-webkit-datetime-edit-fields-wrapper,
+.plan-page input[type='time']::-webkit-datetime-edit-text,
+.plan-page input[type='time']::-webkit-datetime-edit-hour-field,
+.plan-page input[type='time']::-webkit-datetime-edit-minute-field,
+.plan-page input[type='time']::-webkit-datetime-edit-ampm-field {
+  color: var(--plan-ink);
+}
+
+.plan-page input[type='date']::-webkit-calendar-picker-indicator,
+.plan-page input[type='time']::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 1;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-left: 0.35rem;
+  background-color: transparent;
+  filter: invert(0.82) sepia(0.95) saturate(4.4) hue-rotate(6deg) brightness(1.18);
 }
 
 .plan-btn {
@@ -558,6 +600,32 @@ body.plan-night-vision .plan-btn:not(.plan-btn--ghost) {
   color: #ffe8e0 !important;
 }
 
+body.plan-night-vision .plan-tab.is-active {
+  background: #9a241c !important;
+  color: #ffe8e0 !important;
+  box-shadow: 0 0 0 1px rgba(255, 180, 140, 0.45) !important;
+}
+
+body.plan-night-vision input[type='date']::-webkit-datetime-edit,
+body.plan-night-vision input[type='date']::-webkit-datetime-edit-fields-wrapper,
+body.plan-night-vision input[type='date']::-webkit-datetime-edit-text,
+body.plan-night-vision input[type='date']::-webkit-datetime-edit-month-field,
+body.plan-night-vision input[type='date']::-webkit-datetime-edit-day-field,
+body.plan-night-vision input[type='date']::-webkit-datetime-edit-year-field,
+body.plan-night-vision input[type='time']::-webkit-datetime-edit,
+body.plan-night-vision input[type='time']::-webkit-datetime-edit-fields-wrapper,
+body.plan-night-vision input[type='time']::-webkit-datetime-edit-text,
+body.plan-night-vision input[type='time']::-webkit-datetime-edit-hour-field,
+body.plan-night-vision input[type='time']::-webkit-datetime-edit-minute-field,
+body.plan-night-vision input[type='time']::-webkit-datetime-edit-ampm-field {
+  color: #ffc8b8;
+}
+
+body.plan-night-vision input[type='date']::-webkit-calendar-picker-indicator,
+body.plan-night-vision input[type='time']::-webkit-calendar-picker-indicator {
+  filter: invert(0.52) sepia(1) saturate(6) hue-rotate(-28deg) brightness(1.12);
+}
+
 body.plan-night-vision .plan-stage {
   border-color: rgba(255, 80, 60, 0.3);
   filter: sepia(0.35) hue-rotate(-25deg) saturate(1.4);
@@ -826,27 +894,55 @@ body.plan-night-vision .plan-dome-rim__ring {
 .plan-tabs {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.3rem;
-  padding: 0.3rem;
-  border-radius: 0.85rem;
-  border: 1px solid var(--plan-line);
-  background: var(--plan-glass);
+  gap: 0.4rem;
+  padding: 0.4rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 210, 120, 0.32);
+  background: rgba(10, 14, 24, 0.88);
+  box-shadow:
+    0 0 0 1px rgba(255, 210, 120, 0.08),
+    inset 0 1px 0 rgba(255, 232, 176, 0.1);
 }
 
 .plan-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.22rem;
   border: 0;
-  border-radius: 0.65rem;
+  border-radius: 0.78rem;
   background: transparent;
-  color: rgba(220, 228, 242, 0.68);
-  font-size: 0.74rem;
+  color: #f3d7a8;
+  font-size: 0.95rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  padding: 0.42rem 0.2rem;
+  letter-spacing: 0.03em;
+  line-height: 1.1;
+  padding: 0.72rem 0.25rem 0.62rem;
+  min-height: 3.55rem;
+  cursor: pointer;
+  transition: background 0.18s var(--plan-ease), color 0.18s var(--plan-ease), box-shadow 0.18s var(--plan-ease);
+}
+
+.plan-tab i {
+  font-size: 1.18rem;
+  line-height: 1;
+  opacity: 0.88;
+}
+
+.plan-tab:hover {
+  color: #ffe8b0;
+  background: rgba(255, 210, 120, 0.12);
 }
 
 .plan-tab.is-active {
-  background: rgba(255, 210, 120, 0.16);
-  color: #ffe8b0;
+  background: linear-gradient(180deg, #ffe8b0 0%, #ffd278 100%);
+  color: #1a1208;
+  box-shadow: 0 8px 20px rgba(255, 180, 80, 0.28);
+}
+
+.plan-tab.is-active i {
+  opacity: 1;
 }
 
 .plan-tabpane {
@@ -1037,6 +1133,91 @@ body.plan-night-vision .plan-dome-rim__ring {
   font-size: 0.72rem;
   color: rgba(200, 210, 230, 0.55);
   min-height: 1rem;
+}
+
+.plan-heygen-demo-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2200;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.plan-heygen-demo-modal--splash {
+  z-index: 4000;
+  padding: 0;
+  background: #04060e;
+}
+
+.plan-heygen-demo-modal--splash .plan-heygen-demo-video {
+  width: 100vw;
+  height: 100vh;
+  object-fit: contain;
+  border-radius: 0;
+  background: #04060e;
+}
+
+.plan-heygen-skip,
+.plan-heygen-play {
+  position: absolute;
+  z-index: 2;
+  border: 0;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.plan-heygen-skip {
+  top: 1rem;
+  right: 1rem;
+  padding: 0.45rem 1rem;
+  background: rgba(4, 8, 18, 0.72);
+  color: #ffe8b0;
+  border: 1px solid rgba(255, 210, 120, 0.45);
+}
+
+.plan-heygen-play {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 0.85rem 1.6rem;
+  background: rgba(120, 255, 220, 0.92);
+  color: #041018;
+  font-size: 1.05rem;
+}
+
+html.is-intro-splash .plan-wrap,
+html.is-intro-splash modern-navbar,
+html.is-intro-splash .plan-skip,
+body.is-intro-splash .plan-wrap,
+body.is-intro-splash modern-navbar,
+body.is-intro-splash .plan-skip {
+  visibility: hidden !important;
+  pointer-events: none;
+}
+
+.plan-heygen-demo-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 6, 16, 0.78);
+}
+
+.plan-heygen-demo-panel {
+  position: relative;
+  width: min(720px, 100%);
+  background: #06101c;
+  border: 1px solid rgba(120, 255, 220, 0.28);
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+.plan-heygen-demo-video {
+  width: 100%;
+  border-radius: 10px;
+  background: #04060e;
 }
 
 .plan-roadmap summary {

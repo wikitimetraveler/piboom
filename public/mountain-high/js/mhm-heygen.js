@@ -1,5 +1,5 @@
 /**
- * Jill HeyGen — welcome popup + optional streaming face
+ * Bud Master HeyGen — welcome popup + optional streaming face
  * Development work by David Lane
  */
 (function (root) {
@@ -8,10 +8,39 @@
   const DEMO_RE = /[?&](?:demo=heygen|short=1)(?:&|$)/;
   const DEMO_URL = '/data/mountain-high-heygen-demo.json';
   const FACE_URL = '/data/mountain-high-heygen-face.json';
+  const HEARD_KEY = 'mhm_bud_heard_v1';
+  const INTRO_FALLBACK = '/mountain-high/assets/video/hippie-botanist-intro.mp4';
+  const TOGGLE_SELECTOR = '#mhmBudToggle, #mhmMeetJill';
+  const SPLASH_CLIP = 1 / 3;
+  const SPLASH_RATE = 0.7;
   let cachedDemo = null;
   let face = null;
   let heygenRoom = null;
   let heygenSessionId = null;
+  let introOn = false;
+  let splashStarted = false;
+  let holdingPage = false;
+
+  function hasHeard() {
+    try {
+      return root.localStorage.getItem(HEARD_KEY) === '1';
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function markHeard() {
+    try {
+      root.localStorage.setItem(HEARD_KEY, '1');
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  function shouldAutoplayIntro() {
+    const search = typeof location !== 'undefined' ? location.search : '';
+    return DEMO_RE.test(search) || !hasHeard();
+  }
 
   function esc(value) {
     return String(value || '')
@@ -43,46 +72,163 @@
   }
 
   function closeModal() {
-    document.getElementById('mhmHeygenDemoModal')?.remove();
+    const modal = document.getElementById('mhmHeygenDemoModal');
+    const video = modal?.querySelector('video');
+    if (video) {
+      try {
+        video.pause();
+        video.removeAttribute('src');
+        video.load();
+      } catch (_) {
+        /* ignore */
+      }
+    }
+    modal?.remove();
   }
 
-  function showModal(demo, videoUrl) {
-    closeModal();
-    const script = demo?.heygenScriptShort || '';
-    const bodyInner = videoUrl
-      ? `<video class="mhm-heygen-demo-video" controls playsinline autoplay src="${esc(videoUrl)}"></video>`
-      : `<div>
-          <p><strong>Jill’s HeyGen clip isn’t cached yet.</strong> Streaming face still works if the key is set. TTS reads the script now.</p>
-          ${script ? `<p>${esc(script)}</p>` : ''}
-        </div>`;
-    const rootEl = document.createElement('div');
-    rootEl.id = 'mhmHeygenDemoModal';
-    rootEl.className = 'mhm-heygen-demo-modal';
-    rootEl.setAttribute('role', 'dialog');
-    rootEl.setAttribute('aria-modal', 'true');
-    rootEl.innerHTML = `
-      <div class="mhm-heygen-demo-backdrop"></div>
-      <div class="mhm-heygen-demo-panel">
-        <header class="d-flex justify-content-between align-items-center mb-2">
-          <h2 class="h5 mb-0">${esc(demo?.title || 'Meet Jill')}</h2>
-          <button type="button" class="btn-close btn-close-white" data-mhm-heygen-close aria-label="Close"></button>
-        </header>
-        ${bodyInner}
-        <p class="small mt-2 mb-0">${esc(demo?.brand?.attribution || 'HeyGen')} · ${esc(demo?.brand?.developmentBy || 'David E Lane')}</p>
-      </div>`;
-    document.body.appendChild(rootEl);
-    rootEl.querySelector('[data-mhm-heygen-close]')?.addEventListener('click', closeModal);
-    rootEl.querySelector('.mhm-heygen-demo-backdrop')?.addEventListener('click', closeModal);
-    if (!videoUrl && script && typeof root.MhmSpeakJill === 'function') {
-      root.MhmSpeakJill(script);
+  function stopSpeech() {
+    try {
+      root.speechSynthesis?.cancel();
+    } catch (_) {
+      /* ignore */
     }
   }
 
-  async function playIntro() {
-    const demo = await loadDemo();
-    const videoUrl = demo?.heygenVideoLocalShort || demo?.heygenVideoUrlShort || null;
-    showModal(demo, videoUrl);
-    return Boolean(videoUrl);
+  function syncToggles() {
+    if (typeof document === 'undefined') return;
+    document.querySelectorAll(TOGGLE_SELECTOR).forEach((btn) => {
+      btn.setAttribute('aria-pressed', introOn ? 'true' : 'false');
+      const icon = introOn ? 'bi-pause-fill' : 'bi-play-fill';
+      const label = btn.querySelector('.mhm-guide-action-label');
+      const iconEl = btn.querySelector('i');
+      if (iconEl) iconEl.className = `bi ${icon}`;
+      if (label) {
+        label.textContent = 'Bud Master';
+      } else {
+        const span = btn.querySelector('span');
+        if (span) span.textContent = ' Bud Master';
+      }
+      btn.title = introOn ? 'Pause Bud Master intro' : 'Play Bud Master intro';
+      btn.setAttribute('aria-label', btn.title);
+    });
+  }
+
+  function holdPage() {
+    holdingPage = true;
+    document.documentElement.classList.add('is-intro-splash');
+    document.body.classList.add('is-intro-splash');
+  }
+
+  function releasePage() {
+    holdingPage = false;
+    document.documentElement.classList.remove('is-intro-splash');
+    document.body.classList.remove('is-intro-splash');
+  }
+
+  function kickPlayback(video, playBtn) {
+    if (!video || typeof video.play !== 'function') return;
+    try {
+      const attempt = video.play();
+      if (attempt && typeof attempt.catch === 'function') {
+        attempt.catch(() => {
+          if (playBtn) playBtn.hidden = false;
+        });
+      }
+    } catch (_) {
+      if (playBtn) playBtn.hidden = false;
+    }
+  }
+
+  function bindSplashClip(video) {
+    video.playbackRate = SPLASH_RATE;
+    const stopAtThird = () => {
+      const dur = Number(video.duration);
+      if (!Number.isFinite(dur) || dur <= 0) return;
+      if (video.currentTime >= dur * SPLASH_CLIP) {
+        video.removeEventListener('timeupdate', stopAtThird);
+        stopIntro();
+      }
+    };
+    video.addEventListener('loadedmetadata', () => {
+      video.playbackRate = SPLASH_RATE;
+    });
+    video.addEventListener('timeupdate', stopAtThird);
+    video.addEventListener('ended', stopIntro);
+  }
+
+  function introVideoUrl(demo) {
+    return String(
+      demo?.heygenVideoLocalShort || demo?.heygenVideoUrlShort || INTRO_FALLBACK
+    ).trim() || INTRO_FALLBACK;
+  }
+
+  function stopIntro() {
+    introOn = false;
+    markHeard();
+    closeModal();
+    stopSpeech();
+    releasePage();
+    syncToggles();
+  }
+
+  function showModal(demo, videoUrl, { splash = false } = {}) {
+    closeModal();
+    const url = videoUrl || INTRO_FALLBACK;
+    const rootEl = document.createElement('div');
+    rootEl.id = 'mhmHeygenDemoModal';
+    rootEl.className = splash ? 'mhm-heygen-demo-modal mhm-heygen-demo-modal--splash' : 'mhm-heygen-demo-modal';
+    rootEl.setAttribute('role', 'dialog');
+    rootEl.setAttribute('aria-modal', 'true');
+    rootEl.setAttribute('aria-label', demo?.title || 'Meet Bud Master');
+    rootEl.innerHTML = splash
+      ? `<video class="mhm-heygen-demo-video" playsinline autoplay src="${esc(url)}"></video>
+        <button type="button" class="mhm-heygen-play" hidden>Play</button>
+        <button type="button" class="mhm-heygen-skip" data-mhm-heygen-close>Skip</button>`
+      : `<div class="mhm-heygen-demo-backdrop" data-mhm-heygen-close></div>
+      <div class="mhm-heygen-demo-panel">
+        <header class="d-flex justify-content-between align-items-center mb-2">
+          <h2 class="h5 mb-0">${esc(demo?.title || 'Meet Bud Master')}</h2>
+          <button type="button" class="btn-close btn-close-white" data-mhm-heygen-close aria-label="Close intro"></button>
+        </header>
+        <video class="mhm-heygen-demo-video" controls playsinline autoplay src="${esc(url)}"></video>
+        <p class="small mt-2 mb-0">${esc(demo?.brand?.attribution || 'HeyGen')} · ${esc(demo?.brand?.developmentBy || 'David E Lane')}</p>
+      </div>`;
+    document.body.appendChild(rootEl);
+    rootEl.querySelectorAll('[data-mhm-heygen-close]').forEach((el) => {
+      el.addEventListener('click', stopIntro);
+    });
+    const video = rootEl.querySelector('video');
+    const playBtn = rootEl.querySelector('.mhm-heygen-play');
+    if (playBtn) {
+      playBtn.addEventListener('click', () => {
+        playBtn.hidden = true;
+        kickPlayback(video);
+      });
+    }
+    if (video) {
+      if (splash) bindSplashClip(video);
+      else video.addEventListener('ended', stopIntro);
+      kickPlayback(video, playBtn);
+    }
+  }
+
+  function playIntro(opts) {
+    const splash = Boolean(opts && opts.splash);
+    root.MhmSong?.stop?.();
+    introOn = true;
+    if (splash) holdPage();
+    showModal(cachedDemo, introVideoUrl(cachedDemo), { splash });
+    syncToggles();
+    if (!cachedDemo) loadDemo();
+    return true;
+  }
+
+  async function toggleIntro() {
+    if (introOn) {
+      stopIntro();
+      return false;
+    }
+    return playIntro();
   }
 
   function setStatus(msg) {
@@ -115,7 +261,7 @@
       }
       heygenRoom = { kind: 'poster' };
       media.hidden = false;
-      root.HeygenLiveTile.attachPoster(media, data.url, 'mhm-heygen__video', 'Jill');
+      root.HeygenLiveTile.attachPoster(media, data.url, 'mhm-heygen__video', 'Bud Master');
       if (data.audioUrl) root.HeygenLiveTile.playAudio?.(data.audioUrl);
       return;
     }
@@ -165,12 +311,12 @@
       media.hidden = true;
     }
     const btn = document.getElementById('mhmHeygenLive');
-    if (btn) btn.textContent = 'Live Jill';
+    if (btn) btn.textContent = 'Live Bud Master';
     setStatus('');
   }
 
   async function startStream() {
-    const greeting = face?.greeting || 'Hey — Jill here. Flip a type or ask about a lockout.';
+    const greeting = face?.greeting || 'Hey — Bud Master here. Flip a type or ask about a lockout.';
     const res = await fetch('/api/heygen/streaming/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -183,11 +329,11 @@
     }
     await attachSession(data);
     const btn = document.getElementById('mhmHeygenLive');
-    if (btn) btn.textContent = 'Hide Jill';
+    if (btn) btn.textContent = 'Hide Bud Master';
     setStatus(
       data.fallback || data.playback === 'poster'
-        ? 'Jill on voice — live stream is not on this HeyGen plan.'
-        : 'Jill live on HeyGen.'
+        ? 'Bud Master on voice — live stream is not on this HeyGen plan.'
+        : 'Bud Master live on HeyGen.'
     );
   }
 
@@ -211,25 +357,56 @@
     if (data?.url) await attachSession(data);
   }
 
-  root.MhmHeygen = { playIntro, toggleStream, speak, stop: stopStream };
+  root.MhmHeygen = {
+    playIntro,
+    toggleIntro,
+    stopIntro,
+    hasHeard,
+    shouldAutoplayIntro,
+    toggleStream,
+    speak,
+    stop: stopStream,
+  };
+
+  function maybeAutoplaySplash() {
+    if (splashStarted || introOn) return;
+    if (typeof document !== 'undefined' && document.body?.dataset?.age && document.body.dataset.age !== 'ok') {
+      return;
+    }
+    if (!shouldAutoplayIntro()) {
+      releasePage();
+      return;
+    }
+    splashStarted = true;
+    playIntro({ splash: true });
+  }
 
   function boot() {
+    if (typeof document === 'undefined') return;
     loadFace();
-    document.getElementById('mhmMeetJill')?.addEventListener('click', () => playIntro());
+    loadDemo();
+    document.querySelectorAll(TOGGLE_SELECTOR).forEach((btn) => {
+      if (btn._mhmBudBound) return;
+      btn._mhmBudBound = true;
+      btn.addEventListener('click', () => toggleIntro().catch(() => {}));
+    });
+    syncToggles();
     document.getElementById('mhmHeygenLive')?.addEventListener('click', () =>
       toggleStream().catch((err) => setStatus(err.message || 'HeyGen failed'))
     );
-    if (DEMO_RE.test(location.search) && document.body.dataset.age === 'ok') {
-      playIntro();
-    }
-    root.addEventListener('mhm-age-ok', () => {
-      if (DEMO_RE.test(location.search)) playIntro();
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape' && document.getElementById('mhmHeygenDemoModal')) stopIntro();
     });
+    maybeAutoplaySplash();
+    root.addEventListener('mhm-age-ok', maybeAutoplaySplash);
+    root.addEventListener('mhm-age-confirmed', maybeAutoplaySplash);
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
-  } else {
-    boot();
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', boot);
+    } else {
+      boot();
+    }
   }
 })(typeof globalThis !== 'undefined' ? globalThis : window);

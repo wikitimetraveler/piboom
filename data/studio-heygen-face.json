@@ -1,11 +1,16 @@
 {
-  "name": "Zed",
-  "avatarFile": "AVATAR-ZED.md",
-  "avatarId": "057f1a1e84bfb592fb06313f857ed0a2",
-  "groupId": "057f1a1e84bfb592fb06313f857ed0a2",
+  "name": "Alienigena",
+  "avatarFile": "AVATAR-ALIENIGENA.md",
+  "avatarId": "880b0855c4eb4151969095004e443da0",
+  "portraitAvatarId": "c98a835e0a6e4eb3a26a5a0c7c1fd2f9",
+  "groupId": "cf2f87baf4084f0c9892538bc0345680",
   "voiceId": "6HafnaqPci0RvF2XGKDm",
   "voiceName": "Signal - Voice 1",
   "greeting": "Signal acquired. Console is live — arm a track when you're ready.",
+  "introVideo": "/planetarium/assets/video/alienigena-zigzag-intro.mp4",
   "status": "heygen-ready",
-  "portraitAvatarId": "42b49fd6f16adc42c0df884c2cf0893c"
+  "looks": {
+    "workspace": "880b0855c4eb4151969095004e443da0",
+    "portrait": "c98a835e0a6e4eb3a26a5a0c7c1fd2f9"
+  }
 }

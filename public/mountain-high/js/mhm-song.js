@@ -37,8 +37,8 @@
     return TRACKS[currentIndex] || TRACKS[0];
   }
   const DEFAULT_VOLUME = 100;
-  /** Play after the 21+ gate; the Panama Red button then toggles it. */
-  const AUTOPLAY_ON_LOAD = true;
+  /** Stay off until the visitor hits Play — Bud Master's intro needs the speakers. */
+  const AUTOPLAY_ON_LOAD = false;
   const SKIP_SECONDS = 0;
   const DUCK_WHILE_PLAYING = 0;
   const MUTE_KEY = 'mhmSongMuted';

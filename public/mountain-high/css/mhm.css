@@ -1063,10 +1063,65 @@ body.mhm-page[data-age="ok"] {
 .mhm-heygen-demo-modal {
   position: fixed;
   inset: 0;
-  z-index: 90;
+  z-index: 2200;
   display: grid;
   place-items: center;
   padding: 1rem;
+}
+
+.mhm-heygen-demo-modal--splash {
+  z-index: 4000;
+  padding: 0;
+  background: #000;
+}
+
+.mhm-heygen-demo-modal--splash .mhm-heygen-demo-video {
+  width: 100vw;
+  height: 100vh;
+  object-fit: contain;
+  border-radius: 0;
+  background: #000;
+}
+
+.mhm-heygen-skip,
+.mhm-heygen-play {
+  position: absolute;
+  z-index: 2;
+  border: 0;
+  border-radius: 999px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.mhm-heygen-skip {
+  top: 1rem;
+  right: 1rem;
+  padding: 0.45rem 1rem;
+  background: rgba(8, 4, 18, 0.72);
+  color: #e8d5a3;
+  border: 1px solid rgba(232, 213, 163, 0.45);
+}
+
+.mhm-heygen-play {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 0.85rem 1.6rem;
+  background: rgba(123, 60, 255, 0.9);
+  color: #fff;
+  font-size: 1.05rem;
+}
+
+html.is-intro-splash .mhm-app,
+html.is-intro-splash modern-navbar,
+html.is-intro-splash .mhm-float-wrap,
+body.is-intro-splash .mhm-app,
+body.is-intro-splash modern-navbar,
+body.is-intro-splash .mhm-float-wrap {
+  visibility: hidden !important;
+  pointer-events: none;
 }
 
 .mhm-heygen-demo-backdrop {
@@ -1149,6 +1204,12 @@ body.mhm-page[data-age="ok"] {
 
 body.mhm-page .ai-chat-button {
   display: none !important;
+}
+
+body.mhm-page .ai-chat-panel {
+  z-index: 1400 !important;
+  bottom: calc(5.75rem + env(safe-area-inset-bottom, 0px));
+  height: min(600px, calc(100vh - 7.25rem));
 }
 
 body.mhm-page .ai-chat-header {

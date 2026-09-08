@@ -14,6 +14,12 @@ function projectStack(id) {
   return project ? project.stack || [] : [];
 }
 
+describe('portfolio platform name', () => {
+  test('public brand is Lane AI Labs', () => {
+    expect(SITE_PORTFOLIO.PLATFORM_NAME).toBe('Lane AI Labs');
+  });
+});
+
 describe('portfolio tech stack', () => {
   test('chips include WebGL and WebGPU for a glanceable wall', () => {
     expect(labels(SITE_PORTFOLIO.STACK_CHIPS)).toEqual(

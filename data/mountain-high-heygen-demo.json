@@ -1,26 +1,26 @@
 {
-  "id": "mountain-high-jill-intro",
-  "title": "Mountain High — Meet Jill",
+  "id": "mountain-high-bud-master-intro",
+  "title": "Mountain High — Meet Bud Master",
   "ctaLabel": "Flip the type cards",
   "ctaHref": "/mountain-high/#mhmTypes",
   "brand": {
     "attribution": "Avatar narration powered by HeyGen",
     "developmentBy": "David E Lane"
   },
-  "heygenScriptShort": "Hey — I'm Jill. Welcome to Mountain High Medicinals. Hippie botanist, grow expert, 21 and over. Flip a type card for indica, sativa, hybrid, hemp, or ruderalis. If you need a locksmith, we cover Long Beach and L.A. Same number on the card.",
-  "heygenVideoLocalShort": null,
-  "heygenVideoUrlShort": null,
+  "heygenScriptShort": "Hey — I'm Bud Master. Welcome to Mountain High Medicinals. Hippie botanist, grow expert, 21 and over. Flip a type card for indica, sativa, hybrid, hemp, or ruderalis. If you need a locksmith, we cover Long Beach and L.A. Same number on the card.",
+  "heygenVideoLocalShort": "/mountain-high/assets/video/hippie-botanist-intro.mp4",
+  "heygenVideoUrlShort": "/mountain-high/assets/video/hippie-botanist-intro.mp4",
   "heygenMotionPrompt": "calm nod, hippie botanist speaking to camera, woman's voice, soft mountain-night light",
   "heygenExpressiveness": "low",
   "avatar": {
-    "name": "Jill",
-    "file": "AVATAR-JILL.md",
-    "portrait": "/mountain-high/assets/jill-portrait.svg",
-    "status": "prototype-tts-fallback"
+    "name": "Bud Master",
+    "file": "AVATAR-BUD-MASTER.md",
+    "portrait": "/mountain-high/assets/bud-master-portrait.webp",
+    "status": "heygen-ready"
   },
-  "heygenAvatarId": null,
-  "heygenAvatarGroupId": null,
-  "heygenVoiceId": null,
-  "heygenVoiceName": null,
+  "heygenAvatarId": "2c123117fd1c42d1ac18c359d2d44f60",
+  "heygenAvatarGroupId": "cf2f87baf4084f0c9892538bc0345680",
+  "heygenVoiceId": "42d00d4aac5441279d8536cd6b52c53c",
+  "heygenVoiceName": "Hope",
   "heygenVideoIdShort": null
 }

@@ -66,8 +66,8 @@ Home WebGPU NASA globe textures (optional local assets): run `npm run fetch:nasa
 | `LIVEKIT_EGRESS_S3_ACCESS_KEY` | Optional S3 access key for egress (falls back to `AWS_ACCESS_KEY_ID`) |
 | `LIVEKIT_EGRESS_S3_SECRET` | Optional S3 secret for egress (falls back to `AWS_SECRET_ACCESS_KEY`) |
 | `LIVEKIT_EGRESS_S3_REGION` | Optional S3 region |
-| `HEYGEN_STREAMING_AVATAR_ID` | HeyGen Avatar Realtime look id for live face tiles (Studio, planetarium Zed, Mountain High Jill). **Default:** [`data/studio-heygen-face.json`](../data/studio-heygen-face.json) (Zed). Env overrides the catalog when set. |
-| `HEYGEN_STREAMING_VOICE_ID` | HeyGen voice for Avatar Realtime text streams. Catalog `voiceId` is used when env is unset. Populate via `npm run create:zed-heygen-avatar`. |
+| `HEYGEN_STREAMING_AVATAR_ID` | HeyGen Avatar Realtime look id fallback for live face tiles. Pages should send their own catalog `avatarId`: planetarium/studio [`data/studio-heygen-face.json`](../data/studio-heygen-face.json) (Alienigena), Mountain High [`data/mountain-high-heygen-face.json`](../data/mountain-high-heygen-face.json) (Bud Master). Env overrides only when a page omits `avatarId`. |
+| `HEYGEN_STREAMING_VOICE_ID` | HeyGen voice for Avatar Realtime text streams. Catalog `voiceId` is used when env is unset. |
 | `STUDIO_LISTEN_PASSWORD` | Listening-room password (default `reel1`) |
 
 ## Misc

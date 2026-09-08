@@ -8,7 +8,7 @@
   /** DevConnect Labs marketing host. */
   const PRIMARY_HOST = 'devconnectlabs.com';
   /** Public platform name (replaces “DevConnect Labs” on portfolio pages). */
-  const PLATFORM_NAME = 'LOS AI Labs';
+  const PLATFORM_NAME = 'Lane AI Labs';
   /** Lane family production host (same app deployment). */
   const LANE_FAMILY_HOST = 'thelanefamily.us';
   /** Portfolio contact — update Calendly when you have a booking link. */

@@ -129,6 +129,55 @@ describe('Planetarium', () => {
     expect(opts.fovAz).toBeGreaterThan(140);
   });
 
+  test('openNativePicker skips touch and missing showPicker', () => {
+    expect(Planetarium.openNativePicker(null)).toBe(false);
+    expect(Planetarium.openNativePicker({})).toBe(false);
+    let calls = 0;
+    const el = {
+      showPicker() {
+        calls += 1;
+      },
+    };
+    expect(Planetarium.openNativePicker(el, { coarse: true })).toBe(false);
+    expect(calls).toBe(0);
+    expect(Planetarium.openNativePicker(el)).toBe(true);
+    expect(calls).toBe(1);
+    el.showPicker = () => {
+      throw new Error('already open');
+    };
+    expect(Planetarium.openNativePicker(el)).toBe(false);
+  });
+
+  test('bindDateTimePickers opens the native picker on click', () => {
+    function fakeInput() {
+      const listeners = {};
+      let pickerCalls = 0;
+      return {
+        dataset: {},
+        pickerCalls: () => pickerCalls,
+        showPicker() {
+          pickerCalls += 1;
+        },
+        addEventListener(type, fn) {
+          listeners[type] = (listeners[type] || []).concat(fn);
+        },
+        click() {
+          (listeners.click || []).forEach((fn) => fn());
+        },
+      };
+    }
+    const date = fakeInput();
+    const time = fakeInput();
+    Planetarium.bindDateTimePickers({ date, time }, { coarse: false });
+    date.click();
+    time.click();
+    expect(date.pickerCalls()).toBe(1);
+    expect(time.pickerCalls()).toBe(1);
+    Planetarium.bindDateTimePickers({ date, time }, { coarse: false });
+    date.click();
+    expect(date.pickerCalls()).toBe(2);
+  });
+
   test('buildShareUrl records horizon view when look-up is off', () => {
     const url = Planetarium.buildShareUrl(
       {

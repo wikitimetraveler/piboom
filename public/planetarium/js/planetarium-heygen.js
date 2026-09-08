@@ -1,5 +1,5 @@
 /**
- * Zed HeyGen live tile for planetarium Carl sessions
+ * Alienigena HeyGen live tile for planetarium Carl sessions
  * Development work by David Lane
  */
 (function (root) {
@@ -8,6 +8,181 @@
   let heygenRoom = null;
   let heygenSessionId = null;
   let studioFace = null;
+  let introOn = false;
+  let splashStarted = false;
+  let holdingPage = false;
+  const HEARD_KEY = 'plan_alien_heard_v1';
+  const INTRO_FALLBACK = '/planetarium/assets/video/alienigena-zigzag-intro.mp4';
+  const DEMO_RE = /[?&](?:demo=heygen|reel=1)(?:&|$)/;
+  const SPLASH_CLIP = 1 / 3;
+  const SPLASH_RATE = 0.7;
+
+  function esc(value) {
+    return String(value || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function hasHeard() {
+    try {
+      return root.localStorage.getItem(HEARD_KEY) === '1';
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function markHeard() {
+    try {
+      root.localStorage.setItem(HEARD_KEY, '1');
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  function shouldAutoplayIntro() {
+    const search = typeof location !== 'undefined' ? location.search : '';
+    return DEMO_RE.test(search) || !hasHeard();
+  }
+
+  function introVideoUrl(face) {
+    return String(face?.introVideo || INTRO_FALLBACK).trim() || INTRO_FALLBACK;
+  }
+
+  function holdPage() {
+    holdingPage = true;
+    document.documentElement.classList.add('is-intro-splash');
+    document.body.classList.add('is-intro-splash');
+  }
+
+  function releasePage() {
+    holdingPage = false;
+    document.documentElement.classList.remove('is-intro-splash');
+    document.body.classList.remove('is-intro-splash');
+  }
+
+  function kickPlayback(video, playBtn) {
+    if (!video || typeof video.play !== 'function') return;
+    try {
+      const attempt = video.play();
+      if (attempt && typeof attempt.catch === 'function') {
+        attempt.catch(() => {
+          if (playBtn) playBtn.hidden = false;
+        });
+      }
+    } catch (_) {
+      if (playBtn) playBtn.hidden = false;
+    }
+  }
+
+  function bindSplashClip(video) {
+    video.playbackRate = SPLASH_RATE;
+    const stopAtThird = () => {
+      const dur = Number(video.duration);
+      if (!Number.isFinite(dur) || dur <= 0) return;
+      if (video.currentTime >= dur * SPLASH_CLIP) {
+        video.removeEventListener('timeupdate', stopAtThird);
+        stopIntro();
+      }
+    };
+    video.addEventListener('loadedmetadata', () => {
+      video.playbackRate = SPLASH_RATE;
+    });
+    video.addEventListener('timeupdate', stopAtThird);
+    video.addEventListener('ended', stopIntro);
+  }
+
+  function syncIntroToggle() {
+    const btn = document.getElementById('planAlienIntroToggle');
+    if (!btn) return;
+    btn.setAttribute('aria-pressed', introOn ? 'true' : 'false');
+    btn.textContent = introOn ? 'Pause intro' : 'Play intro';
+  }
+
+  function closeIntroModal() {
+    const modal = document.getElementById('planHeygenDemoModal');
+    const video = modal?.querySelector('video');
+    if (video) {
+      try {
+        video.pause();
+        video.removeAttribute('src');
+        video.load();
+      } catch (_) {
+        /* ignore */
+      }
+    }
+    modal?.remove();
+  }
+
+  function stopIntro() {
+    introOn = false;
+    markHeard();
+    closeIntroModal();
+    releasePage();
+    syncIntroToggle();
+  }
+
+  function showIntroModal(url, { splash = false } = {}) {
+    closeIntroModal();
+    const rootEl = document.createElement('div');
+    rootEl.id = 'planHeygenDemoModal';
+    rootEl.className = splash ? 'plan-heygen-demo-modal plan-heygen-demo-modal--splash' : 'plan-heygen-demo-modal';
+    rootEl.setAttribute('role', 'dialog');
+    rootEl.setAttribute('aria-modal', 'true');
+    rootEl.setAttribute('aria-label', 'Alienigena intro');
+    rootEl.innerHTML = splash
+      ? '<video class="plan-heygen-demo-video" playsinline autoplay src="' +
+        esc(url) +
+        '"></video>' +
+        '<button type="button" class="plan-heygen-play" hidden>Play</button>' +
+        '<button type="button" class="plan-heygen-skip" data-plan-heygen-close>Skip</button>'
+      : '<div class="plan-heygen-demo-backdrop" data-plan-heygen-close></div>' +
+        '<div class="plan-heygen-demo-panel">' +
+        '<header class="d-flex justify-content-between align-items-center mb-2">' +
+        '<h2 class="h5 mb-0">Alienigena</h2>' +
+        '<button type="button" class="btn-close btn-close-white" data-plan-heygen-close aria-label="Close intro"></button>' +
+        '</header>' +
+        '<video class="plan-heygen-demo-video" controls playsinline autoplay src="' +
+        esc(url) +
+        '"></video></div>';
+    document.body.appendChild(rootEl);
+    rootEl.querySelectorAll('[data-plan-heygen-close]').forEach((el) => {
+      el.addEventListener('click', stopIntro);
+    });
+    const video = rootEl.querySelector('video');
+    const playBtn = rootEl.querySelector('.plan-heygen-play');
+    if (playBtn) {
+      playBtn.addEventListener('click', () => {
+        playBtn.hidden = true;
+        kickPlayback(video);
+      });
+    }
+    if (video) {
+      if (splash) bindSplashClip(video);
+      else video.addEventListener('ended', stopIntro);
+      kickPlayback(video, playBtn);
+    }
+  }
+
+  function playIntro(opts) {
+    const splash = Boolean(opts && opts.splash);
+    root.PlanetariumSkySong?.stop?.();
+    introOn = true;
+    if (splash) holdPage();
+    showIntroModal(introVideoUrl(studioFace), { splash });
+    syncIntroToggle();
+    if (!studioFace) loadStudioFace();
+    return true;
+  }
+
+  async function toggleIntro() {
+    if (introOn) {
+      stopIntro();
+      return false;
+    }
+    return playIntro();
+  }
 
   async function loadStudioFace() {
     try {
@@ -15,7 +190,7 @@
       if (!res.ok) return null;
       const data = await res.json();
       studioFace = data && typeof data === 'object' ? data : null;
-      const faceName = String(studioFace?.name || 'Zed').trim() || 'Zed';
+      const faceName = String(studioFace?.name || 'Alienigena').trim() || 'Alienigena';
       const label = document.getElementById('planHeygenLabel');
       if (label) label.textContent = faceName + ' · alien presenter';
       return studioFace;
@@ -32,7 +207,7 @@
   function friendlyError(raw) {
     const text = String(raw || '');
     if (/streaming\.new|avatar-realtime|resource_not_found|404/i.test(text)) {
-      return 'Live stream is not on this HeyGen plan — Zed still speaks.';
+      return 'Live stream is not on this HeyGen plan — Alienigena still speaks.';
     }
     return text;
   }
@@ -74,7 +249,7 @@
       heygenRoom = { kind: 'poster' };
       media.hidden = false;
       wrap?.classList.add('plan-heygen--live');
-      root.HeygenLiveTile.attachPoster(media, data.url, 'plan-heygen__video', 'Zed');
+      root.HeygenLiveTile.attachPoster(media, data.url, 'plan-heygen__video', 'Alienigena');
       if (data.audioUrl) root.HeygenLiveTile.playAudio?.(data.audioUrl);
       return;
     }
@@ -113,7 +288,7 @@
     clearMedia();
     heygenSessionId = null;
     const btn = document.getElementById('planHeygenToggle');
-    if (btn) btn.textContent = 'Show Zed · alien presenter';
+    if (btn) btn.textContent = 'Show Alienigena · alien presenter';
     setStatus('');
   }
 
@@ -124,14 +299,15 @@
 
   function facePayload(face, extra) {
     const body = extra && typeof extra === 'object' ? { ...extra } : {};
-    if (face?.avatarId) body.avatarId = face.avatarId;
+    const lookId = face?.portraitAvatarId || face?.avatarId;
+    if (lookId) body.avatarId = lookId;
     if (face?.voiceId) body.voiceId = face.voiceId;
     return body;
   }
 
   async function startHeygen() {
     const face = studioFace || (await loadStudioFace());
-    const faceName = String(face?.name || 'Zed').trim() || 'Zed';
+    const faceName = String(face?.name || 'Alienigena').trim() || 'Alienigena';
     const greeting =
       String(face?.greeting || '').trim() ||
       'Signal acquired. Carl and I are watching the sky with you.';
@@ -144,7 +320,7 @@
     if (data?.url && (data.fallback || data.playback === 'poster' || root.HeygenLiveTile?.isPoster?.(data))) {
       await attachSession(data);
       const btn = document.getElementById('planHeygenToggle');
-      if (btn) btn.textContent = 'Hide Zed';
+      if (btn) btn.textContent = 'Hide Alienigena';
       setStatus(`${faceName} on voice — live lip-sync is not on this HeyGen plan.`);
       if (!data.audioUrl) await speakTts(greeting);
       return;
@@ -156,17 +332,18 @@
         media.hidden = false;
         wrap?.classList.add('plan-heygen--live');
         media.innerHTML =
-          '<div class="plan-heygen__standin" role="img" aria-label="Zed">' +
-          '<span>ZED</span><small>alien presenter</small></div>';
+          '<div class="plan-heygen__standin" role="img" aria-label="Alienigena">' +
+          '<img src="/planetarium/assets/alienigena-portrait.webp" alt="Alienigena" width="160" height="160"/>' +
+          '<small>alien presenter</small></div>';
         heygenRoom = { kind: 'poster' };
         heygenSessionId = 'poster';
         const btn = document.getElementById('planHeygenToggle');
-        if (btn) btn.textContent = 'Hide Zed';
+        if (btn) btn.textContent = 'Hide Alienigena';
         setStatus(
           friendlyError(data.error) ||
             (face?.avatarId
-              ? 'HeyGen streaming unavailable — Zed can still talk through Carl.'
-              : `${faceName} needs avatar IDs — see AVATAR-ZED.md.`)
+              ? 'HeyGen streaming unavailable — Alienigena can still talk through Carl.'
+              : `${faceName} needs avatar IDs — see AVATAR-ALIENIGENA.md.`)
         );
         await speakTts(greeting);
         return;
@@ -174,14 +351,14 @@
       setStatus(
         friendlyError(data.error) ||
           (face?.avatarId
-            ? 'HeyGen streaming unavailable — Zed can still talk through Carl.'
-            : `${faceName} needs avatar IDs — see AVATAR-ZED.md.`)
+            ? 'HeyGen streaming unavailable — Alienigena can still talk through Carl.'
+              : `${faceName} needs avatar IDs — see AVATAR-ALIENIGENA.md.`)
       );
       return;
     }
     await attachSession(data);
     const btn = document.getElementById('planHeygenToggle');
-    if (btn) btn.textContent = 'Hide Zed';
+    if (btn) btn.textContent = 'Hide Alienigena';
     setStatus(`${faceName} live — Carl speaks through this tile.`);
   }
 
@@ -216,15 +393,55 @@
     return Boolean(heygenSessionId);
   }
 
-  root.PlanetariumHeygen = { toggle: toggleHeygen, speak, stop: stopHeygen, isLive };
+  root.PlanetariumHeygen = {
+    toggle: toggleHeygen,
+    speak,
+    stop: stopHeygen,
+    isLive,
+    playIntro,
+    toggleIntro,
+    stopIntro,
+    hasHeard,
+    shouldAutoplayIntro,
+  };
 
-  document.getElementById('planHeygenToggle')?.addEventListener('click', () => {
-    toggleHeygen().catch((err) => setStatus(err.message || 'HeyGen failed'));
-  });
+  if (typeof document !== 'undefined') {
+    function maybeAutoplaySplash() {
+      if (splashStarted || introOn) return;
+      if (!document.getElementById('planHeygenWrap') && !document.getElementById('planAlienIntroToggle')) {
+        releasePage();
+        return;
+      }
+      if (!shouldAutoplayIntro()) {
+        releasePage();
+        return;
+      }
+      splashStarted = true;
+      playIntro({ splash: true });
+    }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => loadStudioFace());
-  } else {
-    loadStudioFace();
+    function boot() {
+      if (!document.getElementById('planHeygenWrap') && !document.getElementById('planAlienIntroToggle')) {
+        return;
+      }
+      document.getElementById('planHeygenToggle')?.addEventListener('click', () => {
+        toggleHeygen().catch((err) => setStatus(err.message || 'HeyGen failed'));
+      });
+      document.getElementById('planAlienIntroToggle')?.addEventListener('click', () => {
+        toggleIntro().catch((err) => setStatus(err.message || 'Intro failed'));
+      });
+      document.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Escape' && document.getElementById('planHeygenDemoModal')) stopIntro();
+      });
+      loadStudioFace();
+      syncIntroToggle();
+      maybeAutoplaySplash();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', boot);
+    } else {
+      boot();
+    }
   }
 })(typeof globalThis !== 'undefined' ? globalThis : window);

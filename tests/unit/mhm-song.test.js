@@ -14,8 +14,8 @@ describe('MhmSong', () => {
     expect(MhmSong.VIDEO_ID).toBe('Tt6Do5fo4k8');
   });
 
-  test('song is on by default after the 21+ gate', () => {
-    expect(MhmSong.AUTOPLAY_ON_LOAD).toBe(true);
+  test('song stays off after the 21+ gate so Bud Master can intro', () => {
+    expect(MhmSong.AUTOPLAY_ON_LOAD).toBe(false);
   });
 
   test('starts at the beginning of the track', () => {

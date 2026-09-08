@@ -11,8 +11,8 @@
   const TITLE = 'Spirit in the Sky';
   const YEAR = 1969;
   const DEFAULT_VOLUME = 100;
-  /** Play on planetarium load; the Spirit button then toggles it. */
-  const AUTOPLAY_ON_LOAD = true;
+  /** Stay off until Play — Alienigena's first-visit intro needs the speakers. */
+  const AUTOPLAY_ON_LOAD = false;
   /** Official MV cold open + extra delay (12s + 2s + 1s) — land on the guitar. */
   const SKIP_SECONDS = 15;
   const DUCK_WHILE_PLAYING = 0;

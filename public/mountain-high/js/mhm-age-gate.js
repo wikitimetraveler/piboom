@@ -38,6 +38,7 @@
       /* ignore */
     }
     apply('ok');
+    root.dispatchEvent(new CustomEvent('mhm-age-confirmed'));
   }
 
   function deny() {

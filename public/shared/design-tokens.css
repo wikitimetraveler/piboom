@@ -2,6 +2,7 @@
  * DevConnect Labs — shared design tokens
  * Zen (#4a90a4), finance aliases, ICE, Lane heritage (--lf-*)
  */
+@import url('bi-mountain.css');
 :root {
   /* Zen primary (finance + sitewide accent) */
   --zen-primary: #4a90a4;

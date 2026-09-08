@@ -2,14 +2,14 @@
   "brand": {
     "name": "Mountain High Medicinals",
     "tagline": "Types on the table. Call the mountain. Locksmith on the side.",
-    "guideName": "Jill",
+    "guideName": "Bud Master",
     "guideTitle": "Hippie botanist · grow expert",
-    "guidePortrait": "/mountain-high/assets/jill-portrait.svg",
-    "welcomeScript": "Hey — I'm Jill. Hippie botanist, grow expert, 21 and over. Flip a type card for a little history, wander the lab, or call if you need a locksmith in Long Beach or L.A.",
+    "guidePortrait": "/mountain-high/assets/bud-master-portrait.webp",
+    "welcomeScript": "Hey — I'm Bud Master. Hippie botanist, grow expert, 21 and over. Flip a type card for a little history, wander the lab, or call if you need a locksmith in Long Beach or L.A.",
     "publicSiteUrl": "https://www.thelanefamily.us"
   },
   "soundtrack": {
-    "note": "Hidden YouTube audio after the 21+ gate. No local rips.",
+    "note": "Hidden YouTube audio. Visitor starts it with Play — do not start it over Bud Master's intro. No local rips.",
     "tracks": [
       {
         "id": "panama-red",

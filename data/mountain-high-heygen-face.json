@@ -1,10 +1,16 @@
 {
-  "name": "Jill",
-  "avatarFile": "AVATAR-JILL.md",
-  "avatarId": null,
-  "groupId": null,
-  "voiceId": null,
-  "voiceName": null,
-  "greeting": "Hey — Jill here. Hippie botanist, grow expert, twenty-one and over. Flip a type or ask me about locksmiths in Long Beach and L.A.",
-  "status": "streaming-uses-env-defaults"
+  "name": "Bud Master",
+  "avatarFile": "AVATAR-BUD-MASTER.md",
+  "avatarId": "2c123117fd1c42d1ac18c359d2d44f60",
+  "altAvatarId": "ecaf83a70cd24e05b4f9160f9ac8a6b9",
+  "groupId": "cf2f87baf4084f0c9892538bc0345680",
+  "voiceId": "42d00d4aac5441279d8536cd6b52c53c",
+  "voiceName": "Hope",
+  "greeting": "Hey — Bud Master here. Hippie botanist, grow expert, twenty-one and over. Flip a type or ask me about locksmiths in Long Beach and L.A.",
+  "introVideo": "/mountain-high/assets/video/hippie-botanist-intro.mp4",
+  "status": "heygen-ready",
+  "looks": {
+    "budMaster": "2c123117fd1c42d1ac18c359d2d44f60",
+    "plantEnthusiast": "ecaf83a70cd24e05b4f9160f9ac8a6b9"
+  }
 }

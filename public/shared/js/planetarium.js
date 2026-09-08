@@ -28,6 +28,36 @@
     return !!(root.__PLANETARIUM_FIELD || (typeof document !== 'undefined' && document.body?.classList.contains('plan-field')));
   }
 
+  function prefersCoarsePointer(media) {
+    const mq = media || (root.matchMedia && root.matchMedia('(pointer: coarse)'));
+    return !!(mq && mq.matches);
+  }
+
+  /** Open the native calendar/clock on desktop. Touch devices already have a working picker. */
+  function openNativePicker(el, opts) {
+    if (!el || typeof el.showPicker !== 'function') return false;
+    if (opts && opts.coarse) return false;
+    try {
+      el.showPicker();
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function bindDateTimePickers(els, opts) {
+    const coarse = !!(opts && opts.coarse);
+    [els && els.date, els && els.time].forEach((el) => {
+      if (!el || el.dataset.planPickerBound === '1') return;
+      el.dataset.planPickerBound = '1';
+      el.addEventListener('click', () => openNativePicker(el, { coarse }));
+      el.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        if (openNativePicker(el, { coarse })) event.preventDefault();
+      });
+    });
+  }
+
   /** Parse ?date=&time=&lat=&lon=&face=&body=&select=&view=&app= URL params into partial state. */
   function parseParams(search) {
     const params = new URLSearchParams(search || '');
@@ -1326,6 +1356,8 @@
       });
     }
 
+    bindDateTimePickers(els, { coarse: prefersCoarsePointer() });
+
     ['change', 'input'].forEach((ev) => {
       if (els.date) els.date.addEventListener(ev, () => refresh(true));
       if (els.time) els.time.addEventListener(ev, () => refresh(true));
@@ -1518,6 +1550,9 @@
     isDarkSky,
     normalizeSelection,
     selectionKey,
+    prefersCoarsePointer,
+    openNativePicker,
+    bindDateTimePickers,
     initPage,
     _live: null,
     enableCompass: () => {},

@@ -82,6 +82,13 @@ describe('fun-home public project cards', () => {
     expect(body).not.toMatch(/>Unit Tests</);
   });
 
+  test('Entertainment card More menu includes Mountain High with a mountain icon', () => {
+    const card = cardSlice('entertainment');
+    expect(card).toMatch(/href="\/mountain-high\/"/);
+    expect(card).toMatch(/bi-mountain/);
+    expect(card).toMatch(/Mountain High/);
+  });
+
   test('CSS defines feature list and chip styles', () => {
     expect(css).toMatch(/\.fun-card__features\b/);
     expect(css).toMatch(/\.fun-card__stack\b/);

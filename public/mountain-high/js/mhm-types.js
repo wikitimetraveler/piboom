@@ -45,8 +45,8 @@
             ${examples ? `<p><strong>On the map:</strong> ${esc(examples)}</p>` : ''}
           </div>
           <div class="mhm-back-actions">
-            <button type="button" class="mhm-btn mhm-btn-sm mhm-hear" data-hear="${esc(type.id)}">Hear Jill</button>
-            <button type="button" class="mhm-btn mhm-btn-ghost mhm-btn-sm mhm-ask" data-ask="${esc(type.id)}">Ask Jill</button>
+            <button type="button" class="mhm-btn mhm-btn-sm mhm-hear" data-hear="${esc(type.id)}">Hear Bud Master</button>
+            <button type="button" class="mhm-btn mhm-btn-ghost mhm-btn-sm mhm-ask" data-ask="${esc(type.id)}">Ask Bud Master</button>
             <button type="button" class="mhm-btn mhm-btn-sm mhm-map" data-map="${esc(type.id)}">Show on map</button>
             <button type="button" class="mhm-btn mhm-btn-ghost mhm-btn-sm mhm-flip-back">Flip back</button>
           </div>
@@ -68,14 +68,21 @@
       const mapBtn = ev.target.closest('[data-map]');
       const card = ev.target.closest('.mhm-card');
       if (hear) {
+        ev.stopPropagation();
         const type = types.find((t) => t.id === hear.getAttribute('data-hear'));
-        if (type && typeof root.MhmAskJill === 'function') {
-          root.MhmSpeakJill?.(type.history);
+        if (type && typeof root.MhmSpeakJill === 'function') {
+          root.MhmSpeakJill(type.history);
         }
-      } else if (ask) {
+        return;
+      }
+      if (ask) {
+        ev.stopPropagation();
         const type = types.find((t) => t.id === ask.getAttribute('data-ask'));
         root.MhmAskJill?.(`Tell me about ${type?.name || 'this type'} — history and botany, no grow recipes.`);
-      } else if (mapBtn) {
+        return;
+      }
+      if (mapBtn) {
+        ev.stopPropagation();
         const type = types.find((t) => t.id === mapBtn.getAttribute('data-map'));
         document.getElementById('mhmOrigins')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         const first = (type?.examples || [])[0];
@@ -86,6 +93,7 @@
           });
           if (id) window.setTimeout(() => window.CannabisOriginsMapInstance.focusPin(id), 500);
         }
+        return;
       }
       if (card) flipCard(card);
     });

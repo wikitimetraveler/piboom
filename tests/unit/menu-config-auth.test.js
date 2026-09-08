@@ -101,6 +101,13 @@ describe('menu-config auth filtering', () => {
     expect(loggedIn.length).toBeGreaterThan(loggedOut.length);
   });
 
+  test('Entertainment menu includes Mountain High with a mountain icon', () => {
+    const navItem = MENU_CONFIG.NAV_ENTERTAINMENT.find((t) => t.label === 'Mountain High');
+    const hubItem = MENU_CONFIG.ENTERTAINMENT_TOOLS.find((t) => t.label === 'Mountain High');
+    expect(navItem).toMatchObject({ href: '/mountain-high/', icon: 'bi-mountain' });
+    expect(hubItem).toMatchObject({ href: '/mountain-high/', icon: 'bi-mountain' });
+  });
+
   test('getDomainTiles hides Worksheets tile when logged out', () => {
     const loggedOut = MENU_CONFIG.getDomainTiles(false, false);
     const loggedIn = MENU_CONFIG.getDomainTiles(false, true);

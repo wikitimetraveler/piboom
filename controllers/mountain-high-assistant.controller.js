@@ -1,5 +1,5 @@
 /**
- * Jill assistant API for Mountain High Medicinals
+ * Bud Master assistant API for Mountain High Medicinals
  * Development work by David Lane
  */
 import { Router } from 'express';
@@ -18,7 +18,7 @@ function resolveUserId(req) {
 }
 
 function resolveSessionId(req) {
-  return String(req.body?.sessionId || req.query?.sessionId || 'mountain-high-jill').slice(0, 255);
+  return String(req.body?.sessionId || req.query?.sessionId || 'mountain-high-bud').slice(0, 255);
 }
 
 function resolveHistory(req) {
@@ -99,7 +99,7 @@ router.post('/chat', async (req, res) => {
     });
   } catch (error) {
     const status = error.code === 'OPENAI_NOT_CONFIGURED' ? 503 : 500;
-    console.error('Jill assistant chat error:', error);
+    console.error('Bud Master assistant chat error:', error);
     res.status(status).json({ error: error.message || 'Chat failed' });
   }
 });

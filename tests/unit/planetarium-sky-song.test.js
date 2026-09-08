@@ -34,8 +34,8 @@ describe('PlanetariumSkySong', () => {
     expect(PlanetariumSkySong.VIDEO_ID).toBe('YqYN-1vMM9k');
   });
 
-  test('song is on by default and starts on planetarium page load', () => {
-    expect(PlanetariumSkySong.AUTOPLAY_ON_LOAD).toBe(true);
+  test('song stays off on load so Alienigena can intro', () => {
+    expect(PlanetariumSkySong.AUTOPLAY_ON_LOAD).toBe(false);
   });
 
   test('default volume is high and clampVolume stays in 0–100', () => {

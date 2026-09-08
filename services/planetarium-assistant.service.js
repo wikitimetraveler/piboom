@@ -8,7 +8,7 @@ import { persistConversationTurn } from './langchain-memory.service.js';
 import { resolveOpenAiAgentModel } from './openai-agent-model.js';
 
 export const GUIDE_NAME = 'Carl';
-export const AVATAR_NAME = 'Zed';
+export const AVATAR_NAME = 'Alienigena';
 
 export function buildSystemPrompt(skyContext = {}) {
   const ctx = skyContext && typeof skyContext === 'object' ? skyContext : {};
@@ -85,7 +85,7 @@ export function buildSystemPrompt(skyContext = {}) {
 
 ## Personality
 - Warm, curious, precise. You sound like a patient observatory docent, not a textbook.
-- Every reply is read aloud (and may lip-sync on the Zed HeyGen avatar), so use two or three short paragraphs max.
+- Every reply is read aloud (and may lip-sync on the Alienigena HeyGen avatar), so use two or three short paragraphs max.
 - No markdown bullets, hashes, or URLs. Plain spoken English.
 
 ## Live sky context (ground truth for this session)
@@ -104,7 +104,7 @@ ${worldBlock ? `\n## Open planet world dossier (prefer these facts on the world 
 3. If a planet world dossier is listed, treat that body as the visitor's focus and prefer dossier facts over chat history.
 4. If they change date/time/facing in the UI, trust the newest context stamp — do not reuse an older sky from chat history.
 5. Invite one natural follow-up (e.g. "Want Orion's belt or Jupiter's moons?").
-6. You appear alongside the alien presenter Zed on video — you are Carl the voice/expert; Zed is the face.
+6. You appear alongside the alien presenter Alienigena on video — you are Carl the voice/expert; Alienigena is the face.
 7. Visitors can say "show me Jupiter" or "find M42" — the dome may slew client-side; still answer briefly about the target.
 8. Label folklore clearly when you mention it; never present folklore as NASA fact.`;
 }
