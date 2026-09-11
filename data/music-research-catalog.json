@@ -1,0 +1,181 @@
+{
+  "artists": [
+    {
+      "name": "Grateful Dead",
+      "aliases": ["the grateful dead", "the dead", "gd"],
+      "type": "Group",
+      "isBand": true,
+      "description": "American rock band formed in Palo Alto, California, in 1965. Known for eclectic live sets that fused rock, folk, blues, and improvisation.",
+      "genre": "Rock",
+      "birthDate": "1965",
+      "birthPlace": "Palo Alto",
+      "url": "https://en.wikipedia.org/wiki/Grateful_Dead",
+      "coordinates": { "lat": 37.4419, "lng": -122.143 },
+      "bandMembers": [
+        { "name": "Jerry Garcia", "instrument": "guitar, vocals", "birthPlace": "San Francisco", "birthDate": "1942" },
+        { "name": "Bob Weir", "instrument": "guitar, vocals", "birthPlace": "San Francisco", "birthDate": "1947" },
+        { "name": "Phil Lesh", "instrument": "bass", "birthPlace": "Berkeley", "birthDate": "1940" },
+        { "name": "Bill Kreutzmann", "instrument": "drums", "birthPlace": "Palo Alto", "birthDate": "1946" },
+        { "name": "Mickey Hart", "instrument": "drums", "birthPlace": "Brooklyn", "birthDate": "1943" },
+        { "name": "Ron McKernan", "instrument": "keyboards, harmonica, vocals", "birthPlace": "San Bruno", "birthDate": "1945" }
+      ],
+      "albums": [
+        { "title": "The Grateful Dead", "year": "1967", "releaseDate": "1967-03-17" },
+        { "title": "Workingman's Dead", "year": "1970", "releaseDate": "1970-06-14" },
+        { "title": "American Beauty", "year": "1970", "releaseDate": "1970-11-01" }
+      ]
+    },
+    {
+      "name": "The Band",
+      "aliases": ["the hawks"],
+      "type": "Group",
+      "isBand": true,
+      "description": "Canadian-American rock group formed in 1967, known for roots rock, close harmony, and the Basement Tapes era with Bob Dylan.",
+      "genre": "Rock",
+      "birthDate": "1967",
+      "birthPlace": "Toronto",
+      "url": "https://en.wikipedia.org/wiki/The_Band",
+      "coordinates": { "lat": 43.6532, "lng": -79.3832 },
+      "bandMembers": [
+        { "name": "Robbie Robertson", "instrument": "guitar", "birthPlace": "Toronto", "birthDate": "1943" },
+        { "name": "Levon Helm", "instrument": "drums, vocals", "birthPlace": "Elaine", "birthDate": "1940" },
+        { "name": "Rick Danko", "instrument": "bass, vocals", "birthPlace": "Blayney", "birthDate": "1943" },
+        { "name": "Richard Manuel", "instrument": "piano, vocals", "birthPlace": "Stratford", "birthDate": "1943" },
+        { "name": "Garth Hudson", "instrument": "keyboards", "birthPlace": "Windsor", "birthDate": "1937" }
+      ],
+      "albums": [
+        { "title": "Music from Big Pink", "year": "1968", "releaseDate": "1968-07-01" },
+        { "title": "The Band", "year": "1969", "releaseDate": "1969-09-22" }
+      ]
+    },
+    {
+      "name": "Pink Floyd",
+      "aliases": ["the pink floyd"],
+      "type": "Group",
+      "isBand": true,
+      "description": "English rock band formed in London in 1965, known for progressive and psychedelic albums and large-scale live presentations.",
+      "genre": "Progressive rock",
+      "birthDate": "1965",
+      "birthPlace": "London",
+      "url": "https://en.wikipedia.org/wiki/Pink_Floyd",
+      "coordinates": { "lat": 51.5074, "lng": -0.1278 },
+      "bandMembers": [
+        { "name": "Syd Barrett", "instrument": "guitar, vocals", "birthPlace": "Cambridge", "birthDate": "1946" },
+        { "name": "David Gilmour", "instrument": "guitar, vocals", "birthPlace": "Cambridge", "birthDate": "1946" },
+        { "name": "Roger Waters", "instrument": "bass, vocals", "birthPlace": "Great Bookham", "birthDate": "1943" },
+        { "name": "Richard Wright", "instrument": "keyboards", "birthPlace": "London", "birthDate": "1943" },
+        { "name": "Nick Mason", "instrument": "drums", "birthPlace": "Birmingham", "birthDate": "1944" }
+      ],
+      "albums": [
+        { "title": "The Dark Side of the Moon", "year": "1973", "releaseDate": "1973-03-01" },
+        { "title": "Wish You Were Here", "year": "1975", "releaseDate": "1975-09-12" },
+        { "title": "The Wall", "year": "1979", "releaseDate": "1979-11-30" }
+      ]
+    },
+    {
+      "name": "The Beatles",
+      "aliases": ["beatles"],
+      "type": "Group",
+      "isBand": true,
+      "description": "English rock band formed in Liverpool in 1960, whose recordings reshaped popular music in the 1960s.",
+      "genre": "Rock",
+      "birthDate": "1960",
+      "birthPlace": "Liverpool",
+      "url": "https://en.wikipedia.org/wiki/The_Beatles",
+      "coordinates": { "lat": 53.4084, "lng": -2.9916 },
+      "bandMembers": [
+        { "name": "John Lennon", "instrument": "guitar, vocals", "birthPlace": "Liverpool", "birthDate": "1940" },
+        { "name": "Paul McCartney", "instrument": "bass, vocals", "birthPlace": "Liverpool", "birthDate": "1942" },
+        { "name": "George Harrison", "instrument": "guitar, vocals", "birthPlace": "Liverpool", "birthDate": "1943" },
+        { "name": "Ringo Starr", "instrument": "drums, vocals", "birthPlace": "Liverpool", "birthDate": "1940" }
+      ],
+      "albums": [
+        { "title": "Rubber Soul", "year": "1965", "releaseDate": "1965-12-03" },
+        { "title": "Sgt. Pepper's Lonely Hearts Club Band", "year": "1967", "releaseDate": "1967-06-01" },
+        { "title": "Abbey Road", "year": "1969", "releaseDate": "1969-09-26" }
+      ]
+    },
+    {
+      "name": "Bob Dylan",
+      "aliases": ["robert zimmerman"],
+      "type": "Person",
+      "isBand": false,
+      "description": "American singer-songwriter whose 1960s recordings became a central document of modern folk and rock songwriting.",
+      "genre": "Folk, rock",
+      "birthDate": "1941",
+      "birthPlace": "Duluth",
+      "url": "https://en.wikipedia.org/wiki/Bob_Dylan",
+      "coordinates": { "lat": 46.7867, "lng": -92.1005 },
+      "bandMembers": [],
+      "albums": [
+        { "title": "The Freewheelin' Bob Dylan", "year": "1963", "releaseDate": "1963-05-27" },
+        { "title": "Highway 61 Revisited", "year": "1965", "releaseDate": "1965-08-30" },
+        { "title": "Blood on the Tracks", "year": "1975", "releaseDate": "1975-01-20" }
+      ]
+    },
+    {
+      "name": "Led Zeppelin",
+      "aliases": ["zeppelin"],
+      "type": "Group",
+      "isBand": true,
+      "description": "English rock band formed in London in 1968, known for hard rock and blues-derived studio and live work.",
+      "genre": "Rock",
+      "birthDate": "1968",
+      "birthPlace": "London",
+      "url": "https://en.wikipedia.org/wiki/Led_Zeppelin",
+      "coordinates": { "lat": 51.5074, "lng": -0.1278 },
+      "bandMembers": [
+        { "name": "Jimmy Page", "instrument": "guitar", "birthPlace": "Heston", "birthDate": "1944" },
+        { "name": "Robert Plant", "instrument": "vocals", "birthPlace": "West Bromwich", "birthDate": "1948" },
+        { "name": "John Paul Jones", "instrument": "bass, keyboards", "birthPlace": "Sidcup", "birthDate": "1946" },
+        { "name": "John Bonham", "instrument": "drums", "birthPlace": "Redditch", "birthDate": "1948" }
+      ],
+      "albums": [
+        { "title": "Led Zeppelin IV", "year": "1971", "releaseDate": "1971-11-08" },
+        { "title": "Physical Graffiti", "year": "1975", "releaseDate": "1975-02-24" }
+      ]
+    },
+    {
+      "name": "The Rolling Stones",
+      "aliases": ["rolling stones", "the stones"],
+      "type": "Group",
+      "isBand": true,
+      "description": "English rock band formed in London in 1962, known for a long recording and touring career rooted in blues and rock and roll.",
+      "genre": "Rock",
+      "birthDate": "1962",
+      "birthPlace": "London",
+      "url": "https://en.wikipedia.org/wiki/The_Rolling_Stones",
+      "coordinates": { "lat": 51.5074, "lng": -0.1278 },
+      "bandMembers": [
+        { "name": "Mick Jagger", "instrument": "vocals", "birthPlace": "Dartford", "birthDate": "1943" },
+        { "name": "Keith Richards", "instrument": "guitar", "birthPlace": "Dartford", "birthDate": "1943" },
+        { "name": "Charlie Watts", "instrument": "drums", "birthPlace": "London", "birthDate": "1941" },
+        { "name": "Ronnie Wood", "instrument": "guitar", "birthPlace": "Hillingdon", "birthDate": "1947" }
+      ],
+      "albums": [
+        { "title": "Let It Bleed", "year": "1969", "releaseDate": "1969-12-05" },
+        { "title": "Exile on Main St.", "year": "1972", "releaseDate": "1972-05-12" }
+      ]
+    },
+    {
+      "name": "A Perfect Circle",
+      "aliases": ["perfect circle"],
+      "type": "Group",
+      "isBand": true,
+      "description": "American rock band formed in Los Angeles in 1999, led by Maynard James Keenan and Billy Howerdel.",
+      "genre": "Rock",
+      "birthDate": "1999",
+      "birthPlace": "Los Angeles",
+      "url": "https://en.wikipedia.org/wiki/A_Perfect_Circle",
+      "coordinates": { "lat": 34.0522, "lng": -118.2437 },
+      "bandMembers": [
+        { "name": "Maynard James Keenan", "instrument": "vocals", "birthPlace": "Ravenna", "birthDate": "1964" },
+        { "name": "Billy Howerdel", "instrument": "guitar", "birthPlace": "New Jersey", "birthDate": "1970" }
+      ],
+      "albums": [
+        { "title": "Mer de Noms", "year": "2000", "releaseDate": "2000-05-23" },
+        { "title": "Thirteenth Step", "year": "2003", "releaseDate": "2003-09-16" }
+      ]
+    }
+  ]
+}

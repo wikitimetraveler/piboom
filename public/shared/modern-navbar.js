@@ -477,6 +477,50 @@ class ModernNavbar extends HTMLElement {
           border-color: #30363d !important;
           color: #e6edf3 !important;
         }
+
+        /* Planetarium Theater — observatory chrome when the menu is revealed */
+        :host-context(body.plan-page) .modern-navbar {
+          background: rgba(8, 12, 22, 0.94) !important;
+          border-bottom-color: rgba(210, 190, 140, 0.22) !important;
+          box-shadow: 0 10px 32px rgba(0, 0, 0, 0.4);
+        }
+        :host-context(body.plan-page) .navbar-brand-modern {
+          background: none;
+          -webkit-text-fill-color: #ffe8b0;
+          color: #ffe8b0;
+          filter: none;
+        }
+        :host-context(body.plan-page) .nav-link {
+          color: rgba(232, 236, 244, 0.88) !important;
+        }
+        :host-context(body.plan-page) .nav-link:hover,
+        :host-context(body.plan-page) .nav-link.active-page {
+          color: #ffe8b0 !important;
+        }
+        :host-context(body.plan-page) .dropdown-menu {
+          background: rgba(8, 12, 22, 0.96) !important;
+          border: 1px solid rgba(210, 190, 140, 0.22);
+          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+        }
+        :host-context(body.plan-page) .dropdown-item {
+          color: rgba(232, 236, 244, 0.9) !important;
+        }
+        :host-context(body.plan-page) .dropdown-item:hover {
+          background: rgba(255, 210, 120, 0.12) !important;
+          color: #ffe8b0 !important;
+        }
+        :host-context(body.plan-page) .navbar-collapse {
+          background: rgba(8, 12, 22, 0.96) !important;
+        }
+        :host-context(body.plan-page) .nav-user-btn {
+          background: rgba(255, 210, 120, 0.1) !important;
+          border-color: rgba(210, 190, 140, 0.35) !important;
+          color: #ffe8b0 !important;
+        }
+        :host-context(body.plan-page) .navbar-toggler {
+          border-color: rgba(210, 190, 140, 0.35) !important;
+          color: #ffe8b0 !important;
+        }
       </style>
       
       <nav class="modern-navbar">

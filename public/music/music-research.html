@@ -84,6 +84,55 @@
     flex: 1 1 280px;
     min-width: 0;
   }
+  .search-toolbar .artist-search-wrap {
+    flex: 1 1 280px;
+    min-width: 0;
+    position: relative;
+  }
+  .search-toolbar .artist-search-wrap .search-box {
+    width: 100%;
+    flex: none;
+  }
+  .artist-suggest-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 1100;
+    margin: 0;
+    padding: 0.35rem 0;
+    list-style: none;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .artist-suggest-list[hidden] {
+    display: none;
+  }
+  .artist-suggest-list li {
+    padding: 10px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .artist-suggest-list li:last-child {
+    border-bottom: none;
+  }
+  .artist-suggest-list li:hover,
+  .artist-suggest-list li.is-active {
+    background: #f8f9fa;
+  }
+  .artist-suggest-list .suggest-name {
+    display: block;
+    font-weight: 600;
+  }
+  .artist-suggest-list .suggest-meta {
+    display: block;
+    font-size: 0.8rem;
+    color: #6c757d;
+  }
   .search-toolbar .mic-toggle-btn {
     height: 50px;
     min-width: 50px;
@@ -782,7 +831,10 @@
             <option value="chat">ChatGPT</option>
           </select>
           <label for="kgBand" class="sr-only">Search a band or artist</label>
-          <input id="kgBand" class="form-control search-box" placeholder="Search a band or artist…" aria-label="Search a band or artist" onkeypress="handleSearchKeypress(event)" oninput="updateModeButtonText()">
+          <div class="artist-search-wrap">
+            <input id="kgBand" class="form-control search-box" placeholder="Search a band or artist…" aria-label="Search a band or artist" autocomplete="off" aria-autocomplete="list" aria-controls="artistSuggestList" onkeypress="handleSearchKeypress(event)" oninput="updateModeButtonText()">
+            <ul id="artistSuggestList" class="artist-suggest-list" hidden role="listbox" aria-label="Artist suggestions"></ul>
+          </div>
           <button type="button" class="btn mic-toggle-btn" id="voicePanelToggle" aria-expanded="false" aria-controls="voiceCommandsHelp" title="Voice commands" onclick="toggleVoicePanel()">
             <i class="bi-mic" aria-hidden="true"></i>
             <span class="sr-only">Toggle voice commands</span>
@@ -812,13 +864,18 @@
 
   <!-- Search & Results Section (Combined) -->
   <div class="card mb-4" style="background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-radius: 16px; box-shadow: 0 6px 18px rgba(0,0,0,.08);">
-    <div class="card-header music-panel-header">
+    <div class="card-header music-panel-header d-flex align-items-center justify-content-between flex-wrap">
       <h5 class="mb-0">
         <i class="bi-search"></i> Search & Results
-        <button class="btn btn-sm btn-outline-light float-right" type="button" data-toggle="collapse" data-target="#searchAndResults" aria-expanded="true">
+      </h5>
+      <div class="d-flex align-items-center" style="gap: 0.5rem;">
+        <button type="button" class="btn btn-sm btn-primary" id="enrichBtn" disabled title="Load Wikipedia details and album timeline" onclick="enrichCurrentArtist()">
+          <i class="bi-stars"></i> Enrich
+        </button>
+        <button class="btn btn-sm btn-outline-light" type="button" data-toggle="collapse" data-target="#searchAndResults" aria-expanded="true">
           <i class="bi-chevron-down"></i>
         </button>
-      </h5>
+      </div>
     </div>
     <div class="collapse show" id="searchAndResults">
       <div class="card-body">
@@ -1088,6 +1145,7 @@ document.addEventListener('DOMContentLoaded', function() {
   initSocketIO();
   loadGoogleMapsAPI();
   initializeKGWidget();
+  initArtistSuggestBackup();
   updateModeButtonText(); // Initialize button text
   
   // Preload artist from localStorage if available
@@ -1538,9 +1596,11 @@ function initializeKGWidget() {
             } else {
               console.warn('❌ KG widget elements not found or KGSearchWidget not available');
               console.warn('Element:', el, 'KGSearchWidget:', typeof KGSearchWidget);
+              initArtistSuggestBackup();
             }
           } else {
             console.warn('❌ Google API key not available for KG widget');
+            initArtistSuggestBackup();
           }
         } catch (error) {
           console.error('❌ Error in KG widget initialization:', error);
@@ -1551,6 +1611,98 @@ function initializeKGWidget() {
       });
   } catch (error) {
     console.error('❌ Error in initializeKGWidget:', error);
+  }
+}
+
+function kgDropdownHasResults() {
+  const items = document.querySelectorAll('.kge-dropdown .kge-dropdown-item, .kge-dropdown [role="option"], .kge-dropdown li');
+  return Array.from(items).some((el) => (el.textContent || '').trim().length > 0 && el.offsetParent !== null);
+}
+
+function hideArtistSuggest() {
+  const list = document.getElementById('artistSuggestList');
+  if (list) {
+    list.innerHTML = '';
+    list.hidden = true;
+  }
+}
+
+function selectArtistSuggestion(name) {
+  hideArtistSuggest();
+  const input = document.getElementById('kgBand');
+  if (input) input.value = name;
+  localStorage.setItem('selectedArtist', name);
+  searchArtistByName(name);
+}
+
+function renderArtistSuggest(suggestions, source) {
+  const list = document.getElementById('artistSuggestList');
+  if (!list) return;
+  if (!suggestions.length) {
+    hideArtistSuggest();
+    return;
+  }
+  list.innerHTML = suggestions.map((row) => {
+    const meta = [row.type, row.disambiguation, row.source === 'catalog' ? 'backup' : '']
+      .filter(Boolean)
+      .join(' · ');
+    return `<li role="option" data-name="${String(row.name).replace(/"/g, '&quot;')}">
+      <span class="suggest-name">${row.name}</span>
+      ${meta ? `<span class="suggest-meta">${meta}</span>` : ''}
+    </li>`;
+  }).join('');
+  list.hidden = false;
+  list.querySelectorAll('li').forEach((item) => {
+    item.addEventListener('mousedown', (event) => {
+      event.preventDefault();
+      selectArtistSuggestion(item.getAttribute('data-name'));
+    });
+  });
+  if (source === 'catalog' && typeof showToast === 'function') {
+    showToast('Showing backup artist matches.', { type: 'info', title: 'Backup search' });
+  }
+}
+
+let artistSuggestTimer = null;
+let artistSuggestBound = false;
+
+function initArtistSuggestBackup() {
+  const input = document.getElementById('kgBand');
+  if (!input || artistSuggestBound) return;
+  artistSuggestBound = true;
+
+  input.addEventListener('input', () => {
+    const q = input.value.trim();
+    clearTimeout(artistSuggestTimer);
+    if (q.length < 2 || searchMode === 'chat') {
+      hideArtistSuggest();
+      return;
+    }
+    artistSuggestTimer = setTimeout(() => fetchArtistSuggestions(q), 400);
+  });
+
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') hideArtistSuggest();
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.artist-search-wrap')) hideArtistSuggest();
+  });
+}
+
+async function fetchArtistSuggestions(q) {
+  if (kgDropdownHasResults()) {
+    hideArtistSuggest();
+    return;
+  }
+  try {
+    const response = await fetch(`/api/music-research/suggest?q=${encodeURIComponent(q)}`);
+    const data = await response.json();
+    if (kgDropdownHasResults()) return;
+    renderArtistSuggest(data.suggestions || [], data.source);
+  } catch (error) {
+    console.warn('Artist suggest backup failed:', error);
+    hideArtistSuggest();
   }
 }
 
@@ -2369,10 +2521,10 @@ function searchArtistByName(artistName) {
     return;
   }
   
-  // Show loading states
+  // Show loading: artist, members, map, timeline on initial pull (like before)
   showLoading('artistLoading', true);
-  showLoading('membersLoading', true);
   showLoading('youtubeLoading', true);
+  showLoading('membersLoading', true);
   showLoading('timelineLoading', true);
   showLoading('mapLoading', true);
   
@@ -2383,9 +2535,11 @@ function searchArtistByName(artistName) {
   document.getElementById('timeline').innerHTML = '';
 
   currentTimelineArtist = artistName;
+  currentResearchArtist = artistName;
   timelineMapEvents = [];
   timelineAlbumEvents = [];
   timelineArtistEvents = [];
+  setEnrichButtonEnabled(false);
   
   // Auto-expand YouTube section when videos are loaded
   setTimeout(() => {
@@ -2415,7 +2569,6 @@ function searchArtistByName(artistName) {
   
   window.toggleMap = function() {
     $('#searchAndResults').collapse('show');
-    // Scroll to map section
     setTimeout(() => {
       const mapContainer = document.getElementById('mapContainer');
       if (mapContainer) {
@@ -2426,7 +2579,6 @@ function searchArtistByName(artistName) {
   
   window.toggleTimeline = function() {
     $('#searchAndResults').collapse('show');
-    // Scroll to timeline section
     setTimeout(() => {
       const timelineContainer = document.getElementById('timelineContainer');
       if (timelineContainer) {
@@ -2435,17 +2587,153 @@ function searchArtistByName(artistName) {
     }, 300);
   };
   
-  // Search for artist information based on selected mode
-  if (searchMode === 'kg') {
-    searchKnowledgeGraph(artistName);
-  } else {
-    searchWikipedia(artistName);
-  }
-  searchBandMembers(artistName);
+  // Initial pull: artist + members + map (like before). Enrich adds wiki/albums.
+  searchQuick(artistName);
   searchYouTube(artistName);
-  searchMapData(artistName);
-  searchDiscographyAlbums(artistName);
 }
+
+let currentResearchArtist = '';
+let enrichInFlight = false;
+
+function setEnrichButtonEnabled(enabled) {
+  const btn = document.getElementById('enrichBtn');
+  if (!btn) return;
+  btn.disabled = !enabled || enrichInFlight;
+}
+
+function showEnrichPlaceholders() {
+  // Albums / wiki stay on Enrich; members + map load on initial search.
+  const timeline = document.getElementById('timeline');
+  if (timeline && !timeline.innerHTML.trim()) {
+    timeline.innerHTML =
+      '<div class="alert alert-info mb-0">Click <strong>Enrich</strong> for Wikipedia details and album releases on the timeline.</div>';
+  }
+}
+
+function searchQuick(artistName) {
+  fetch('/api/music-research/quick', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ artist: artistName })
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      showLoading('artistLoading', false);
+      showLoading('membersLoading', false);
+      showLoading('timelineLoading', false);
+      showLoading('mapLoading', false);
+      if (data.degraded && typeof showToast === 'function') {
+        showToast('Showing a quick card; live lookup was briefly unavailable.', {
+          type: 'info',
+          title: 'Partial data'
+        });
+      }
+      displayArtistInfo(data);
+      if (data.bandMembers && data.bandMembers.length) {
+        displayBandMembers({
+          name: data.name,
+          bandMembers: data.bandMembers
+        });
+      } else {
+        document.getElementById('membersList').innerHTML =
+          '<div class="col-12"><div class="alert alert-info mb-0">No band members found for this artist.</div></div>';
+      }
+      timelineMapEvents = data.timelineEvents || [];
+      timelineArtistEvents = [];
+      refreshMergedTimeline();
+      if (data.mapData && data.mapData.length) {
+        initMapWithData(data.mapData, data.name || artistName);
+      }
+      setEnrichButtonEnabled(true);
+    })
+    .catch((error) => {
+      showLoading('artistLoading', false);
+      showLoading('membersLoading', false);
+      showLoading('timelineLoading', false);
+      showLoading('mapLoading', false);
+      document.getElementById('artistContent').innerHTML =
+        '<div class="alert alert-warning">Error loading artist information. Please try again.</div>';
+      document.getElementById('membersList').innerHTML =
+        '<div class="col-12"><div class="alert alert-warning">Error loading band members. Please try again.</div></div>';
+      console.error('Quick search error:', error);
+      setEnrichButtonEnabled(!!artistName);
+    });
+}
+
+function enrichCurrentArtist() {
+  const artistName =
+    currentResearchArtist ||
+    document.getElementById('kgBand')?.value?.trim() ||
+    '';
+  if (!artistName || enrichInFlight) return;
+
+  enrichInFlight = true;
+  setEnrichButtonEnabled(false);
+  const btn = document.getElementById('enrichBtn');
+  if (btn) {
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Enriching…';
+  }
+
+  showLoading('membersLoading', true);
+  showLoading('timelineLoading', true);
+  showLoading('mapLoading', true);
+
+  fetch('/api/music-research/enrich', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ artist: artistName })
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      showLoading('membersLoading', false);
+      showLoading('timelineLoading', false);
+      showLoading('mapLoading', false);
+
+      if (data.degraded && typeof showToast === 'function') {
+        showToast('Some enrichment sources were unavailable; showing what we have.', {
+          type: 'info',
+          title: 'Partial enrich'
+        });
+      }
+      if (data.wikipediaRateLimited) showWikimediaRateLimitNotice();
+
+      displayArtistInfo(data);
+      displayBandMembers({
+        name: data.name,
+        bandMembers: data.bandMembers || []
+      });
+
+      timelineAlbumEvents = data.albums || [];
+      timelineMapEvents = data.timelineEvents || [];
+      timelineArtistEvents = [];
+      refreshMergedTimeline();
+
+      if (data.mapData && data.mapData.length) {
+        initMapWithData(data.mapData, data.name || artistName);
+      }
+
+      if (typeof showToast === 'function') {
+        showToast('Wikipedia and albums loaded.', { type: 'success', title: 'Enriched' });
+      }
+    })
+    .catch((error) => {
+      showLoading('membersLoading', false);
+      showLoading('timelineLoading', false);
+      showLoading('mapLoading', false);
+      document.getElementById('membersList').innerHTML =
+        '<div class="col-12"><div class="alert alert-warning">Enrichment failed. Try again in a moment.</div></div>';
+      console.error('Enrich error:', error);
+    })
+    .finally(() => {
+      enrichInFlight = false;
+      if (btn) {
+        btn.innerHTML = '<i class="bi-stars"></i> Enrich';
+      }
+      setEnrichButtonEnabled(true);
+    });
+}
+
+window.enrichCurrentArtist = enrichCurrentArtist;
 
 function showLoading(elementId, show) {
   const element = document.getElementById(elementId);
@@ -2586,8 +2874,8 @@ function searchBandMembers(artistName) {
   })
   .catch(error => {
     showLoading('membersLoading', false);
-    document.getElementById('membersList').innerHTML = 
-      '<div class="alert alert-warning">Error loading band members. Please try again.</div>';
+    document.getElementById('membersList').innerHTML =
+      '<div class="col-12"><div class="alert alert-info">Band members are briefly unavailable. Search again in a moment.</div></div>';
     console.error('Error loading band members:', error);
   });
 }

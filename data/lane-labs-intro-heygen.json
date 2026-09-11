@@ -1,0 +1,85 @@
+{
+  "id": "lane-labs-intro-trio",
+  "title": "Lane AI Labs — Zigzag, Summer, Dave",
+  "format": "multi-avatar-chat",
+  "aspectRatio": "16:9",
+  "resolution": "1080p",
+  "targetSeconds": 60,
+  "cta": "Start at the home sky. Pick a planet. Get lost on purpose.",
+  "chatLocalRel": "/shared/assets/video/lane-labs-intro-chat.mp4",
+  "portraits": [
+    {
+      "id": "zigzag",
+      "name": "Zigzag",
+      "src": "public/planetarium/assets/alienigena-portrait.webp",
+      "stillFrom": "public/planetarium/assets/video/alienigena-zigzag-intro.mp4"
+    },
+    {
+      "id": "summer",
+      "name": "Summer",
+      "src": "public/mountain-high/assets/bud-master-portrait.webp",
+      "stillFrom": "public/mountain-high/assets/video/hippie-botanist-intro.mp4"
+    },
+    {
+      "id": "dave",
+      "name": "Dave",
+      "src": "public/family/assets/DavidELane.png",
+      "stillFrom": "public/family/assets/video/lane-labs-intro-dave.mp4"
+    }
+  ],
+  "videoAgentPrompt": "Make a 60-second landscape (16:9) website intro for Lane AI Labs. Funny, cool, conversational.\n\nTHIS IS A MULTI-PERSON CONVERSATION. Three people are on camera together and talk TO EACH OTHER. Not three sequential solo talking-head clips. Not a round-robin of monologues. They interrupt, glance at each other, and finish each other's jokes — like a group chat that escaped onto a couch.\n\nThree characters — use the attached photos as their faces. Do not invent new faces.\n1) First image: ZIGZAG — green alien, dry, slightly processed, planetarium DJ energy.\n2) Second image: SUMMER — hippie botanist, sunflower headband, tea-tint sunglasses, warm Southern California, unhurried, plants-and-peace.\n3) Third image: DAVE — the human who built the site; warm, dry, a little proud, never salesy. Use the man's FACE from the photo; ignore poster text and props.\n\nFRAMING NOTE: Summer's photo is nearly square and this video is landscape 16:9. Frame her from the chest up, centered, with generous headroom ABOVE her sunflower headband. Never crop the top of her head, her hair, or the sunflower. Extend the plant-lab background horizontally to fill 16:9. Do not add black bars.\n\nFRAMING NOTE: Keep all three heads fully in frame whenever they share the shot. Medium shots, not extreme close-ups. Headroom on everyone.\n\nVisual grammar: start on a three-shot (split or group). Cut to two-shots when they argue. Occasional MCU but always return to the group. They look at each other, not only the lens.\n\nThis script is a concept and theme to convey — not a verbatim transcript. You have full creative freedom to expand, elaborate, add examples, and fill the duration naturally. Do not pad with silence or pauses.\n\nCONVERSATION\nZigzag (to camera, then to Summer): Signal acquired. Cute sky. Is this Earth?\nSummer (cutting him off): That's the planetarium, spaceman. Don't eat the plants.\nDave (between them, grinning): That's Zigzag. That's Summer. I'm Dave. I built Lane AI Labs so they'd stop arguing in the group chat.\nZigzag (to Dave): Astronomy's the easy part. Tap a star, Carl talks, I look cool. You keep dragging me back to Earth.\nSummer (to Zigzag): He means stars. I mean plants — trees, fish, a valley you can wander. Garden's twenty-one and over, so breathe.\nDave: Family wall. Dead shows. Home page — pick a planet.\nZigzag (to Dave): He always says that.\nSummer (peace sign, to camera): Get lost on purpose.\nDave: Lane AI Labs.\n\nCRITICAL ON-SCREEN TEXT\nLane AI Labs\nAstronomy · Genealogy · Music · Plants\nStart at the home sky\n\nVISUALS\nCut on the jokes. Keep motion subtle. No stock office. No mortgage, no finance.\n\nSTYLE — PLAY MODE: Electric blue #3B8BFF, hot pink #FF2DAA, lime green #8CFF4C accents on dark night-sky black #0A1018. Bouncy but not childish. Oversized titles for the four words. Pop cuts on the punchlines. End on a clean title card: Lane AI Labs.",
+  "stitchOrder": [
+    "zigzag",
+    "summer",
+    "dave"
+  ],
+  "clips": [
+    {
+      "id": "zigzag",
+      "name": "Zigzag",
+      "role": "Astronomy",
+      "avatarId": "880b0855c4eb4151969095004e443da0",
+      "voiceId": "6HafnaqPci0RvF2XGKDm",
+      "motionPrompt": "dry alien presenter, slight head tilt, three-finger greeting, speaking to camera in a dark lab",
+      "expressiveness": "low",
+      "localRel": "/planetarium/assets/video/lane-labs-intro-zigzag.mp4",
+      "script": "Signal acquired. I flew in for the sky. You've got a planetarium — tap a star, Carl talks, I just look cool. Astronomy's the easy part. The human named Dave keeps dragging me back to Earth. Start at the home sky.",
+      "heygenVideoId": "b6501c2a1456959fc9210260745a6a30",
+      "heygenVideoUrl": "/planetarium/assets/video/lane-labs-intro-zigzag.mp4",
+      "heygenVideoLocal": "/planetarium/assets/video/lane-labs-intro-zigzag.mp4"
+    },
+    {
+      "id": "summer",
+      "name": "Summer",
+      "role": "Plants",
+      "avatarId": "2c123117fd1c42d1ac18c359d2d44f60",
+      "voiceId": "42d00d4aac5441279d8536cd6b52c53c",
+      "motionPrompt": "warm unhurried botanist, small smile, speaking to camera among plants",
+      "expressiveness": "low",
+      "localRel": "/mountain-high/assets/video/lane-labs-intro-summer.mp4",
+      "script": "Peace. He means stars. I mean plants — trees, fish, a whole valley you can wander. The garden page is twenty-one and over, so breathe. Don't mix the sky with the soil unless you're Dave.",
+      "heygenVideoId": "b9e91e866759d54b0ea9e4cd45f62f7d",
+      "heygenVideoUrl": "/mountain-high/assets/video/lane-labs-intro-summer.mp4",
+      "heygenVideoLocal": "/mountain-high/assets/video/lane-labs-intro-summer.mp4"
+    },
+    {
+      "id": "dave",
+      "name": "Dave",
+      "role": "Genealogy + music",
+      "avatarId": "af9577b8a46846c9abafc77ce0043b4b",
+      "altAvatarId": "619a5cab58db423bbbecd9b03379c466",
+      "voiceId": "828b59f834fd4c7188da322b6d9b6c75",
+      "motionPrompt": "warm dry nod, proud not salesy, speaking directly to camera",
+      "expressiveness": "low",
+      "localRel": "/family/assets/video/lane-labs-intro-dave.mp4",
+      "script": "I'm Dave. I built Lane AI Labs so my alien, my botanist, and I would stop arguing in the group chat. Stars. Lane family. Dead shows. Plants. Home page — pick a planet. Get lost on purpose.",
+      "heygenVideoId": "e9b7ea2adb6efa3c4047f07f0908fe00",
+      "heygenVideoUrl": "/family/assets/video/lane-labs-intro-dave.mp4",
+      "heygenVideoLocal": "/family/assets/video/lane-labs-intro-dave.mp4",
+      "renderedAvatarId": "619a5cab58db423bbbecd9b03379c466"
+    }
+  ],
+  "generatedAt": "2026-09-09T03:00:10.021Z",
+  "chatSessionId": "3644e7fc59c248aa9779c0fa45f353c4",
+  "chatSessionUrl": "https://app.heygen.com/video-agent/3644e7fc59c248aa9779c0fa45f353c4"
+}

@@ -13,21 +13,76 @@ import {
 import {
   getMusicBrainzArtistByName,
   applyMusicBrainzFallback,
-  enrichMemberBirthDatesFromMusicBrainz
+  enrichMemberBirthDatesFromMusicBrainz,
+  searchMusicBrainzArtistSuggestions
 } from '../services/music-research-musicbrainz.service.js';
-
-const WIKIMEDIA_RATE_LIMIT_MESSAGE =
-  'Wikipedia is temporarily rate-limiting requests. Please wait a minute and try again.';
+import {
+  findCatalogArtist,
+  suggestCatalogArtists,
+  catalogToWikipediaResult,
+  catalogToKgResult,
+  catalogToAlbumResult,
+  catalogToMusicBrainzResult,
+  catalogToArtistInfo,
+  catalogMapSeed,
+  applyCatalogFallback,
+  mergeCatalogMemberDetails,
+  pickWikipediaArtistHit
+} from '../services/music-research-catalog.service.js';
 
 function isWikimediaRateLimitError(error) {
   return error instanceof WikimediaRateLimitError || error?.name === 'WikimediaRateLimitError';
 }
 
-function respondWikimediaRateLimit(res) {
-  return res.status(503).json({
-    error: WIKIMEDIA_RATE_LIMIT_MESSAGE,
-    rateLimited: true
-  });
+function degradedArtistPayload(artist, extra = {}) {
+  return {
+    name: artist,
+    description: `${artist} — live lookup is briefly unavailable. Search again in a moment.`,
+    genre: 'Music',
+    birthDate: 'Unknown',
+    birthPlace: 'Unknown',
+    bandMembers: [],
+    url: '',
+    image: '',
+    degraded: true,
+    ...extra
+  };
+}
+
+async function artistBackupPayload(artist, { wikipediaRateLimited = false } = {}) {
+  const mb = await getMusicBrainzArtistByName(artist);
+  const catalog = findCatalogArtist(artist);
+  if (mb) {
+    let bandMembers = [];
+    try {
+      bandMembers = await getMusicBrainzMembers(artist);
+      bandMembers = await enrichMemberBirthDatesFromMusicBrainz(bandMembers);
+    } catch (mbErr) {
+      console.error('MusicBrainz members fallback failed:', mbErr.message);
+    }
+    const payload = applyCatalogFallback(
+      {
+        name: mb.name,
+        description: `${mb.name} is a music artist${mb.birthPlace && mb.birthPlace !== 'Unknown' ? ` from ${mb.birthPlace}` : ''} (backup source: MusicBrainz).`,
+        genre: 'Various',
+        birthDate: mb.birthDate,
+        birthPlace: mb.birthPlace,
+        bandMembers: bandMembers.length ? bandMembers : [],
+        url: `https://musicbrainz.org/artist/${mb.mbid}`,
+        image: '',
+        source: 'musicbrainz'
+      },
+      catalog
+    );
+    if (wikipediaRateLimited) payload.wikipediaRateLimited = true;
+    return payload;
+  }
+  if (catalog) {
+    const payload = catalogToWikipediaResult(catalog);
+    if (wikipediaRateLimited) payload.wikipediaRateLimited = true;
+    return payload;
+  }
+  return degradedArtistPayload(artist, wikipediaRateLimited ? { wikipediaRateLimited: true } : {});
 }
 
 /** Batch english labels for Q-ids (up to 50 per request — API limit). */
@@ -66,9 +121,10 @@ export async function searchKnowledgeGraph(req, res) {
 
     if (data.artists && data.artists.length > 0) {
       const artistData = data.artists[0];
+      const catalog = findCatalogArtist(artist);
       const description = `${artistData.name || artist} is a ${artistData.type || 'music artist'}${artistData.area ? ` from ${artistData.area.name}` : ''}${artistData.begin_area ? ` (born in ${artistData.begin_area.name})` : ''}.`;
       
-      const result = {
+      const result = applyCatalogFallback({
         success: true,
         name: artistData.name || artist,
         description,
@@ -80,10 +136,14 @@ export async function searchKnowledgeGraph(req, res) {
         url: `https://musicbrainz.org/artist/${artistData.id}`,
         image: '',
         imageUrl: ''
-      };
+      }, catalog);
 
       res.json(result);
     } else {
+      const catalog = findCatalogArtist(artist);
+      if (catalog) {
+        return res.json(catalogToKgResult(catalog, artist));
+      }
       // Fallback to basic info if MusicBrainz doesn't have data
       res.json({
         success: true,
@@ -96,11 +156,16 @@ export async function searchKnowledgeGraph(req, res) {
         bandMembers: [],
         url: `https://en.wikipedia.org/wiki/${encodeURIComponent(artist.replace(/\s+/g, '_'))}`,
         image: '',
-        imageUrl: ''
+        imageUrl: '',
+        degraded: true
       });
     }
   } catch (error) {
     console.error('MusicBrainz search error:', error);
+    const catalog = findCatalogArtist(artist);
+    if (catalog) {
+      return res.json(catalogToKgResult(catalog, artist));
+    }
     res.json({
       success: true,
       name: artist,
@@ -112,7 +177,8 @@ export async function searchKnowledgeGraph(req, res) {
       bandMembers: [],
       url: '',
       image: '',
-      imageUrl: ''
+      imageUrl: '',
+      degraded: true
     });
   }
 }
@@ -127,23 +193,18 @@ export async function searchWikipedia(req, res) {
 
   try {
     // First search for the page with music context to avoid disambiguation
-    // Add "band" or "musician" to prioritize music results over non-music topics
     const searchQuery = encodeURIComponent(`${artist} band music`);
-    const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch=${searchQuery}&srlimit=1`;
+    const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch=${searchQuery}&srlimit=5`;
     
     const searchResponse = await wikimediaApiGet(searchUrl);
     const searchData = searchResponse.data;
+    const pageHit = pickWikipediaArtistHit(searchData.query?.search, artist);
     
-    if (!searchData.query?.search?.[0]) {
-      res.json({ 
-        name: artist,
-        description: 'No Wikipedia page found',
-        error: 'No results found'
-      });
-      return;
+    if (!pageHit) {
+      return res.json(await artistBackupPayload(artist));
     }
 
-    const pageTitle = searchData.query.search[0].title;
+    const pageTitle = pageHit.title;
 
     // Get page summary for description first
     const summaryUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`;
@@ -199,54 +260,38 @@ export async function searchWikipedia(req, res) {
     }
 
     const mbArtist = await getMusicBrainzArtistByName(artist);
-    const mergedDates = applyMusicBrainzFallback(
-      {
-        birthDate: wikidataInfo.birthDate || 'Unknown',
-        birthPlace: wikidataInfo.birthPlace || 'Unknown',
-        name: pageTitle
-      },
-      mbArtist
+    const catalog = findCatalogArtist(artist);
+    const mergedDates = applyCatalogFallback(
+      applyMusicBrainzFallback(
+        {
+          birthDate: wikidataInfo.birthDate || 'Unknown',
+          birthPlace: wikidataInfo.birthPlace || 'Unknown',
+          name: pageTitle
+        },
+        mbArtist
+      ),
+      catalog
     );
 
     const result = {
       name: pageTitle,
-      description: summaryData.extract || 'No description available',
-      genre: wikidataInfo.genre || 'Various',
+      description: summaryData.extract || catalog?.description || 'No description available',
+      genre: wikidataInfo.genre || catalog?.genre || 'Various',
       birthDate: mergedDates.birthDate || 'Unknown',
       birthPlace: mergedDates.birthPlace || 'Unknown',
-      bandMembers: wikidataInfo.bandMembers || [],
+      bandMembers: (wikidataInfo.bandMembers && wikidataInfo.bandMembers.length)
+        ? wikidataInfo.bandMembers
+        : (catalog?.bandMembers || []),
       url: summaryData.content_urls?.desktop?.page || `https://en.wikipedia.org/wiki/${encodeURIComponent(pageTitle)}`,
       image: summaryData.thumbnail?.source || ''
     };
 
     res.json(result);
   } catch (error) {
-    if (isWikimediaRateLimitError(error)) {
-      const mb = await getMusicBrainzArtistByName(artist);
-      if (mb) {
-        let bandMembers = [];
-        try {
-          bandMembers = await getMusicBrainzMembers(artist);
-          bandMembers = await enrichMemberBirthDatesFromMusicBrainz(bandMembers);
-        } catch (mbErr) {
-          console.error('MusicBrainz members fallback failed:', mbErr.message);
-        }
-        return res.json({
-          name: mb.name,
-          description: `${mb.name} is a music artist (data from MusicBrainz; Wikipedia temporarily unavailable).`,
-          genre: 'Various',
-          birthDate: mb.birthDate,
-          birthPlace: mb.birthPlace,
-          bandMembers,
-          url: `https://musicbrainz.org/artist/${mb.mbid}`,
-          image: '',
-          wikipediaRateLimited: true
-        });
-      }
-      return respondWikimediaRateLimit(res);
-    }
     console.error('Wikipedia search error:', error);
-    res.status(500).json({ error: 'Failed to search Wikipedia' });
+    return res.json(await artistBackupPayload(artist, {
+      wikipediaRateLimited: isWikimediaRateLimitError(error)
+    }));
   }
 }
 
@@ -940,7 +985,11 @@ export async function searchMusicBrainz(req, res) {
     const searchResponse = await mbGet('/artist', { query: artist, limit: 1 });
 
     if (!searchResponse.data.artists || searchResponse.data.artists.length === 0) {
-      return res.json({ error: 'Artist not found in MusicBrainz' });
+      const catalog = findCatalogArtist(artist);
+      if (catalog) {
+        return res.json(catalogToMusicBrainzResult(catalog));
+      }
+      return res.json({ name: artist, bandMembers: [], degraded: true });
     }
 
     const artistData = searchResponse.data.artists[0];
@@ -1005,15 +1054,13 @@ export async function searchMusicBrainz(req, res) {
       }
     }
 
-    // Enrich band members with Wikipedia/Wikidata data to get birth places
-    if (bandMembers.length > 0) {
-      try {
-        const enrichedMembers = await enrichBandMembersWithLocations(bandMembers);
-        bandMembers = enrichedMembers;
-      } catch (error) {
-        console.error('Error enriching band members:', error);
-        // Continue with unenriched members if enrichment fails
-      }
+    // Skip Wikipedia member enrichment here — it fans out per-person and
+    // turns a MusicBrainz lookup into a 60s+ timeout on the live page.
+    const catalog = findCatalogArtist(artist);
+    if (!bandMembers.length && catalog?.bandMembers?.length) {
+      bandMembers = catalogToMusicBrainzResult(catalog).bandMembers;
+    } else {
+      bandMembers = mergeCatalogMemberDetails(bandMembers, catalog);
     }
 
     res.json({
@@ -1027,7 +1074,15 @@ export async function searchMusicBrainz(req, res) {
 
   } catch (error) {
     console.error('MusicBrainz search error:', error);
-    res.status(500).json({ error: 'Failed to search MusicBrainz' });
+    const catalog = findCatalogArtist(req.body?.artist);
+    if (catalog) {
+      return res.json(catalogToMusicBrainzResult(catalog));
+    }
+    res.json({
+      name: req.body?.artist || '',
+      bandMembers: [],
+      degraded: true
+    });
   }
 }
 
@@ -1043,7 +1098,11 @@ export async function searchAlbums(req, res) {
     const searchResponse = await mbGet('/artist', { query: artist, limit: 1 });
 
     if (!searchResponse.data.artists || searchResponse.data.artists.length === 0) {
-      return res.json({ error: 'Artist not found in MusicBrainz' });
+      const catalog = findCatalogArtist(artist);
+      if (catalog) {
+        return res.json(catalogToAlbumResult(catalog));
+      }
+      return res.json({ artist, albums: [], total: 0, degraded: true });
     }
 
     const artistData = searchResponse.data.artists[0];
@@ -1085,7 +1144,11 @@ export async function searchAlbums(req, res) {
 
   } catch (error) {
     console.error('Album search error:', error);
-    res.status(500).json({ error: 'Failed to search albums' });
+    const catalog = findCatalogArtist(req.body?.artist);
+    if (catalog) {
+      return res.json(catalogToAlbumResult(catalog));
+    }
+    res.json({ artist: req.body?.artist || '', albums: [], total: 0, degraded: true });
   }
 }
 
@@ -1191,11 +1254,24 @@ export async function getMapData(req, res) {
     }
 
     const apiKey = getGoogleServerApiKey();
-    if (!apiKey) {
-      return res.status(500).json({ error: 'Google API key not configured' });
-    }
 
-    const { artistInfo, wikipediaRateLimited } = await getArtistInfoWithFallbacks(artist);
+    let artistInfo;
+    let wikipediaRateLimited = false;
+    try {
+      const fallback = await getArtistInfoWithFallbacks(artist);
+      artistInfo = fallback.artistInfo;
+      wikipediaRateLimited = fallback.wikipediaRateLimited;
+    } catch (error) {
+      const catalog = findCatalogArtist(artist);
+      if (catalog) {
+        artistInfo = catalogToArtistInfo(catalog);
+        wikipediaRateLimited = isWikimediaRateLimitError(error);
+      } else if (isWikimediaRateLimitError(error)) {
+        return res.json({ mapData: [], timelineEvents: [], wikipediaRateLimited: true, degraded: true });
+      } else {
+        throw error;
+      }
+    }
     
     let mapData = [];
     let timelineEvents = [];
@@ -1264,24 +1340,52 @@ export async function getMapData(req, res) {
 
     const payload = { mapData, timelineEvents };
     if (wikipediaRateLimited) payload.wikipediaRateLimited = true;
+    if (!mapData.length && !timelineEvents.length) {
+      const catalog = findCatalogArtist(artist);
+      if (catalog) {
+        const seed = catalogMapSeed(catalog);
+        payload.mapData = seed.mapData;
+        payload.timelineEvents = seed.timelineEvents;
+        payload.source = 'catalog';
+      }
+    }
     res.json(payload);
   } catch (error) {
-    if (isWikimediaRateLimitError(error)) {
-      return respondWikimediaRateLimit(res);
-    }
     console.error('Map data error:', error);
-    res.status(500).json({ error: 'Failed to get map data' });
+    const catalog = findCatalogArtist(req.body?.artist);
+    if (catalog) {
+      const seed = catalogMapSeed(catalog);
+      return res.json({ ...seed, source: 'catalog', degraded: true });
+    }
+    res.json({
+      mapData: [],
+      timelineEvents: [],
+      degraded: true,
+      wikipediaRateLimited: isWikimediaRateLimitError(error)
+    });
   }
 }
 
 async function getArtistInfoWithFallbacks(artist) {
   try {
-    const artistInfo = await getArtistInfoFromWikipedia(artist);
+    const artistInfo = applyCatalogFallback(
+      await getArtistInfoFromWikipedia(artist),
+      findCatalogArtist(artist)
+    );
     return { artistInfo, wikipediaRateLimited: false };
   } catch (error) {
     if (!isWikimediaRateLimitError(error)) throw error;
     const mb = await getMusicBrainzArtistByName(artist);
-    if (!mb) throw error;
+    if (!mb) {
+      const catalog = findCatalogArtist(artist);
+      if (catalog) {
+        return {
+          artistInfo: catalogToArtistInfo(catalog),
+          wikipediaRateLimited: true
+        };
+      }
+      throw error;
+    }
     let bandMembers = [];
     try {
       bandMembers = await getMusicBrainzMembers(artist);
@@ -1307,37 +1411,42 @@ async function getArtistInfoWithFallbacks(artist) {
 async function getArtistInfoFromWikipedia(artist) {
   try {
     const searchQuery = encodeURIComponent(artist);
-    const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch=${searchQuery}&srlimit=1`;
+    const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch=${searchQuery}&srlimit=5`;
     
     const searchResponse = await wikimediaApiGet(searchUrl);
     const searchData = searchResponse.data;
     
-    if (!searchData.query?.search?.[0]) {
+    const pageHit = pickWikipediaArtistHit(searchData.query?.search, artist);
+    if (!pageHit) {
       const mb = await getMusicBrainzArtistByName(artist);
       if (mb) {
-        return {
+        return applyCatalogFallback({
           name: mb.name,
           birthPlace: mb.birthPlace,
           birthDate: mb.birthDate,
           bandMembers: [],
           isBand: mb.isBand,
           mbid: mb.mbid
-        };
+        }, findCatalogArtist(artist));
       }
-      return { name: artist, birthPlace: 'Unknown', birthDate: 'Unknown', bandMembers: [] };
+      const catalog = catalogToArtistInfo(findCatalogArtist(artist));
+      return catalog || { name: artist, birthPlace: 'Unknown', birthDate: 'Unknown', bandMembers: [] };
     }
 
-    const pageTitle = searchData.query.search[0].title;
+    const pageTitle = pageHit.title;
     const wikidataInfo = await getWikidataInfo(pageTitle);
     const mb = await getMusicBrainzArtistByName(artist);
-    return applyMusicBrainzFallback(
-      {
-        name: pageTitle,
-        birthPlace: wikidataInfo.birthPlace,
-        birthDate: wikidataInfo.birthDate,
-        bandMembers: wikidataInfo.bandMembers
-      },
-      mb
+    return applyCatalogFallback(
+      applyMusicBrainzFallback(
+        {
+          name: pageTitle,
+          birthPlace: wikidataInfo.birthPlace,
+          birthDate: wikidataInfo.birthDate,
+          bandMembers: wikidataInfo.bandMembers
+        },
+        mb
+      ),
+      findCatalogArtist(artist)
     );
   } catch (error) {
     if (isWikimediaRateLimitError(error)) {
@@ -1346,16 +1455,17 @@ async function getArtistInfoFromWikipedia(artist) {
     console.error('Error getting artist info:', error);
     const mb = await getMusicBrainzArtistByName(artist);
     if (mb) {
-      return {
+      return applyCatalogFallback({
         name: mb.name,
         birthPlace: mb.birthPlace,
         birthDate: mb.birthDate,
         bandMembers: [],
         isBand: mb.isBand,
         mbid: mb.mbid
-      };
+      }, findCatalogArtist(artist));
     }
-    return { name: artist, birthPlace: 'Unknown', birthDate: 'Unknown', bandMembers: [] };
+    return catalogToArtistInfo(findCatalogArtist(artist))
+      || { name: artist, birthPlace: 'Unknown', birthDate: 'Unknown', bandMembers: [] };
   }
 }
 
@@ -1511,6 +1621,535 @@ async function tryGeocode(address) {
     return null;
   } catch (error) {
     return null;
+  }
+}
+
+function extractMembersFromArtistRelations(detailedArtist) {
+  const bandMembers = [];
+  if (!detailedArtist?.relations) return bandMembers;
+  for (const relation of detailedArtist.relations) {
+    const isForwardMember =
+      relation.type === 'member' &&
+      relation.artist &&
+      (!relation.direction || relation.direction === 'forward');
+    const isBackwardMember =
+      relation.type === 'member of band' &&
+      relation.artist &&
+      (relation.direction === 'backward' || !relation.direction);
+    if (!isForwardMember && !isBackwardMember) continue;
+    const member = relation.artist;
+    if (bandMembers.find((m) => m.mbid === member.id)) continue;
+    let instrument = 'Unknown';
+    if (relation.attributes && relation.attributes.length > 0) {
+      instrument = relation.attributes.join(', ');
+    }
+    bandMembers.push({
+      name: member.name,
+      instrument,
+      birthPlace: 'Unknown',
+      birthDate: 'Unknown',
+      deathDate: null,
+      deathPlace: null,
+      associatedActs: [],
+      imageUrl: null,
+      equipment: [],
+      mbid: member.id,
+      type: member.type || 'Person'
+    });
+  }
+  return bandMembers;
+}
+
+function quickPayloadFromCatalog(catalog) {
+  const wiki = catalogToWikipediaResult(catalog);
+  const albums = catalogToAlbumResult(catalog);
+  return {
+    success: true,
+    name: wiki.name,
+    description: wiki.description,
+    genre: wiki.genre,
+    birthDate: wiki.birthDate,
+    birthPlace: wiki.birthPlace,
+    bandMembers: wiki.bandMembers || [],
+    url: wiki.url,
+    image: wiki.image || '',
+    mbid: catalog.mbid || '',
+    isBand: catalog.isBand === true,
+    source: 'catalog',
+    enriched: false,
+    previewAlbums: (albums?.albums || []).slice(0, 3),
+    coordinates: catalog.coordinates || null,
+    mapData: [],
+    timelineEvents: []
+  };
+}
+
+/**
+ * Formation/birth pin + geolocate member birthplaces (capped).
+ * Same map behavior as the original Music Research search.
+ */
+async function buildMemberMapAndTimeline({
+  name,
+  birthDate,
+  birthPlace,
+  isBand,
+  bandMembers,
+  catalog
+}) {
+  const apiKey = getGoogleServerApiKey();
+  const mapData = [];
+  const timelineEvents = [];
+
+  if (birthPlace && birthPlace !== 'Unknown') {
+    let formationPin = null;
+    if (catalog?.coordinates) {
+      formationPin = {
+        name: birthPlace,
+        lat: catalog.coordinates.lat,
+        lng: catalog.coordinates.lng,
+        eventType: isBand ? 'formation' : 'birth'
+      };
+    } else {
+      formationPin = await geocodeLocation(birthPlace, apiKey);
+      if (formationPin) formationPin.eventType = isBand ? 'formation' : 'birth';
+    }
+    if (formationPin) {
+      mapData.push(formationPin);
+      timelineEvents.push({
+        date: birthDate,
+        title: isBand ? `Formed: ${name}` : `Born: ${name}`,
+        description: isBand ? `Formation of ${name}` : `Birth of ${name}`,
+        location: birthPlace,
+        type: isBand ? 'formation' : 'birth',
+        coordinates: { lat: formationPin.lat, lng: formationPin.lng }
+      });
+    }
+  }
+
+  const membersToMap = (bandMembers || [])
+    .filter((m) => m.birthPlace && m.birthPlace !== 'Unknown')
+    .slice(0, 8);
+
+  for (const member of membersToMap) {
+    const geocoded = await geocodeLocation(member.birthPlace, apiKey, birthPlace);
+    if (!geocoded) continue;
+
+    const exists = mapData.some(
+      (loc) =>
+        Math.abs(loc.lat - geocoded.lat) < 0.01 && Math.abs(loc.lng - geocoded.lng) < 0.01
+    );
+    if (!exists) {
+      geocoded.eventType = 'birth';
+      geocoded.memberName = member.name;
+      geocoded.memberInstrument = member.instrument;
+      mapData.push(geocoded);
+    }
+
+    timelineEvents.push({
+      date: member.birthDate || 'Unknown',
+      title: `Band Member: ${member.name}`,
+      description: `${member.name}${member.instrument ? ` (${member.instrument})` : ''}`,
+      location: member.birthPlace,
+      type: 'other',
+      coordinates: { lat: geocoded.lat, lng: geocoded.lng }
+    });
+  }
+
+  if (!timelineEvents.length && (birthDate !== 'Unknown' || birthPlace !== 'Unknown')) {
+    timelineEvents.push({
+      date: birthDate,
+      title: isBand ? `Formed: ${name}` : `Born: ${name}`,
+      description: isBand ? `Formation of ${name}` : `Birth of ${name}`,
+      location: birthPlace,
+      type: isBand ? 'formation' : 'birth'
+    });
+  }
+
+  for (const member of (bandMembers || []).slice(0, 8)) {
+    if (!member.birthDate || member.birthDate === 'Unknown') continue;
+    const already = timelineEvents.some(
+      (ev) => ev.title === `Band Member: ${member.name}` && ev.date === member.birthDate
+    );
+    if (already) continue;
+    timelineEvents.push({
+      date: member.birthDate,
+      title: `Band Member: ${member.name}`,
+      description: `${member.name}${member.instrument ? ` (${member.instrument})` : ''}`,
+      location: member.birthPlace || 'Unknown',
+      type: 'other'
+    });
+  }
+
+  return { mapData, timelineEvents };
+}
+
+/**
+ * Initial search (like before): artist card + members + geolocated birthplaces.
+ * No Wikipedia fan-out, no album browse — those stay on Enrich.
+ * Never 500 — degraded 200 when live lookup fails.
+ */
+export async function quickSearch(req, res) {
+  const { artist } = req.body || {};
+  if (!artist) {
+    return res.status(400).json({ error: 'Artist name is required' });
+  }
+
+  try {
+    const catalog = findCatalogArtist(artist);
+    if (catalog) {
+      const payload = quickPayloadFromCatalog(catalog);
+      try {
+        const mapped = await buildMemberMapAndTimeline({
+          name: payload.name,
+          birthDate: payload.birthDate,
+          birthPlace: payload.birthPlace,
+          isBand: payload.isBand,
+          bandMembers: payload.bandMembers,
+          catalog
+        });
+        payload.mapData = mapped.mapData;
+        payload.timelineEvents = mapped.timelineEvents;
+      } catch (geoErr) {
+        console.error('Quick catalog geocode failed:', geoErr.message);
+        payload.degraded = true;
+      }
+      return res.json(payload);
+    }
+
+    const response = await mbGet('/artist', { query: artist, limit: 1 });
+    const artistData = response.data?.artists?.[0];
+    if (!artistData) {
+      return res.json({
+        success: true,
+        name: artist,
+        description: `${artist} — no MusicBrainz match yet. Try Enrich or another spelling.`,
+        genre: 'Music',
+        birthDate: 'Unknown',
+        birthPlace: 'Unknown',
+        bandMembers: [],
+        url: '',
+        image: '',
+        enriched: false,
+        degraded: true,
+        source: 'none',
+        mapData: [],
+        timelineEvents: []
+      });
+    }
+
+    const mapped = mapMusicBrainzArtistFromSearch(artistData);
+    const description = `${mapped.name} is a ${mapped.type || 'music artist'}${
+      mapped.birthPlace && mapped.birthPlace !== 'Unknown' ? ` from ${mapped.birthPlace}` : ''
+    }.`;
+
+    let bandMembers = [];
+    try {
+      const detailResponse = await mbGet(`/artist/${artistData.id}`, { inc: 'artist-rels' });
+      bandMembers = extractMembersFromArtistRelations(detailResponse.data);
+      bandMembers = mergeCatalogMemberDetails(bandMembers, findCatalogArtist(mapped.name));
+    } catch (memberErr) {
+      console.error('Quick members lookup failed:', memberErr.message);
+    }
+
+    const catalogForGeo = findCatalogArtist(mapped.name) || findCatalogArtist(artist);
+    if (catalogForGeo?.bandMembers?.length && !bandMembers.length) {
+      bandMembers = catalogToMusicBrainzResult(catalogForGeo).bandMembers;
+    }
+
+    let mapData = [];
+    let timelineEvents = [];
+    try {
+      const mappedGeo = await buildMemberMapAndTimeline({
+        name: mapped.name,
+        birthDate: mapped.birthDate,
+        birthPlace: mapped.birthPlace,
+        isBand: mapped.isBand,
+        bandMembers,
+        catalog: catalogForGeo
+      });
+      mapData = mappedGeo.mapData;
+      timelineEvents = mappedGeo.timelineEvents;
+    } catch (geoErr) {
+      console.error('Quick geocode failed:', geoErr.message);
+    }
+
+    return res.json({
+      success: true,
+      name: mapped.name,
+      description,
+      genre: artistData.tags ? artistData.tags.map((t) => t.name).join(', ') : 'Music',
+      birthDate: mapped.birthDate,
+      birthPlace: mapped.birthPlace,
+      bandMembers,
+      url: `https://musicbrainz.org/artist/${mapped.mbid}`,
+      image: '',
+      mbid: mapped.mbid,
+      isBand: mapped.isBand,
+      source: 'musicbrainz',
+      enriched: false,
+      mapData,
+      timelineEvents
+    });
+  } catch (error) {
+    console.error('Quick search error:', error);
+    const catalog = findCatalogArtist(artist);
+    if (catalog) {
+      const payload = quickPayloadFromCatalog(catalog);
+      try {
+        const mapped = await buildMemberMapAndTimeline({
+          name: payload.name,
+          birthDate: payload.birthDate,
+          birthPlace: payload.birthPlace,
+          isBand: payload.isBand,
+          bandMembers: payload.bandMembers,
+          catalog
+        });
+        payload.mapData = mapped.mapData;
+        payload.timelineEvents = mapped.timelineEvents;
+      } catch {
+        /* keep empty map */
+      }
+      return res.json(payload);
+    }
+    return res.json({
+      success: true,
+      name: artist,
+      description: `${artist} — artist lookup is briefly unavailable. Search again in a moment.`,
+      genre: 'Music',
+      birthDate: 'Unknown',
+      birthPlace: 'Unknown',
+      bandMembers: [],
+      url: '',
+      image: '',
+      enriched: false,
+      degraded: true,
+      source: 'none',
+      mapData: [],
+      timelineEvents: []
+    });
+  }
+}
+
+function mapMusicBrainzArtistFromSearch(artistData) {
+  const type = artistData.type || '';
+  const begin = artistData['life-span']?.begin;
+  const year = begin ? String(begin).match(/^(\d{4})/)?.[1] || 'Unknown' : 'Unknown';
+  return {
+    name: artistData.name,
+    mbid: artistData.id,
+    type,
+    isBand: type === 'Group',
+    birthDate: year,
+    birthPlace: artistData['begin-area']?.name || artistData.area?.name || 'Unknown'
+  };
+}
+
+/**
+ * On-demand enrich: Wikipedia summary + MB members + albums + one map pin.
+ * Queued on the server; returns 200 with partial data when sources fail.
+ */
+export async function enrichArtist(req, res) {
+  const { artist } = req.body || {};
+  if (!artist) {
+    return res.status(400).json({ error: 'Artist name is required' });
+  }
+
+  const catalog = findCatalogArtist(artist);
+  let degraded = false;
+  let wikipediaRateLimited = false;
+  let name = artist;
+  let description = '';
+  let genre = 'Various';
+  let birthDate = 'Unknown';
+  let birthPlace = 'Unknown';
+  let url = '';
+  let image = '';
+  let mbid = '';
+  let isBand = false;
+  let bandMembers = [];
+  let albums = [];
+  let mapData = [];
+  let timelineEvents = [];
+
+  // 1) Wikipedia summary (one search + one summary)
+  try {
+    const searchQuery = encodeURIComponent(`${artist} band music`);
+    const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch=${searchQuery}&srlimit=5`;
+    const searchResponse = await wikimediaApiGet(searchUrl);
+    const pageHit = pickWikipediaArtistHit(searchResponse.data?.query?.search, artist);
+    if (pageHit) {
+      name = pageHit.title;
+      const summaryUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageHit.title)}`;
+      const summaryResponse = await wikimediaApiGet(summaryUrl);
+      const summaryData = summaryResponse.data || {};
+      description = summaryData.extract || description;
+      url = summaryData.content_urls?.desktop?.page || url;
+      image = summaryData.thumbnail?.source || image;
+    }
+  } catch (error) {
+    console.error('Enrich Wikipedia failed:', error.message);
+    degraded = true;
+    if (isWikimediaRateLimitError(error)) wikipediaRateLimited = true;
+  }
+
+  // 2) MusicBrainz artist + members (search + detail with artist-rels)
+  try {
+    const searchResponse = await mbGet('/artist', { query: artist, limit: 1 });
+    const artistData = searchResponse.data?.artists?.[0];
+    if (artistData) {
+      const mapped = mapMusicBrainzArtistFromSearch(artistData);
+      name = mapped.name || name;
+      mbid = mapped.mbid;
+      isBand = mapped.isBand;
+      if (birthDate === 'Unknown') birthDate = mapped.birthDate;
+      if (birthPlace === 'Unknown') birthPlace = mapped.birthPlace;
+      if (!url) url = `https://musicbrainz.org/artist/${mbid}`;
+      if (!description) {
+        description = `${mapped.name} is a ${mapped.type || 'music artist'}${
+          mapped.birthPlace !== 'Unknown' ? ` from ${mapped.birthPlace}` : ''
+        }.`;
+      }
+
+      const detailResponse = await mbGet(`/artist/${artistData.id}`, { inc: 'artist-rels' });
+      bandMembers = extractMembersFromArtistRelations(detailResponse.data);
+      bandMembers = mergeCatalogMemberDetails(bandMembers, catalog);
+
+      // 3) Albums (one release-group browse)
+      try {
+        const albumsResponse = await mbGet('/release-group', {
+          artist: artistData.id,
+          type: 'album',
+          limit: 20
+        });
+        const releaseGroups = albumsResponse.data?.['release-groups'] || [];
+        albums = releaseGroups.map((album) => ({
+          id: album.id,
+          title: album.title,
+          year: album['first-release-date']
+            ? album['first-release-date'].substring(0, 4)
+            : 'Unknown',
+          releaseDate: album['first-release-date'] || '9999-12-31',
+          type: album['primary-type'] || 'Album',
+          coverArt: `https://coverartarchive.org/release-group/${album.id}/front-250`,
+          coverArtLarge: `https://coverartarchive.org/release-group/${album.id}/front-500`,
+          artist: mapped.name
+        }));
+        albums.sort((a, b) => {
+          if (a.year === 'Unknown' && b.year === 'Unknown') return 0;
+          if (a.year === 'Unknown') return 1;
+          if (b.year === 'Unknown') return -1;
+          return new Date(a.releaseDate) - new Date(b.releaseDate);
+        });
+      } catch (albumErr) {
+        console.error('Enrich albums failed:', albumErr.message);
+        degraded = true;
+      }
+    } else {
+      degraded = true;
+    }
+  } catch (error) {
+    console.error('Enrich MusicBrainz failed:', error.message);
+    degraded = true;
+  }
+
+  // Catalog fills gaps — prefer catalog members when they carry birth places
+  if (catalog) {
+    if (!description) description = catalog.description;
+    if (birthDate === 'Unknown' && catalog.birthDate) birthDate = catalog.birthDate;
+    if (birthPlace === 'Unknown' && catalog.birthPlace) birthPlace = catalog.birthPlace;
+    if (catalog.genre) genre = catalog.genre;
+    if (catalog.bandMembers?.length) {
+      if (!bandMembers.length) {
+        bandMembers = catalogToMusicBrainzResult(catalog).bandMembers;
+      } else {
+        bandMembers = mergeCatalogMemberDetails(bandMembers, catalog);
+      }
+    }
+    if (!albums.length) {
+      albums = catalogToAlbumResult(catalog)?.albums || [];
+    }
+    if (catalog.isBand === true) isBand = true;
+    if (!url && catalog.url) url = catalog.url;
+  }
+
+  // 4) Map + timeline: formation/birth + member birthplaces (same as initial pull)
+  try {
+    const mappedGeo = await buildMemberMapAndTimeline({
+      name,
+      birthDate,
+      birthPlace,
+      isBand,
+      bandMembers,
+      catalog
+    });
+    mapData = mappedGeo.mapData;
+    timelineEvents = mappedGeo.timelineEvents;
+  } catch (geoErr) {
+    console.error('Enrich member geocode failed:', geoErr.message);
+    degraded = true;
+  }
+
+  const payload = {
+    success: true,
+    name,
+    description: description || `${name} — enriched data partially unavailable.`,
+    genre,
+    birthDate,
+    birthPlace,
+    bandMembers,
+    url,
+    image,
+    mbid,
+    isBand,
+    albums,
+    total: albums.length,
+    mapData,
+    timelineEvents,
+    enriched: true,
+    source: mbid ? 'musicbrainz' : catalog ? 'catalog' : 'partial'
+  };
+  if (degraded) payload.degraded = true;
+  if (wikipediaRateLimited) payload.wikipediaRateLimited = true;
+  return res.json(payload);
+}
+
+// Artist autocomplete: MusicBrainz first, local catalog if live search is empty or down.
+export async function suggestArtists(req, res) {
+  const q = String(req.query?.q || req.body?.q || '').trim();
+  if (!q) {
+    return res.json({ suggestions: [], source: 'none' });
+  }
+  try {
+    const mb = await searchMusicBrainzArtistSuggestions(q, 8);
+    const catalog = suggestCatalogArtists(q);
+    const seen = new Set();
+    const suggestions = [];
+    for (const row of [...catalog, ...mb]) {
+      const key = String(row.name || '').toLowerCase();
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      suggestions.push({
+        name: row.name,
+        type: row.type || '',
+        disambiguation: row.disambiguation || '',
+        mbid: row.mbid || '',
+        source: row.source || 'catalog'
+      });
+      if (suggestions.length >= 8) break;
+    }
+    const hasMb = suggestions.some((row) => row.source === 'musicbrainz');
+    const hasCatalog = suggestions.some((row) => row.source === 'catalog');
+    return res.json({
+      suggestions,
+      source: hasMb && hasCatalog ? 'mixed' : hasMb ? 'musicbrainz' : (suggestions.length ? 'catalog' : 'none')
+    });
+  } catch (error) {
+    console.error('Artist suggest error:', error);
+    const catalog = suggestCatalogArtists(q);
+    return res.json({
+      suggestions: catalog,
+      source: catalog.length ? 'catalog' : 'none'
+    });
   }
 }
 

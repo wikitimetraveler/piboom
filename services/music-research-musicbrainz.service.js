@@ -41,6 +41,25 @@ export async function getMusicBrainzArtistByName(artistName) {
   }
 }
 
+export async function searchMusicBrainzArtistSuggestions(query, limit = 8) {
+  const q = String(query || '').trim();
+  if (!q) return [];
+  try {
+    const response = await mbGet('/artist', { query: q, limit });
+    return (response.data?.artists || []).map((artist) => ({
+      name: artist.name,
+      type: artist.type || '',
+      disambiguation: artist.disambiguation || '',
+      mbid: artist.id,
+      score: artist.score,
+      source: 'musicbrainz'
+    }));
+  } catch (error) {
+    console.error('MusicBrainz suggest failed:', error.message);
+    return [];
+  }
+}
+
 /** Fill only missing birthDate / birthPlace / mbid / isBand on artistInfo. */
 export function applyMusicBrainzFallback(artistInfo, mb) {
   if (!mb || !artistInfo) return artistInfo;

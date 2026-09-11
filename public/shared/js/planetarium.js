@@ -968,7 +968,7 @@
         els.facingCaption.textContent = state.domeMode ? 'Bottom' : 'Facing';
       }
       const hint = document.getElementById('planHint');
-      if (hint && hint.querySelector('p')) {
+      if (hint && hint.querySelector('p') && !hint.classList.contains('plan-hint--pick')) {
         if (isFieldApp()) {
           hint.querySelector('p').textContent =
             'Hold the phone like a window. Drag to pan. Pinch to zoom. Face locks to the real horizon.';

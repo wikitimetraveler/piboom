@@ -2,11 +2,15 @@
  * Development work by David Lane
  */
 import { Router } from 'express';
-import { searchKnowledgeGraph, searchWikipedia, searchYouTube, getMapData, getGoogleApiKey, testBirthDateExtraction, searchMusicBrainz, searchAlbums, searchYouTubeForAlbum } from '../controllers/music-research.controller.js';
+import { searchKnowledgeGraph, searchWikipedia, searchYouTube, getMapData, getGoogleApiKey, testBirthDateExtraction, searchMusicBrainz, searchAlbums, searchYouTubeForAlbum, suggestArtists, quickSearch, enrichArtist } from '../controllers/music-research.controller.js';
 
 const router = Router();
 
 // Music research routes
+router.get('/suggest', suggestArtists);
+router.post('/suggest', suggestArtists);
+router.post('/quick', quickSearch);
+router.post('/enrich', enrichArtist);
 router.post('/knowledge-graph', searchKnowledgeGraph);
 router.post('/wikipedia', searchWikipedia);
 router.post('/musicbrainz', searchMusicBrainz);

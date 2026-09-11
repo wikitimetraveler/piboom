@@ -493,6 +493,68 @@
     }
   }
 
+  function isTheaterPage() {
+    return !root.__PLANETARIUM_FIELD && !document.body?.classList.contains('plan-field');
+  }
+
+  function markHintGone(hint) {
+    const el = hint || document.getElementById('planHint');
+    if (el) el.classList.add('is-gone');
+    try {
+      sessionStorage.setItem('planHintSeen', '1');
+      sessionStorage.setItem('planPickCueSeen', '1');
+    } catch (_) {
+      /* private mode */
+    }
+  }
+
+  function showPickCue(hint) {
+    const el = hint || document.getElementById('planHint');
+    if (!el || !isTheaterPage()) return false;
+    try {
+      if (sessionStorage.getItem('planPickCueSeen')) return false;
+    } catch (_) {
+      /* private mode */
+    }
+    const hud = document.getElementById('planPickHud');
+    if (hud && !hud.hidden) return false;
+    el.classList.add('plan-hint--pick');
+    el.classList.remove('is-gone');
+    const p = el.querySelector('p');
+    if (p) p.textContent = 'Tap a bright star or planet — then Ask Carl';
+    try {
+      sessionStorage.setItem('planHintSeen', '1');
+    } catch (_) {
+      /* private mode */
+    }
+    return true;
+  }
+
+  function dismissTheaterHint() {
+    const hint = document.getElementById('planHint');
+    if (!hint) return;
+    if (!hint.classList.contains('plan-hint--pick') && !hint.classList.contains('is-gone')) {
+      if (showPickCue(hint)) {
+        setTimeout(() => dismissTheaterHint(), 10000);
+        return;
+      }
+    }
+    markHintGone(hint);
+  }
+
+  function setNavOpen(open) {
+    document.body.classList.toggle('plan-nav-open', !!open);
+    const btn = document.getElementById('planNavToggle');
+    const scrim = document.getElementById('planNavScrim');
+    if (btn) {
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      btn.setAttribute('title', open ? 'Hide site menu' : 'Show site menu');
+      const icon = btn.querySelector('i');
+      if (icon) icon.className = open ? 'bi bi-x-lg' : 'bi bi-list';
+    }
+    if (scrim) scrim.hidden = !open;
+  }
+
   function bindDeskChrome() {
     const fieldApp =
       !!(root.__PLANETARIUM_FIELD || document.body?.classList.contains('plan-field'));
@@ -536,8 +598,16 @@
       }
     });
 
+    document.getElementById('planNavToggle')?.addEventListener('click', () => {
+      setNavOpen(!document.body.classList.contains('plan-nav-open'));
+    });
+    document.getElementById('planNavScrim')?.addEventListener('click', () => setNavOpen(false));
+
     document.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Escape') setDeskOpen(false);
+      if (ev.key === 'Escape') {
+        setDeskOpen(false);
+        setNavOpen(false);
+      }
       if (ev.key === '/' && !/input|textarea|select/i.test(ev.target.tagName)) {
         ev.preventDefault();
         setDeskTab('discover');
@@ -546,15 +616,35 @@
       }
     });
 
+    const hintAdvance = fieldApp ? dismissHint : dismissTheaterHint;
     try {
-      if (sessionStorage.getItem('planHintSeen')) dismissHint();
+      if (sessionStorage.getItem('planPickCueSeen')) {
+        document.getElementById('planHint')?.classList.add('is-gone');
+      } else if (!fieldApp && sessionStorage.getItem('planHintSeen')) {
+        showPickCue();
+        setTimeout(dismissTheaterHint, 10000);
+      } else if (sessionStorage.getItem('planHintSeen')) {
+        dismissHint();
+      }
     } catch (_) {
       /* private mode */
     }
     ['pointerdown', 'wheel', 'touchstart'].forEach((ev) => {
-      document.getElementById('planSkyGpu')?.addEventListener(ev, dismissHint, { once: true, passive: true });
+      document.getElementById('planSkyGpu')?.addEventListener(ev, hintAdvance, { once: true, passive: true });
     });
-    setTimeout(dismissHint, 7000);
+    setTimeout(() => {
+      const hint = document.getElementById('planHint');
+      if (!hint || hint.classList.contains('is-gone') || hint.classList.contains('plan-hint--pick')) return;
+      hintAdvance();
+    }, 7000);
+
+    const hud = document.getElementById('planPickHud');
+    if (hud && !fieldApp) {
+      const obs = new MutationObserver(() => {
+        if (!hud.hidden) markHintGone();
+      });
+      obs.observe(hud, { attributes: true, attributeFilter: ['hidden'] });
+    }
   }
 
   function initExtras() {

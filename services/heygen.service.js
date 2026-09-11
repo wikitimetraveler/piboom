@@ -273,6 +273,48 @@ export async function getVideoStatus(videoId) {
   return heygenRequest(`/v3/videos/${encodeURIComponent(videoId)}`);
 }
 
+/**
+ * One-shot Video Agent session (multi-avatar / Hyperframes composition).
+ * Docs: https://developers.heygen.com/docs/video-agent.md
+ */
+export async function createVideoAgent({
+  prompt,
+  mode = 'generate',
+  avatarId,
+  voiceId,
+  styleId,
+  orientation = 'landscape',
+  files,
+  callbackUrl,
+  callbackId
+}) {
+  if (!prompt || !String(prompt).trim()) throw new Error('prompt is required');
+  const body = {
+    prompt: String(prompt).trim().slice(0, 10000),
+    mode,
+    orientation
+  };
+  if (avatarId) body.avatar_id = avatarId;
+  if (voiceId) body.voice_id = voiceId;
+  if (styleId) body.style_id = styleId;
+  if (Array.isArray(files) && files.length) body.files = files;
+  if (callbackUrl) body.callback_url = callbackUrl;
+  if (callbackId) body.callback_id = callbackId;
+  return heygenRequest('/v3/video-agents', { method: 'POST', body });
+}
+
+export async function getVideoAgentSession(sessionId) {
+  if (!sessionId) throw new Error('sessionId is required');
+  return heygenRequest(`/v3/video-agents/${encodeURIComponent(sessionId)}`);
+}
+
+/** Videos produced by a Video Agent session (GET session-by-id 404s while thinking). */
+export async function listVideoAgentVideos(sessionId) {
+  if (!sessionId) throw new Error('sessionId is required');
+  const data = await heygenRequest(`/v3/video-agents/${encodeURIComponent(sessionId)}/videos`);
+  return Array.isArray(data) ? data : data?.videos || [];
+}
+
 function streamingAvatarId() {
   return String(process.env.HEYGEN_STREAMING_AVATAR_ID || process.env.HEYGEN_AVATAR_ID || '').trim();
 }

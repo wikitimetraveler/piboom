@@ -63,6 +63,8 @@
     "generate:lane-heygen-line": "node scripts/tools/generate-lane-heygen-line.mjs",
     "generate:lane-family-guide-card": "node scripts/tools/generate-lane-family-guide-card.mjs",
     "generate:lane-family-guide-video": "node scripts/tools/generate-lane-family-guide-video.mjs --short --force --cache-local",
+    "generate:lane-labs-intro": "node scripts/tools/generate-lane-labs-intro-heygen.mjs --force --cache-local",
+    "generate:lane-labs-intro-chat": "node scripts/tools/generate-lane-labs-intro-chat.mjs --force --wait --cache-local",
     "smoke:heygen-lane": "node scripts/tools/generate-lane-heygen-line.mjs --person jonathan-homer-lane --photo --short --smoke --force --direct --cache-local",
     "migrate:lane-json-postgres": "node scripts/migrate-lane-json-to-postgres.mjs",
     "build:us-geo": "node scripts/tools/build-us-geo-assets.mjs",

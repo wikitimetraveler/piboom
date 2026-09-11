@@ -43,12 +43,137 @@ body.plan-page {
   padding: 0.75rem 1rem 5.5rem;
 }
 
+/* Theater: sky fills the leftover viewport. Site nav is stowed until asked. */
+body.plan-page:not(.plan-field) {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-height: 100dvh;
+}
+
+body.plan-page:not(.plan-field) modern-navbar {
+  display: none;
+}
+
+body.plan-page.plan-nav-open:not(.plan-field) modern-navbar {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 90;
+}
+
+body.plan-page.plan-nav-open:not(.plan-field) .plan-nav-toggle {
+  position: fixed;
+  top: 0.45rem;
+  left: 0.65rem;
+  z-index: 91;
+}
+
+.plan-nav-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 89;
+  border: 0;
+  padding: 0;
+  background: rgba(4, 6, 14, 0.52);
+  cursor: pointer;
+}
+
+.plan-nav-scrim[hidden] {
+  display: none;
+}
+
+.plan-nav-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2.15rem;
+  height: 2.15rem;
+  padding: 0;
+  border: 1px solid rgba(200, 210, 230, 0.28);
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(232, 236, 244, 0.88);
+  cursor: pointer;
+}
+
+.plan-nav-toggle:hover,
+.plan-nav-toggle[aria-expanded='true'] {
+  border-color: rgba(255, 210, 120, 0.5);
+  color: #ffe8b0;
+  background: rgba(255, 210, 120, 0.1);
+}
+
+.plan-nav-toggle:focus-visible {
+  outline: 2px solid #ffe8b0;
+  outline-offset: 2px;
+}
+
+.plan-nav-toggle i {
+  font-size: 1.15rem;
+}
+
+.plan-page:not(.plan-field) .plan-wrap {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+  padding: 0.35rem 0.9rem 0.45rem;
+  overflow: hidden;
+}
+
+.plan-page:not(.plan-field) .plan-desk,
+.plan-page:not(.plan-field) .plan-theater {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.plan-page:not(.plan-field) .plan-layout {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .plan-masthead {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 0.75rem 1.25rem;
-  align-items: end;
-  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.1rem;
+  margin-bottom: 0.4rem;
+  flex: 0 0 auto;
+}
+
+.plan-masthead__brand {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.85rem;
+  min-width: 0;
+}
+
+.plan-masthead__links {
+  display: flex;
+  gap: 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.plan-masthead__links a {
+  color: rgba(255, 210, 120, 0.72);
+  text-decoration: none;
+}
+
+.plan-masthead__links a:hover,
+.plan-masthead__links a:focus-visible {
+  color: #ffe8b0;
+  text-decoration: underline;
 }
 
 .plan-kicker {
@@ -62,24 +187,27 @@ body.plan-page {
 
 .plan-masthead h1 {
   font-family: Fraunces, Georgia, serif;
-  font-size: clamp(1.7rem, 3.4vw, 2.35rem);
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
   font-weight: 560;
   letter-spacing: -0.02em;
-  line-height: 1;
+  line-height: 1.05;
   margin: 0;
 }
 
-.plan-masthead__lede {
-  margin: 0;
-  max-width: 36rem;
-  font-size: 0.88rem;
-  line-height: 1.45;
-  color: var(--plan-muted);
+.plan-masthead__mode {
+  margin-left: 0.4rem;
+  font-family: Outfit, system-ui, sans-serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 210, 120, 0.72);
+  vertical-align: 0.18em;
 }
 
 .plan-masthead__meta {
   text-align: right;
-  min-width: 12rem;
+  min-width: 0;
 }
 
 .plan-location,
@@ -99,7 +227,7 @@ body.plan-page {
 
 .plan-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 248px);
   gap: 0.9rem;
   align-items: stretch;
 }
@@ -113,7 +241,7 @@ body.plan-page {
   flex-wrap: wrap;
   gap: 0.55rem 0.75rem;
   align-items: stretch;
-  margin-bottom: 0.7rem;
+  margin: 0;
 }
 
 .plan-cluster {
@@ -205,6 +333,10 @@ body.plan-page {
 }
 
 .plan-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
   background: linear-gradient(135deg, rgba(255, 210, 120, 0.95), rgba(255, 170, 80, 0.9));
   border: 0;
   color: #1a1208;
@@ -222,7 +354,8 @@ body.plan-page {
 .plan-btn:focus-visible,
 .plan-tab:focus-visible,
 .plan-dock__btn:focus-visible,
-.plan-stage__fs:focus-visible {
+.plan-stage__fs:focus-visible,
+.plan-hud__toggle:focus-visible {
   outline: 2px solid #ffe8b0;
   outline-offset: 2px;
 }
@@ -246,7 +379,6 @@ body.plan-page {
 
 .plan-stage {
   position: relative;
-  min-height: clamp(28rem, calc(100dvh - 15.5rem), 46rem);
   background:
     radial-gradient(ellipse 120% 80% at 50% 100%, rgba(20, 30, 55, 0.55) 0%, transparent 55%),
     linear-gradient(180deg, #04060e 0%, #0a1020 45%, #121828 100%);
@@ -254,6 +386,12 @@ body.plan-page {
   border-radius: 1rem;
   overflow: hidden;
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+}
+
+.plan-page:not(.plan-field) .plan-stage {
+  flex: 1 1 auto;
+  min-height: min(32rem, 58dvh);
+  height: 100%;
 }
 
 .plan-stage--dome {
@@ -278,11 +416,140 @@ body.plan-page {
   border: 0;
 }
 
+.plan-hud {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  z-index: 5;
+  max-width: min(38rem, calc(100% - 7.25rem));
+  pointer-events: none;
+}
+
+.plan-hud__rail,
+.plan-hud__sheet,
+.plan-hud__toggle,
+.plan-hud .plan-btn {
+  pointer-events: auto;
+}
+
+.plan-hud__rail {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.32rem;
+  padding: 0.28rem;
+  border-radius: 999px;
+  border: 1px solid rgba(210, 190, 140, 0.28);
+  background: rgba(8, 12, 22, 0.72);
+  backdrop-filter: blur(16px);
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 232, 176, 0.08);
+}
+
+.plan-hud__rail .plan-btn {
+  padding: 0.38rem 0.72rem;
+  min-height: 2.15rem;
+}
+
+.plan-hud__gap {
+  display: inline-block;
+  width: 1px;
+  height: 1.15rem;
+  margin: 0 0.12rem;
+  background: rgba(210, 190, 140, 0.28);
+}
+
+.plan-hud__more {
+  position: static;
+}
+
+.plan-hud__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  min-height: 2.15rem;
+  padding: 0.38rem 0.72rem;
+  border: 1px solid rgba(200, 210, 230, 0.28);
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(232, 236, 244, 0.85);
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.plan-hud__toggle::-webkit-details-marker {
+  display: none;
+}
+
+.plan-hud__toggle::marker {
+  content: '';
+}
+
+.plan-hud__toggle:hover {
+  border-color: rgba(255, 210, 120, 0.5);
+  color: #ffe8b0;
+}
+
+.plan-hud__more[open] .plan-hud__toggle {
+  border-color: rgba(255, 210, 120, 0.55);
+  color: #ffe8b0;
+  background: rgba(255, 210, 120, 0.1);
+}
+
+.plan-hud__sheet {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  left: 0;
+  z-index: 6;
+  width: min(28.5rem, calc(100vw - 1.4rem));
+  max-height: min(70dvh, 30rem);
+  overflow: auto;
+  padding: 0.7rem 0.7rem 0.75rem;
+  border-radius: 0.95rem;
+  border: 1px solid rgba(210, 190, 140, 0.28);
+  background: rgba(8, 12, 22, 0.88);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.42);
+}
+
+.plan-hud__lede {
+  margin: 0 0 0.55rem;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--plan-muted);
+}
+
+.plan-hud__sheet .plan-controls {
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.plan-hud__sheet .plan-cluster {
+  padding: 0.45rem 0.55rem 0.5rem;
+}
+
+.plan-hud__sheet .plan-controls .form-control,
+.plan-hud__sheet .plan-controls select.form-control,
+.plan-hud__sheet .plan-controls input[type='date'].form-control,
+.plan-hud__sheet .plan-controls input[type='time'].form-control {
+  min-width: 0;
+  width: 100%;
+}
+
+.plan-hud__sheet .plan-cluster label {
+  flex: 1 1 7rem;
+}
+
 .plan-stage__fs {
   position: absolute;
   top: 0.65rem;
   right: 0.65rem;
-  z-index: 4;
+  z-index: 5;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -326,6 +593,22 @@ body.plan-page {
 }
 
 .plan-hint.is-gone {
+  opacity: 0;
+}
+
+.plan-hint--pick {
+  border-color: rgba(255, 210, 120, 0.42);
+  color: #ffe8b0;
+  background: rgba(8, 12, 22, 0.78);
+}
+
+.plan-page:not(.plan-field) .plan-hint {
+  top: auto;
+  bottom: 2.65rem;
+  max-width: min(26rem, calc(100% - 1.5rem));
+}
+
+.plan-page:not(.plan-field) .plan-stage:has(#planPickHud:not([hidden])) .plan-hint {
   opacity: 0;
 }
 
@@ -418,8 +701,14 @@ body.plan-page {
 }
 
 .plan-stage--fullscreen .plan-stage__fs {
-  top: 1rem;
-  right: 1rem;
+  top: max(1rem, env(safe-area-inset-top, 0px));
+  right: max(1rem, env(safe-area-inset-right, 0px));
+}
+
+.plan-stage--fullscreen .plan-hud,
+.plan-stage--immersive .plan-hud {
+  top: max(0.7rem, env(safe-area-inset-top, 0px));
+  left: max(0.7rem, env(safe-area-inset-left, 0px));
 }
 
 .plan-stage--fullscreen .plan-hint,
@@ -585,9 +874,13 @@ body.plan-night-vision .plan-cluster,
 body.plan-night-vision .plan-tab,
 body.plan-night-vision .plan-dock,
 body.plan-night-vision .plan-pick,
+body.plan-night-vision .plan-hud__rail,
+body.plan-night-vision .plan-hud__sheet,
+body.plan-night-vision .plan-hud__toggle,
 body.plan-night-vision .form-control,
 body.plan-night-vision .plan-status,
 body.plan-night-vision .plan-masthead,
+body.plan-night-vision .plan-nav-toggle,
 body.plan-night-vision .plan-footer-links a {
   border-color: rgba(255, 80, 60, 0.35) !important;
   color: #ffc8b8 !important;
@@ -868,6 +1161,20 @@ body.plan-night-vision .plan-dome-rim__ring {
   min-height: 0;
 }
 
+.plan-page:not(.plan-field) .plan-sidebar {
+  overflow: hidden;
+}
+
+.plan-page:not(.plan-field) .plan-tabs {
+  flex: 0 0 auto;
+}
+
+.plan-page:not(.plan-field) .plan-tabpane.is-active {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+
 .plan-sidebar__head {
   display: none;
   align-items: center;
@@ -1022,8 +1329,18 @@ body.plan-night-vision .plan-dome-rim__ring {
 }
 
 .plan-footer-links {
-  margin-top: 1rem;
-  font-size: 0.85rem;
+  flex: 0 0 auto;
+  margin: 0.4rem 0 0;
+  font-size: 0.78rem;
+}
+
+.plan-page:not(.plan-field) .plan-wrap > .plan-footer-links {
+  display: none;
+}
+
+.plan-footer-links--desk {
+  display: block;
+  margin-top: 0.7rem;
 }
 
 .plan-footer-links a {
@@ -1037,7 +1354,39 @@ body.plan-night-vision .plan-dome-rim__ring {
 
 .plan-btn--carl {
   width: 100%;
+  margin-top: 0;
+}
+
+.plan-presenter {
+  margin-top: 0.65rem;
+}
+
+.plan-presenter summary {
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(120, 255, 220, 0.72);
+  list-style: none;
+}
+
+.plan-presenter summary::-webkit-details-marker {
+  display: none;
+}
+
+.plan-presenter summary::marker {
+  content: '';
+}
+
+.plan-presenter summary:hover,
+.plan-presenter[open] summary {
+  color: #9dffc4;
+}
+
+.plan-presenter .plan-heygen {
   margin-top: 0.5rem;
+  margin-bottom: 0;
 }
 
 #planAmbienceToggle[aria-pressed='true'] {
@@ -1422,24 +1771,85 @@ body.is-intro-splash #planHeygenClose {
 }
 
 @media (max-width: 991.98px) {
+  .plan-page:not(.plan-field) .plan-wrap {
+    padding: 0.3rem 0.65rem 4.85rem;
+  }
+
   .plan-masthead {
-    grid-template-columns: 1fr;
+    margin-bottom: 0.3rem;
+  }
+
+  .plan-nav-toggle {
+    width: 44px;
+    height: 44px;
   }
 
   .plan-masthead__meta {
-    text-align: left;
+    text-align: right;
   }
 
   .plan-layout {
     grid-template-columns: 1fr;
   }
 
-  .plan-stage {
-    min-height: clamp(22rem, calc(100dvh - 18rem), 34rem);
+  .plan-page:not(.plan-field) .plan-stage {
+    min-height: min(24rem, 52dvh);
   }
 
   .plan-btn__text {
     display: none;
+  }
+
+  .plan-hud {
+    max-width: calc(100% - 2.9rem);
+  }
+
+  .plan-hud__rail {
+    flex-wrap: nowrap;
+    gap: 0.16rem;
+    padding: 0.2rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .plan-hud__rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .plan-hud__rail .plan-btn,
+  .plan-hud__toggle {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.4rem;
+    flex: 0 0 auto;
+  }
+
+  .plan-hud__rail #planNow {
+    padding-inline: 0.55rem;
+  }
+
+  .plan-stage__fs {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.45rem;
+    justify-content: center;
+  }
+
+  .plan-hud__sheet {
+    width: min(22.5rem, calc(100vw - 1.1rem));
+  }
+
+  .plan-page:not(.plan-field) .plan-hint {
+    bottom: 4.25rem;
+  }
+
+  .plan-page:not(.plan-field) .plan-footer-links:not(.plan-footer-links--desk) {
+    display: none;
+  }
+
+  .plan-footer-links--desk {
+    display: block;
+    margin-top: 0.7rem;
   }
 
   .plan-sidebar-backdrop {
