@@ -6,7 +6,7 @@
 (function (root) {
   'use strict';
 
-  const HEARD_KEY = 'lane_labs_intro_heard_v1';
+  const HEARD_KEY = 'lane_labs_intro_heard_v2';
   const DEMO_RE = /[?&](?:demo=heygen|reel=1|intro=1)(?:&|$)/;
   const CHAT = {
     src: '/shared/assets/video/lane-labs-intro-chat.mp4',
@@ -68,19 +68,22 @@
   function closeSplash() {
     const modal = document.getElementById('funIntroModal');
     const closeBtn = document.getElementById('funIntroClose');
-    if (videoEl) {
+    const dying = videoEl;
+    videoEl = null;
+    captionEl = null;
+    if (dying) {
+      dying.removeEventListener('ended', onClipEnded);
+      dying.removeEventListener('error', onVideoError);
       try {
-        videoEl.pause();
-        videoEl.removeAttribute('src');
-        videoEl.load();
+        dying.pause();
+        dying.removeAttribute('src');
+        dying.load();
       } catch (_) {
         /* ignore */
       }
     }
     modal?.remove();
     closeBtn?.remove();
-    videoEl = null;
-    captionEl = null;
   }
 
   function stopIntro() {
@@ -152,8 +155,8 @@
     kickPlayback(videoEl);
   }
 
-  function onClipEnded() {
-    if (!introOn) return;
+  function onClipEnded(ev) {
+    if (!introOn || ev.target !== videoEl) return;
     if (usingChat) {
       stopIntro();
       return;
@@ -165,8 +168,8 @@
     stopIntro();
   }
 
-  function onVideoError() {
-    if (!introOn) return;
+  function onVideoError(ev) {
+    if (!introOn || ev.target !== videoEl) return;
     if (usingChat) {
       showClip(0);
       return;

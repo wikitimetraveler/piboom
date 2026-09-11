@@ -79,7 +79,11 @@
       "renderedAvatarId": "619a5cab58db423bbbecd9b03379c466"
     }
   ],
-  "generatedAt": "2026-09-09T03:00:10.021Z",
+  "generatedAt": "2026-09-11T20:04:28.196Z",
   "chatSessionId": "3644e7fc59c248aa9779c0fa45f353c4",
-  "chatSessionUrl": "https://app.heygen.com/video-agent/3644e7fc59c248aa9779c0fa45f353c4"
+  "chatSessionUrl": "https://app.heygen.com/video-agent/3644e7fc59c248aa9779c0fa45f353c4",
+  "chatHeygenVideoId": "dff98806dea1483797c16c430d3a4a98",
+  "chatHeygenVideoUrl": "/shared/assets/video/lane-labs-intro-chat.mp4",
+  "chatDuration": 74.0261,
+  "chatHeygenVideoLocal": "/shared/assets/video/lane-labs-intro-chat.mp4"
 }

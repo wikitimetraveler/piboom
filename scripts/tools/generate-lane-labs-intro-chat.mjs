@@ -209,11 +209,12 @@ async function main() {
     catalog.chatHeygenVideoId = videoId;
     await writeFile(CATALOG, `${JSON.stringify(catalog, null, 2)}\n`, 'utf8');
     const video = await pollVideoDirect(videoId);
-    catalog.chatHeygenVideoUrl = video.video_url;
+    catalog.chatHeygenVideoUrl = catalog.chatLocalRel || video.video_url;
     catalog.chatDuration = video.duration;
     if (hasFlag('--cache-local') && catalog.chatLocalRel) {
       await downloadMp4(video.video_url, path.join(PUBLIC_DIR, catalog.chatLocalRel.replace(/^\//, '')));
       catalog.chatHeygenVideoLocal = catalog.chatLocalRel;
+      catalog.chatHeygenVideoUrl = catalog.chatLocalRel;
     }
     catalog.generatedAt = new Date().toISOString();
     await writeFile(CATALOG, `${JSON.stringify(catalog, null, 2)}\n`, 'utf8');

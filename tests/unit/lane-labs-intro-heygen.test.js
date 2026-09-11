@@ -16,6 +16,9 @@ describe('Lane AI Labs intro HeyGen trio', () => {
     expect(catalog.stitchOrder).toEqual(['zigzag', 'summer', 'dave']);
     expect(catalog.format).toBe('multi-avatar-chat');
     expect(catalog.chatLocalRel).toBe('/shared/assets/video/lane-labs-intro-chat.mp4');
+    expect(catalog.chatHeygenVideoUrl).toBe('/shared/assets/video/lane-labs-intro-chat.mp4');
+    expect(catalog.chatHeygenVideoLocal).toBe('/shared/assets/video/lane-labs-intro-chat.mp4');
+    expect(catalog.chatSessionId).toBe('3644e7fc59c248aa9779c0fa45f353c4');
     expect(catalog.videoAgentPrompt).toContain('Lane AI Labs');
     expect(catalog.videoAgentPrompt).toContain('PLAY MODE');
     expect(catalog.videoAgentPrompt).toMatch(/MULTI-PERSON CONVERSATION/i);
@@ -42,14 +45,16 @@ describe('Lane AI Labs intro HeyGen trio', () => {
     const html = await readFile(path.join(root, 'public/index.html'), 'utf8');
     const css = await readFile(path.join(root, 'public/shared/css/fun-home.css'), 'utf8');
     expect(src).toContain('/shared/assets/video/lane-labs-intro-chat.mp4');
+    expect(src).toContain('lane_labs_intro_heard_v2');
     expect(src).toContain('showChat()');
     expect(src).toContain('function onVideoError');
+    expect(src).toContain('ev.target !== videoEl');
     expect(src).toContain("closeBtn.textContent = 'Close'");
     expect(src).toContain('pointerdown');
     expect(src).toContain('video.muted = true');
     expect(html).toContain('fun-home-intro.js');
     expect(html).toContain('funIntroReplay');
-    expect(html).toContain('lane_labs_intro_heard_v1');
+    expect(html).toContain('lane_labs_intro_heard_v2');
     expect(css).toContain('object-fit: contain');
     expect(css).toContain('#funIntroClose');
   });
