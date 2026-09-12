@@ -74,8 +74,7 @@ export function createStationScene(container, options = {}) {
   fill.position.set(-3, 1, -2);
   scene.add(fill);
 
-  const earth = new THREE.Mesh(
-    new THREE.SphereGeometry(8.5, 48, 32),
+  const earthMat = trackMat(
     new THREE.MeshStandardMaterial({
       color: 0x163a78,
       emissive: 0x0a1e40,
@@ -84,6 +83,7 @@ export function createStationScene(container, options = {}) {
       roughness: 0.85,
     })
   );
+  const earth = new THREE.Mesh(new THREE.SphereGeometry(8.5, 48, 32), earthMat);
   earth.position.set(0, -9.2, -2);
   scene.add(earth);
 
@@ -189,11 +189,13 @@ export function createStationScene(container, options = {}) {
   let raf = 0;
   let running = true;
   let visible = true;
-  let dragging = false;
+  let pointerDown = false;
+  let didDrag = false;
   let lastX = 0;
   let orbitYaw = 0.55;
   let orbitPitch = 0.28;
   let orbitRadius = 5.2;
+  const focusWorld = new THREE.Vector3();
 
   function applyIsolation(id) {
     moduleGroups.forEach((group, mid) => {
@@ -202,28 +204,40 @@ export function createStationScene(container, options = {}) {
         if (!obj.isMesh || !obj.material) return;
         const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
         mats.forEach((mat) => {
+          if (mat.userData._emi == null) {
+            mat.userData._emi = mat.emissiveIntensity || 0;
+          }
           mat.transparent = true;
           mat.opacity = on ? 1 : 0.18;
-          mat.emissiveIntensity = on ? (mat.userData._emi || mat.emissiveIntensity || 0) : 0;
+          mat.emissiveIntensity = on ? mat.userData._emi : 0;
         });
       });
       group.scale.setScalar(on ? 1.04 : 0.98);
     });
   }
 
-  function cameraFor(id) {
+  function updateFocusPoint(id) {
     const group = moduleGroups.get(id);
-    const focus = group ? group.position.clone() : new THREE.Vector3();
+    if (group) {
+      group.getWorldPosition(focusWorld);
+      targetLook.copy(focusWorld);
+    } else {
+      targetLook.set(0, 0.1, 0);
+    }
+  }
+
+  function cameraFor(id) {
     const layout = MODULE_LAYOUT[id];
     const boost = layout?.kind === 'truss' ? 1.35 : 1;
-    targetLook.copy(focus);
     orbitRadius = 3.2 * boost;
     orbitYaw = 0.65;
     orbitPitch = 0.32;
+    updateFocusPoint(id);
     syncOrbitCam(true);
   }
 
   function syncOrbitCam(immediate) {
+    updateFocusPoint(activeId);
     const x = Math.cos(orbitPitch) * Math.sin(orbitYaw) * orbitRadius;
     const y = Math.sin(orbitPitch) * orbitRadius + 0.35;
     const z = Math.cos(orbitPitch) * Math.cos(orbitYaw) * orbitRadius;
@@ -249,12 +263,13 @@ export function createStationScene(container, options = {}) {
   }
 
   function onPointerDown(ev) {
-    dragging = true;
+    pointerDown = true;
+    didDrag = false;
     lastX = ev.clientX;
     renderer.domElement.setPointerCapture?.(ev.pointerId);
   }
   function onPointerUp(ev) {
-    dragging = false;
+    pointerDown = false;
     try {
       renderer.domElement.releasePointerCapture?.(ev.pointerId);
     } catch (_) {
@@ -262,14 +277,15 @@ export function createStationScene(container, options = {}) {
     }
   }
   function onPointerMove(ev) {
-    if (!dragging || reducedMotion) return;
+    if (!pointerDown || reducedMotion) return;
     const dx = ev.clientX - lastX;
     lastX = ev.clientX;
+    if (Math.abs(dx) > 2) didDrag = true;
     orbitYaw += dx * 0.005;
     syncOrbitCam(false);
   }
   function onClick(ev) {
-    if (dragging && Math.abs(ev.movementX) > 2) return;
+    if (didDrag) return;
     const rect = renderer.domElement.getBoundingClientRect();
     const ndc = new THREE.Vector2(
       ((ev.clientX - rect.left) / rect.width) * 2 - 1,
@@ -328,6 +344,7 @@ export function createStationScene(container, options = {}) {
     t0 = now;
     if (!reducedMotion) {
       station.rotation.y += dt * 0.08;
+      syncOrbitCam(false);
       camera.position.lerp(targetCam, 1 - Math.pow(0.001, dt));
       lookAt.lerp(targetLook, 1 - Math.pow(0.001, dt));
       camera.lookAt(lookAt);
@@ -352,6 +369,10 @@ export function createStationScene(container, options = {}) {
     renderer.domElement.removeEventListener('click', onClick);
     scene.traverse((obj) => {
       if (obj.geometry) obj.geometry.dispose?.();
+      if (obj.material) {
+        const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+        mats.forEach((m) => m.dispose?.());
+      }
     });
     materials.forEach((m) => m.dispose?.());
     renderer.dispose();
