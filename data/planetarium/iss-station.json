@@ -1,0 +1,136 @@
+{
+  "id": "iss-station",
+  "title": "International Space Station",
+  "kicker": "Planetarium · Station",
+  "lede": "Tour the real ISS in 3D — pick a module, meet the agencies and crew, and catch the next flyover from your sky.",
+  "guide": null,
+  "about": {
+    "headline": "A laboratory in low Earth orbit",
+    "body": "The International Space Station is a permanently crewed research outpost circling Earth about every 90 minutes. Assembled in orbit from modules built by five partner agencies, it is humanity’s longest continuous presence off the planet — a place for science, engineering, and international cooperation.",
+    "facts": [
+      { "label": "Altitude", "value": "~400 km" },
+      { "label": "Orbit", "value": "~90 minutes" },
+      { "label": "Inclination", "value": "51.6°" },
+      { "label": "Mass", "value": "~420 metric tons" },
+      { "label": "Solar arrays", "value": "~2,500 m²" },
+      { "label": "Crew", "value": "Typically 7" }
+    ]
+  },
+  "agencies": [
+    {
+      "id": "nasa",
+      "name": "NASA",
+      "fullName": "National Aeronautics and Space Administration",
+      "role": "US segment — Destiny, Harmony, Quest, Cupola, and major truss elements"
+    },
+    {
+      "id": "roscosmos",
+      "name": "Roscosmos",
+      "fullName": "State Space Corporation Roscosmos",
+      "role": "Russian segment — Zarya, Zvezda, and docking ports"
+    },
+    {
+      "id": "esa",
+      "name": "ESA",
+      "fullName": "European Space Agency",
+      "role": "Columbus laboratory and Automated Transfer Vehicle heritage"
+    },
+    {
+      "id": "jaxa",
+      "name": "JAXA",
+      "fullName": "Japan Aerospace Exploration Agency",
+      "role": "Kibo — pressurized module, logistics module, and exposed facility"
+    },
+    {
+      "id": "csa",
+      "name": "CSA",
+      "fullName": "Canadian Space Agency",
+      "role": "Canadarm2 and Dextre on the Mobile Servicing System"
+    }
+  ],
+  "crewFallback": [
+    { "name": "Crew roster unavailable", "craft": "ISS", "agency": null }
+  ],
+  "modules": [
+    {
+      "id": "destiny",
+      "name": "Destiny",
+      "shortName": "Destiny",
+      "agency": "NASA",
+      "role": "US laboratory",
+      "summary": "Primary US research lab — life sciences, materials, and Earth observation through its window.",
+      "detail": "Destiny launched in 2001 and remains the core US laboratory. Racks hold experiments in biology, physics, and fluid science. Its nadir window supports Earth photography when the Cupola is busy.",
+      "color": "#6eb6ff"
+    },
+    {
+      "id": "columbus",
+      "name": "Columbus",
+      "shortName": "Columbus",
+      "agency": "ESA",
+      "role": "European laboratory",
+      "summary": "ESA’s pressurized lab for biology, fluid physics, and technology demos.",
+      "detail": "Columbus docks to Harmony’s starboard port. External payloads ride on its Exposed Facility; inside, European racks share power and cooling with the US segment.",
+      "color": "#7ad0c4"
+    },
+    {
+      "id": "kibo",
+      "name": "Kibo",
+      "shortName": "Kibo",
+      "agency": "JAXA",
+      "role": "Japanese experiment module",
+      "summary": "The largest single ISS module — pressurized lab, logistics, and an exposed platform.",
+      "detail": "Kibo’s Pressurized Module, Experiment Logistics Module, and Exposed Facility form Japan’s orbital workshop. A robotic arm services external experiments outside the airlock.",
+      "color": "#f0a868"
+    },
+    {
+      "id": "harmony",
+      "name": "Harmony",
+      "shortName": "Harmony",
+      "agency": "NASA",
+      "role": "Node 2 hub",
+      "summary": "Utility node linking Destiny, Columbus, Kibo, and visiting vehicles.",
+      "detail": "Harmony distributes power, data, and life support among attached modules. Its forward port hosts visiting spacecraft; PMA adapters and berthing mechanisms live here.",
+      "color": "#9bb8e8"
+    },
+    {
+      "id": "cupola",
+      "name": "Cupola",
+      "shortName": "Cupola",
+      "agency": "ESA / NASA",
+      "role": "Observation dome",
+      "summary": "Seven windows looking Earthward — robotics control and the best view on station.",
+      "detail": "Mounted on Tranquility’s nadir, Cupola gives crew a wide-angle look at Earth and visiting vehicles. Workstations here guide Canadarm2 during capture and berthing.",
+      "color": "#c8e0ff"
+    },
+    {
+      "id": "quest",
+      "name": "Quest",
+      "shortName": "Quest",
+      "agency": "NASA",
+      "role": "US airlock",
+      "summary": "Where US spacesuits exit for spacewalks along the truss.",
+      "detail": "Quest stores Extravehicular Mobility Units and provides the US segment’s primary airlock. Crews stage tools here before heading onto the Integrated Truss Structure.",
+      "color": "#b8a0d8"
+    },
+    {
+      "id": "russian",
+      "name": "Zarya · Zvezda",
+      "shortName": "Russian",
+      "agency": "Roscosmos",
+      "role": "Russian segment core",
+      "summary": "Zarya’s power and propulsion heritage meets Zvezda’s living quarters and docking ports.",
+      "detail": "Zarya (Functional Cargo Block) was the first ISS element. Zvezda provides crew quarters, life support, and the aft docking port for Soyuz and Progress. Together they anchor the Russian segment.",
+      "color": "#e09090"
+    },
+    {
+      "id": "truss",
+      "name": "Truss · Solar",
+      "shortName": "Truss",
+      "agency": "NASA / partners",
+      "role": "Power and structure",
+      "summary": "The Integrated Truss Structure carries solar arrays, radiators, and Canadarm2’s rails.",
+      "detail": "From S0 through the outboard solar array wings, the truss is the station’s backbone. Gigantic arrays track the Sun; radiators dump heat; the Mobile Transporter rolls Canadarm2 along the boom.",
+      "color": "#d4c090"
+    }
+  ]
+}

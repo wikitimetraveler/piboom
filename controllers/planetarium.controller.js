@@ -11,7 +11,7 @@ const router = Router();
 router.get('/health', (_req, res) => {
   res.json({
     ok: true,
-    features: ['iss-passes', 'iss-tle', 'events', 'catalog', 'astronomy-engine'],
+    features: ['iss-passes', 'iss-tle', 'iss-crew', 'events', 'catalog', 'astronomy-engine'],
   });
 });
 
@@ -29,6 +29,16 @@ router.get('/iss-passes', async (req, res) => {
         : error.code === 'ISS_UPSTREAM' || error.code === 'ISS_TLE_UPSTREAM'
           ? 502
           : 500;
+    res.status(status).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/iss-crew', async (_req, res) => {
+  try {
+    const result = await planetariumIssService.fetchIssCrew(globalThis.fetch);
+    res.json({ success: true, ...result });
+  } catch (error) {
+    const status = error.code === 'ISS_CREW_UPSTREAM' ? 502 : 500;
     res.status(status).json({ success: false, error: error.message });
   }
 });
