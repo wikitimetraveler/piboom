@@ -6,6 +6,7 @@
 import * as satellite from 'satellite.js';
 
 const OPEN_NOTIFY_ISS = 'https://api.open-notify.org/iss-pass.json';
+const OPEN_NOTIFY_ASTROS = 'https://api.open-notify.org/astros.json';
 const CELESTRAK_TLE =
   process.env.ISS_TLE_URL ||
   'https://celestrak.org/NORAD/elements/gp.php?CATNR=25544&FORMAT=TLE';
@@ -201,8 +202,48 @@ export async function fetchIssPasses(lat, lon, fetchImpl = globalThis.fetch, opt
   };
 }
 
+/** Normalize Open Notify astros people → ISS-only crew rows. */
+export function filterIssCrew(people) {
+  const list = Array.isArray(people) ? people : [];
+  return list
+    .filter((p) => p && String(p.craft || '').trim().toUpperCase() === 'ISS')
+    .map((p) => ({
+      name: String(p.name || '').trim(),
+      craft: 'ISS',
+      agency: p.agency ? String(p.agency).trim() : null,
+    }))
+    .filter((p) => p.name);
+}
+
+/**
+ * Live ISS crew via Open Notify astros.json (ISS craft only).
+ */
+export async function fetchIssCrew(fetchImpl = globalThis.fetch) {
+  if (typeof fetchImpl !== 'function') {
+    const err = new Error('fetch unavailable');
+    err.code = 'FETCH_UNAVAILABLE';
+    throw err;
+  }
+  const res = await fetchImpl(OPEN_NOTIFY_ASTROS, { headers: { Accept: 'application/json' } });
+  if (!res.ok) {
+    const err = new Error(`ISS crew HTTP ${res.status}`);
+    err.code = 'ISS_CREW_UPSTREAM';
+    throw err;
+  }
+  const data = await res.json();
+  const people = filterIssCrew(data?.people);
+  return {
+    count: people.length,
+    people,
+    number: Number(data?.number) || people.length,
+    source: 'open-notify.org',
+  };
+}
+
 export default {
   fetchIssPasses,
+  fetchIssCrew,
+  filterIssCrew,
   fetchIssTle,
   lookAnglesFromTle,
   predictPassesFromTle,

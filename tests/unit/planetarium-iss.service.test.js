@@ -3,6 +3,8 @@
  */
 import {
   fetchIssPasses,
+  fetchIssCrew,
+  filterIssCrew,
   normalizePass,
   lookAnglesFromTle,
   predictPassesFromTle,
@@ -74,5 +76,51 @@ describe('planetarium-iss.service', () => {
       10
     );
     expect(Array.isArray(passes)).toBe(true);
+  });
+
+  test('filterIssCrew keeps only ISS craft and drops empties', () => {
+    const people = filterIssCrew([
+      { name: 'A', craft: 'ISS' },
+      { name: 'B', craft: 'Tiangong' },
+      { name: 'C', craft: 'iss' },
+      { name: '', craft: 'ISS' },
+      { name: 'D', craft: 'ISS', agency: 'NASA' },
+    ]);
+    expect(people).toEqual([
+      { name: 'A', craft: 'ISS', agency: null },
+      { name: 'C', craft: 'ISS', agency: null },
+      { name: 'D', craft: 'ISS', agency: 'NASA' },
+    ]);
+  });
+
+  test('filterIssCrew returns empty for missing people', () => {
+    expect(filterIssCrew(null)).toEqual([]);
+    expect(filterIssCrew(undefined)).toEqual([]);
+    expect(filterIssCrew([])).toEqual([]);
+  });
+
+  test('fetchIssCrew maps Open Notify astros and filters ISS', async () => {
+    const mockFetch = async (url) => {
+      expect(String(url)).toMatch(/astros\.json/);
+      return {
+        ok: true,
+        json: async () => ({
+          number: 3,
+          people: [
+            { name: 'On ISS', craft: 'ISS' },
+            { name: 'Elsewhere', craft: 'Tiangong' },
+          ],
+        }),
+      };
+    };
+    const result = await fetchIssCrew(mockFetch);
+    expect(result.count).toBe(1);
+    expect(result.people[0].name).toBe('On ISS');
+    expect(result.source).toBe('open-notify.org');
+  });
+
+  test('fetchIssCrew throws on upstream failure', async () => {
+    const mockFetch = async () => ({ ok: false, status: 503 });
+    await expect(fetchIssCrew(mockFetch)).rejects.toMatchObject({ code: 'ISS_CREW_UPSTREAM' });
   });
 });

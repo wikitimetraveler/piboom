@@ -83,6 +83,7 @@
     { name: 'Psychedelic Visualizer', url: '/entertainment/visualizer.html', category: 'Entertainment', keywords: 'visualizer trippy' },
     { name: 'Planetarium', url: '/planetarium/', category: 'Entertainment', keywords: 'stars sky constellations planets astronomy moon theater dome' },
     { name: 'Planetarium Field', url: '/planetarium/field.html', category: 'Entertainment', keywords: 'stars sky field mobile outdoor compass night vision observing ISS Carl' },
+    { name: 'ISS Station', url: '/planetarium/station.html', category: 'Entertainment', keywords: 'ISS space station modules Destiny Cupola crew flyover schedule NASA orbit' },
     { name: 'Black Light Zone', url: '/entertainment/blacklight.html', category: 'Entertainment', keywords: 'cosmic neon' },
     { name: 'Black Light Poster', url: '/entertainment/blacklight-poster.html', category: 'Entertainment', keywords: 'sound reactive uv poster webgpu' },
     { name: 'Poster Generator', url: '/entertainment/poster-generator.html', category: 'Entertainment', keywords: 'AI poster art' },

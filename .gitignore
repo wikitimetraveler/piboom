@@ -53,6 +53,7 @@ jspm_packages/
 # Scratch files from API probes and one-off conversions; may contain
 # session cookies, loan data, or other tenant-specific payloads
 .tmp*
+tmp/
 
 # IDE files
 .vscode/
