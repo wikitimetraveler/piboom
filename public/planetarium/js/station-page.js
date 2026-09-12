@@ -276,15 +276,20 @@ async function boot() {
   const fallback = document.getElementById('psFallback');
   let scene = null;
   if (stage) {
-    scene = createStationScene(stage, {
-      modules,
-      onFocus: (id) => {
-        if (!byId.has(id)) return;
-        activeId = id;
-        setActiveRail(id);
-        renderModuleCard(byId.get(id));
-      },
-    });
+    try {
+      scene = createStationScene(stage, {
+        modules,
+        onFocus: (id) => {
+          if (!byId.has(id)) return;
+          activeId = id;
+          setActiveRail(id);
+          renderModuleCard(byId.get(id));
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      scene = { ok: false };
+    }
     if (!scene?.ok) {
       fallback?.classList.add('is-visible');
       if (fallback) fallback.setAttribute('aria-hidden', 'false');
