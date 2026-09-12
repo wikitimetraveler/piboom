@@ -94,4 +94,12 @@ describe('fun-home public project cards', () => {
     expect(css).toMatch(/\.fun-card__stack\b/);
     expect(css).toMatch(/\.fun-chip\b/);
   });
+
+  test('home page always opens in dark mode', () => {
+    expect(indexHtml).toMatch(/<body class="fun-home fun-home--solar-system" data-theme="dark">/);
+    expect(indexHtml).toContain('aria-label="Switch to zen theme"');
+    expect(js).toContain("if (path === '/')");
+    expect(js).toContain("applyTheme('dark')");
+    expect(js).not.toContain('Default to zen');
+  });
 });

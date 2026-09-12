@@ -43,17 +43,21 @@
 
     btn.addEventListener('click', toggleTheme);
 
-    // Load saved theme
+    // Home always opens dark. Other fun-home pages keep a saved zen/dark choice.
     try {
+      const path = String(location.pathname || '/').replace(/\/index\.html$/i, '').replace(/\/+$/, '') || '/';
+      if (path === '/') {
+        applyTheme('dark');
+        return;
+      }
       const saved = localStorage.getItem(THEME_KEY);
       if (saved === 'dark' || saved === 'zen') {
         applyTheme(saved);
       } else {
-        // Default to zen
-        applyTheme('zen');
+        applyTheme('dark');
       }
     } catch (_) {
-      applyTheme('zen');
+      applyTheme('dark');
     }
   }
 

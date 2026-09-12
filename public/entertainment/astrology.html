@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>Astrology · Twelve Signs | Lane AI Labs</title>
+  <meta name="description" content="A decorated Western tropical zodiac: all twelve signs on a gold wheel, birthday finder, and constellation cards."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="/shared/design-tokens.css"/>
+  <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/entertainment/css/astrology.css"/>
+  <script src="/shared/modern-navbar.js"></script>
+</head>
+<body class="astro-page">
+  <a class="astro-skip" href="#astroWheel">Skip to zodiac wheel</a>
+  <canvas id="astroSky" class="astro-sky" aria-hidden="true"></canvas>
+  <div class="astro-aurora" aria-hidden="true"></div>
+  <div class="astro-grain" aria-hidden="true"></div>
+  <div class="astro-filigree" aria-hidden="true"></div>
+  <div class="astro-drift" aria-hidden="true">
+    <span style="left:6%; animation-delay:0s">♈︎</span>
+    <span style="left:14%; animation-delay:3s">♉︎</span>
+    <span style="left:22%; animation-delay:6s">♊︎</span>
+    <span style="left:31%; animation-delay:2s">♋︎</span>
+    <span style="left:40%; animation-delay:8s">♌︎</span>
+    <span style="left:48%; animation-delay:1s">♍︎</span>
+    <span style="left:57%; animation-delay:5s">♎︎</span>
+    <span style="left:65%; animation-delay:9s">♏︎</span>
+    <span style="left:73%; animation-delay:4s">♐︎</span>
+    <span style="left:81%; animation-delay:7s">♑︎</span>
+    <span style="left:88%; animation-delay:10s">♒︎</span>
+    <span style="left:94%; animation-delay:12s">♓︎</span>
+  </div>
+
+  <modern-navbar></modern-navbar>
+
+  <main class="astro-wrap">
+    <header class="astro-hero">
+      <p class="astro-kicker"><i class="bi bi-moon-stars" aria-hidden="true"></i> Tropical wheel</p>
+      <h1>The twelve signs</h1>
+      <p class="astro-hero__lead">A gold ring of the Western zodiac — every glyph, every date, a birthday finder, and a little constellation for the sign you tap.</p>
+      <div class="astro-ornament" aria-hidden="true">✦ ☽ ✦</div>
+
+      <form class="astro-finder" id="astroFinder">
+        <label>
+          Month
+          <select id="astroMonth" name="month" required></select>
+        </label>
+        <label>
+          Day
+          <select id="astroDay" name="day" required></select>
+        </label>
+        <button type="submit">Find my sign</button>
+        <p id="astroFinderStatus" role="status" aria-live="polite"></p>
+      </form>
+    </header>
+
+    <section class="astro-stage">
+      <div class="astro-wheel" id="astroWheel" aria-label="Zodiac wheel">
+        <svg class="astro-wheel__art" viewBox="0 0 200 200" aria-hidden="true">
+          <defs>
+            <linearGradient id="astroGold" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#f3dd9a"/>
+              <stop offset="50%" stop-color="#c8ab57"/>
+              <stop offset="100%" stop-color="#8f7430"/>
+            </linearGradient>
+          </defs>
+          <circle cx="100" cy="100" r="96" fill="none" stroke="url(#astroGold)" stroke-width="1.2" opacity="0.85"/>
+          <circle cx="100" cy="100" r="78" fill="none" stroke="rgba(232,200,114,0.28)" stroke-width="0.6" stroke-dasharray="2 4"/>
+          <g stroke="rgba(232,200,114,0.55)" stroke-width="1.2">
+            <line x1="100" y1="6" x2="100" y2="16"/>
+            <line x1="100" y1="184" x2="100" y2="194"/>
+            <line x1="6" y1="100" x2="16" y2="100"/>
+            <line x1="184" y1="100" x2="194" y2="100"/>
+            <line x1="34.1" y1="34.1" x2="41.2" y2="41.2"/>
+            <line x1="158.8" y1="158.8" x2="165.9" y2="165.9"/>
+            <line x1="165.9" y1="34.1" x2="158.8" y2="41.2"/>
+            <line x1="41.2" y1="158.8" x2="34.1" y2="165.9"/>
+          </g>
+        </svg>
+        <div id="astroSlots"></div>
+        <div class="astro-wheel__core">
+          <div>
+            <div class="astro-wheel__glyph" id="astroCoreGlyph" aria-hidden="true">♈</div>
+            <div class="astro-wheel__name" id="astroCoreName">Aries</div>
+          </div>
+        </div>
+      </div>
+
+      <article class="astro-detail" id="astroDetail" aria-labelledby="astroDetailTitle" data-element="fire"></article>
+    </section>
+
+    <div class="astro-toolbar" id="astroFilters" role="toolbar" aria-label="Filter signs by element">
+      <button type="button" data-element-filter="all" aria-pressed="true">All signs</button>
+      <button type="button" data-element-filter="fire" aria-pressed="false">Fire</button>
+      <button type="button" data-element-filter="earth" aria-pressed="false">Earth</button>
+      <button type="button" data-element-filter="air" aria-pressed="false">Air</button>
+      <button type="button" data-element-filter="water" aria-pressed="false">Water</button>
+    </div>
+
+    <section aria-label="All twelve signs">
+      <div class="astro-gallery" id="astroGallery"></div>
+    </section>
+
+    <p class="astro-note">
+      Playful tropical astrology, not the night sky. For stars in their true places, open the
+      <a href="/planetarium/">Planetarium</a>.
+    </p>
+  </main>
+
+  <footer class="astro-footer">
+    Lane AI Labs — Astrology wheel — <span id="astroDate"></span>
+  </footer>
+
+  <script src="/entertainment/js/astrology-zodiac.js"></script>
+  <script src="/entertainment/js/astrology.js"></script>
+  <script>
+    document.getElementById('astroDate').textContent = new Date().toLocaleDateString();
+  </script>
+</body>
+</html>

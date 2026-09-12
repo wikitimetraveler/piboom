@@ -81,7 +81,8 @@
     "publish:newport-pier-reel": "npm run render:newport-pier-reel && node scripts/tools/copy-newport-pier-reel.mjs",
     "ensure-audio:ice-rag": "npm run ensure-audio --prefix video/ice-rag",
     "publish:ice-rag-reel": "node scripts/tools/publish-ice-rag-reel.mjs",
-    "build:planetarium-catalog": "node scripts/tools/build-planetarium-catalog.mjs"
+    "build:planetarium-catalog": "node scripts/tools/build-planetarium-catalog.mjs",
+    "fetch:spacex-catalog": "node scripts/tools/fetch-spacex-catalog.mjs"
   },
   "dependencies": {
     "@google-cloud/speech": "^5.0.0",

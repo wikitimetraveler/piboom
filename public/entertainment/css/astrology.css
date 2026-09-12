@@ -1,0 +1,616 @@
+/**
+ * Astrology night-sky decorations.
+ * Development work by David Lane
+ */
+
+:root {
+  --as-void: #07060f;
+  --as-night: #12101c;
+  --as-ink: #f4efe4;
+  --as-muted: #c6bfb0;
+  --as-gold: #e8c872;
+  --as-gold-deep: #c8ab57;
+  --as-fire: #ff8a5b;
+  --as-earth: #d4b483;
+  --as-air: #9fd4e8;
+  --as-water: #7eb3e0;
+  --as-ring: rgba(232, 200, 114, 0.45);
+  --as-serif: "Fraunces", "Palatino Linotype", Palatino, serif;
+  --as-sans: "Outfit", "Segoe UI", sans-serif;
+}
+
+html,
+body.astro-page {
+  min-height: 100%;
+}
+
+body.astro-page {
+  margin: 0;
+  color: var(--as-ink);
+  font-family: var(--as-sans);
+  background-color: var(--as-void);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(88, 64, 140, 0.35), transparent 55%),
+    radial-gradient(ellipse 45% 35% at 8% 80%, rgba(40, 70, 110, 0.28), transparent 60%),
+    radial-gradient(ellipse 40% 30% at 92% 18%, rgba(180, 110, 50, 0.16), transparent 55%),
+    linear-gradient(180deg, #0b0a14 0%, var(--as-void) 42%, #0a0812 100%);
+}
+
+body.astro-page modern-navbar {
+  position: relative;
+  z-index: 40;
+}
+
+.astro-sky {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.astro-aurora,
+.astro-grain,
+.astro-filigree {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.astro-aurora {
+  background:
+    radial-gradient(ellipse 70% 28% at 50% 0%, rgba(120, 90, 200, 0.18), transparent 70%),
+    radial-gradient(ellipse 40% 22% at 18% 12%, rgba(70, 160, 180, 0.12), transparent 70%),
+    radial-gradient(ellipse 36% 20% at 82% 8%, rgba(232, 200, 114, 0.1), transparent 70%);
+  animation: astroAurora 22s ease-in-out infinite alternate;
+}
+
+.astro-grain {
+  opacity: 0.18;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+}
+
+.astro-filigree::before,
+.astro-filigree::after {
+  content: "";
+  position: absolute;
+  width: min(18vw, 120px);
+  height: min(18vw, 120px);
+  pointer-events: none;
+}
+
+.astro-filigree::before {
+  top: 5.2rem;
+  left: 0.85rem;
+  border-top: 1px solid rgba(232, 200, 114, 0.45);
+  border-left: 1px solid rgba(232, 200, 114, 0.45);
+  border-top-left-radius: 14px;
+}
+
+.astro-filigree::after {
+  right: 0.85rem;
+  bottom: 1.4rem;
+  border-bottom: 1px solid rgba(232, 200, 114, 0.45);
+  border-right: 1px solid rgba(232, 200, 114, 0.45);
+  border-bottom-right-radius: 14px;
+}
+
+.astro-drift {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.astro-drift span {
+  position: absolute;
+  color: rgba(232, 200, 114, 0.18);
+  font-size: clamp(1.4rem, 3vw, 2.4rem);
+  animation: astroDrift 28s linear infinite;
+}
+
+.astro-drift span:nth-child(odd) {
+  animation-duration: 34s;
+}
+
+.astro-skip {
+  position: absolute;
+  left: 0.75rem;
+  top: -3rem;
+  z-index: 50;
+  padding: 0.4rem 0.7rem;
+  background: var(--as-gold);
+  color: #1a1408;
+  border-radius: 0.4rem;
+}
+
+.astro-skip:focus {
+  top: 0.75rem;
+}
+
+.astro-wrap {
+  position: relative;
+  z-index: 2;
+  width: min(1120px, calc(100% - 1.5rem));
+  margin: 0 auto;
+  padding: 1.25rem 0 3.5rem;
+}
+
+.astro-hero {
+  text-align: center;
+  padding: 1.25rem 0 0.5rem;
+}
+
+.astro-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 0.65rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: var(--as-gold);
+}
+
+.astro-hero h1 {
+  font-family: var(--as-serif);
+  font-optical-sizing: auto;
+  font-weight: 620;
+  font-size: clamp(2.4rem, 6vw, 4.4rem);
+  line-height: 1.05;
+  margin: 0 0 0.55rem;
+  text-shadow: 0 0 42px rgba(232, 200, 114, 0.28);
+}
+
+.astro-hero__lead {
+  max-width: 38rem;
+  margin: 0 auto 1.1rem;
+  color: var(--as-muted);
+  font-size: 1.05rem;
+}
+
+.astro-ornament {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  color: var(--as-gold-deep);
+  font-size: 0.95rem;
+  letter-spacing: 0.4em;
+}
+
+.astro-ornament::before,
+.astro-ornament::after {
+  content: "";
+  width: min(22vw, 140px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--as-gold), transparent);
+}
+
+.astro-finder {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: end;
+  gap: 0.75rem 1rem;
+  margin: 1.4rem auto 0;
+  padding: 0.95rem 1.1rem;
+  max-width: 42rem;
+  border-radius: 1.15rem;
+  background: rgba(18, 16, 28, 0.62);
+  border: 1px solid rgba(232, 200, 114, 0.22);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+    0 18px 50px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(12px);
+}
+
+.astro-finder label {
+  display: grid;
+  gap: 0.28rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--as-muted);
+}
+
+.astro-finder select,
+.astro-finder button {
+  font-family: inherit;
+  min-height: 2.5rem;
+  border-radius: 0.7rem;
+}
+
+.astro-finder select {
+  min-width: 8.5rem;
+  padding: 0.35rem 0.7rem;
+  color: var(--as-ink);
+  background: rgba(7, 6, 15, 0.7);
+  border: 1px solid rgba(232, 200, 114, 0.32);
+}
+
+#astroFinderStatus {
+  width: 100%;
+  margin: 0;
+  min-height: 1.2em;
+  text-align: center;
+  color: var(--as-gold);
+  font-size: 0.92rem;
+}
+
+.astro-finder button {
+  padding: 0.4rem 1.05rem;
+  border: 0;
+  background: linear-gradient(180deg, #f0d78a, var(--as-gold-deep));
+  color: #1c1408;
+  font-weight: 650;
+}
+
+.astro-finder button:hover,
+.astro-finder button:focus-visible {
+  filter: brightness(1.06);
+}
+
+.astro-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 1.4rem;
+  align-items: center;
+  margin-top: 1.7rem;
+}
+
+.astro-wheel {
+  position: relative;
+  aspect-ratio: 1;
+  width: min(100%, 520px);
+  margin: 0 auto;
+  isolation: isolate;
+}
+
+.astro-wheel__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 18px rgba(232, 200, 114, 0.18));
+}
+
+.astro-wheel::after {
+  content: "";
+  position: absolute;
+  inset: 5%;
+  border-radius: 50%;
+  border: 1px dashed rgba(232, 200, 114, 0.32);
+  animation: astroSpin 80s linear infinite;
+  pointer-events: none;
+}
+
+.astro-wheel__core {
+  position: absolute;
+  inset: 32%;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.16), transparent 42%),
+    radial-gradient(circle at 50% 50%, rgba(18, 16, 28, 0.2), rgba(7, 6, 15, 0.88) 70%);
+  border: 1px solid var(--as-ring);
+  box-shadow:
+    0 0 0 10px rgba(7, 6, 15, 0.35),
+    0 0 40px rgba(232, 200, 114, 0.16);
+  text-align: center;
+}
+
+.astro-wheel__glyph {
+  font-size: clamp(2.6rem, 8vw, 4.2rem);
+  line-height: 1;
+  color: var(--as-gold);
+  text-shadow: 0 0 24px rgba(232, 200, 114, 0.55);
+}
+
+.astro-wheel__name {
+  font-family: var(--as-serif);
+  font-size: 1.05rem;
+  margin-top: 0.15rem;
+}
+
+.astro-slot-arm {
+  position: absolute;
+  inset: 6%;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  transform: rotate(var(--angle));
+}
+
+.astro-slot {
+  pointer-events: auto;
+  width: 4.4rem;
+  display: grid;
+  place-items: center;
+  gap: 0.05rem;
+  padding: 0.35rem 0.2rem 0.4rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: rgba(7, 6, 15, 0.55);
+  color: var(--as-ink);
+  cursor: pointer;
+  appearance: none;
+  transform: rotate(calc(-1 * var(--angle)));
+  align-self: start;
+}
+
+.astro-slot__glyph,
+.astro-card__glyph,
+.astro-wheel__glyph,
+.astro-drift span {
+  font-family: "Segoe UI Symbol", "Noto Sans Symbols", "Fraunces", serif;
+}
+
+.astro-slot__glyph {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.astro-slot__label {
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.astro-slot[data-element="fire"] { box-shadow: 0 0 0 1px color-mix(in srgb, var(--as-fire) 45%, transparent); }
+.astro-slot[data-element="earth"] { box-shadow: 0 0 0 1px color-mix(in srgb, var(--as-earth) 45%, transparent); }
+.astro-slot[data-element="air"] { box-shadow: 0 0 0 1px color-mix(in srgb, var(--as-air) 45%, transparent); }
+.astro-slot[data-element="water"] { box-shadow: 0 0 0 1px color-mix(in srgb, var(--as-water) 45%, transparent); }
+
+.astro-slot:hover,
+.astro-slot:focus-visible,
+.astro-slot[aria-pressed="true"] {
+  background: rgba(232, 200, 114, 0.16);
+  border-color: var(--as-gold);
+  transform: rotate(calc(-1 * var(--angle))) scale(1.08);
+  z-index: 2;
+}
+
+.astro-detail {
+  min-height: 22rem;
+  padding: 1.25rem 1.3rem 1.4rem;
+  border-radius: 1.4rem;
+  background:
+    linear-gradient(180deg, rgba(232, 200, 114, 0.08), transparent 28%),
+    rgba(12, 10, 22, 0.78);
+  border: 1px solid rgba(232, 200, 114, 0.2);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+}
+
+.astro-detail[data-element="fire"] { border-color: color-mix(in srgb, var(--as-fire) 55%, transparent); }
+.astro-detail[data-element="earth"] { border-color: color-mix(in srgb, var(--as-earth) 55%, transparent); }
+.astro-detail[data-element="air"] { border-color: color-mix(in srgb, var(--as-air) 55%, transparent); }
+.astro-detail[data-element="water"] { border-color: color-mix(in srgb, var(--as-water) 55%, transparent); }
+
+.astro-detail__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 0.7rem;
+}
+
+.astro-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(232, 200, 114, 0.28);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--as-muted);
+}
+
+.astro-detail h2 {
+  font-family: var(--as-serif);
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  margin: 0 0 0.2rem;
+}
+
+.astro-detail__dates {
+  color: var(--as-gold);
+  margin: 0 0 0.8rem;
+}
+
+.astro-const {
+  width: min(100%, 280px);
+  height: auto;
+  display: block;
+  margin: 0 auto 0.85rem;
+}
+
+.astro-const line {
+  stroke: var(--as-gold);
+  stroke-width: 1.2;
+  opacity: 0.7;
+}
+
+.astro-const__star {
+  fill: #fff6d8;
+  filter: drop-shadow(0 0 4px rgba(255, 246, 216, 0.8));
+}
+
+.astro-detail p {
+  margin: 0;
+  color: var(--as-muted);
+}
+
+.astro-traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.astro-traits li {
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(232, 200, 114, 0.12);
+  color: var(--as-ink);
+  font-size: 0.85rem;
+}
+
+.astro-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.45rem;
+  margin: 1.8rem 0 0.9rem;
+}
+
+.astro-toolbar button {
+  appearance: none;
+  border: 1px solid rgba(232, 200, 114, 0.28);
+  background: rgba(7, 6, 15, 0.45);
+  color: var(--as-muted);
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.82rem;
+}
+
+.astro-toolbar button[aria-pressed="true"] {
+  color: #1c1408;
+  background: var(--as-gold);
+  border-color: var(--as-gold);
+}
+
+.astro-gallery {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.astro-card {
+  text-align: left;
+  padding: 0.95rem 0.9rem 1rem;
+  border-radius: 1.05rem;
+  border: 1px solid rgba(232, 200, 114, 0.18);
+  background: rgba(12, 10, 22, 0.7);
+  color: inherit;
+  min-height: 100%;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.astro-card:hover,
+.astro-card:focus-visible,
+.astro-card[aria-pressed="true"] {
+  transform: translateY(-3px);
+  border-color: var(--as-gold);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+}
+
+.astro-card[hidden] {
+  display: none !important;
+}
+
+.astro-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.astro-card__glyph {
+  font-size: 1.7rem;
+  color: var(--as-gold);
+}
+
+.astro-card h3 {
+  font-family: var(--as-serif);
+  font-size: 1.15rem;
+  margin: 0.15rem 0 0.2rem;
+}
+
+.astro-card p {
+  margin: 0;
+  color: var(--as-muted);
+  font-size: 0.88rem;
+}
+
+.astro-note {
+  margin: 1.6rem auto 0;
+  max-width: 40rem;
+  text-align: center;
+  color: var(--as-muted);
+  font-size: 0.92rem;
+}
+
+.astro-note a {
+  color: var(--as-gold);
+}
+
+.astro-footer {
+  position: relative;
+  z-index: 2;
+  padding: 1.2rem;
+  text-align: center;
+  color: var(--as-muted);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 900px) {
+  .astro-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .astro-gallery {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .astro-slot {
+    width: 3.7rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .astro-gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .astro-filigree::before,
+  .astro-filigree::after {
+    width: 88px;
+    height: 88px;
+  }
+
+  .astro-slot__label {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .astro-aurora,
+  .astro-drift span,
+  .astro-wheel::after,
+  .astro-card {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+@keyframes astroAurora {
+  from { opacity: 0.75; transform: translateY(0); }
+  to { opacity: 1; transform: translateY(12px); }
+}
+
+@keyframes astroSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes astroDrift {
+  from { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+  12% { opacity: 0.55; }
+  to { transform: translateY(-12vh) rotate(80deg); opacity: 0; }
+}

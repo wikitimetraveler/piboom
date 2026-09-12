@@ -1,0 +1,74 @@
+{
+  "id": "spacex-hangar",
+  "title": "Hangar chat",
+  "subtitle": "Zigzag pulls Elon onto the pad.",
+  "disclaimer": "Stylized planetarium dialogue — not an official SpaceX interview.",
+  "voices": {
+    "zigzag": {
+      "voice": "en-US-Neural2-I",
+      "pitch": 2.4,
+      "speakingRate": 0.96,
+      "label": "Zigzag"
+    },
+    "elon": {
+      "voice": "en-US-Neural2-D",
+      "pitch": -1.2,
+      "speakingRate": 1.02,
+      "label": "Elon"
+    }
+  },
+  "beats": [
+    {
+      "id": "open",
+      "who": "zigzag",
+      "text": "Elon. I flew in from the Magellanic Cloud. Your metal tubes keep punching the sky. Walk me through the family."
+    },
+    {
+      "id": "f1",
+      "who": "elon",
+      "rocket": "falcon-1",
+      "text": "Start with Falcon 1. Five flights from Kwajalein. That was the proof we could reach orbit without a government rocket."
+    },
+    {
+      "id": "f1-r",
+      "who": "zigzag",
+      "rocket": "falcon-1",
+      "text": "Five flights. Then you stacked nine Merlins. Reckless. Beautiful. I like the cadence."
+    },
+    {
+      "id": "f9",
+      "who": "elon",
+      "rocket": "falcon-9",
+      "text": "Falcon 9 is the workhorse. Landing the booster was the plot twist. Reuse is how you get the launch table sitting under this pad."
+    },
+    {
+      "id": "fh-q",
+      "who": "zigzag",
+      "rocket": "falcon-heavy",
+      "text": "And the three-core stack? Looks like you glued two extra tubes on for luck."
+    },
+    {
+      "id": "fh",
+      "who": "elon",
+      "rocket": "falcon-heavy",
+      "text": "Falcon Heavy. Twenty-seven engines at liftoff. When the payload is heavy and the destination is far, you bring friends."
+    },
+    {
+      "id": "ss-q",
+      "who": "zigzag",
+      "rocket": "starship",
+      "text": "Starship is the one that smells like a city. Stainless. Huge. Still in flight test."
+    },
+    {
+      "id": "ss",
+      "who": "elon",
+      "rocket": "starship",
+      "text": "Starship is the city bus to Mars. Super Heavy plus Ship. That is the vehicle that makes a multiplanet species possible."
+    },
+    {
+      "id": "close",
+      "who": "zigzag",
+      "text": "I will keep the pad running. Tap a rocket if you want the next lift-off. I will be in the hangar."
+    }
+  ]
+}

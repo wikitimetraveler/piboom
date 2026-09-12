@@ -57,4 +57,21 @@ describe('planetarium-assistant.service', () => {
     expect(prompt).toContain('Canal myths');
     expect(prompt).toContain('Highlight Olympus Mons');
   });
+
+  test('buildSystemPrompt embeds SpaceX pad context', () => {
+    const prompt = buildSystemPrompt({
+      surface: 'spacex',
+      spacex: {
+        focusRocket: 'Falcon Heavy',
+        vehicles: 'Falcon 1 (5), Falcon 9 (796)',
+        launchCount: 853,
+        successCount: 800,
+        nextLaunch: 'Sep 13, 2026 · O3b mPower',
+      },
+    });
+    expect(prompt).toContain('SpaceX pad');
+    expect(prompt).toContain('Falcon Heavy');
+    expect(prompt).toContain('O3b mPower');
+    expect(prompt).toContain('Zigzag');
+  });
 });

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>SpaceX rockets | Planetarium | DevConnect Labs</title>
+  <meta name="description" content="Every SpaceX rocket family and launch date — Falcon 1, Falcon 9, Falcon Heavy, and Starship."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/shared/css/planetarium-world.css?v=2"/>
+  <link rel="stylesheet" href="/shared/css/planetarium-spacex.css?v=8"/>
+  <script src="/shared/modern-navbar.js"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "/shared/js/vendor/three.module.js"
+    }
+  }
+  </script>
+</head>
+<body class="plan-worlds-hub plan-spacex">
+  <a class="visually-hidden-focusable" href="#sxPad">Skip to launch pad</a>
+  <modern-navbar></modern-navbar>
+  <main class="pw-wrap sx-wrap">
+    <header class="pw-masthead">
+      <p class="pw-kicker">Planetarium</p>
+      <h1>SpaceX rockets</h1>
+      <p class="pw-lede">
+        All four vehicle families and every tracked launch date, from Falcon 1 at Kwajalein through Falcon 9, Falcon Heavy, and Starship flight tests. Zigzag, our alien presenter, is in the hangar talking it through with Elon.
+      </p>
+      <div class="pw-nav-row">
+        <a class="pw-btn" href="/planetarium/"><i class="bi bi-stars" aria-hidden="true"></i> Full sky</a>
+        <a class="pw-btn" href="/planetarium/worlds/"><i class="bi bi-globe2" aria-hidden="true"></i> Worlds</a>
+        <a class="pw-btn" href="/planetarium/field.html"><i class="bi bi-phone" aria-hidden="true"></i> Field</a>
+        <a class="pw-btn" href="#sxHangar"><i class="bi bi-chat-quote" aria-hidden="true"></i> Hangar chat</a>
+        <button type="button" class="pw-btn pw-btn--primary" id="planAskCarl">
+          <i class="bi bi-mic-fill" aria-hidden="true"></i> Ask Carl
+        </button>
+        <a class="pw-btn" href="/">Home</a>
+      </div>
+    </header>
+
+    <p class="sx-status" id="sxStatus" role="status" aria-live="polite">Loading launch catalog…</p>
+    <section class="sx-stats" id="sxStats" aria-label="Catalog totals"></section>
+
+    <section class="sx-pad" id="sxPad" aria-label="3D lift-off mockup">
+      <div class="sx-pad__stage" id="sxPadStage">
+        <img
+          class="sx-pad__still"
+          id="sxPadStill"
+          src="/planetarium/assets/spacex/pad-night.png"
+          alt="Night launch pad floodlights and flame trench"
+          width="1920"
+          height="1080"
+        />
+      </div>
+      <div class="sx-pad__hud">
+        <p class="sx-pad__kicker">Launch pad</p>
+        <h2 class="sx-pad__title" id="sxPadTitle">Falcon 9</h2>
+        <p class="sx-pad__phase" id="sxPadPhase">Hold-down</p>
+        <p class="sx-pad__clock" id="sxPadClock" aria-live="polite">T−2.6s</p>
+        <button type="button" class="pw-btn pw-btn--primary" id="sxPadReplay">
+          <i class="bi bi-play-fill" aria-hidden="true"></i> Replay liftoff
+        </button>
+      </div>
+    </section>
+
+    <section class="sx-hangar" id="sxHangar" aria-labelledby="sxHangarHeading">
+      <div class="sx-hangar__stage">
+        <figure class="sx-who sx-who--zigzag" id="sxWhoZigzag">
+          <img
+            class="sx-who__photo lane-lightbox-ignore"
+            src="/planetarium/assets/alienigena-portrait.webp"
+            alt="Zigzag, the planetarium’s green alien presenter"
+            width="160"
+            height="160"
+          />
+          <figcaption>
+            <span class="sx-who__name">Zigzag</span>
+            <span class="sx-who__role">Alien presenter</span>
+          </figcaption>
+        </figure>
+        <div class="sx-hangar__script">
+          <p class="sx-hangar__kicker">Hangar chat</p>
+          <h2 class="sx-hangar__title" id="sxHangarHeading">Zigzag talks with Elon</h2>
+          <p class="sx-hangar__speaker" id="sxHangarSpeaker">Zigzag</p>
+          <p class="sx-hangar__line" id="sxHangarLine" aria-live="polite">
+            Elon. I flew in from the Magellanic Cloud. Your metal tubes keep punching the sky.
+          </p>
+          <div class="sx-hangar__controls">
+            <button type="button" class="pw-btn pw-btn--primary" id="sxHangarPlay" aria-pressed="false">
+              <i class="bi bi-play-fill" aria-hidden="true"></i> Play conversation
+            </button>
+            <button type="button" class="pw-btn" id="sxHangarPause" disabled>
+              <i class="bi bi-pause-fill" aria-hidden="true"></i> Pause
+            </button>
+            <button type="button" class="pw-btn" id="sxHangarNext">
+              Next line
+            </button>
+          </div>
+          <p class="sx-hangar__status" id="sxHangarStatus"></p>
+          <p class="sx-hangar__note">Stylized planetarium dialogue — not an official SpaceX interview.</p>
+        </div>
+        <figure class="sx-who sx-who--elon" id="sxWhoElon">
+          <img
+            class="sx-who__photo lane-lightbox-ignore"
+            src="/planetarium/assets/spacex/elon-hangar.png"
+            alt="Stylized Elon hangar guest"
+            width="1024"
+            height="1024"
+          />
+          <figcaption>
+            <span class="sx-who__name">Elon</span>
+            <span class="sx-who__role">Hangar guest</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sx-carl" id="sxCarl" aria-labelledby="sxCarlHeading">
+      <h2 class="sx-section-title" id="sxCarlHeading">Carl · AstroAI</h2>
+      <p class="sx-carl__lead">
+        Ask Carl about Falcon 1, Falcon 9, Falcon Heavy, Starship, or the next launch on this pad. Voice is on by default.
+      </p>
+      <button type="button" class="pw-btn pw-btn--primary" id="sxAskCarl">
+        <i class="bi bi-mic-fill" aria-hidden="true"></i> Ask Carl · voice on
+      </button>
+    </section>
+
+    <section aria-labelledby="sxRocketsHeading">
+      <h2 class="sx-section-title" id="sxRocketsHeading">Vehicles</h2>
+      <div class="sx-rocket-grid" id="sxRocketGrid"></div>
+    </section>
+
+    <section class="sx-launches" id="sxLaunches" aria-labelledby="sxLaunchesHeading">
+      <div class="sx-launches__head">
+        <h2 class="sx-section-title" id="sxLaunchesHeading">Launch dates</h2>
+        <p class="sx-launches__count" id="sxLaunchCount"></p>
+      </div>
+      <form class="sx-toolbar" id="sxToolbar" role="search">
+        <label class="sx-search">
+          <span class="visually-hidden">Search missions</span>
+          <i class="bi bi-search" aria-hidden="true"></i>
+          <input type="search" id="sxSearch" name="q" placeholder="Search mission, pad, or payload" autocomplete="off"/>
+        </label>
+        <div class="sx-chips" id="sxRocketChips" role="group" aria-label="Filter by rocket"></div>
+        <div class="sx-chips" id="sxWhenChips" role="group" aria-label="Past or upcoming"></div>
+        <label class="sx-year">
+          Year
+          <select id="sxYear" name="year">
+            <option value="">All years</option>
+          </select>
+        </label>
+      </form>
+      <div class="sx-table-wrap">
+        <table class="sx-table" id="sxLaunchTable">
+          <caption class="visually-hidden">SpaceX launches by date</caption>
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">Mission</th>
+              <th scope="col">Rocket</th>
+              <th scope="col">Pad</th>
+              <th scope="col">Outcome</th>
+            </tr>
+          </thead>
+          <tbody id="sxLaunchBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <p class="pw-footer-links">
+      Data from <a id="sxCredit" href="https://thespacedevs.com/" rel="noopener noreferrer">The Space Devs Launch Library 2</a>
+      ·
+      <a href="/planetarium/">Planetarium theater</a>
+      ·
+      <a href="/planetarium/worlds/">Planet worlds</a>
+      ·
+      <a href="/">Home</a>
+    </p>
+  </main>
+
+  <script src="/shared/tts.js"></script>
+  <script src="/shared/speech-recognition.js"></script>
+  <script src="/planetarium/js/planetarium-spacex.js?v=4"></script>
+  <script src="/planetarium/js/planetarium-spacex-hangar.js?v=1"></script>
+  <script type="module" src="/planetarium/js/planetarium-spacex-pad.js?v=3"></script>
+  <script type="module" src="/planetarium/js/planetarium-guide.js?v=6"></script>
+</body>
+</html>

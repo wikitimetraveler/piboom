@@ -1,17 +1,18 @@
 /**
- * Planetarium data API — ISS passes, events, catalog search
+ * Planetarium data API — ISS passes, events, catalog search, SpaceX launches
  * Development work by David Lane
  */
 import { Router } from 'express';
 import planetariumIssService from '../services/planetarium-iss.service.js';
 import planetariumEventsService from '../services/planetarium-events.service.js';
+import planetariumSpacexService from '../services/planetarium-spacex.service.js';
 
 const router = Router();
 
 router.get('/health', (_req, res) => {
   res.json({
     ok: true,
-    features: ['iss-passes', 'iss-tle', 'events', 'catalog', 'astronomy-engine'],
+    features: ['iss-passes', 'iss-tle', 'events', 'catalog', 'astronomy-engine', 'spacex'],
   });
 });
 
@@ -51,6 +52,21 @@ router.get('/catalog/search', (req, res) => {
     if (!q) return res.status(400).json({ success: false, error: 'q is required' });
     const results = planetariumEventsService.searchCatalogIndex(q, 15);
     res.json({ success: true, query: q, results });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/spacex', (req, res) => {
+  try {
+    const page = planetariumSpacexService.getSpacexPage({
+      rocket: req.query.rocket,
+      q: req.query.q,
+      when: req.query.when,
+      year: req.query.year,
+      status: req.query.status,
+    });
+    res.json({ success: true, ...page });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

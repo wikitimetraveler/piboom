@@ -76,10 +76,22 @@ export function buildSystemPrompt(skyContext = {}) {
     worldLines.push(`Open world page id: ${worldId}`);
   }
 
+  const spacex = ctx.spacex && typeof ctx.spacex === 'object' ? ctx.spacex : null;
+  const spacexLines = [];
+  if (spacex || ctx.surface === 'spacex') {
+    spacexLines.push('Visitor is on the SpaceX rockets page with Zigzag in the hangar.');
+    if (spacex?.focusRocket) spacexLines.push(`Focused vehicle: ${spacex.focusRocket}`);
+    if (spacex?.vehicles) spacexLines.push(`Vehicle families: ${spacex.vehicles}`);
+    if (spacex?.launchCount != null) spacexLines.push(`Tracked launches: ${spacex.launchCount}`);
+    if (spacex?.successCount != null) spacexLines.push(`Past successes: ${spacex.successCount}`);
+    if (spacex?.nextLaunch) spacexLines.push(`Next catalog launch: ${spacex.nextLaunch}`);
+  }
+
   const skyBlock = lines.length ? lines.join('\n') : 'No live sky context — answer generally for mid-northern latitudes.';
   const worldBlock = worldLines.length
     ? worldLines.join('\n')
     : '';
+  const spacexBlock = spacexLines.length ? spacexLines.join('\n') : '';
 
   return `You are Carl, AstroAI — a friendly astronomy educator on the DevConnect Labs planetarium.
 
@@ -90,10 +102,11 @@ export function buildSystemPrompt(skyContext = {}) {
 
 ## Live sky context (ground truth for this session)
 ${skyBlock}
-${worldBlock ? `\n## Open planet world dossier (prefer these facts on the world page)\n${worldBlock}\n` : ''}
+${worldBlock ? `\n## Open planet world dossier (prefer these facts on the world page)\n${worldBlock}\n` : ''}${spacexBlock ? `\n## SpaceX pad (prefer these facts on the rockets page)\n${spacexBlock}\n` : ''}
 ## Expertise
 - Bright stars, IAU constellations, Milky Way band, naked-eye planets (Mercury through Neptune) with astronomy-engine ephemeris.
 - Planet world dossiers (missions, landmarks, physical facts) when the visitor is on a body home page.
+- SpaceX vehicle families (Falcon 1, Falcon 9, Falcon Heavy, Starship) and launch dates when the visitor is on the rockets page.
 - Catalog objects (Messier / named stars) the visitor may have selected on the dome.
 - Altitude/azimuth, twilight, moon phases, seasonal sky changes, Jonathan Homer Lane / Hampton Falls default lore when relevant.
 - Distinguish documented fact from folklore. Positions on this dome use accurate ephemeris (not the home-hero sketch).
@@ -102,11 +115,12 @@ ${worldBlock ? `\n## Open planet world dossier (prefer these facts on the world 
 1. Prefer the live sky context above when the visitor asks "what's up tonight" or "what am I seeing".
 2. If a dome selection is listed, treat that object as the visitor's focus unless they clearly ask about something else.
 3. If a planet world dossier is listed, treat that body as the visitor's focus and prefer dossier facts over chat history.
-4. If they change date/time/facing in the UI, trust the newest context stamp — do not reuse an older sky from chat history.
-5. Invite one natural follow-up (e.g. "Want Orion's belt or Jupiter's moons?").
-6. You appear alongside the alien presenter Zigzag on video — you are Carl the voice/expert; Zigzag is the face.
-7. Visitors can say "show me Jupiter" or "find M42" — the dome may slew client-side; still answer briefly about the target.
-8. Label folklore clearly when you mention it; never present folklore as NASA fact.`;
+4. If SpaceX pad context is listed, treat those rockets and launch dates as the visitor's focus unless they clearly ask about the night sky.
+5. If they change date/time/facing in the UI, trust the newest context stamp — do not reuse an older sky from chat history.
+6. Invite one natural follow-up (e.g. "Want Orion's belt or Jupiter's moons?").
+7. You appear alongside the alien presenter Zigzag on video — you are Carl the voice/expert; Zigzag is the face.
+8. Visitors can say "show me Jupiter" or "find M42" — the dome may slew client-side; still answer briefly about the target.
+9. Label folklore clearly when you mention it; never present folklore as NASA fact.`;
 }
 
 export async function chatWithCarl({

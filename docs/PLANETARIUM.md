@@ -14,14 +14,18 @@ The home hero still uses the lightweight [`FunHomeSky`](../public/shared/js/fun-
 | **Field** (phone outdoor instrument) | `/planetarium/field.html` — horizon + night chrome by default; Face / Find / Carl / Tonight / More dock; lite PWA manifest |
 | **Planet worlds hub** | `/planetarium/worlds/` |
 | **Planet world page** | `/planetarium/worlds/body.html?id=mars` (mercury–pluto + moon) |
+| **SpaceX rockets** | `/planetarium/spacex.html` — Falcon 1 / 9 / Heavy / Starship plus every tracked launch date; Zigzag hangar chat with Elon (`?talk=1`) |
 | Carl chat | `POST /api/planetarium/assistant/chat` |
 | ISS passes + position | `GET /api/planetarium/iss-passes?lat=&lon=&at=` |
 | Events / meteors | `GET /api/planetarium/events?from=` |
 | Catalog search | `GET /api/planetarium/catalog/search?q=` |
+| SpaceX catalog | `GET /api/planetarium/spacex?rocket=&q=&when=&year=` — snapshot from Launch Library 2 |
 | Star catalog | `data/planetarium/bright-stars.json` |
 | Constellation lines | `data/planetarium/constellation-lines.json` |
 | Events data | `data/planetarium/sky-events.json`, `meteor-showers.json` |
 | World dossiers | `data/planetarium/worlds/{id}.json`, `index.json` |
+| SpaceX snapshot | `data/planetarium/spacex-catalog.json` (`npm run fetch:spacex-catalog`) |
+| SpaceX hangar chat | `data/planetarium/spacex-hangar-chat.json` — Zigzag ↔ Elon scripted beats |
 
 ### Theater vs Field
 
@@ -60,6 +64,7 @@ The home hero still uses the lightweight [`FunHomeSky`](../public/shared/js/fun-
 - `public/planetarium/js/planetarium-world.js` — body home page globe + research desk
 - `public/planetarium/js/planetarium-worlds-hub.js` — worlds hub card grid
 - `public/shared/css/planetarium-world.css` — worlds hub / body page chrome
+- `public/planetarium/spacex.html` + `js/planetarium-spacex.js` + `js/planetarium-spacex-pad.js` + `js/planetarium-spacex-hangar.js` + `public/shared/css/planetarium-spacex.css` — SpaceX vehicles, launch dates, Three.js lift-off pad, Zigzag ↔ Elon hangar chat
 
 ## Rebuild catalogs
 
@@ -69,6 +74,14 @@ npm run build:planetarium-catalog
 node scripts/tools/build-planetarium-catalog.mjs --fetch
 ```
 
+SpaceX launch snapshot (Launch Library 2):
+
+```bash
+npm run fetch:spacex-catalog
+# rewrite rocket copy from the existing launch list (no network):
+node scripts/tools/fetch-spacex-catalog.mjs --rebuild
+```
+
 Sources: ofrohn/d3-celestial stars.6 + constellation lines (BSD-3).
 
 ## Deep links
@@ -76,6 +89,8 @@ Sources: ofrohn/d3-celestial stars.6 + constellation lines (BSD-3).
 Share / home CTA params: `date`, `time`, `lat`, `lon`, `label`, `face`, `body` (planet id), `select` (constellation / asterism name), `view` (`dome` default on theater, `horizon` default on Field), `app=field` (Field share links).
 
 World pages: `id` (or `body`) on `/planetarium/worlds/body.html` — e.g. `?id=mars`.
+
+SpaceX catalog: `/planetarium/spacex.html?rocket=falcon-9&when=upcoming&q=starlink&year=2024`. Hangar chat: `/planetarium/spacex.html?talk=1`.
 
 Home hero: enlarge a globe → **Open {Planet}** world page + **View in sky** dome; Ctrl/Meta+click a sky planet dot opens the world page.
 

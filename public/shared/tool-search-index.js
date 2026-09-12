@@ -83,6 +83,8 @@
     { name: 'Psychedelic Visualizer', url: '/entertainment/visualizer.html', category: 'Entertainment', keywords: 'visualizer trippy' },
     { name: 'Planetarium', url: '/planetarium/', category: 'Entertainment', keywords: 'stars sky constellations planets astronomy moon theater dome' },
     { name: 'Planetarium Field', url: '/planetarium/field.html', category: 'Entertainment', keywords: 'stars sky field mobile outdoor compass night vision observing ISS Carl' },
+    { name: 'SpaceX rockets', url: '/planetarium/spacex.html', category: 'Entertainment', keywords: 'spacex falcon 9 falcon heavy starship launch dates rockets elon musk' },
+    { name: 'Astrology', url: '/entertainment/astrology.html', category: 'Entertainment', keywords: 'zodiac signs horoscope aries taurus gemini cancer leo virgo libra scorpio sagittarius capricorn aquarius pisces birthday wheel' },
     { name: 'Black Light Zone', url: '/entertainment/blacklight.html', category: 'Entertainment', keywords: 'cosmic neon' },
     { name: 'Black Light Poster', url: '/entertainment/blacklight-poster.html', category: 'Entertainment', keywords: 'sound reactive uv poster webgpu' },
     { name: 'Poster Generator', url: '/entertainment/poster-generator.html', category: 'Entertainment', keywords: 'AI poster art' },
