@@ -5,7 +5,7 @@
 import express from 'express';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import planetariumIssService from '../services/planetarium-iss.service.js';
+import planetariumIssService from '../../services/planetarium-iss.service.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');

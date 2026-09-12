@@ -74,6 +74,12 @@ export function createStationScene(container, options = {}) {
   fill.position.set(-3, 1, -2);
   scene.add(fill);
 
+  const materials = [];
+  function trackMat(mat) {
+    materials.push(mat);
+    return mat;
+  }
+
   const earthMat = trackMat(
     new THREE.MeshStandardMaterial({
       color: 0x163a78,
@@ -91,12 +97,6 @@ export function createStationScene(container, options = {}) {
   scene.add(station);
 
   const moduleGroups = new Map();
-  const materials = [];
-
-  function trackMat(mat) {
-    materials.push(mat);
-    return mat;
-  }
 
   function addBox(group, w, h, d, color, pos, rot) {
     const geo = new THREE.BoxGeometry(w, h, d);
