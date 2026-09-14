@@ -1,18 +1,19 @@
 /**
- * Planetarium data API — ISS passes, events, catalog search, SpaceX launches
+ * Planetarium data API — ISS passes, events, catalog search, SpaceX launches, station
  * Development work by David Lane
  */
 import { Router } from 'express';
 import planetariumIssService from '../services/planetarium-iss.service.js';
 import planetariumEventsService from '../services/planetarium-events.service.js';
 import planetariumSpacexService from '../services/planetarium-spacex.service.js';
+import planetariumStationService from '../services/planetarium-station.service.js';
 
 const router = Router();
 
 router.get('/health', (_req, res) => {
   res.json({
     ok: true,
-    features: ['iss-passes', 'iss-tle', 'events', 'catalog', 'astronomy-engine', 'spacex'],
+    features: ['iss-passes', 'iss-tle', 'events', 'catalog', 'astronomy-engine', 'spacex', 'station'],
   });
 });
 
@@ -69,6 +70,20 @@ router.get('/spacex', (req, res) => {
     res.json({ success: true, ...page });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+router.get('/station', async (req, res) => {
+  try {
+    const page = await planetariumStationService.getStationPage(
+      { module: req.query.module, mode: req.query.mode },
+      globalThis.fetch,
+      req.query.at
+    );
+    res.json({ success: true, ...page });
+  } catch (error) {
+    const status = error.code === 'ISS_TLE_UPSTREAM' ? 502 : 500;
+    res.status(status).json({ success: false, error: error.message });
   }
 });
 

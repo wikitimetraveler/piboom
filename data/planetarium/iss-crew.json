@@ -1,0 +1,95 @@
+{
+  "station": "ISS",
+  "expedition": "Current increment",
+  "fetchedAt": "2026-09-13T05:00:00.000Z",
+  "source": "Launch Library 2",
+  "sourceUrl": "https://ll.thespacedevs.com/2.2.0/astronaut/?in_space=true",
+  "credit": "The Space Devs Launch Library 2 — quarters mapped by craft, not official sleep-station assignments.",
+  "note": "Tiangong crew and non-human entries (Starman) are excluded. Sleep modules are planetarium estimates: Crew Dragon → Harmony, Soyuz → Rassvet / Poisk / Zvezda.",
+  "people": [
+    {
+      "id": 573,
+      "name": "Jessica Meir",
+      "agency": "NASA",
+      "nationality": "American",
+      "role": "Flight engineer",
+      "craft": "Crew Dragon",
+      "arrival": "2026-02-13T10:15:56Z",
+      "photo": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305190924.jpeg",
+      "wiki": "https://en.wikipedia.org/wiki/Jessica_Meir",
+      "quartersModuleId": "harmony"
+    },
+    {
+      "id": 712,
+      "name": "Jack Hathaway",
+      "agency": "NASA",
+      "nationality": "American",
+      "role": "Flight engineer",
+      "craft": "Crew Dragon",
+      "arrival": "2026-02-13T10:15:56Z",
+      "photo": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305190331.jpeg",
+      "wiki": "https://en.wikipedia.org/wiki/Jack_Hathaway",
+      "quartersModuleId": "harmony"
+    },
+    {
+      "id": 747,
+      "name": "Sophie Adenot",
+      "agency": "ESA",
+      "nationality": "French",
+      "role": "Flight engineer",
+      "craft": "Crew Dragon",
+      "arrival": "2026-02-13T10:15:56Z",
+      "photo": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305185354.jpeg",
+      "wiki": "https://en.wikipedia.org/wiki/Sophie_Adenot",
+      "quartersModuleId": "harmony"
+    },
+    {
+      "id": 732,
+      "name": "Andrei Fedyaev",
+      "agency": "Roscosmos",
+      "nationality": "Russian",
+      "role": "Flight engineer",
+      "craft": "Crew Dragon",
+      "arrival": "2026-02-13T10:15:56Z",
+      "photo": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305190412.jpeg",
+      "wiki": "https://en.wikipedia.org/wiki/Andrey_Fedyaev",
+      "quartersModuleId": "harmony"
+    },
+    {
+      "id": 649,
+      "name": "Anna Kikina",
+      "agency": "Roscosmos",
+      "nationality": "Russian",
+      "role": "Flight engineer",
+      "craft": "Soyuz",
+      "arrival": "2026-07-14T14:47:43Z",
+      "photo": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305185904.jpeg",
+      "wiki": "https://en.wikipedia.org/wiki/Anna_Kikina",
+      "quartersModuleId": "rassvet"
+    },
+    {
+      "id": 650,
+      "name": "Pyotr Dubrov",
+      "agency": "Roscosmos",
+      "nationality": "Russian",
+      "role": "Flight engineer",
+      "craft": "Soyuz",
+      "arrival": "2026-07-14T14:47:43Z",
+      "photo": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305185922.jpeg",
+      "wiki": "https://en.wikipedia.org/wiki/Pyotr_Dubrov",
+      "quartersModuleId": "poisk"
+    },
+    {
+      "id": 713,
+      "name": "Anil Menon",
+      "agency": "NASA",
+      "nationality": "American",
+      "role": "Flight engineer",
+      "craft": "Soyuz",
+      "arrival": "2026-07-14T14:47:43Z",
+      "photo": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305190559.jpeg",
+      "wiki": "https://en.wikipedia.org/wiki/Anil_Menon_(astronaut)",
+      "quartersModuleId": "zvezda"
+    }
+  ]
+}

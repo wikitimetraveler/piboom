@@ -1,0 +1,427 @@
+/**
+ * Planetarium ISS station world
+ * Development work by David Lane
+ */
+body.plan-station {
+  --st-gold: #ffd278;
+  --st-ok: #7dffb3;
+  --st-ice: #9ad4ff;
+  --st-hull: #e8e4dc;
+}
+
+.st-wrap {
+  position: relative;
+}
+
+.st-wrap::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    radial-gradient(1px 1px at 14% 16%, rgba(255, 255, 255, 0.55), transparent),
+    radial-gradient(1px 1px at 82% 10%, rgba(255, 255, 255, 0.4), transparent),
+    radial-gradient(1.5px 1.5px at 58% 32%, rgba(154, 212, 255, 0.4), transparent),
+    radial-gradient(1px 1px at 30% 70%, rgba(255, 255, 255, 0.35), transparent),
+    radial-gradient(ellipse 70% 38% at 50% -6%, rgba(40, 80, 140, 0.32), transparent 58%);
+}
+
+.st-status {
+  min-height: 1.2rem;
+  margin: 0 0 0.85rem;
+  font-size: 0.8rem;
+  color: rgba(157, 255, 196, 0.88);
+}
+
+.st-live {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: 0.65rem;
+  margin: 0 0 1.25rem;
+}
+
+.st-stat {
+  padding: 0.7rem 0.85rem 0.75rem;
+  border-radius: 0.7rem;
+  border: 1px solid var(--plan-line);
+  background: var(--plan-glass);
+}
+
+.st-stat__kicker {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--plan-muted);
+  margin-bottom: 0.15rem;
+}
+
+.st-stat strong {
+  display: block;
+  font-family: Fraunces, Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 560;
+  line-height: 1.2;
+}
+
+.st-stage-block {
+  position: relative;
+  margin: 0 0 1.5rem;
+  border-radius: 1.1rem;
+  overflow: hidden;
+  border: 1px solid var(--plan-line);
+  background: #07090f;
+  min-height: 28rem;
+}
+
+.st-stage {
+  position: relative;
+  width: 100%;
+  height: min(72vh, 40rem);
+  min-height: 26rem;
+}
+
+.st-stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.st-stage__still {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.st-hud {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  z-index: 2;
+  max-width: min(28rem, calc(100% - 2rem));
+  padding: 0.85rem 1rem 1rem;
+  border-radius: 0.85rem;
+  background: rgba(8, 10, 16, 0.72);
+  border: 1px solid rgba(255, 210, 120, 0.28);
+  backdrop-filter: blur(10px);
+}
+
+.st-hud__kicker {
+  margin: 0 0 0.15rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--st-gold);
+}
+
+.st-hud__title {
+  margin: 0 0 0.2rem;
+  font-family: Fraunces, Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 560;
+}
+
+.st-hud__meta,
+.st-hud__blurb {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--plan-muted);
+}
+
+.st-hud__blurb {
+  margin-top: 0.35rem;
+}
+
+.st-hud__hint,
+.st-hud__hw {
+  margin: 0.4rem 0 0;
+  font-size: 0.78rem;
+  color: var(--st-ice);
+}
+
+.st-hud__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.65rem;
+}
+
+.st-photo {
+  margin: 0 0 0.85rem;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid var(--plan-line);
+  background: #0a0e14;
+}
+
+.st-photo__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 22rem;
+  object-fit: cover;
+}
+
+.st-photo__cap {
+  margin: 0;
+  padding: 0.45rem 0.7rem 0.55rem;
+  font-size: 0.72rem;
+  color: var(--plan-muted);
+}
+
+.st-display__note {
+  margin: 0.75rem 0 0;
+  font-size: 0.78rem;
+  color: var(--plan-muted);
+}
+
+.st-rack.is-hw {
+  border-color: rgba(154, 212, 255, 0.28);
+  cursor: pointer;
+}
+
+.st-rack.is-on {
+  border-color: var(--st-gold);
+  box-shadow: 0 0 0 1px rgba(255, 210, 120, 0.35);
+}
+
+.plan-station .pw-btn.is-on {
+  border-color: var(--st-gold);
+  color: var(--st-gold);
+}
+
+.st-modes {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: flex-end;
+}
+
+.st-section-title {
+  font-family: Fraunces, Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 560;
+  margin: 0 0 0.85rem;
+}
+
+.st-dock {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
+  gap: 0.65rem;
+  margin: 0 0 2rem;
+}
+
+.st-mod {
+  text-align: left;
+  padding: 0.75rem 0.8rem 0.8rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--plan-line);
+  background: var(--plan-glass);
+  color: inherit;
+  cursor: pointer;
+}
+
+.st-mod:hover,
+.st-mod:focus-visible {
+  border-color: rgba(255, 210, 120, 0.55);
+  outline: none;
+}
+
+.st-mod.is-on {
+  border-color: var(--st-gold);
+  box-shadow: 0 0 0 1px rgba(255, 210, 120, 0.35);
+}
+
+.st-mod__partner {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--plan-muted);
+}
+
+.st-mod__name {
+  display: block;
+  font-weight: 650;
+  margin: 0.15rem 0 0.2rem;
+}
+
+.st-mod__fn {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--plan-muted);
+}
+
+.st-crew {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 0.85rem;
+  margin: 0 0 2rem;
+}
+
+.st-person {
+  display: grid;
+  grid-template-columns: 4.2rem 1fr;
+  gap: 0.75rem;
+  align-items: center;
+  text-align: left;
+  padding: 0.7rem;
+  border-radius: 0.85rem;
+  border: 1px solid var(--plan-line);
+  background: var(--plan-glass);
+  color: inherit;
+  cursor: pointer;
+}
+
+.st-person.is-on {
+  border-color: var(--st-ice);
+}
+
+.st-person__photo {
+  width: 4.2rem;
+  height: 4.2rem;
+  border-radius: 0.6rem;
+  object-fit: cover;
+  background: #1a2230;
+}
+
+.st-person__name {
+  display: block;
+  font-weight: 650;
+}
+
+.st-person__meta {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--plan-muted);
+}
+
+.st-display {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0 0 2rem;
+  padding: 1rem 1.1rem;
+  border-radius: 0.9rem;
+  border: 1px solid var(--plan-line);
+  background: linear-gradient(180deg, rgba(18, 28, 42, 0.7), rgba(8, 10, 16, 0.55));
+}
+
+.st-display__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.65rem;
+}
+
+.st-rack {
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.55rem;
+  border: 1px solid rgba(125, 255, 179, 0.22);
+  background: rgba(8, 18, 16, 0.55);
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.78rem;
+}
+
+.st-rack strong {
+  display: block;
+  color: var(--st-ok);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.62rem;
+  margin-bottom: 0.2rem;
+}
+
+.st-tour {
+  margin: 0 0 2rem;
+  padding: 1rem 1.15rem 1.15rem;
+  border-radius: 1rem;
+  border: 1px solid var(--plan-line);
+  background: var(--plan-glass);
+}
+
+.st-tour__stage {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+.st-who__photo {
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.st-tour__kicker {
+  margin: 0;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--st-gold);
+}
+
+.st-tour__line {
+  margin: 0.35rem 0 0.75rem;
+  font-size: 1.05rem;
+}
+
+.st-tour__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.st-tour__note,
+.st-tour__status {
+  margin: 0.55rem 0 0;
+  font-size: 0.78rem;
+  color: var(--plan-muted);
+}
+
+.st-passes {
+  margin: 0 0 1.5rem;
+}
+
+.st-passes ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.st-pass {
+  width: 100%;
+  text-align: left;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.55rem;
+  border: 1px solid var(--plan-line);
+  background: transparent;
+  color: inherit;
+}
+
+@media (max-width: 719.98px) {
+  .st-stage {
+    height: 70vh;
+    min-height: 22rem;
+  }
+  .st-modes {
+    position: static;
+    padding: 0.65rem;
+    justify-content: flex-start;
+  }
+  .st-tour__stage {
+    grid-template-columns: 1fr;
+  }
+}

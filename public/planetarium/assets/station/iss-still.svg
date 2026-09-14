@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="International Space Station over Earth">
+  <defs>
+    <radialGradient id="sky" cx="50%" cy="18%" r="80%">
+      <stop offset="0%" stop-color="#1a2a4a"/>
+      <stop offset="55%" stop-color="#07090f"/>
+      <stop offset="100%" stop-color="#020308"/>
+    </radialGradient>
+    <radialGradient id="earth" cx="50%" cy="78%" r="42%">
+      <stop offset="0%" stop-color="#4aa3ff"/>
+      <stop offset="45%" stop-color="#1d5c9c"/>
+      <stop offset="100%" stop-color="#071018"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <circle cx="800" cy="980" r="520" fill="url(#earth)"/>
+  <g fill="#f2efe8" stroke="#9aa3ad" stroke-width="3" transform="translate(800 390)">
+    <rect x="-210" y="-18" width="430" height="36" rx="10"/>
+    <rect x="80" y="-18" width="70" height="36" rx="8" fill="#d5e2f0"/>
+    <rect x="-40" y="-18" width="70" height="36" rx="8"/>
+    <rect x="80" y="22" width="36" height="70" rx="8" fill="#d5e2f0"/>
+    <rect x="80" y="-92" width="36" height="70" rx="8"/>
+    <rect x="-18" y="28" width="36" height="55" rx="10"/>
+    <rect x="-250" y="-16" width="55" height="32" rx="8" fill="#8b95a0"/>
+    <rect x="-330" y="-16" width="90" height="32" rx="8" fill="#8b95a0"/>
+    <rect x="-18" y="-70" width="420" height="14" rx="4" fill="#5f6570" stroke="none"/>
+    <rect x="-200" y="-195" width="14" height="250" rx="3" fill="#1a2744" stroke="none"/>
+    <rect x="120" y="-195" width="14" height="250" rx="3" fill="#1a2744" stroke="none"/>
+    <rect x="-280" y="-195" width="14" height="250" rx="3" fill="#16203a" stroke="none"/>
+    <rect x="200" y="-195" width="14" height="250" rx="3" fill="#16203a" stroke="none"/>
+  </g>
+</svg>

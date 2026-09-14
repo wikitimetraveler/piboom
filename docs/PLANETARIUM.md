@@ -15,8 +15,10 @@ The home hero still uses the lightweight [`FunHomeSky`](../public/shared/js/fun-
 | **Planet worlds hub** | `/planetarium/worlds/` |
 | **Planet world page** | `/planetarium/worlds/body.html?id=mars` (mercury–pluto + moon) |
 | **SpaceX rockets** | `/planetarium/spacex.html` — Falcon 1 / 9 / Heavy / Starship plus every tracked launch date; Zigzag hangar chat with Elon (`?talk=1`) |
+| **ISS station** | `/planetarium/station.html` — clickable 3D modules, current crew, Cupola walk, Zigzag tour (`?module=cupola&mode=walk&tour=1`) |
 | Carl chat | `POST /api/planetarium/assistant/chat` |
 | ISS passes + position | `GET /api/planetarium/iss-passes?lat=&lon=&at=` |
+| ISS station world | `GET /api/planetarium/station?module=&mode=` — modules + crew snapshot + live nadir |
 | Events / meteors | `GET /api/planetarium/events?from=` |
 | Catalog search | `GET /api/planetarium/catalog/search?q=` |
 | SpaceX catalog | `GET /api/planetarium/spacex?rocket=&q=&when=&year=` — snapshot from Launch Library 2 |
@@ -26,6 +28,9 @@ The home hero still uses the lightweight [`FunHomeSky`](../public/shared/js/fun-
 | World dossiers | `data/planetarium/worlds/{id}.json`, `index.json` |
 | SpaceX snapshot | `data/planetarium/spacex-catalog.json` (`npm run fetch:spacex-catalog`) |
 | SpaceX hangar chat | `data/planetarium/spacex-hangar-chat.json` — Zigzag ↔ Elon scripted beats |
+| ISS modules | `data/planetarium/iss-modules.json` — pressurized rooms, truss, arrays, layout |
+| ISS crew snapshot | `data/planetarium/iss-crew.json` (`npm run fetch:iss-crew`) |
+| ISS module tour | `data/planetarium/iss-station-tour.json` — Zigzag walks Destiny → Cupola → Zvezda |
 
 ### Theater vs Field
 
@@ -65,6 +70,8 @@ The home hero still uses the lightweight [`FunHomeSky`](../public/shared/js/fun-
 - `public/planetarium/js/planetarium-worlds-hub.js` — worlds hub card grid
 - `public/shared/css/planetarium-world.css` — worlds hub / body page chrome
 - `public/planetarium/spacex.html` + `js/planetarium-spacex.js` + `js/planetarium-spacex-pad.js` + `js/planetarium-spacex-hangar.js` + `public/shared/css/planetarium-spacex.css` — SpaceX vehicles, launch dates, Three.js lift-off pad, Zigzag ↔ Elon hangar chat
+- `public/planetarium/station.html` + `js/planetarium-station.js` + `js/planetarium-station-scene.js` + `js/planetarium-station-interiors.js` + `js/planetarium-station-tour.js` + `public/shared/css/planetarium-station.css` — ISS modules, crew, Three.js station, hybrid interiors, Zigzag tour
+- `data/planetarium/iss-interiors.json` + NASA stills under `public/planetarium/assets/station/interiors/` — 1:1 walk rooms (Destiny, Harmony, Columbus, Kibo, Cupola, Zvezda)
 
 ## Rebuild catalogs
 
@@ -82,6 +89,20 @@ npm run fetch:spacex-catalog
 node scripts/tools/fetch-spacex-catalog.mjs --rebuild
 ```
 
+ISS crew snapshot (Launch Library 2 astronauts currently in space, minus Tiangong / Starman):
+
+```bash
+npm run fetch:iss-crew
+```
+
+ISS interior NASA stills (public-domain photos for the station desk + walk hull maps):
+
+```bash
+npm run fetch:iss-interiors
+```
+
+Hybrid station UX: pick a walkable module → NASA still + named hardware in the desk → **Enter module** for optional 1:1 Walk (look-around; Esc / Back to orbit). Orbit stays schematic.
+
 Sources: ofrohn/d3-celestial stars.6 + constellation lines (BSD-3).
 
 ## Deep links
@@ -91,6 +112,8 @@ Share / home CTA params: `date`, `time`, `lat`, `lon`, `label`, `face`, `body` (
 World pages: `id` (or `body`) on `/planetarium/worlds/body.html` — e.g. `?id=mars`.
 
 SpaceX catalog: `/planetarium/spacex.html?rocket=falcon-9&when=upcoming&q=starlink&year=2024`. Hangar chat: `/planetarium/spacex.html?talk=1`.
+
+ISS station: `/planetarium/station.html?module=cupola&mode=walk`. Zigzag tour: `/planetarium/station.html?tour=1`.
 
 Home hero: enlarge a globe → **Open {Planet}** world page + **View in sky** dome; Ctrl/Meta+click a sky planet dot opens the world page.
 
@@ -102,11 +125,12 @@ Home hero: enlarge a globe → **Open {Planet}** world page + **View in sky** do
 - **Night vision** — red desk theme
 - Drag to spin the dome; wheel to change FOV (Look-up fisheye up to 180°; horizon/Field perspective to ~110°)
 - Click ISS pass rows to jump sky time to pass start
+- Discover / Field ISS panel: **Open station world**
 - Planet pick HUD / Tonight table: **Open {Planet} home** when the selection is a known world body
 
 ## Carl context
 
-Each chat turn sends live `getSkyContext()` (observer, date, facing, planets, twilight, selection, engine). On world pages, context also includes the open `world` dossier excerpt; session id is `planetarium-carl-{id}`. Phrases like “show me Mars” or “find M42” slew the dome client-side before Carl answers (theater / Field only).
+Each chat turn sends live `getSkyContext()` (observer, date, facing, planets, twilight, selection, engine). On world pages, context also includes the open `world` dossier excerpt; session id is `planetarium-carl-{id}`. On the SpaceX page the session is `planetarium-carl-spacex`. On the ISS station world it is `planetarium-carl-station`. Phrases like “show me Mars” or “find M42” slew the dome client-side before Carl answers (theater / Field only).
 
 ## Out of scope
 

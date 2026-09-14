@@ -22,7 +22,7 @@
   "missions": [
     { "name": "Apollo", "year": 1968, "note": "Earthrise and whole-Earth photography from lunar distance." },
     { "name": "Landsat", "year": 1972, "note": "Long-running Earth-observation series for land cover and climate." },
-    { "name": "ISS", "year": 2000, "note": "Continuous crewed laboratory in low Earth orbit; visible as a bright moving star." }
+    { "name": "ISS", "year": 2000, "note": "Continuous crewed laboratory in low Earth orbit; visible as a bright moving star.", "href": "/planetarium/station.html" }
   ],
   "researchNotes": [
     "Earth's axial tilt drives seasons. A roughly 24-hour rotation and a 365.25-day orbit set the calendar used by this planetarium.",

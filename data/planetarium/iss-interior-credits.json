@@ -1,0 +1,61 @@
+{
+  "fetchedAt": "2026-09-13T05:51:23.086Z",
+  "policy": "NASA public domain (US Government work) unless otherwise noted.",
+  "guide": "https://www.nasa.gov/wp-content/uploads/2017/09/np-2015-05-022-jsc-iss-guide-2015-update-111015-508c.pdf",
+  "assets": [
+    {
+      "id": "destiny",
+      "nasaId": "iss007e11800",
+      "file": "destiny.jpg",
+      "path": "/planetarium/assets/station/interiors/destiny.jpg",
+      "title": "View into the Destiny laboratory",
+      "credit": "NASA — iss007e11800",
+      "sourceUrl": "https://images-assets.nasa.gov/image/iss007e11800/iss007e11800~medium.jpg"
+    },
+    {
+      "id": "harmony",
+      "nasaId": "iss018e013808",
+      "file": "harmony.jpg",
+      "path": "/planetarium/assets/station/interiors/harmony.jpg",
+      "title": "Node 2 crew quarters maintenance",
+      "credit": "NASA — iss018e013808",
+      "sourceUrl": "https://images-assets.nasa.gov/image/iss018e013808/iss018e013808~medium.jpg"
+    },
+    {
+      "id": "columbus",
+      "nasaId": "iss023e048576",
+      "file": "columbus.jpg",
+      "path": "/planetarium/assets/station/interiors/columbus.jpg",
+      "title": "ERNObox installation in Columbus",
+      "credit": "NASA — iss023e048576",
+      "sourceUrl": "https://images-assets.nasa.gov/image/iss023e048576/iss023e048576~medium.jpg"
+    },
+    {
+      "id": "kibo",
+      "nasaId": "iss038e000257",
+      "file": "kibo.jpg",
+      "path": "/planetarium/assets/station/interiors/kibo.jpg",
+      "title": "Station view including Kibo / Cupola vicinity",
+      "credit": "NASA — iss038e000257",
+      "sourceUrl": "https://images-assets.nasa.gov/image/iss038e000257/iss038e000257~medium.jpg"
+    },
+    {
+      "id": "cupola",
+      "nasaId": "iss042e099123",
+      "file": "cupola.jpg",
+      "path": "/planetarium/assets/station/interiors/cupola.jpg",
+      "title": "Interior view from Cupola",
+      "credit": "NASA — iss042e099123 (ISS042-E-099123)",
+      "sourceUrl": "https://images-assets.nasa.gov/image/iss042e099123/iss042e099123~medium.jpg"
+    },
+    {
+      "id": "zvezda",
+      "nasaId": "iss010e24914",
+      "file": "zvezda.jpg",
+      "path": "/planetarium/assets/station/interiors/zvezda.jpg",
+      "title": "Interior view of Zvezda Service Module",
+      "credit": "NASA — iss010e24914",
+      "sourceUrl": "https://images-assets.nasa.gov/image/iss010e24914/iss010e24914~medium.jpg"
+    }
+  ]
+}

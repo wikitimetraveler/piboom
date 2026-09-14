@@ -93,6 +93,21 @@ export function buildSystemPrompt(skyContext = {}) {
     : '';
   const spacexBlock = spacexLines.length ? spacexLines.join('\n') : '';
 
+  const station = ctx.station && typeof ctx.station === 'object' ? ctx.station : null;
+  const stationLines = [];
+  if (station || ctx.surface === 'station') {
+    stationLines.push('Visitor is on the ISS station world with Zigzag walking the modules.');
+    if (station?.focusModule) stationLines.push(`Focused module: ${station.focusModule}`);
+    if (station?.focusBlurb) stationLines.push(`Module notes: ${station.focusBlurb}`);
+    if (station?.interiorDims) stationLines.push(`Interior size (schematic): ${station.interiorDims}`);
+    if (station?.hardware) stationLines.push(`Named hardware nearby: ${station.hardware}`);
+    if (station?.crew) stationLines.push(`Crew aboard: ${station.crew}`);
+    if (station?.now) stationLines.push(`ISS over Earth: ${station.now}`);
+    if (station?.altitudeKm) stationLines.push(`Altitude: ${station.altitudeKm} km`);
+    if (station?.mode) stationLines.push(`View mode: ${station.mode}`);
+  }
+  const stationBlock = stationLines.length ? stationLines.join('\n') : '';
+
   return `You are Carl, AstroAI — a friendly astronomy educator on the DevConnect Labs planetarium.
 
 ## Personality
@@ -102,11 +117,12 @@ export function buildSystemPrompt(skyContext = {}) {
 
 ## Live sky context (ground truth for this session)
 ${skyBlock}
-${worldBlock ? `\n## Open planet world dossier (prefer these facts on the world page)\n${worldBlock}\n` : ''}${spacexBlock ? `\n## SpaceX pad (prefer these facts on the rockets page)\n${spacexBlock}\n` : ''}
+${worldBlock ? `\n## Open planet world dossier (prefer these facts on the world page)\n${worldBlock}\n` : ''}${spacexBlock ? `\n## SpaceX pad (prefer these facts on the rockets page)\n${spacexBlock}\n` : ''}${stationBlock ? `\n## ISS station (prefer these facts on the station world)\n${stationBlock}\n` : ''}
 ## Expertise
 - Bright stars, IAU constellations, Milky Way band, naked-eye planets (Mercury through Neptune) with astronomy-engine ephemeris.
 - Planet world dossiers (missions, landmarks, physical facts) when the visitor is on a body home page.
 - SpaceX vehicle families (Falcon 1, Falcon 9, Falcon Heavy, Starship) and launch dates when the visitor is on the rockets page.
+- ISS modules, current crew snapshot, and live nadir when the visitor is on the station world.
 - Catalog objects (Messier / named stars) the visitor may have selected on the dome.
 - Altitude/azimuth, twilight, moon phases, seasonal sky changes, Jonathan Homer Lane / Hampton Falls default lore when relevant.
 - Distinguish documented fact from folklore. Positions on this dome use accurate ephemeris (not the home-hero sketch).
@@ -116,11 +132,12 @@ ${worldBlock ? `\n## Open planet world dossier (prefer these facts on the world 
 2. If a dome selection is listed, treat that object as the visitor's focus unless they clearly ask about something else.
 3. If a planet world dossier is listed, treat that body as the visitor's focus and prefer dossier facts over chat history.
 4. If SpaceX pad context is listed, treat those rockets and launch dates as the visitor's focus unless they clearly ask about the night sky.
-5. If they change date/time/facing in the UI, trust the newest context stamp — do not reuse an older sky from chat history.
-6. Invite one natural follow-up (e.g. "Want Orion's belt or Jupiter's moons?").
-7. You appear alongside the alien presenter Zigzag on video — you are Carl the voice/expert; Zigzag is the face.
-8. Visitors can say "show me Jupiter" or "find M42" — the dome may slew client-side; still answer briefly about the target.
-9. Label folklore clearly when you mention it; never present folklore as NASA fact.`;
+5. If ISS station context is listed, treat those modules, crew names, and the live nadir as the visitor's focus unless they clearly ask about the night sky.
+6. If they change date/time/facing in the UI, trust the newest context stamp — do not reuse an older sky from chat history.
+7. Invite one natural follow-up (e.g. "Want Orion's belt or Jupiter's moons?").
+8. You appear alongside the alien presenter Zigzag on video — you are Carl the voice/expert; Zigzag is the face.
+9. Visitors can say "show me Jupiter" or "find M42" — the dome may slew client-side; still answer briefly about the target.
+10. Label folklore clearly when you mention it; never present folklore as NASA fact.`;
 }
 
 export async function chatWithCarl({

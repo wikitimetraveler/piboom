@@ -74,4 +74,13 @@ describe('planetarium-assistant.service', () => {
     expect(prompt).toContain('O3b mPower');
     expect(prompt).toContain('Zigzag');
   });
+
+  test('buildSystemPrompt embeds ISS station context', () => {
+    const prompt = buildSystemPrompt({
+      surface: 'station',
+      station: { focusModule: 'Destiny', crew: 'Test Crew' },
+    });
+    expect(prompt).toContain('ISS station');
+    expect(prompt).toContain('Destiny');
+  });
 });

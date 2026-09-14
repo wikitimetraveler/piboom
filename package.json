@@ -82,7 +82,9 @@
     "ensure-audio:ice-rag": "npm run ensure-audio --prefix video/ice-rag",
     "publish:ice-rag-reel": "node scripts/tools/publish-ice-rag-reel.mjs",
     "build:planetarium-catalog": "node scripts/tools/build-planetarium-catalog.mjs",
-    "fetch:spacex-catalog": "node scripts/tools/fetch-spacex-catalog.mjs"
+    "fetch:spacex-catalog": "node scripts/tools/fetch-spacex-catalog.mjs",
+    "fetch:iss-crew": "node scripts/tools/fetch-iss-crew.mjs",
+    "fetch:iss-interiors": "node scripts/tools/fetch-iss-interiors.mjs"
   },
   "dependencies": {
     "@google-cloud/speech": "^5.0.0",

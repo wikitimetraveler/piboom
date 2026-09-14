@@ -111,6 +111,35 @@ export function lookAnglesFromTle(tleLines, date, lat, lon) {
   };
 }
 
+/** Geodetic sub-satellite point from TLE (lat/lon degrees, height km). */
+export function geodeticFromTle(tleLines, date = new Date()) {
+  const satrec = satellite.twoline2satrec(tleLines[0], tleLines[1]);
+  const when = date instanceof Date ? date : new Date(date);
+  const pv = satellite.propagate(satrec, when);
+  if (!pv || !pv.position || pv.position === false) return null;
+  const gmst = satellite.gstime(when);
+  const gd = satellite.eciToGeodetic(pv.position, gmst);
+  const lonDeg = gd.longitude * RAD;
+  return {
+    lat: gd.latitude * RAD,
+    lon: ((lonDeg + 540) % 360) - 180,
+    altKm: gd.height,
+    date: when.toISOString(),
+  };
+}
+
+export async function fetchIssNow(fetchImpl = globalThis.fetch, at) {
+  const tle = await fetchIssTle(fetchImpl);
+  const when = at ? new Date(at) : new Date();
+  const geo = geodeticFromTle(tle, when);
+  if (!geo) {
+    const err = new Error('ISS position unavailable');
+    err.code = 'ISS_POSITION';
+    throw err;
+  }
+  return { ...geo, source: 'celestrak-tle' };
+}
+
 /**
  * Sample the next `hours` for passes where elevation exceeds minElev deg.
  */
@@ -204,7 +233,9 @@ export async function fetchIssPasses(lat, lon, fetchImpl = globalThis.fetch, opt
 export default {
   fetchIssPasses,
   fetchIssTle,
+  fetchIssNow,
   lookAnglesFromTle,
+  geodeticFromTle,
   predictPassesFromTle,
   normalizePass,
   clearIssTleCache,

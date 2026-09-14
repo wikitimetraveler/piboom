@@ -516,9 +516,14 @@
       missions.replaceChildren();
       (d.missions || []).forEach((m) => {
         const li = document.createElement('li');
+        const href = String(m.href || '');
+        const name =
+          href.startsWith('/') && !href.startsWith('//')
+            ? '<a href="' + href + '">' + (m.name || 'Mission') + '</a>'
+            : m.name || 'Mission';
         li.innerHTML =
           '<strong>' +
-          (m.name || 'Mission') +
+          name +
           '</strong> (' +
           (m.year || '?') +
           ') — ' +

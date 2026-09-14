@@ -5,6 +5,7 @@ import {
   fetchIssPasses,
   normalizePass,
   lookAnglesFromTle,
+  geodeticFromTle,
   predictPassesFromTle,
   clearIssTleCache,
 } from '../../services/planetarium-iss.service.js';
@@ -61,6 +62,17 @@ describe('planetarium-iss.service', () => {
       expect(Number.isFinite(look.az)).toBe(true);
     } else {
       expect(look).toBeNull();
+    }
+  });
+
+  test('geodeticFromTle returns a sub-satellite point when propagation works', () => {
+    const geo = geodeticFromTle(SAMPLE_TLE, new Date('2026-01-01T12:00:00Z'));
+    if (geo) {
+      expect(Number.isFinite(geo.lat)).toBe(true);
+      expect(Number.isFinite(geo.lon)).toBe(true);
+      expect(Number.isFinite(geo.altKm)).toBe(true);
+    } else {
+      expect(geo).toBeNull();
     }
   });
 

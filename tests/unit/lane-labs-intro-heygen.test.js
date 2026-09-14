@@ -40,7 +40,7 @@ describe('Lane AI Labs intro HeyGen trio', () => {
     expect(dave.script).toMatch(/Lane AI Labs/i);
   });
 
-  test('home splash prefers the multi-avatar chat and keeps Close tappable', async () => {
+  test('intro player stays ready offline; home page keeps it off until a clean re-cut', async () => {
     const src = await readFile(path.join(root, 'public/shared/js/fun-home-intro.js'), 'utf8');
     const html = await readFile(path.join(root, 'public/index.html'), 'utf8');
     const css = await readFile(path.join(root, 'public/shared/css/fun-home.css'), 'utf8');
@@ -52,9 +52,10 @@ describe('Lane AI Labs intro HeyGen trio', () => {
     expect(src).toContain("closeBtn.textContent = 'Close'");
     expect(src).toContain('pointerdown');
     expect(src).toContain('video.muted = true');
-    expect(html).toContain('fun-home-intro.js');
-    expect(html).toContain('funIntroReplay');
-    expect(html).toContain('lane_labs_intro_heard_v2');
+    expect(html).not.toContain('fun-home-intro.js');
+    expect(html).not.toContain('funIntroReplay');
+    expect(html).not.toContain('lane_labs_intro_heard_v2');
+    expect(html).not.toContain('is-intro-splash');
     expect(css).toContain('object-fit: contain');
     expect(css).toContain('#funIntroClose');
   });

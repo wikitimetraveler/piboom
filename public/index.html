@@ -11,13 +11,6 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
 <link rel="stylesheet" href="/shared/design-tokens.css"/>
 <link rel="stylesheet" href="/shared/css/fun-home.css?v=sky37"/>
-<script>
-  try {
-    if (/[?&](?:demo=heygen|reel=1|intro=1)(?:&|$)/.test(location.search) || localStorage.getItem('lane_labs_intro_heard_v2') !== '1') {
-      document.documentElement.classList.add('is-intro-splash');
-    }
-  } catch (e) {}
-</script>
 </head>
 <body class="fun-home fun-home--solar-system" data-theme="dark">
 
@@ -151,10 +144,6 @@
           <button type="button" class="fun-btn fun-btn--ghost fun-btn--ambience" id="funAmbienceToggle" data-ambience-compact="1" aria-pressed="true" title="Pause Children of the Sun">
             <i class="bi bi-pause-fill" aria-hidden="true"></i>
             <span> Children of the Sun</span>
-          </button>
-          <button type="button" class="fun-btn fun-btn--ghost" id="funIntroReplay" title="Watch Zigzag, Summer, and Dave">
-            <i class="bi bi-play-circle" aria-hidden="true"></i>
-            <span>Watch intro</span>
           </button>
         </div>
 
@@ -632,6 +621,7 @@
       </p>
       <ul class="fun-card__features">
         <li>Interactive sky dome with live ISS</li>
+        <li>ISS station world — modules and crew</li>
         <li>Carl AstroAI voice guide</li>
         <li>NASA WebGPU planet worlds</li>
       </ul>
@@ -666,6 +656,10 @@
           <a href="/planetarium/spacex.html" class="fun-card__link">
             <span>SpaceX rockets</span>
             <i class="bi bi-rocket-takeoff"></i>
+          </a>
+          <a href="/planetarium/station.html" class="fun-card__link">
+            <span>ISS station</span>
+            <i class="bi bi-hdd-stack"></i>
           </a>
         </details>
       </div>
@@ -759,6 +753,5 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script src="/shared/js/fun-home.js?v=sky34"></script>
 <script src="/shared/js/fun-home-sky-song.js?v=3"></script>
-<script src="/shared/js/fun-home-intro.js?v=4"></script>
 </body>
 </html>

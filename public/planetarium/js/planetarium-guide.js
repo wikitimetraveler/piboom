@@ -32,10 +32,21 @@ const WELCOME_SPACEX = `<div class="plan-carl-welcome">
   <small class="text-muted">Try: "Walk me through Falcon Heavy" or "What's the next launch?"</small>
 </div>`;
 
+const WELCOME_STATION = `<div class="plan-carl-welcome">
+  <span class="plan-carl-welcome__avatar" aria-hidden="true">🛰️</span>
+  <p>I'm <strong>Carl</strong>, your AstroAI guide for the ISS station world — modules, crew, and the view over Earth.</p>
+  <p class="small text-muted mb-0">Zigzag is walking the stack. Tap <strong>Ask Carl</strong> and speak — voice is on by default.</p>
+  <small class="text-muted">Try: "Who is sleeping in Harmony?" or "What is Cupola for?"</small>
+</div>`;
+
 const ALIENIGENA_HANDOFF = 'Carl has the sky on this one.';
 
 function isSpacexPage() {
   return !!(document.body?.classList.contains('plan-spacex') || window.PlanetariumSpacex);
+}
+
+function isStationPage() {
+  return !!(document.body?.classList.contains('plan-station') || window.PlanetariumStation);
 }
 
 function isWorldPage() {
@@ -84,6 +95,12 @@ async function speakReply(text) {
 
 /** Fresh dome / world snapshot every Carl turn. */
 function getSkyContext() {
+  if (isStationPage() && typeof window.PlanetariumStation?.getCarlContext === 'function') {
+    return {
+      ...window.PlanetariumStation.getCarlContext(),
+      clientSentAt: new Date().toISOString(),
+    };
+  }
   if (isSpacexPage() && typeof window.PlanetariumSpacex?.getCarlContext === 'function') {
     return {
       ...window.PlanetariumSpacex.getCarlContext(),
@@ -262,31 +279,48 @@ function initChat() {
   const fieldApp = !!(window.__PLANETARIUM_FIELD || document.body?.classList.contains('plan-field'));
   const worldApp = isWorldPage();
   const spacexApp = isSpacexPage();
+  const stationApp = isStationPage();
   const worldId = worldApp ? worldIdFromPage() : null;
   const widget = new AIChatWidget({
     apiEndpoint: '/api/planetarium/assistant/chat',
     userId: 'planetarium-guest',
-    sessionId: spacexApp
-      ? 'planetarium-carl-spacex'
-      : worldApp
-        ? 'planetarium-carl-' + worldId
-        : 'planetarium-carl',
-    title: spacexApp
-      ? 'Carl · SpaceX'
-      : worldApp
-        ? 'Carl · ' + (window.__PLANETARIUM_WORLD?.name || worldId || 'World')
-        : 'Carl · AstroAI',
-    buttonTitle: spacexApp
-      ? 'Ask Carl about SpaceX rockets'
-      : worldApp
-        ? 'Ask Carl about this world'
-        : 'Ask Carl about the sky',
-    inputPlaceholder: spacexApp
-      ? 'Ask about Falcon 9, Starship, the next launch…'
-      : worldApp
-        ? 'Tell me about this world…'
-        : 'What is up tonight? Show me Jupiter…',
-    welcomeHtml: spacexApp ? WELCOME_SPACEX : worldApp ? WELCOME_WORLD : fieldApp ? WELCOME_FIELD : WELCOME_THEATER,
+    sessionId: stationApp
+      ? 'planetarium-carl-station'
+      : spacexApp
+        ? 'planetarium-carl-spacex'
+        : worldApp
+          ? 'planetarium-carl-' + worldId
+          : 'planetarium-carl',
+    title: stationApp
+      ? 'Carl · ISS'
+      : spacexApp
+        ? 'Carl · SpaceX'
+        : worldApp
+          ? 'Carl · ' + (window.__PLANETARIUM_WORLD?.name || worldId || 'World')
+          : 'Carl · AstroAI',
+    buttonTitle: stationApp
+      ? 'Ask Carl about the space station'
+      : spacexApp
+        ? 'Ask Carl about SpaceX rockets'
+        : worldApp
+          ? 'Ask Carl about this world'
+          : 'Ask Carl about the sky',
+    inputPlaceholder: stationApp
+      ? 'Ask about Destiny, Cupola, who is aboard…'
+      : spacexApp
+        ? 'Ask about Falcon 9, Starship, the next launch…'
+        : worldApp
+          ? 'Tell me about this world…'
+          : 'What is up tonight? Show me Jupiter…',
+    welcomeHtml: stationApp
+      ? WELCOME_STATION
+      : spacexApp
+        ? WELCOME_SPACEX
+        : worldApp
+          ? WELCOME_WORLD
+          : fieldApp
+            ? WELCOME_FIELD
+            : WELCOME_THEATER,
     getContext: () => ({ skyContext: getSkyContext() }),
     onMessageSent: () => {
       if (typeof window.aiChatWidget?.open === 'function') window.aiChatWidget.open();
@@ -302,7 +336,7 @@ function initChat() {
   if (typeof widget.sendMessage === 'function') {
     const origSend = widget.sendMessage.bind(widget);
     widget.sendMessage = async (msg) => {
-      if (!worldApp && !spacexApp) {
+      if (!worldApp && !spacexApp && !stationApp) {
         try {
           await trySlewFromText(msg);
         } catch (_) {
@@ -313,13 +347,13 @@ function initChat() {
     };
   }
 
-  document.querySelectorAll('#planAskCarl, #sxAskCarl').forEach((btn) => {
+  document.querySelectorAll('#planAskCarl, #sxAskCarl, #stAskCarl').forEach((btn) => {
     btn.addEventListener('click', () => {
       openChat(null, { startVoice: true });
     });
   });
   window.PlanetariumAskCarl = (msg) => openChat(msg, { startVoice: !msg });
-  if (!worldApp && !spacexApp) bindSkyContextRefresh();
+  if (!worldApp && !spacexApp && !stationApp) bindSkyContextRefresh();
 }
 
 if (document.readyState === 'loading') {

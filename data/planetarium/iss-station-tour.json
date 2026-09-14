@@ -1,0 +1,72 @@
+{
+  "id": "iss-station-tour",
+  "title": "Module tour",
+  "subtitle": "Zigzag walks the stack.",
+  "disclaimer": "Stylized planetarium tour — not an official NASA briefing.",
+  "voices": {
+    "zigzag": {
+      "voice": "en-US-Neural2-I",
+      "pitch": 2.4,
+      "speakingRate": 0.96,
+      "label": "Zigzag"
+    }
+  },
+  "beats": [
+    {
+      "id": "open",
+      "who": "zigzag",
+      "module": "destiny",
+      "mode": "orbit",
+      "text": "Welcome aboard. I am Zigzag. This kite of metal is your International Space Station. We will walk it room by room."
+    },
+    {
+      "id": "destiny",
+      "who": "zigzag",
+      "module": "destiny",
+      "mode": "walk",
+      "text": "Destiny. The American laboratory. Racks of biology and materials science, and the brains of the U.S. segment."
+    },
+    {
+      "id": "harmony",
+      "who": "zigzag",
+      "module": "harmony",
+      "mode": "walk",
+      "text": "Harmony, Node 2. Crew Dragon docks on the ram port. Four sleep stations. This is where most visiting crews hang their sleeping bags."
+    },
+    {
+      "id": "columbus",
+      "who": "zigzag",
+      "module": "columbus",
+      "mode": "walk",
+      "text": "Starboard, Columbus. Europe’s lab. Short, dense, and full of fluid physics. ESA built it; NASA flew it up on a shuttle."
+    },
+    {
+      "id": "kibo",
+      "who": "zigzag",
+      "module": "kibo",
+      "mode": "walk",
+      "text": "Port side, Kibo. Japan’s big room — the largest single module. An airlock at the far end hands experiments to the porch in vacuum."
+    },
+    {
+      "id": "cupola",
+      "who": "zigzag",
+      "module": "cupola",
+      "mode": "walk",
+      "text": "Nadir now. Cupola. Seven windows, Earth filling the glass. This is where they fly the Canadian arm and watch weather crawl."
+    },
+    {
+      "id": "zvezda",
+      "who": "zigzag",
+      "module": "zvezda",
+      "mode": "walk",
+      "text": "Aft, Zvezda. The Russian home. Engines, a table, sleep nooks. The station still reboosts from here."
+    },
+    {
+      "id": "explode",
+      "who": "zigzag",
+      "module": "unity",
+      "mode": "explode",
+      "text": "Pull the rooms apart and you see the joints. Unity in the middle. Truss on top. Solar wings like a dragonfly. That is the whole animal."
+    }
+  ]
+}

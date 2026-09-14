@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>ISS station | Planetarium | DevConnect Labs</title>
+  <meta name="description" content="Walk the International Space Station module by module — live crew, 3D schematic, Cupola Earth view, and Carl AstroAI."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/shared/css/planetarium-world.css?v=2"/>
+  <link rel="stylesheet" href="/shared/css/planetarium-station.css?v=3"/>
+  <script src="/shared/modern-navbar.js"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "/shared/js/vendor/three.module.js"
+    }
+  }
+  </script>
+</head>
+<body class="plan-worlds-hub plan-station">
+  <a class="visually-hidden-focusable" href="#stStage">Skip to station</a>
+  <modern-navbar></modern-navbar>
+  <main class="pw-wrap st-wrap">
+    <header class="pw-masthead">
+      <p class="pw-kicker">Planetarium</p>
+      <h1>ISS station</h1>
+      <p class="pw-lede">
+        Module by module — Destiny, Harmony, Columbus, Kibo, Cupola, Zvezda — plus who is aboard tonight. Select a room for the NASA still and named hardware, then Enter module for an optional 1:1 walk. Zigzag leads the tour; Carl has the facts.
+      </p>
+      <div class="pw-nav-row">
+        <a class="pw-btn" href="/planetarium/"><i class="bi bi-stars" aria-hidden="true"></i> Full sky</a>
+        <a class="pw-btn" href="/planetarium/worlds/"><i class="bi bi-globe2" aria-hidden="true"></i> Worlds</a>
+        <a class="pw-btn" href="/planetarium/spacex.html"><i class="bi bi-rocket-takeoff" aria-hidden="true"></i> SpaceX</a>
+        <a class="pw-btn" href="/planetarium/field.html"><i class="bi bi-phone" aria-hidden="true"></i> Field</a>
+        <a class="pw-btn" href="#stTour"><i class="bi bi-chat-quote" aria-hidden="true"></i> Module tour</a>
+        <button type="button" class="pw-btn pw-btn--primary" id="planAskCarl">
+          <i class="bi bi-mic-fill" aria-hidden="true"></i> Ask Carl
+        </button>
+        <a class="pw-btn" href="/">Home</a>
+      </div>
+    </header>
+
+    <p class="st-status" id="stStatus" role="status" aria-live="polite">Loading station…</p>
+    <section class="st-live" id="stLive" aria-label="Live ISS position"></section>
+
+    <section class="st-stage-block" aria-label="3D International Space Station">
+      <div class="st-modes" role="group" aria-label="Station view">
+        <button type="button" class="pw-btn is-on" data-mode="orbit" id="stModeOrbit">Orbit</button>
+        <button type="button" class="pw-btn" data-mode="explode" id="stModeExplode">Explode</button>
+        <button type="button" class="pw-btn" data-mode="walk" id="stModeWalk">Walk</button>
+        <button type="button" class="pw-btn" id="stPrevMod"><i class="bi bi-chevron-left" aria-hidden="true"></i> Prev</button>
+        <button type="button" class="pw-btn" id="stNextMod">Next <i class="bi bi-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <div class="st-stage" id="stStage">
+        <img
+          class="st-stage__still"
+          id="stStill"
+          src="/planetarium/assets/station/iss-still.svg"
+          alt="Schematic International Space Station over a sunlit Earth"
+          width="1600"
+          height="900"
+        />
+      </div>
+      <div class="st-hud" id="stHud">
+        <p class="st-hud__kicker" id="stHudKicker">Module</p>
+        <h2 class="st-hud__title" id="stHudTitle">Unity</h2>
+        <p class="st-hud__meta" id="stHudMeta">NASA · Node 1</p>
+        <p class="st-hud__blurb" id="stHudBlurb">Click a module on the station or pick one from the dock.</p>
+        <p class="st-hud__hint" id="stHudHint" hidden>Drag to look · Esc returns to orbit</p>
+        <p class="st-hud__hw" id="stHudHw" hidden></p>
+        <div class="st-hud__actions">
+          <button type="button" class="pw-btn pw-btn--primary" id="stEnterModule" hidden>
+            <i class="bi bi-door-open" aria-hidden="true"></i> Enter module
+          </button>
+          <button type="button" class="pw-btn" id="stExitWalk" hidden>
+            <i class="bi bi-box-arrow-left" aria-hidden="true"></i> Back to orbit
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="st-display" id="stDisplay" aria-labelledby="stDisplayHeading">
+      <h2 class="st-section-title" id="stDisplayHeading">Interior display</h2>
+      <p id="stDisplayLead">Select a pressurized module for a NASA interior still and named hardware.</p>
+      <figure class="st-photo" id="stPhoto" hidden>
+        <img class="st-photo__img" id="stPhotoImg" alt="" width="1280" height="850"/>
+        <figcaption class="st-photo__cap" id="stPhotoCap"></figcaption>
+      </figure>
+      <div class="st-display__grid" id="stRacks"></div>
+      <p class="st-display__note" id="stDisplayNote">
+        Schematic interiors from NASA fact sheets and NASA public-domain stills — not photogrammetry or official CAD.
+      </p>
+    </section>
+
+    <section aria-labelledby="stDockHeading">
+      <h2 class="st-section-title" id="stDockHeading">Modules</h2>
+      <div class="st-dock" id="stDock"></div>
+    </section>
+
+    <section aria-labelledby="stCrewHeading">
+      <h2 class="st-section-title" id="stCrewHeading">Who is stationed</h2>
+      <p class="pw-lede" id="stCrewLead" style="margin-top:-0.4rem">Sleep stations are planetarium estimates from visiting craft, not official NASA bunk maps.</p>
+      <div class="st-crew" id="stCrew"></div>
+    </section>
+
+    <section class="st-tour" id="stTour" aria-labelledby="stTourHeading">
+      <div class="st-tour__stage">
+        <figure class="st-who" id="stWhoZigzag">
+          <img
+            class="st-who__photo lane-lightbox-ignore"
+            src="/planetarium/assets/alienigena-portrait.webp"
+            alt="Zigzag, the planetarium’s green alien presenter"
+            width="160"
+            height="160"
+          />
+        </figure>
+        <div>
+          <p class="st-tour__kicker">Module tour</p>
+          <h2 class="st-tour__title" id="stTourHeading">Zigzag walks the stack</h2>
+          <p class="st-tour__line" id="stTourLine" aria-live="polite">
+            Welcome aboard. I am Zigzag. This kite of metal is your International Space Station.
+          </p>
+          <div class="st-tour__controls">
+            <button type="button" class="pw-btn pw-btn--primary" id="stTourPlay" aria-pressed="false">
+              <i class="bi bi-play-fill" aria-hidden="true"></i> Play tour
+            </button>
+            <button type="button" class="pw-btn" id="stTourPause" disabled>
+              <i class="bi bi-pause-fill" aria-hidden="true"></i> Pause
+            </button>
+            <button type="button" class="pw-btn" id="stTourNext">Next room</button>
+          </div>
+          <p class="st-tour__status" id="stTourStatus"></p>
+          <p class="st-tour__note">Stylized planetarium tour — not an official NASA briefing.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="st-passes" aria-labelledby="stPassHeading">
+      <h2 class="st-section-title" id="stPassHeading">Next passes over you</h2>
+      <ul id="stPassList"></ul>
+    </section>
+
+    <section class="sx-carl" id="stCarl" aria-labelledby="stCarlHeading">
+      <h2 class="st-section-title" id="stCarlHeading">Carl · AstroAI</h2>
+      <p>Ask Carl about a module, who is sleeping where, or where the station is over Earth right now. Voice is on by default.</p>
+      <button type="button" class="pw-btn pw-btn--primary" id="stAskCarl">
+        <i class="bi bi-mic-fill" aria-hidden="true"></i> Ask Carl · voice on
+      </button>
+    </section>
+
+    <p class="pw-footer-links">
+      Crew snapshot from <a href="https://thespacedevs.com/" rel="noopener noreferrer">The Space Devs Launch Library 2</a>
+      ·
+      Live path from Celestrak TLE
+      ·
+      Interior stills NASA public domain
+      ·
+      Dimensions from the <a href="https://www.nasa.gov/wp-content/uploads/2017/09/np-2015-05-022-jsc-iss-guide-2015-update-111015-508c.pdf" rel="noopener noreferrer">NASA ISS Reference Guide</a>
+      ·
+      <a href="/planetarium/spacex.html">SpaceX rockets</a>
+      ·
+      <a href="/planetarium/worlds/">Planet worlds</a>
+      ·
+      <a href="/">Home</a>
+    </p>
+  </main>
+
+  <script src="/shared/tts.js"></script>
+  <script src="/shared/speech-recognition.js"></script>
+  <script src="/planetarium/js/planetarium-station.js?v=3"></script>
+  <script src="/planetarium/js/planetarium-station-tour.js?v=1"></script>
+  <script type="module" src="/planetarium/js/planetarium-station-scene.js?v=3"></script>
+  <script type="module" src="/planetarium/js/planetarium-guide.js?v=7"></script>
+</body>
+</html>
