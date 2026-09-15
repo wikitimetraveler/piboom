@@ -66,6 +66,7 @@ import newportPierRoutes from './newport-pier.routes.js';
 import studioRoutes from './studio.routes.js';
 import buildWatchTogetherRoutes from './watch-together.routes.js';
 import planetariumRoutes from './planetarium.routes.js';
+import astrologyRoutes from './astrology.routes.js';
 import mountainHighRoutes from './mountain-high.routes.js';
 import wolfmanLivekitRoutes from './wolfman-livekit.routes.js';
 
@@ -134,6 +135,7 @@ export default function buildRoutes(io) {
   api.use('/studio', studioRoutes);
   api.use('/watch-together', buildWatchTogetherRoutes(io));
   api.use('/planetarium', planetariumRoutes);
+  api.use('/astrology', astrologyRoutes);
   api.use('/mountain-high', mountainHighRoutes);
   api.use('/wolfman', wolfmanLivekitRoutes);
   api.use('/', musicHistoryRoutes); // Music history and concert finder

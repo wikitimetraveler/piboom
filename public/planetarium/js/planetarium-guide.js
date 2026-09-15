@@ -40,6 +40,31 @@ const WELCOME_STATION = `<div class="plan-carl-welcome">
 </div>`;
 
 const ALIENIGENA_HANDOFF = 'Carl has the sky on this one.';
+const ROSE_HANDOFF =
+  "That's Rose's parlor — tropical signs and Major Arcana, not the real sky. Opening her page for you.";
+
+function isAstrologyIntent(text) {
+  return /\b(zodiac|horoscope|sun sign|moon sign|rising sign|tarot|astrology|major arcana|aries|taurus|gemini|cancer|leo|virgo|libra|scorpio|sagittarius|capricorn|aquarius|pisces|the fool|the magician|the tower|the star|the moon|the sun|the world)\b/i.test(
+    String(text || '')
+  );
+}
+
+function handoffToRose(text) {
+  const widget = window.aiChatWidget;
+  if (widget && typeof widget.addMessage === 'function') {
+    widget.addMessage(ROSE_HANDOFF, 'assistant');
+  }
+  const q = String(text || '').trim();
+  const url = new URL('/entertainment/astrology.html', window.location.origin);
+  if (/\breading\b|\bspread\b|\bbirthday\b/i.test(q)) url.searchParams.set('reading', '1');
+  const signMatch = q.match(
+    /\b(aries|taurus|gemini|cancer|leo|virgo|libra|scorpio|sagittarius|capricorn|aquarius|pisces)\b/i
+  );
+  if (signMatch) url.searchParams.set('sign', signMatch[1].toLowerCase());
+  window.setTimeout(() => {
+    window.location.href = url.pathname + url.search;
+  }, 900);
+}
 
 function isSpacexPage() {
   return !!(document.body?.classList.contains('plan-spacex') || window.PlanetariumSpacex);
@@ -336,6 +361,12 @@ function initChat() {
   if (typeof widget.sendMessage === 'function') {
     const origSend = widget.sendMessage.bind(widget);
     widget.sendMessage = async (msg) => {
+      if (isAstrologyIntent(msg)) {
+        if (!widget.isOpen && typeof widget.open === 'function') widget.open();
+        if (typeof widget.addMessage === 'function') widget.addMessage(String(msg || ''), 'user');
+        handoffToRose(msg);
+        return;
+      }
       if (!worldApp && !spacexApp && !stationApp) {
         try {
           await trySlewFromText(msg);

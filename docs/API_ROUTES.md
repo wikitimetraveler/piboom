@@ -150,6 +150,8 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | POST | `/api/heygen/streaming/start` | HeyGen Avatar Realtime HLS session (v3; Interactive Avatar `/v1/streaming.new` sunset) |
 | POST | `/api/heygen/streaming/speak` | Append speech text on an open realtime session |
 | POST | `/api/heygen/streaming/stop` | Cancel realtime avatar session |
+| POST | `/api/astrology/assistant/chat` | Rose parlor reader (twelve tropical signs — not astronomy) |
+| GET | `/api/astrology/assistant/health` | Rose assistant health + catalog summary |
 | POST | `/api/studio/listen/unlock` | Listening-room password (default `reel1`) |
 | * | `/api/voice/*` | Voice (init, start, stop, speak, etc.) |
 | * | `/api/music-research/*` | Knowledge graph, Wikipedia, MusicBrainz, etc. |

@@ -190,7 +190,9 @@ describe('station page wiring', () => {
     expect(interiorsJs).toContain('BackSide');
     expect(interiorsJs).toContain('createInteriorManager');
     expect(menu).toContain('/planetarium/station.html');
+    expect(menu).toContain('/entertainment/astrology.html');
     expect(home).toContain('/planetarium/station.html');
+    expect(home).toContain('/entertainment/astrology.html');
     expect(guide).toContain('WELCOME_STATION');
     expect(guide).toContain('planetarium-carl-station');
   });

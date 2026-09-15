@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <title>Astrology · Twelve Signs | Lane AI Labs</title>
-  <meta name="description" content="A decorated Western tropical zodiac: all twelve signs on a gold wheel, birthday finder, and constellation cards."/>
+  <title>Rose · Twelve Sign Cards | Lane AI Labs</title>
+  <meta name="description" content="Rose, a HeyGen tarot-style reader, flips the twelve Western zodiac cards: gold wheel, birthday finder, and a three-card parlor spread."/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"/>
@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="/entertainment/css/astrology.css"/>
   <script src="/shared/modern-navbar.js"></script>
 </head>
-<body class="astro-page">
+<body class="astro-page" data-element="rose">
   <a class="astro-skip" href="#astroWheel">Skip to zodiac wheel</a>
   <canvas id="astroSky" class="astro-sky" aria-hidden="true"></canvas>
   <div class="astro-aurora" aria-hidden="true"></div>
@@ -41,28 +41,28 @@
 
   <main class="astro-wrap">
     <header class="astro-hero">
-      <p class="astro-kicker"><i class="bi bi-moon-stars" aria-hidden="true"></i> Tropical wheel</p>
-      <h1>The twelve signs</h1>
-      <p class="astro-hero__lead">A gold ring of the Western zodiac — every glyph, every date, a birthday finder, and a little constellation for the sign you tap.</p>
-      <div class="astro-ornament" aria-hidden="true">✦ ☽ ✦</div>
+      <p class="astro-kicker"><i class="bi bi-moon-stars" aria-hidden="true"></i> Twelve sign cards · parlor reading</p>
+      <h1>Rose</h1>
+      <p class="astro-hero__lead">Playful tropical cards — not the night sky.</p>
 
-      <form class="astro-finder" id="astroFinder">
-        <label>
-          Month
-          <select id="astroMonth" name="month" required></select>
-        </label>
-        <label>
-          Day
-          <select id="astroDay" name="day" required></select>
-        </label>
-        <button type="submit">Find my sign</button>
-        <p id="astroFinderStatus" role="status" aria-live="polite"></p>
-      </form>
+      <div class="astro-rose-dock" id="astroRoseDock">
+        <div class="astro-rose-dock__face">
+          <img src="/entertainment/assets/rose-guide-portrait.png" width="180" height="180" alt="Rose, the parlor reader"/>
+          <div id="astroHeygenMedia" class="astro-heygen-media" hidden aria-label="Rose live face"></div>
+        </div>
+        <div class="astro-rose-dock__copy">
+          <p>She reads the gold wheel like a deck.</p>
+          <div class="astro-rose-actions">
+            <button type="button" id="astroMeetRose">Meet Rose</button>
+            <button type="button" id="astroRoseSpeaks" class="astro-speak-toggle" aria-pressed="false">Rose speaks</button>
+          </div>
+        </div>
+      </div>
     </header>
 
     <section class="astro-stage">
       <div class="astro-wheel" id="astroWheel" aria-label="Zodiac wheel">
-        <svg class="astro-wheel__art" viewBox="0 0 200 200" aria-hidden="true">
+        <svg class="astro-wheel__art" id="astroWheelArt" viewBox="0 0 200 200" aria-hidden="true">
           <defs>
             <linearGradient id="astroGold" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stop-color="#f3dd9a"/>
@@ -70,6 +70,7 @@
               <stop offset="100%" stop-color="#8f7430"/>
             </linearGradient>
           </defs>
+          <g id="astroWedges" class="astro-wedges"></g>
           <circle cx="100" cy="100" r="96" fill="none" stroke="url(#astroGold)" stroke-width="1.2" opacity="0.85"/>
           <circle cx="100" cy="100" r="78" fill="none" stroke="rgba(232,200,114,0.28)" stroke-width="0.6" stroke-dasharray="2 4"/>
           <g stroke="rgba(232,200,114,0.55)" stroke-width="1.2">
@@ -92,8 +93,24 @@
         </div>
       </div>
 
-      <article class="astro-detail" id="astroDetail" aria-labelledby="astroDetailTitle" data-element="fire"></article>
+      <article class="astro-detail astro-flip astro-hero-card" id="astroDetail" aria-labelledby="astroDetailTitle" data-element="fire"></article>
     </section>
+
+    <form class="astro-finder" id="astroFinder">
+      <label>
+        Month
+        <select id="astroMonth" name="month" required></select>
+      </label>
+      <label>
+        Day
+        <select id="astroDay" name="day" required></select>
+      </label>
+      <button type="submit">Find my sign</button>
+      <button type="button" id="astroReadBtn">Ask Rose for a reading</button>
+      <p id="astroFinderStatus" role="status" aria-live="polite"></p>
+    </form>
+
+    <section class="astro-spread" id="astroSpread" hidden aria-label="Rose three-card reading"></section>
 
     <div class="astro-toolbar" id="astroFilters" role="toolbar" aria-label="Filter signs by element">
       <button type="button" data-element-filter="all" aria-pressed="true">All signs</button>
@@ -103,8 +120,20 @@
       <button type="button" data-element-filter="water" aria-pressed="false">Water</button>
     </div>
 
-    <section aria-label="All twelve signs">
+    <section class="astro-gallery-block" aria-labelledby="astroGalleryHeading">
+      <header class="astro-section-head">
+        <h2 id="astroGalleryHeading">Flip the deck</h2>
+        <p>All twelve sign cards — tap to flip and ask Rose.</p>
+      </header>
       <div class="astro-gallery" id="astroGallery"></div>
+    </section>
+
+    <section class="astro-arcana-block" aria-labelledby="astroArcanaHeading">
+      <header class="astro-section-head">
+        <h2 id="astroArcanaHeading">Major Arcana</h2>
+        <p>Twenty-two parlor trump cards — Rose reads them beside the wheel.</p>
+      </header>
+      <div class="astro-gallery astro-arcana-gallery" id="astroArcanaGallery"></div>
     </section>
 
     <p class="astro-note">
@@ -114,11 +143,18 @@
   </main>
 
   <footer class="astro-footer">
-    Lane AI Labs — Astrology wheel — <span id="astroDate"></span>
+    Lane AI Labs — Rose · Astrology wheel — <span id="astroDate"></span>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/livekit-client@2.9.1/dist/livekit-client.umd.min.js"></script>
+  <script src="/shared/tts.js"></script>
+  <script src="/shared/js/heygen-live-tile.js"></script>
   <script src="/entertainment/js/astrology-zodiac.js"></script>
+  <script src="/entertainment/js/astrology-arcana.js"></script>
   <script src="/entertainment/js/astrology.js"></script>
+  <script src="/entertainment/js/astrology-heygen.js"></script>
+  <script type="module" src="/entertainment/js/astrology-rose-chat.js"></script>
   <script>
     document.getElementById('astroDate').textContent = new Date().toLocaleDateString();
   </script>

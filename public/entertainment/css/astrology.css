@@ -10,6 +10,8 @@
   --as-muted: #c6bfb0;
   --as-gold: #e8c872;
   --as-gold-deep: #c8ab57;
+  --as-rose: #c44860;
+  --as-rose-deep: #8a2a3c;
   --as-fire: #ff8a5b;
   --as-earth: #d4b483;
   --as-air: #9fd4e8;
@@ -17,6 +19,7 @@
   --as-ring: rgba(232, 200, 114, 0.45);
   --as-serif: "Fraunces", "Palatino Linotype", Palatino, serif;
   --as-sans: "Outfit", "Segoe UI", sans-serif;
+  --as-element: var(--as-rose);
 }
 
 html,
@@ -30,11 +33,18 @@ body.astro-page {
   font-family: var(--as-sans);
   background-color: var(--as-void);
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(88, 64, 140, 0.35), transparent 55%),
+    radial-gradient(ellipse 80% 50% at 50% -10%, color-mix(in srgb, var(--as-element) 42%, transparent), transparent 55%),
     radial-gradient(ellipse 45% 35% at 8% 80%, rgba(40, 70, 110, 0.28), transparent 60%),
     radial-gradient(ellipse 40% 30% at 92% 18%, rgba(180, 110, 50, 0.16), transparent 55%),
     linear-gradient(180deg, #0b0a14 0%, var(--as-void) 42%, #0a0812 100%);
+  transition: background-image 0.8s ease;
 }
+
+body.astro-page[data-element="fire"] { --as-element: var(--as-fire); }
+body.astro-page[data-element="earth"] { --as-element: var(--as-earth); }
+body.astro-page[data-element="air"] { --as-element: var(--as-air); }
+body.astro-page[data-element="water"] { --as-element: var(--as-water); }
+body.astro-page[data-element="rose"] { --as-element: var(--as-rose); }
 
 body.astro-page modern-navbar {
   position: relative;
@@ -59,10 +69,11 @@ body.astro-page modern-navbar {
 
 .astro-aurora {
   background:
-    radial-gradient(ellipse 70% 28% at 50% 0%, rgba(120, 90, 200, 0.18), transparent 70%),
+    radial-gradient(ellipse 70% 28% at 50% 0%, color-mix(in srgb, var(--as-element) 34%, transparent), transparent 70%),
     radial-gradient(ellipse 40% 22% at 18% 12%, rgba(70, 160, 180, 0.12), transparent 70%),
     radial-gradient(ellipse 36% 20% at 82% 8%, rgba(232, 200, 114, 0.1), transparent 70%);
   animation: astroAurora 22s ease-in-out infinite alternate;
+  transition: background 0.8s ease;
 }
 
 .astro-grain {
@@ -83,16 +94,16 @@ body.astro-page modern-navbar {
 .astro-filigree::before {
   top: 5.2rem;
   left: 0.85rem;
-  border-top: 1px solid rgba(232, 200, 114, 0.45);
-  border-left: 1px solid rgba(232, 200, 114, 0.45);
+  border-top: 1px solid color-mix(in srgb, var(--as-element) 55%, rgba(232, 200, 114, 0.45));
+  border-left: 1px solid color-mix(in srgb, var(--as-element) 55%, rgba(232, 200, 114, 0.45));
   border-top-left-radius: 14px;
 }
 
 .astro-filigree::after {
   right: 0.85rem;
   bottom: 1.4rem;
-  border-bottom: 1px solid rgba(232, 200, 114, 0.45);
-  border-right: 1px solid rgba(232, 200, 114, 0.45);
+  border-bottom: 1px solid color-mix(in srgb, var(--as-rose) 50%, rgba(232, 200, 114, 0.45));
+  border-right: 1px solid color-mix(in srgb, var(--as-rose) 50%, rgba(232, 200, 114, 0.45));
   border-bottom-right-radius: 14px;
 }
 
@@ -106,7 +117,7 @@ body.astro-page modern-navbar {
 
 .astro-drift span {
   position: absolute;
-  color: rgba(232, 200, 114, 0.18);
+  color: color-mix(in srgb, var(--as-element) 35%, rgba(232, 200, 114, 0.12));
   font-size: clamp(1.4rem, 3vw, 2.4rem);
   animation: astroDrift 28s linear infinite;
 }
@@ -151,42 +162,29 @@ body.astro-page modern-navbar {
   letter-spacing: 0.28em;
   text-transform: uppercase;
   font-size: 0.72rem;
-  color: var(--as-gold);
+  color: color-mix(in srgb, var(--as-gold) 55%, var(--as-rose));
 }
 
 .astro-hero h1 {
   font-family: var(--as-serif);
   font-optical-sizing: auto;
   font-weight: 620;
-  font-size: clamp(2.4rem, 6vw, 4.4rem);
+  font-size: clamp(2.8rem, 7vw, 5rem);
   line-height: 1.05;
-  margin: 0 0 0.55rem;
-  text-shadow: 0 0 42px rgba(232, 200, 114, 0.28);
+  margin: 0 0 0.45rem;
+  background: linear-gradient(115deg, var(--as-gold) 10%, #fff3d2 42%, var(--as-rose) 92%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 0 14px rgba(232, 200, 114, 0.18));
 }
 
 .astro-hero__lead {
-  max-width: 38rem;
-  margin: 0 auto 1.1rem;
+  max-width: 28rem;
+  margin: 0 auto 1.35rem;
   color: var(--as-muted);
   font-size: 1.05rem;
-}
-
-.astro-ornament {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.7rem;
-  color: var(--as-gold-deep);
-  font-size: 0.95rem;
-  letter-spacing: 0.4em;
-}
-
-.astro-ornament::before,
-.astro-ornament::after {
-  content: "";
-  width: min(22vw, 140px);
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--as-gold), transparent);
 }
 
 .astro-finder {
@@ -195,15 +193,15 @@ body.astro-page modern-navbar {
   justify-content: center;
   align-items: end;
   gap: 0.75rem 1rem;
-  margin: 1.4rem auto 0;
+  margin: 1.6rem auto 0;
   padding: 0.95rem 1.1rem;
-  max-width: 42rem;
+  max-width: 48rem;
   border-radius: 1.15rem;
-  background: rgba(18, 16, 28, 0.62);
-  border: 1px solid rgba(232, 200, 114, 0.22);
+  background: rgba(18, 16, 28, 0.55);
+  border: 1px solid color-mix(in srgb, var(--as-rose) 35%, var(--as-gold));
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.03) inset,
-    0 18px 50px rgba(0, 0, 0, 0.28);
+    0 12px 36px rgba(0, 0, 0, 0.22);
   backdrop-filter: blur(12px);
 }
 
@@ -236,8 +234,9 @@ body.astro-page modern-navbar {
   margin: 0;
   min-height: 1.2em;
   text-align: center;
-  color: var(--as-gold);
+  color: var(--as-element);
   font-size: 0.92rem;
+  text-shadow: 0 0 18px color-mix(in srgb, var(--as-element) 40%, transparent);
 }
 
 .astro-finder button {
@@ -269,12 +268,29 @@ body.astro-page modern-navbar {
   isolation: isolate;
 }
 
+.astro-wheel::before {
+  content: "";
+  position: absolute;
+  inset: -8%;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--as-element) 28%, transparent), transparent 68%);
+  pointer-events: none;
+  z-index: 0;
+}
+
 .astro-wheel__art {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   filter: drop-shadow(0 0 18px rgba(232, 200, 114, 0.18));
+  z-index: 1;
+}
+
+#astroSlots {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
 }
 
 .astro-wheel::after {
@@ -295,19 +311,28 @@ body.astro-page modern-navbar {
   border-radius: 50%;
   background:
     radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.16), transparent 42%),
-    radial-gradient(circle at 50% 50%, rgba(18, 16, 28, 0.2), rgba(7, 6, 15, 0.88) 70%);
-  border: 1px solid var(--as-ring);
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--as-element) 22%, transparent), rgba(7, 6, 15, 0.88) 70%);
+  border: 1px solid color-mix(in srgb, var(--as-element) 55%, var(--as-ring));
   box-shadow:
     0 0 0 10px rgba(7, 6, 15, 0.35),
-    0 0 40px rgba(232, 200, 114, 0.16);
+    0 0 40px color-mix(in srgb, var(--as-element) 45%, transparent);
   text-align: center;
+  z-index: 2;
+  transition: background 0.45s ease, box-shadow 0.45s ease, border-color 0.45s ease;
 }
+
+.astro-wheel__core[data-element="fire"] { --as-element: var(--as-fire); }
+.astro-wheel__core[data-element="earth"] { --as-element: var(--as-earth); }
+.astro-wheel__core[data-element="air"] { --as-element: var(--as-air); }
+.astro-wheel__core[data-element="water"] { --as-element: var(--as-water); }
 
 .astro-wheel__glyph {
   font-size: clamp(2.6rem, 8vw, 4.2rem);
   line-height: 1;
-  color: var(--as-gold);
-  text-shadow: 0 0 24px rgba(232, 200, 114, 0.55);
+  color: color-mix(in srgb, var(--as-gold) 55%, var(--as-element));
+  text-shadow:
+    0 0 24px color-mix(in srgb, var(--as-element) 65%, transparent),
+    0 0 8px rgba(232, 200, 114, 0.45);
 }
 
 .astro-wheel__name {
@@ -334,13 +359,18 @@ body.astro-page modern-navbar {
   padding: 0.35rem 0.2rem 0.4rem;
   border: 1px solid transparent;
   border-radius: 999px;
-  background: rgba(7, 6, 15, 0.55);
+  background: color-mix(in srgb, var(--as-element, var(--as-gold)) 18%, rgba(7, 6, 15, 0.72));
   color: var(--as-ink);
   cursor: pointer;
   appearance: none;
   transform: rotate(calc(-1 * var(--angle)));
   align-self: start;
 }
+
+.astro-slot[data-element="fire"] { --as-element: var(--as-fire); }
+.astro-slot[data-element="earth"] { --as-element: var(--as-earth); }
+.astro-slot[data-element="air"] { --as-element: var(--as-air); }
+.astro-slot[data-element="water"] { --as-element: var(--as-water); }
 
 .astro-slot__glyph,
 .astro-card__glyph,
@@ -428,15 +458,28 @@ body.astro-page modern-navbar {
 }
 
 .astro-const line {
-  stroke: var(--as-gold);
+  stroke: color-mix(in srgb, var(--as-element, var(--as-gold)) 70%, var(--as-gold));
   stroke-width: 1.2;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 .astro-const__star {
-  fill: #fff6d8;
-  filter: drop-shadow(0 0 4px rgba(255, 246, 216, 0.8));
+  fill: color-mix(in srgb, #fff6d8 70%, var(--as-element, #fff6d8));
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--as-element, #fff6d8) 70%, transparent));
 }
+
+.astro-flip__face[data-element="fire"] .astro-const,
+.astro-hero-card[data-element="fire"] .astro-const,
+.astro-card[data-element="fire"] .astro-const { --as-element: var(--as-fire); }
+.astro-flip__face[data-element="earth"] .astro-const,
+.astro-hero-card[data-element="earth"] .astro-const,
+.astro-card[data-element="earth"] .astro-const { --as-element: var(--as-earth); }
+.astro-flip__face[data-element="air"] .astro-const,
+.astro-hero-card[data-element="air"] .astro-const,
+.astro-card[data-element="air"] .astro-const { --as-element: var(--as-air); }
+.astro-flip__face[data-element="water"] .astro-const,
+.astro-hero-card[data-element="water"] .astro-const,
+.astro-card[data-element="water"] .astro-const { --as-element: var(--as-water); }
 
 .astro-detail p {
   margin: 0;
@@ -455,7 +498,8 @@ body.astro-page modern-navbar {
 .astro-traits li {
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
-  background: rgba(232, 200, 114, 0.12);
+  background: color-mix(in srgb, var(--as-element, var(--as-gold)) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--as-element, var(--as-gold)) 35%, transparent);
   color: var(--as-ink);
   font-size: 0.85rem;
 }
@@ -478,10 +522,54 @@ body.astro-page modern-navbar {
   font-size: 0.82rem;
 }
 
+.astro-toolbar button[data-element-filter="fire"] {
+  border-color: color-mix(in srgb, var(--as-fire) 45%, transparent);
+  color: color-mix(in srgb, var(--as-fire) 75%, var(--as-muted));
+}
+
+.astro-toolbar button[data-element-filter="earth"] {
+  border-color: color-mix(in srgb, var(--as-earth) 45%, transparent);
+  color: color-mix(in srgb, var(--as-earth) 75%, var(--as-muted));
+}
+
+.astro-toolbar button[data-element-filter="air"] {
+  border-color: color-mix(in srgb, var(--as-air) 45%, transparent);
+  color: color-mix(in srgb, var(--as-air) 75%, var(--as-muted));
+}
+
+.astro-toolbar button[data-element-filter="water"] {
+  border-color: color-mix(in srgb, var(--as-water) 45%, transparent);
+  color: color-mix(in srgb, var(--as-water) 75%, var(--as-muted));
+}
+
 .astro-toolbar button[aria-pressed="true"] {
   color: #1c1408;
   background: var(--as-gold);
   border-color: var(--as-gold);
+}
+
+.astro-toolbar button[data-element-filter="fire"][aria-pressed="true"] {
+  background: var(--as-fire);
+  border-color: var(--as-fire);
+  color: #2a1208;
+}
+
+.astro-toolbar button[data-element-filter="earth"][aria-pressed="true"] {
+  background: var(--as-earth);
+  border-color: var(--as-earth);
+  color: #2a2010;
+}
+
+.astro-toolbar button[data-element-filter="air"][aria-pressed="true"] {
+  background: var(--as-air);
+  border-color: var(--as-air);
+  color: #102028;
+}
+
+.astro-toolbar button[data-element-filter="water"][aria-pressed="true"] {
+  background: var(--as-water);
+  border-color: var(--as-water);
+  color: #0c1a28;
 }
 
 .astro-gallery {
@@ -492,22 +580,18 @@ body.astro-page modern-navbar {
 
 .astro-card {
   text-align: left;
-  padding: 0.95rem 0.9rem 1rem;
-  border-radius: 1.05rem;
-  border: 1px solid rgba(232, 200, 114, 0.18);
-  background: rgba(12, 10, 22, 0.7);
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: inherit;
-  min-height: 100%;
+  min-height: 18.5rem;
   cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .astro-card:hover,
 .astro-card:focus-visible,
 .astro-card[aria-pressed="true"] {
-  transform: translateY(-3px);
-  border-color: var(--as-gold);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+  border-color: transparent;
 }
 
 .astro-card[hidden] {
@@ -536,6 +620,28 @@ body.astro-page modern-navbar {
   margin: 0;
   color: var(--as-muted);
   font-size: 0.88rem;
+}
+
+.astro-section-head {
+  text-align: center;
+  margin: 1.8rem 0 0.85rem;
+}
+
+.astro-section-head h2 {
+  font-family: var(--as-serif);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  margin: 0 0 0.35rem;
+  color: var(--as-ink);
+}
+
+.astro-section-head p {
+  margin: 0;
+  color: var(--as-muted);
+  font-size: 0.95rem;
+}
+
+.astro-arcana-gallery {
+  margin-bottom: 0.5rem;
 }
 
 .astro-note {
@@ -587,6 +693,29 @@ body.astro-page modern-navbar {
   .astro-slot__label {
     display: none;
   }
+
+  .astro-drift {
+    display: none;
+  }
+
+  .astro-rose-dock {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.9rem;
+  }
+
+  .astro-rose-dock__copy {
+    text-align: center;
+    max-width: none;
+  }
+
+  .astro-rose-dock p {
+    text-align: center;
+  }
+
+  .astro-rose-actions {
+    justify-content: center;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -613,4 +742,374 @@ body.astro-page modern-navbar {
   from { transform: translateY(110vh) rotate(0deg); opacity: 0; }
   12% { opacity: 0.55; }
   to { transform: translateY(-12vh) rotate(80deg); opacity: 0; }
+}
+
+.astro-wedges {
+  pointer-events: none;
+}
+
+.astro-wedge {
+  fill: color-mix(in srgb, var(--as-gold) 12%, transparent);
+  stroke: rgba(232, 200, 114, 0.35);
+  stroke-width: 0.6;
+  opacity: 0.85;
+  transition: fill 0.35s ease, opacity 0.35s ease;
+}
+
+.astro-wedge[data-element="fire"] { fill: color-mix(in srgb, var(--as-fire) 26%, transparent); }
+.astro-wedge[data-element="earth"] { fill: color-mix(in srgb, var(--as-earth) 26%, transparent); }
+.astro-wedge[data-element="air"] { fill: color-mix(in srgb, var(--as-air) 26%, transparent); }
+.astro-wedge[data-element="water"] { fill: color-mix(in srgb, var(--as-water) 26%, transparent); }
+
+.astro-wedge.is-selected {
+  opacity: 1;
+  fill: color-mix(in srgb, var(--as-element) 42%, transparent);
+}
+
+.astro-wedge.is-dim {
+  opacity: 0.18;
+}
+
+.astro-wheel__art,
+.astro-slots,
+#astroSlots {
+  z-index: 1;
+}
+
+.astro-rose-dock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  margin: 0 auto 0.5rem;
+  max-width: 36rem;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.astro-rose-dock img {
+  width: min(180px, 42vw);
+  height: min(180px, 42vw);
+  border-radius: 1rem;
+  object-fit: cover;
+  border: 1px solid color-mix(in srgb, var(--as-rose) 45%, var(--as-gold));
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+}
+
+.astro-rose-dock__face {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.astro-heygen-media {
+  position: absolute;
+  inset: 0;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: #0a0610;
+}
+
+.astro-heygen-media .astro-heygen__video,
+.astro-heygen-media video,
+.astro-heygen-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.astro-rose-dock--live .astro-rose-dock__face > img {
+  opacity: 0;
+}
+
+.astro-rose-dock__copy {
+  text-align: left;
+  max-width: 16rem;
+}
+
+.astro-rose-dock p {
+  margin: 0 0 0.75rem;
+  text-align: left;
+  font-size: 1rem;
+  color: var(--as-muted);
+}
+
+.astro-rose-dock strong {
+  color: var(--as-gold);
+  font-family: var(--as-serif);
+}
+
+.astro-rose-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.astro-rose-actions button,
+.astro-flip-cta,
+.astro-ask,
+.astro-unflip,
+#astroReadBtn,
+.astro-finder button {
+  appearance: none;
+  border: 0;
+  border-radius: 0.7rem;
+  padding: 0.4rem 0.95rem;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.astro-rose-actions button,
+.astro-flip-cta,
+.astro-ask,
+#astroReadBtn {
+  background: linear-gradient(180deg, #f0d78a, var(--as-gold-deep));
+  color: #1c1408;
+}
+
+#astroMeetRose {
+  border-radius: 0.7rem;
+}
+
+.astro-unflip {
+  background: transparent;
+  color: var(--as-gold);
+  border: 1px solid rgba(232, 200, 114, 0.35);
+}
+
+.astro-chip--fire { color: var(--as-fire); border-color: color-mix(in srgb, var(--as-fire) 55%, transparent); background: color-mix(in srgb, var(--as-fire) 14%, transparent); }
+.astro-chip--earth { color: var(--as-earth); border-color: color-mix(in srgb, var(--as-earth) 55%, transparent); background: color-mix(in srgb, var(--as-earth) 14%, transparent); }
+.astro-chip--air { color: var(--as-air); border-color: color-mix(in srgb, var(--as-air) 55%, transparent); background: color-mix(in srgb, var(--as-air) 14%, transparent); }
+.astro-chip--water { color: var(--as-water); border-color: color-mix(in srgb, var(--as-water) 55%, transparent); background: color-mix(in srgb, var(--as-water) 14%, transparent); }
+
+.astro-spread {
+  margin: 1.5rem auto 0;
+  padding: 1.1rem 1rem 1.25rem;
+  border-radius: 1.3rem;
+  background:
+    radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--as-rose) 18%, transparent), transparent 55%),
+    rgba(18, 10, 16, 0.78);
+  border: 1px solid color-mix(in srgb, var(--as-rose) 40%, var(--as-gold));
+}
+
+.astro-spread__head {
+  text-align: center;
+  margin-bottom: 0.9rem;
+}
+
+.astro-spread__head h2 {
+  font-family: var(--as-serif);
+  margin: 0.2rem 0 0.35rem;
+}
+
+.astro-spread__rail {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.astro-spread-card__role {
+  margin: 0 0 0.4rem;
+  text-align: center;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: var(--as-gold);
+}
+
+.astro-ask--spread {
+  display: block;
+  margin: 1rem auto 0;
+}
+
+.astro-flip {
+  perspective: 1100px;
+  min-height: 16rem;
+}
+
+.astro-hero-card {
+  min-height: 26rem;
+}
+
+.astro-flip__inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.4, 0.05, 0.2, 1);
+}
+
+.astro-flip.is-flipped .astro-flip__inner {
+  transform: rotateY(180deg);
+}
+
+.astro-flip__face {
+  inset: 0;
+  width: 100%;
+  min-height: 16rem;
+  padding: 0.95rem 0.9rem 1rem;
+  border-radius: 1.05rem;
+  border: 1px solid rgba(232, 200, 114, 0.22);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--as-element, var(--as-gold)) 16%, transparent), transparent 38%),
+    rgba(12, 10, 22, 0.86);
+  color: inherit;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.astro-flip:not(.is-flipped) .astro-flip__back,
+.astro-flip.is-flipped .astro-flip__front {
+  pointer-events: none;
+}
+
+.astro-gallery .astro-flip__front,
+.astro-spread-card .astro-flip__front {
+  position: relative;
+  display: block;
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
+  font: inherit;
+}
+
+.astro-flip__back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: rotateY(180deg);
+  overflow: auto;
+}
+
+.astro-flip__back[data-element="fire"],
+.astro-hero-card[data-element="fire"] .astro-flip__face { --as-element: var(--as-fire); }
+.astro-flip__back[data-element="earth"],
+.astro-hero-card[data-element="earth"] .astro-flip__face { --as-element: var(--as-earth); }
+.astro-flip__back[data-element="air"],
+.astro-hero-card[data-element="air"] .astro-flip__face { --as-element: var(--as-air); }
+.astro-flip__back[data-element="water"],
+.astro-hero-card[data-element="water"] .astro-flip__face { --as-element: var(--as-water); }
+
+.astro-gallery .astro-flip {
+  min-height: 18.5rem;
+}
+
+.astro-gallery .astro-flip.is-selected .astro-flip__front,
+.astro-gallery .astro-flip.is-selected .astro-flip__back {
+  border-color: var(--as-gold);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+}
+
+.astro-gallery .astro-const {
+  width: min(100%, 160px);
+  margin: 0.55rem auto 0;
+}
+
+.astro-hero-card.astro-detail {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.astro-hero-card .astro-flip__face {
+  min-height: 26rem;
+  padding: 1.25rem 1.3rem 1.4rem;
+  border-radius: 1.4rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+}
+
+.astro-flip__oracle,
+.astro-flip__gift,
+.astro-flip__shadow {
+  margin: 0.45rem 0 0;
+  color: var(--as-muted);
+  font-size: 0.92rem;
+}
+
+.astro-flip__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.8rem;
+}
+
+.astro-flip-cta {
+  margin-top: 0.9rem;
+}
+
+.astro-speak-toggle {
+  background: transparent !important;
+  color: var(--as-gold) !important;
+  border: 1px solid rgba(232, 200, 114, 0.4) !important;
+}
+
+.astro-speak-toggle[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--as-rose) 35%, #1c1408) !important;
+  color: #fff3d2 !important;
+  border-color: var(--as-rose) !important;
+}
+
+.astro-heygen-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+}
+
+.astro-heygen-modal .astro-heygen-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 3, 10, 0.72);
+}
+
+.astro-heygen-modal .astro-heygen-panel {
+  position: relative;
+  z-index: 1;
+  width: min(32rem, calc(100% - 1.5rem));
+  margin: 12vh auto 0;
+  padding: 1.1rem 1.15rem 1.2rem;
+  border-radius: 1.2rem;
+  background: #16111a;
+  border: 1px solid color-mix(in srgb, var(--as-rose) 40%, var(--as-gold));
+  color: var(--as-ink);
+}
+
+.astro-heygen-modal video {
+  width: 100%;
+  border-radius: 0.8rem;
+  background: #000;
+}
+
+.astro-heygen-script {
+  display: grid;
+  gap: 0.7rem;
+  justify-items: center;
+  text-align: center;
+}
+
+.astro-heygen-script img {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 2px solid var(--as-rose);
+}
+
+@media (max-width: 900px) {
+  .astro-spread__rail {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .astro-flip__inner {
+    transition: none !important;
+  }
 }

@@ -16,7 +16,9 @@ The home hero still uses the lightweight [`FunHomeSky`](../public/shared/js/fun-
 | **Planet world page** | `/planetarium/worlds/body.html?id=mars` (mercury–pluto + moon) |
 | **SpaceX rockets** | `/planetarium/spacex.html` — Falcon 1 / 9 / Heavy / Starship plus every tracked launch date; Zigzag hangar chat with Elon (`?talk=1`) |
 | **ISS station** | `/planetarium/station.html` — clickable 3D modules, current crew, Cupola walk, Zigzag tour (`?module=cupola&mode=walk&tour=1`) |
-| Carl chat | `POST /api/planetarium/assistant/chat` |
+| **Astrology** | `/entertainment/astrology.html` — Rose parlor: flip signs, Major Arcana, birthday spread (`?reading=1`, `?demo=heygen`) |
+| Carl chat | `POST /api/planetarium/assistant/chat` — zodiac/tarot intents hand off to Rose |
+| Rose chat | `POST /api/astrology/assistant/chat` — parlor reader (not astronomy) |
 | ISS passes + position | `GET /api/planetarium/iss-passes?lat=&lon=&at=` |
 | ISS station world | `GET /api/planetarium/station?module=&mode=` — modules + crew snapshot + live nadir |
 | Events / meteors | `GET /api/planetarium/events?from=` |

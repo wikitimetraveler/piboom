@@ -1,0 +1,33 @@
+{
+  "id": "astrology-rose-intro",
+  "title": "Meet Rose",
+  "ctaLabel": "Ask Rose for a reading",
+  "ctaHref": "/entertainment/astrology.html?reading=1",
+  "qrLandingPath": "/entertainment/astrology.html?demo=heygen",
+  "brand": {
+    "attribution": "Avatar narration powered by HeyGen",
+    "developmentBy": "David E Lane"
+  },
+  "heygenScriptShort": "I'm Rose. This gold wheel is my deck — twelve signs, four elements, and twenty-two Major Arcana. Give me a birthday, or let me deal Sun, Cross, and Path. Playful tropical astrology, not the night sky — Carl keeps the dome.",
+  "heygenVoiceLanguage": "English",
+  "heygenMotionPrompt": "intimate nod, candlelit tarot reader speaking to camera, low expressiveness",
+  "heygenExpressiveness": "low",
+  "heygenAvatarId": "9b419a297d0cde418ac1408f4d0a0de5",
+  "heygenAvatarGroupId": null,
+  "heygenVoiceId": "57e4c49b43be4517b7c6a1d59a56659e",
+  "heygenVoiceName": "Shanon - Warm & Friendly",
+  "heygenVideoIdShort": "859052adcc6020c6828af6800f3c5841",
+  "heygenVideoUrlShort": null,
+  "heygenVideoLocalShort": "/entertainment/assets/video/astrology-rose-intro.mp4",
+  "generatedAt": "2026-09-15T01:57:01.942Z",
+  "avatar": {
+    "name": "Rose",
+    "file": "AVATAR-ROSE.md",
+    "portrait": "/entertainment/assets/rose-guide-portrait-256.png",
+    "source": "/entertainment/assets/rose-guide-portrait.png",
+    "status": "heygen-ready-with-video",
+    "lookId": "9b419a297d0cde418ac1408f4d0a0de5",
+    "groupId": null
+  },
+  "generateHint": "npm run create:rose-heygen-avatar -- --dry-run  then  npm run generate:rose-heygen-demo"
+}
