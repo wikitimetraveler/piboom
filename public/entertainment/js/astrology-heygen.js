@@ -300,8 +300,9 @@
    * When "Rose speaks" streaming is on, also pushes text to the live avatar.
    */
   async function speak(text) {
-    const clean = String(text || '').trim().slice(0, 900);
+    const clean = String(text || '').trim().slice(0, 1800);
     if (!clean) return;
+    if (typeof root.isAgentSpeechMuted === 'function' && root.isAgentSpeechMuted()) return;
     if (speakOn && heygenSessionId && heygenSessionId !== 'poster') {
       const demo = cachedDemo;
       const res = await fetch('/api/heygen/streaming/speak', {
@@ -309,7 +310,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionId: heygenSessionId,
-          text: clean,
+          text: clean.slice(0, 900),
           avatarId: demo?.heygenAvatarId || undefined,
           voiceId: demo?.heygenVoiceId || undefined,
         }),
@@ -319,12 +320,25 @@
     await speakTts(clean);
   }
 
+  function stopSpeaking() {
+    if (typeof root.stopSpeech === 'function') root.stopSpeech();
+    try {
+      root.speechSynthesis?.cancel();
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
   function boot() {
     document.getElementById('astroMeetRose')?.addEventListener('click', () => {
       playIntro();
     });
     document.getElementById('astroRoseSpeaks')?.addEventListener('click', () => {
       setSpeak(!speakOn);
+    });
+    document.getElementById('astroRoseStop')?.addEventListener('click', () => {
+      stopSpeaking();
+      if (speakOn) setSpeak(false);
     });
     if (DEMO_RE.test(String(location.search || ''))) playIntro();
   }
@@ -339,6 +353,7 @@
     playIntro,
     speak,
     setSpeak,
+    stopSpeaking,
     loadDemo,
   };
 })(typeof globalThis !== 'undefined' ? globalThis : window);

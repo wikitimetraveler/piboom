@@ -163,6 +163,8 @@ describe('astrology page wiring', () => {
     expect(html).toContain('id="astroArcanaGallery"');
     expect(html).toContain('id="astroGalleryHeading"');
     expect(html).toContain('Flip the deck');
+    expect(html).toContain('Tarot cards');
+    expect(html).toContain('id="astroTarotFilters"');
     expect(html).toContain('id="astroSpread"');
     expect(html).toContain('id="astroMeetRose"');
     expect(html).toContain('id="astroWedges"');

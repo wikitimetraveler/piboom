@@ -99,6 +99,67 @@ describe('CalculationsEngine DAG-lite propagation', () => {
       globalThis.document = originalDocument;
     }
   });
+
+  test('onCellComputed fires once per changed result during cascade', () => {
+    const originalDocument = globalThis.document;
+    const fields = {
+      x: { id: 'x', value: '1', addEventListener: () => {} },
+      r1: { id: 'r1', value: '', addEventListener: () => {} },
+      r2: { id: 'r2', value: '', addEventListener: () => {} },
+      r3: { id: 'r3', value: '', addEventListener: () => {} },
+      r4: { id: 'r4', value: '', addEventListener: () => {} },
+    };
+
+    globalThis.document = {
+      getElementById(id) {
+        return fields[id] || null;
+      },
+    };
+
+    const math = {
+      copyValue(values = []) {
+        return Number(values[0] || 0);
+      },
+      sumRounded(values = []) {
+        return values.reduce((sum, value) => sum + Number(value || 0), 0);
+      },
+    };
+
+    const config = {
+      groups: [
+        { inputIds: ['x'], resultId: 'r1', calculation: 'copyValue' },
+        { inputIds: ['r1'], resultId: 'r2', calculation: 'copyValue' },
+        { inputIds: ['r1'], resultId: 'r3', calculation: 'copyValue' },
+        { inputIds: ['r2', 'r3'], resultId: 'r4', calculation: 'sumRounded' },
+      ],
+    };
+
+    const seen = [];
+    try {
+      const engine = new CalculationsEngine(config, {
+        math,
+        debounceMs: 0,
+        listenToChange: false,
+        enableDagLite: true,
+        onCellComputed(evt) {
+          seen.push(evt.resultId);
+        },
+      });
+
+      engine.recalculateAll();
+      seen.length = 0;
+
+      fields.x.value = '2';
+      engine.updateResult('copyValue', 'r1');
+
+      expect(new Set(seen)).toEqual(new Set(['r1', 'r2', 'r3', 'r4']));
+      expect(seen.filter((id) => id === 'r1')).toHaveLength(1);
+      expect(seen.filter((id) => id === 'r4').length).toBeGreaterThanOrEqual(1);
+      expect(fields.r4.value).toBe('4');
+    } finally {
+      globalThis.document = originalDocument;
+    }
+  });
 });
 
 describe('CalculationsEngine strict parsing and invalid boundary handling', () => {

@@ -20,9 +20,44 @@
   let audioCtx = null;
   /** Created during a user gesture; reused for the next Google MP3 (phrases). */
   let primedPlayer = null;
+  /** Bumped by stopSpeech so in-flight synthesize/play can abort. */
+  let speechGeneration = 0;
+  const MUTE_KEY = 'laneAgentSpeechMuted';
   // Valid tiny silent WAV — the old truncated URI made Firefox throw NS_ERROR_DOM_MEDIA_METADATA_ERR.
   const SILENT_WAV =
     'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+
+  function isAgentSpeechMuted() {
+    try {
+      return window.localStorage.getItem(MUTE_KEY) === '1';
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function setAgentSpeechMuted(on) {
+    const muted = Boolean(on);
+    try {
+      window.localStorage.setItem(MUTE_KEY, muted ? '1' : '0');
+    } catch (_) {
+      /* ignore */
+    }
+    if (muted) stopSpeech();
+    try {
+      window.dispatchEvent(new CustomEvent('lane-agent-speech-mute', { detail: { muted } }));
+    } catch (_) {
+      /* ignore */
+    }
+    return muted;
+  }
+
+  function toggleAgentSpeechMuted() {
+    return setAgentSpeechMuted(!isAgentSpeechMuted());
+  }
+
+  function speechWasStopped(gen) {
+    return typeof gen === 'number' && gen !== speechGeneration;
+  }
 
   function unlockWebAudio() {
     try {
@@ -182,6 +217,13 @@
 
   async function speakWithGoogle(text, voice = 'en-US-Standard-D', options = {}) {
     try {
+      if (isAgentSpeechMuted()) return false;
+      const myGen = speechGeneration;
+      const cancelled = () =>
+        speechWasStopped(myGen) ||
+        isAgentSpeechMuted() ||
+        (typeof options.isCancelled === 'function' && options.isCancelled());
+
       // Always Google Cloud TTS first (every surface, every language). Browser speech is
       // last-resort only — mobile system voices are unreliable (matron EN, missing AR, etc.).
       if (currentAudio) {
@@ -207,20 +249,24 @@
         })
       });
 
+      if (cancelled()) return false;
+
       const data = await response.json();
 
       if (data.success && data.audio) {
         const audioBlob = base64ToBlob(data.audio, 'audio/mp3');
         const played = await playSynthesizedBlob(audioBlob, {
           volume: options.volume || 0.8,
-          isCancelled: options.isCancelled
+          isCancelled: cancelled
         });
         if (played) return true;
+        if (cancelled()) return false;
         console.warn('Audio play blocked; user interaction required.');
-        return speakWithBrowser(text, options);
+        return speakWithBrowser(text, { ...options, isCancelled: cancelled });
       }
 
-      return speakWithBrowser(text, options);
+      if (cancelled()) return false;
+      return speakWithBrowser(text, { ...options, isCancelled: cancelled });
     } catch (error) {
       console.error('Speech error:', error);
       return speakWithBrowser(text, options);
@@ -228,6 +274,7 @@
   }
 
   function stopSpeech() {
+    speechGeneration += 1;
     if (currentAudio) {
       try {
         currentAudio.pause();
@@ -553,4 +600,7 @@
   if (!window.ensureAudioUnlock) window.ensureAudioUnlock = ensureAudioUnlock;
   if (!window.primeSpeechSynthesis) window.primeSpeechSynthesis = primeSpeechSynthesis;
   if (!window.speakNarrationAwaitEnd) window.speakNarrationAwaitEnd = speakNarrationAwaitEnd;
+  if (!window.isAgentSpeechMuted) window.isAgentSpeechMuted = isAgentSpeechMuted;
+  if (!window.setAgentSpeechMuted) window.setAgentSpeechMuted = setAgentSpeechMuted;
+  if (!window.toggleAgentSpeechMuted) window.toggleAgentSpeechMuted = toggleAgentSpeechMuted;
 })();

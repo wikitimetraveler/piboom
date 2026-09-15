@@ -33,6 +33,8 @@ const config = createDTICalculatorConfig({
 
 Live worksheet: **`/finance/fha-streamline-loan-amount-calculator.html`** (uses `createFHACalculatorConfig()` + DAG-lite). HeyGen script: [CALCULATION_ENGINE_VIDEO_SCRIPT.md](CALCULATION_ENGINE_VIDEO_SCRIPT.md).
 
+WebGPU demo (new page, not a worksheet replacement): **`/finance/calc-engine-webgpu.html`**. CPU `calcMath` still computes live values. WebGPU paints the FHA DAG and runs an **integer-cent** kernel as a verifier. Default GPU `f32` cannot safely round FHA-scale cents; this is **not** a speed-up (11 sequential cells vs dispatch + readback). Helpers: `dollarsToCents`, `centsToDollars`, `fhaLoanAmountIntegerCents`, `multiplyPercentageF32`. Optional engine hook: `onCellComputed`.
+
 ```javascript
 const config = createFHACalculatorConfig({
   prefix: 'fs',
@@ -76,6 +78,9 @@ const config = createAssetQualifierConfig({
 | `minAssetsPass` | PASS if liquid+other+retirement-required ≥ 500000, else FAIL |
 | `supportablePaymentRounded` | netAssets × factor (formula in source) |
 | `messagesC31C32` | Asset qualifier guidance messages |
+| `dollarsToCents` / `centsToDollars` | Integer-cent conversion (exact money path) |
+| `fhaLoanAmountIntegerCents` | FHA loan-amount DAG in cents + G33 hundredths |
+| `multiplyPercentageF32` | f32 stand-in for UFMIP; documents cent drift |
 
 ## DAG-Lite (Cascading Dependencies)
 
@@ -94,4 +99,5 @@ Pass `customIds` with Encompass field IDs (native `[4002]` or custom `CX.RS.X`) 
 - **AGENTS.md** – Conventions: use calculationEngine + customIds
 - **docs/ENCOMPASS.md** – Encompass integration
 - **docs/CALCULATION_ENGINE_VIDEO_SCRIPT.md** – HeyGen / teleprompter script (DAG-lite explainer)
+- **WebGPU DAG demo** – `/finance/calc-engine-webgpu.html` (paint + integer-cent verifier)
 - **Encompass Assistant** – Knows calc methods (sumRounded, calculateDTI, etc.) for Q&A

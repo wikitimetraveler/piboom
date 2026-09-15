@@ -1,0 +1,476 @@
+{
+  "attribution": "Pamela Colman Smith / Rider–Waite–Smith deck (public domain). Scans via Wikimedia Commons.",
+  "license": "Public domain",
+  "source": "https://commons.wikimedia.org/wiki/Category:Rider-Waite_tarot_deck",
+  "fetchedAt": "2026-09-15T02:24:19.035Z",
+  "cards": [
+    {
+      "id": "the-fool",
+      "file": "RWS Tarot 00 Fool.jpg",
+      "local": "/entertainment/assets/tarot/the-fool.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "the-magician",
+      "file": "RWS Tarot 01 Magician.jpg",
+      "local": "/entertainment/assets/tarot/the-magician.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "the-high-priestess",
+      "file": "RWS Tarot 02 High Priestess.jpg",
+      "local": "/entertainment/assets/tarot/the-high-priestess.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "the-empress",
+      "file": "RWS Tarot 03 Empress.jpg",
+      "local": "/entertainment/assets/tarot/the-empress.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "the-emperor",
+      "file": "RWS Tarot 04 Emperor.jpg",
+      "local": "/entertainment/assets/tarot/the-emperor.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "the-hierophant",
+      "file": "RWS Tarot 05 Hierophant.jpg",
+      "local": "/entertainment/assets/tarot/the-hierophant.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "the-lovers",
+      "file": "RWS Tarot 06 Lovers.jpg",
+      "local": "/entertainment/assets/tarot/the-lovers.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "the-chariot",
+      "file": "RWS Tarot 07 Chariot.jpg",
+      "local": "/entertainment/assets/tarot/the-chariot.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "strength",
+      "file": "RWS Tarot 08 Strength.jpg",
+      "local": "/entertainment/assets/tarot/strength.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "the-hermit",
+      "file": "RWS Tarot 09 Hermit.jpg",
+      "local": "/entertainment/assets/tarot/the-hermit.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "wheel-of-fortune",
+      "file": "RWS Tarot 10 Wheel of Fortune.jpg",
+      "local": "/entertainment/assets/tarot/wheel-of-fortune.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "justice",
+      "file": "RWS Tarot 11 Justice.jpg",
+      "local": "/entertainment/assets/tarot/justice.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "the-hanged-man",
+      "file": "RWS Tarot 12 Hanged Man.jpg",
+      "local": "/entertainment/assets/tarot/the-hanged-man.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "death",
+      "file": "RWS Tarot 13 Death.jpg",
+      "local": "/entertainment/assets/tarot/death.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "temperance",
+      "file": "RWS Tarot 14 Temperance.jpg",
+      "local": "/entertainment/assets/tarot/temperance.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "the-devil",
+      "file": "RWS Tarot 15 Devil.jpg",
+      "local": "/entertainment/assets/tarot/the-devil.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "the-tower",
+      "file": "RWS Tarot 16 Tower.jpg",
+      "local": "/entertainment/assets/tarot/the-tower.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "the-star",
+      "file": "RWS Tarot 17 Star.jpg",
+      "local": "/entertainment/assets/tarot/the-star.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "the-moon",
+      "file": "RWS Tarot 18 Moon.jpg",
+      "local": "/entertainment/assets/tarot/the-moon.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "the-sun",
+      "file": "RWS Tarot 19 Sun.jpg",
+      "local": "/entertainment/assets/tarot/the-sun.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "judgement",
+      "file": "RWS Tarot 20 Judgement.jpg",
+      "local": "/entertainment/assets/tarot/judgement.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "the-world",
+      "file": "RWS Tarot 21 World.jpg",
+      "local": "/entertainment/assets/tarot/the-world.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "ace-of-wands",
+      "file": "Wands01.jpg",
+      "local": "/entertainment/assets/tarot/ace-of-wands.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "two-of-wands",
+      "file": "Wands02.jpg",
+      "local": "/entertainment/assets/tarot/two-of-wands.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "three-of-wands",
+      "file": "Wands03.jpg",
+      "local": "/entertainment/assets/tarot/three-of-wands.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "four-of-wands",
+      "file": "Wands04.jpg",
+      "local": "/entertainment/assets/tarot/four-of-wands.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "five-of-wands",
+      "file": "Wands05.jpg",
+      "local": "/entertainment/assets/tarot/five-of-wands.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "six-of-wands",
+      "file": "Wands06.jpg",
+      "local": "/entertainment/assets/tarot/six-of-wands.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "seven-of-wands",
+      "file": "Wands07.jpg",
+      "local": "/entertainment/assets/tarot/seven-of-wands.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "eight-of-wands",
+      "file": "Wands08.jpg",
+      "local": "/entertainment/assets/tarot/eight-of-wands.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "nine-of-wands",
+      "file": "Wands09.jpg",
+      "local": "/entertainment/assets/tarot/nine-of-wands.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "ten-of-wands",
+      "file": "Wands10.jpg",
+      "local": "/entertainment/assets/tarot/ten-of-wands.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "page-of-wands",
+      "file": "Wands11.jpg",
+      "local": "/entertainment/assets/tarot/page-of-wands.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "knight-of-wands",
+      "file": "Wands12.jpg",
+      "local": "/entertainment/assets/tarot/knight-of-wands.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "queen-of-wands",
+      "file": "Wands13.jpg",
+      "local": "/entertainment/assets/tarot/queen-of-wands.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "king-of-wands",
+      "file": "Wands14.jpg",
+      "local": "/entertainment/assets/tarot/king-of-wands.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "ace-of-cups",
+      "file": "Cups01.jpg",
+      "local": "/entertainment/assets/tarot/ace-of-cups.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "two-of-cups",
+      "file": "Cups02.jpg",
+      "local": "/entertainment/assets/tarot/two-of-cups.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "three-of-cups",
+      "file": "Cups03.jpg",
+      "local": "/entertainment/assets/tarot/three-of-cups.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "four-of-cups",
+      "file": "Cups04.jpg",
+      "local": "/entertainment/assets/tarot/four-of-cups.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "five-of-cups",
+      "file": "Cups05.jpg",
+      "local": "/entertainment/assets/tarot/five-of-cups.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "six-of-cups",
+      "file": "Cups06.jpg",
+      "local": "/entertainment/assets/tarot/six-of-cups.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "seven-of-cups",
+      "file": "Cups07.jpg",
+      "local": "/entertainment/assets/tarot/seven-of-cups.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "eight-of-cups",
+      "file": "Cups08.jpg",
+      "local": "/entertainment/assets/tarot/eight-of-cups.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "nine-of-cups",
+      "file": "Cups09.jpg",
+      "local": "/entertainment/assets/tarot/nine-of-cups.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "ten-of-cups",
+      "file": "Cups10.jpg",
+      "local": "/entertainment/assets/tarot/ten-of-cups.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "page-of-cups",
+      "file": "Cups11.jpg",
+      "local": "/entertainment/assets/tarot/page-of-cups.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "knight-of-cups",
+      "file": "Cups12.jpg",
+      "local": "/entertainment/assets/tarot/knight-of-cups.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "queen-of-cups",
+      "file": "Cups13.jpg",
+      "local": "/entertainment/assets/tarot/queen-of-cups.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "king-of-cups",
+      "file": "Cups14.jpg",
+      "local": "/entertainment/assets/tarot/king-of-cups.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "ace-of-swords",
+      "file": "Swords01.jpg",
+      "local": "/entertainment/assets/tarot/ace-of-swords.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "two-of-swords",
+      "file": "Swords02.jpg",
+      "local": "/entertainment/assets/tarot/two-of-swords.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "three-of-swords",
+      "file": "Swords03.jpg",
+      "local": "/entertainment/assets/tarot/three-of-swords.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "four-of-swords",
+      "file": "Swords04.jpg",
+      "local": "/entertainment/assets/tarot/four-of-swords.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "five-of-swords",
+      "file": "Swords05.jpg",
+      "local": "/entertainment/assets/tarot/five-of-swords.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "six-of-swords",
+      "file": "Swords06.jpg",
+      "local": "/entertainment/assets/tarot/six-of-swords.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "seven-of-swords",
+      "file": "Swords07.jpg",
+      "local": "/entertainment/assets/tarot/seven-of-swords.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "eight-of-swords",
+      "file": "Swords08.jpg",
+      "local": "/entertainment/assets/tarot/eight-of-swords.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "nine-of-swords",
+      "file": "Swords09.jpg",
+      "local": "/entertainment/assets/tarot/nine-of-swords.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "ten-of-swords",
+      "file": "Swords10.jpg",
+      "local": "/entertainment/assets/tarot/ten-of-swords.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "page-of-swords",
+      "file": "Swords11.jpg",
+      "local": "/entertainment/assets/tarot/page-of-swords.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "knight-of-swords",
+      "file": "Swords12.jpg",
+      "local": "/entertainment/assets/tarot/knight-of-swords.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "queen-of-swords",
+      "file": "Swords13.jpg",
+      "local": "/entertainment/assets/tarot/queen-of-swords.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "king-of-swords",
+      "file": "Swords14.jpg",
+      "local": "/entertainment/assets/tarot/king-of-swords.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "ace-of-pentacles",
+      "file": "Pents01.jpg",
+      "local": "/entertainment/assets/tarot/ace-of-pentacles.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "two-of-pentacles",
+      "file": "Pents02.jpg",
+      "local": "/entertainment/assets/tarot/two-of-pentacles.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "three-of-pentacles",
+      "file": "Pents03.jpg",
+      "local": "/entertainment/assets/tarot/three-of-pentacles.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "four-of-pentacles",
+      "file": "Pents04.jpg",
+      "local": "/entertainment/assets/tarot/four-of-pentacles.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "five-of-pentacles",
+      "file": "Pents05.jpg",
+      "local": "/entertainment/assets/tarot/five-of-pentacles.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "six-of-pentacles",
+      "file": "Pents06.jpg",
+      "local": "/entertainment/assets/tarot/six-of-pentacles.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "seven-of-pentacles",
+      "file": "Pents07.jpg",
+      "local": "/entertainment/assets/tarot/seven-of-pentacles.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "eight-of-pentacles",
+      "file": "Pents08.jpg",
+      "local": "/entertainment/assets/tarot/eight-of-pentacles.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "nine-of-pentacles",
+      "file": "Pents09.jpg",
+      "local": "/entertainment/assets/tarot/nine-of-pentacles.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "ten-of-pentacles",
+      "file": "Pents10.jpg",
+      "local": "/entertainment/assets/tarot/ten-of-pentacles.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "page-of-pentacles",
+      "file": "Pents11.jpg",
+      "local": "/entertainment/assets/tarot/page-of-pentacles.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "knight-of-pentacles",
+      "file": "Pents12.jpg",
+      "local": "/entertainment/assets/tarot/knight-of-pentacles.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "queen-of-pentacles",
+      "file": "Pents13.jpg",
+      "local": "/entertainment/assets/tarot/queen-of-pentacles.jpg",
+      "status": "ok"
+    },
+    {
+      "id": "king-of-pentacles",
+      "file": "Pents14.jpg",
+      "local": "/entertainment/assets/tarot/king-of-pentacles.jpg",
+      "status": "ok"
+    }
+  ]
+}

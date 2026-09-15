@@ -35,6 +35,7 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let selectedId = '';
   let elementFilter = 'all';
+  let tarotSuitFilter = 'all';
   let skyRaf = 0;
   let skyElement = 'rose';
   let lastSpread = null;
@@ -155,39 +156,59 @@
   function arcanaBackFace(card) {
     return `
       <div class="astro-flip__meta">
-        <span class="astro-chip">${esc(card.roman)}</span>
+        <span class="astro-chip">${esc(card.suitLabel || card.suit)}</span>
         <span class="astro-chip">${esc(card.keyword)}</span>
       </div>
       <h3>${esc(card.glyph)} ${esc(card.name)}</h3>
       <p class="astro-flip__oracle">${esc(card.oracle)}</p>
       <p class="astro-flip__gift"><strong>Gift.</strong> ${esc(card.gift)}</p>
       <p class="astro-flip__shadow"><strong>Watch.</strong> ${esc(card.shadow)}</p>
-      <ul class="astro-traits">${card.traits.map((trait) => `<li>${esc(trait)}</li>`).join('')}</ul>
+      <ul class="astro-traits">${(card.traits || []).map((trait) => `<li>${esc(trait)}</li>`).join('')}</ul>
       <div class="astro-flip__actions">
         <button type="button" class="astro-ask" data-ask-rose="${esc(card.askRose)}">Ask Rose</button>
         <button type="button" class="astro-unflip">Flip back</button>
       </div>`;
   }
 
+  function tarotImage(card) {
+    const src = A && A.imageSrc ? A.imageSrc(card) : card.image || card.commonsUrl || '';
+    if (!src) return '';
+    return `<img class="astro-tarot-art" src="${esc(src)}" alt="" loading="lazy" width="180" height="300" onerror="this.classList.add('is-missing')"/>`;
+  }
+
   function arcanaGalleryMarkup() {
-    if (!A || !A.ARCANA) return '';
-    return A.ARCANA.map(
-      (card) => `<article class="astro-flip astro-card astro-arcana-card" data-arcana="${card.id}">
+    if (!A) return '';
+    const deck = A.DECK || A.ARCANA || [];
+    return deck
+      .map(
+        (card) => `<article class="astro-flip astro-card astro-arcana-card" data-arcana="${card.id}" data-tarot-suit="${card.suit}">
       <div class="astro-flip__inner">
-        <button type="button" class="astro-flip__face astro-flip__front" data-arcana-flip aria-expanded="false">
-          <div class="astro-card__top">
-            <span class="astro-card__glyph" aria-hidden="true">${esc(card.glyph)}</span>
-            <span class="astro-chip">${esc(card.roman)}</span>
+        <button type="button" class="astro-flip__face astro-flip__front astro-tarot-front" data-arcana-flip aria-expanded="false">
+          ${tarotImage(card)}
+          <div class="astro-tarot-front__meta">
+            <span class="astro-chip">${esc(card.suit === 'major' ? card.roman : card.suitLabel)}</span>
+            <h3>${esc(card.name)}</h3>
+            <p>${esc(card.keyword)}</p>
           </div>
-          <h3>${esc(card.name)}</h3>
-          <p>${esc(card.keyword)}</p>
         </button>
         <div class="astro-flip__face astro-flip__back">
           ${arcanaBackFace(card)}
         </div>
       </div>
     </article>`
-    ).join('');
+      )
+      .join('');
+  }
+
+  function applyTarotFilter() {
+    document.querySelectorAll('#astroArcanaGallery .astro-arcana-card').forEach((card) => {
+      const suit = card.dataset.tarotSuit;
+      const show =
+        tarotSuitFilter === 'all' ||
+        suit === tarotSuitFilter ||
+        (tarotSuitFilter === 'major' && suit === 'major');
+      card.hidden = !show;
+    });
   }
 
   function renderDetail(sign) {
@@ -569,6 +590,18 @@
       });
       applyFilter();
     });
+
+    const tarotFilters = $('astroTarotFilters');
+    tarotFilters?.addEventListener('click', (event) => {
+      const btn = event.target.closest('[data-tarot-suit]');
+      if (!btn) return;
+      tarotSuitFilter = btn.dataset.tarotSuit;
+      tarotFilters.querySelectorAll('[data-tarot-suit]').forEach((el) => {
+        el.setAttribute('aria-pressed', String(el === btn));
+      });
+      applyTarotFilter();
+    });
+    applyTarotFilter();
 
     const fromQuery = Z.parseSignQuery(window.location.search) || Z.parseSignQuery(window.location.hash);
     const wantReading = Z.parseReadingQuery(window.location.search);

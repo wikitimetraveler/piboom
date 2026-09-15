@@ -12,8 +12,8 @@ const DEMO_PATH = path.join(ROOT, 'data/rose-heygen-demo.json');
 
 export const ROSE_DEMO_SHORT_SCRIPT = [
   "I'm Rose.",
-  'This gold wheel is my deck — twelve signs, four elements, and twenty-two Major Arcana.',
-  'Give me a birthday, or let me deal Sun, Cross, and Path.',
+  'This gold wheel is my deck — twelve signs, four elements, and a full seventy-eight-card tarot.',
+  'I teach how to shuffle, draw, and read — give me a birthday, or flip a card.',
   'Playful tropical astrology, not the night sky — Carl keeps the dome.',
 ].join(' ');
 

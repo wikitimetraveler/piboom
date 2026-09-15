@@ -23,7 +23,8 @@ class CalculationsEngine {
 
       // Host-compat knobs (Encompass / embedded browsers can be quirky)
       listenToChange = true,      // add 'change' listeners alongside 'input'
-      enableReentryGuard = true   // prevent root calls while cascading
+      enableReentryGuard = true,  // prevent root calls while cascading
+      onCellComputed = null       // ({ resultId, value, calculation }) when a result value changes
     } = {}
   ) {
     this.groups = config?.groups || [];
@@ -40,6 +41,7 @@ class CalculationsEngine {
     // Host safety
     this.listenToChange = listenToChange;
     this.enableReentryGuard = enableReentryGuard;
+    this.onCellComputed = typeof onCellComputed === 'function' ? onCellComputed : null;
     this._isComputing = false;
 
     this.initializeGroups();
@@ -186,6 +188,14 @@ class CalculationsEngine {
 
       if (prevValue !== nextValue) {
         group.result.value = nextValue;
+
+        if (this.onCellComputed) {
+          this.onCellComputed({
+            resultId,
+            value: nextValue,
+            calculation
+          });
+        }
 
         // DAG-lite propagation
         if (this.enableDagLite) {

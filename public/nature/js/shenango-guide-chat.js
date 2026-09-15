@@ -31,7 +31,9 @@ function unlockTts() {
 async function speakReply(text) {
   const clean = forSpeech(text);
   if (!clean) return;
+  if (typeof window.isAgentSpeechMuted === 'function' && window.isAgentSpeechMuted()) return;
   unlockTts();
+  if (typeof window.stopSpeech === 'function') window.stopSpeech();
   if (typeof window.speakWithGoogle === 'function') {
     try {
       await window.speakWithGoogle(clean, { lang: 'en-US', gender: 'male' });

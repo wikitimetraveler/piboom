@@ -45,6 +45,7 @@
     { name: 'TPO Connect', url: '/finance/tpo-connect.html', category: 'Encompass', keywords: 'TPO third party originator correspondent wholesale SSF guest LoanContractTPO iframe token exchange postman externalOrganizations tpoFees externalUsers', requiresAuth: true },
     { name: 'FHA Streamline', url: '/finance/fha-streamline-calculator.html', category: 'Worksheets', keywords: 'FHA refinance', requiresAuth: true },
     { name: 'FHA Loan Amount', url: '/finance/fha-streamline-loan-amount-calculator.html', category: 'Worksheets', keywords: 'FHA streamline loan amount', requiresAuth: true },
+    { name: 'Calc Engine WebGPU', url: '/finance/calc-engine-webgpu.html', category: 'Worksheets', keywords: 'FHA streamline DAG webgpu calcMath integer cents', requiresAuth: true },
     { name: 'FHA NTB', url: '/finance/fha-streamline-ntb-calculator.html', category: 'Worksheets', keywords: 'FHA streamline net tangible benefit', requiresAuth: true },
     { name: 'Asset Qualifier', url: '/finance/asset-qualifier-calculator.html', category: 'Worksheets', keywords: 'asset retirement', requiresAuth: true },
     { name: 'DTI Calculator', url: '/finance/dti-calculator.html', category: 'Worksheets', keywords: 'debt income ratio', requiresAuth: true },

@@ -55,6 +55,7 @@
           <div class="astro-rose-actions">
             <button type="button" id="astroMeetRose">Meet Rose</button>
             <button type="button" id="astroRoseSpeaks" class="astro-speak-toggle" aria-pressed="false">Rose speaks</button>
+            <button type="button" id="astroRoseStop" class="astro-speak-toggle" title="Stop Rose speaking">Stop</button>
           </div>
         </div>
       </div>
@@ -130,10 +131,21 @@
 
     <section class="astro-arcana-block" aria-labelledby="astroArcanaHeading">
       <header class="astro-section-head">
-        <h2 id="astroArcanaHeading">Major Arcana</h2>
-        <p>Twenty-two parlor trump cards — Rose reads them beside the wheel.</p>
+        <h2 id="astroArcanaHeading">Tarot cards</h2>
+        <p>Full seventy-eight-card parlor deck — Rose reads and teaches how to use them.</p>
       </header>
+      <div class="astro-toolbar astro-tarot-filters" id="astroTarotFilters" role="toolbar" aria-label="Tarot suit filter">
+        <button type="button" data-tarot-suit="all" aria-pressed="true">All</button>
+        <button type="button" data-tarot-suit="major" aria-pressed="false">Major</button>
+        <button type="button" data-tarot-suit="wands" aria-pressed="false">Wands</button>
+        <button type="button" data-tarot-suit="cups" aria-pressed="false">Cups</button>
+        <button type="button" data-tarot-suit="swords" aria-pressed="false">Swords</button>
+        <button type="button" data-tarot-suit="pentacles" aria-pressed="false">Pentacles</button>
+      </div>
       <div class="astro-gallery astro-arcana-gallery" id="astroArcanaGallery"></div>
+      <p class="astro-tarot-credit">
+        Card art: Pamela Colman Smith / Rider–Waite–Smith (public domain), via Wikimedia Commons.
+      </p>
     </section>
 
     <p class="astro-note">

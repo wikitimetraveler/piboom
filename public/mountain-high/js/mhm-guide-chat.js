@@ -29,7 +29,9 @@ function unlockTts() {
 async function speakBud(text) {
   const clean = forSpeech(text);
   if (!clean) return;
+  if (typeof window.isAgentSpeechMuted === 'function' && window.isAgentSpeechMuted()) return;
   unlockTts();
+  if (typeof window.stopSpeech === 'function') window.stopSpeech();
   if (window.MhmHeygen?.speak) {
     window.MhmHeygen.speak(clean);
   }

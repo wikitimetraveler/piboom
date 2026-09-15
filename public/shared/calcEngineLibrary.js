@@ -28,6 +28,36 @@
 
   const round2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
 
+  const dollarsToCents = (value) => {
+    const n = toNumber(value);
+    if (!Number.isFinite(n)) return 0;
+    return Math.round(n * 100 + Number.EPSILON);
+  };
+
+  const centsToDollars = (cents) => {
+    const c = typeof cents === 'number' ? cents : toNumber(cents);
+    if (!Number.isFinite(c)) return 0;
+    return c / 100;
+  };
+
+  const floorToDollarCents = (cents) => {
+    const c = typeof cents === 'number' ? cents : toNumber(cents);
+    if (!Number.isFinite(c)) return 0;
+    return Math.trunc(c / 100) * 100;
+  };
+
+  const roundHalfUpMulDiv = (a, b, denom) => {
+    const aa = typeof a === 'number' ? a : toNumber(a);
+    const bb = typeof b === 'number' ? b : toNumber(b);
+    const dd = typeof denom === 'number' ? denom : toNumber(denom);
+    if (!(dd > 0) || !Number.isFinite(aa) || !Number.isFinite(bb)) return 0;
+    const q = Math.trunc(aa / dd);
+    const r = aa % dd;
+    const hi = q * bb;
+    const lo = Math.trunc((r * bb + Math.trunc(dd / 2)) / dd);
+    return hi + lo;
+  };
+
   const calcMath = {
     // Legacy behaviors preserved
     sumInputs(values = []) {
@@ -267,6 +297,100 @@
       const b = toNumber(expected, null, { invalidValue: NaN });
       if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
       return Math.abs(a - b) <= epsilon;
+    },
+
+    /**
+     * Nearest-cent conversion (half-up via Math.round). Integer cents are the
+     * exact money representation — GPU f32 dollar floats are not.
+     * @param {*} value dollars
+     * @returns {number} integer cents
+     */
+    dollarsToCents,
+
+    /**
+     * @param {*} cents integer cents
+     * @returns {number} dollars (binary64 of n/100; exact for integer cents)
+     */
+    centsToDollars,
+
+    /**
+     * Floor to whole-dollar cents (matches minRoundDown / roundDown on dollars).
+     * @param {number} cents
+     */
+    floorToDollarCents,
+
+    /**
+     * round_half_up(a * b / denom) for nonnegative ints without i32 overflow.
+     * Splits a = q*denom + r so (q*b) and (r*b) stay in range for FHA-scale cents.
+     */
+    roundHalfUpMulDiv,
+
+    /**
+     * f32 stand-in for multiplyPercentage (WebGPU default float). Heuristic only.
+     */
+    multiplyPercentageF32(values = []) {
+      const base = Math.fround(toNumber(values[0]));
+      const pct = Math.fround(toNumber(values[1]));
+      const prod = Math.fround(Math.fround(base * pct) / Math.fround(100));
+      const asCents = Math.fround(prod * Math.fround(100));
+      return Math.fround(Math.round(asCents) / 100);
+    },
+
+    /**
+     * Canned G24 × 1.75% where integer cents and f32 rounded cents disagree by 1¢.
+     * Not HUD policy — documents why dollar f32 is unsafe at FHA scale.
+     */
+    FHA_F32_UFMIP_DIVERGENCE: {
+      g24Dollars: 300000.27,
+      d29: 1.75,
+      integerCents: 525000
+    },
+
+    /**
+     * FHA Streamline loan-amount chain in integer cents (and g33 in ratio hundredths).
+     * UFMIP: round_half_up(g24Cents * pctBps / 10000) with 1.75% → 175 bps.
+     * Not HUD-certified; matches the DAG in createFHACalculatorConfig.
+     * @param {{ g7?:*, g8?:*, g9?:*, g12?:*, g13?:*, g14?:*, d29?:* }} input dollars
+     */
+    fhaLoanAmountIntegerCents(input = {}) {
+      const g7 = dollarsToCents(input.g7);
+      const g8 = dollarsToCents(input.g8);
+      const g9 = dollarsToCents(input.g9);
+      const g12 = dollarsToCents(input.g12);
+      const g13 = dollarsToCents(input.g13);
+      const g14 = dollarsToCents(input.g14);
+      const pctBps = dollarsToCents(input.d29);
+      const g15 = g12 + g13 + g14;
+      const g18 = g15;
+      const g19 = g9;
+      const g20 = g18 - g19;
+      const g22 = g8;
+      const g24 = floorToDollarCents(Math.min(g20, g22));
+      const g28 = g24;
+      const e29 = roundHalfUpMulDiv(g24, pctBps, 10000);
+      const g29 = floorToDollarCents(e29);
+      const g30 = g28 + g29;
+      const g33Hundredths = g7 === 0 ? 0 : roundHalfUpMulDiv(g24, 100, g7);
+      return {
+        g7,
+        g8,
+        g9,
+        g12,
+        g13,
+        g14,
+        pctBps,
+        g15,
+        g18,
+        g19,
+        g20,
+        g22,
+        g24,
+        g28,
+        e29,
+        g29,
+        g30,
+        g33Hundredths
+      };
     }
   };
 

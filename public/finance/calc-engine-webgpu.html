@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calc Engine · WebGPU DAG</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/finance/css/worksheets-shell.css" />
+    <style>
+      :root {
+        --primary: #4A90A4;
+        --dark: #2C3E50;
+        --border: #E8EDF2;
+        --shadow: rgba(74, 144, 164, 0.1);
+      }
+      body.worksheets-shell { color: var(--dark); }
+      .worksheets-calculator-stack.container {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px var(--shadow);
+        padding: 24px;
+        max-width: 1080px;
+      }
+      .ce-dag-wrap {
+        position: relative;
+        height: 340px;
+        border-radius: 16px;
+        overflow: hidden;
+        background: #0c1722;
+      }
+      .ce-dag-wrap canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      .ce-dag-label {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        color: #e8f4f8;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        pointer-events: none;
+        text-shadow: 0 1px 4px #0c1722;
+        white-space: nowrap;
+      }
+      .result { background: #F7F9FC; font-weight: 600; }
+      .ce-visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+      .ce-match { color: #1b7a4a; }
+      .ce-drift { color: #b45309; font-weight: 700; }
+      .ce-analysis {
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.25rem 1.35rem;
+        background: linear-gradient(165deg, #f7fafc 0%, #eef5f8 55%, #f8fafb 100%);
+        margin-top: 1.5rem;
+      }
+      .ce-analysis h2 { font-size: 1.15rem; color: var(--dark); margin-bottom: 0.75rem; }
+      .ce-analysis h3 { font-size: 0.95rem; margin-top: 1rem; margin-bottom: 0.4rem; color: var(--primary); }
+      .ce-analysis ul { margin-bottom: 0.35rem; padding-left: 1.15rem; }
+      .ce-analysis li { margin-bottom: 0.35rem; }
+      .ce-analysis .ce-claim { font-size: 0.875rem; color: #5a6a78; }
+      .ce-timing-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin: 0.75rem 0 0.25rem;
+      }
+      @media (max-width: 576px) {
+        .ce-timing-grid { grid-template-columns: 1fr; }
+      }
+      .ce-timing-card {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 0.75rem 0.9rem;
+      }
+      .ce-timing-card strong { display: block; font-size: 0.8rem; letter-spacing: 0.03em; text-transform: uppercase; color: #6b7c8a; }
+      .ce-timing-card .ce-scale { font-size: 1.35rem; font-weight: 700; color: var(--dark); line-height: 1.2; }
+      .ce-timing-card p { margin: 0.35rem 0 0; font-size: 0.85rem; color: #5a6a78; }
+    </style>
+  </head>
+  <body class="worksheets-shell" data-calculator="calc-engine-webgpu">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container">
+        <span class="navbar-brand mb-0 fs-5">Calc Engine · WebGPU</span>
+        <div class="navbar-collapse">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="/finance/index.html"><i class="bi bi-grid-3x3-gap-fill me-1"></i>Worksheets Hub</a></li>
+            <li class="nav-item"><a class="nav-link" href="/finance/fha-streamline-loan-amount-calculator.html"><i class="bi bi-cash-coin me-1"></i>FHA Loan Amount</a></li>
+            <li class="nav-item"><a class="nav-link" href="/index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="main-content">
+    <div class="container worksheets-calculator-stack">
+      <h1 class="mb-2">FHA Streamline DAG on WebGPU</h1>
+      <p class="text-muted mb-3">
+        CPU <code>calcMath</code> + <code>CalculationsEngine</code> still compute the live numbers (already microseconds).
+        WebGPU paints the cascade and runs an <strong>integer-cent</strong> kernel as a verifier — not a speed-up, and not HUD-certified.
+        Default GPU <code>f32</code> dollar floats cannot safely round FHA-scale cents.
+      </p>
+      <p class="small mb-4">
+        <span class="badge text-bg-light border" id="ceBackendBadge">GPU: detecting…</span>
+        <a class="ms-2" href="/finance/fha-streamline-loan-amount-calculator.html">Open the live FHA Loan Amount worksheet</a>
+      </p>
+
+      <div class="ce-dag-wrap mb-3" id="ceDagWrap">
+        <canvas id="ceDagCanvas" role="img" aria-label="FHA Streamline calculation DAG"></canvas>
+      </div>
+      <p class="small text-muted mb-4">Teal nodes are results; cooler nodes are inputs. Heat pulses when DAG-lite recomputes a cell.</p>
+
+      <div class="row g-3 mb-4">
+        <div class="col-md-4 col-lg-3">
+          <label class="form-label" for="fs_g7">Base G7</label>
+          <div class="input-group input-group-sm">
+            <span class="input-group-text">$</span>
+            <input type="number" class="form-control" id="fs_g7" value="400000" min="0" step="0.01">
+          </div>
+        </div>
+        <div class="col-md-4 col-lg-3">
+          <label class="form-label" for="fs_g8">Max loan G8</label>
+          <div class="input-group input-group-sm">
+            <span class="input-group-text">$</span>
+            <input type="number" class="form-control" id="fs_g8" value="360000" min="0" step="0.01">
+          </div>
+        </div>
+        <div class="col-md-4 col-lg-3">
+          <label class="form-label" for="fs_g9">Balance G9</label>
+          <div class="input-group input-group-sm">
+            <span class="input-group-text">$</span>
+            <input type="number" class="form-control" id="fs_g9" value="222000" min="0" step="0.01">
+          </div>
+        </div>
+        <div class="col-md-4 col-lg-3">
+          <label class="form-label" for="fs_d29">UFMIP D29</label>
+          <div class="input-group input-group-sm">
+            <span class="input-group-text">%</span>
+            <input type="number" class="form-control" id="fs_d29" value="1.75" min="0" step="0.01">
+          </div>
+        </div>
+        <div class="col-md-4 col-lg-3">
+          <label class="form-label" for="fs_g12">Additional G12</label>
+          <div class="input-group input-group-sm">
+            <span class="input-group-text">$</span>
+            <input type="number" class="form-control" id="fs_g12" value="180000" min="0" step="0.01">
+          </div>
+        </div>
+        <div class="col-md-4 col-lg-3">
+          <label class="form-label" for="fs_g13">Additional G13</label>
+          <div class="input-group input-group-sm">
+            <span class="input-group-text">$</span>
+            <input type="number" class="form-control" id="fs_g13" value="40000" min="0" step="0.01">
+          </div>
+        </div>
+        <div class="col-md-4 col-lg-3">
+          <label class="form-label" for="fs_g14">Additional G14</label>
+          <div class="input-group input-group-sm">
+            <span class="input-group-text">$</span>
+            <input type="number" class="form-control" id="fs_g14" value="24000" min="0" step="0.01">
+          </div>
+        </div>
+      </div>
+
+      <fieldset class="ce-visually-hidden">
+        <legend>Engine result bindings</legend>
+        <input id="fs_g15" class="result" readonly>
+        <input id="fs_g18" class="result" readonly>
+        <input id="fs_g19" class="result" readonly>
+        <input id="fs_g20" class="result" readonly>
+        <input id="fs_g22" class="result" readonly>
+        <input id="fs_g24" class="result" readonly>
+        <input id="fs_g28" class="result" readonly>
+        <input id="fs_e29" class="result" readonly>
+        <input id="fs_g29" class="result" readonly>
+        <input id="fs_g30" class="result" readonly>
+        <input id="fs_g33" class="result" readonly>
+      </fieldset>
+
+      <h2 class="h5">Live chain — calcMath vs integer cents vs GPU</h2>
+      <p class="small text-muted">GPU cents should match CPU integer cents. calcMath is the binary64 rounding heuristic used on the worksheet.</p>
+      <div class="table-responsive mb-4">
+        <table class="table table-sm align-middle" id="ceCompareTable">
+          <thead>
+            <tr>
+              <th>Cell</th>
+              <th>calcMath</th>
+              <th>CPU integer ¢</th>
+              <th>GPU integer ¢</th>
+              <th>GPU source</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <h2 class="h5">f32 drift exhibit (canned, not the live G24)</h2>
+      <p class="small text-muted mb-2">
+        G24 = <code>300000.27</code> × 1.75% UFMIP. Integer cents round to $5,250.00; f32 rounded cents miss by 1¢.
+        The live DAG floors G24 to whole dollars, so this row is a separate counterexample.
+      </p>
+      <div class="table-responsive mb-2">
+        <table class="table table-sm" id="ceF32Table">
+          <thead>
+            <tr>
+              <th>G24 dollars</th>
+              <th>D29</th>
+              <th>Integer ¢</th>
+              <th>f32 rounded ¢</th>
+              <th>Delta</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <section class="ce-analysis" aria-labelledby="ceAnalysisHeading">
+        <h2 id="ceAnalysisHeading">Prototype analysis — what this proves (and what it does not)</h2>
+        <p class="ce-claim mb-2">
+          This page is a <strong>prototype</strong>: WebGPU visualizes the FHA Streamline DAG and verifies an integer-cent chain.
+          The live product worksheet still runs on CPU <code>calcMath</code> + <code>CalculationsEngine</code>.
+        </p>
+
+        <h3>Microseconds vs milliseconds</h3>
+        <div class="ce-timing-grid">
+          <div class="ce-timing-card">
+            <strong>CPU calcMath (~11 cells)</strong>
+            <span class="ce-scale">µs</span>
+            <p>A microsecond is 1/1,000,000 of a second. The loan chain finishes in tens of microseconds — already “free” for keystroke UI.</p>
+          </div>
+          <div class="ce-timing-card">
+            <strong>WebGPU kernel + readback</strong>
+            <span class="ce-scale">ms</span>
+            <p>A millisecond is 1/1,000 of a second — <strong>1,000×</strong> a microsecond. GPU setup, dispatch, and CPU readback usually land in a few milliseconds for this tiny DAG.</p>
+          </div>
+        </div>
+        <p class="small text-muted mb-0">Bottom line: for one loan, GPU is slower. Humans notice ~100&nbsp;ms; both paths still feel instant — the point is engineering cost, not UX lag.</p>
+
+        <h3>Precision (formal claims)</h3>
+        <ul>
+          <li><code>f32</code> dollar floats cannot safely round FHA-scale cents (see the drift exhibit above).</li>
+          <li><strong>Integer cents (<code>i32</code>)</strong> make add / subtract / min / floor-to-dollar exact for typical loan sizes (~$21M max in cents).</li>
+          <li>GPU does <em>not</em> add precision — the <strong>integer representation</strong> does. Same rules run on CPU via <code>fhaLoanAmountIntegerCents</code>.</li>
+          <li>UFMIP uses a named half-up bps rule — research/demo only, <strong>not HUD-certified</strong>.</li>
+        </ul>
+
+        <h3>Where this could matter theoretically</h3>
+        <ul>
+          <li><strong>Batch / stress grids</strong> — thousands of independent scenarios in one dispatch (rate × balance × factor), not one keystroke chain.</li>
+          <li><strong>Teach / audit / demos</strong> — pulse the DAG so processors see why G15 → G30 cascade; Unit Test / training reels.</li>
+          <li><strong>Second-opinion verifier</strong> — CI or pre-write check: GPU cents ≡ CPU integer cents, while Encompass UI stays on float <code>calcMath</code>.</li>
+        </ul>
+
+        <h3>Where not to use it</h3>
+        <ul>
+          <li>Replacing the live FHA Loan Amount worksheet recalculation.</li>
+          <li>Trusting default GPU <code>f32</code> dollars for money.</li>
+          <li>Expecting a speed-up on an 11-node sequential DAG.</li>
+        </ul>
+
+        <p class="small mb-0 mt-3">
+          <strong>Thesis:</strong> WebGPU here is a visual + exact-cent research layer.
+          Product calculators stay on CPU. Scale the kernel only when the workload is many independent loans, not one form.
+        </p>
+      </section>
+    </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/shared/calcEngineLibrary.js"></script>
+    <script src="/shared/calculationEngine.js"></script>
+    <script src="/shared/js/webgpu-runtime.js"></script>
+    <script src="/shared/js/webgpu-calc-engine-dag.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', async function () {
+        const config = createFHACalculatorConfig({ prefix: 'fs' });
+        const layout = WebGpuCalcEngineDag.layoutFhaDag(config.groups);
+        const wrap = document.getElementById('ceDagWrap');
+        const canvas = document.getElementById('ceDagCanvas');
+        const badge = document.getElementById('ceBackendBadge');
+        const tbody = document.querySelector('#ceCompareTable tbody');
+        const f32Body = document.querySelector('#ceF32Table tbody');
+
+        function placeLabels() {
+          wrap.querySelectorAll('.ce-dag-label').forEach(function (el) { el.remove(); });
+          layout.nodes.forEach(function (n) {
+            const el = document.createElement('span');
+            el.className = 'ce-dag-label';
+            el.textContent = n.label;
+            el.style.left = (n.x * 100) + '%';
+            el.style.top = (n.y * 100) + '%';
+            wrap.appendChild(el);
+          });
+        }
+        placeLabels();
+
+        function num(id) {
+          const el = document.getElementById(id);
+          return el ? el.value : '';
+        }
+
+        function money(n) {
+          const v = Number(n);
+          if (!Number.isFinite(v) || n === '') return '—';
+          return '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function readInputs() {
+          return {
+            g7: num('fs_g7'),
+            g8: num('fs_g8'),
+            g9: num('fs_g9'),
+            g12: num('fs_g12'),
+            g13: num('fs_g13'),
+            g14: num('fs_g14'),
+            d29: num('fs_d29')
+          };
+        }
+
+        const viz = await WebGpuCalcEngineDag.mount({ canvas: canvas, layout: layout });
+        if (badge) {
+          const backend = viz && viz.backend ? viz.backend : 'none';
+          badge.textContent = backend === 'webgpu'
+            ? 'GPU: WebGPU (paint + i32 kernel)'
+            : 'GPU: canvas 2D fallback — integer kernel on CPU';
+        }
+
+        const engine = new CalculationsEngine(config, {
+          debounceMs: 50,
+          onCellComputed: function (evt) {
+            if (viz) viz.pulse(evt.resultId);
+          }
+        });
+
+        const compareRows = [
+          { id: 'fs_g15', key: 'g15', label: 'G15', kind: 'money' },
+          { id: 'fs_g20', key: 'g20', label: 'G20', kind: 'money' },
+          { id: 'fs_g24', key: 'g24', label: 'G24', kind: 'money' },
+          { id: 'fs_e29', key: 'e29', label: 'E29', kind: 'money' },
+          { id: 'fs_g29', key: 'g29', label: 'G29', kind: 'money' },
+          { id: 'fs_g30', key: 'g30', label: 'G30', kind: 'money' },
+          { id: 'fs_g33', key: 'g33Hundredths', label: 'G33', kind: 'ratio' }
+        ];
+
+        let kernelPending = false;
+        let kernelDirty = false;
+        async function refreshCompare() {
+          if (!tbody) return;
+          if (kernelPending) {
+            kernelDirty = true;
+            return;
+          }
+          kernelPending = true;
+          try {
+            do {
+              kernelDirty = false;
+              const cpuInt = calcMath.fhaLoanAmountIntegerCents(readInputs());
+              const gpuRun = viz ? await viz.runIntegerKernel(readInputs()) : { source: 'cpu', cents: cpuInt };
+              const gpu = gpuRun.cents || cpuInt;
+              tbody.innerHTML = compareRows.map(function (row) {
+                const live = num(row.id);
+                const intC = cpuInt[row.key];
+                const gpuC = gpu[row.key];
+                const liveText = row.kind === 'ratio' ? (live === '' ? '—' : Number(live).toFixed(2) + '×') : money(live);
+                const intText = row.kind === 'ratio'
+                  ? (intC / 100).toFixed(2) + '×'
+                  : intC + ' ¢';
+                const gpuText = row.kind === 'ratio'
+                  ? (gpuC / 100).toFixed(2) + '×'
+                  : gpuC + ' ¢';
+                const match = intC === gpuC;
+                return '<tr><td>' + row.label + '</td><td>' + liveText + '</td><td>' + intText +
+                  '</td><td class="' + (match ? 'ce-match' : 'ce-drift') + '">' + gpuText +
+                  '</td><td>' + (gpuRun.source || 'cpu') + '</td></tr>';
+              }).join('');
+            } while (kernelDirty);
+          } finally {
+            kernelPending = false;
+          }
+        }
+
+        function paintF32Exhibit() {
+          const fx = calcMath.FHA_F32_UFMIP_DIVERGENCE;
+          const intC = fx.integerCents;
+          const f32Dollars = calcMath.multiplyPercentageF32([fx.g24Dollars, fx.d29]);
+          const f32C = Math.round(f32Dollars * 100 + Number.EPSILON);
+          const delta = f32C - intC;
+          f32Body.innerHTML = '<tr><td>' + money(fx.g24Dollars) + '</td><td>' + fx.d29 +
+            '%</td><td>' + intC + ' ¢</td><td class="ce-drift">' + f32C +
+            ' ¢</td><td class="ce-drift">' + (delta > 0 ? '+' : '') + delta + ' ¢</td></tr>';
+        }
+
+        engine.recalculateAll();
+        paintF32Exhibit();
+        await refreshCompare();
+
+        ['fs_g7', 'fs_g8', 'fs_g9', 'fs_g12', 'fs_g13', 'fs_g14', 'fs_d29'].forEach(function (id) {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.addEventListener('input', function () {
+            window.setTimeout(refreshCompare, 80);
+          });
+        });
+      });
+    </script>
+    <script src="/shared/finance-auth-guard.js"></script>
+  </body>
+</html>

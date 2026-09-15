@@ -6,7 +6,10 @@ import '../../public/shared/js/webgpu-globe.js';
 import '../../public/shared/js/webgpu-blacklight-poster.js';
 import '../../public/shared/js/webgpu-knowledge-constellation.js';
 import '../../public/shared/js/webgpu-planetarium-sky.js';
+import '../../public/shared/js/webgpu-calc-engine-dag.js';
 import '../../public/finance/js/disasters-unified/webgpu-heat-overlay.js';
+import '../../public/shared/calcEngineLibrary.js';
+import '../../public/shared/calculationEngine.js';
 
 const {
   WebGpuRuntime,
@@ -14,7 +17,9 @@ const {
   WebGpuBlacklightPoster,
   WebGpuKnowledgeConstellation,
   WebGpuPlanetariumSky,
+  WebGpuCalcEngineDag,
   DuWebGpuHeat,
+  createFHACalculatorConfig,
 } = globalThis;
 
 describe('WebGpuRuntime', () => {
@@ -212,5 +217,40 @@ describe('DuWebGpuHeat', () => {
     expect(low).toBeGreaterThan(0);
     expect(high).toBeGreaterThan(low);
     expect(high).toBeLessThanOrEqual(3);
+  });
+});
+
+describe('WebGpuCalcEngineDag', () => {
+  test('exports mount, layout, and compute shaders', () => {
+    expect(typeof WebGpuCalcEngineDag.mount).toBe('function');
+    expect(typeof WebGpuCalcEngineDag.layoutFhaDag).toBe('function');
+    expect(WebGpuCalcEngineDag.PAINT_WGSL).toMatch(/@compute/);
+    expect(WebGpuCalcEngineDag.INTEGER_KERNEL_WGSL).toMatch(/round_half_up_mul_div/);
+  });
+
+  test('layoutFhaDag from createFHACalculatorConfig has 11 results and expected edges', () => {
+    const config = createFHACalculatorConfig({ prefix: 'fs' });
+    expect(config.groups).toHaveLength(11);
+    const { nodes, edges, maxDepth } = WebGpuCalcEngineDag.layoutFhaDag(config.groups);
+    const results = nodes.filter((n) => n.isResult);
+    expect(results).toHaveLength(11);
+    expect(nodes).toHaveLength(18);
+    expect(edges).toHaveLength(18);
+    expect(edges).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ from: 'fs_g12', to: 'fs_g15' }),
+        expect.objectContaining({ from: 'fs_g15', to: 'fs_g18' }),
+        expect.objectContaining({ from: 'fs_g20', to: 'fs_g24' }),
+        expect.objectContaining({ from: 'fs_g28', to: 'fs_g30' }),
+        expect.objectContaining({ from: 'fs_g24', to: 'fs_g33' }),
+      ])
+    );
+    expect(maxDepth).toBeGreaterThanOrEqual(4);
+    nodes.forEach((n) => {
+      expect(n.x).toBeGreaterThan(0);
+      expect(n.x).toBeLessThan(1);
+      expect(n.y).toBeGreaterThan(0);
+      expect(n.y).toBeLessThan(1);
+    });
   });
 });

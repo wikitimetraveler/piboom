@@ -58,6 +58,7 @@
     "generate:jordan-heygen-demo": "node scripts/tools/generate-jordan-heygen-demo.mjs --lang both --direct --cache-local",
     "generate:rose-heygen-demo": "node scripts/tools/create-rose-heygen-avatar.mjs --create-avatar --video --direct --cache-local",
     "create:rose-heygen-avatar": "node scripts/tools/create-rose-heygen-avatar.mjs --create-avatar",
+    "fetch:rose-tarot-images": "node scripts/tools/fetch-rose-tarot-images.mjs",
     "generate:syria-heygen-demo": "node scripts/tools/generate-syria-heygen-demo.mjs --lang both --direct --cache-local",
     "cache:heygen-library": "node scripts/tools/cache-heygen-library-videos.mjs",
     "generate:newport-pier-heygen": "node scripts/tools/generate-newport-pier-heygen.mjs --sync --pip",

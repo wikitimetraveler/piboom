@@ -41,7 +41,7 @@ const WELCOME_STATION = `<div class="plan-carl-welcome">
 
 const ALIENIGENA_HANDOFF = 'Carl has the sky on this one.';
 const ROSE_HANDOFF =
-  "That's Rose's parlor — tropical signs and Major Arcana, not the real sky. Opening her page for you.";
+  "That's Rose's parlor — tropical signs and a full tarot deck, not the real sky. Opening her page for you.";
 
 function isAstrologyIntent(text) {
   return /\b(zodiac|horoscope|sun sign|moon sign|rising sign|tarot|astrology|major arcana|aries|taurus|gemini|cancer|leo|virgo|libra|scorpio|sagittarius|capricorn|aquarius|pisces|the fool|the magician|the tower|the star|the moon|the sun|the world)\b/i.test(
@@ -102,6 +102,13 @@ function forSpeech(text) {
 async function speakReply(text) {
   const clean = forSpeech(text);
   if (!clean) return;
+  if (typeof window.isAgentSpeechMuted === 'function' && window.isAgentSpeechMuted()) return;
+  try {
+    window.ensureAudioUnlock?.();
+    window.primeSpeechSynthesis?.();
+  } catch (_) {
+    /* ignore */
+  }
   if (typeof window.speakWithGoogle === 'function') {
     window.speakWithGoogle(clean, 'en-US-Standard-D');
   }

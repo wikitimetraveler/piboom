@@ -69,6 +69,8 @@ class AIChatWidget {
                 ${headerTitle}
                 <div class="ai-chat-header-actions">
                     ${this.showMusicMute ? `<button type="button" id="aiChatMusicMuteBtn" class="ai-chat-music-mute-btn" title="Toggle disaster mood music" aria-label="Toggle disaster mood music"><i class="bi bi-music-note-beamed"></i></button>` : ''}
+                    <button type="button" id="aiChatStopSpeakBtn" class="ai-chat-speak-btn" title="Stop speaking" aria-label="Stop speaking"><i class="bi bi-stop-fill"></i></button>
+                    <button type="button" id="aiChatMuteSpeakBtn" class="ai-chat-speak-btn" title="Mute agent voice" aria-label="Mute agent voice" aria-pressed="false"><i class="bi bi-volume-up"></i></button>
                     <button type="button" class="btn-close btn-close-white" onclick="window.aiChatWidget?.close()" aria-label="Close"></button>
                 </div>
             </div>
@@ -196,6 +198,25 @@ class AIChatWidget {
                 .ai-chat-music-mute-btn.is-muted {
                     opacity: 0.55;
                 }
+                .ai-chat-speak-btn {
+                    border: none;
+                    background: rgba(255, 255, 255, 0.15);
+                    color: white;
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .ai-chat-speak-btn:hover {
+                    background: rgba(255, 255, 255, 0.25);
+                }
+                .ai-chat-speak-btn.is-muted,
+                .ai-chat-speak-btn[aria-pressed="true"] {
+                    background: rgba(220, 53, 69, 0.45);
+                }
                 .ai-chat-messages {
                     flex: 1;
                     overflow-y: auto;
@@ -291,6 +312,8 @@ class AIChatWidget {
         const input = document.getElementById('aiChatInput');
         const sendBtn = document.getElementById('aiChatSendBtn');
         const musicMuteBtn = document.getElementById('aiChatMusicMuteBtn');
+        const stopSpeakBtn = document.getElementById('aiChatStopSpeakBtn');
+        const muteSpeakBtn = document.getElementById('aiChatMuteSpeakBtn');
         
         if (input) {
             input.addEventListener('keypress', (e) => {
@@ -308,6 +331,48 @@ class AIChatWidget {
                     this.updateMusicMuteButton();
                 }
             });
+        }
+
+        if (stopSpeakBtn) {
+            stopSpeakBtn.addEventListener('click', () => {
+                if (typeof window.stopSpeech === 'function') window.stopSpeech();
+            });
+        }
+
+        if (muteSpeakBtn) {
+            this.updateAgentMuteButton();
+            muteSpeakBtn.addEventListener('click', () => {
+                if (typeof window.toggleAgentSpeechMuted === 'function') {
+                    window.toggleAgentSpeechMuted();
+                } else if (typeof window.stopSpeech === 'function') {
+                    window.stopSpeech();
+                }
+                this.updateAgentMuteButton();
+            });
+            window.addEventListener('lane-agent-speech-mute', () => this.updateAgentMuteButton());
+        }
+    }
+
+    updateAgentMuteButton() {
+        const muteSpeakBtn = document.getElementById('aiChatMuteSpeakBtn');
+        if (!muteSpeakBtn) return;
+        const muted = typeof window.isAgentSpeechMuted === 'function' ? window.isAgentSpeechMuted() : false;
+        muteSpeakBtn.classList.toggle('is-muted', muted);
+        muteSpeakBtn.setAttribute('aria-pressed', String(muted));
+        muteSpeakBtn.title = muted ? 'Unmute agent voice' : 'Mute agent voice';
+        muteSpeakBtn.setAttribute('aria-label', muteSpeakBtn.title);
+        const icon = muteSpeakBtn.querySelector('i');
+        if (icon) {
+            icon.className = muted ? 'bi bi-volume-mute' : 'bi bi-volume-up';
+        }
+    }
+
+    unlockAgentSpeech() {
+        try {
+            window.ensureAudioUnlock?.();
+            window.primeSpeechSynthesis?.();
+        } catch (_) {
+            /* ignore */
         }
     }
 
@@ -339,6 +404,8 @@ class AIChatWidget {
             this.isOpen = true;
             document.getElementById('aiChatInput')?.focus();
         }
+        this.unlockAgentSpeech();
+        this.updateAgentMuteButton();
         if (this.onOpen) {
             Promise.resolve()
                 .then(async () => {
@@ -371,6 +438,9 @@ class AIChatWidget {
         const message = messageText || input?.value?.trim();
         
         if (!message) return;
+
+        // Unlock audio during this user gesture so the reply can speak after fetch.
+        this.unlockAgentSpeech();
 
         // Always show the transcript in chat (voice + typed)
         if (!this.isOpen) this.open();

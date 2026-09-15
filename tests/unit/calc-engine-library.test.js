@@ -89,3 +89,90 @@ describe('calcEngineLibrary helpers', () => {
     expect(value).toBeNull();
   });
 });
+
+describe('calcMath integer cents (FHA Streamline)', () => {
+  test('dollarsToCents / centsToDollars round-trip 2-decimal dollars', () => {
+    expect(calcMath.dollarsToCents(12.34)).toBe(1234);
+    expect(calcMath.centsToDollars(1234)).toBe(12.34);
+    expect(calcMath.dollarsToCents('')).toBe(0);
+  });
+
+  test('floorToDollarCents matches minRoundDown / roundDown on dollars', () => {
+    expect(calcMath.floorToDollarCents(12345)).toBe(12300);
+    expect(calcMath.minRoundDown([123.45, 200])).toBe(123);
+  });
+
+  test('fhaLoanAmountIntegerCents add/sub/copy and floor-to-dollar', () => {
+    const out = calcMath.fhaLoanAmountIntegerCents({
+      g7: 400000,
+      g8: 350000.99,
+      g9: 1000,
+      g12: 5000.1,
+      g13: 2500.2,
+      g14: 1000.3,
+      d29: 1.75
+    });
+    expect(out.g15).toBe(500010 + 250020 + 100030);
+    expect(out.g18).toBe(out.g15);
+    expect(out.g19).toBe(100000);
+    expect(out.g20).toBe(out.g15 - out.g19);
+    expect(out.g22).toBe(35000099);
+    expect(out.g24).toBe(calcMath.floorToDollarCents(Math.min(out.g20, out.g22)));
+    expect(out.g24 % 100).toBe(0);
+    expect(out.g24).toBeGreaterThan(0);
+    expect(out.g28).toBe(out.g24);
+    expect(out.g29).toBe(calcMath.floorToDollarCents(out.e29));
+    expect(out.g30).toBe(out.g28 + out.g29);
+  });
+
+  test('UFMIP uses round_half_up(g24 * 175 / 10000)', () => {
+    const e29 = calcMath.roundHalfUpMulDiv(1000000, 175, 10000);
+    expect(e29).toBe(17500);
+    const out = calcMath.fhaLoanAmountIntegerCents({
+      g7: 10000,
+      g8: 10000,
+      g9: 0,
+      g12: 10000,
+      g13: 0,
+      g14: 0,
+      d29: 1.75
+    });
+    expect(out.pctBps).toBe(175);
+    expect(out.g24).toBe(1000000);
+    expect(out.e29).toBe(17500);
+  });
+
+  test('g33 hundredths is scaled ratio; zero G7 is 0', () => {
+    const out = calcMath.fhaLoanAmountIntegerCents({
+      g7: 200000,
+      g8: 100000,
+      g9: 0,
+      g12: 100000,
+      g13: 0,
+      g14: 0,
+      d29: 0
+    });
+    expect(out.g33Hundredths).toBe(50);
+    const zeroBase = calcMath.fhaLoanAmountIntegerCents({
+      g7: 0,
+      g8: 100,
+      g9: 0,
+      g12: 50,
+      g13: 0,
+      g14: 0,
+      d29: 0
+    });
+    expect(zeroBase.g33Hundredths).toBe(0);
+  });
+
+  test('f32 UFMIP diverges from integer cents on canned G24 × 1.75%', () => {
+    const { g24Dollars, d29, integerCents } = calcMath.FHA_F32_UFMIP_DIVERGENCE;
+    expect(calcMath.roundHalfUpMulDiv(calcMath.dollarsToCents(g24Dollars), 175, 10000)).toBe(
+      integerCents
+    );
+    const f32Dollars = calcMath.multiplyPercentageF32([g24Dollars, d29]);
+    const f32Cents = Math.round(f32Dollars * 100 + Number.EPSILON);
+    expect(f32Cents).not.toBe(integerCents);
+    expect(f32Cents - integerCents).toBe(1);
+  });
+});

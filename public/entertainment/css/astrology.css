@@ -644,6 +644,55 @@ body.astro-page modern-navbar {
   margin-bottom: 0.5rem;
 }
 
+.astro-tarot-filters {
+  margin: 0 auto 1rem;
+}
+
+.astro-tarot-front {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.45rem;
+  padding: 0.55rem !important;
+  text-align: left;
+}
+
+.astro-tarot-art {
+  width: 100%;
+  aspect-ratio: 2 / 3.4;
+  object-fit: cover;
+  border-radius: 0.45rem;
+  border: 1px solid color-mix(in srgb, var(--as-gold) 40%, transparent);
+  background: #1a1020;
+}
+
+.astro-tarot-art.is-missing {
+  display: none;
+}
+
+.astro-tarot-front__meta h3 {
+  margin: 0.15rem 0 0;
+  font-size: 0.95rem;
+}
+
+.astro-tarot-front__meta p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--as-muted);
+}
+
+.astro-tarot-credit {
+  margin: 0.75rem auto 0;
+  max-width: 36rem;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--as-muted);
+}
+
+.astro-arcana-gallery .astro-arcana-card .astro-flip__inner {
+  min-height: 22rem;
+}
+
 .astro-note {
   margin: 1.6rem auto 0;
   max-width: 40rem;

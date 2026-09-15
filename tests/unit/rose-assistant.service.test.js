@@ -27,17 +27,18 @@ describe('rose-assistant.service', () => {
     expect(prompt).not.toMatch(/You are Carl/);
   });
 
-  test('summary lists twelve signs and Major Arcana', () => {
+  test('summary lists twelve signs and full tarot', () => {
     const summary = getRoseSummary();
     expect(summary.guide).toBe('Rose');
     expect(summary.signCount).toBe(12);
     expect(summary.arcanaCount).toBe(22);
+    expect(summary.tarotCount).toBe(78);
     expect(summary.elements).toEqual(['fire', 'earth', 'air', 'water']);
   });
 
   test('buildSystemPrompt grounds Major Arcana', () => {
     const prompt = buildSystemPrompt({ arcana: 'The Tower' });
-    expect(prompt).toContain('Major Arcana');
+    expect(prompt).toMatch(/tarot expert|seventy-eight/i);
     expect(prompt).toContain('The Fool');
     expect(prompt).toContain('The World');
     expect(prompt).toContain('The Tower');
