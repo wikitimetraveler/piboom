@@ -41,116 +41,130 @@
 
   <main class="astro-wrap">
     <header class="astro-hero">
-      <p class="astro-kicker"><i class="bi bi-moon-stars" aria-hidden="true"></i> Twelve sign cards · parlor reading</p>
+      <div class="astro-hero__top">
+        <p class="astro-kicker" data-i18n="heroKicker"><i class="bi bi-moon-stars" aria-hidden="true"></i> Twelve sign cards · parlor reading</p>
+        <button type="button" class="astro-lang-toggle" id="astroLangToggle" aria-label="Switch language">
+          <i class="bi bi-translate" aria-hidden="true"></i>
+          <span id="astroLangToggleLabel">Tiếng Việt</span>
+        </button>
+      </div>
       <h1>Rose</h1>
-      <p class="astro-hero__lead">Playful tropical cards — not the night sky.</p>
+      <p class="astro-hero__lead" data-i18n="heroLead">Playful tropical cards — not the night sky.</p>
 
       <div class="astro-rose-dock" id="astroRoseDock">
         <div class="astro-rose-dock__face">
-          <img src="/entertainment/assets/rose-guide-portrait.png" width="180" height="180" alt="Rose, the parlor reader"/>
+          <img src="/entertainment/assets/rose-guide-portrait.png" width="180" height="180" alt="Rose, the parlor reader" data-i18n-alt="roseAlt"/>
           <div id="astroHeygenMedia" class="astro-heygen-media" hidden aria-label="Rose live face"></div>
         </div>
         <div class="astro-rose-dock__copy">
-          <p>She reads the gold wheel like a deck.</p>
+          <p data-i18n="roseDockCopy">She reads the gold wheel like a deck.</p>
           <div class="astro-rose-actions">
-            <button type="button" id="astroMeetRose">Meet Rose</button>
-            <button type="button" id="astroRoseSpeaks" class="astro-speak-toggle" aria-pressed="false">Rose speaks</button>
-            <button type="button" id="astroRoseStop" class="astro-speak-toggle" title="Stop Rose speaking">Stop</button>
+            <button type="button" id="astroMeetRose" data-i18n="meetRose">Meet Rose</button>
+            <button type="button" id="astroRoseSpeaks" class="astro-speak-toggle" aria-pressed="false" data-i18n="roseSpeaks">Rose speaks</button>
+            <button type="button" id="astroRoseStop" class="astro-speak-toggle" title="Stop Rose speaking" data-i18n="stop" data-i18n-title="stopTitle">Stop</button>
           </div>
         </div>
       </div>
     </header>
 
-    <section class="astro-stage">
-      <div class="astro-wheel" id="astroWheel" aria-label="Zodiac wheel">
-        <svg class="astro-wheel__art" id="astroWheelArt" viewBox="0 0 200 200" aria-hidden="true">
-          <defs>
-            <linearGradient id="astroGold" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#f3dd9a"/>
-              <stop offset="50%" stop-color="#c8ab57"/>
-              <stop offset="100%" stop-color="#8f7430"/>
-            </linearGradient>
-          </defs>
-          <g id="astroWedges" class="astro-wedges"></g>
-          <circle cx="100" cy="100" r="96" fill="none" stroke="url(#astroGold)" stroke-width="1.2" opacity="0.85"/>
-          <circle cx="100" cy="100" r="78" fill="none" stroke="rgba(232,200,114,0.28)" stroke-width="0.6" stroke-dasharray="2 4"/>
-          <g stroke="rgba(232,200,114,0.55)" stroke-width="1.2">
-            <line x1="100" y1="6" x2="100" y2="16"/>
-            <line x1="100" y1="184" x2="100" y2="194"/>
-            <line x1="6" y1="100" x2="16" y2="100"/>
-            <line x1="184" y1="100" x2="194" y2="100"/>
-            <line x1="34.1" y1="34.1" x2="41.2" y2="41.2"/>
-            <line x1="158.8" y1="158.8" x2="165.9" y2="165.9"/>
-            <line x1="165.9" y1="34.1" x2="158.8" y2="41.2"/>
-            <line x1="41.2" y1="158.8" x2="34.1" y2="165.9"/>
-          </g>
-        </svg>
-        <div id="astroSlots"></div>
-        <div class="astro-wheel__core">
-          <div>
-            <div class="astro-wheel__glyph" id="astroCoreGlyph" aria-hidden="true">♈</div>
-            <div class="astro-wheel__name" id="astroCoreName">Aries</div>
+    <section class="astro-stage-panel" id="astroStagePanel" data-collapsed="false">
+      <button type="button" class="astro-collapse-toggle" id="astroStageToggle" aria-expanded="true" aria-controls="astroStageBody">
+        <span class="astro-collapse-toggle__label">
+          <span class="astro-kicker" data-i18n="stageKicker">Wheel · detail</span>
+          <strong id="astroStageToggleTitle" data-i18n="stageTitle">Sign and card</strong>
+        </span>
+        <span class="astro-collapse-toggle__hint" id="astroStageToggleHint" data-i18n="hide">Hide</span>
+        <i class="bi bi-chevron-down" aria-hidden="true"></i>
+      </button>
+      <div class="astro-stage-body" id="astroStageBody">
+        <div class="astro-stage">
+          <div class="astro-wheel" id="astroWheel" aria-label="Zodiac wheel">
+            <svg class="astro-wheel__art" id="astroWheelArt" viewBox="0 0 200 200" aria-hidden="true">
+              <defs>
+                <linearGradient id="astroGold" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#f3dd9a"/>
+                  <stop offset="50%" stop-color="#c8ab57"/>
+                  <stop offset="100%" stop-color="#8f7430"/>
+                </linearGradient>
+              </defs>
+              <g id="astroWedges" class="astro-wedges"></g>
+              <circle cx="100" cy="100" r="96" fill="none" stroke="url(#astroGold)" stroke-width="1.2" opacity="0.85"/>
+              <circle cx="100" cy="100" r="78" fill="none" stroke="rgba(232,200,114,0.28)" stroke-width="0.6" stroke-dasharray="2 4"/>
+              <g stroke="rgba(232,200,114,0.55)" stroke-width="1.2">
+                <line x1="100" y1="6" x2="100" y2="16"/>
+                <line x1="100" y1="184" x2="100" y2="194"/>
+                <line x1="6" y1="100" x2="16" y2="100"/>
+                <line x1="184" y1="100" x2="194" y2="100"/>
+                <line x1="34.1" y1="34.1" x2="41.2" y2="41.2"/>
+                <line x1="158.8" y1="158.8" x2="165.9" y2="165.9"/>
+                <line x1="165.9" y1="34.1" x2="158.8" y2="41.2"/>
+                <line x1="41.2" y1="158.8" x2="34.1" y2="165.9"/>
+              </g>
+            </svg>
+            <div id="astroSlots"></div>
+            <div class="astro-wheel__core">
+              <div>
+                <div class="astro-wheel__glyph" id="astroCoreGlyph" aria-hidden="true">♈</div>
+                <div class="astro-wheel__name" id="astroCoreName">Aries</div>
+              </div>
+            </div>
           </div>
+
+          <article class="astro-detail astro-flip astro-hero-card" id="astroDetail" aria-labelledby="astroDetailTitle" data-element="fire"></article>
         </div>
       </div>
-
-      <article class="astro-detail astro-flip astro-hero-card" id="astroDetail" aria-labelledby="astroDetailTitle" data-element="fire"></article>
     </section>
 
     <form class="astro-finder" id="astroFinder">
       <label>
-        Month
-        <select id="astroMonth" name="month" required></select>
+        <span data-i18n="dobLabel">Date of birth</span>
+        <input type="date" id="astroDob" name="dob" required min="1900-01-01" max="2100-12-31"/>
       </label>
-      <label>
-        Day
-        <select id="astroDay" name="day" required></select>
-      </label>
-      <button type="submit">Find my sign</button>
-      <button type="button" id="astroReadBtn">Ask Rose for a reading</button>
+      <button type="submit" data-i18n="findSign">Find my sign</button>
+      <button type="button" id="astroReadBtn" data-i18n="askReading">Ask Rose for a reading</button>
       <p id="astroFinderStatus" role="status" aria-live="polite"></p>
     </form>
 
-    <section class="astro-spread" id="astroSpread" hidden aria-label="Rose three-card reading"></section>
+    <section class="astro-spread" id="astroSpread" hidden aria-label="Rose three-card reading" data-i18n-aria="spreadAria"></section>
 
-    <div class="astro-toolbar" id="astroFilters" role="toolbar" aria-label="Filter signs by element">
-      <button type="button" data-element-filter="all" aria-pressed="true">All signs</button>
-      <button type="button" data-element-filter="fire" aria-pressed="false">Fire</button>
-      <button type="button" data-element-filter="earth" aria-pressed="false">Earth</button>
-      <button type="button" data-element-filter="air" aria-pressed="false">Air</button>
-      <button type="button" data-element-filter="water" aria-pressed="false">Water</button>
+    <div class="astro-toolbar" id="astroFilters" role="toolbar" aria-label="Filter signs by element" data-i18n-aria="filterAria">
+      <button type="button" data-element-filter="all" aria-pressed="true" data-i18n="filterAll">All signs</button>
+      <button type="button" data-element-filter="fire" aria-pressed="false" data-i18n="filterFire">Fire</button>
+      <button type="button" data-element-filter="earth" aria-pressed="false" data-i18n="filterEarth">Earth</button>
+      <button type="button" data-element-filter="air" aria-pressed="false" data-i18n="filterAir">Air</button>
+      <button type="button" data-element-filter="water" aria-pressed="false" data-i18n="filterWater">Water</button>
     </div>
 
     <section class="astro-gallery-block" aria-labelledby="astroGalleryHeading">
       <header class="astro-section-head">
-        <h2 id="astroGalleryHeading">Flip the deck</h2>
-        <p>All twelve sign cards — tap to flip and ask Rose.</p>
+        <h2 id="astroGalleryHeading" data-i18n="galleryHeading">Flip the deck</h2>
+        <p data-i18n="galleryLead">All twelve sign cards — tap to flip and ask Rose.</p>
       </header>
       <div class="astro-gallery" id="astroGallery"></div>
     </section>
 
     <section class="astro-arcana-block" aria-labelledby="astroArcanaHeading">
       <header class="astro-section-head">
-        <h2 id="astroArcanaHeading">Tarot cards</h2>
-        <p>Full seventy-eight-card parlor deck — Rose reads and teaches how to use them.</p>
+        <h2 id="astroArcanaHeading" data-i18n="tarotHeading">Tarot cards</h2>
+        <p data-i18n="tarotLead">Full seventy-eight-card parlor deck — Rose reads and teaches how to use them.</p>
       </header>
-      <div class="astro-toolbar astro-tarot-filters" id="astroTarotFilters" role="toolbar" aria-label="Tarot suit filter">
-        <button type="button" data-tarot-suit="all" aria-pressed="true">All</button>
-        <button type="button" data-tarot-suit="major" aria-pressed="false">Major</button>
-        <button type="button" data-tarot-suit="wands" aria-pressed="false">Wands</button>
-        <button type="button" data-tarot-suit="cups" aria-pressed="false">Cups</button>
-        <button type="button" data-tarot-suit="swords" aria-pressed="false">Swords</button>
-        <button type="button" data-tarot-suit="pentacles" aria-pressed="false">Pentacles</button>
+      <div class="astro-toolbar astro-tarot-filters" id="astroTarotFilters" role="toolbar" aria-label="Tarot suit filter" data-i18n-aria="tarotFilterAria">
+        <button type="button" data-tarot-suit="all" aria-pressed="true" data-i18n="tarotAll">All</button>
+        <button type="button" data-tarot-suit="major" aria-pressed="false" data-i18n="tarotMajor">Major</button>
+        <button type="button" data-tarot-suit="wands" aria-pressed="false" data-i18n="tarotWands">Wands</button>
+        <button type="button" data-tarot-suit="cups" aria-pressed="false" data-i18n="tarotCups">Cups</button>
+        <button type="button" data-tarot-suit="swords" aria-pressed="false" data-i18n="tarotSwords">Swords</button>
+        <button type="button" data-tarot-suit="pentacles" aria-pressed="false" data-i18n="tarotPentacles">Pentacles</button>
       </div>
       <div class="astro-gallery astro-arcana-gallery" id="astroArcanaGallery"></div>
-      <p class="astro-tarot-credit">
+      <p class="astro-tarot-credit" data-i18n="tarotCredit">
         Card art: Pamela Colman Smith / Rider–Waite–Smith (public domain), via Wikimedia Commons.
       </p>
     </section>
 
     <p class="astro-note">
-      Playful tropical astrology, not the night sky. For stars in their true places, open the
-      <a href="/planetarium/">Planetarium</a>.
+      <span data-i18n="noteBefore">Playful tropical astrology, not the night sky. For stars in their true places, open the</span>
+      <a href="/planetarium/" data-i18n="planetariumLink">Planetarium</a><span data-i18n="noteAfter">.</span>
     </p>
   </main>
 
@@ -164,6 +178,8 @@
   <script src="/shared/js/heygen-live-tile.js"></script>
   <script src="/entertainment/js/astrology-zodiac.js"></script>
   <script src="/entertainment/js/astrology-arcana.js"></script>
+  <script src="/entertainment/js/astrology-copy-vi.js"></script>
+  <script src="/entertainment/js/astrology-i18n.js"></script>
   <script src="/entertainment/js/astrology.js"></script>
   <script src="/entertainment/js/astrology-heygen.js"></script>
   <script type="module" src="/entertainment/js/astrology-rose-chat.js"></script>

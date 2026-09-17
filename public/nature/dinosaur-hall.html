@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Dinosaur Hall | Nature · Deep-time field guide</title>
+  <meta name="description" content="Mesozoic diorama you can restage by era — Triassic, Jurassic, Cretaceous — with true-to-scale creatures, a scholarly field guide, size compare, and HyperFrames reel."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/nature/css/dinosaur-hall.css"/>
+  <script src="/shared/menu-config.js"></script>
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/demo-users.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <script src="/shared/dark-mode.js" defer></script>
+</head>
+<body class="dh-page">
+  <a class="dh-skip" href="#dhMain">Skip to Dinosaur Hall</a>
+  <modern-navbar></modern-navbar>
+
+  <main class="dh-main" id="dhMain">
+    <section class="dh-hero" id="dhHero">
+      <div class="dh-hero-stage-wrap" id="dhStage" role="img" aria-label="Interactive Mesozoic diorama">
+        <canvas id="dhCanvas" class="dh-canvas" aria-hidden="true"></canvas>
+        <div class="dh-hero-fallback" id="dhFallback" hidden aria-hidden="true">
+          <svg class="dh-fallback-ridge" viewBox="0 0 1200 280" preserveAspectRatio="xMidYMax meet" focusable="false">
+            <path d="M0 180 C160 120 280 160 420 100 C560 40 720 130 900 90 C1020 60 1120 110 1200 80 L1200 280 L0 280 Z"/>
+          </svg>
+          <div class="dh-fallback-silhouettes" aria-hidden="true"></div>
+        </div>
+        <div class="dh-stage-hud">
+          <p class="dh-stage-status" id="dhStageStatus" role="status" aria-live="polite">Loading diorama…</p>
+          <button type="button" class="dh-btn dh-btn-ghost dh-btn-sm" id="dhResetCam" hidden>
+            <i class="bi bi-arrow-counterclockwise"></i> Reset camera
+          </button>
+        </div>
+      </div>
+
+      <div class="dh-hero-chrome">
+        <div class="dh-hero-mast" id="dhHeroInner">
+          <div class="dh-hero-brand">
+            <p class="dh-kicker" id="dhKicker">Nature · Deep-time field guide</p>
+            <h1 class="dh-hero-title" id="dhTitle">Dinosaur Hall</h1>
+          </div>
+          <div class="dh-hero-cta" role="toolbar" aria-label="Dinosaur Hall actions">
+            <a class="dh-btn dh-btn-ghost dh-btn-sm" href="/nature/nature-hub.html"><i class="bi bi-globe2"></i> Hub</a>
+            <a class="dh-btn dh-btn-primary dh-btn-sm" href="#dhEras"><i class="bi bi-hourglass-split"></i> Eras</a>
+            <button type="button" class="dh-btn dh-btn-sand dh-btn-sm" id="dhStoryPlay" aria-pressed="false">
+              <i class="bi bi-film"></i> Reel
+            </button>
+            <a class="dh-btn dh-btn-ghost dh-btn-sm" href="#dhSpecies"><i class="bi bi-collection"></i> Hall</a>
+            <a class="dh-btn dh-btn-ghost dh-btn-sm" href="#dhQuiz"><i class="bi bi-question-circle"></i> Quiz</a>
+          </div>
+        </div>
+        <p class="dh-hero-line dh-hero-line--slim" id="dhSubtitle">Click the diorama · era chips restage the world · cards open the field guide.</p>
+        <div class="dh-hero-tools">
+          <p class="dh-guide-status" id="dhGuideStatus">Welcome to deep time.</p>
+          <label class="dh-story-narrate">
+            <input type="checkbox" id="dhStoryNarrate" checked/>
+            <span>Narrate reel</span>
+          </label>
+          <div class="dh-story-panel" id="dhStoryPanel">
+            <div class="dh-story-status" id="dhStoryStatus" hidden aria-live="polite">
+              <span id="dhStoryStatusText"></span>
+              <div class="dh-story-dots" id="dhStoryDots" aria-hidden="true"></div>
+            </div>
+            <p class="dh-story-error" id="dhStoryError" hidden></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="container">
+      <section class="dh-onboarding" aria-label="How to read this hall">
+        <p class="mb-0" id="dhOnboarding">
+          <strong>How to read this hall:</strong> Context = earth-history framing. Evidence = named taxa, published length estimates, and clear labels when something is <em>not</em> a dinosaur (pterosaurs, mosasaurs).
+        </p>
+      </section>
+
+      <section class="dh-section" id="dhEras">
+        <div class="dh-section-head">
+          <h2>Mesozoic eras</h2>
+          <p>Restage the diorama. Each chapter changes fog, ground, and which animals appear.</p>
+        </div>
+        <div class="dh-era-chips" id="dhEraChips" role="group" aria-label="Select Mesozoic era"></div>
+        <article class="dh-era-panel" id="dhEraPanel" hidden>
+          <h3 id="dhEraLabel"></h3>
+          <p class="dh-era-years" id="dhEraYears"></p>
+          <p id="dhEraSummary"></p>
+        </article>
+      </section>
+
+      <section class="dh-section" id="dhSpecies">
+        <div class="dh-section-head">
+          <h2>Species hall</h2>
+          <p>Filter by era or diet. Cards open evidence labels and spotlight the diorama mesh.</p>
+        </div>
+        <div class="dh-filters" id="dhSpeciesFilters" role="group" aria-label="Filter species">
+          <button type="button" class="dh-chip is-active" data-filter="all">All</button>
+          <button type="button" class="dh-chip" data-filter="triassic">Triassic</button>
+          <button type="button" class="dh-chip" data-filter="jurassic">Jurassic</button>
+          <button type="button" class="dh-chip" data-filter="cretaceous">Cretaceous</button>
+          <button type="button" class="dh-chip" data-filter="carnivore">Carnivores</button>
+          <button type="button" class="dh-chip" data-filter="herbivore">Herbivores</button>
+          <button type="button" class="dh-chip" data-filter="not-dino">Not dinosaurs</button>
+        </div>
+        <div class="dh-species-grid" id="dhSpeciesGrid"></div>
+      </section>
+
+      <section class="dh-section" id="dhDetail" hidden>
+        <div class="dh-section-head">
+          <h2 id="dhDetailName">Species</h2>
+          <p id="dhDetailBinom" class="dh-binom"></p>
+        </div>
+        <div class="dh-detail-layout">
+          <figure class="dh-detail-media">
+            <img id="dhDetailImg" alt="" loading="lazy"/>
+            <figcaption id="dhDetailCredit"></figcaption>
+          </figure>
+          <div class="dh-detail-body">
+            <p id="dhDetailNotable"></p>
+            <div class="dh-evidence-box">
+              <p><strong>Misconception:</strong> <span id="dhDetailMyth"></span></p>
+              <p><strong>Evidence:</strong> <span id="dhDetailEvidence"></span></p>
+            </div>
+            <dl class="dh-meta-list">
+              <div><dt>Era</dt><dd id="dhDetailEra"></dd></div>
+              <div><dt>Diet</dt><dd id="dhDetailDiet"></dd></div>
+              <div><dt>Length</dt><dd id="dhDetailLength"></dd></div>
+              <div><dt>Clade</dt><dd id="dhDetailClade"></dd></div>
+            </dl>
+            <button type="button" class="dh-btn dh-btn-primary dh-btn-sm" id="dhDetailSpotlight">
+              <i class="bi bi-bullseye"></i> Spotlight in diorama
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="dh-section" id="dhCompare">
+        <div class="dh-section-head">
+          <h2>Size compare</h2>
+          <p>Pick two animals. Lengths come from the field guide — educational estimates, not movie posters.</p>
+        </div>
+        <div class="dh-compare-controls row g-3">
+          <div class="col-md-5">
+            <label class="form-label" for="dhCompareA">Animal A</label>
+            <select class="form-select" id="dhCompareA"></select>
+          </div>
+          <div class="col-md-5">
+            <label class="form-label" for="dhCompareB">Animal B</label>
+            <select class="form-select" id="dhCompareB"></select>
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button type="button" class="dh-btn dh-btn-primary w-100" id="dhCompareRun">Compare</button>
+          </div>
+        </div>
+        <div class="dh-compare-result" id="dhCompareResult" hidden>
+          <div class="dh-compare-bars" id="dhCompareBars"></div>
+          <p class="dh-compare-summary" id="dhCompareSummary"></p>
+        </div>
+      </section>
+
+      <section class="dh-section" id="dhQuiz">
+        <div class="dh-section-head">
+          <h2>Field quiz</h2>
+          <p>Five questions — eras, non-dinosaurs, and movie myths. Answers must match the hall evidence.</p>
+        </div>
+        <div id="dhQuizBoard" class="dh-quiz-board"></div>
+        <p class="dh-quiz-score" id="dhQuizScore" hidden aria-live="polite"></p>
+      </section>
+    </div>
+  </main>
+
+  <div class="dh-story-overlay" id="dhStoryOverlay" hidden aria-hidden="true">
+    <div class="dh-story-chip" id="dhStoryChip">
+      <img id="dhStoryChipImg" class="dh-story-chip-img" alt="" width="48" height="48"/>
+      <div>
+        <p class="dh-story-kicker" id="dhStoryKicker"></p>
+        <p class="dh-story-title" id="dhStoryTitle"></p>
+        <p class="dh-story-copy" id="dhStoryCopy"></p>
+        <p class="dh-story-progress" id="dhStoryProgress"></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="/shared/tts.js"></script>
+  <script src="/nature/js/dinosaur-hall-scene.js"></script>
+  <script src="/nature/js/dinosaur-hall.js"></script>
+  <script src="/nature/js/dinosaur-hall-reel.js"></script>
+</body>
+</html>

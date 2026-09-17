@@ -549,6 +549,7 @@ class AIChatWidget {
             if (lang.startsWith('ar')) return 'ar-SA';
             if (lang.startsWith('es')) return 'es-ES';
             if (lang.startsWith('fr')) return 'fr-FR';
+            if (lang.startsWith('vi')) return 'vi-VN';
             return 'en-US';
         } catch (_) {
             return 'en-US';

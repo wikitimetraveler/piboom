@@ -154,6 +154,35 @@ body.astro-page modern-navbar {
   padding: 1.25rem 0 0.5rem;
 }
 
+.astro-hero__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem 1.25rem;
+  margin-bottom: 0.35rem;
+}
+
+.astro-lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--as-rose) 40%, var(--as-gold));
+  background: rgba(18, 16, 28, 0.65);
+  color: var(--as-gold);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.astro-lang-toggle:hover,
+.astro-lang-toggle:focus-visible {
+  border-color: var(--as-gold);
+  outline: none;
+}
+
 .astro-kicker {
   display: inline-flex;
   align-items: center;
@@ -215,13 +244,15 @@ body.astro-page modern-navbar {
 }
 
 .astro-finder select,
+.astro-finder input[type="date"],
 .astro-finder button {
   font-family: inherit;
   min-height: 2.5rem;
   border-radius: 0.7rem;
 }
 
-.astro-finder select {
+.astro-finder select,
+.astro-finder input[type="date"] {
   min-width: 8.5rem;
   padding: 0.35rem 0.7rem;
   color: var(--as-ink);
@@ -257,7 +288,79 @@ body.astro-page modern-navbar {
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
   gap: 1.4rem;
   align-items: center;
+  margin-top: 0;
+}
+
+.astro-stage-panel {
   margin-top: 1.7rem;
+  border: 1px solid rgba(232, 200, 114, 0.22);
+  border-radius: 1.15rem;
+  background: rgba(10, 8, 18, 0.42);
+  overflow: hidden;
+}
+
+.astro-collapse-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.05rem;
+  border: 0;
+  background: linear-gradient(180deg, rgba(232, 200, 114, 0.1), transparent);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.astro-collapse-toggle:hover,
+.astro-collapse-toggle:focus-visible {
+  background: linear-gradient(180deg, rgba(232, 200, 114, 0.16), transparent);
+  outline: none;
+}
+
+.astro-collapse-toggle__label {
+  display: grid;
+  gap: 0.1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.astro-collapse-toggle__label .astro-kicker {
+  margin: 0;
+  font-size: 0.68rem;
+}
+
+.astro-collapse-toggle__label strong {
+  font-family: Fraunces, Georgia, serif;
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: var(--as-gold);
+}
+
+.astro-collapse-toggle__hint {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(232, 220, 190, 0.55);
+}
+
+.astro-collapse-toggle .bi {
+  font-size: 1.1rem;
+  color: var(--as-gold);
+  transition: transform 0.25s ease;
+}
+
+.astro-stage-panel[data-collapsed="true"] .astro-collapse-toggle .bi {
+  transform: rotate(-90deg);
+}
+
+.astro-stage-body {
+  padding: 0 1rem 1.1rem;
+}
+
+.astro-stage-panel[data-collapsed="true"] .astro-stage-body {
+  display: none;
 }
 
 .astro-wheel {
@@ -965,12 +1068,18 @@ body.astro-page modern-navbar {
 }
 
 .astro-spread-card__role {
-  margin: 0 0 0.4rem;
+  margin: 0 0 0.35rem;
   text-align: center;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   font-size: 0.72rem;
-  color: var(--as-gold);
+  color: color-mix(in srgb, var(--as-gold) 70%, var(--as-rose));
+}
+
+.astro-spread-card--tarot .astro-tarot-art {
+  max-height: 210px;
+  width: auto;
+  margin: 0 auto;
 }
 
 .astro-ask--spread {

@@ -31,9 +31,9 @@ const config = createDTICalculatorConfig({
 
 ### FHA Calculator
 
-Live worksheet: **`/finance/fha-streamline-loan-amount-calculator.html`** (uses `createFHACalculatorConfig()` + DAG-lite). HeyGen script: [CALCULATION_ENGINE_VIDEO_SCRIPT.md](CALCULATION_ENGINE_VIDEO_SCRIPT.md).
+Live worksheet: **`/finance/fha-streamline-loan-amount-calculator.html`** (uses `createFHACalculatorConfig()` + DAG-lite). Embeds a collapsible **Calculation graph** card that paints the FHA DAG via WebGPU (canvas 2D fallback) and pulses on `onCellComputed` — graphics only; CPU `calcMath` still computes values. HeyGen script: [CALCULATION_ENGINE_VIDEO_SCRIPT.md](CALCULATION_ENGINE_VIDEO_SCRIPT.md).
 
-WebGPU demo (new page, not a worksheet replacement): **`/finance/calc-engine-webgpu.html`**. CPU `calcMath` still computes live values. WebGPU paints the FHA DAG and runs an **integer-cent** kernel as a verifier. Default GPU `f32` cannot safely round FHA-scale cents; this is **not** a speed-up (11 sequential cells vs dispatch + readback). Helpers: `dollarsToCents`, `centsToDollars`, `fhaLoanAmountIntegerCents`, `multiplyPercentageF32`. Optional engine hook: `onCellComputed`.
+WebGPU research demo (integer-cent verifier + f32 drift exhibit): **`/finance/calc-engine-webgpu.html`**. Default GPU `f32` cannot safely round FHA-scale cents; this is **not** a speed-up (11 sequential cells vs dispatch + readback). Helpers: `dollarsToCents`, `centsToDollars`, `fhaLoanAmountIntegerCents`, `multiplyPercentageF32`. Optional engine hook: `onCellComputed`.
 
 ```javascript
 const config = createFHACalculatorConfig({

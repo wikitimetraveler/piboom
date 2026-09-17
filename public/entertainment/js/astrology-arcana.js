@@ -204,7 +204,46 @@
     return DECK.filter((card) => card.suit === key);
   }
 
-function imageSrc(card) {
+  function mulberry32(seed) {
+    let a = seed >>> 0;
+    return function next() {
+      a += 0x6d2b79f5;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function shuffleCopy(list, rng) {
+    const copy = list.slice();
+    for (let i = copy.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(rng() * (i + 1));
+      const tmp = copy[i];
+      copy[i] = copy[j];
+      copy[j] = tmp;
+    }
+    return copy;
+  }
+
+  /**
+   * Deterministic upright three-card parlor draw: Situation / Cross / Path.
+   * @param {number} seed
+   * @returns {{ situation: object, cross: object, path: object, seed: number } | null}
+   */
+  function spreadFromDeck(seed) {
+    if (!DECK.length) return null;
+    const rng = mulberry32((Number(seed) >>> 0) || 1);
+    const drawn = shuffleCopy(DECK, rng);
+    return {
+      situation: drawn[0],
+      cross: drawn[1],
+      path: drawn[2],
+      seed: (Number(seed) >>> 0) || 1,
+    };
+  }
+
+  function imageSrc(card) {
     if (!card) return '';
     return card.image || card.commonsUrl || '';
   }
@@ -250,6 +289,7 @@ function imageSrc(card) {
     SUITS,
     cardById,
     cardsBySuit,
+    spreadFromDeck,
     imageSrc,
     factSheet,
     imageManifest,

@@ -106,6 +106,7 @@
     { name: 'Tree Collection', url: '/nature/tree-collection.html', category: 'Nature', keywords: 'trees forest' },
     { name: 'Critter Discovery', url: '/nature/critter-discovery.html', category: 'Nature', keywords: 'animal wildlife identify photo' },
     { name: 'Critter Collection', url: '/nature/critter-collection.html', category: 'Nature', keywords: 'critters wildlife collection' },
+    { name: 'Dinosaur Hall', url: '/nature/dinosaur-hall.html', category: 'Nature', keywords: 'dinosaur mesozoic triassic jurassic cretaceous paleontology field guide diorama three.js size compare quiz hyperframes reel tyrannosaurus velociraptor pterosaur mosasaur' },
     { name: 'The Valley', url: '/nature/shenango-valley.html', category: 'Nature', keywords: 'shenango valley buhl park hermitage sharon farrell steel amish new wilmington sports lettermen tony butala trent reznor nine inch nails music quaker steak lube luigi pizza david heygen atlas photos video youngstown mahoning mob organized crime east ohio west pennsylvania hyperframes reel story mode museum events concert buhl day river market acoustic sunday' },
     { name: 'Local Spots', url: '/local/local-spots.html', category: 'Local', keywords: 'thrift spots map' },
     { name: 'Finds', url: '/finds/index.html', category: 'Local', keywords: 'thrift flea vintage collection AI' },

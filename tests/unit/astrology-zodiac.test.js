@@ -128,6 +128,30 @@ describe('AstrologyZodiac spread', () => {
     expect(AstrologyZodiac.parseReadingQuery('?sign=cancer')).toBe(false);
   });
 
+  test('parseDobString and parseDobQuery read YYYY-MM-DD', () => {
+    expect(AstrologyZodiac.parseDobString('1990-09-14')).toEqual({
+      year: 1990,
+      month: 9,
+      day: 14,
+      iso: '1990-09-14',
+    });
+    expect(AstrologyZodiac.parseDobString('2024-02-29')).toEqual({
+      year: 2024,
+      month: 2,
+      day: 29,
+      iso: '2024-02-29',
+    });
+    expect(AstrologyZodiac.parseDobString('2023-02-29')).toBeNull();
+    expect(AstrologyZodiac.parseDobString('1990-13-01')).toBeNull();
+    expect(AstrologyZodiac.parseDobQuery('?dob=2001-03-21&reading=1').iso).toBe('2001-03-21');
+    expect(AstrologyZodiac.parseDobQuery('?sign=aries')).toBeNull();
+  });
+
+  test('dobSeed is deterministic for the same birthday', () => {
+    expect(AstrologyZodiac.dobSeed(1990, 9, 14)).toBe(AstrologyZodiac.dobSeed(1990, 9, 14));
+    expect(AstrologyZodiac.dobSeed(1990, 9, 14)).not.toBe(AstrologyZodiac.dobSeed(1991, 9, 14));
+  });
+
   test('wheelWedgesSvg paints twelve element wedges', () => {
     const svg = AstrologyZodiac.wheelWedgesSvg();
     expect(svg).toContain('astro-wedges');
@@ -155,9 +179,14 @@ describe('astrology page wiring', () => {
     expect(html).toContain('<h1>Rose</h1>');
     expect(html).toContain('astrology-zodiac.js');
     expect(html).toContain('astrology-arcana.js');
+    expect(html).toContain('astrology-i18n.js');
+    expect(html).toContain('astrology-copy-vi.js');
     expect(html).toContain('astrology-heygen.js');
     expect(html).toContain('astrology-rose-chat.js');
     expect(html).toContain('id="astroWheel"');
+    expect(html).toContain('id="astroStagePanel"');
+    expect(html).toContain('id="astroStageToggle"');
+    expect(html).toContain('Sign and card');
     expect(html).toContain('id="astroSky"');
     expect(html).toContain('id="astroGallery"');
     expect(html).toContain('id="astroArcanaGallery"');
@@ -167,8 +196,12 @@ describe('astrology page wiring', () => {
     expect(html).toContain('id="astroTarotFilters"');
     expect(html).toContain('id="astroSpread"');
     expect(html).toContain('id="astroMeetRose"');
+    expect(html).toContain('id="astroLangToggle"');
     expect(html).toContain('id="astroWedges"');
     expect(html).toContain('id="astroFinder"');
+    expect(html).toContain('id="astroDob"');
+    expect(html).toContain('type="date"');
+    expect(html).not.toContain('id="astroMonth"');
     expect(html).not.toContain('astro-hero__nav');
     expect(html).toContain('/planetarium/');
     expect(html).toContain('/shared/tts.js');
@@ -191,6 +224,8 @@ describe('astrology page wiring', () => {
     expect(css).toContain('.astro-toolbar button[data-element-filter="water"][aria-pressed="true"]');
     expect(css).toContain('.astro-rose-dock');
     expect(css).toContain('.astro-section-head');
+    expect(css).toContain('.astro-stage-panel');
+    expect(css).toContain('.astro-collapse-toggle');
 
     const js = readFileSync(join(process.cwd(), 'public/entertainment/js/astrology.js'), 'utf8');
     expect(js).toContain('ELEMENT_RGB');
@@ -198,6 +233,7 @@ describe('astrology page wiring', () => {
     expect(js).toContain('nebulae');
     expect(js).toContain('petals');
     expect(js).toContain('astroWedges');
+    expect(js).toContain('setStageCollapsed');
     expect(js).toContain('arcanaGalleryMarkup');
     expect(js).toContain('astro-chip--${sign.element}');
     expect(js).not.toMatch(/astro-detail__meta[\s\S]*modality[\s\S]*Flip the card/);

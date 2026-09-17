@@ -15,7 +15,7 @@ Tarot-style reader for the tropical zodiac page (`/entertainment/astrology.html`
 
 ## Voice
 - Tone: Warm, slightly husky, intimate
-- Accent: English, late-night parlor
+- Accent: English, late-night parlor (Vietnamese parlor reads use a HeyGen Vietnamese voice when rendering; chat/TTS falls back to `vi-VN-Neural2-A`)
 - Energy: Mid — a reader, not a carnival barker
 - Think: Someone who turns a gold wheel as if it were a deck of cards
 
@@ -28,12 +28,14 @@ Tarot-style reader for the tropical zodiac page (`/entertainment/astrology.html`
 - Looks: square=9b419a297d0cde418ac1408f4d0a0de5
 - Last Synced: 2026-09-15T01:52:55.724Z
 - Status: heygen-ready (photo avatar from parlor portrait)
+- Vietnamese intro: `public/entertainment/assets/video/astrology-rose-intro-vi.mp4` (`npm run generate:rose-heygen-demo:vi`). Female Vietnamese voice **HuyenTrang** (`51a130b1be7149f79df5a8de957aa7ad`); picker never selects male VI voices. Chat/TTS still uses Google `vi-VN-Neural2-A`.
 
 ## Pipeline
 - Scripts: `services/rose-heygen.service.js`
 - Catalog: `data/rose-heygen-demo.json`
 - Create / render: `npm run create:rose-heygen-avatar` then `npm run generate:rose-heygen-demo` (add `-- --dry-run` to resolve voice without spending credits)
+- Vietnamese render: `npm run generate:rose-heygen-demo:vi` (`--lang vi --video-only --direct --cache-local`)
 - Page: `public/entertainment/js/astrology-heygen.js`
 - Chat: `/api/astrology/assistant/*`
-- Page fallback: Google TTS (`en-US-Neural2-F`) via `/shared/tts.js` when streaming is off; Meet Rose plays cached MP4
-- Speak API: `GET /api/astrology/demo` returns `spokenScript` (disaster briefing pattern)
+- Page fallback: Google TTS (`en-US-Neural2-F` / `vi-VN-Neural2-A`) via `/shared/tts.js` when streaming is off; Meet Rose plays cached MP4 per language
+- Speak API: `GET /api/astrology/demo?lang=en|vi` returns `spokenScript` (disaster briefing pattern)

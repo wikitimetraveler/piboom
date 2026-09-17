@@ -28,12 +28,22 @@ function resolveHistory(req) {
   }));
 }
 
+function resolveLang(req) {
+  const context = req.body?.context;
+  const candidate = req.body?.lang || (context && !Array.isArray(context) ? context.lang : null);
+  return String(candidate || 'en').toLowerCase().startsWith('vi') ? 'vi' : 'en';
+}
+
 function resolveChatContext(req) {
   const context = req.body?.context;
   if (!context || Array.isArray(context) || typeof context !== 'object') return {};
   return {
     sign: context.sign,
     spread: context.spread,
+    arcana: context.arcana,
+    birthDate: context.birthDate,
+    birthYear: context.birthYear,
+    lang: resolveLang(req),
   };
 }
 
@@ -84,6 +94,7 @@ router.post('/chat', async (req, res) => {
       userId: resolveUserId(req),
       sessionId: resolveSessionId(req),
       context: resolveChatContext(req),
+      lang: resolveLang(req),
     });
 
     res.json({
@@ -92,6 +103,7 @@ router.post('/chat', async (req, res) => {
       reply: result.reply,
       message: result.reply,
       guideName: result.guideName,
+      lang: result.lang,
     });
   } catch (error) {
     const status = error.code === 'OPENAI_NOT_CONFIGURED' ? 503 : 500;

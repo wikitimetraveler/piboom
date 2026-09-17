@@ -7,6 +7,7 @@
  *   node scripts/tools/create-rose-heygen-avatar.mjs --create-avatar
  *   node scripts/tools/create-rose-heygen-avatar.mjs --create-avatar --video --direct --cache-local
  *   node scripts/tools/create-rose-heygen-avatar.mjs --video-only --direct --cache-local
+ *   node scripts/tools/create-rose-heygen-avatar.mjs --lang vi --video-only --direct --cache-local
  */
 import 'dotenv/config';
 import { mkdir, readFile, writeFile, unlink } from 'node:fs/promises';
@@ -21,17 +22,35 @@ import {
   createAvatarVideo,
   getVideoStatus,
 } from '../../services/heygen.service.js';
-import { getRoseDemoShort, pickRoseVoice, ROSE_VIDEO_LOCAL } from '../../services/rose-heygen.service.js';
+import {
+  getRoseDemoShort,
+  pickRoseVoice,
+  ROSE_LANGS,
+  ROSE_VIDEO_LOCAL,
+} from '../../services/rose-heygen.service.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
 const PORTRAIT = path.join(ROOT, 'public/entertainment/assets/rose-guide-portrait.png');
 const AVATAR_MD = path.join(ROOT, 'AVATAR-ROSE.md');
 const DEMO_JSON = path.join(ROOT, 'data/rose-heygen-demo.json');
-const LOCAL_ABS = path.join(ROOT, 'public', ROSE_VIDEO_LOCAL.replace(/^\//, ''));
 
 function hasFlag(flag) {
   return process.argv.includes(flag);
+}
+
+function argValue(flag) {
+  const idx = process.argv.indexOf(flag);
+  if (idx < 0 || idx >= process.argv.length - 1) return null;
+  return process.argv[idx + 1];
+}
+
+function resolveLang() {
+  const raw = String(argValue('--lang') || 'en').toLowerCase().slice(0, 2);
+  if (!ROSE_LANGS.includes(raw)) {
+    throw new Error(`--lang must be one of: ${ROSE_LANGS.join(', ')}`);
+  }
+  return raw;
 }
 
 function sleep(ms) {
@@ -101,20 +120,39 @@ async function main() {
   const createAvatar = hasFlag('--create-avatar') || hasFlag('--avatar-only');
   const videoOnly = hasFlag('--video-only');
   const wantVideo = hasFlag('--video') || videoOnly || hasFlag('--cache-local');
+  const lang = resolveLang();
+  const short = getRoseDemoShort(lang);
+  const localPath = short.localPath;
+  const localAbs = path.join(ROOT, 'public', localPath.replace(/^\//, ''));
 
   const demo = JSON.parse(await readFile(DEMO_JSON, 'utf8'));
-  const short = getRoseDemoShort();
 
   let lookId = demo.heygenAvatarId || demo.avatar?.lookId || null;
   let groupId = demo.heygenAvatarGroupId || demo.avatar?.groupId || null;
-  let voiceId = demo.heygenVoiceId || null;
-  let voiceName = demo.heygenVoiceName || 'Rose';
+  let voiceId =
+    argValue('--voice-id') ||
+    (lang === 'vi' ? demo.heygenVoiceIdVi || null : demo.heygenVoiceId || null);
+  let voiceName =
+    lang === 'vi'
+      ? demo.heygenVoiceNameVi || 'Rose'
+      : demo.heygenVoiceName || 'Rose';
 
-  console.log('Rose HeyGen plan');
+  // Never reuse a known male Vietnamese catalog pick for Rose.
+  if (lang === 'vi' && !argValue('--voice-id')) {
+    const maleNames = /son tran|minh quang|dang tung|minhtrung|ly hai|anh đức|kim hung|huynhduong|khanhlq|việt dũng|nổi tiếng/i;
+    if (maleNames.test(String(voiceName)) || voiceId === '0132f85950a94d11ba180f885101bf84') {
+      voiceId = null;
+      voiceName = 'Rose';
+    }
+  }
+
+  console.log(`Rose HeyGen plan [${lang}]`);
   console.log(`  script: ${short.script.slice(0, 80)}…`);
   console.log(`  portrait: ${PORTRAIT}`);
   console.log(`  look: ${lookId || 'will create'}`);
+  console.log(`  voice language: ${short.voiceLanguage}`);
   console.log(`  voice: ${voiceName} (${voiceId || 'pick from catalog'})`);
+  console.log(`  local: ${localPath}`);
   console.log(`  createAvatar=${createAvatar} video=${wantVideo}`);
   if (dry) {
     console.log('Dry run — no credits spent.');
@@ -125,14 +163,45 @@ async function main() {
     throw new Error('HEYGEN_API_KEY is not configured');
   }
 
-  const voices = await listVoices();
-  const picked = pickRoseVoice(voices);
-  if (picked && !voiceId) {
+  const voices = await listVoices({
+    language: short.voiceLanguage,
+    maxPages: lang === 'vi' ? 20 : 2,
+  });
+  if (voiceId && argValue('--voice-id')) {
+    const named = voices.find((v) => (v.voice_id || v.id) === voiceId);
+    if (named) voiceName = named.name || named.voice_name || voiceName;
+    if (!named) {
+      const all = await listVoices({ maxPages: 20 });
+      const hit = all.find((v) => (v.voice_id || v.id) === voiceId);
+      if (hit) {
+        voiceName = hit.name || hit.voice_name || voiceName;
+        if (String(hit.gender || '').toLowerCase() === 'male') {
+          throw new Error(`Voice ${voiceId} is male — Rose requires a female voice.`);
+        }
+      }
+    }
+  }
+  const picked = pickRoseVoice(voices, lang);
+  if (picked && !argValue('--voice-id')) {
     voiceId = picked.voiceId;
     voiceName = picked.voiceName;
   }
+  if (!voiceId && lang === 'vi') {
+    const all = await listVoices({ maxPages: 20 });
+    const fallback = pickRoseVoice(all, lang);
+    if (fallback) {
+      voiceId = fallback.voiceId;
+      voiceName = fallback.voiceName;
+    }
+  }
   console.log(`  resolved voice: ${voiceName} (${voiceId || 'unresolved'})`);
-
+  if (!voiceId) {
+    throw new Error(
+      lang === 'vi'
+        ? 'No female Vietnamese HeyGen voice found for Rose. Pass --voice-id with a female voice.'
+        : 'No suitable Rose voice found.'
+    );
+  }
   if (createAvatar && !videoOnly) {
     const tmp = await preparePortraitUpload(PORTRAIT);
     try {
@@ -151,16 +220,26 @@ async function main() {
 
   demo.heygenAvatarId = lookId;
   demo.heygenAvatarGroupId = groupId;
-  demo.heygenVoiceId = voiceId;
-  demo.heygenVoiceName = voiceName;
-  demo.heygenScriptShort = short.script;
+  if (lang === 'vi') {
+    demo.heygenScriptShortVi = short.script;
+    demo.heygenVoiceIdVi = voiceId;
+    demo.heygenVoiceNameVi = voiceName;
+    demo.titleVi = short.title;
+  } else {
+    demo.heygenVoiceId = voiceId;
+    demo.heygenVoiceName = voiceName;
+    demo.heygenScriptShort = short.script;
+    demo.title = short.title;
+  }
   if (demo.avatar) {
     demo.avatar.lookId = lookId;
     demo.avatar.groupId = groupId;
     demo.avatar.status = lookId ? 'heygen-ready' : demo.avatar.status;
   }
   await writeFile(DEMO_JSON, `${JSON.stringify(demo, null, 2)}\n`, 'utf8');
-  await patchAvatarMd({ groupId, lookId, voiceId, voiceName });
+  if (lang === 'en') {
+    await patchAvatarMd({ groupId, lookId, voiceId, voiceName });
+  }
 
   if (hasFlag('--avatar-only')) {
     console.log('Avatar only — stopping before video render.');
@@ -173,7 +252,7 @@ async function main() {
   }
 
   if (!lookId || !voiceId) {
-    throw new Error('Need avatar look id and voice id before rendering. Re-run with --create-avatar.');
+    throw new Error('Need avatar look id and voice id before rendering. Re-run with --create-avatar or fix voice pick.');
   }
 
   const created = await createVideoWithRetry({
@@ -189,16 +268,28 @@ async function main() {
   if (!videoId) throw new Error('No video id from createAvatarVideo');
   console.log(`Rendering ${videoId}…`);
   const url = await pollVideo(videoId);
-  demo.heygenVideoIdShort = videoId;
-  demo.heygenVideoUrlShort = url;
-  demo.generatedAt = new Date().toISOString();
+
+  if (lang === 'vi') {
+    demo.heygenVideoIdShortVi = videoId;
+    demo.heygenVideoUrlShortVi = url;
+    demo.generatedAtVi = new Date().toISOString();
+  } else {
+    demo.heygenVideoIdShort = videoId;
+    demo.heygenVideoUrlShort = url;
+    demo.generatedAt = new Date().toISOString();
+  }
 
   if (hasFlag('--cache-local')) {
-    await cacheLocal(url, LOCAL_ABS);
-    demo.heygenVideoLocalShort = ROSE_VIDEO_LOCAL;
-    demo.heygenVideoUrlShort = null;
+    await cacheLocal(url, localAbs);
+    if (lang === 'vi') {
+      demo.heygenVideoLocalShortVi = localPath;
+      demo.heygenVideoUrlShortVi = null;
+    } else {
+      demo.heygenVideoLocalShort = localPath;
+      demo.heygenVideoUrlShort = null;
+    }
     if (demo.avatar) demo.avatar.status = 'heygen-ready-with-video';
-    console.log(`Cached ${ROSE_VIDEO_LOCAL}`);
+    console.log(`Cached ${localPath}`);
   }
 
   await writeFile(DEMO_JSON, `${JSON.stringify(demo, null, 2)}\n`, 'utf8');

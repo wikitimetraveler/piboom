@@ -81,6 +81,29 @@
       .input-group-text { background: #F1F5F9; border-color: var(--border); }
       .result { background: #F7F9FC; font-weight: 600; }
       .is-invalid { border-color: #dc3545; }
+      .fs-dag-wrap {
+        position: relative;
+        height: 280px;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #0c1722;
+      }
+      .fs-dag-wrap canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      .fs-dag-label {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        color: #e8f4f8;
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        pointer-events: none;
+        text-shadow: 0 1px 4px #0c1722;
+        white-space: nowrap;
+      }
     </style>
   </head>
   <body class="worksheets-shell" data-calculator="fha-streamline-loan-amount">
@@ -117,7 +140,22 @@
         </ul>
       </div>
       <h1 class="mb-2">FHA Streamline Loan Amount Worksheet</h1>
-      <p class="text-muted mb-4">Calculate loan amounts based on FHA Streamline guidelines. Formulas match Excel worksheet structure. <a href="/finance/calc-engine-webgpu.html">WebGPU DAG demo</a> (visualization + integer-cent verifier — CPU calcMath stays the worksheet engine).</p>
+      <p class="text-muted mb-4">Calculate loan amounts based on FHA Streamline guidelines. Formulas match Excel worksheet structure. CPU <code>calcMath</code> drives the numbers; the graph below paints the cascade. Full integer-cent / f32 analysis: <a href="/finance/calc-engine-webgpu.html">WebGPU DAG demo</a>.</p>
+
+      <!-- Section: Calculation graph (WebGPU / 2D paint only) -->
+      <div class="calculator-card">
+        <h3 data-bs-toggle="collapse" data-bs-target="#collapseDag" aria-expanded="true" aria-controls="collapseDag">
+          <span><i class="bi-diagram-3 me-2"></i>Calculation graph</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseDag">
+          <div class="fs-dag-wrap mb-2" id="fsDagWrap">
+            <canvas id="fsDagCanvas" role="img" aria-label="FHA Streamline calculation DAG"></canvas>
+          </div>
+          <p class="small text-muted mb-0">Teal nodes are results; cooler nodes are inputs. Heat pulses when a cell recomputes. Graphics only — not a second calculator.</p>
+          <p class="small text-muted mb-0 mt-1"><span class="badge text-bg-light border" id="fsDagBackendBadge">GPU: detecting…</span></p>
+        </div>
+      </div>
 
       <!-- Section: Borrower Information -->
       <div class="calculator-card">
@@ -344,20 +382,49 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/shared/calcEngineLibrary.js"></script>
     <script src="/shared/calculationEngine.js"></script>
+    <script src="/shared/js/webgpu-runtime.js"></script>
+    <script src="/shared/js/webgpu-calc-engine-dag.js"></script>
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        // Use factory function to create FHA Streamline Loan Amount calculator configuration
-        const calc = new CalculationsEngine(createFHACalculatorConfig());
+      document.addEventListener('DOMContentLoaded', async function() {
+        const config = createFHACalculatorConfig();
+        const canvas = document.getElementById('fsDagCanvas');
+        const wrap = document.getElementById('fsDagWrap');
+        const badge = document.getElementById('fsDagBackendBadge');
+        let dagViz = null;
 
-        // Format currency displays
-        function formatCurrency(value) {
-          return value ? '$' + parseFloat(value).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '$0.00';
+        if (canvas && window.WebGpuCalcEngineDag) {
+          const layout = WebGpuCalcEngineDag.layoutFhaDag(config.groups);
+          if (wrap) {
+            wrap.querySelectorAll('.fs-dag-label').forEach(function (el) { el.remove(); });
+            layout.nodes.forEach(function (n) {
+              const el = document.createElement('span');
+              el.className = 'fs-dag-label';
+              el.textContent = n.label;
+              el.style.left = (n.x * 100) + '%';
+              el.style.top = (n.y * 100) + '%';
+              wrap.appendChild(el);
+            });
+          }
+          try {
+            dagViz = await WebGpuCalcEngineDag.mount({ canvas: canvas, layout: layout });
+            if (badge) {
+              const backend = dagViz && dagViz.backend ? dagViz.backend : 'none';
+              badge.textContent = backend === 'webgpu'
+                ? 'GPU: WebGPU paint'
+                : 'GPU: canvas 2D fallback';
+            }
+          } catch (_) {
+            if (badge) badge.textContent = 'GPU: unavailable';
+          }
+        } else if (badge) {
+          badge.textContent = 'GPU: script not loaded';
         }
 
-        // Format percentage
-        function formatPercent(value) {
-          return value ? (parseFloat(value) / 100).toLocaleString('en-US', {style: 'percent', minimumFractionDigits: 2}) : '0.00%';
-        }
+        const calc = new CalculationsEngine(config, {
+          onCellComputed: function (evt) {
+            if (dagViz && evt && evt.resultId) dagViz.pulse(evt.resultId);
+          }
+        });
 
         // Update displays when values change
         ['fs_g15', 'fs_g18', 'fs_g19', 'fs_g20', 'fs_g22', 'fs_g24', 'fs_g28', 'fs_e29', 'fs_g29', 'fs_g30'].forEach(id => {

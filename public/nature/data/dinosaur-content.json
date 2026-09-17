@@ -1,0 +1,389 @@
+{
+  "id": "dinosaur-hall",
+  "title": "Dinosaur Hall",
+  "kicker": "Nature · Deep-time field guide",
+  "subtitle": "A Mesozoic diorama you can restage by era — Triassic, Jurassic, Cretaceous — with true-to-scale creatures and a scholarly field guide.",
+  "onboarding": "How to read this hall: Context = earth-history framing (eras, climates, body plans). Evidence = named taxa, published length estimates, and clear labels when something is not a dinosaur (pterosaurs, mosasaurs).",
+  "eras": [
+    {
+      "id": "triassic",
+      "label": "Triassic",
+      "years": "252–201 Ma",
+      "summary": "After the end-Permian collapse, the first dinosaurs appear on a warmer, drier supercontinent. Early forms are often bipedal and modest in size.",
+      "palette": {
+        "fog": "#c45a3a",
+        "sky": "#e8a060",
+        "ground": "#8b5a3c",
+        "water": "#4a6b6e"
+      }
+    },
+    {
+      "id": "jurassic",
+      "label": "Jurassic",
+      "years": "201–145 Ma",
+      "summary": "Fern forests, giant sauropods, and famous plate-backed herbivores. Dinosaurs dominate land ecosystems worldwide.",
+      "palette": {
+        "fog": "#6a8f5a",
+        "sky": "#a8c878",
+        "ground": "#4a6b3c",
+        "water": "#3a7a7e"
+      }
+    },
+    {
+      "id": "cretaceous",
+      "label": "Cretaceous",
+      "years": "145–66 Ma",
+      "summary": "Flowering plants spread. Tyrannosaurs, horned dinosaurs, and hadrosaurs thrive until the end-Cretaceous impact winter.",
+      "palette": {
+        "fog": "#c48a3a",
+        "sky": "#e8c070",
+        "ground": "#6b5a3c",
+        "water": "#2a6a6e"
+      }
+    }
+  ],
+  "species": [
+    {
+      "id": "coelophysis",
+      "commonName": "Coelophysis",
+      "binomial": "Coelophysis bauri",
+      "era": "triassic",
+      "diet": "carnivore",
+      "bodyPlan": "theropod",
+      "lengthM": 3,
+      "isDinosaur": true,
+      "notable": "One of the earliest well-known dinosaurs — a slender bipedal hunter from Late Triassic North America.",
+      "misconception": "All early dinosaurs were giant monsters.",
+      "evidence": "Coelophysis averaged roughly 2–3 m long and lightly built; mass death assemblages at Ghost Ranch show many individuals of modest size.",
+      "image": "/nature/assets/dinosaur/coelophysis.jpg",
+      "imageCredit": "James St. John · CC BY 2.0 · Wikimedia Commons"
+    },
+    {
+      "id": "plateosaurus",
+      "commonName": "Plateosaurus",
+      "binomial": "Plateosaurus engelhardti",
+      "era": "triassic",
+      "diet": "herbivore",
+      "bodyPlan": "sauropod",
+      "lengthM": 8,
+      "isDinosaur": true,
+      "notable": "A large early sauropodomorph — long neck, bipedal or quadrupedal stance — hinting at later giant plant-eaters.",
+      "misconception": "Sauropods existed from the very first dinosaurs.",
+      "evidence": "True giant sauropods peak later; Plateosaurus is a Triassic precursor with a different body plan than Jurassic titans.",
+      "image": "/nature/assets/dinosaur/plateosaurus.jpg",
+      "imageCredit": "Kritzolina · CC BY-SA 4.0 · Wikimedia Commons"
+    },
+    {
+      "id": "herrerasaurus",
+      "commonName": "Herrerasaurus",
+      "binomial": "Herrerasaurus ischigualastensis",
+      "era": "triassic",
+      "diet": "carnivore",
+      "bodyPlan": "theropod",
+      "lengthM": 4,
+      "isDinosaur": true,
+      "notable": "An early South American predator from ~230 Ma, close to the dinosaur root.",
+      "misconception": "Dinosaurs appeared suddenly fully formed.",
+      "evidence": "Herrerasaurus and related taxa show transitional early dinosaur anatomy in the mid–Late Triassic.",
+      "image": "/nature/assets/dinosaur/herrerasaurus.jpg",
+      "imageCredit": "Zissoudisctrucker · CC BY-SA 4.0 · Wikimedia Commons"
+    },
+    {
+      "id": "apatosaurus",
+      "commonName": "Apatosaurus",
+      "binomial": "Apatosaurus ajax",
+      "era": "jurassic",
+      "diet": "herbivore",
+      "bodyPlan": "sauropod",
+      "lengthM": 23,
+      "isDinosaur": true,
+      "notable": "A massive Late Jurassic sauropod of western North America — long neck, pillar limbs, whip-like tail.",
+      "misconception": "Brontosaurus and Apatosaurus are totally unrelated names with no scientific history.",
+      "evidence": "Apatosaurus was named first; Brontosaurus was long synonymized, then some species were revived as valid — taxonomy, not movie branding.",
+      "image": "/nature/assets/dinosaur/apatosaurus.jpg",
+      "imageCredit": "AbstractionBlue · CC BY-SA 4.0 · Wikimedia Commons"
+    },
+    {
+      "id": "stegosaurus",
+      "commonName": "Stegosaurus",
+      "binomial": "Stegosaurus stenops",
+      "era": "jurassic",
+      "diet": "herbivore",
+      "bodyPlan": "stegosaur",
+      "lengthM": 9,
+      "isDinosaur": true,
+      "notable": "Plates along the back and spiked tail (thagomizer) — an iconic Late Jurassic herbivore.",
+      "misconception": "The plates were armor like a tank.",
+      "evidence": "Plates were likely for display and/or thermoregulation; the tail spikes were the primary defensive weapons.",
+      "image": "/nature/assets/dinosaur/stegosaurus.jpg",
+      "imageCredit": "Mike Pennington · CC BY-SA 2.0 · Wikimedia Commons"
+    },
+    {
+      "id": "allosaurus",
+      "commonName": "Allosaurus",
+      "binomial": "Allosaurus fragilis",
+      "era": "jurassic",
+      "diet": "carnivore",
+      "bodyPlan": "theropod",
+      "lengthM": 9.5,
+      "isDinosaur": true,
+      "notable": "Apex Late Jurassic theropod — blade-like teeth, strong arms, common in Morrison Formation deposits.",
+      "misconception": "T. rex lived alongside Stegosaurus.",
+      "evidence": "Allosaurus hunted Jurassic prey; Tyrannosaurus is ~80 million years later in the Late Cretaceous.",
+      "image": "/nature/assets/dinosaur/allosaurus.jpg",
+      "imageCredit": "Jebulon · Public domain · Wikimedia Commons"
+    },
+    {
+      "id": "brachiosaurus",
+      "commonName": "Brachiosaurus",
+      "binomial": "Brachiosaurus altithorax",
+      "era": "jurassic",
+      "diet": "herbivore",
+      "bodyPlan": "sauropod",
+      "lengthM": 22,
+      "isDinosaur": true,
+      "notable": "Front limbs longer than hind — a giraffe-like browsing stance among Jurassic giants.",
+      "misconception": "All sauropods dragged their tails on the ground.",
+      "evidence": "Trackways and skeletal biomechanics support elevated tails held off the ground in life.",
+      "image": "/nature/assets/dinosaur/brachiosaurus.jpg",
+      "imageCredit": "Sheeba Samuel · CC BY-SA 4.0 · Wikimedia Commons"
+    },
+    {
+      "id": "diplodocus",
+      "commonName": "Diplodocus",
+      "binomial": "Diplodocus carnegii",
+      "era": "jurassic",
+      "diet": "herbivore",
+      "bodyPlan": "sauropod",
+      "lengthM": 27,
+      "isDinosaur": true,
+      "notable": "Extremely long, whip-tailed sauropod — among the longest dinosaurs known from complete skeletons.",
+      "misconception": "Longer always means heavier and slower.",
+      "evidence": "Diplodocus was relatively gracile for its length compared with bulkier titanosaurs and brachiosaurids.",
+      "image": "/nature/assets/dinosaur/diplodocus.jpg",
+      "imageCredit": "Creator:Dmitry Bogdanov · CC BY 3.0 · Wikimedia Commons"
+    },
+    {
+      "id": "tyrannosaurus",
+      "commonName": "Tyrannosaurus rex",
+      "binomial": "Tyrannosaurus rex",
+      "era": "cretaceous",
+      "diet": "carnivore",
+      "bodyPlan": "theropod",
+      "lengthM": 12.3,
+      "isDinosaur": true,
+      "notable": "Late Cretaceous apex predator with crushing bite force and reduced forelimbs.",
+      "misconception": "T. rex was a slow scavenger that never hunted.",
+      "evidence": "Bite force, binocular vision, and healed prey injuries support active predation as well as scavenging.",
+      "image": "/nature/assets/dinosaur/tyrannosaurus.jpg",
+      "imageCredit": "Ben Jacobson ( Kranar Drogin ) · CC BY 2.5 · Wikimedia Commons"
+    },
+    {
+      "id": "triceratops",
+      "commonName": "Triceratops",
+      "binomial": "Triceratops horridus",
+      "era": "cretaceous",
+      "diet": "herbivore",
+      "bodyPlan": "ceratopsian",
+      "lengthM": 9,
+      "isDinosaur": true,
+      "notable": "Three-horned face and broad frill — a classic Maastrichtian herbivore of western North America.",
+      "misconception": "The frill was solid bone armor against T. rex bites.",
+      "evidence": "Frills show vascular channels and display-related variation; horns were used in defense and intraspecific combat.",
+      "image": "/nature/assets/dinosaur/triceratops.jpg",
+      "imageCredit": "Balise42 · CC BY-SA 4.0 · Wikimedia Commons"
+    },
+    {
+      "id": "parasaurolophus",
+      "commonName": "Parasaurolophus",
+      "binomial": "Parasaurolophus walkeri",
+      "era": "cretaceous",
+      "diet": "herbivore",
+      "bodyPlan": "hadrosaur",
+      "lengthM": 10,
+      "isDinosaur": true,
+      "notable": "Hollow cranial crest — likely a resonating chamber for calls among hadrosaurs.",
+      "misconception": "Duck-billed dinosaurs were aquatic only.",
+      "evidence": "Hadrosaurs show terrestrial locomotion and plant-processing teeth suited to land vegetation.",
+      "image": "/nature/assets/dinosaur/parasaurolophus.jpg",
+      "imageCredit": "Marcin Marucha · CC BY-SA 3.0 · Wikimedia Commons"
+    },
+    {
+      "id": "velociraptor",
+      "commonName": "Velociraptor",
+      "binomial": "Velociraptor mongoliensis",
+      "era": "cretaceous",
+      "diet": "carnivore",
+      "bodyPlan": "theropod",
+      "lengthM": 2,
+      "isDinosaur": true,
+      "notable": "Turkey-sized dromaeosaur with a sickle claw — feathered, not human-sized.",
+      "misconception": "Velociraptors were man-sized and scaly like movie villains.",
+      "evidence": "Fossils show ~2 m length, feathers, and a much smaller body than Jurassic Park depictions.",
+      "image": "/nature/assets/dinosaur/velociraptor.jpg",
+      "imageCredit": "Nobu Tamura ( http://spinops.blogspot.com ) · CC BY 2.5 · Wikimedia Commons"
+    },
+    {
+      "id": "ankylosaurus",
+      "commonName": "Ankylosaurus",
+      "binomial": "Ankylosaurus magniventris",
+      "era": "cretaceous",
+      "diet": "herbivore",
+      "bodyPlan": "ankylosaur",
+      "lengthM": 8,
+      "isDinosaur": true,
+      "notable": "Armored osteoderms and a heavy tail club — a tank-like Late Cretaceous herbivore.",
+      "misconception": "Ankylosaurs could roll into a ball like armadillos.",
+      "evidence": "Body plan is sprawling and heavily plated; defense relied on armor and the club, not rolling.",
+      "image": "/nature/assets/dinosaur/ankylosaurus.jpg",
+      "imageCredit": "Wikimedia Commons · File:Ankylosaurus.jpg"
+    },
+    {
+      "id": "pteranodon",
+      "commonName": "Pteranodon",
+      "binomial": "Pteranodon longiceps",
+      "era": "cretaceous",
+      "diet": "carnivore",
+      "bodyPlan": "pterosaur",
+      "lengthM": 7,
+      "isDinosaur": false,
+      "notable": "A flying reptile of the Late Cretaceous seas — crest, toothless beak, wings of skin.",
+      "misconception": "Pterosaurs are dinosaurs.",
+      "evidence": "Pterosaurs are close archosaur relatives but sit outside Dinosauria; dinosaurs are a separate clade on land (and later birds).",
+      "image": "/nature/assets/dinosaur/pteranodon.jpg",
+      "imageCredit": "Unknown author Unknown author · Public domain · Wikimedia Commons"
+    },
+    {
+      "id": "mosasaurus",
+      "commonName": "Mosasaurus",
+      "binomial": "Mosasaurus hoffmannii",
+      "era": "cretaceous",
+      "diet": "carnivore",
+      "bodyPlan": "mosasaur",
+      "lengthM": 15,
+      "isDinosaur": false,
+      "notable": "A giant marine lizard of the Late Cretaceous oceans — flippers, powerful jaws, not a dinosaur.",
+      "misconception": "Sea monsters like Mosasaurus were swimming dinosaurs.",
+      "evidence": "Mosasaurs are squamates (related to monitor lizards), not dinosaurs; they returned to the sea independently.",
+      "image": "/nature/assets/dinosaur/mosasaurus.jpg",
+      "imageCredit": "Ghedoghedo · CC BY-SA 3.0 · Wikimedia Commons"
+    }
+  ],
+  "quiz": [
+    {
+      "id": "q1",
+      "question": "Which of these lived in the Jurassic alongside Stegosaurus — not with T. rex?",
+      "choices": [
+        {
+          "id": "a",
+          "label": "Tyrannosaurus rex",
+          "speciesId": "tyrannosaurus"
+        },
+        {
+          "id": "b",
+          "label": "Allosaurus",
+          "speciesId": "allosaurus"
+        },
+        {
+          "id": "c",
+          "label": "Triceratops",
+          "speciesId": "triceratops"
+        }
+      ],
+      "answerId": "b",
+      "explain": "Allosaurus is a Late Jurassic theropod. T. rex and Triceratops are Maastrichtian (latest Cretaceous)."
+    },
+    {
+      "id": "q2",
+      "question": "Which animal is not a dinosaur?",
+      "choices": [
+        {
+          "id": "a",
+          "label": "Pteranodon",
+          "speciesId": "pteranodon"
+        },
+        {
+          "id": "b",
+          "label": "Velociraptor",
+          "speciesId": "velociraptor"
+        },
+        {
+          "id": "c",
+          "label": "Stegosaurus",
+          "speciesId": "stegosaurus"
+        }
+      ],
+      "answerId": "a",
+      "explain": "Pteranodon is a pterosaur — a flying reptile outside Dinosauria."
+    },
+    {
+      "id": "q3",
+      "question": "About how long was a real Velociraptor?",
+      "choices": [
+        {
+          "id": "a",
+          "label": "~2 meters (turkey-sized)",
+          "speciesId": "velociraptor"
+        },
+        {
+          "id": "b",
+          "label": "~6 meters (human-sized hunter)",
+          "speciesId": "tyrannosaurus"
+        },
+        {
+          "id": "c",
+          "label": "~12 meters (bus-length)",
+          "speciesId": "tyrannosaurus"
+        }
+      ],
+      "answerId": "a",
+      "explain": "Velociraptor mongoliensis was roughly 2 m long and feathered — far smaller than movie raptors."
+    },
+    {
+      "id": "q4",
+      "question": "Which marine reptile is a squamate (lizard relative), not a dinosaur?",
+      "choices": [
+        {
+          "id": "a",
+          "label": "Mosasaurus",
+          "speciesId": "mosasaurus"
+        },
+        {
+          "id": "b",
+          "label": "Apatosaurus",
+          "speciesId": "apatosaurus"
+        },
+        {
+          "id": "c",
+          "label": "Parasaurolophus",
+          "speciesId": "parasaurolophus"
+        }
+      ],
+      "answerId": "a",
+      "explain": "Mosasaurs returned to the sea as marine lizards; dinosaurs never included that lineage."
+    },
+    {
+      "id": "q5",
+      "question": "Which era saw the first dinosaurs after the end-Permian recovery?",
+      "choices": [
+        {
+          "id": "a",
+          "label": "Triassic",
+          "speciesId": "coelophysis"
+        },
+        {
+          "id": "b",
+          "label": "Jurassic",
+          "speciesId": "stegosaurus"
+        },
+        {
+          "id": "c",
+          "label": "Cretaceous",
+          "speciesId": "tyrannosaurus"
+        }
+      ],
+      "answerId": "a",
+      "explain": "Dinosaurs originate in the Triassic; Coelophysis is a classic Late Triassic example."
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "id": "dinosaur-hall-hyperframes-reel",
+  "title": "Dinosaur Hall HyperFrame Tour",
+  "portrait": "/family/assets/david-lane-time-traveler-scene.png",
+  "voice": "en-US-Neural2-D",
+  "pitch": -1,
+  "speakingRate": 0.98,
+  "scenes": [
+    {
+      "id": "open",
+      "anchor": "dhHero",
+      "spotlight": "#dhHeroInner",
+      "durationMs": 7500,
+      "kicker": "HyperFrame · 01 · Hall",
+      "title": "Deep time, one diorama",
+      "copy": "Restage the Mesozoic by era. Context is earth history. Evidence is named taxa and published sizes.",
+      "narration": "Welcome to Dinosaur Hall. This is a deep-time field guide — a Three.js diorama you can restage by era, plus a museum wall of named species. Context versus Evidence stays on the label."
+    },
+    {
+      "id": "triassic",
+      "anchor": "dhEras",
+      "spotlight": "#dhEraChips",
+      "action": "setEraTriassic",
+      "durationMs": 7200,
+      "kicker": "HyperFrame · 02 · Triassic",
+      "title": "First footsteps",
+      "copy": "252 to 201 million years ago — early bipedal hunters and long-necked precursors.",
+      "narration": "Chapter one — the Triassic. After the end-Permian collapse, the first dinosaurs appear. Coelophysis and Plateosaurus remind us early forms were not all movie giants."
+    },
+    {
+      "id": "jurassic",
+      "anchor": "dhStage",
+      "spotlight": "#dhStage",
+      "action": "setEraJurassic",
+      "durationMs": 7500,
+      "kicker": "HyperFrame · 03 · Jurassic",
+      "title": "Fern forests and titans",
+      "copy": "Sauropods, Stegosaurus, Allosaurus — the classic Morrison fauna.",
+      "narration": "Chapter two — the Jurassic. Fern greens, pillar-legged sauropods, plate-backed Stegosaurus, and Allosaurus on the hunt. T. rex is still eighty million years away."
+    },
+    {
+      "id": "cretaceous",
+      "anchor": "dhSpecies",
+      "spotlight": "#dhSpeciesGrid",
+      "action": "setEraCretaceous",
+      "durationMs": 7800,
+      "kicker": "HyperFrame · 04 · Cretaceous",
+      "title": "Horns, crests, and impact dusk",
+      "copy": "Tyrannosaurs, ceratopsians, hadrosaurs — then the end-Cretaceous winter.",
+      "narration": "Chapter three — the Cretaceous. Flowering plants spread. Tyrannosaurus, Triceratops, and crested hadrosaurs fill the hall until the impact winter closes the era."
+    },
+    {
+      "id": "not-dino",
+      "anchor": "dhSpecies",
+      "spotlight": "[data-species-id=\"pteranodon\"]",
+      "action": "selectPteranodon",
+      "durationMs": 8000,
+      "kicker": "HyperFrame · 05 · Not a dinosaur",
+      "title": "Pterosaurs and mosasaurs",
+      "copy": "Flying and swimming Mesozoic reptiles sit outside Dinosauria — labeled clearly here.",
+      "narration": "One sharp scholarly hook: not everything Mesozoic is a dinosaur. Pteranodon is a pterosaur. Mosasaurus is a marine lizard. We keep those labels honest."
+    },
+    {
+      "id": "scale",
+      "anchor": "dhCompare",
+      "spotlight": "#dhCompare",
+      "action": "openCompare",
+      "durationMs": 7000,
+      "kicker": "HyperFrame · 06 · Scale",
+      "title": "True-to-scale lengths",
+      "copy": "Pick two animals. Numbers come from the field guide — not movie posters.",
+      "narration": "Use the size compare. A human silhouette anchors the diorama. Velociraptor was turkey-sized. Diplodocus stretched toward twenty-seven meters."
+    },
+    {
+      "id": "quiz",
+      "anchor": "dhQuiz",
+      "spotlight": "#dhQuiz",
+      "action": "openQuiz",
+      "durationMs": 6500,
+      "kicker": "HyperFrame · 07 · Field quiz",
+      "title": "Check the evidence",
+      "copy": "Five quick questions — eras, non-dinosaurs, and movie myths.",
+      "narration": "Finish with the field quiz. If Allosaurus shared the Jurassic with Stegosaurus, you already know more than the movies."
+    }
+  ]
+}

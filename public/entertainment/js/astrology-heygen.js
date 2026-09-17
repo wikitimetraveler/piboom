@@ -12,13 +12,19 @@
   const HEARD_KEY = 'astro_rose_heard_v1';
   const MODAL_ID = 'astroHeygenModal';
   const DEFAULT_GOOGLE_VOICE = 'en-US-Neural2-F';
+  const DEFAULT_GOOGLE_VOICE_VI = 'vi-VN-Neural2-A';
 
   let cachedDemo = null;
+  let cachedDemoLang = '';
   let speakOn = false;
   let heygenSessionId = null;
   let heygenRoom = null;
   let activeVideo = null;
   let googleVoice = DEFAULT_GOOGLE_VOICE;
+
+  function pageLang() {
+    return root.AstrologyI18N?.lang?.() === 'vi' ? 'vi' : 'en';
+  }
 
   function esc(value) {
     return String(value || '')
@@ -45,17 +51,26 @@
   }
 
   function spokenScript(demo) {
-    return String(demo?.spokenScript || demo?.heygenScriptShort || demo?.script || '').trim();
+    const lang = pageLang();
+    if (lang === 'vi') {
+      return String(demo?.spokenScriptVi || demo?.spokenScript || demo?.heygenScriptShortVi || '').trim();
+    }
+    return String(demo?.spokenScriptEn || demo?.spokenScript || demo?.heygenScriptShort || demo?.script || '').trim();
   }
 
   async function loadDemo() {
-    if (cachedDemo) return cachedDemo;
+    const lang = pageLang();
+    if (cachedDemo && cachedDemoLang === lang) return cachedDemo;
     try {
-      const res = await fetch(API_DEMO, { cache: 'no-store' });
+      const res = await fetch(`${API_DEMO}?lang=${encodeURIComponent(lang)}`, { cache: 'no-store' });
       if (res.ok) {
         const json = await res.json();
         cachedDemo = json?.data || json;
-        googleVoice = json?.googleVoice || cachedDemo?.googleVoice || DEFAULT_GOOGLE_VOICE;
+        cachedDemoLang = lang;
+        googleVoice =
+          json?.googleVoice ||
+          cachedDemo?.googleVoice ||
+          (lang === 'vi' ? DEFAULT_GOOGLE_VOICE_VI : DEFAULT_GOOGLE_VOICE);
         return cachedDemo;
       }
     } catch (_) {
@@ -64,10 +79,25 @@
     try {
       const res = await fetch(STATIC_DEMO, { cache: 'no-store' });
       cachedDemo = res.ok ? await res.json() : null;
+      cachedDemoLang = lang;
+      if (cachedDemo && lang === 'vi') {
+        cachedDemo.spokenScript = cachedDemo.heygenScriptShortVi || ROSE_FALLBACK_VI();
+        cachedDemo.allowIntroVideo = false;
+        googleVoice = DEFAULT_GOOGLE_VOICE_VI;
+      } else {
+        googleVoice = DEFAULT_GOOGLE_VOICE;
+      }
     } catch (_) {
       cachedDemo = null;
     }
     return cachedDemo;
+  }
+
+  function ROSE_FALLBACK_VI() {
+    return (
+      root.AstrologyI18N?.t?.('greetingFallback') ||
+      'Tôi là Rose. Cho tôi ngày sinh, hoặc để tôi trải bài.'
+    );
   }
 
   async function resolveVideoUrl(demo) {
@@ -185,7 +215,11 @@
 
   function showModal(demo, videoUrl) {
     closeModal();
-    const title = demo?.spokenTitle || demo?.title || 'Meet Rose';
+    const title =
+      demo?.spokenTitle ||
+      demo?.title ||
+      root.AstrologyI18N?.t?.('meetRose') ||
+      'Meet Rose';
     const script = spokenScript(demo);
     const portrait = demo?.avatar?.portrait || '/entertainment/assets/rose-guide-portrait-256.png';
     const body = videoUrl
@@ -209,7 +243,9 @@
         </header>
         <div>${body}</div>
         <footer class="mt-3 d-flex flex-wrap gap-2">
-          <button type="button" class="astro-ask" id="astroHeygenCta">${esc(demo?.ctaLabel || 'Ask Rose for a reading')}</button>
+          <button type="button" class="astro-ask" id="astroHeygenCta">${esc(
+            demo?.ctaLabel || root.AstrologyI18N?.t?.('askReading') || 'Ask Rose for a reading'
+          )}</button>
           <p class="mb-0 small" style="color:var(--as-muted)">${esc(demo?.brand?.attribution || '')} · ${esc(demo?.brand?.developmentBy || '')}</p>
         </footer>
       </div>`;
@@ -230,8 +266,11 @@
   }
 
   async function playIntro() {
+    cachedDemo = null;
+    cachedDemoLang = '';
     const demo = await loadDemo();
-    const videoUrl = await resolveVideoUrl(demo);
+    const allowVideo = demo?.allowIntroVideo !== false && demo?.videoReady !== false;
+    const videoUrl = allowVideo ? await resolveVideoUrl(demo) : null;
     showModal(demo, videoUrl);
     markHeard();
     if (!videoUrl) await speakTts(spokenScript(demo));
@@ -252,7 +291,10 @@
 
   async function startStream() {
     const demo = await loadDemo();
-    const greeting = spokenScript(demo) || "I'm Rose. Give me a birthday, or let me deal the cards.";
+    const greeting =
+      spokenScript(demo) ||
+      root.AstrologyI18N?.t?.('greetingFallback') ||
+      "I'm Rose. Give me a birthday, or let me deal the cards.";
     const res = await fetch('/api/heygen/streaming/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -281,7 +323,9 @@
     const btn = document.getElementById('astroRoseSpeaks');
     if (btn) {
       btn.setAttribute('aria-pressed', String(speakOn));
-      btn.textContent = speakOn ? 'Rose speaking…' : 'Rose speaks';
+      btn.textContent = speakOn
+        ? root.AstrologyI18N?.t?.('roseSpeaking') || 'Rose speaking…'
+        : root.AstrologyI18N?.t?.('roseSpeaks') || 'Rose speaks';
     }
     if (speakOn) {
       await startStream();
@@ -303,6 +347,8 @@
     const clean = String(text || '').trim().slice(0, 1800);
     if (!clean) return;
     if (typeof root.isAgentSpeechMuted === 'function' && root.isAgentSpeechMuted()) return;
+    const profile = root.AstrologyI18N?.voiceProfile?.();
+    if (profile?.voice) googleVoice = profile.voice;
     if (speakOn && heygenSessionId && heygenSessionId !== 'poster') {
       const demo = cachedDemo;
       const res = await fetch('/api/heygen/streaming/speak', {
@@ -339,6 +385,11 @@
     document.getElementById('astroRoseStop')?.addEventListener('click', () => {
       stopSpeaking();
       if (speakOn) setSpeak(false);
+    });
+    root.AstrologyI18N?.onChange?.(() => {
+      cachedDemo = null;
+      cachedDemoLang = '';
+      googleVoice = pageLang() === 'vi' ? DEFAULT_GOOGLE_VOICE_VI : DEFAULT_GOOGLE_VOICE;
     });
     if (DEMO_RE.test(String(location.search || ''))) playIntro();
   }

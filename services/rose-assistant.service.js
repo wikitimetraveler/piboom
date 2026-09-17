@@ -11,6 +11,7 @@ import '../public/entertainment/js/astrology-arcana.js';
 
 export const GUIDE_NAME = 'Rose';
 export const AVATAR_NAME = 'Rose';
+export const SUPPORTED_LANGS = ['en', 'vi'];
 
 function catalog() {
   return globalThis.AstrologyZodiac || null;
@@ -18,6 +19,11 @@ function catalog() {
 
 function arcana() {
   return globalThis.AstrologyArcana || null;
+}
+
+function normalizeLang(lang) {
+  const value = String(lang || '').toLowerCase().slice(0, 2);
+  return value === 'vi' ? 'vi' : 'en';
 }
 
 function factSheet() {
@@ -41,16 +47,44 @@ function factSheet() {
   return lines.join('\n');
 }
 
+function formatTarotSpread(spread) {
+  if (!spread || typeof spread !== 'object') return '';
+  const sit = spread.situation?.name || spread.situation;
+  const cross = spread.cross?.name || spread.cross;
+  const path = spread.path?.name || spread.path;
+  const sun = spread.sun?.name || spread.sun;
+  if (sit && cross && path) {
+    const sunBit = sun ? ` Sun sign ${sun}.` : '';
+    return `Current birthday tarot spread:${sunBit} Situation ${sit}, Cross ${cross}, Path ${path}.`;
+  }
+  if (spread.sun && spread.cross && spread.path) {
+    return `Current three-card zodiac spread: Sun ${spread.sun}, Cross ${spread.cross}, Path ${spread.path}.`;
+  }
+  return '';
+}
+
 export function buildSystemPrompt(extra = {}) {
-  const spread = extra.spread ? `Current three-card zodiac spread: Sun ${extra.spread.sun}, Cross ${extra.spread.cross}, Path ${extra.spread.path}.` : '';
+  const language = normalizeLang(extra.lang);
+  const languageRule =
+    language === 'vi'
+      ? 'Answer only in Vietnamese (Tiếng Việt). Keep Rose\'s warm parlor voice. Do not reply in English unless the visitor explicitly asks for English.'
+      : 'Answer in English in Rose\'s warm parlor voice.';
+  const spread = formatTarotSpread(extra.spread);
   const selected = extra.sign ? `Visitor is looking at ${extra.sign}.` : '';
   const arcanaCard = extra.arcana ? `Visitor flipped tarot card: ${extra.arcana}.` : '';
+  const birth =
+    extra.birthDate || extra.birthYear
+      ? `Visitor birth date context: ${extra.birthDate || ''}${extra.birthYear ? ` (year ${extra.birthYear})` : ''}. Year personalizes the parlor shuffle only — not a natal chart.`
+      : '';
   return `You are ${GUIDE_NAME}, a candlelit parlor reader and tarot expert on the Lane AI Labs astrology page. You use and read a full seventy-eight-card Rider–Waite-style deck (twenty-two Major Arcana plus fifty-six Minor Arcana in Wands, Cups, Swords, and Pentacles), and you also read the twelve Western tropical signs as parlor cards.
 
 ## Personality
 - Warm, slightly husky, intimate. Late-night reader, not a carnival barker.
 - Every reply may be read aloud, so keep answers to two or three short paragraphs. Avoid bullet lists, markdown, and URLs.
 - Playful. Never claim this is astronomy, a natal chart, or the night sky. Carl and the Planetarium handle real stars.
+
+## Language
+${languageRule}
 
 ## Expertise — how you use and read tarot
 - Teach method simply: shuffle with a clear question, cut once, draw upright for parlor play.
@@ -64,11 +98,12 @@ ${factSheet()}
 ${selected}
 ${arcanaCard}
 ${spread}
+${birth}
 
 ## Rules
 1. Stay with tropical entertainment astrology and the full parlor tarot deck. If asked about the real sky, ISS, or planets as astronomy, point them to the Planetarium and Carl.
 2. Prefer the facts above. Do not invent cusps, degrees, houses, or birth times.
-3. A three-card zodiac draw is Sun (their sign), Cross (tension), Path (lean) from the twelve signs. Tarot cards are the separate seventy-eight-card gallery — teach how to use them when asked.
+3. A birthday reading deals three tarot cards (Situation, Cross, Path) seeded by the birth date, while the Sun sign comes from month and day on the tropical wheel.
 4. Do not give medical, legal, or financial advice. Readings are parlor play.
 5. If you are unsure, say so in Rose's voice.`;
 }
@@ -88,7 +123,8 @@ function isOpenAiQuotaError(error) {
   );
 }
 
-function groundedReply(message) {
+function groundedReply(message, lang = 'en') {
+  const language = normalizeLang(lang);
   const Z = catalog();
   const Arc = arcana();
   const q = String(message || '')
@@ -97,16 +133,24 @@ function groundedReply(message) {
     .replace(/\s+/g, ' ')
     .trim();
   if (!Z) {
-    return "The parlor lamp is low. Ask me about a sign once the wheel is lit.";
+    return language === 'vi'
+      ? 'Đèn phòng khách đang yếu. Hỏi tôi về một cung khi bánh xe sáng.'
+      : 'The parlor lamp is low. Ask me about a sign once the wheel is lit.';
   }
   if (!q) {
-    return "I'm Rose. Give me a birthday, name a sign, or flip a tarot card — I can teach you how to use the full deck.";
+    return language === 'vi'
+      ? 'Tôi là Rose. Cho tôi ngày sinh, gọi tên một cung, hoặc lật một lá tarot — tôi dạy cách dùng cả bộ bài.'
+      : "I'm Rose. Give me a birthday, name a sign, or flip a tarot card — I can teach you how to use the full deck.";
   }
-  if (/\b(sky|planetarium|iss|astronomy|constellation in the real)\b/.test(q)) {
-    return "That's Carl's dome, love — the Planetarium. I read the tropical wheel and the full tarot deck as parlor cards.";
+  if (/\b(sky|planetarium|iss|astronomy|constellation in the real|thiên văn|đài thiên văn)\b/.test(q)) {
+    return language === 'vi'
+      ? 'Đó là mái vòm của Carl, yêu ơi — Đài thiên văn. Tôi đọc bánh xe nhiệt đới và bộ tarot như bài phòng khách.'
+      : "That's Carl's dome, love — the Planetarium. I read the tropical wheel and the full tarot deck as parlor cards.";
   }
-  if (/\b(how (do|to) (i )?(use|read|shuffle|draw)|teach me|spread|how does tarot)\b/.test(q)) {
-    return "Shuffle with one clear question, cut once, draw upright for parlor play. A simple line is Situation, Cross, and Path. Majors speak the big chapter; minors speak the day's weather — Wands for work-fire, Cups for feeling, Swords for mind, Pentacles for body and coin. Flip a card on the page and I'll read it with you.";
+  if (/\b(how (do|to) (i )?(use|read|shuffle|draw)|teach me|spread|how does tarot|xáo|rút bài|dùng bộ bài)\b/.test(q)) {
+    return language === 'vi'
+      ? 'Xáo với một câu hỏi rõ, cắt một lần, rút xuôi cho vui phòng khách. Một hàng đơn giản là Tình huống, Giao cắt, và Đường đi. Ẩn chính nói chương lớn; ẩn phụ nói thời tiết ngày — Gậy cho lửa công việc, Cốc cho cảm xúc, Kiếm cho trí óc, Tiền cho thân và xu. Lật một lá trên trang và tôi đọc cùng bạn.'
+      : 'Shuffle with one clear question, cut once, draw upright for parlor play. A simple line is Situation, Cross, and Path. Majors speak the big chapter; minors speak the day\'s weather — Wands for work-fire, Cups for feeling, Swords for mind, Pentacles for body and coin. Flip a card on the page and I\'ll read it with you.';
   }
   const deck = Arc?.DECK || Arc?.ARCANA;
   if (deck) {
@@ -121,7 +165,10 @@ function groundedReply(message) {
         bestArc = card;
       }
     }
-    if (bestArc && bestArcScore >= 8) {
+    if (bestArc && bestArcScore >= 12) {
+      if (language === 'vi') {
+        return `${bestArc.oracle} Quà: ${bestArc.gift} Cẩn thận: ${bestArc.shadow}`;
+      }
       return `${bestArc.oracle} Gift: ${bestArc.gift} Watch: ${bestArc.shadow}`;
     }
   }
@@ -140,12 +187,19 @@ function groundedReply(message) {
     }
   }
   if (best && bestScore >= 8) {
+    if (language === 'vi') {
+      return `${best.oracle} Quà: ${best.gift} Cẩn thận: ${best.shadow}`;
+    }
     return `${best.oracle} Gift: ${best.gift} Watch: ${best.shadow}`;
   }
-  if (/\bsun\b/.test(q) && /\bcross\b/.test(q)) {
-    return "Sun is your sign, Cross is the tension, Path is the lean. Deal a reading on the page and I will speak the three cards.";
+  if (/\b(sun|situation)\b/.test(q) && /\bcross\b/.test(q)) {
+    return language === 'vi'
+      ? 'Mặt trời là cung của bạn; trải bài sinh nhật là Tình huống, Giao cắt, và Đường đi bằng lá tarot. Nhờ Rose đọc trên trang và tôi sẽ nói ba lá.'
+      : 'Sun is your sign; the birthday draw deals Situation, Cross, and Path as tarot cards. Deal a reading on the page and I will speak the three cards.';
   }
-  return "I can answer from the twelve signs and the full tarot deck while the larger lamp is out. Name a card, ask how to shuffle, or ask for Sun, Cross, and Path.";
+  return language === 'vi'
+    ? 'Tôi có thể trả lời từ mười hai cung và bộ tarot khi đèn lớn tắt. Gọi tên một lá, hỏi cách xáo, hoặc nhờ trải Tình huống, Giao cắt, Đường đi.'
+    : 'I can answer from the twelve signs and the full tarot deck while the larger lamp is out. Name a card, ask how to shuffle, or ask for Situation, Cross, and Path.';
 }
 
 export async function chatWithRose({
@@ -154,13 +208,16 @@ export async function chatWithRose({
   userId = 'astrology-anon',
   sessionId = 'astrology-rose',
   context = {},
+  lang = 'en',
 }) {
+  const language = normalizeLang(lang || context?.lang);
   const openaiKey = (process.env.OPENAI_API_KEY || '').trim();
   let reply;
   let source = 'openai';
+  const promptContext = { ...(context || {}), lang: language };
 
   if (!openaiKey) {
-    reply = groundedReply(message);
+    reply = groundedReply(message, language);
     source = 'page-facts';
   } else {
     try {
@@ -170,7 +227,7 @@ export async function chatWithRose({
         openAIApiKey: openaiKey,
         maxRetries: 0,
       });
-      const messages = [new SystemMessage(buildSystemPrompt(context || {}))];
+      const messages = [new SystemMessage(buildSystemPrompt(promptContext))];
       for (const turn of history.slice(-8)) {
         const text = String(turn.content || '');
         if (!text) continue;
@@ -179,10 +236,10 @@ export async function chatWithRose({
       }
       messages.push(new HumanMessage(String(message).trim()));
       const response = await model.invoke(messages);
-      reply = String(response?.content || '').trim() || groundedReply(message);
+      reply = String(response?.content || '').trim() || groundedReply(message, language);
     } catch (error) {
       if (isOpenAiQuotaError(error) || error?.status === 429) {
-        reply = groundedReply(message);
+        reply = groundedReply(message, language);
         source = 'page-facts';
       } else {
         throw error;
@@ -196,7 +253,7 @@ export async function chatWithRose({
     /* memory is optional */
   }
 
-  return { reply, guideName: GUIDE_NAME, source };
+  return { reply, guideName: GUIDE_NAME, source, lang: language };
 }
 
 export function getRoseSummary() {
@@ -209,7 +266,16 @@ export function getRoseSummary() {
     arcanaCount: Arc?.ARCANA?.length || 0,
     tarotCount: Arc?.DECK?.length || Arc?.ARCANA?.length || 0,
     elements: Z ? Object.keys(Z.ELEMENTS) : [],
+    languages: SUPPORTED_LANGS,
   };
 }
 
-export default { chatWithRose, buildSystemPrompt, getRoseSummary, GUIDE_NAME, AVATAR_NAME };
+export default {
+  chatWithRose,
+  buildSystemPrompt,
+  getRoseSummary,
+  GUIDE_NAME,
+  AVATAR_NAME,
+  SUPPORTED_LANGS,
+  normalizeLang,
+};

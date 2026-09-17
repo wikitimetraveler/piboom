@@ -9,21 +9,7 @@
   const A = typeof AstrologyArcana !== 'undefined' ? AstrologyArcana : null;
   if (!Z) return;
 
-  const MONTHS = [
-    ['1', 'January'],
-    ['2', 'February'],
-    ['3', 'March'],
-    ['4', 'April'],
-    ['5', 'May'],
-    ['6', 'June'],
-    ['7', 'July'],
-    ['8', 'August'],
-    ['9', 'September'],
-    ['10', 'October'],
-    ['11', 'November'],
-    ['12', 'December'],
-  ];
-
+  const DOB_KEY = 'astroDob';
   const ELEMENT_RGB = {
     fire: [255, 138, 91],
     earth: [212, 180, 131],
@@ -39,9 +25,33 @@
   let skyRaf = 0;
   let skyElement = 'rose';
   let lastSpread = null;
+  let lastFlippedArcana = '';
 
   function $(id) {
     return document.getElementById(id);
+  }
+
+  function i18n() {
+    return window.AstrologyI18N || null;
+  }
+
+  function t(key, fallback) {
+    const value = i18n()?.t?.(key);
+    return value || fallback || '';
+  }
+
+  function localizeSign(sign) {
+    if (!sign) return null;
+    const overlay = i18n()?.signCopy?.(sign.id);
+    if (!overlay) return sign;
+    return { ...sign, ...overlay };
+  }
+
+  function localizeCard(card) {
+    if (!card) return null;
+    const overlay = i18n()?.cardCopy?.(card.id);
+    if (!overlay) return card;
+    return { ...card, ...overlay };
   }
 
   function esc(value) {
@@ -52,11 +62,37 @@
       .replace(/"/g, '&quot;');
   }
 
-  function fillSelect(select, items) {
-    if (!select) return;
-    select.innerHTML = items
-      .map(([value, label]) => `<option value="${value}">${esc(label)}</option>`)
-      .join('');
+  function formatIsoDate(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  function readDobInput() {
+    const el = $('astroDob');
+    return Z.parseDobString(el?.value || '');
+  }
+
+  function persistDob(iso) {
+    try {
+      if (iso) localStorage.setItem(DOB_KEY, iso);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+
+  function resolveInitialDob() {
+    const fromQuery = Z.parseDobQuery(window.location.search);
+    if (fromQuery) return fromQuery;
+    try {
+      const saved = Z.parseDobString(localStorage.getItem(DOB_KEY) || '');
+      if (saved) return saved;
+    } catch (_) {
+      /* ignore */
+    }
+    const now = new Date();
+    return Z.parseDobString(formatIsoDate(now));
   }
 
   function gsapTween(targets, vars) {
@@ -105,10 +141,11 @@
     }
     return Z.SIGNS.map((sign, index) => {
       const angle = index * 30;
+      const view = localizeSign(sign) || sign;
       return `<div class="astro-slot-arm" style="--angle:${angle}deg">
         <button type="button" class="astro-slot" data-sign="${sign.id}" data-element="${sign.element}" style="--angle:${angle}deg" aria-pressed="false">
           <span class="astro-slot__glyph" aria-hidden="true">${Z.textGlyph(sign)}</span>
-          <span class="astro-slot__label">${esc(sign.name)}</span>
+          <span class="astro-slot__label">${esc(view.name)}</span>
         </button>
       </div>`;
     }).join('');
@@ -116,57 +153,68 @@
 
   function backFace(sign, opts) {
     const compact = opts && opts.compact;
+    const view = localizeSign(sign) || sign;
+    const ask = i18n()?.lang?.() === 'vi'
+      ? `Đọc ${sign.name} giúp tôi`
+      : sign.askRose;
     return `
       <div class="astro-flip__meta">
-        <span class="astro-chip astro-chip--${sign.element}">${esc(sign.element)}</span>
-        <span class="astro-chip">${esc(sign.modality)}</span>
+        <span class="astro-chip astro-chip--${sign.element}">${esc(t(`element_${sign.element}`, sign.element))}</span>
+        <span class="astro-chip">${esc(t(`modality_${sign.modality}`, sign.modality))}</span>
         <span class="astro-chip">${esc(sign.ruler)}</span>
       </div>
-      <h3>${Z.textGlyph(sign)} ${esc(sign.name)}</h3>
-      <p class="astro-flip__oracle">${esc(sign.oracle)}</p>
-      ${compact ? '' : `<p class="astro-flip__gift"><strong>Gift.</strong> ${esc(sign.gift)}</p>
-      <p class="astro-flip__shadow"><strong>Watch.</strong> ${esc(sign.shadow)}</p>`}
-      <ul class="astro-traits">${sign.traits.map((trait) => `<li>${esc(trait)}</li>`).join('')}</ul>
+      <h3>${Z.textGlyph(sign)} ${esc(view.name)}</h3>
+      <p class="astro-flip__oracle">${esc(view.oracle)}</p>
+      ${compact ? '' : `<p class="astro-flip__gift"><strong>${esc(t('giftLabel', 'Gift.'))}</strong> ${esc(view.gift)}</p>
+      <p class="astro-flip__shadow"><strong>${esc(t('watchLabel', 'Watch.'))}</strong> ${esc(view.shadow)}</p>`}
+      <ul class="astro-traits">${(view.traits || sign.traits).map((trait) => `<li>${esc(trait)}</li>`).join('')}</ul>
       <div class="astro-flip__actions">
-        <button type="button" class="astro-ask" data-ask-rose="${esc(sign.askRose)}">Ask Rose</button>
-        <button type="button" class="astro-unflip">Flip back</button>
+        <button type="button" class="astro-ask" data-ask-rose="${esc(ask)}">${esc(t('askRose', 'Ask Rose'))}</button>
+        <button type="button" class="astro-unflip">${esc(t('flipBack', 'Flip back'))}</button>
       </div>`;
   }
 
   function galleryMarkup() {
-    return Z.SIGNS.map((sign) => `<article class="astro-flip astro-card" data-sign="${sign.id}" data-element="${sign.element}">
+    return Z.SIGNS.map((sign) => {
+      const view = localizeSign(sign) || sign;
+      return `<article class="astro-flip astro-card" data-sign="${sign.id}" data-element="${sign.element}">
       <div class="astro-flip__inner">
         <button type="button" class="astro-flip__face astro-flip__front" data-sign="${sign.id}" aria-pressed="false" aria-expanded="false">
           <div class="astro-card__top">
             <span class="astro-card__glyph" aria-hidden="true">${Z.textGlyph(sign)}</span>
-            <span class="astro-chip astro-chip--${sign.element}">${esc(sign.element)}</span>
+            <span class="astro-chip astro-chip--${sign.element}">${esc(t(`element_${sign.element}`, sign.element))}</span>
           </div>
-          <h3>${esc(sign.name)}</h3>
+          <h3>${esc(view.name)}</h3>
           <p>${esc(sign.dates)}</p>
-          <p>${esc(sign.kicker)}</p>
+          <p>${esc(view.kicker || sign.kicker)}</p>
           ${Z.constellationSvg(sign)}
         </button>
         <div class="astro-flip__face astro-flip__back" data-element="${sign.element}">
           ${backFace(sign, { compact: true })}
         </div>
       </div>
-    </article>`).join('');
+    </article>`;
+    }).join('');
   }
 
   function arcanaBackFace(card) {
+    const view = localizeCard(card) || card;
+    const ask = i18n()?.lang?.() === 'vi'
+      ? `Đọc ${card.name} giúp tôi`
+      : card.askRose;
     return `
       <div class="astro-flip__meta">
-        <span class="astro-chip">${esc(card.suitLabel || card.suit)}</span>
-        <span class="astro-chip">${esc(card.keyword)}</span>
+        <span class="astro-chip">${esc(view.suitLabel || card.suitLabel || card.suit)}</span>
+        <span class="astro-chip">${esc(view.keyword || card.keyword)}</span>
       </div>
-      <h3>${esc(card.glyph)} ${esc(card.name)}</h3>
-      <p class="astro-flip__oracle">${esc(card.oracle)}</p>
-      <p class="astro-flip__gift"><strong>Gift.</strong> ${esc(card.gift)}</p>
-      <p class="astro-flip__shadow"><strong>Watch.</strong> ${esc(card.shadow)}</p>
-      <ul class="astro-traits">${(card.traits || []).map((trait) => `<li>${esc(trait)}</li>`).join('')}</ul>
+      <h3>${esc(card.glyph)} ${esc(view.name)}</h3>
+      <p class="astro-flip__oracle">${esc(view.oracle)}</p>
+      <p class="astro-flip__gift"><strong>${esc(t('giftLabel', 'Gift.'))}</strong> ${esc(view.gift)}</p>
+      <p class="astro-flip__shadow"><strong>${esc(t('watchLabel', 'Watch.'))}</strong> ${esc(view.shadow)}</p>
+      <ul class="astro-traits">${(view.traits || card.traits || []).map((trait) => `<li>${esc(trait)}</li>`).join('')}</ul>
       <div class="astro-flip__actions">
-        <button type="button" class="astro-ask" data-ask-rose="${esc(card.askRose)}">Ask Rose</button>
-        <button type="button" class="astro-unflip">Flip back</button>
+        <button type="button" class="astro-ask" data-ask-rose="${esc(ask)}">${esc(t('askRose', 'Ask Rose'))}</button>
+        <button type="button" class="astro-unflip">${esc(t('flipBack', 'Flip back'))}</button>
       </div>`;
   }
 
@@ -180,23 +228,24 @@
     if (!A) return '';
     const deck = A.DECK || A.ARCANA || [];
     return deck
-      .map(
-        (card) => `<article class="astro-flip astro-card astro-arcana-card" data-arcana="${card.id}" data-tarot-suit="${card.suit}">
+      .map((card) => {
+        const view = localizeCard(card) || card;
+        return `<article class="astro-flip astro-card astro-arcana-card" data-arcana="${card.id}" data-tarot-suit="${card.suit}">
       <div class="astro-flip__inner">
         <button type="button" class="astro-flip__face astro-flip__front astro-tarot-front" data-arcana-flip aria-expanded="false">
           ${tarotImage(card)}
           <div class="astro-tarot-front__meta">
-            <span class="astro-chip">${esc(card.suit === 'major' ? card.roman : card.suitLabel)}</span>
-            <h3>${esc(card.name)}</h3>
-            <p>${esc(card.keyword)}</p>
+            <span class="astro-chip">${esc(card.suit === 'major' ? card.roman : (view.suitLabel || card.suitLabel))}</span>
+            <h3>${esc(view.name)}</h3>
+            <p>${esc(view.keyword || card.keyword)}</p>
           </div>
         </button>
         <div class="astro-flip__face astro-flip__back">
           ${arcanaBackFace(card)}
         </div>
       </div>
-    </article>`
-      )
+    </article>`;
+      })
       .join('');
   }
 
@@ -211,11 +260,34 @@
     });
   }
 
+  function setStageCollapsed(collapsed) {
+    const panel = $('astroStagePanel');
+    const toggle = $('astroStageToggle');
+    const hint = $('astroStageToggleHint');
+    if (!panel || !toggle) return;
+    const next = Boolean(collapsed);
+    panel.dataset.collapsed = String(next);
+    toggle.setAttribute('aria-expanded', String(!next));
+    if (hint) hint.textContent = next ? t('show', 'Show') : t('hide', 'Hide');
+  }
+
+  function updateStageToggleTitle(sign) {
+    const title = $('astroStageToggleTitle');
+    if (!title) return;
+    if (sign) {
+      const view = localizeSign(sign) || sign;
+      title.textContent = `${Z.textGlyph(sign)} ${view.name} · ${t('stageTitle', 'Sign and card')}`;
+    } else {
+      title.textContent = t('stageTitle', 'Sign and card');
+    }
+  }
+
   function renderDetail(sign) {
     const panel = $('astroDetail');
     const glyph = $('astroCoreGlyph');
     const name = $('astroCoreName');
     if (!panel || !sign) return;
+    const view = localizeSign(sign) || sign;
     panel.dataset.element = sign.element;
     panel.dataset.sign = sign.id;
     panel.classList.add('astro-flip', 'astro-hero-card');
@@ -224,14 +296,14 @@
       <div class="astro-flip__inner">
         <div class="astro-flip__face astro-flip__front">
           <div class="astro-detail__meta">
-            <span class="astro-chip astro-chip--${sign.element}">${esc(sign.element)}</span>
+            <span class="astro-chip astro-chip--${sign.element}">${esc(t(`element_${sign.element}`, sign.element))}</span>
           </div>
-          <h2 id="astroDetailTitle">${Z.textGlyph(sign)} ${esc(sign.name)}</h2>
-          <p class="astro-detail__dates">${esc(sign.dates)} · ${esc(sign.symbol)}</p>
+          <h2 id="astroDetailTitle">${Z.textGlyph(sign)} ${esc(view.name)}</h2>
+          <p class="astro-detail__dates">${esc(sign.dates)} · ${esc(view.symbol || sign.symbol)}</p>
           ${Z.constellationSvg(sign)}
-          <p>${esc(sign.blurb)}</p>
-          <ul class="astro-traits">${sign.traits.map((trait) => `<li>${esc(trait)}</li>`).join('')}</ul>
-          <button type="button" class="astro-flip-cta" data-hero-flip>Flip the card</button>
+          <p>${esc(view.blurb || sign.blurb)}</p>
+          <ul class="astro-traits">${(view.traits || sign.traits).map((trait) => `<li>${esc(trait)}</li>`).join('')}</ul>
+          <button type="button" class="astro-flip-cta" data-hero-flip>${esc(t('flipCard', 'Flip the card'))}</button>
         </div>
         <div class="astro-flip__face astro-flip__back" data-element="${sign.element}">
           ${backFace(sign)}
@@ -239,9 +311,10 @@
       </div>
     `;
     if (glyph) glyph.textContent = Z.textGlyph(sign);
-    if (name) name.textContent = sign.name;
+    if (name) name.textContent = view.name;
     const core = document.querySelector('.astro-wheel__core');
     if (core) core.dataset.element = sign.element;
+    updateStageToggleTitle(sign);
   }
 
   function applyFilter() {
@@ -270,10 +343,11 @@
     card.classList.toggle('is-flipped', next);
     card.querySelectorAll('[aria-expanded]').forEach((el) => el.setAttribute('aria-expanded', String(next)));
     if (next && card.dataset.sign) {
-      const sign = Z.signById(card.dataset.sign);
+      const sign = localizeSign(Z.signById(card.dataset.sign)) || Z.signById(card.dataset.sign);
       if (sign) speakOracle(sign.oracle);
     } else if (next && card.dataset.arcana && A) {
-      const arcana = A.cardById(card.dataset.arcana);
+      lastFlippedArcana = card.dataset.arcana;
+      const arcana = localizeCard(A.cardById(card.dataset.arcana)) || A.cardById(card.dataset.arcana);
       if (arcana) speakOracle(arcana.oracle);
     }
   }
@@ -297,6 +371,7 @@
       const url = new URL(window.location.href);
       url.searchParams.set('sign', sign.id);
       if (opts && opts.reading) url.searchParams.set('reading', '1');
+      if (opts && opts.dob) url.searchParams.set('dob', opts.dob);
       url.hash = '';
       history.replaceState(null, '', url.pathname + url.search);
     }
@@ -306,21 +381,33 @@
     return Z.signForDate(new Date()) || Z.SIGNS[0];
   }
 
-  function spreadCardMarkup(role, sign) {
-    if (!sign) return '';
-    return `<article class="astro-flip astro-spread-card" data-sign="${sign.id}" data-element="${sign.element}" data-role="${role}">
+  function tarotSpreadCardMarkup(role, card) {
+    if (!card) return '';
+    const view = localizeCard(card) || card;
+    return `<article class="astro-flip astro-spread-card astro-spread-card--tarot" data-arcana="${card.id}" data-tarot-suit="${card.suit}" data-role="${role}">
       <p class="astro-spread-card__role">${esc(role)}</p>
       <div class="astro-flip__inner">
-        <button type="button" class="astro-flip__face astro-flip__front" data-spread-flip aria-expanded="false">
-          <span class="astro-card__glyph" aria-hidden="true">${Z.textGlyph(sign)}</span>
-          <h3>${esc(sign.name)}</h3>
-          <p>${esc(sign.dates)}</p>
+        <button type="button" class="astro-flip__face astro-flip__front astro-tarot-front" data-spread-tarot-flip aria-expanded="false">
+          ${tarotImage(card)}
+          <div class="astro-tarot-front__meta">
+            <span class="astro-chip">${esc(card.suit === 'major' ? card.roman : (view.suitLabel || card.suitLabel))}</span>
+            <h3>${esc(view.name)}</h3>
+            <p>${esc(view.keyword || card.keyword)}</p>
+          </div>
         </button>
-        <div class="astro-flip__face astro-flip__back" data-element="${sign.element}">
-          ${backFace(sign, { compact: true })}
+        <div class="astro-flip__face astro-flip__back">
+          ${arcanaBackFace(card)}
         </div>
       </div>
     </article>`;
+  }
+
+  function tarotSpreadPrompt(spread) {
+    if (!spread?.sun || !spread?.situation || !spread?.cross || !spread?.path) return '';
+    if (i18n()?.lang?.() === 'vi') {
+      return `Đọc trải bài sinh nhật này: Mặt trời ${spread.sun.name}; Tình huống ${spread.situation.name}, Giao cắt ${spread.cross.name}, Đường đi ${spread.path.name}`;
+    }
+    return Z.spreadPrompt(spread);
   }
 
   function renderSpread(spread) {
@@ -330,34 +417,90 @@
     lastSpread = spread;
     table.hidden = false;
     table.dataset.ready = '1';
+    const sunView = localizeSign(spread.sun) || spread.sun;
+    const roleSit = t('roleSituation', 'Situation');
+    const roleCross = t('roleCross', 'Cross');
+    const rolePath = t('rolePath', 'Path');
     table.innerHTML = `
       <header class="astro-spread__head">
-        <p class="astro-kicker">Rose · three-card draw</p>
-        <h2>Sun · Cross · Path</h2>
-        <p>Your sign, the tension, and the lean — tap a card to flip it.</p>
+        <p class="astro-kicker">${esc(t('spreadKicker', 'Rose · three-card draw'))}</p>
+        <h2>${esc(t('spreadTitle', 'Situation · Cross · Path'))}</h2>
+        <p>${esc(t('spreadLead', 'Your birthday draw — tap a card to flip it.'))}
+          ${sunView ? ` · ${esc(t('sunSignLabel', 'Sun'))}: ${esc(sunView.name)}` : ''}</p>
       </header>
       <div class="astro-spread__rail">
-        ${spreadCardMarkup('Sun', spread.sun)}
-        ${spreadCardMarkup('Cross', spread.cross)}
-        ${spreadCardMarkup('Path', spread.path)}
+        ${tarotSpreadCardMarkup(roleSit, spread.situation)}
+        ${tarotSpreadCardMarkup(roleCross, spread.cross)}
+        ${tarotSpreadCardMarkup(rolePath, spread.path)}
       </div>
-      <button type="button" class="astro-ask astro-ask--spread" data-ask-rose="${esc(Z.spreadPrompt(spread))}">Ask Rose about this spread</button>
+      <button type="button" class="astro-ask astro-ask--spread" data-ask-rose="${esc(tarotSpreadPrompt(spread))}">${esc(t('askSpread', 'Ask Rose about this spread'))}</button>
     `;
-    if (status) status.textContent = `${spread.sun.name} · ${spread.sun.dates}`;
-    selectSign(spread.sun.id, { reading: true });
+    if (status) {
+      status.textContent = sunView
+        ? `${sunView.name} · ${spread.sun.dates}${spread.birthDate ? ` · ${spread.birthDate}` : ''}`
+        : '';
+    }
+    if (spread.sun) {
+      selectSign(spread.sun.id, { reading: true, dob: spread.birthDate, syncUrl: true });
+    }
+    setStageCollapsed(true);
     const cards = table.querySelectorAll('.astro-spread-card');
     gsapTween(cards, { y: 28, opacity: 0, duration: 0.7, stagger: 0.12, ease: 'power3.out', clearProps: 'all' });
   }
 
-  function dealReading(month, day) {
-    const spread = Z.spreadForMonthDay(Number(month), Number(day));
+  function dealReading(dobParts) {
     const status = $('astroFinderStatus');
-    if (!spread) {
-      if (status) status.textContent = 'That date is not on the tropical wheel.';
+    const parsed = dobParts || readDobInput();
+    if (!parsed) {
+      if (status) status.textContent = t('invalidDate', 'That date is not on the tropical wheel.');
       return null;
     }
+    const sun = Z.signForMonthDay(parsed.month, parsed.day);
+    if (!sun || !A?.spreadFromDeck) {
+      if (status) status.textContent = t('invalidDate', 'That date is not on the tropical wheel.');
+      return null;
+    }
+    const seed = Z.dobSeed(parsed.year, parsed.month, parsed.day);
+    const tarot = A.spreadFromDeck(seed);
+    if (!tarot) {
+      if (status) status.textContent = t('invalidDate', 'That date is not on the tropical wheel.');
+      return null;
+    }
+    const spread = {
+      sun,
+      situation: tarot.situation,
+      cross: tarot.cross,
+      path: tarot.path,
+      birthDate: parsed.iso,
+      birthYear: parsed.year,
+      month: parsed.month,
+      day: parsed.day,
+      seed: tarot.seed,
+    };
+    persistDob(parsed.iso);
     renderSpread(spread);
     return spread;
+  }
+
+  function findSignOnly(dobParts) {
+    const status = $('astroFinderStatus');
+    const parsed = dobParts || readDobInput();
+    if (!parsed) {
+      if (status) status.textContent = t('invalidDate', 'That date is not on the tropical wheel.');
+      return null;
+    }
+    const sun = Z.signForMonthDay(parsed.month, parsed.day);
+    if (!sun) {
+      if (status) status.textContent = t('invalidDate', 'That date is not on the tropical wheel.');
+      return null;
+    }
+    persistDob(parsed.iso);
+    selectSign(sun.id, { dob: parsed.iso });
+    if (status) {
+      const view = localizeSign(sun) || sun;
+      status.textContent = `${view.name} · ${sun.dates}`;
+    }
+    return sun;
   }
 
   function bindClicks(root) {
@@ -388,6 +531,13 @@
         const card = spreadFlip.closest('.astro-flip');
         flipCard(card);
         if (card?.dataset.sign) selectSign(card.dataset.sign, { syncUrl: false });
+        return;
+      }
+      const spreadTarotFlip = event.target.closest('[data-spread-tarot-flip]');
+      if (spreadTarotFlip) {
+        event.preventDefault();
+        const card = spreadTarotFlip.closest('.astro-flip');
+        flipCard(card);
         return;
       }
       const arcanaFlip = event.target.closest('[data-arcana-flip]');
@@ -548,36 +698,52 @@
     });
   }
 
+  function refreshLocalizedMarkup() {
+    const slots = $('astroSlots');
+    const gallery = $('astroGallery');
+    const arcanaGallery = $('astroArcanaGallery');
+    if (slots) slots.innerHTML = wheelMarkup();
+    if (gallery) gallery.innerHTML = galleryMarkup();
+    if (arcanaGallery) arcanaGallery.innerHTML = arcanaGalleryMarkup();
+    applyFilter();
+    applyTarotFilter();
+    if (selectedId) selectSign(selectedId, { syncUrl: false });
+    if (lastSpread) renderSpread(lastSpread);
+  }
+
   function init() {
     const slots = $('astroSlots');
     const gallery = $('astroGallery');
     const arcanaGallery = $('astroArcanaGallery');
-    const month = $('astroMonth');
-    const day = $('astroDay');
+    const dob = $('astroDob');
     const form = $('astroFinder');
     const filters = $('astroFilters');
     const readBtn = $('astroReadBtn');
-
-    fillSelect(month, MONTHS);
-    fillSelect(day, Array.from({ length: 31 }, (_, i) => [String(i + 1), String(i + 1)]));
 
     if (slots) slots.innerHTML = wheelMarkup();
     if (gallery) gallery.innerHTML = galleryMarkup();
     if (arcanaGallery) arcanaGallery.innerHTML = arcanaGalleryMarkup();
 
-    const now = new Date();
-    if (month) month.value = String(now.getMonth() + 1);
-    if (day) day.value = String(now.getDate());
+    const initialDob = resolveInitialDob();
+    if (dob && initialDob) {
+      dob.value = initialDob.iso;
+      dob.max = formatIsoDate(new Date());
+    }
 
     bindClicks(document);
 
     form?.addEventListener('submit', (event) => {
       event.preventDefault();
-      dealReading(month.value, day.value);
+      findSignOnly();
+    });
+
+    dob?.addEventListener('change', () => {
+      const parsed = readDobInput();
+      if (parsed) persistDob(parsed.iso);
     });
 
     readBtn?.addEventListener('click', () => {
-      dealReading(month?.value || now.getMonth() + 1, day?.value || now.getDate());
+      dealReading();
       $('astroSpread')?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
     });
 
@@ -605,10 +771,20 @@
 
     const fromQuery = Z.parseSignQuery(window.location.search) || Z.parseSignQuery(window.location.hash);
     const wantReading = Z.parseReadingQuery(window.location.search);
-    selectSign((fromQuery || todaysSign()).id, { syncUrl: Boolean(fromQuery) });
+    const dobFromQuery = Z.parseDobQuery(window.location.search);
+    selectSign((fromQuery || (initialDob && Z.signForMonthDay(initialDob.month, initialDob.day)) || todaysSign()).id, {
+      syncUrl: Boolean(fromQuery),
+      dob: initialDob?.iso,
+    });
+    $('astroStageToggle')?.addEventListener('click', () => {
+      const panel = $('astroStagePanel');
+      const collapsed = panel?.dataset.collapsed === 'true';
+      setStageCollapsed(!collapsed);
+    });
     if (wantReading) {
-      dealReading(month?.value || now.getMonth() + 1, day?.value || now.getDate());
+      dealReading(dobFromQuery || initialDob);
     }
+    i18n()?.onChange?.(() => refreshLocalizedMarkup());
     startSky();
   }
 
@@ -625,6 +801,10 @@
   window.AstrologyPage = {
     selectSign,
     dealReading,
+    findSignOnly,
     lastSpread: () => lastSpread,
+    lastFlippedArcana: () => lastFlippedArcana,
+    birthDate: () => readDobInput()?.iso || lastSpread?.birthDate || '',
+    refreshLocalizedMarkup,
   };
 })();

@@ -1,7 +1,9 @@
 {
   "id": "astrology-rose-intro",
   "title": "Meet Rose",
+  "titleVi": "Gặp Rose",
   "ctaLabel": "Ask Rose for a reading",
+  "ctaLabelVi": "Nhờ Rose đọc bài",
   "ctaHref": "/entertainment/astrology.html?reading=1",
   "qrLandingPath": "/entertainment/astrology.html?demo=heygen",
   "brand": {
@@ -9,6 +11,7 @@
     "developmentBy": "David E Lane"
   },
   "heygenScriptShort": "I'm Rose. This gold wheel is my deck — twelve signs, four elements, and twenty-two Major Arcana. Give me a birthday, or let me deal Sun, Cross, and Path. Playful tropical astrology, not the night sky — Carl keeps the dome.",
+  "heygenScriptShortVi": "Tôi là Rose. Bánh xe vàng này là bộ bài của tôi — mười hai cung, bốn nguyên tố, và bảy mươi tám lá tarot. Tôi dạy cách xáo, rút, và đọc — cho tôi ngày sinh, hoặc lật một lá. Chiêm tinh nhiệt đới vui vẻ, không phải bầu trời đêm — Carl giữ mái vòm.",
   "heygenVoiceLanguage": "English",
   "heygenMotionPrompt": "intimate nod, candlelit tarot reader speaking to camera, low expressiveness",
   "heygenExpressiveness": "low",
@@ -29,5 +32,11 @@
     "lookId": "9b419a297d0cde418ac1408f4d0a0de5",
     "groupId": null
   },
-  "generateHint": "npm run create:rose-heygen-avatar -- --dry-run  then  npm run generate:rose-heygen-demo"
+  "generateHint": "npm run create:rose-heygen-avatar -- --dry-run  then  npm run generate:rose-heygen-demo",
+  "heygenVoiceIdVi": "51a130b1be7149f79df5a8de957aa7ad",
+  "heygenVoiceNameVi": "HuyenTrang",
+  "heygenVideoIdShortVi": "c992d8e0d25ebee1d06008f2951955a5",
+  "heygenVideoUrlShortVi": null,
+  "generatedAtVi": "2026-09-17T06:27:18.096Z",
+  "heygenVideoLocalShortVi": "/entertainment/assets/video/astrology-rose-intro-vi.mp4"
 }

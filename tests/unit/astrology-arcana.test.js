@@ -38,6 +38,20 @@ describe('AstrologyArcana tarot deck', () => {
     expect(AstrologyArcana.cardsBySuit('all')).toHaveLength(78);
   });
 
+  test('spreadFromDeck deals three unique upright cards deterministically', () => {
+    const a = AstrologyArcana.spreadFromDeck(12345);
+    const b = AstrologyArcana.spreadFromDeck(12345);
+    const c = AstrologyArcana.spreadFromDeck(99999);
+    expect(a.situation.id).toBeTruthy();
+    expect(a.cross.id).toBeTruthy();
+    expect(a.path.id).toBeTruthy();
+    expect(new Set([a.situation.id, a.cross.id, a.path.id]).size).toBe(3);
+    expect(b.situation.id).toBe(a.situation.id);
+    expect(b.cross.id).toBe(a.cross.id);
+    expect(b.path.id).toBe(a.path.id);
+    expect(c.situation.id).not.toBe(a.situation.id);
+  });
+
   test('fact sheet teaches how to use the deck', () => {
     const sheet = AstrologyArcana.factSheet();
     expect(sheet).toMatch(/How Rose uses the deck/i);
@@ -101,6 +115,35 @@ describe('rose-heygen.service', () => {
     expect(payload.spokenTitle).toMatch(/Rose/);
     expect(payload.spokenScript).toMatch(/Rose/);
     expect(payload.googleVoice).toMatch(/en-US/);
+    expect(payload.heygenVideoLocalShort).toMatch(/astrology-rose-intro\.mp4/);
+    expect(payload.allowIntroVideo).toBe(true);
+
+    const vi = getRoseDemoPayload({ lang: 'vi' });
+    expect(vi.lang).toBe('vi');
+    expect(vi.spokenScript).toMatch(/Rose/);
+    expect(vi.googleVoice).toMatch(/^vi-VN/);
+    expect(vi.heygenVideoLocalShort).toMatch(/astrology-rose-intro-vi\.mp4/);
+    expect(vi.heygenVideoLocalShort).not.toMatch(/astrology-rose-intro\.mp4$/);
+    expect(vi.allowIntroVideo).toBe(true);
+  });
+
+  test('getRoseDemoShort and pickRoseVoice are language-aware', async () => {
+    const { getRoseDemoShort, pickRoseVoice } = await import('../../services/rose-heygen.service.js');
+    expect(getRoseDemoShort('vi').script).toMatch(/Tôi là Rose/);
+    expect(getRoseDemoShort('vi').voiceLanguage).toBe('Vietnamese');
+    expect(getRoseDemoShort('vi').localPath).toContain('-vi.mp4');
+    const voice = pickRoseVoice(
+      [
+        { id: 'en1', name: 'Warm Storyteller', gender: 'female', language: 'English' },
+        { id: 'vi1', name: 'HuyenTrang', gender: 'female', language: 'Vietnamese' },
+        { id: 'vi2', name: 'Son Tran', gender: 'male', language: 'Vietnamese' },
+      ],
+      'vi'
+    );
+    expect(voice.voiceId).toBe('vi1');
+    expect(
+      pickRoseVoice([{ id: 'vi2', name: 'Son Tran', gender: 'male', language: 'Vietnamese' }], 'vi')
+    ).toBeNull();
   });
 
   test('create script and npm entries exist', () => {

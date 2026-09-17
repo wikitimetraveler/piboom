@@ -325,6 +325,48 @@
     return value === '1' || value === 'true' || value === 'yes';
   }
 
+  /**
+   * Parse YYYY-MM-DD (or ISO date prefix) into calendar parts.
+   * @returns {{ year: number, month: number, day: number, iso: string } | null}
+   */
+  function parseDobString(value) {
+    const raw = String(value || '').trim();
+    const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (!match) return null;
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+    if (!Number.isInteger(year) || year < 1900 || year > 2100) return null;
+    if (!Number.isInteger(month) || month < 1 || month > 12) return null;
+    if (!Number.isInteger(day) || day < 1 || day > DAYS_IN_MONTH[month]) return null;
+    if (month === 2 && day === 29) {
+      const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+      if (!leap) return null;
+    }
+    return {
+      year,
+      month,
+      day,
+      iso: `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
+    };
+  }
+
+  function parseDobQuery(search) {
+    const raw = String(search || '').replace(/^\?/, '');
+    if (!raw || raw.startsWith('#')) return null;
+    const params = new URLSearchParams(raw);
+    return parseDobString(params.get('dob'));
+  }
+
+  /** Deterministic seed from full birth date for parlor tarot draws. */
+  function dobSeed(year, month, day) {
+    const y = Number(year);
+    const m = Number(month);
+    const d = Number(day);
+    if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d)) return 1;
+    return ((y * 10000 + m * 100 + d) * 2654435761) >>> 0 || 1;
+  }
+
   function mulberry32(seed) {
     let a = seed >>> 0;
     return function next() {
@@ -365,7 +407,15 @@
   }
 
   function spreadPrompt(spread) {
-    if (!spread || !spread.sun || !spread.cross || !spread.path) return '';
+    if (!spread) return '';
+    if (spread.situation && spread.cross && spread.path && spread.sun) {
+      const sit = spread.situation.name || spread.situation;
+      const cross = spread.cross.name || spread.cross;
+      const path = spread.path.name || spread.path;
+      const sun = spread.sun.name || spread.sun;
+      return `Read this birthday tarot: Sun ${sun}; Situation ${sit}, Cross ${cross}, Path ${path}`;
+    }
+    if (!spread.sun || !spread.cross || !spread.path) return '';
     return `Read this Sun / Cross / Path: ${spread.sun.name}, ${spread.cross.name}, ${spread.path.name}`;
   }
 
@@ -411,12 +461,16 @@
   root.AstrologyZodiac = {
     SIGNS,
     ELEMENTS,
+    DAYS_IN_MONTH,
     textGlyph,
     signById,
     signForMonthDay,
     signForDate,
     parseSignQuery,
     parseReadingQuery,
+    parseDobString,
+    parseDobQuery,
+    dobSeed,
     spreadForMonthDay,
     spreadPrompt,
     constellationSvg,

@@ -138,6 +138,7 @@
     { href: '/lebanon/', icon: 'bi-globe-central-south-asia', label: 'Lebanon', title: 'Lebanon — bilingual history, food, music, café and living culture atlas with Karim (no login)' },
     { href: '/egypt/', icon: 'bi-globe-central-south-asia', label: 'Egypt', title: 'Egypt — bilingual history, food, music, café and living culture atlas with Omar (no login)' },
     { href: '/nature/shenango-valley.html', icon: 'bi-geo-alt', label: 'The Valley', title: 'West PA & East Ohio history gallery — Buhl Park hub, happening-now events, HyperFrames reel, Youngstown corridor, AI expert David' },
+    { href: '/nature/dinosaur-hall.html', icon: 'bi-hourglass-split', label: 'Dinosaur Hall', title: 'Mesozoic diorama — Triassic, Jurassic, Cretaceous field guide, size compare, HyperFrames reel' },
     { href: '/gse-analyzer.html', icon: 'bi-graph-up-arrow', label: 'GSE scenario analyzer' },
     { href: '/bike-store-home.html', icon: 'bi-bicycle', label: 'Bike Store' },
     { href: '/ai/voice-dj.html', icon: 'bi-mic', label: 'Wolfman Dave' },
@@ -266,6 +267,7 @@
     { href: '/nature/fish-collection.html', icon: 'bi-collection', label: 'Fish Collection', title: 'Your fish collection' },
     { href: '/nature/rock-discovery.html', icon: 'bi-gem', label: 'Rocky The Rock Star', title: 'Rubies, gems & meteorites — Rocky The Rock Star' },
     { href: '/nature/rock-collection.html', icon: 'bi-circle', label: 'Rock Collection', title: 'Your rock specimens' },
+    { href: '/nature/dinosaur-hall.html', icon: 'bi-hourglass-split', label: 'Dinosaur Hall', title: 'Mesozoic diorama — Triassic, Jurassic, Cretaceous field guide, size compare, HyperFrames reel' },
     { href: '/nature/share-collection.html', icon: 'bi-share', label: 'Share Collection', title: 'Share your collection' },
     { href: '/nature/shenango-valley.html', icon: 'bi-geo-alt', label: 'The Valley', title: 'West PA & East Ohio gallery — happening-now events, HyperFrames, Youngstown mob history, AI expert' },
   ];
