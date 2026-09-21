@@ -49,6 +49,21 @@
     return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
+  function setSpeaking(on) {
+    if (els.zigzag) els.zigzag.classList.toggle('is-speaking', Boolean(on));
+  }
+
+  function setSceneKeepAlive(on) {
+    const scene = window.PlanetariumStationScene;
+    if (scene && typeof scene.setKeepAlive === 'function') scene.setKeepAlive(on);
+  }
+
+  function scrollStageIntoView() {
+    const stage = document.getElementById('stStage');
+    if (!stage) return;
+    stage.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'center' });
+  }
+
   function cueStation(beat) {
     const page = window.PlanetariumStation;
     if (!page) return;
@@ -58,12 +73,23 @@
     }
   }
 
+  function moduleLabel(beat) {
+    if (!beat || !beat.module) return '';
+    const page = window.PlanetariumStation;
+    const state = page && typeof page.getState === 'function' ? page.getState() : null;
+    const mod = state && Array.isArray(state.modules)
+      ? state.modules.find((m) => m.id === beat.module)
+      : null;
+    return mod && mod.name ? mod.name : String(beat.module);
+  }
+
   function showBeat(beat) {
     if (els.line) els.line.textContent = beat && beat.text ? beat.text : '';
-    if (els.zigzag) els.zigzag.classList.toggle('is-speaking', true);
     if (els.status) {
       const n = beats().length;
-      els.status.textContent = n ? 'Beat ' + (index + 1) + ' of ' + n : '';
+      const room = moduleLabel(beat);
+      const beatPart = n ? 'Beat ' + (index + 1) + ' of ' + n : '';
+      els.status.textContent = room ? beatPart + ' · ' + room : beatPart;
     }
     if (els.play) els.play.setAttribute('aria-pressed', playing ? 'true' : 'false');
     if (els.pause) els.pause.disabled = !playing;
@@ -74,18 +100,23 @@
     const text = String((beat && beat.text) || '').trim();
     if (!text) return;
     const v = voice();
-    if (typeof window.speakNarrationAwaitEnd === 'function') {
-      await window.speakNarrationAwaitEnd(text, {
-        voice: v.voice,
-        pitch: v.pitch,
-        speakingRate: v.speakingRate,
-        gender: 'male',
-        isCancelled: isCancelled,
-      });
-      return;
-    }
-    if (typeof window.speakWithGoogle === 'function') {
-      await window.speakWithGoogle(text, v.voice, { pitch: v.pitch, speakingRate: v.speakingRate });
+    setSpeaking(true);
+    try {
+      if (typeof window.speakNarrationAwaitEnd === 'function') {
+        await window.speakNarrationAwaitEnd(text, {
+          voice: v.voice,
+          pitch: v.pitch,
+          speakingRate: v.speakingRate,
+          gender: 'male',
+          isCancelled: isCancelled,
+        });
+        return;
+      }
+      if (typeof window.speakWithGoogle === 'function') {
+        await window.speakWithGoogle(text, v.voice, { pitch: v.pitch, speakingRate: v.speakingRate });
+      }
+    } finally {
+      if (!isCancelled || !isCancelled()) setSpeaking(false);
     }
   }
 
@@ -98,6 +129,8 @@
     if (!list.length) return;
     index = Math.max(0, Math.min(start, list.length - 1));
     playing = true;
+    setSceneKeepAlive(true);
+    scrollStageIntoView();
     const myId = ++runId;
     if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
     if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
@@ -111,6 +144,8 @@
       if (runId !== myId || !playing) return;
     }
     playing = false;
+    setSpeaking(false);
+    setSceneKeepAlive(false);
     showBeat(list[index] || list[0]);
   }
 
@@ -125,6 +160,8 @@
     playing = false;
     runId += 1;
     stopAudio();
+    setSpeaking(false);
+    setSceneKeepAlive(false);
     showBeat(beats()[index] || beats()[0]);
   }
 
@@ -159,11 +196,24 @@
     if (!els.root) return;
     script = await loadScript();
     showBeat(beats()[0]);
+    setSpeaking(false);
     if (els.play) els.play.addEventListener('click', play);
     if (els.pause) els.pause.addEventListener('click', pause);
     if (els.next) els.next.addEventListener('click', next);
     if (new URLSearchParams(location.search).get('tour') === '1') {
-      els.root.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
+      scrollStageIntoView();
+      const first = beats()[0];
+      if (first) {
+        cueStation(first);
+        showBeat(first);
+      }
+      if (!reducedMotion()) {
+        try {
+          play();
+        } catch (_) {
+          /* autoplay / TTS blocked */
+        }
+      }
     }
   }
 

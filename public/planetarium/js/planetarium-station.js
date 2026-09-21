@@ -13,22 +13,28 @@
     status: document.getElementById('stStatus'),
     live: document.getElementById('stLive'),
     dock: document.getElementById('stDock'),
+    dockFilters: document.getElementById('stDockFilters'),
     crew: document.getElementById('stCrew'),
     crewLead: document.getElementById('stCrewLead'),
+    hud: document.getElementById('stHud'),
     hudKicker: document.getElementById('stHudKicker'),
     hudTitle: document.getElementById('stHudTitle'),
     hudMeta: document.getElementById('stHudMeta'),
     hudBlurb: document.getElementById('stHudBlurb'),
     hudHint: document.getElementById('stHudHint'),
     hudHw: document.getElementById('stHudHw'),
+    pickHud: document.getElementById('stPickHud'),
     enter: document.getElementById('stEnterModule'),
     exit: document.getElementById('stExitWalk'),
+    modeWalk: document.getElementById('stModeWalk'),
     displayLead: document.getElementById('stDisplayLead'),
     racks: document.getElementById('stRacks'),
     photo: document.getElementById('stPhoto'),
     photoImg: document.getElementById('stPhotoImg'),
     photoCap: document.getElementById('stPhotoCap'),
     passList: document.getElementById('stPassList'),
+    passHeading: document.getElementById('stPassHeading'),
+    stage: document.getElementById('stStage'),
   };
 
   const state = {
@@ -41,6 +47,8 @@
     hardwareId: '',
     observer: { ...DEFAULT_OBS },
     modulesBound: false,
+    dockFilter: 'all',
+    hoverId: '',
   };
 
   function escapeHtml(value) {
@@ -119,12 +127,66 @@
     return WALK_ROOMS.has(String(id || state.module));
   }
 
+  function hatchCue(room) {
+    if (!room || !Array.isArray(room.hardware)) return '';
+    const names = room.hardware
+      .filter((h) => /hatch/i.test(h.name || '') || /hatch/i.test(h.role || ''))
+      .map((h) => {
+        const m = String(h.name || '').match(/to\s+(.+)$/i);
+        return m ? m[1].replace(/\s*[—–-].*$/, '').trim() : '';
+      })
+      .filter(Boolean);
+    const unique = [...new Set(names)].slice(0, 3);
+    if (!unique.length) return '';
+    return 'Inside ' + room.name + ' · hatches to ' + unique.join(' / ');
+  }
+
+  function renderPickHud(id) {
+    if (!els.pickHud) return;
+    if (!id || id === state.module || state.mode === 'walk') {
+      els.pickHud.hidden = true;
+      els.pickHud.setAttribute('aria-hidden', 'true');
+      els.pickHud.textContent = '';
+      return;
+    }
+    const mod = findModule(id);
+    if (!mod) {
+      els.pickHud.hidden = true;
+      els.pickHud.setAttribute('aria-hidden', 'true');
+      return;
+    }
+    els.pickHud.hidden = false;
+    els.pickHud.setAttribute('aria-hidden', 'false');
+    els.pickHud.textContent = mod.name + (WALK_ROOMS.has(mod.id) ? ' · walkable' : '');
+  }
+
+  function updateWalkControls(mod) {
+    const walkable = canWalk(mod?.id);
+    if (els.modeWalk) {
+      els.modeWalk.disabled = !walkable && state.mode !== 'walk';
+      els.modeWalk.title = walkable
+        ? 'Look around inside this module (1 unit = 1 meter)'
+        : 'Select Destiny, Harmony, Columbus, Kibo, Cupola, or Zvezda first';
+    }
+    if (els.enter) {
+      els.enter.hidden = !walkable || state.mode === 'walk';
+      els.enter.disabled = !walkable;
+    }
+    if (els.exit) {
+      els.exit.hidden = state.mode !== 'walk';
+    }
+  }
+
   function renderHud(mod) {
     if (!mod) return;
     const room = findInterior(mod.id);
     if (els.hudKicker) {
       els.hudKicker.textContent =
-        state.mode === 'walk' ? 'Walk · 1:1 m' : mod.kind === 'pressurized' ? 'Pressurized' : mod.kind;
+        state.mode === 'walk'
+          ? 'Walk · 1:1 m'
+          : mod.kind === 'pressurized'
+            ? 'Pressurized'
+            : mod.kind;
     }
     if (els.hudTitle) els.hudTitle.textContent = mod.name;
     if (els.hudMeta) {
@@ -132,17 +194,16 @@
       if (room) bits.push(room.lengthM + ' × ' + room.diameterM + ' m');
       els.hudMeta.textContent = bits.filter(Boolean).join(' · ');
     }
-    if (els.hudBlurb) els.hudBlurb.textContent = mod.blurb || mod.function || '';
+    if (els.hudBlurb) {
+      const cue = state.mode === 'walk' ? hatchCue(room) : '';
+      els.hudBlurb.textContent = cue || mod.blurb || mod.function || '';
+    }
     if (els.hudHint) {
       els.hudHint.hidden = state.mode !== 'walk';
-      els.hudHint.textContent = 'Drag to look · Esc returns to orbit';
+      els.hudHint.textContent = 'Drag to look around · Esc returns to orbit';
     }
-    if (els.enter) {
-      els.enter.hidden = !canWalk(mod.id) || state.mode === 'walk';
-    }
-    if (els.exit) {
-      els.exit.hidden = state.mode !== 'walk';
-    }
+    updateWalkControls(mod);
+    renderPickHud(state.hoverId);
   }
 
   function renderPhoto(mod) {
@@ -164,7 +225,7 @@
     const people = crewFor(mod?.id);
     if (els.displayLead) {
       els.displayLead.textContent = room
-        ? 'NASA still + named hardware. Enter module for an optional 1:1 walk (1 unit = 1 meter).'
+        ? 'NASA still + named hardware. Look inside for an optional 1:1 look-around (1 unit = 1 meter).'
         : 'Exterior structure. Pick Destiny, Harmony, Columbus, Kibo, Cupola, or Zvezda for interiors.';
     }
     renderPhoto(mod);
@@ -194,8 +255,13 @@
       .map((row) => {
         const on = row.id && row.id === state.hardwareId ? ' is-on' : '';
         const hw = row.hw ? ' is-hw' : '';
+        const tag = row.hw ? 'button' : 'div';
+        const typeAttr = row.hw ? ' type="button"' : '';
         return (
-          '<div class="st-rack' +
+          '<' +
+          tag +
+          typeAttr +
+          ' class="st-rack' +
           hw +
           on +
           '"' +
@@ -204,7 +270,9 @@
           escapeHtml(row.k) +
           '</strong>' +
           escapeHtml(row.v) +
-          '</div>'
+          '</' +
+          tag +
+          '>'
         );
       })
       .join('');
@@ -228,17 +296,51 @@
     renderDisplay(mod);
   }
 
+  function isStructureModule(mod) {
+    const kind = String(mod?.kind || '');
+    return kind === 'truss' || kind === 'array' || kind === 'arm' || kind === 'dock' || kind === 'structure';
+  }
+
+  function moduleMatchesFilter(mod) {
+    const f = state.dockFilter;
+    if (!f || f === 'all') return true;
+    if (f === 'walk') return WALK_ROOMS.has(mod.id);
+    if (f === 'structure') return isStructureModule(mod);
+    return String(mod.partner || '') === f;
+  }
+
+  function setDockFilter(filter) {
+    state.dockFilter = filter || 'all';
+    if (els.dockFilters) {
+      els.dockFilters.querySelectorAll('[data-dock-filter]').forEach((btn) => {
+        const on = btn.getAttribute('data-dock-filter') === state.dockFilter;
+        btn.classList.toggle('is-on', on);
+        btn.setAttribute('aria-pressed', String(on));
+      });
+    }
+    renderDock();
+  }
+
   function renderDock() {
     if (!els.dock) return;
     els.dock.replaceChildren();
-    state.modules.forEach((mod) => {
+    state.modules.filter(moduleMatchesFilter).forEach((mod) => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'st-mod' + (mod.id === state.module ? ' is-on' : '');
+      const walkable = WALK_ROOMS.has(mod.id);
+      const structure = isStructureModule(mod);
+      btn.className =
+        'st-mod' +
+        (mod.id === state.module ? ' is-on' : '') +
+        (walkable ? ' is-walk' : '') +
+        (structure ? ' is-structure' : '');
       btn.dataset.module = mod.id;
+      btn.dataset.partner = mod.partner || '';
+      const walkChip = walkable ? '<span class="st-mod__walk">Walk</span>' : '';
       btn.innerHTML =
         '<span class="st-mod__partner">' +
         escapeHtml(mod.partner) +
+        walkChip +
         '</span><span class="st-mod__name">' +
         escapeHtml(mod.name) +
         '</span><span class="st-mod__fn">' +
@@ -255,35 +357,54 @@
     if (els.crewLead && state.crew.note) els.crewLead.textContent = state.crew.note;
     els.crew.replaceChildren();
     people.forEach((person) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'st-person' + (person.quartersModuleId === state.module ? ' is-on' : '');
+      const card = document.createElement('article');
+      card.className = 'st-person' + (person.quartersModuleId === state.module ? ' is-on' : '');
       const photo = person.photo
         ? '<img class="st-person__photo" src="' +
           escapeHtml(person.photo) +
-          '" alt="" width="72" height="72"/>'
+          '" alt="' +
+          escapeHtml(person.name) +
+          '" width="72" height="72"/>'
         : '<span class="st-person__photo" aria-hidden="true"></span>';
       const room = findModule(person.quartersModuleId);
-      btn.innerHTML =
+      const select = document.createElement('button');
+      select.type = 'button';
+      select.className = 'st-person__select';
+      select.setAttribute('aria-label', 'Show ' + person.name + ' quarters module');
+      select.innerHTML =
         photo +
-        '<span><span class="st-person__name">' +
+        '<span class="st-person__body"><span class="st-person__name">' +
         escapeHtml(person.name) +
         '</span><span class="st-person__meta">' +
         escapeHtml([person.agency, person.craft, person.role].filter(Boolean).join(' · ')) +
         '</span><span class="st-person__meta">Sleeps in ' +
         escapeHtml(room?.name || person.quartersModuleId) +
         '</span></span>';
-      btn.addEventListener('click', () => {
+      select.addEventListener('click', () => {
         if (person.quartersModuleId) selectModule(person.quartersModuleId);
       });
-      els.crew.appendChild(btn);
+      card.appendChild(select);
+      if (person.wiki) {
+        const wiki = document.createElement('a');
+        wiki.className = 'st-person__wiki';
+        wiki.setAttribute('data-crew-wiki', '');
+        wiki.href = person.wiki;
+        wiki.target = '_blank';
+        wiki.rel = 'noopener noreferrer';
+        wiki.textContent = 'Wikipedia';
+        card.appendChild(wiki);
+      }
+      els.crew.appendChild(card);
     });
   }
 
   function setModeButtons() {
     document.querySelectorAll('[data-mode]').forEach((btn) => {
-      btn.classList.toggle('is-on', btn.getAttribute('data-mode') === state.mode);
+      const on = btn.getAttribute('data-mode') === state.mode;
+      btn.classList.toggle('is-on', on);
+      btn.setAttribute('aria-pressed', String(on));
     });
+    updateWalkControls(findModule(state.module));
   }
 
   function syncScene() {
@@ -323,9 +444,7 @@
 
   function stepModule(dir) {
     const list =
-      state.mode === 'walk'
-        ? state.modules.filter((m) => canWalk(m.id))
-        : pressurizedList();
+      state.mode === 'walk' ? state.modules.filter((m) => canWalk(m.id)) : pressurizedList();
     if (!list.length) return;
     let i = list.findIndex((m) => m.id === state.module);
     if (i < 0) i = 0;
@@ -334,11 +453,16 @@
   }
 
   function setMode(mode) {
-    state.mode = mode === 'explode' || mode === 'walk' ? mode : 'orbit';
-    if (state.mode === 'walk' && !canWalk(state.module)) {
-      const first = state.modules.find((m) => canWalk(m.id));
-      if (first) state.module = first.id;
+    const next = mode === 'explode' || mode === 'walk' ? mode : 'orbit';
+    if (next === 'walk' && !canWalk(state.module)) {
+      if (els.status) {
+        els.status.textContent =
+          'Look inside needs a walkable module — pick Destiny, Harmony, Columbus, Kibo, Cupola, or Zvezda.';
+      }
+      setModeButtons();
+      return;
     }
+    state.mode = next;
     writeUrl();
     setModeButtons();
     const mod = findModule(state.module);
@@ -386,8 +510,39 @@
     }
   }
 
+  function buildPassSkyUrl(pass, observer) {
+    const when = new Date(pass.start);
+    const sky = window.FunHomeSky;
+    if (sky && typeof sky.buildPlanetariumUrl === 'function') {
+      return sky.buildPlanetariumUrl({ date: when, observer: observer });
+    }
+    const pad = (n) => String(n).padStart(2, '0');
+    const params = new URLSearchParams();
+    params.set(
+      'date',
+      when.getFullYear() + '-' + pad(when.getMonth() + 1) + '-' + pad(when.getDate())
+    );
+    params.set('time', pad(when.getHours()) + ':' + pad(when.getMinutes()));
+    if (Number.isFinite(observer.lat) && Number.isFinite(observer.lon)) {
+      params.set('lat', String(Number(observer.lat.toFixed(4))));
+      params.set('lon', String(Number(observer.lon.toFixed(4))));
+    }
+    if (observer.label) params.set('label', String(observer.label).slice(0, 80));
+    return '/planetarium/?' + params.toString();
+  }
+
+  function updatePassHeading() {
+    if (!els.passHeading) return;
+    const label = state.observer.label || 'your location';
+    els.passHeading.textContent =
+      label === 'Your location'
+        ? 'Next passes over your location'
+        : 'Next passes over ' + label;
+  }
+
   async function loadPasses() {
     if (!els.passList) return;
+    updatePassHeading();
     els.passList.innerHTML = '<li class="plan-empty">Loading passes…</li>';
     try {
       const res = await fetch(
@@ -399,20 +554,39 @@
       const data = await res.json().catch(() => ({}));
       els.passList.replaceChildren();
       if (!res.ok || !data.passes || !data.passes.length) {
-        els.passList.innerHTML = '<li>No bright passes in the next two days from ' + escapeHtml(state.observer.label) + '.</li>';
+        els.passList.innerHTML =
+          '<li>No bright passes in the next two days from ' +
+          escapeHtml(state.observer.label) +
+          '.</li>';
         return;
       }
       data.passes.slice(0, 5).forEach((pass) => {
         const li = document.createElement('li');
         const when = new Date(pass.start);
-        li.innerHTML =
-          '<button type="button" class="st-pass"><strong>' +
-          escapeHtml(when.toUTCString()) +
+        const local = when.toLocaleString(undefined, {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+        });
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'st-pass';
+        btn.title = when.toUTCString() + ' UTC';
+        btn.innerHTML =
+          '<span><strong>' +
+          escapeHtml(local) +
           '</strong> · ' +
           Math.round(pass.duration / 60) +
           ' min' +
           (pass.maxElev != null ? ' · max ' + Math.round(pass.maxElev) + '°' : '') +
-          '</button>';
+          '</span><span class="st-pass__sky">Watch in sky</span>';
+        btn.addEventListener('click', () => {
+          const url = buildPassSkyUrl(pass, state.observer);
+          window.location.href = url;
+        });
+        li.appendChild(btn);
         els.passList.appendChild(li);
       });
     } catch (_) {
@@ -424,6 +598,13 @@
     document.querySelectorAll('[data-mode]').forEach((btn) => {
       btn.addEventListener('click', () => setMode(btn.getAttribute('data-mode')));
     });
+    if (els.dockFilters) {
+      els.dockFilters.addEventListener('click', (ev) => {
+        const btn = ev.target.closest('[data-dock-filter]');
+        if (!btn) return;
+        setDockFilter(btn.getAttribute('data-dock-filter'));
+      });
+    }
     const prev = document.getElementById('stPrevMod');
     const next = document.getElementById('stNextMod');
     if (prev) prev.addEventListener('click', () => stepModule(-1));
@@ -446,11 +627,18 @@
         if (hw) setHardware(hw);
       });
     }
+    if (els.hud) {
+      els.hud.addEventListener('click', () => {
+        els.hud.classList.toggle('is-expanded');
+      });
+    }
     document.addEventListener('keydown', (ev) => {
       if (ev.key === 'Escape' && state.mode === 'walk') {
         setMode('orbit');
         return;
       }
+      const tag = (ev.target && ev.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || ev.target?.isContentEditable) return;
       if (ev.key === 'ArrowLeft') stepModule(-1);
       if (ev.key === 'ArrowRight') stepModule(1);
     });
@@ -464,6 +652,16 @@
     }
     if (typeof scene.onHardware === 'function') {
       scene.onHardware((hw) => setHardware(hw));
+    }
+    if (typeof scene.onHover === 'function') {
+      scene.onHover((id) => {
+        state.hoverId = id || '';
+        renderPickHud(state.hoverId);
+      });
+    }
+    if (scene.canvas) {
+      scene.canvas.setAttribute('role', 'img');
+      scene.canvas.setAttribute('aria-label', 'Interactive International Space Station schematic');
     }
     syncScene();
     return true;

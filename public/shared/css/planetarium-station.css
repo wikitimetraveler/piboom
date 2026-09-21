@@ -7,6 +7,13 @@ body.plan-station {
   --st-ok: #7dffb3;
   --st-ice: #9ad4ff;
   --st-hull: #e8e4dc;
+  --st-muted: rgba(232, 228, 220, 0.78);
+  --st-partner-nasa: #d8d4cc;
+  --st-partner-ros: #8a9099;
+  --st-partner-esa: #9ad4ff;
+  --st-partner-jaxa: #e8dcc8;
+  --st-partner-csa: #ffd278;
+  --st-partner-structure: #6a7380;
 }
 
 .st-wrap {
@@ -34,11 +41,66 @@ body.plan-station {
   color: rgba(157, 255, 196, 0.88);
 }
 
+.st-desk {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 1.25rem;
+  align-items: start;
+  margin: 0 0 1.75rem;
+}
+
+.st-exhibit {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
 .st-live {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
   gap: 0.65rem;
   margin: 0 0 1.25rem;
+}
+
+.st-live--ticker {
+  position: absolute;
+  top: 3.35rem;
+  left: 0.85rem;
+  right: 0.85rem;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 1rem;
+  margin: 0;
+  padding: 0.4rem 0.65rem;
+  border-radius: 0.45rem;
+  border: 1px solid color-mix(in srgb, var(--st-ice) 28%, transparent);
+  background: rgba(4, 8, 14, 0.72);
+  backdrop-filter: blur(8px);
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+
+.st-live--ticker .st-stat {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.st-live--ticker .st-stat__kicker {
+  margin: 0;
+  color: var(--st-ice);
+}
+
+.st-live--ticker .st-stat strong {
+  font-family: Outfit, system-ui, sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--st-ok);
 }
 
 .st-stat {
@@ -54,7 +116,7 @@ body.plan-station {
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--plan-muted);
+  color: var(--st-muted);
   margin-bottom: 0.15rem;
 }
 
@@ -68,19 +130,42 @@ body.plan-station {
 
 .st-stage-block {
   position: relative;
-  margin: 0 0 1.5rem;
+  margin: 0;
   border-radius: 1.1rem;
   overflow: hidden;
-  border: 1px solid var(--plan-line);
-  background: #07090f;
+  border: 1px solid color-mix(in srgb, var(--st-ice) 32%, #1a2230);
+  background:
+    radial-gradient(ellipse 70% 40% at 50% -8%, rgba(40, 90, 160, 0.28), transparent 55%),
+    #07090f;
   min-height: 28rem;
+  box-shadow: inset 0 0 0 1px rgba(154, 212, 255, 0.06);
+}
+
+.st-stage-toolbar {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  justify-content: flex-end;
+  max-width: calc(100% - 1.5rem);
+}
+
+.st-modes,
+.st-mod-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  justify-content: flex-end;
 }
 
 .st-stage {
   position: relative;
   width: 100%;
-  height: min(72vh, 40rem);
-  min-height: 26rem;
+  height: min(68vh, 38rem);
+  min-height: 24rem;
 }
 
 .st-stage canvas {
@@ -97,17 +182,37 @@ body.plan-station {
   object-fit: cover;
 }
 
+.st-pick-hud {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  margin: 0;
+  padding: 0.35rem 0.65rem;
+  transform: translate(-50%, -140%);
+  border-radius: 0.4rem;
+  border: 1px solid color-mix(in srgb, var(--st-gold) 45%, transparent);
+  background: rgba(6, 8, 14, 0.82);
+  color: var(--st-hull);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
 .st-hud {
   position: absolute;
   left: 1rem;
   bottom: 1rem;
   z-index: 2;
-  max-width: min(28rem, calc(100% - 2rem));
-  padding: 0.85rem 1rem 1rem;
-  border-radius: 0.85rem;
-  background: rgba(8, 10, 16, 0.72);
-  border: 1px solid rgba(255, 210, 120, 0.28);
-  backdrop-filter: blur(10px);
+  max-width: min(18rem, calc(100% - 2rem));
+  padding: 0.7rem 0.85rem 0.85rem;
+  border-radius: 0.55rem;
+  background: rgba(6, 8, 14, 0.78);
+  border: 1px solid color-mix(in srgb, var(--st-ice) 28%, transparent);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(8px);
 }
 
 .st-hud__kicker {
@@ -122,15 +227,16 @@ body.plan-station {
 .st-hud__title {
   margin: 0 0 0.2rem;
   font-family: Fraunces, Georgia, serif;
-  font-size: 1.35rem;
+  font-size: 1.25rem;
   font-weight: 560;
+  color: var(--st-hull);
 }
 
 .st-hud__meta,
 .st-hud__blurb {
   margin: 0;
   font-size: 0.88rem;
-  color: var(--plan-muted);
+  color: var(--st-muted);
 }
 
 .st-hud__blurb {
@@ -163,7 +269,7 @@ body.plan-station {
   display: block;
   width: 100%;
   height: auto;
-  max-height: 22rem;
+  max-height: 18rem;
   object-fit: cover;
 }
 
@@ -171,13 +277,13 @@ body.plan-station {
   margin: 0;
   padding: 0.45rem 0.7rem 0.55rem;
   font-size: 0.72rem;
-  color: var(--plan-muted);
+  color: var(--st-muted);
 }
 
 .st-display__note {
   margin: 0.75rem 0 0;
   font-size: 0.78rem;
-  color: var(--plan-muted);
+  color: var(--st-muted);
 }
 
 .st-rack.is-hw {
@@ -195,15 +301,13 @@ body.plan-station {
   color: var(--st-gold);
 }
 
-.st-modes {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  z-index: 2;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  justify-content: flex-end;
+.plan-station .pw-btn:focus-visible,
+.st-mod:focus-visible,
+.st-person:focus-visible,
+.st-person__select:focus-visible,
+.st-pass:focus-visible {
+  outline: 2px solid var(--st-ice);
+  outline-offset: 2px;
 }
 
 .st-section-title {
@@ -220,6 +324,18 @@ body.plan-station {
   margin: 0 0 2rem;
 }
 
+.st-dock-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0 0 0.75rem;
+}
+
+.st-dock-filters .pw-btn {
+  font-size: 0.78rem;
+  padding: 0.28rem 0.65rem;
+}
+
 .st-mod {
   text-align: left;
   padding: 0.75rem 0.8rem 0.8rem;
@@ -230,10 +346,12 @@ body.plan-station {
   cursor: pointer;
 }
 
-.st-mod:hover,
-.st-mod:focus-visible {
+.st-mod.is-walk {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--st-ice) 45%, transparent);
+}
+
+.st-mod:hover {
   border-color: rgba(255, 210, 120, 0.55);
-  outline: none;
 }
 
 .st-mod.is-on {
@@ -242,24 +360,73 @@ body.plan-station {
 }
 
 .st-mod__partner {
-  display: block;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
   font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--plan-muted);
+  color: var(--st-muted);
+}
+
+.st-mod__partner::before {
+  content: '';
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--st-partner-structure);
+  flex-shrink: 0;
+}
+
+.st-mod[data-partner='NASA'] .st-mod__partner::before,
+.st-mod[data-partner='NASA / ESA'] .st-mod__partner::before {
+  background: var(--st-partner-nasa);
+}
+
+.st-mod[data-partner='Roscosmos'] .st-mod__partner::before {
+  background: var(--st-partner-ros);
+}
+
+.st-mod[data-partner='ESA'] .st-mod__partner::before {
+  background: var(--st-partner-esa);
+}
+
+.st-mod[data-partner='JAXA'] .st-mod__partner::before {
+  background: var(--st-partner-jaxa);
+}
+
+.st-mod[data-partner='CSA'] .st-mod__partner::before {
+  background: var(--st-partner-csa);
+}
+
+.st-mod.is-structure .st-mod__partner::before {
+  background: var(--st-partner-structure);
+}
+
+.st-mod__walk {
+  display: inline-block;
+  padding: 0.05rem 0.35rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--st-ice) 55%, transparent);
+  color: var(--st-ice);
+  letter-spacing: 0.08em;
+  font-size: 0.58rem;
 }
 
 .st-mod__name {
   display: block;
-  font-weight: 650;
+  font-family: Fraunces, Georgia, serif;
+  font-weight: 560;
   margin: 0.15rem 0 0.2rem;
+  color: var(--st-hull);
 }
 
 .st-mod__fn {
   display: block;
   font-size: 0.78rem;
-  color: var(--plan-muted);
+  color: var(--st-muted);
 }
 
 .st-crew {
@@ -270,21 +437,35 @@ body.plan-station {
 }
 
 .st-person {
-  display: grid;
-  grid-template-columns: 4.2rem 1fr;
-  gap: 0.75rem;
-  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
   text-align: left;
   padding: 0.7rem;
   border-radius: 0.85rem;
   border: 1px solid var(--plan-line);
   background: var(--plan-glass);
   color: inherit;
-  cursor: pointer;
 }
 
 .st-person.is-on {
   border-color: var(--st-ice);
+}
+
+.st-person__select {
+  display: grid;
+  grid-template-columns: 4.2rem 1fr;
+  gap: 0.75rem;
+  align-items: center;
+  width: 100%;
+  cursor: pointer;
+  color: inherit;
+  text-align: left;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font: inherit;
 }
 
 .st-person__photo {
@@ -303,23 +484,26 @@ body.plan-station {
 .st-person__meta {
   display: block;
   font-size: 0.8rem;
-  color: var(--plan-muted);
+  color: var(--st-muted);
 }
 
 .st-display {
   display: grid;
   gap: 0.75rem;
-  margin: 0 0 2rem;
+  margin: 0;
   padding: 1rem 1.1rem;
   border-radius: 0.9rem;
-  border: 1px solid var(--plan-line);
+  border: 1px solid color-mix(in srgb, var(--st-ice) 22%, var(--plan-line));
   background: linear-gradient(180deg, rgba(18, 28, 42, 0.7), rgba(8, 10, 16, 0.55));
+  min-width: 0;
 }
 
 .st-display__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
   gap: 0.65rem;
+  max-height: min(42vh, 28rem);
+  overflow: auto;
 }
 
 .st-rack {
@@ -342,11 +526,17 @@ body.plan-station {
 }
 
 .st-tour {
-  margin: 0 0 2rem;
-  padding: 1rem 1.15rem 1.15rem;
-  border-radius: 1rem;
+  margin: 0;
+  padding: 0.85rem 1rem 1rem;
+  border-radius: 0.85rem;
   border: 1px solid var(--plan-line);
   background: var(--plan-glass);
+}
+
+.st-tour--caption {
+  position: sticky;
+  bottom: 0.5rem;
+  z-index: 1;
 }
 
 .st-tour__stage {
@@ -356,11 +546,39 @@ body.plan-station {
   align-items: center;
 }
 
+.st-tour__title {
+  margin: 0.1rem 0 0;
+  font-family: Fraunces, Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 560;
+}
+
 .st-who__photo {
-  width: 5.5rem;
-  height: 5.5rem;
+  width: 4.5rem;
+  height: 4.5rem;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid color-mix(in srgb, var(--st-ok) 45%, transparent);
+  transition: box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.st-who.is-speaking .st-who__photo {
+  border-color: var(--st-gold);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--st-gold) 35%, transparent),
+    0 0 22px color-mix(in srgb, var(--st-gold) 40%, transparent);
+  animation: st-speak-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes st-speak-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--st-gold) 30%, transparent),
+      0 0 16px color-mix(in srgb, var(--st-gold) 28%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--st-gold) 45%, transparent),
+      0 0 28px color-mix(in srgb, var(--st-gold) 50%, transparent);
+  }
 }
 
 .st-tour__kicker {
@@ -373,7 +591,7 @@ body.plan-station {
 
 .st-tour__line {
   margin: 0.35rem 0 0.75rem;
-  font-size: 1.05rem;
+  font-size: 0.98rem;
 }
 
 .st-tour__controls {
@@ -386,7 +604,7 @@ body.plan-station {
 .st-tour__status {
   margin: 0.55rem 0 0;
   font-size: 0.78rem;
-  color: var(--plan-muted);
+  color: var(--st-muted);
 }
 
 .st-passes {
@@ -409,19 +627,132 @@ body.plan-station {
   border: 1px solid var(--plan-line);
   background: transparent;
   color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.35rem 0.75rem;
+}
+
+.st-pass:hover {
+  border-color: color-mix(in srgb, var(--st-ice) 55%, var(--plan-line));
+}
+
+.st-pass__sky {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--st-ice);
+  white-space: nowrap;
+}
+
+.st-carl {
+  margin: 0 0 1.75rem;
+  padding: 0.95rem 1.05rem 1.05rem;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--st-gold) 28%, var(--st-ice));
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--st-ice) 10%, transparent), transparent 42%),
+    var(--plan-glass);
+}
+
+.st-carl__lead {
+  margin: 0 0 0.7rem;
+  color: var(--st-muted);
+  font-size: 0.88rem;
+}
+
+.st-person__body {
+  min-width: 0;
+}
+
+.st-person__wiki {
+  display: inline-block;
+  margin-left: calc(4.2rem + 0.75rem);
+  margin-top: 0.1rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 0.72rem;
+  color: var(--st-ice);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.st-rack.is-hw {
+  cursor: pointer;
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  width: 100%;
+  text-align: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st-who.is-speaking .st-who__photo {
+    animation: none;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .st-desk {
+    grid-template-columns: 1fr;
+  }
+
+  .st-display__grid {
+    max-height: none;
+  }
 }
 
 @media (max-width: 719.98px) {
   .st-stage {
-    height: 70vh;
-    min-height: 22rem;
+    height: 58vh;
+    min-height: 20rem;
   }
-  .st-modes {
+
+  .st-stage-toolbar {
     position: static;
-    padding: 0.65rem;
+    padding: 0.55rem 0.65rem 0;
+    max-width: none;
     justify-content: flex-start;
   }
+
+  .st-live--ticker {
+    position: static;
+    margin: 0.45rem 0.65rem 0;
+  }
+
+  .st-hud {
+    max-width: min(16rem, calc(100% - 1.5rem));
+    left: 0.65rem;
+    bottom: 0.65rem;
+    padding: 0.55rem 0.7rem 0.7rem;
+  }
+
+  .st-hud__blurb {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .st-hud.is-expanded .st-hud__blurb {
+    display: block;
+    -webkit-line-clamp: unset;
+  }
+
   .st-tour__stage {
     grid-template-columns: 1fr;
+  }
+
+  .st-tour--caption {
+    position: static;
+  }
+
+  .st-who__photo {
+    width: 3.75rem;
+    height: 3.75rem;
   }
 }

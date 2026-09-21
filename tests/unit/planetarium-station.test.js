@@ -175,18 +175,49 @@ describe('station page wiring', () => {
 
   test('page, CSS, scene, and menu exist', () => {
     expect(page).toContain('plan-station');
+    expect(page).toContain('st-desk');
+    expect(page).toContain('stLive');
+    expect(page).toContain('stPickHud');
     expect(page).toContain('stEnterModule');
+    expect(page).toContain('Look inside');
+    expect(page).toContain('viewport-fit=cover');
+    expect(page).toContain('aria-controls="stDock"');
+    expect(page).toContain('aria-live="polite"');
     expect(page).toContain('stPhoto');
+    expect(page).toContain('st-carl');
+    expect(page).not.toContain('sx-carl');
+    expect(page).toContain('stDockFilters');
+    expect(page).toContain('data-dock-filter="walk"');
+    expect(page).not.toMatch(/href="\/planetarium\/station\.html"[^>]*>[\s\S]*ISS/);
     expect(js).toContain('/api/planetarium/station');
     expect(js).toContain('iss-interiors.json');
     expect(js).toContain('stEnterModule');
     expect(js).toContain('Escape');
+    expect(js).toContain('Watch in sky');
+    expect(js).toContain('buildPlanetariumUrl');
+    expect(js).toContain('setDockFilter');
+    expect(js).toContain('aria-pressed');
+    expect(js).toContain('data-crew-wiki');
+    expect(js).toMatch(/createElement\('a'\)[\s\S]*data-crew-wiki|setAttribute\('data-crew-wiki'/);
+    expect(js).toContain('onHover');
+    expect(css).toContain('.st-desk');
     expect(css).toContain('.st-stage');
+    expect(css).toContain('.st-live--ticker');
+    expect(css).toContain('.st-pick-hud');
     expect(css).toContain('.st-photo');
+    expect(css).toContain('.st-carl');
+    expect(css).toContain('.st-dock-filters');
+    expect(css).toContain('.st-who.is-speaking');
     expect(scene).toContain('createStationScene');
     expect(scene).toContain('setInteriorsCatalog');
     expect(scene).toContain('prefers-reduced-motion');
     expect(scene).toContain('dispose');
+    expect(scene).toContain('setKeepAlive');
+    expect(scene).toContain('onHover');
+    expect(scene).toContain('TorusGeometry');
+    expect(scene).toContain('HemisphereLight');
+    expect(scene).toContain('walkRim');
+    expect(scene).toContain('aria-label');
     expect(interiorsJs).toContain('BackSide');
     expect(interiorsJs).toContain('createInteriorManager');
     expect(menu).toContain('/planetarium/station.html');
@@ -202,6 +233,20 @@ describe('station page wiring', () => {
     ['destiny', 'harmony', 'columbus', 'kibo', 'cupola', 'zvezda'].forEach((id) => {
       expect(rooms).toContain(id);
     });
+  });
+
+  test('tour=1 deep link plays after load', () => {
+    const tourJs = fs.readFileSync(
+      path.join(process.cwd(), 'public', 'planetarium', 'js', 'planetarium-station-tour.js'),
+      'utf8'
+    );
+    expect(tourJs).toContain("get('tour') === '1'");
+    expect(tourJs).toMatch(/tour'\) === '1'[\s\S]*play\(/);
+    expect(tourJs).toContain('setSpeaking(false)');
+    expect(tourJs).toContain('scrollStageIntoView');
+    expect(tourJs).toContain('stStage');
+    expect(tourJs).toContain('setKeepAlive');
+    expect(tourJs).toContain('reducedMotion()');
   });
 });
 
