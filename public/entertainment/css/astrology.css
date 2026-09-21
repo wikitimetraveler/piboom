@@ -1049,6 +1049,7 @@ body.astro-page modern-navbar {
     radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--as-rose) 18%, transparent), transparent 55%),
     rgba(18, 10, 16, 0.78);
   border: 1px solid color-mix(in srgb, var(--as-rose) 40%, var(--as-gold));
+  position: relative;
 }
 
 .astro-spread__head {
@@ -1059,6 +1060,75 @@ body.astro-page modern-navbar {
 .astro-spread__head h2 {
   font-family: var(--as-serif);
   margin: 0.2rem 0 0.35rem;
+}
+
+.astro-spread__status {
+  margin: 0.35rem 0 0;
+  min-height: 1.25em;
+  font-size: 0.88rem;
+  color: color-mix(in srgb, var(--as-gold) 75%, var(--as-muted));
+}
+
+.astro-deck-pile {
+  position: relative;
+  width: min(7.2rem, 28vw);
+  height: 10.4rem;
+  margin: 0.35rem auto 1.1rem;
+  perspective: 900px;
+  pointer-events: none;
+}
+
+.astro-deck-pile[hidden] {
+  display: none !important;
+}
+
+.astro-deck-sheet {
+  position: absolute;
+  inset: 0;
+  border-radius: 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--as-gold) 45%, var(--as-rose));
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+  background:
+    radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--as-rose) 55%, transparent) 0 18%, transparent 19%),
+    repeating-linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--as-rose-deep) 70%, #1a0e14) 0 6px,
+      color-mix(in srgb, var(--as-night) 80%, #2a1520) 6px 12px
+    ),
+    linear-gradient(160deg, #2a121c, #120a12 58%, #1c1018);
+  transform-origin: center center;
+}
+
+.astro-deck-sheet::after {
+  content: "";
+  position: absolute;
+  inset: 0.45rem;
+  border-radius: 0.4rem;
+  border: 1px solid color-mix(in srgb, var(--as-gold) 55%, transparent);
+  background:
+    radial-gradient(circle at 50% 48%, color-mix(in srgb, var(--as-gold) 35%, transparent), transparent 55%),
+    linear-gradient(180deg, transparent 40%, color-mix(in srgb, var(--as-rose) 22%, transparent));
+  opacity: 0.9;
+}
+
+.astro-deck-flyer {
+  position: fixed;
+  z-index: 40;
+  width: 7.2rem;
+  height: 10.4rem;
+  border-radius: 0.65rem;
+  pointer-events: none;
+  will-change: transform, left, top;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.4);
+  background:
+    radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--as-rose) 55%, transparent) 0 18%, transparent 19%),
+    repeating-linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--as-rose-deep) 70%, #1a0e14) 0 6px,
+      color-mix(in srgb, var(--as-night) 80%, #2a1520) 6px 12px
+    ),
+    linear-gradient(160deg, #2a121c, #120a12 58%, #1c1018);
+  border: 1px solid color-mix(in srgb, var(--as-gold) 45%, var(--as-rose));
 }
 
 .astro-spread__rail {
@@ -1074,12 +1144,122 @@ body.astro-page modern-navbar {
   text-transform: uppercase;
   font-size: 0.72rem;
   color: color-mix(in srgb, var(--as-gold) 70%, var(--as-rose));
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.astro-spread-card--tarot.is-dealt .astro-spread-card__role,
+.astro-spread-card--tarot.is-revealed .astro-spread-card__role {
+  opacity: 1;
+}
+
+.astro-spread-card--tarot.is-pending {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.astro-spread-card--tarot.is-dealt:not(.is-revealed) {
+  opacity: 1;
+  visibility: visible;
+}
+
+.astro-tarot-deck-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 16rem;
+  cursor: default;
+  background:
+    radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--as-rose) 40%, transparent) 0 16%, transparent 17%),
+    repeating-linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--as-rose-deep) 65%, #1a0e14) 0 7px,
+      color-mix(in srgb, var(--as-night) 78%, #2a1520) 7px 14px
+    ),
+    linear-gradient(165deg, #2c131d, #100a12 55%, #1a1018) !important;
+  border-color: color-mix(in srgb, var(--as-gold) 50%, var(--as-rose)) !important;
+}
+
+.astro-tarot-deck-back__mark {
+  display: grid;
+  gap: 0.35rem;
+  justify-items: center;
+  text-align: center;
+  padding: 0.75rem;
+  border-radius: 999px;
+  width: 5.5rem;
+  height: 5.5rem;
+  place-content: center;
+  border: 1px solid color-mix(in srgb, var(--as-gold) 55%, transparent);
+  background: radial-gradient(circle, color-mix(in srgb, var(--as-rose) 28%, transparent), transparent 70%);
+  color: var(--as-gold);
+  font-family: var(--as-serif);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+}
+
+.astro-tarot-deck-back__rose {
+  font-size: 1.35rem;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.astro-spread-card--tarot.is-revealed .astro-flip__inner {
+  transform: rotateY(180deg);
+}
+
+.astro-spread-card--tarot:not(.is-revealed) .astro-flip__back,
+.astro-spread-card--tarot.is-revealed .astro-flip__front {
+  pointer-events: none;
+}
+
+.astro-spread-card--tarot.is-revealed .astro-flip__back {
+  pointer-events: auto;
 }
 
 .astro-spread-card--tarot .astro-tarot-art {
   max-height: 210px;
   width: auto;
+  max-width: 100%;
   margin: 0 auto;
+  aspect-ratio: auto;
+  height: auto;
+}
+
+.astro-tarot-revealed {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.45rem;
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  overflow: auto;
+}
+
+.astro-tarot-oracle {
+  display: none;
+  margin-top: 0.75rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid color-mix(in srgb, var(--as-gold) 28%, transparent);
+}
+
+.astro-spread-card--tarot.is-reading .astro-tarot-oracle {
+  display: block;
+}
+
+.astro-spread-card--tarot.is-reading .astro-tarot-art {
+  max-height: 140px;
+}
+
+.astro-spread.is-ceremony .astro-ask--spread {
+  opacity: 0.45;
+  pointer-events: none;
 }
 
 .astro-ask--spread {
@@ -1269,5 +1449,14 @@ body.astro-page modern-navbar {
 @media (prefers-reduced-motion: reduce) {
   .astro-flip__inner {
     transition: none !important;
+  }
+
+  .astro-spread-card__role {
+    transition: none !important;
+    opacity: 1;
+  }
+
+  .astro-deck-pile {
+    display: none !important;
   }
 }

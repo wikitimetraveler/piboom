@@ -381,25 +381,64 @@
     return Z.signForDate(new Date()) || Z.SIGNS[0];
   }
 
+  function spreadOracleMarkup(card) {
+    const view = localizeCard(card) || card;
+    const ask = i18n()?.lang?.() === 'vi'
+      ? `Đọc ${card.name} giúp tôi`
+      : card.askRose;
+    return `
+      <div class="astro-flip__meta">
+        <span class="astro-chip">${esc(view.suitLabel || card.suitLabel || card.suit)}</span>
+        <span class="astro-chip">${esc(view.keyword || card.keyword)}</span>
+      </div>
+      <p class="astro-flip__oracle">${esc(view.oracle)}</p>
+      <p class="astro-flip__gift"><strong>${esc(t('giftLabel', 'Gift.'))}</strong> ${esc(view.gift)}</p>
+      <p class="astro-flip__shadow"><strong>${esc(t('watchLabel', 'Watch.'))}</strong> ${esc(view.shadow)}</p>
+      <ul class="astro-traits">${(view.traits || card.traits || []).map((trait) => `<li>${esc(trait)}</li>`).join('')}</ul>
+      <div class="astro-flip__actions">
+        <button type="button" class="astro-ask" data-ask-rose="${esc(ask)}">${esc(t('askRose', 'Ask Rose'))}</button>
+        <button type="button" data-spread-oracle-hide>${esc(t('hideReading', 'Hide reading'))}</button>
+      </div>`;
+  }
+
   function tarotSpreadCardMarkup(role, card) {
     if (!card) return '';
     const view = localizeCard(card) || card;
-    return `<article class="astro-flip astro-spread-card astro-spread-card--tarot" data-arcana="${card.id}" data-tarot-suit="${card.suit}" data-role="${role}">
+    return `<article class="astro-flip astro-spread-card astro-spread-card--tarot is-pending" data-arcana="${card.id}" data-tarot-suit="${card.suit}" data-role="${role}" data-phase="back">
       <p class="astro-spread-card__role">${esc(role)}</p>
       <div class="astro-flip__inner">
-        <button type="button" class="astro-flip__face astro-flip__front astro-tarot-front" data-spread-tarot-flip aria-expanded="false">
+        <div class="astro-flip__face astro-flip__front astro-tarot-deck-back" aria-hidden="true">
+          <div class="astro-tarot-deck-back__mark">
+            <span class="astro-tarot-deck-back__rose" aria-hidden="true">✦</span>
+            <span>${esc(t('deckBackMark', 'Rose'))}</span>
+          </div>
+        </div>
+        <button type="button" class="astro-flip__face astro-flip__back astro-tarot-front astro-tarot-revealed" data-spread-tarot-flip aria-expanded="false">
           ${tarotImage(card)}
           <div class="astro-tarot-front__meta">
             <span class="astro-chip">${esc(card.suit === 'major' ? card.roman : (view.suitLabel || card.suitLabel))}</span>
             <h3>${esc(view.name)}</h3>
             <p>${esc(view.keyword || card.keyword)}</p>
           </div>
+          <div class="astro-tarot-oracle" hidden>${spreadOracleMarkup(card)}</div>
         </button>
-        <div class="astro-flip__face astro-flip__back">
-          ${arcanaBackFace(card)}
-        </div>
       </div>
     </article>`;
+  }
+
+  function toggleSpreadReading(card, open) {
+    if (!card || !card.classList.contains('is-revealed')) return;
+    const next = typeof open === 'boolean' ? open : !card.classList.contains('is-reading');
+    card.classList.toggle('is-reading', next);
+    card.dataset.phase = next ? 'oracle' : 'art';
+    const oracle = card.querySelector('.astro-tarot-oracle');
+    if (oracle) oracle.hidden = !next;
+    card.querySelectorAll('[aria-expanded]').forEach((el) => el.setAttribute('aria-expanded', String(next)));
+    if (next && card.dataset.arcana && A) {
+      lastFlippedArcana = card.dataset.arcana;
+      const arcana = localizeCard(A.cardById(card.dataset.arcana)) || A.cardById(card.dataset.arcana);
+      if (arcana) speakOracle(arcana.oracle);
+    }
   }
 
   function tarotSpreadPrompt(spread) {
@@ -410,24 +449,33 @@
     return Z.spreadPrompt(spread);
   }
 
-  function renderSpread(spread) {
+  function renderSpread(spread, opts) {
     const table = $('astroSpread');
     const status = $('astroFinderStatus');
     if (!table || !spread) return;
+    if (window.AstrologyTarotCeremony?.cancel) {
+      window.AstrologyTarotCeremony.cancel();
+    }
     lastSpread = spread;
     table.hidden = false;
     table.dataset.ready = '1';
+    table.classList.remove('is-ceremony');
     const sunView = localizeSign(spread.sun) || spread.sun;
     const roleSit = t('roleSituation', 'Situation');
     const roleCross = t('roleCross', 'Cross');
     const rolePath = t('rolePath', 'Path');
+    const pileHtml = window.AstrologyTarotCeremony?.buildPileMarkup
+      ? window.AstrologyTarotCeremony.buildPileMarkup()
+      : '';
     table.innerHTML = `
       <header class="astro-spread__head">
         <p class="astro-kicker">${esc(t('spreadKicker', 'Rose · three-card draw'))}</p>
         <h2>${esc(t('spreadTitle', 'Situation · Cross · Path'))}</h2>
-        <p>${esc(t('spreadLead', 'Your birthday draw — tap a card to flip it.'))}
+        <p>${esc(t('spreadLead', 'Rose shuffles, deals face-down, then turns each card — tap one for her reading.'))}
           ${sunView ? ` · ${esc(t('sunSignLabel', 'Sun'))}: ${esc(sunView.name)}` : ''}</p>
+        <p class="astro-spread__status" data-spread-status></p>
       </header>
+      <div class="astro-deck-pile" id="astroDeckPile" aria-hidden="true">${pileHtml}</div>
       <div class="astro-spread__rail">
         ${tarotSpreadCardMarkup(roleSit, spread.situation)}
         ${tarotSpreadCardMarkup(roleCross, spread.cross)}
@@ -444,8 +492,34 @@
       selectSign(spread.sun.id, { reading: true, dob: spread.birthDate, syncUrl: true });
     }
     setStageCollapsed(true);
-    const cards = table.querySelectorAll('.astro-spread-card');
-    gsapTween(cards, { y: 28, opacity: 0, duration: 0.7, stagger: 0.12, ease: 'power3.out', clearProps: 'all' });
+
+    const skipCeremony = opts && opts.skipCeremony;
+    if (skipCeremony) {
+      if (window.AstrologyTarotCeremony?.finishInstant) {
+        window.AstrologyTarotCeremony.finishInstant(table);
+      } else {
+        table.querySelectorAll('.astro-spread-card--tarot').forEach((card) => {
+          card.classList.remove('is-pending');
+          card.classList.add('is-dealt', 'is-revealed');
+          card.dataset.phase = 'art';
+        });
+        const pile = table.querySelector('#astroDeckPile');
+        if (pile) pile.hidden = true;
+      }
+      return;
+    }
+
+    if (window.AstrologyTarotCeremony?.play) {
+      window.AstrologyTarotCeremony.play(table, { seed: spread.seed });
+    } else {
+      table.querySelectorAll('.astro-spread-card--tarot').forEach((card) => {
+        card.classList.remove('is-pending');
+        card.classList.add('is-dealt', 'is-revealed');
+        card.dataset.phase = 'art';
+      });
+      const pile = table.querySelector('#astroDeckPile');
+      if (pile) pile.hidden = true;
+    }
   }
 
   function dealReading(dobParts) {
@@ -512,6 +586,13 @@
         askRose(ask.getAttribute('data-ask-rose'));
         return;
       }
+      const hideOracle = event.target.closest('[data-spread-oracle-hide]');
+      if (hideOracle) {
+        event.preventDefault();
+        event.stopPropagation();
+        toggleSpreadReading(hideOracle.closest('.astro-spread-card--tarot'), false);
+        return;
+      }
       const unflip = event.target.closest('.astro-unflip');
       if (unflip) {
         event.preventDefault();
@@ -536,8 +617,12 @@
       const spreadTarotFlip = event.target.closest('[data-spread-tarot-flip]');
       if (spreadTarotFlip) {
         event.preventDefault();
-        const card = spreadTarotFlip.closest('.astro-flip');
-        flipCard(card);
+        const card = spreadTarotFlip.closest('.astro-spread-card--tarot');
+        if (!card || !card.classList.contains('is-revealed')) return;
+        document.querySelectorAll('.astro-spread-card--tarot.is-reading').forEach((other) => {
+          if (other !== card) toggleSpreadReading(other, false);
+        });
+        toggleSpreadReading(card);
         return;
       }
       const arcanaFlip = event.target.closest('[data-arcana-flip]');
@@ -708,7 +793,7 @@
     applyFilter();
     applyTarotFilter();
     if (selectedId) selectSign(selectedId, { syncUrl: false });
-    if (lastSpread) renderSpread(lastSpread);
+    if (lastSpread) renderSpread(lastSpread, { skipCeremony: true });
   }
 
   function init() {
@@ -796,6 +881,9 @@
 
   window.addEventListener('pagehide', () => {
     if (skyRaf) cancelAnimationFrame(skyRaf);
+    if (window.AstrologyTarotCeremony?.cancel) {
+      window.AstrologyTarotCeremony.cancel();
+    }
   });
 
   window.AstrologyPage = {

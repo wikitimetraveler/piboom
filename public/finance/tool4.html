@@ -615,17 +615,19 @@
                         <div id="videoStatus" class="small text-muted mt-2" role="status" aria-live="polite">No video loaded.</div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="ruleOutput">Field Definitions</label>
-                        <div class="helper-note mb-1">JSON from vision, paste, or manual edits does not get the rule-box placeholder formula. Use the Rule name / description fields above when you want that placeholder on <code>CX.R.*</code> fields, or paste Unit Test output for real logic.</div>
-                        <textarea class="form-control" id="ruleOutput" rows="8" placeholder="Tab-separated field rows appear here as you type the rule name…"></textarea>
+                        <label class="form-label" for="ruleOutput">Field Definitions (editable)</label>
+                        <div class="helper-note mb-1">Type or paste tab-separated field rows here. JSON from vision, paste, or manual edits does not get the rule-box placeholder formula. Use the Rule name / description fields above when you want that placeholder on <code>CX.R.*</code> fields, or paste Unit Test output for real logic.</div>
+                        <textarea class="form-control" id="ruleOutput" rows="8" spellcheck="false" placeholder="Tab-separated field rows appear here as you type the rule name…"></textarea>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="ADOoutput">Generated JSON (New)</label>
-                        <textarea class="form-control" id="ADOoutput" rows="8" placeholder="Generated JSON appears here…"></textarea>
+                        <label class="form-label" for="ADOoutput">Generated JSON (New) (editable)</label>
+                        <div class="helper-note mb-1">Edit this JSON before Copy or Create Fields. Regenerates when Field Definitions change or you click Parse Pasted Content.</div>
+                        <textarea class="form-control" id="ADOoutput" rows="8" spellcheck="false" placeholder="Generated JSON appears here…"></textarea>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="ADOupdateOutput">Generated JSON (Modify)</label>
-                        <textarea class="form-control" id="ADOupdateOutput" rows="6" placeholder="Modify rows JSON appears here…"></textarea>
+                        <label class="form-label" for="ADOupdateOutput">Generated JSON (Modify) (editable)</label>
+                        <div class="helper-note mb-1">Edit this JSON before Copy or Update Fields. Regenerates with the New JSON when Field Definitions change.</div>
+                        <textarea class="form-control" id="ADOupdateOutput" rows="6" spellcheck="false" placeholder="Modify rows JSON appears here…"></textarea>
                     </div>
                     <div class="d-flex flex-wrap gap-2">
                         <button type="button" class="btn btn-outline-primary" id="parsePastedBtn" title="Parse pasted field definition rows into JSON">
@@ -915,7 +917,7 @@
 
             const rules = [
                 [`[${processedInput.toUpperCase()}]`, "New", ruleIndicatorFieldType, `${appendParam || inputParam} Rule${isIneligibleAudit ? ' - Auto Decline' : ''}`, "N"],
-                [`[${processedInput.replace(".R.", ".O.").toUpperCase()}]`, "New", "String(16)", `${appendParam || inputParam} Override`, "N"],
+                [`[${processedInput.replace(".R.", ".O.").toUpperCase()}]`, "New", "String(35)", `${appendParam || inputParam} Override`, "N"],
                 [`[${processedInput.replace(".R.", ".O.").toUpperCase()}.BY]`, "New", "String(128)", `${appendParam || inputParam} Override By`, "N"],
                 [`[${processedInput.replace(".R.", ".O.").toUpperCase()}.DT]`, "New", "String(40)", `${appendParam || inputParam} Override Date`, "N"],
                 [`[${processedInput.replace(".R.", ".O.").toUpperCase()}.RN]`, "New", "String(256)", `${appendParam || inputParam} Override Reason`, "N"]
