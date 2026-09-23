@@ -180,6 +180,9 @@ describe('station page wiring', () => {
     expect(page).toContain('stPickHud');
     expect(page).toContain('stEnterModule');
     expect(page).toContain('Look inside');
+    expect(page).toContain('stFullscreenStage');
+    expect(page).toContain('stFullscreenDisplay');
+    expect(page).toContain('stChromeToggle');
     expect(page).toContain('viewport-fit=cover');
     expect(page).toContain('aria-controls="stDock"');
     expect(page).toContain('aria-live="polite"');
@@ -193,6 +196,11 @@ describe('station page wiring', () => {
     expect(js).toContain('iss-interiors.json');
     expect(js).toContain('stEnterModule');
     expect(js).toContain('Escape');
+    expect(js).toContain('requestFullscreen');
+    expect(js).toContain('is-st-chrome-hidden');
+    expect(js).toContain('stFullscreenStage');
+    expect(js).toContain('stFullscreenDisplay');
+    expect(js).toContain('stChromeToggle');
     expect(js).toContain('Watch in sky');
     expect(js).toContain('buildPlanetariumUrl');
     expect(js).toContain('setDockFilter');
@@ -208,10 +216,14 @@ describe('station page wiring', () => {
     expect(css).toContain('.st-carl');
     expect(css).toContain('.st-dock-filters');
     expect(css).toContain('.st-who.is-speaking');
+    expect(css).toContain('is-st-chrome-hidden');
+    expect(css).toContain(':fullscreen');
+    expect(css).toContain('.st-chrome-dock');
     expect(scene).toContain('createStationScene');
     expect(scene).toContain('setInteriorsCatalog');
     expect(scene).toContain('prefers-reduced-motion');
     expect(scene).toContain('dispose');
+    expect(scene).toContain('resize');
     expect(scene).toContain('setKeepAlive');
     expect(scene).toContain('onHover');
     expect(scene).toContain('TorusGeometry');

@@ -676,6 +676,7 @@ export function createStationScene(container, opts = {}) {
       onHover = typeof fn === 'function' ? fn : () => {};
     },
     dispose,
+    resize,
     canvas: renderer.domElement,
   };
 }

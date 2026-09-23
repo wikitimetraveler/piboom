@@ -35,6 +35,11 @@
     passList: document.getElementById('stPassList'),
     passHeading: document.getElementById('stPassHeading'),
     stage: document.getElementById('stStage'),
+    stageBlock: document.getElementById('stStageBlock'),
+    display: document.getElementById('stDisplay'),
+    chromeToggle: document.getElementById('stChromeToggle'),
+    fsStage: document.getElementById('stFullscreenStage'),
+    fsDisplay: document.getElementById('stFullscreenDisplay'),
   };
 
   const state = {
@@ -49,6 +54,7 @@
     modulesBound: false,
     dockFilter: 'all',
     hoverId: '',
+    chromeHidden: false,
   };
 
   function escapeHtml(value) {
@@ -594,6 +600,84 @@
     }
   }
 
+  function fullscreenElement() {
+    return document.fullscreenElement || document.webkitFullscreenElement || null;
+  }
+
+  function isFullscreen(el) {
+    return Boolean(el && fullscreenElement() === el);
+  }
+
+  function syncFullscreenButtons() {
+    const stageOn = isFullscreen(els.stageBlock);
+    const displayOn = isFullscreen(els.display);
+    if (els.fsStage) {
+      els.fsStage.setAttribute('aria-pressed', String(stageOn));
+      const label = els.fsStage.querySelector('[data-fs-stage-label]');
+      if (label) label.textContent = stageOn ? 'Exit' : 'Fullscreen';
+      const icon = els.fsStage.querySelector('i');
+      if (icon) icon.className = stageOn ? 'bi bi-fullscreen-exit' : 'bi bi-fullscreen';
+      els.fsStage.title = stageOn ? 'Exit fullscreen' : 'Fullscreen station';
+    }
+    if (els.fsDisplay) {
+      els.fsDisplay.setAttribute('aria-pressed', String(displayOn));
+      const label = els.fsDisplay.querySelector('[data-fs-display-label]');
+      if (label) label.textContent = displayOn ? 'Exit' : 'Fullscreen';
+      const icon = els.fsDisplay.querySelector('i');
+      if (icon) icon.className = displayOn ? 'bi bi-fullscreen-exit' : 'bi bi-fullscreen';
+      els.fsDisplay.title = displayOn ? 'Exit fullscreen' : 'Fullscreen interior display';
+    }
+  }
+
+  async function toggleFullscreen(el) {
+    if (!el) return;
+    try {
+      if (isFullscreen(el)) {
+        if (document.exitFullscreen) await document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      } else if (el.requestFullscreen) {
+        await el.requestFullscreen();
+      } else if (el.webkitRequestFullscreen) {
+        el.webkitRequestFullscreen();
+      } else if (els.status) {
+        els.status.textContent = 'This browser cannot fill the screen.';
+      }
+    } catch (err) {
+      if (els.status) els.status.textContent = err?.message || 'Fullscreen was blocked.';
+    }
+    syncFullscreenButtons();
+    resizeScene();
+  }
+
+  function resizeScene() {
+    const scene = window.PlanetariumStationScene;
+    if (scene && typeof scene.resize === 'function') {
+      window.requestAnimationFrame(() => scene.resize());
+    }
+  }
+
+  function syncChromeToggle() {
+    const on = state.chromeHidden;
+    document.body.classList.toggle('is-st-chrome-hidden', on);
+    if (els.chromeToggle) {
+      els.chromeToggle.setAttribute('aria-pressed', String(on));
+      const label = els.chromeToggle.querySelector('[data-chrome-label]');
+      if (label) label.textContent = on ? 'Show chrome' : 'Hide chrome';
+      const icon = els.chromeToggle.querySelector('i');
+      if (icon) icon.className = on ? 'bi bi-eye' : 'bi bi-eye-slash';
+      els.chromeToggle.title = on ? 'Show chrome (H)' : 'Hide chrome (H)';
+    }
+  }
+
+  function setChromeHidden(on) {
+    state.chromeHidden = Boolean(on);
+    syncChromeToggle();
+  }
+
+  function toggleChrome() {
+    setChromeHidden(!state.chromeHidden);
+  }
+
   function bind() {
     document.querySelectorAll('[data-mode]').forEach((btn) => {
       btn.addEventListener('click', () => setMode(btn.getAttribute('data-mode')));
@@ -632,16 +716,50 @@
         els.hud.classList.toggle('is-expanded');
       });
     }
+    if (els.chromeToggle) {
+      els.chromeToggle.addEventListener('click', toggleChrome);
+    }
+    if (els.fsStage) {
+      els.fsStage.addEventListener('click', () => toggleFullscreen(els.stageBlock));
+    }
+    if (els.fsDisplay) {
+      els.fsDisplay.addEventListener('click', () => toggleFullscreen(els.display));
+    }
+    document.addEventListener('fullscreenchange', () => {
+      syncFullscreenButtons();
+      resizeScene();
+    });
+    document.addEventListener('webkitfullscreenchange', () => {
+      syncFullscreenButtons();
+      resizeScene();
+    });
     document.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Escape' && state.mode === 'walk') {
-        setMode('orbit');
-        return;
-      }
       const tag = (ev.target && ev.target.tagName) || '';
       if (tag === 'INPUT' || tag === 'TEXTAREA' || ev.target?.isContentEditable) return;
+
+      if (ev.key === 'Escape') {
+        if (fullscreenElement()) return;
+        if (state.chromeHidden) {
+          setChromeHidden(false);
+          ev.preventDefault();
+          return;
+        }
+        if (state.mode === 'walk') {
+          setMode('orbit');
+          return;
+        }
+        return;
+      }
+
+      if (ev.key === 'h' || ev.key === 'H') {
+        toggleChrome();
+        return;
+      }
       if (ev.key === 'ArrowLeft') stepModule(-1);
       if (ev.key === 'ArrowRight') stepModule(1);
     });
+    syncChromeToggle();
+    syncFullscreenButtons();
   }
 
   function wireScene() {
