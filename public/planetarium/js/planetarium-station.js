@@ -109,6 +109,7 @@
     const aboard = (state.crew.people || []).length;
     const alt = now && Number.isFinite(Number(now.altKm)) ? Math.round(Number(now.altKm)) + ' km' : '—';
     const pos = now && Number.isFinite(Number(now.lat)) ? fmtCoord(now.lat, now.lon) : 'Waiting on TLE';
+    const age = tleAgeLabel(now);
     els.live.innerHTML =
       '<div class="st-stat"><span class="st-stat__kicker">Over Earth</span><strong>' +
       escapeHtml(pos) +
@@ -121,7 +122,42 @@
       ' crew</strong></div>' +
       '<div class="st-stat"><span class="st-stat__kicker">Modules</span><strong>' +
       state.modules.length +
+      '</strong></div>' +
+      '<div class="st-stat"><span class="st-stat__kicker">TLE age</span><strong>' +
+      escapeHtml(age) +
       '</strong></div>';
+  }
+
+  function tleAgeLabel(now) {
+    if (!now || !now.date) return 'stale';
+    const t = Date.parse(now.date);
+    if (!Number.isFinite(t)) return 'stale';
+    const s = Math.max(0, Math.round((Date.now() - t) / 1000));
+    if (s > 15 * 60) return 'stale';
+    if (s < 60) return s + 's';
+    const m = Math.floor(s / 60);
+    if (m < 60) return m + 'm';
+    return Math.floor(m / 60) + 'h';
+  }
+
+  function renderScale() {
+    const scale = document.getElementById('stScale');
+    const block = els.stageBlock || document.getElementById('stStageBlock');
+    if (block) {
+      block.classList.toggle('is-walk', state.mode === 'walk');
+      block.classList.toggle('is-cupola', state.mode === 'walk' && state.module === 'cupola');
+    }
+    if (!scale) return;
+    if (state.mode === 'walk') {
+      scale.textContent =
+        state.module === 'cupola'
+          ? 'Walk · 1 unit = 1 m · Earth below'
+          : 'Walk · 1 unit = 1 m · drag or arrow keys to look';
+    } else if (state.mode === 'explode') {
+      scale.textContent = 'Schematic · exploded · not to scale';
+    } else {
+      scale.textContent = 'Schematic view · not to scale · scroll to zoom';
+    }
   }
 
   function findInterior(id) {
@@ -206,10 +242,11 @@
     }
     if (els.hudHint) {
       els.hudHint.hidden = state.mode !== 'walk';
-      els.hudHint.textContent = 'Drag to look around · Esc returns to orbit';
+      els.hudHint.textContent = 'Drag or arrow keys to look around · Esc returns to orbit';
     }
     updateWalkControls(mod);
     renderPickHud(state.hoverId);
+    renderScale();
   }
 
   function renderPhoto(mod) {
@@ -540,10 +577,11 @@
   function updatePassHeading() {
     if (!els.passHeading) return;
     const label = state.observer.label || 'your location';
-    els.passHeading.textContent =
+    const base =
       label === 'Your location'
         ? 'Next passes over your location'
         : 'Next passes over ' + label;
+    els.passHeading.textContent = base + ' · coarse 30s sampling';
   }
 
   async function loadPasses() {
@@ -753,6 +791,18 @@
 
       if (ev.key === 'h' || ev.key === 'H') {
         toggleChrome();
+        return;
+      }
+      if (state.mode === 'walk') {
+        const scene = window.PlanetariumStationScene;
+        const look = { yaw: 0, pitch: 0 };
+        if (ev.key === 'ArrowLeft' || ev.key === 'a' || ev.key === 'A') look.yaw = 0.12;
+        else if (ev.key === 'ArrowRight' || ev.key === 'd' || ev.key === 'D') look.yaw = -0.12;
+        else if (ev.key === 'ArrowUp' || ev.key === 'w' || ev.key === 'W') look.pitch = 0.08;
+        else if (ev.key === 'ArrowDown' || ev.key === 's' || ev.key === 'S') look.pitch = -0.08;
+        else return;
+        if (scene && typeof scene.nudgeLook === 'function') scene.nudgeLook(look.yaw, look.pitch);
+        ev.preventDefault();
         return;
       }
       if (ev.key === 'ArrowLeft') stepModule(-1);

@@ -219,6 +219,38 @@ body.plan-station {
   white-space: nowrap;
 }
 
+.st-scale {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  z-index: 2;
+  margin: 0;
+  padding: 0.25rem 0.55rem;
+  border-radius: 0.4rem;
+  border: 1px solid color-mix(in srgb, var(--st-ice) 22%, transparent);
+  background: rgba(6, 8, 14, 0.72);
+  color: var(--st-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Walk mode: keep HUD clear of the look direction; Cupola pins top so nadir stays open */
+.st-stage-block.is-walk .st-hud {
+  max-width: min(16rem, calc(100% - 2rem));
+}
+
+.st-stage-block.is-walk.is-cupola .st-hud {
+  top: 3.4rem;
+  bottom: auto;
+  left: 0.75rem;
+}
+
+.st-stage-block.is-walk.is-cupola .st-scale {
+  bottom: 0.75rem;
+}
+
 .st-hud {
   position: absolute;
   left: 1rem;
@@ -628,6 +660,36 @@ body.plan-station {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
+}
+
+.st-tour__beats {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.st-tour__beats button {
+  appearance: none;
+  border: 1px solid var(--plan-line);
+  background: transparent;
+  color: inherit;
+  font-size: 0.72rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.st-tour__beats button.is-on {
+  border-color: var(--st-gold);
+  color: var(--st-gold);
+}
+
+.st-tour__beats button:focus-visible {
+  outline: 2px solid var(--st-ice);
+  outline-offset: 2px;
 }
 
 .st-tour__note,

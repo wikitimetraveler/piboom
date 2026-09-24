@@ -525,9 +525,29 @@ export function createStationScene(container, opts = {}) {
         orbit.phi = Math.max(-0.2, Math.min(1.15, orbit.phi - dy * 0.004));
       }
     }
-    const pick = pickModule(ev);
-    emitHover(pick.type === 'module' ? pick.id : '');
-    renderer.domElement.style.cursor = pick.id || pick.hw ? 'pointer' : dragging ? 'grabbing' : 'grab';
+    queueHover(ev);
+  }
+
+  let hoverQueued = false;
+  let hoverEv = null;
+  function queueHover(ev) {
+    hoverEv = ev;
+    if (hoverQueued) return;
+    hoverQueued = true;
+    window.requestAnimationFrame(() => {
+      hoverQueued = false;
+      const cur = hoverEv;
+      hoverEv = null;
+      if (!cur || disposed) return;
+      const pick = pickModule(cur);
+      emitHover(pick.type === 'module' ? pick.id : '');
+      renderer.domElement.style.cursor = pick.id || pick.hw ? 'pointer' : dragging ? 'grabbing' : 'grab';
+    });
+  }
+
+  function nudgeLook(dYaw, dPitch) {
+    look.yaw += Number(dYaw) || 0;
+    look.pitch = Math.max(-1.2, Math.min(1.2, look.pitch + (Number(dPitch) || 0)));
   }
   function onPointerUp(ev) {
     const moved = Math.hypot(ev.clientX - downX, ev.clientY - downY);
@@ -675,6 +695,7 @@ export function createStationScene(container, opts = {}) {
     onHover(fn) {
       onHover = typeof fn === 'function' ? fn : () => {};
     },
+    nudgeLook,
     dispose,
     resize,
     canvas: renderer.domElement,

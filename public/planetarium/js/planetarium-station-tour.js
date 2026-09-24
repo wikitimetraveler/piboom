@@ -27,7 +27,9 @@
     line: document.getElementById('stTourLine'),
     play: document.getElementById('stTourPlay'),
     pause: document.getElementById('stTourPause'),
+    prev: document.getElementById('stTourPrev'),
     next: document.getElementById('stTourNext'),
+    beats: document.getElementById('stTourBeats'),
     status: document.getElementById('stTourStatus'),
     zigzag: document.getElementById('stWhoZigzag'),
   };
@@ -94,6 +96,30 @@
     if (els.play) els.play.setAttribute('aria-pressed', playing ? 'true' : 'false');
     if (els.pause) els.pause.disabled = !playing;
     if (els.next) els.next.disabled = index >= beats().length - 1 && !playing;
+    if (els.prev) els.prev.disabled = index <= 0 && !playing;
+    renderBeats();
+  }
+
+  function renderBeats() {
+    if (!els.beats) return;
+    const list = beats();
+    els.beats.replaceChildren();
+    list.forEach((beat, i) => {
+      const li = document.createElement('li');
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.dataset.beat = String(i);
+      const label = moduleLabel(beat) || 'Beat ' + (i + 1);
+      btn.textContent = label;
+      btn.setAttribute('aria-label', 'Go to ' + label + ' (beat ' + (i + 1) + ' of ' + list.length + ')');
+      if (i === index) {
+        btn.classList.add('is-on');
+        btn.setAttribute('aria-current', 'true');
+      }
+      btn.addEventListener('click', () => goTo(i));
+      li.appendChild(btn);
+      els.beats.appendChild(li);
+    });
   }
 
   async function speakBeat(beat, isCancelled) {
@@ -179,6 +205,33 @@
     cueStation(list[index]);
   }
 
+  function prev() {
+    const list = beats();
+    if (!list.length) return;
+    const wasPlaying = playing;
+    const prevIndex = Math.max(index - 1, 0);
+    if (wasPlaying) {
+      playFrom(prevIndex);
+      return;
+    }
+    index = prevIndex;
+    showBeat(list[index]);
+    cueStation(list[index]);
+  }
+
+  function goTo(i) {
+    const list = beats();
+    if (!list.length) return;
+    const target = Math.max(0, Math.min(Number(i) || 0, list.length - 1));
+    if (playing) {
+      playFrom(target);
+      return;
+    }
+    index = target;
+    showBeat(list[index]);
+    cueStation(list[index]);
+  }
+
   async function loadScript() {
     try {
       const res = await fetch(SCRIPT_URL, { cache: 'no-store' });
@@ -200,6 +253,7 @@
     if (els.play) els.play.addEventListener('click', play);
     if (els.pause) els.pause.addEventListener('click', pause);
     if (els.next) els.next.addEventListener('click', next);
+    if (els.prev) els.prev.addEventListener('click', prev);
     if (new URLSearchParams(location.search).get('tour') === '1') {
       scrollStageIntoView();
       const first = beats()[0];
@@ -217,7 +271,7 @@
     }
   }
 
-  window.PlanetariumStationTour = { play, pause, next };
+  window.PlanetariumStationTour = { play, pause, next, prev, goTo };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();

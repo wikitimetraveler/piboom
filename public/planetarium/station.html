@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/shared/styles.css"/>
   <link rel="stylesheet" href="/shared/css/planetarium-world.css?v=2"/>
-  <link rel="stylesheet" href="/shared/css/planetarium-station.css?v=6"/>
+  <link rel="stylesheet" href="/shared/css/planetarium-station.css?v=7"/>
   <script src="/shared/modern-navbar.js"></script>
   <script type="importmap">
   {
@@ -86,6 +86,7 @@
             />
           </div>
           <p class="st-pick-hud" id="stPickHud" hidden aria-hidden="true"></p>
+          <p class="st-scale" id="stScale">Schematic view · not to scale</p>
           <div class="st-hud" id="stHud" aria-live="polite">
             <p class="st-hud__kicker" id="stHudKicker">Module</p>
             <h2 class="st-hud__title" id="stHudTitle">Unity</h2>
@@ -122,6 +123,7 @@
                 Welcome aboard. I am Zigzag. This kite of metal is your International Space Station.
               </p>
               <div class="st-tour__controls">
+                <button type="button" class="pw-btn" id="stTourPrev">Prev room</button>
                 <button type="button" class="pw-btn pw-btn--primary" id="stTourPlay" aria-pressed="false">
                   <i class="bi bi-play-fill" aria-hidden="true"></i> Play tour
                 </button>
@@ -130,6 +132,7 @@
                 </button>
                 <button type="button" class="pw-btn" id="stTourNext">Next room</button>
               </div>
+              <ol class="st-tour__beats" id="stTourBeats" aria-label="Tour rooms"></ol>
               <p class="st-tour__status" id="stTourStatus"></p>
               <p class="st-tour__note">Stylized planetarium tour — not an official NASA briefing.</p>
             </div>
@@ -214,9 +217,9 @@
   <script src="/shared/tts.js"></script>
   <script src="/shared/speech-recognition.js"></script>
   <script src="/shared/js/fun-home-sky.js"></script>
-  <script src="/planetarium/js/planetarium-station.js?v=6"></script>
-  <script src="/planetarium/js/planetarium-station-tour.js?v=3"></script>
-  <script type="module" src="/planetarium/js/planetarium-station-scene.js?v=6"></script>
+  <script src="/planetarium/js/planetarium-station.js?v=7"></script>
+  <script src="/planetarium/js/planetarium-station-tour.js?v=4"></script>
+  <script type="module" src="/planetarium/js/planetarium-station-scene.js?v=7"></script>
   <script type="module" src="/planetarium/js/planetarium-guide.js?v=7"></script>
 </body>
 </html>
