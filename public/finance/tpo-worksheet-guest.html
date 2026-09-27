@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<!--
+  TPO Connect worksheet guest — launch shell.
+  Pattern matches the shared binding class (public/shared/bindings.js):
+  labeled input elements carrying the Encompass field ID in `emid`.
+  Read-only display for now; write-back (setFields) + calculations come later.
+  Development work by David Lane
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FHA Streamline Worksheet Guest — TPO Connect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Encompass SSF polyfill guest library (provides window.elli inside TPO Connect) -->
+  <script src="https://cdn.elliemae.com/ssf/elli.ssf.guest-with-polyfill.js"></script>
+  <!-- Shared binding class: binds input[emid] <-> loan object -->
+  <script src="../shared/bindings.js"></script>
+  <style>
+    body { padding: 1rem; }
+    .guest-field-id { font-family: monospace; color: #6c757d; font-size: .85em; }
+  </style>
+</head>
+<body>
+  <main class="container-fluid">
+    <h1 class="h5">FHA Streamline Worksheet <span class="badge bg-secondary">guest</span></h1>
+    <p class="text-muted small mb-2">
+      Current loan: <strong id="guestLoanId">—</strong>
+      <button id="guestRefresh" class="btn btn-sm btn-outline-primary ms-2" type="button">Refresh</button>
+    </p>
+
+    <div id="guestFields" class="row g-2">
+      <div class="col-md-6">
+        <label class="form-label" for="guestFirst">First name <span class="guest-field-id">[4000]</span></label>
+        <input id="guestFirst" class="form-control" type="text" emid="4000" readonly>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="guestLast">Last name <span class="guest-field-id">[4002]</span></label>
+        <input id="guestLast" class="form-control" type="text" emid="4002" readonly>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="guestAmount">Loan amount <span class="guest-field-id">[1109]</span></label>
+        <input id="guestAmount" class="form-control" type="text" emid="1109" readonly>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="guestValue">Property value <span class="guest-field-id">[356]</span></label>
+        <input id="guestValue" class="form-control" type="text" emid="356" readonly>
+      </div>
+    </div>
+
+    <p id="guestStatus" class="small text-muted mt-2" role="status">Starting…</p>
+
+    <details class="mt-3 small">
+      <summary>TPO Connect admin snippet</summary>
+      <pre class="bg-light p-2"><code>&lt;iframe src="https://YOUR-HOST/finance/tpo-worksheet-guest.html"
+  width="100%" height="520" title="FHA Streamline worksheet"&gt;&lt;/iframe&gt;</code></pre>
+    </details>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+      var params = new URLSearchParams(location.search);
+      var statusEl = document.getElementById('guestStatus');
+      var loanIdEl = document.getElementById('guestLoanId');
+
+      function setStatus(msg) { statusEl.textContent = msg; }
+
+      // Standalone demo values keyed by emid (same contract as loan.getField).
+      var DEMO = { GUID: 'CL-DEMO-001', 4000: 'Casey', 4002: 'Lane', 1109: '412000', 356: '520000' };
+
+      function fillFromMap(map) {
+        document.querySelectorAll('input[emid]').forEach(function (el) {
+          var v = map[el.getAttribute('emid')];
+          el.value = (v === undefined || v === null) ? '' : v;
+        });
+      }
+
+      function demoMode() {
+        loanIdEl.textContent = params.get('loanId') || DEMO.GUID;
+        fillFromMap(DEMO);
+        setStatus('Demo loan — open inside TPO Connect for the live current loan.');
+      }
+
+      async function liveMode() {
+        var bindings = new ScreenBindings();
+        await bindings.bindFieldValues();
+        var id = null;
+        try { id = await bindings.loanObject.getField('GUID'); } catch (e) { id = null; }
+        loanIdEl.textContent = id || params.get('loanId') || '—';
+        setStatus('Bound to current loan via ScreenBindings.');
+      }
+
+      async function start() {
+        setStatus('Connecting to TPO Connect…');
+        var hasElli = (typeof window.elli !== 'undefined' && window.elli && window.elli.script);
+        if (!hasElli || params.has('demo')) { demoMode(); return; }
+        try { await liveMode(); }
+        catch (err) { console.warn('[tpo-guest] live bind failed, demo fallback', err); demoMode(); }
+      }
+
+      document.getElementById('guestRefresh').addEventListener('click', start);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', start);
+      } else {
+        start();
+      }
+    })();
+  </script>
+</body>
+</html>
