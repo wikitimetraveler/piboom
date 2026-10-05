@@ -1,0 +1,255 @@
+{
+  "version": 1,
+  "ui": {
+    "en": {
+      "kicker": "A caravan through eight atlases",
+      "title": "The Silk Road",
+      "lead": "Follow silk, incense, purple dye and paper from Alexandria to the monsoon ports of Oman. Each guide hands the caravan to the next.",
+      "play": "Play journey",
+      "pause": "Pause",
+      "listen": "Listen",
+      "prev": "Previous stop",
+      "next": "Next stop",
+      "openAtlas": "Open the {country} atlas",
+      "stop": "Stop {n} of {total}",
+      "cargo": "Cargo manifest",
+      "cargoEmpty": "Your camels are empty. Start the journey to load cargo.",
+      "goods": "Goods traded here",
+      "handoff": "Handoff",
+      "legLand": "Caravan road",
+      "legSea": "Sea lane",
+      "complete": "Journey complete — {count} goods loaded across {total} stops.",
+      "note": "Sketch map, not to scale. Routes are simplified from many centuries of overlapping trade; eras show when each stop flourished on the road.",
+      "langToggle": "العربية",
+      "seaMed": "Mediterranean",
+      "seaRed": "Red Sea",
+      "seaArabian": "Arabian Sea",
+      "seaCaspian": "Caspian"
+    },
+    "ar": {
+      "kicker": "قافلة عبر ثمانية أطالس",
+      "title": "طريق الحرير",
+      "lead": "تتبّع الحرير والبخور والأرجوان والورق من الإسكندرية إلى موانئ الرياح الموسمية في عُمان. كل دليل يسلّم القافلة إلى الذي يليه.",
+      "play": "ابدأ الرحلة",
+      "pause": "إيقاف مؤقت",
+      "listen": "استمع",
+      "prev": "المحطة السابقة",
+      "next": "المحطة التالية",
+      "openAtlas": "افتح أطلس {country}",
+      "stop": "المحطة {n} من {total}",
+      "cargo": "بيان الحمولة",
+      "cargoEmpty": "جمالك فارغة. ابدأ الرحلة لتحميل البضائع.",
+      "goods": "بضائع تُتداول هنا",
+      "handoff": "التسليم",
+      "legLand": "طريق القوافل",
+      "legSea": "طريق بحري",
+      "complete": "اكتملت الرحلة — حُمّلت {count} بضائع عبر {total} محطات.",
+      "note": "خريطة تقريبية بلا مقياس. الطرق مبسّطة من قرون طويلة من التجارة المتداخلة، والحقب تُظهر متى ازدهرت كل محطة على الطريق.",
+      "langToggle": "English",
+      "seaMed": "البحر المتوسط",
+      "seaRed": "البحر الأحمر",
+      "seaArabian": "بحر العرب",
+      "seaCaspian": "بحر قزوين"
+    }
+  },
+  "waypoints": {
+    "hormuz": { "x": 707, "y": 322 }
+  },
+  "stops": [
+    {
+      "id": "egypt",
+      "atlas": "/egypt/",
+      "guide": { "en": "Omar", "ar": "عمر" },
+      "country": { "en": "Egypt", "ar": "مصر" },
+      "city": { "en": "Alexandria", "ar": "الإسكندرية" },
+      "x": 48,
+      "y": 220,
+      "leg": "land",
+      "era": { "en": "Ptolemaic to Fatimid · 3rd c. BCE – 12th c. CE", "ar": "من البطالمة إلى الفاطميين · القرن الثالث ق.م – القرن الثاني عشر م" },
+      "goods": [
+        { "en": "papyrus", "ar": "البردي" },
+        { "en": "linen", "ar": "الكتّان" },
+        { "en": "glass", "ar": "الزجاج" }
+      ],
+      "story": {
+        "en": "Alexandria's harbor joined the Mediterranean to the Nile and the Red Sea ports. Pepper, cinnamon and Chinese silk arrived through harbors like Berenike and moved through the city's warehouses toward Rome, and centuries later toward Venice.",
+        "ar": "ربطت الإسكندرية البحر المتوسط بالنيل وموانئ البحر الأحمر. وصل الفلفل والقرفة والحرير الصيني عبر موانئ مثل برنيكي، ثم انتقل عبر مخازن المدينة نحو روما، وبعد قرون نحو البندقية."
+      },
+      "handoff": {
+        "en": "From here the caravans head east along the coast road. Noor will meet you at Gaza, where the Incense Road meets the sea.",
+        "ar": "من هنا تتجه القوافل شرقًا على طريق الساحل. نور ستلقاك في غزة، حيث يلتقي طريق البخور بالبحر."
+      }
+    },
+    {
+      "id": "holy-land",
+      "atlas": "/holy-land/",
+      "guide": { "en": "Noor", "ar": "نور" },
+      "country": { "en": "Palestine · Israel", "ar": "فلسطين · إسرائيل" },
+      "city": { "en": "Gaza", "ar": "غزة" },
+      "x": 162,
+      "y": 212,
+      "leg": "land",
+      "era": { "en": "Nabataean to Byzantine · 3rd c. BCE – 7th c. CE", "ar": "من الأنباط إلى البيزنطيين · القرن الثالث ق.م – القرن السابع م" },
+      "goods": [
+        { "en": "frankincense", "ar": "اللبان" },
+        { "en": "myrrh", "ar": "المرّ" },
+        { "en": "Gaza wine", "ar": "نبيذ غزة" }
+      ],
+      "story": {
+        "en": "Gaza was the Mediterranean end of the Incense Road. Camel trains carrying frankincense and myrrh from southern Arabia unloaded here for ships bound west, and Byzantine Gaza was famed for its wine, shipped across the sea in tall amphorae.",
+        "ar": "كانت غزة الطرف المتوسطي لطريق البخور. أفرغت القوافل التي حملت اللبان والمرّ من جنوب الجزيرة العربية حمولتها هنا للسفن المتجهة غربًا، واشتهرت غزة البيزنطية بنبيذها الذي شُحن في جرار طويلة عبر البحر."
+      },
+      "handoff": {
+        "en": "Follow the incense back inland. Rami is waiting at Petra, the rose-red caravan city.",
+        "ar": "اتبع البخور عائدًا إلى الداخل. رامي ينتظرك في البتراء، مدينة القوافل الوردية."
+      }
+    },
+    {
+      "id": "jordan",
+      "atlas": "/jordan/",
+      "guide": { "en": "Rami", "ar": "رامي" },
+      "country": { "en": "Jordan", "ar": "الأردن" },
+      "city": { "en": "Petra", "ar": "البتراء" },
+      "x": 186,
+      "y": 242,
+      "leg": "land",
+      "era": { "en": "Nabataean · 4th c. BCE – 2nd c. CE", "ar": "الأنباط · القرن الرابع ق.م – القرن الثاني م" },
+      "goods": [
+        { "en": "incense", "ar": "البخور" },
+        { "en": "Dead Sea bitumen", "ar": "قار البحر الميت" },
+        { "en": "spices", "ar": "التوابل" }
+      ],
+      "story": {
+        "en": "The Nabataeans grew rich as caravan brokers. Petra controlled water in the desert, with cisterns, dams and channels cut into the sandstone, so caravans paid to rest, water their camels and trade before heading north on the King's Highway.",
+        "ar": "اغتنى الأنباط بوصفهم وسطاء للقوافل. سيطرت البتراء على الماء في الصحراء بصهاريج وسدود وقنوات منحوتة في الحجر الرملي، فكانت القوافل تدفع لتستريح وتسقي جمالها وتتاجر قبل أن تتجه شمالًا على الطريق الملوكي."
+      },
+      "handoff": {
+        "en": "North along the King's Highway now. Karim will show you the purple-dye harbors of Tyre.",
+        "ar": "إلى الشمال الآن على الطريق الملوكي. كريم سيريك موانئ الصباغ الأرجواني في صور."
+      }
+    },
+    {
+      "id": "lebanon",
+      "atlas": "/lebanon/",
+      "guide": { "en": "Karim", "ar": "كريم" },
+      "country": { "en": "Lebanon", "ar": "لبنان" },
+      "city": { "en": "Tyre", "ar": "صور" },
+      "x": 180,
+      "y": 168,
+      "leg": "land",
+      "era": { "en": "Phoenician to Crusader · 1st millennium BCE – 13th c. CE", "ar": "من الفينيقيين إلى الصليبيين · الألف الأول ق.م – القرن الثالث عشر م" },
+      "goods": [
+        { "en": "Tyrian purple", "ar": "الأرجوان الصوري" },
+        { "en": "cedar timber", "ar": "خشب الأرز" },
+        { "en": "sugar", "ar": "السكر" }
+      ],
+      "story": {
+        "en": "Tyre's dyers boiled murex sea snails to make Tyrian purple, a color worth more than its weight in silver and worn by emperors. Phoenician ships carried cedar and glass, and medieval Tyre traded silk and sugar with Italian merchants.",
+        "ar": "كان صبّاغو صور يغلون حلزون الموريكس البحري لصنع الأرجوان الصوري، وهو لون فاقت قيمته وزنه فضةً ولبسه الأباطرة. حملت السفن الفينيقية الأرز والزجاج، وتاجرت صور في العصور الوسطى بالحرير والسكر مع التجار الإيطاليين."
+      },
+      "handoff": {
+        "en": "Over the mountains to Damascus and out to Palmyra. Niqula knows every caravanserai on the desert road.",
+        "ar": "عبر الجبال إلى دمشق ثم إلى تدمر. نقولا يعرف كل خان على طريق البادية."
+      }
+    },
+    {
+      "id": "syria",
+      "atlas": "/syria/",
+      "guide": { "en": "Niqula", "ar": "نقولا" },
+      "country": { "en": "Syria", "ar": "سوريا" },
+      "city": { "en": "Palmyra", "ar": "تدمر" },
+      "x": 257,
+      "y": 136,
+      "via": [{ "x": 207, "y": 162 }],
+      "leg": "land",
+      "era": { "en": "Roman and Palmyrene · 1st – 3rd c. CE", "ar": "الرومان والتدمريون · القرن الأول – القرن الثالث م" },
+      "goods": [
+        { "en": "Chinese silk", "ar": "الحرير الصيني" },
+        { "en": "olive oil", "ar": "زيت الزيتون" },
+        { "en": "pearls", "ar": "اللؤلؤ" }
+      ],
+      "story": {
+        "en": "Palmyra sat at an oasis halfway between the Mediterranean and the Euphrates. Its merchants ran caravans to the river ports and recorded tolls in Greek and Aramaic on the famous Palmyra Tariff stone. Fragments of Chinese silk have been found in its tombs.",
+        "ar": "قامت تدمر عند واحة في منتصف الطريق بين المتوسط والفرات. سيّر تجارها القوافل إلى موانئ النهر وسجّلوا الرسوم باليونانية والآرامية على حجر التعريفة التدمرية الشهير. وعُثر في مدافنها على قطع من الحرير الصيني."
+      },
+      "handoff": {
+        "en": "Cross the desert to the Euphrates and on to the Tigris. Zayd will take you into Baghdad.",
+        "ar": "اعبر البادية إلى الفرات ثم إلى دجلة. زيد سيأخذك إلى بغداد."
+      }
+    },
+    {
+      "id": "iraq",
+      "atlas": "/iraq/",
+      "guide": { "en": "Zayd", "ar": "زيد" },
+      "country": { "en": "Iraq", "ar": "العراق" },
+      "city": { "en": "Baghdad", "ar": "بغداد" },
+      "x": 409,
+      "y": 167,
+      "leg": "land",
+      "era": { "en": "Abbasid · 8th – 13th c. CE", "ar": "العباسيون · القرن الثامن – القرن الثالث عشر م" },
+      "goods": [
+        { "en": "paper", "ar": "الورق" },
+        { "en": "books", "ar": "الكتب" },
+        { "en": "dates", "ar": "التمر" }
+      ],
+      "story": {
+        "en": "The Abbasid caliph al-Mansur founded Baghdad in 762 as a round city on the Tigris. Ships from India and China came up the river from Basra, and paper-making, learned from Samarkand, spread through the markets and the scholars of the House of Wisdom.",
+        "ar": "أسس الخليفة العباسي المنصور بغداد سنة 762 مدينةً مدوّرة على دجلة. صعدت السفن القادمة من الهند والصين في النهر من البصرة، وانتشرت صناعة الورق، التي تعلّمها الناس من سمرقند، في الأسواق وبين علماء بيت الحكمة."
+      },
+      "handoff": {
+        "en": "East over the Zagros on the Khorasan Road. Nima will meet you in Isfahan.",
+        "ar": "شرقًا عبر جبال زاغروس على طريق خراسان. نيما سيلقاك في أصفهان."
+      }
+    },
+    {
+      "id": "iran",
+      "atlas": "/iran/",
+      "guide": { "en": "Nima", "ar": "نيما" },
+      "country": { "en": "Iran", "ar": "إيران" },
+      "city": { "en": "Isfahan", "ar": "أصفهان" },
+      "x": 592,
+      "y": 184,
+      "leg": "land",
+      "era": { "en": "Seljuk to Safavid · 11th – 17th c. CE", "ar": "من السلاجقة إلى الصفويين · القرن الحادي عشر – القرن السابع عشر م" },
+      "goods": [
+        { "en": "raw silk", "ar": "الحرير الخام" },
+        { "en": "carpets", "ar": "السجاد" },
+        { "en": "turquoise", "ar": "الفيروز" }
+      ],
+      "story": {
+        "en": "Caravanserais spaced about a day's ride apart lined the Persian roads, giving merchants a safe courtyard, water and stabling. Under Shah Abbas I, Isfahan became a silk capital, and the Armenian merchants of New Julfa carried Persian silk as far as Amsterdam.",
+        "ar": "اصطفّت الخانات على الطرق الفارسية على مسافة يوم من السير تقريبًا، فوفّرت للتجار فناءً آمنًا وماءً وإسطبلات. وفي عهد الشاه عباس الأول صارت أصفهان عاصمة للحرير، وحمل تجار جلفا الجديدة الأرمن الحرير الفارسي حتى أمستردام."
+      },
+      "handoff": {
+        "en": "South to the Strait of Hormuz and onto a dhow. Salim will sail you into Sohar.",
+        "ar": "جنوبًا إلى مضيق هرمز ثم على متن مركب شراعي. سالم سيُبحر بك إلى صحار."
+      }
+    },
+    {
+      "id": "oman",
+      "atlas": "/oman/",
+      "guide": { "en": "Salim", "ar": "سالم" },
+      "country": { "en": "Oman", "ar": "عُمان" },
+      "city": { "en": "Sohar", "ar": "صحار" },
+      "x": 719,
+      "y": 391,
+      "via": [{ "waypoint": "hormuz" }],
+      "leg": "sea",
+      "embark": "hormuz",
+      "era": { "en": "Early Islamic · 9th – 10th c. CE", "ar": "العصر الإسلامي المبكر · القرن التاسع – القرن العاشر م" },
+      "goods": [
+        { "en": "Dhofar frankincense", "ar": "لبان ظفار" },
+        { "en": "copper", "ar": "النحاس" },
+        { "en": "horses", "ar": "الخيول" }
+      ],
+      "story": {
+        "en": "Sohar was one of the great ports of the maritime Silk Road. Omani dhows, sewn together with coconut-fiber rope, rode the monsoon winds to India and China, and Dhofar's frankincense trees supplied the same incense that started this journey.",
+        "ar": "كانت صحار من أعظم موانئ طريق الحرير البحري. ركبت السفن العُمانية، المخيطة بحبال ليف النارجيل، رياح الموسم إلى الهند والصين، ومدّت أشجار اللبان في ظفار بالبخور نفسه الذي بدأت به هذه الرحلة."
+      },
+      "handoff": {
+        "en": "The monsoon turns and the circle closes: this frankincense will ride camels back to Gaza. Your journey is complete.",
+        "ar": "تنقلب الرياح الموسمية وتكتمل الدائرة: هذا اللبان سيعود على ظهور الجمال إلى غزة. اكتملت رحلتك."
+      }
+    }
+  ]
+}

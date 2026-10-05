@@ -1,0 +1,34 @@
+{
+  "id": "iss-hall",
+  "title": "Walk the hall",
+  "beats": [
+    {
+      "id": "comms",
+      "title": "Space-to-ground",
+      "text": "Houston Audio Control Room, STS-135. Atlantis leaves the station for the last time. Press play on the comms panel. The recording does not start by itself.",
+      "module": "harmony",
+      "action": "comms"
+    },
+    {
+      "id": "kibo",
+      "title": "JEM Pressurized Module",
+      "text": "Kibo, the JEM Pressurized Module. Japan’s big lab. Saibo and Ryutai are inside. ELM-PS, the storage attic, sits on the zenith.",
+      "module": "kibo",
+      "action": "select"
+    },
+    {
+      "id": "porch",
+      "title": "JEM airlock to JEM-EF",
+      "text": "The JEM airlock passes a payload onto the Exposed Facility. JEMRMS is the Japanese arm. MAXI and CALET sit on the porch, outside in vacuum.",
+      "module": "kibo-ef",
+      "action": "pass"
+    },
+    {
+      "id": "ida",
+      "title": "IDA-2",
+      "text": "IDA-2, Harmony’s forward port, NASA Docking System. The ship flies itself in. The docking gallery has probe-and-drogue, CBM berthing, and who transfers propellant.",
+      "module": "ida2",
+      "action": "docking"
+    }
+  ]
+}

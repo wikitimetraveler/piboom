@@ -7,7 +7,16 @@
 
   const DEFAULT_OBS = { lat: 42.898, lon: -70.864, label: 'Hampton Falls, NH' };
   const PRESSURIZED = new Set(['pressurized']);
-  const WALK_ROOMS = new Set(['destiny', 'harmony', 'columbus', 'kibo', 'cupola', 'zvezda']);
+  const WALK_ROOMS = new Set(['destiny', 'harmony', 'columbus', 'kibo', 'kibo-ef', 'ida2', 'ida3', 'cupola', 'zvezda']);
+  const HUNT_IDS = ['kibo-ef', 'ida2', 'prichal'];
+  const OWNERS = {
+    NASA: 'USA',
+    Roscosmos: 'Russia',
+    ESA: 'Europe',
+    JAXA: 'Japan',
+    CSA: 'Canada',
+  };
+  const SHUTTER_NAMES = ['Nadir window', 'Side window 1', 'Side window 2', 'Side window 3', 'Side window 4', 'Side window 5', 'Side window 6'];
 
   const els = {
     status: document.getElementById('stStatus'),
@@ -40,6 +49,13 @@
     chromeToggle: document.getElementById('stChromeToggle'),
     fsStage: document.getElementById('stFullscreenStage'),
     fsDisplay: document.getElementById('stFullscreenDisplay'),
+    shutters: document.getElementById('stShutters'),
+    owners: document.getElementById('stOwners'),
+    hudPlain: document.getElementById('stHudPlain'),
+    passEf: document.getElementById('stPassEf'),
+    photoreal: document.getElementById('stPhotoreal'),
+    docking: document.getElementById('stDocking'),
+    huntScore: document.getElementById('stHuntScore'),
   };
 
   const state = {
@@ -55,6 +71,9 @@
     dockFilter: 'all',
     hoverId: '',
     chromeHidden: false,
+    shutters: [false, false, false, false, false, false, false],
+    shuttersClosed: false,
+    owner: '',
   };
 
   function escapeHtml(value) {
@@ -71,6 +90,7 @@
     return {
       module: String(q.get('module') || 'unity').toLowerCase(),
       mode: modeRaw === 'explode' || modeRaw === 'walk' ? modeRaw : 'orbit',
+      shuttersClosed: String(q.get('shutters') || '').toLowerCase() === 'closed',
     };
   }
 
@@ -78,6 +98,7 @@
     const q = new URLSearchParams();
     if (state.module) q.set('module', state.module);
     if (state.mode && state.mode !== 'orbit') q.set('mode', state.mode);
+    if (state.shuttersClosed) q.set('shutters', 'closed');
     const tour = new URLSearchParams(location.search).get('tour');
     if (tour === '1') q.set('tour', '1');
     const qs = q.toString();
@@ -208,7 +229,7 @@
       els.modeWalk.disabled = !walkable && state.mode !== 'walk';
       els.modeWalk.title = walkable
         ? 'Look around inside this module (1 unit = 1 meter)'
-        : 'Select Destiny, Harmony, Columbus, Kibo, Cupola, or Zvezda first';
+        : 'Select a walkable module — labs, Cupola, JEM-EF, or an IDA';
     }
     if (els.enter) {
       els.enter.hidden = !walkable || state.mode === 'walk';
@@ -232,7 +253,7 @@
     }
     if (els.hudTitle) els.hudTitle.textContent = mod.name;
     if (els.hudMeta) {
-      const bits = [mod.partner, mod.aka, mod.launched && String(mod.launched).slice(0, 4)];
+      const bits = [ownerLabel(mod.partner), mod.aka, mod.launched && String(mod.launched).slice(0, 4)];
       if (room) bits.push(room.lengthM + ' × ' + room.diameterM + ' m');
       els.hudMeta.textContent = bits.filter(Boolean).join(' · ');
     }
@@ -240,6 +261,11 @@
       const cue = state.mode === 'walk' ? hatchCue(room) : '';
       els.hudBlurb.textContent = cue || mod.blurb || mod.function || '';
     }
+    if (els.hudPlain) {
+      els.hudPlain.hidden = !mod.hint;
+      els.hudPlain.textContent = mod.hint || '';
+    }
+    if (els.passEf) els.passEf.hidden = mod.id !== 'kibo' && mod.id !== 'kibo-ef';
     if (els.hudHint) {
       els.hudHint.hidden = state.mode !== 'walk';
       els.hudHint.textContent = 'Drag or arrow keys to look around · Esc returns to orbit';
@@ -269,7 +295,7 @@
     if (els.displayLead) {
       els.displayLead.textContent = room
         ? 'NASA still + named hardware. Look inside for an optional 1:1 look-around (1 unit = 1 meter).'
-        : 'Exterior structure. Pick Destiny, Harmony, Columbus, Kibo, Cupola, or Zvezda for interiors.';
+        : 'Exterior structure. Pick Destiny, Harmony, Columbus, Kibo, the JEM-EF porch, an IDA, Cupola, or Zvezda for interiors.';
     }
     renderPhoto(mod);
     const rows = [];
@@ -278,6 +304,7 @@
         rows.push({
           k: hw.name,
           v: hw.role + (hw.face ? ' · ' + hw.face : ''),
+          hint: hw.hint || '',
           id: hw.id,
           hw: true,
         });
@@ -313,6 +340,7 @@
           escapeHtml(row.k) +
           '</strong>' +
           escapeHtml(row.v) +
+          (row.hint ? '<span class="st-hud__plain">' + escapeHtml(row.hint) + '</span>' : '') +
           '</' +
           tag +
           '>'
@@ -352,6 +380,16 @@
     return String(mod.partner || '') === f;
   }
 
+  function ownerLabel(partner) {
+    const agency = String(partner || '');
+    const country = agency
+      .split('/')
+      .map((p) => OWNERS[p.trim()])
+      .filter(Boolean)
+      .join(' / ');
+    return country ? country + ' · ' + agency : agency;
+  }
+
   function setDockFilter(filter) {
     state.dockFilter = filter || 'all';
     if (els.dockFilters) {
@@ -362,6 +400,72 @@
       });
     }
     renderDock();
+    const owner = OWNERS[state.dockFilter] ? state.dockFilter : '';
+    if (owner !== state.owner) setOwner(owner);
+  }
+
+  function setOwner(owner) {
+    const next = OWNERS[owner] ? owner : '';
+    state.owner = next;
+    if (els.owners) {
+      els.owners.querySelectorAll('[data-owner]').forEach((btn) => {
+        const on = btn.getAttribute('data-owner') === next;
+        btn.classList.toggle('is-on', on);
+        btn.setAttribute('aria-pressed', String(on));
+      });
+    }
+    const scene = window.PlanetariumStationScene;
+    if (scene && typeof scene.setOwner === 'function') scene.setOwner(next);
+    if (next && state.dockFilter !== next) setDockFilter(next);
+    else if (!next && OWNERS[state.dockFilter]) setDockFilter('all');
+    if (els.status && next) {
+      const count = state.modules.filter((m) => String(m.partner || '').split('/').some((p) => p.trim() === next)).length;
+      els.status.textContent =
+        'Showing ' + OWNERS[next] + ' (' + next + ') · ' + count + (count === 1 ? ' module' : ' modules');
+    } else if (els.status && state.statusText && /^Showing /.test(els.status.textContent)) {
+      els.status.textContent = state.statusText;
+    }
+  }
+
+  function setShutterButton() {
+    if (!els.shutters) return;
+    const closed = state.shuttersClosed;
+    els.shutters.setAttribute('aria-pressed', String(closed));
+    els.shutters.classList.toggle('is-on', closed);
+    els.shutters.title = closed ? 'Open Cupola debris shutters (S)' : 'Close Cupola debris shutters (S)';
+    const icon = els.shutters.querySelector('i');
+    if (icon) icon.className = closed ? 'bi bi-shield-fill-check' : 'bi bi-shield';
+  }
+
+  function showShutterHud(text) {
+    if (!els.hudHw) return;
+    els.hudHw.hidden = false;
+    els.hudHw.textContent = text;
+  }
+
+  function onShuttersChanged(payload) {
+    const states = Array.isArray(payload?.states) ? payload.states : state.shutters;
+    state.shutters = states.slice();
+    const closedCount = states.filter(Boolean).length;
+    state.shuttersClosed = closedCount === states.length;
+    setShutterButton();
+    writeUrl();
+    const i = payload?.changedIndex;
+    if (Number.isInteger(i) && i >= 0) {
+      showShutterHud(
+        'Window shutters — ' + (SHUTTER_NAMES[i] || 'Window') + ' ' + (states[i] ? 'closed' : 'open') + ' · micrometeoroid / debris protection'
+      );
+    } else if (closedCount === states.length) {
+      showShutterHud('Cupola shutters closed — micrometeoroid / debris protection');
+    } else if (closedCount === 0) {
+      showShutterHud('Cupola shutters open — Earth view');
+    }
+  }
+
+  function toggleShutters() {
+    const scene = window.PlanetariumStationScene;
+    if (!scene || typeof scene.setShutters !== 'function') return;
+    scene.setShutters(!state.shuttersClosed);
   }
 
   function renderDock() {
@@ -382,7 +486,7 @@
       const walkChip = walkable ? '<span class="st-mod__walk">Walk</span>' : '';
       btn.innerHTML =
         '<span class="st-mod__partner">' +
-        escapeHtml(mod.partner) +
+        escapeHtml(ownerLabel(mod.partner)) +
         walkChip +
         '</span><span class="st-mod__name">' +
         escapeHtml(mod.name) +
@@ -483,6 +587,75 @@
       els.hudHw.textContent = '';
     }
     syncScene();
+    noteHunt(mod.id);
+  }
+
+  function huntFound() {
+    try {
+      const raw = JSON.parse(sessionStorage.getItem('stHuntFound') || '[]');
+      return new Set(Array.isArray(raw) ? raw : []);
+    } catch (err) {
+      return new Set();
+    }
+  }
+
+  function renderHunt() {
+    if (!els.huntScore) return;
+    const found = huntFound();
+    const n = HUNT_IDS.filter((id) => found.has(id)).length;
+    els.huntScore.textContent = n + ' / ' + HUNT_IDS.length;
+  }
+
+  function noteHunt(id) {
+    if (HUNT_IDS.includes(id)) {
+      const found = huntFound();
+      found.add(id);
+      sessionStorage.setItem('stHuntFound', JSON.stringify([...found]));
+    }
+    renderHunt();
+  }
+
+  function passToPorch() {
+    if (state.mode === 'walk') setMode('orbit');
+    const scene = window.PlanetariumStationScene;
+    if (scene && typeof scene.startPassThrough === 'function') scene.startPassThrough();
+  }
+
+  function toggleDocking() {
+    const scene = window.PlanetariumStationScene;
+    if (!scene || typeof scene.setDocking !== 'function') return;
+    const on = !scene.getDocking();
+    scene.setDocking(on);
+    if (els.docking) {
+      els.docking.setAttribute('aria-pressed', String(on));
+      els.docking.classList.toggle('is-on', on);
+    }
+  }
+
+  function togglePhotoreal() {
+    const scene = window.PlanetariumStationScene;
+    if (!scene || typeof scene.setPhotoreal !== 'function') return;
+    const next = !(scene.getPhotoreal && scene.getPhotoreal());
+    if (els.photoreal) {
+      els.photoreal.disabled = true;
+      els.photoreal.textContent = 'Loading NASA model…';
+    }
+    scene.setPhotoreal(next).then(
+      () => {
+        if (!els.photoreal) return;
+        els.photoreal.disabled = false;
+        const on = scene.getPhotoreal();
+        els.photoreal.setAttribute('aria-pressed', String(on));
+        els.photoreal.classList.toggle('is-on', on);
+        els.photoreal.textContent = on ? 'Schematic' : 'Photoreal';
+      },
+      () => {
+        if (!els.photoreal) return;
+        els.photoreal.disabled = false;
+        els.photoreal.textContent = 'Photoreal';
+        if (els.status) els.status.textContent = 'NASA ISS model did not load.';
+      }
+    );
   }
 
   function stepModule(dir) {
@@ -500,7 +673,7 @@
     if (next === 'walk' && !canWalk(state.module)) {
       if (els.status) {
         els.status.textContent =
-          'Look inside needs a walkable module — pick Destiny, Harmony, Columbus, Kibo, Cupola, or Zvezda.';
+          'Look inside needs a walkable module — a lab, Cupola, JEM-EF, or an IDA.';
       }
       setModeButtons();
       return;
@@ -710,6 +883,10 @@
   function setChromeHidden(on) {
     state.chromeHidden = Boolean(on);
     syncChromeToggle();
+    resizeScene();
+    if (state.chromeHidden && !fullscreenElement() && els.stageBlock) {
+      els.stageBlock.scrollIntoView({ block: 'start' });
+    }
   }
 
   function toggleChrome() {
@@ -727,6 +904,21 @@
         setDockFilter(btn.getAttribute('data-dock-filter'));
       });
     }
+    if (els.owners) {
+      els.owners.addEventListener('click', (ev) => {
+        const btn = ev.target.closest('[data-owner]');
+        if (!btn) return;
+        const owner = btn.getAttribute('data-owner') || '';
+        setOwner(owner && owner === state.owner ? '' : owner);
+      });
+    }
+    if (els.shutters) {
+      els.shutters.addEventListener('click', toggleShutters);
+    }
+    if (els.passEf) els.passEf.addEventListener('click', passToPorch);
+    if (els.photoreal) els.photoreal.addEventListener('click', togglePhotoreal);
+    if (els.docking) els.docking.addEventListener('click', toggleDocking);
+    renderHunt();
     const prev = document.getElementById('stPrevMod');
     const next = document.getElementById('stNextMod');
     if (prev) prev.addEventListener('click', () => stepModule(-1));
@@ -805,6 +997,11 @@
         ev.preventDefault();
         return;
       }
+      if (ev.key === 's' || ev.key === 'S') {
+        if (ev.ctrlKey || ev.metaKey || ev.altKey) return;
+        toggleShutters();
+        return;
+      }
       if (ev.key === 'ArrowLeft') stepModule(-1);
       if (ev.key === 'ArrowRight') stepModule(1);
     });
@@ -832,12 +1029,23 @@
       scene.canvas.setAttribute('aria-label', 'Interactive International Space Station schematic');
     }
     syncScene();
+    if (typeof scene.onShutters === 'function') scene.onShutters(onShuttersChanged);
+    if (typeof scene.onPassThrough === 'function') {
+      scene.onPassThrough(() => {
+        if (state.module !== 'kibo-ef') selectModule('kibo-ef');
+      });
+    }
+    if (state.shuttersClosed && typeof scene.setShutters === 'function') {
+      scene.setShutters(true, { instant: true });
+    }
+    if (typeof scene.setOwner === 'function') scene.setOwner(state.owner);
     return true;
   }
 
   async function boot() {
     Object.assign(state, parseParams(location.search));
     bind();
+    setShutterButton();
     try {
       const [page, interiors] = await Promise.all([loadStation(), loadInteriors()]);
       state.modules = Array.isArray(page.modules) ? page.modules : [];
@@ -849,9 +1057,10 @@
       if (state.mode === 'walk' && !canWalk(state.module)) state.mode = 'orbit';
       if (els.status) {
         const stamp = state.crew.fetchedAt ? String(state.crew.fetchedAt).slice(0, 10) : '';
-        els.status.textContent = stamp
+        state.statusText = stamp
           ? 'Crew snapshot ' + stamp + ' · TLE ' + (state.now ? 'live' : 'offline') + ' · NASA interiors ready'
           : 'Station loaded';
+        els.status.textContent = state.statusText;
       }
       renderLive();
       selectModule(state.module);
@@ -884,6 +1093,8 @@
     parseParams,
     selectModule,
     setMode,
+    setOwner,
+    toggleShutters,
     getCarlContext,
     getState: () => state,
   };

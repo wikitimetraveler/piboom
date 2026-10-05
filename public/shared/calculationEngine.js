@@ -383,6 +383,56 @@ function createAssetQualifierConfig(options = {}) {
   };
 }
 
+function createGseScenarioConfig(options = {}) {
+  const ids = {
+    loanAmount: options.customIds?.loanAmount || 'loanAmount',
+    purchasePrice: options.customIds?.purchasePrice || 'purchasePrice',
+    subordinateFinancing: options.customIds?.subordinateFinancing || 'subordinateFinancing',
+    ltv: options.customIds?.ltv || 'ltv',
+    cltv: options.customIds?.cltv || 'cltv',
+    income: options.customIds?.income || 'income',
+    areaMedianIncome: options.customIds?.areaMedianIncome || 'areaMedianIncome',
+    amiPercent: options.customIds?.amiPercent || 'amiPercent',
+    dti: options.customIds?.dti || 'dti',
+    reservesMonths: options.customIds?.reservesMonths || 'reservesMonths',
+    conformingLimit: options.customIds?.conformingLimit || 'gseLimitAmount',
+    riskLevel: options.customIds?.riskLevel || 'gseLiveRisk',
+    conformingBand: options.customIds?.conformingBand || 'gseLiveConforming'
+  };
+
+  return {
+    groups: [
+      { inputIds: [ids.loanAmount, ids.purchasePrice], resultId: ids.ltv, calculation: 'gseLtvPercent' },
+      {
+        inputIds: [ids.loanAmount, ids.subordinateFinancing, ids.purchasePrice],
+        resultId: ids.cltv,
+        calculation: 'gseCltvPercent'
+      },
+      { inputIds: [ids.income, ids.areaMedianIncome], resultId: ids.amiPercent, calculation: 'gseAmiPercent' },
+      { inputIds: [ids.dti, ids.reservesMonths, ids.ltv], resultId: ids.riskLevel, calculation: 'gseScenarioRiskLevel' },
+      { inputIds: [ids.loanAmount, ids.conformingLimit], resultId: ids.conformingBand, calculation: 'gseConformingBand' }
+    ]
+  };
+}
+
+function createLoanFlightSimConfig(options = {}) {
+  const p = options.prefix || 'lfs';
+  const id = (name) => `${p}${name}`;
+  return {
+    groups: [
+      { inputIds: [id('LoanAmount'), id('Price')], resultId: id('Ltv'), calculation: 'gseLtvPercent' },
+      { inputIds: [id('LoanAmount'), id('Rate'), id('Term')], resultId: id('Pi'), calculation: 'monthlyPrincipalInterest' },
+      { inputIds: [id('Pi'), id('Escrow')], resultId: id('Housing'), calculation: 'sumRounded' },
+      { inputIds: [id('Housing'), id('Debts')], resultId: id('TotalPayment'), calculation: 'sumRounded' },
+      { inputIds: [id('Income')], resultId: id('MonthlyIncome'), calculation: 'annualToMonthly' },
+      { inputIds: [id('Housing'), id('MonthlyIncome')], resultId: id('FrontDti'), calculation: 'calculateDTI' },
+      { inputIds: [id('TotalPayment'), id('MonthlyIncome')], resultId: id('BackDti'), calculation: 'calculateDTI' },
+      { inputIds: [id('Assets'), id('Housing')], resultId: id('Reserves'), calculation: 'divideRounded' },
+      { inputIds: [id('BackDti'), id('Reserves'), id('Ltv')], resultId: id('Risk'), calculation: 'gseScenarioRiskLevel' }
+    ]
+  };
+}
+
 // Expose globals for browser usage (and Node tests)
 const __calcGlobal = typeof window !== 'undefined' ? window : globalThis;
 if (__calcGlobal) {
@@ -390,4 +440,6 @@ if (__calcGlobal) {
   __calcGlobal.createDTICalculatorConfig = createDTICalculatorConfig;
   __calcGlobal.createFHACalculatorConfig = createFHACalculatorConfig;
   __calcGlobal.createAssetQualifierConfig = createAssetQualifierConfig;
+  __calcGlobal.createGseScenarioConfig = createGseScenarioConfig;
+  __calcGlobal.createLoanFlightSimConfig = createLoanFlightSimConfig;
 }

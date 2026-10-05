@@ -1,10 +1,92 @@
 /**
  * Development work by David Lane
  */
+import '../../public/shared/calcEngineLibrary.js';
 import '../../public/shared/calculationEngine.js';
 
-const { createAssetQualifierConfig } = globalThis;
+const { createAssetQualifierConfig, createGseScenarioConfig } = globalThis;
 const { CalculationsEngine } = globalThis;
+
+describe('calculationEngine GSE scenario config', () => {
+  function makeFields(overrides = {}) {
+    const values = {
+      loanAmount: '725000',
+      subordinateFinancing: '12200',
+      purchasePrice: '760000',
+      ltv: '',
+      cltv: '',
+      income: '85000',
+      areaMedianIncome: '109000',
+      amiPercent: '',
+      dti: '43',
+      reservesMonths: '2',
+      gseLimitAmount: '',
+      gseLiveRisk: '',
+      gseLiveConforming: '',
+      ...overrides
+    };
+    return Object.fromEntries(
+      Object.entries(values).map(([id, value]) => [id, { id, value, addEventListener: () => {} }])
+    );
+  }
+
+  function withEngine(fields, fn) {
+    const originalDocument = globalThis.document;
+    globalThis.document = { getElementById: (id) => fields[id] || null };
+    try {
+      const engine = new CalculationsEngine(createGseScenarioConfig(), {
+        math: globalThis.calcMath,
+        debounceMs: 0,
+        listenToChange: false
+      });
+      fn(engine);
+    } finally {
+      globalThis.document = originalDocument;
+    }
+  }
+
+  test('wires LTV, CLTV, AMI, risk, and conforming groups to calcMath helpers', () => {
+    const byResult = Object.fromEntries(createGseScenarioConfig().groups.map((g) => [g.resultId, g]));
+    expect(byResult.ltv.calculation).toBe('gseLtvPercent');
+    expect(byResult.cltv.inputIds).toEqual(['loanAmount', 'subordinateFinancing', 'purchasePrice']);
+    expect(byResult.amiPercent.calculation).toBe('gseAmiPercent');
+    expect(byResult.gseLiveRisk.inputIds).toContain('ltv');
+    expect(byResult.gseLiveConforming.inputIds).toEqual(['loanAmount', 'gseLimitAmount']);
+  });
+
+  test('recalculates derived scenario fields and cascades LTV into risk', () => {
+    const fields = makeFields();
+    withEngine(fields, (engine) => {
+      engine.recalculateAll();
+      expect(fields.ltv.value).toBe('95.39');
+      expect(fields.cltv.value).toBe('97');
+      expect(fields.amiPercent.value).toBe('77.98');
+      expect(fields.gseLiveRisk.value).toBe('high');
+      expect(fields.gseLiveConforming.value).toBe('unknown');
+
+      fields.loanAmount.value = '600000';
+      engine.updateResult('gseLtvPercent', 'ltv');
+      expect(fields.ltv.value).toBe('78.95');
+      expect(fields.gseLiveRisk.value).toBe('medium');
+
+      fields.gseLimitAmount.value = '1209750';
+      engine.updateResult('gseConformingBand', 'gseLiveConforming');
+      expect(fields.gseLiveConforming.value).toBe('within-limit');
+
+      fields.loanAmount.value = '1300000';
+      engine.updateResult('gseConformingBand', 'gseLiveConforming');
+      expect(fields.gseLiveConforming.value).toBe('above-limit');
+    });
+  });
+
+  test('blank area median income leaves AMI % empty', () => {
+    const fields = makeFields({ areaMedianIncome: '' });
+    withEngine(fields, (engine) => {
+      engine.recalculateAll();
+      expect(fields.amiPercent.value).toBe('');
+    });
+  });
+});
 
 describe('calculationEngine asset qualifier config', () => {
   test('builds expected asset qualifier groups', () => {

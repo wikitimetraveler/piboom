@@ -61,6 +61,24 @@ describe('gse-scenario.service', () => {
     expect(out.suggestions.some((s) => String(s).toLowerCase().includes('aus'))).toBe(true);
   });
 
+  it('HomeReady and Home Possible enforce the 80% AMI income limit from bundled data', () => {
+    const affordable = (amiPercent) =>
+      analyzeScenario({ ...sampleScenario, borrower: { ...sampleScenario.borrower, amiPercent } }).products.filter((p) =>
+        /HomeReady|Home Possible/.test(p.product)
+      );
+
+    const under = affordable(78);
+    expect(under).toHaveLength(2);
+    for (const p of under) {
+      expect(p.reasons.some((r) => r.includes('AMI 78% is at or below 80%'))).toBe(true);
+    }
+
+    for (const p of affordable(89.91)) {
+      expect(p.reasons.some((r) => r.includes('AMI 89.91% exceeds prototype 80%'))).toBe(true);
+      expect(p.status).not.toBe('fit');
+    }
+  });
+
   it('analyzeScenario returns errors for invalid body', () => {
     const out = analyzeScenario(null);
     expect(out.success).toBe(false);

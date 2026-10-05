@@ -261,11 +261,23 @@ function buildCupola(room, mats, map) {
   );
   shell.userData.skipPick = true;
 
+  const shutterHw = room.hardware.find((h) => h.id === 'cupola-shutters');
+  const plateMat = mats.shutter.clone();
   const nadir = room.hardware.find((h) => h.id === 'cupola-win-nadir');
   if (nadir) {
     const pane = addMesh(g, new THREE.CircleGeometry(0.4, 28), mats.glassClear.clone(), 0, 0.12, 0);
     pane.rotation.x = -Math.PI / 2;
     tagHardware(pane, nadir);
+    pane.userData.shutterIndex = 0;
+    const pivot = new THREE.Group();
+    pivot.position.set(0.44, 0.09, 0);
+    pivot.userData.shutterPivot = 0;
+    pivot.userData.shutterAxis = 'z';
+    g.add(pivot);
+    const plate = addMesh(pivot, new THREE.CircleGeometry(0.44, 28), plateMat, -0.44, 0, 0);
+    plate.rotation.x = -Math.PI / 2;
+    tagHardware(plate, shutterHw || nadir);
+    plate.userData.shutterIndex = 0;
   }
   const sides = room.hardware.filter((h) => h.id.startsWith('cupola-win-') && h.id !== 'cupola-win-nadir');
   sides.forEach((hw, i) => {
@@ -280,6 +292,18 @@ function buildCupola(room, mats, map) {
     );
     pane.lookAt(0, 0.55, 0);
     tagHardware(pane, hw);
+    pane.userData.shutterIndex = i + 1;
+    const plateH = 0.47;
+    const pivot = new THREE.Group();
+    pivot.position.set(Math.cos(a) * 0.975, 0.55 + plateH / 2, Math.sin(a) * 0.975);
+    pivot.rotation.order = 'YXZ';
+    pivot.rotation.y = Math.atan2(-Math.cos(a), -Math.sin(a));
+    pivot.userData.shutterPivot = i + 1;
+    pivot.userData.shutterAxis = 'x';
+    g.add(pivot);
+    const plate = addMesh(pivot, new THREE.PlaneGeometry(0.6, plateH), plateMat, 0, -plateH / 2, 0);
+    tagHardware(plate, shutterHw || hw);
+    plate.userData.shutterIndex = i + 1;
   });
   const robot = room.hardware.find((h) => h.id === 'cupola-robot');
   if (robot) {
@@ -348,11 +372,77 @@ function buildZvezda(room, mats, map) {
   return g;
 }
 
+function buildKiboEf(room, mats) {
+  const g = new THREE.Group();
+  const deck = addMesh(g, new THREE.BoxGeometry(4.2, 0.12, 5.2), mats.panel.clone(), 0, -0.4, 0);
+  deck.userData.skipPick = true;
+  const maxi = room.hardware.find((h) => h.id === 'jem-ef-maxi');
+  if (maxi) {
+    const box = addMesh(g, new THREE.BoxGeometry(0.7, 0.55, 0.7), mats.rack.clone(), -1.1, 0.05, 0.8);
+    tagHardware(box, maxi);
+  }
+  const calet = room.hardware.find((h) => h.id === 'jem-ef-calet');
+  if (calet) {
+    const box = addMesh(g, new THREE.BoxGeometry(0.8, 0.7, 0.6), mats.hatch.clone(), 1.15, 0.1, 0.4);
+    tagHardware(box, calet);
+  }
+  const arm = room.hardware.find((h) => h.id === 'jemrms');
+  if (arm) {
+    const base = addMesh(g, new THREE.CylinderGeometry(0.12, 0.16, 0.35, 10), mats.rack.clone(), 0, 0.1, -1.6);
+    tagHardware(base, arm);
+    const boom = addMesh(g, new THREE.BoxGeometry(0.12, 0.12, 1.6), mats.hatch.clone(), 0.5, 0.7, -1.1);
+    boom.rotation.y = 0.5;
+    boom.rotation.z = -0.4;
+    boom.userData.skipPick = true;
+  }
+  const air = room.hardware.find((h) => h.id === 'jem-ef-airlock');
+  if (air) {
+    const hatch = addMesh(g, new THREE.CylinderGeometry(0.7, 0.7, 0.2, 16), mats.door.clone(), 0, 0.2, -2.4);
+    hatch.rotation.x = Math.PI / 2;
+    tagHardware(hatch, air);
+  }
+  return g;
+}
+
+function buildDockingTunnel(room, mats) {
+  const g = new THREE.Group();
+  const shell = addMesh(g, new THREE.CylinderGeometry(0.8, 0.8, 1.6, 20, 1, true), hullMaterial(mats, null), 0, 0, 0);
+  shell.rotation.x = Math.PI / 2;
+  shell.userData.skipPick = true;
+  const ringHw = room.hardware.find((h) => /ring/.test(h.id));
+  if (ringHw) {
+    const ring = addMesh(g, new THREE.TorusGeometry(0.72, 0.06, 8, 20), mats.hatch.clone(), 0, 0, 0.7);
+    tagHardware(ring, ringHw);
+  }
+  const petals = room.hardware.find((h) => /petals/.test(h.id));
+  if (petals) {
+    for (let i = 0; i < 3; i += 1) {
+      const a = (i / 3) * Math.PI * 2;
+      const petal = addMesh(
+        g,
+        new THREE.BoxGeometry(0.18, 0.34, 0.08),
+        mats.panel.clone(),
+        Math.cos(a) * 0.78,
+        Math.sin(a) * 0.78,
+        0.85
+      );
+      if (i === 0) tagHardware(petal, petals);
+      else petal.userData.skipPick = true;
+    }
+  }
+  const hatch = room.hardware.find((h) => /hatch/.test(h.id));
+  if (hatch) g.add(buildHatch(mats, hatch, 0, 0, -0.78, 'z'));
+  return g;
+}
+
 const BUILDERS = {
   destiny: buildDestiny,
   harmony: buildHarmony,
   columbus: buildColumbus,
   kibo: buildKibo,
+  'kibo-ef': buildKiboEf,
+  ida2: buildDockingTunnel,
+  ida3: buildDockingTunnel,
   cupola: buildCupola,
   zvezda: buildZvezda,
 };
@@ -368,6 +458,7 @@ export function createInteriorMaterials() {
     hatch: makeMat({ color: '#c9d0d8', metalness: 0.45, roughness: 0.35 }),
     door: makeMat({ color: '#e8e4dc', metalness: 0.2, roughness: 0.5 }),
     cq: makeMat({ color: '#ece8e0', metalness: 0.12, roughness: 0.55 }),
+    shutter: makeMat({ color: '#8d939b', metalness: 0.2, roughness: 0.85, side: THREE.DoubleSide }),
     glass: makeMat({
       color: '#9ad4ff',
       metalness: 0.05,
@@ -403,6 +494,19 @@ export function createInteriorManager(parent, opts = {}) {
   const rooms = new Map();
   let activeId = '';
   let catalog = null;
+  let shutterValues = [];
+  const SHUTTER_OPEN_ANGLE = 1.7;
+
+  function applyShutters(entry) {
+    if (!entry || !entry.shutterPivots) return;
+    entry.shutterPivots.forEach((pivot) => {
+      const v = Number(shutterValues[pivot.userData.shutterPivot]) || 0;
+      const swing = SHUTTER_OPEN_ANGLE * (1 - v);
+      if (pivot.userData.shutterAxis === 'z') pivot.rotation.z = swing;
+      else pivot.rotation.x = swing;
+      pivot.visible = v > 0.02;
+    });
+  }
   const light = new THREE.PointLight(0xfff4e0, 1.35, 28, 2);
   light.position.set(0, 0.4, 0);
   root.add(light);
@@ -422,9 +526,12 @@ export function createInteriorManager(parent, opts = {}) {
       group.clear();
       group.add(built);
       entry.pickables = [];
+      entry.shutterPivots = [];
       group.traverse((obj) => {
         if (obj.isMesh && obj.userData.hardwareId) entry.pickables.push(obj);
+        if (Number.isInteger(obj.userData.shutterPivot)) entry.shutterPivots.push(obj);
       });
+      applyShutters(entry);
     };
     if (mapUrl) {
       loadTexture(loader, mapUrl, (tex) => {
@@ -451,12 +558,11 @@ export function createInteriorManager(parent, opts = {}) {
     show(id) {
       activeId = String(id || '');
       root.visible = Boolean(activeId);
+      const active = activeId ? ensureRoom(activeId) : null;
       rooms.forEach((entry, key) => {
         entry.group.visible = key === activeId;
       });
-      if (activeId) ensureRoom(activeId);
-      const cam = ensureRoom(activeId)?.room?.camera;
-      return cam || { x: 0, y: 0.15, z: 0 };
+      return active?.room?.camera || { x: 0, y: 0.15, z: 0 };
     },
     hide() {
       activeId = '';
@@ -467,7 +573,16 @@ export function createInteriorManager(parent, opts = {}) {
     },
     getPickables() {
       const entry = rooms.get(activeId);
-      return entry ? entry.pickables : [];
+      if (!entry) return [];
+      return entry.pickables.filter((obj) => {
+        for (let p = obj; p; p = p.parent) if (!p.visible) return false;
+        return true;
+      });
+    },
+    /** values[i] in [0,1]: 0 open, 1 closed (index 0 nadir, 1–6 sides). */
+    setShutterValues(values) {
+      shutterValues = Array.isArray(values) ? values.slice() : [];
+      applyShutters(rooms.get('cupola'));
     },
     getActiveId() {
       return activeId;

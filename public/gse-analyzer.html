@@ -50,7 +50,13 @@
         <div class="col-md-4">
           <div class="card gse-summary-card shadow-sm h-100">
             <div class="card-body">
-              <h2 class="h6 text-muted">Summary</h2>
+              <h2 class="h6 text-muted d-flex align-items-center gap-2">
+                Summary
+                <span class="badge rounded-pill text-bg-success fw-normal" id="gseLiveBadge" title="Risk, conforming, and LTV recalculate as you type; products refresh automatically">live</span>
+              </h2>
+              <input type="hidden" id="gseLimitAmount" value="" />
+              <input type="hidden" id="gseLiveRisk" value="" />
+              <input type="hidden" id="gseLiveConforming" value="" />
               <dl class="row small mb-0">
                 <dt class="col-5">Best fit</dt>
                 <dd class="col-7" id="gseBestFit">—</dd>
@@ -86,11 +92,11 @@
               <fieldset class="gse-form-group mb-3">
                 <legend class="gse-form-group__legend">Borrower profile</legend>
                 <div class="row g-2 small">
-                <div class="col-md-3">
+                <div class="col-md-2">
                   <label class="form-label">Credit score</label>
                   <input type="number" class="form-control" id="creditScore" value="720" />
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                   <label class="form-label">First-time buyer</label>
                   <select class="form-select" id="firstTimeHomebuyer">
                     <option value="true" selected>Yes</option>
@@ -102,8 +108,36 @@
                   <input type="number" class="form-control" id="income" value="85000" />
                 </div>
                 <div class="col-md-3">
-                  <label class="form-label">AMI % (optional)</label>
-                  <input type="number" class="form-control" id="amiPercent" value="78" />
+                  <label class="form-label" for="areaMedianIncome">Area median income ($, sample)</label>
+                  <input type="number" class="form-control" id="areaMedianIncome" value="109000" min="0" placeholder="From AMI lookup" aria-describedby="gseAmiHelp" />
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label" for="amiPercent">AMI % <span class="badge text-bg-light border fw-normal">auto</span></label>
+                  <input type="number" class="form-control bg-body-tertiary" id="amiPercent" value="77.98" readonly tabindex="-1" title="Income ÷ area median income (calcMath.gseAmiPercent)" aria-describedby="gseAmiHelp" />
+                </div>
+                <div class="col-12">
+                  <p class="form-text small mb-1" id="gseAmiHelp">
+                    Income ÷ area median income for the property's location (FFIEC / HUD median by census tract). HomeReady and Home Possible
+                    generally cap qualifying income at 80% of AMI. Low-income-tract rules can differ. Verify with the
+                    <a href="https://ami-lookup-tool.fanniemae.com/amilookuptool/" target="_blank" rel="noopener noreferrer">Fannie AMI Lookup</a> and
+                    <a href="https://sf.freddiemac.com/working-with-us/affordable-lending/home-possible-eligibility-map" target="_blank" rel="noopener noreferrer">Freddie Home Possible</a> tools.
+                    Leave the median blank to skip the AMI check.
+                  </p>
+                  <details class="gse-explainer">
+                    <summary>What is AMI %?</summary>
+                    <div class="gse-explainer__body">
+                      <p class="mb-2">
+                        <strong>Formula:</strong> annual qualifying income ÷ area median income × 100.
+                        This scenario: <span id="gseAmiWorked">$85,000 ÷ $109,000 = 77.98%</span>.
+                      </p>
+                      <ul class="mb-0">
+                        <li><strong>Why it matters:</strong> affordable conventional products (Fannie HomeReady, Freddie Home Possible) use AMI % for eligibility. At or below the limit can also mean reduced MI coverage and loan-level price adjustment relief.</li>
+                        <li><strong>Where the median comes from:</strong> FFIEC / HUD publish median family income by census tract each year; the GSE lookup tools return the limit for the subject property address.</li>
+                        <li><strong>What income counts:</strong> for GSE products, the qualifying income of the borrowers on the loan—not every member of the household.</li>
+                        <li><strong>USDA is different:</strong> it counts total household income against a county limit (commonly 115% of AMI), checked in the USDA eligibility tool.</li>
+                      </ul>
+                    </div>
+                  </details>
                 </div>
                 </div>
               </fieldset>
@@ -115,17 +149,21 @@
                   <label class="form-label">Loan amount</label>
                   <input type="number" class="form-control" id="loanAmount" value="725000" />
                 </div>
+                <div class="col-md-2">
+                  <label class="form-label" for="subordinateFinancing">Subordinate liens ($)</label>
+                  <input type="number" class="form-control" id="subordinateFinancing" value="12200" min="0" title="Second mortgages, HELOC draws, or down-payment assistance liens behind the first" />
+                </div>
                 <div class="col-md-3">
                   <label class="form-label">Purchase price</label>
                   <input type="number" class="form-control" id="purchasePrice" value="760000" />
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label">LTV</label>
-                  <input type="number" class="form-control" id="ltv" value="95" />
+                  <label class="form-label" for="ltv">LTV <span class="badge text-bg-light border fw-normal">auto</span></label>
+                  <input type="number" class="form-control bg-body-tertiary" id="ltv" value="95.39" readonly tabindex="-1" title="Loan amount ÷ purchase price (calcMath.gseLtvPercent)" />
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label">CLTV</label>
-                  <input type="number" class="form-control" id="cltv" value="97" />
+                  <label class="form-label" for="cltv">CLTV <span class="badge text-bg-light border fw-normal">auto</span></label>
+                  <input type="number" class="form-control bg-body-tertiary" id="cltv" value="97" readonly tabindex="-1" title="(Loan amount + subordinate liens) ÷ purchase price (calcMath.gseCltvPercent)" />
                 </div>
                 <div class="col-md-2">
                   <label class="form-label">Units</label>
@@ -139,7 +177,7 @@
                   <label class="form-label">County</label>
                   <input type="text" class="form-control" id="county" value="Orange" />
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                   <label class="form-label">Occupancy</label>
                   <select class="form-select" id="occupancy">
                     <option value="primary" selected>Primary</option>
@@ -147,7 +185,7 @@
                     <option value="investment">Investment</option>
                   </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                   <label class="form-label">Purpose</label>
                   <select class="form-select" id="purpose">
                     <option value="purchase" selected>Purchase</option>
@@ -155,7 +193,7 @@
                     <option value="cashOutRefi">Cash-out refi</option>
                   </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                   <label class="form-label">Property type</label>
                   <select class="form-select" id="propertyType">
                     <option value="singleFamily" selected>Single-family</option>
@@ -322,6 +360,30 @@
           </div>
         </div>
       </section>
+
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+        <h2 class="h5 mb-0">Product fit <span class="gse-inline-count" id="gseProductRowCount">0 rows</span></h2>
+        <div class="btn-group btn-group-sm" role="group" aria-label="Filter products by agency">
+          <button type="button" class="btn btn-outline-secondary active" id="gseFilterAll">All</button>
+          <button type="button" class="btn btn-outline-secondary" id="gseFilterGse">GSE only</button>
+          <button type="button" class="btn btn-outline-secondary" id="gseFilterFha">FHA</button>
+          <button type="button" class="btn btn-outline-secondary" id="gseFilterVa">VA</button>
+          <button type="button" class="btn btn-outline-secondary" id="gseFilterUsda">USDA</button>
+        </div>
+      </div>
+      <p class="small text-muted gse-section-subtitle mb-2">Status and score are directional. Review reasons/warnings and overlay findings before lock.</p>
+      <div class="card shadow-sm gse-grid-card mb-4">
+        <div class="card-body p-2 p-md-3">
+          <div id="gseProductsGrid" class="ag-theme-alpine" style="height: 320px; width: 100%"></div>
+        </div>
+      </div>
+
+      <h2 class="h5 mb-2">Suggestions <span class="gse-inline-count" id="gseSuggestionCount">0 items</span></h2>
+      <div class="card shadow-sm gse-grid-card mb-4">
+        <div class="card-body p-2 p-md-3">
+          <div id="gseSuggestionsGrid" class="ag-theme-alpine" style="height: 180px; width: 100%"></div>
+        </div>
+      </div>
 
       <section class="gse-pooling-section mb-4" id="gsePoolingSection" aria-label="Mortgage pooling and MBS primer">
         <article class="gse-pooling-card">
@@ -586,30 +648,6 @@
         </article>
       </section>
 
-      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
-        <h2 class="h5 mb-0">Product fit <span class="gse-inline-count" id="gseProductRowCount">0 rows</span></h2>
-        <div class="btn-group btn-group-sm" role="group" aria-label="Filter products by agency">
-          <button type="button" class="btn btn-outline-secondary active" id="gseFilterAll">All</button>
-          <button type="button" class="btn btn-outline-secondary" id="gseFilterGse">GSE only</button>
-          <button type="button" class="btn btn-outline-secondary" id="gseFilterFha">FHA</button>
-          <button type="button" class="btn btn-outline-secondary" id="gseFilterVa">VA</button>
-          <button type="button" class="btn btn-outline-secondary" id="gseFilterUsda">USDA</button>
-        </div>
-      </div>
-      <p class="small text-muted gse-section-subtitle mb-2">Status and score are directional. Review reasons/warnings and overlay findings before lock.</p>
-      <div class="card shadow-sm gse-grid-card mb-3">
-        <div class="card-body p-2 p-md-3">
-          <div id="gseProductsGrid" class="ag-theme-alpine" style="height: 320px; width: 100%"></div>
-        </div>
-      </div>
-
-      <h2 class="h5 mt-4 mb-2">Suggestions <span class="gse-inline-count" id="gseSuggestionCount">0 items</span></h2>
-      <div class="card shadow-sm gse-grid-card">
-        <div class="card-body p-2 p-md-3">
-          <div id="gseSuggestionsGrid" class="ag-theme-alpine" style="height: 180px; width: 100%"></div>
-        </div>
-      </div>
-
       <section class="card shadow-sm mt-4 gse-ai-card" id="gseKnowledgeBank">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
           <span><i class="bi bi-diagram-3 me-1"></i>GSE knowledge bank + AI expert</span>
@@ -661,6 +699,7 @@
             <button type="button" class="btn btn-sm btn-outline-primary gse-ai-chip" data-prompt="What documents do we need upfront for the best-fit programs?">Required docs upfront</button>
             <button type="button" class="btn btn-sm btn-outline-primary gse-ai-chip" data-prompt="Explain mortgage pooling and MBS delivery paths for this scenario: Fannie/Freddie UMBS vs Ginnie Mae, and what ops must verify before pooling.">Pooling &amp; MBS paths</button>
             <button type="button" class="btn btn-sm btn-outline-primary gse-ai-chip" data-prompt="Explain ARM first rate change date vs first payment change date, and a bank cutoff where March 10 allows April but March 11 rolls to July.">ARM rate change dates</button>
+            <button type="button" class="btn btn-sm btn-outline-primary gse-ai-chip" data-prompt="What appraisal / collateral path fits this scenario? Cover value acceptance or ACE waiver, desktop or hybrid, traditional full appraisal, UCDP submission, and UAD 3.6 / redesigned URAR timing.">Appraisal path</button>
           </div>
           <div class="row g-2">
             <div class="col-md-9">
@@ -715,6 +754,174 @@
           </div>
         </div>
       </section>
+
+      <section class="gse-pooling-section mt-4 mb-4" id="gseAppraisalSection" aria-label="Appraisal products and collateral delivery">
+        <article class="gse-pooling-card">
+          <div class="gse-exhibit-kicker">Collateral · education</div>
+          <h2 class="h5 mb-2">Appraisal products &amp; collateral delivery</h2>
+          <p class="small gse-exhibit-context mb-3">
+            Every agency and government loan needs a supported value. Depending on AUS findings, LTV, occupancy, and property type, that
+            value can come from a <strong>waiver</strong> (no appraisal), a <strong>property data collection</strong>, a <strong>desktop or hybrid appraisal</strong>,
+            or a <strong>traditional full appraisal</strong>. Decision-support only—DU / LPA / TOTAL / GUS findings and the current guides decide which path applies.
+          </p>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6 col-xl-3">
+              <div class="gse-pooling-step">
+                <span class="gse-pooling-step__n" aria-hidden="true">1</span>
+                <h3 class="h6 mb-1">Waiver</h3>
+                <p class="small mb-0">Fannie <strong>value acceptance</strong> or Freddie <strong>ACE</strong> accepts the lender's value estimate from models and prior data. No appraiser, no inspection.</p>
+              </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+              <div class="gse-pooling-step">
+                <span class="gse-pooling-step__n" aria-hidden="true">2</span>
+                <h3 class="h6 mb-1">Property data only</h3>
+                <p class="small mb-0">Fannie <strong>value acceptance + property data</strong> or Freddie <strong>ACE+ PDR</strong>: a trained data collector inspects and reports condition; still no appraiser opinion of value.</p>
+              </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+              <div class="gse-pooling-step">
+                <span class="gse-pooling-step__n" aria-hidden="true">3</span>
+                <h3 class="h6 mb-1">Desktop / hybrid</h3>
+                <p class="small mb-0">A licensed appraiser gives the value. <strong>Desktop</strong>: no inspection, uses public and MLS data. <strong>Hybrid</strong>: a third party collects property data, the appraiser completes the report.</p>
+              </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+              <div class="gse-pooling-step">
+                <span class="gse-pooling-step__n" aria-hidden="true">4</span>
+                <h3 class="h6 mb-1">Traditional full</h3>
+                <p class="small mb-0">Appraiser inspects interior and exterior and develops the sales comparison (plus cost / income where needed). Required whenever AUS does not offer an alternative.</p>
+              </div>
+            </div>
+          </div>
+
+          <details class="gse-explainer mb-2" open>
+            <summary>GSE appraisal products (Fannie Mae / Freddie Mac)</summary>
+            <div class="gse-explainer__body">
+              <div class="row g-3">
+                <div class="col-lg-6">
+                  <h3 class="h6 mb-2">Traditional report forms (legacy UAD 2.6)</h3>
+                  <ul class="small gse-pooling-list mb-0">
+                    <li><strong>1004 / Freddie 70 (URAR)</strong> — single-family, interior and exterior; the workhorse form.</li>
+                    <li><strong>1073 / Freddie 465</strong> — individual condominium unit, interior and exterior.</li>
+                    <li><strong>1075 / Freddie 466</strong> — condominium unit, exterior-only.</li>
+                    <li><strong>2055 / Freddie 2055</strong> — single-family, exterior-only (drive-by), when AUS allows.</li>
+                    <li><strong>1025 / Freddie 72</strong> — small residential income property (2–4 units), with rent schedule.</li>
+                    <li><strong>1004C / Freddie 70B</strong> — manufactured home.</li>
+                    <li><strong>1004D / Freddie 442</strong> — appraisal update and/or completion certificate (subject-to repairs or new construction).</li>
+                    <li><strong>216 / 998</strong> — operating income statement and comparable rent schedule add-ons for investment properties.</li>
+                  </ul>
+                </div>
+                <div class="col-lg-6">
+                  <h3 class="h6 mb-2">Alternatives and age rules</h3>
+                  <ul class="small gse-pooling-list mb-0">
+                    <li><strong>Desktop appraisal</strong> — Fannie 1004 Desktop when DU offers it (typically purchase, 1-unit primary residence, lower LTV bands). Freddie offers a comparable path through LPA.</li>
+                    <li><strong>Hybrid appraisal</strong> — data collector inspects (photos, floor plan, condition) and the appraiser completes the report without visiting.</li>
+                    <li><strong>Value acceptance / ACE</strong> — appraisal waiver offered by DU or LPA. Lender may still order an appraisal; LTV, cash-out, investment, and property type limit eligibility.</li>
+                    <li><strong>Value acceptance + property data / ACE+ PDR</strong> — waiver with a property data report to confirm condition and existence.</li>
+                    <li><strong>Appraisal age</strong> — the effective date must generally be within 12 months of the note date. Older than about 4 months requires a 1004D / 442 update. Older than 12 months requires a new appraisal.</li>
+                    <li><strong>Rep and warrant relief</strong> — Fannie Day 1 Certainty and Freddie LCA can relieve value reps when risk scores are low; verify current terms.</li>
+                  </ul>
+                </div>
+              </div>
+              <p class="small text-muted mt-2 mb-0">
+                References:
+                <a href="https://selling-guide.fanniemae.com/sel/b4-1/property-and-appraisal-requirements" target="_blank" rel="noopener noreferrer">Fannie Selling Guide B4-1</a> ·
+                <a href="https://guide.freddiemac.com/app/guide/chapter/5601" target="_blank" rel="noopener noreferrer">Freddie Guide 5601–5605</a>
+              </p>
+            </div>
+          </details>
+
+          <details class="gse-explainer mb-2">
+            <summary>UCDP — Uniform Collateral Data Portal</summary>
+            <div class="gse-explainer__body">
+              <ul class="small gse-pooling-list mb-2">
+                <li><strong>What it is:</strong> the joint Fannie Mae / Freddie Mac portal for submitting appraisal reports electronically (MISMO XML with embedded PDF) <em>before</em> the loan is delivered.</li>
+                <li><strong>Submission Summary Report (SSR):</strong> returned for each submission. Lists findings by severity; <strong>hard stops</strong> must be fixed (or overridden where allowed) before delivery.</li>
+                <li><strong>Collateral Underwriter (CU):</strong> Fannie's automated appraisal risk score, 1.0 (lowest risk) to 5.0, with flags for comparables, condition, and overvaluation.</li>
+                <li><strong>Loan Collateral Advisor (LCA):</strong> Freddie's equivalent risk score and messages, plus eligibility for collateral rep and warrant relief.</li>
+                <li><strong>Doc file ID:</strong> UCDP assigns an ID per appraisal that must match the loan delivery (ULDD) data.</li>
+                <li><strong>FHA uses a separate portal</strong> — EAD (Electronic Appraisal Delivery) through FHA Connection. VA appraisals flow through WebLGY.</li>
+              </ul>
+              <p class="small text-muted mb-0">
+                Reference: <a href="https://singlefamily.fanniemae.com/applications-technology/uniform-collateral-data-portal" target="_blank" rel="noopener noreferrer">Fannie Mae UCDP</a> ·
+                <a href="https://sf.freddiemac.com/tools-learning/technology-tools/our-solutions/uniform-collateral-data-portal" target="_blank" rel="noopener noreferrer">Freddie Mac UCDP</a>
+              </p>
+            </div>
+          </details>
+
+          <details class="gse-explainer mb-2">
+            <summary>UAD 3.6 and the redesigned URAR</summary>
+            <div class="gse-explainer__body">
+              <ul class="small gse-pooling-list mb-2">
+                <li><strong>One dynamic report:</strong> the redesigned Uniform Residential Appraisal Report replaces the legacy form family (1004, 1073, 1075, 1025, 2055, 1004C and related addenda). Sections appear or hide based on property type and scope.</li>
+                <li><strong>New dataset:</strong> UAD 3.6 on MISMO 3.6—more structured data (condition and quality ratings, property features, market analysis) and fewer free-text fields.</li>
+                <li><strong>Built for automation:</strong> cleaner data for CU / LCA risk scoring, waiver models, and hybrid or desktop workflows.</li>
+              </ul>
+              <ol class="small gse-pooling-list mb-2">
+                <li><strong>Limited production</strong> — early adopters submit UAD 3.6 reports through UCDP.</li>
+                <li><strong>Broad production (Jan 2026)</strong> — all lenders may submit UAD 3.6.</li>
+                <li><strong>Mandatory (Nov 2026)</strong> — new submissions must use UAD 3.6 / redesigned URAR.</li>
+                <li><strong>Legacy retirement (May 2027)</strong> — legacy UAD 2.6 forms no longer accepted.</li>
+              </ol>
+              <p class="small text-muted mb-0">
+                Dates are summarized from GSE announcements—verify the current timeline at
+                <a href="https://singlefamily.fanniemae.com/delivering/uniform-mortgage-data-program/uniform-appraisal-dataset" target="_blank" rel="noopener noreferrer">fanniemae.com</a> and
+                <a href="https://sf.freddiemac.com/tools-learning/uniform-mortgage-data-program/uad" target="_blank" rel="noopener noreferrer">freddiemac.com</a>.
+              </p>
+            </div>
+          </details>
+
+          <details class="gse-explainer mb-3">
+            <summary>FHA, VA, and USDA appraisals</summary>
+            <div class="gse-explainer__body">
+              <div class="row g-3">
+                <div class="col-lg-4">
+                  <h3 class="h6 mb-2">FHA (HUD)</h3>
+                  <ul class="small gse-pooling-list mb-0">
+                    <li>FHA roster appraiser; report must address HUD <strong>Minimum Property Requirements / Standards</strong> (safety, security, soundness).</li>
+                    <li>Submitted through <strong>EAD</strong> in FHA Connection before endorsement.</li>
+                    <li>Validity is generally 180 days, with an update option in limited cases (verify HUD 4000.1).</li>
+                    <li>Streamline refinances can close without an appraisal (non-credit-qualifying).</li>
+                  </ul>
+                </div>
+                <div class="col-lg-4">
+                  <h3 class="h6 mb-2">VA</h3>
+                  <ul class="small gse-pooling-list mb-0">
+                    <li>VA assigns a fee-panel appraiser through WebLGY—lenders do not choose.</li>
+                    <li>Report must address VA <strong>Minimum Property Requirements</strong>; result is the <strong>Notice of Value (NOV)</strong>.</li>
+                    <li><strong>Tidewater</strong>: if value may come in low, the appraiser notifies the lender first so supporting sales can be sent.</li>
+                    <li>IRRRLs generally do not require an appraisal.</li>
+                  </ul>
+                </div>
+                <div class="col-lg-4">
+                  <h3 class="h6 mb-2">USDA</h3>
+                  <ul class="small gse-pooling-list mb-0">
+                    <li>Guaranteed loans use standard GSE forms (1004 / 1073 / 1004C) and HUD-style property standards.</li>
+                    <li>Property must be in a USDA-eligible area; household income must fit the county limit.</li>
+                    <li>Appraisal is reviewed with the GUS submission. Streamlined-assist refinances may not need one.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <h3 class="h6 mb-2">Ops glossary</h3>
+          <dl class="small gse-pooling-glossary mb-0">
+            <div><dt>AMI</dt><dd>Area median income for the property's census tract (FFIEC / HUD). AMI % = qualifying income ÷ AMI; HomeReady and Home Possible generally cap at 80%.</dd></div>
+            <div><dt>SSR</dt><dd>UCDP Submission Summary Report—findings and hard stops for each appraisal submission.</dd></div>
+            <div><dt>CU</dt><dd>Fannie Mae Collateral Underwriter—appraisal risk score 1.0–5.0 plus risk flags.</dd></div>
+            <div><dt>LCA</dt><dd>Freddie Mac Loan Collateral Advisor—appraisal risk score and rep and warrant relief eligibility.</dd></div>
+            <div><dt>PIW</dt><dd>Property inspection waiver—older name for the Fannie waiver now called value acceptance.</dd></div>
+            <div><dt>PDR</dt><dd>Property data report—condition and characteristics collected by a trained non-appraiser.</dd></div>
+            <div><dt>NOV</dt><dd>VA Notice of Value—the VA's determination of reasonable value from the appraisal.</dd></div>
+            <div><dt>EAD</dt><dd>FHA Electronic Appraisal Delivery portal, used before FHA endorsement.</dd></div>
+            <div><dt>MPR / MPS</dt><dd>Minimum Property Requirements / Standards for FHA and VA collateral.</dd></div>
+            <div><dt>Tidewater</dt><dd>VA early notice when the appraised value may fall short of the sales price.</dd></div>
+          </dl>
+        </article>
+      </section>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
@@ -725,6 +932,8 @@
     <script src="/shared/gse-encompass-field-map.js" defer></script>
     <script src="/shared/js/webgpu-runtime.js"></script>
     <script src="/shared/js/webgpu-knowledge-constellation.js"></script>
+    <script src="/shared/calcEngineLibrary.js"></script>
+    <script src="/shared/calculationEngine.js"></script>
     <script src="/js/gse-analyzer.js" defer></script>
   </body>
 </html>

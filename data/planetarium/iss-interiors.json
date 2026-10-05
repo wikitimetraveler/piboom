@@ -184,6 +184,61 @@
         { "id": "zvezda-window-obs", "name": "Observation window", "role": "Working-compartment porthole", "face": "nadir" },
         { "id": "zvezda-hatch-fwd", "name": "Forward to Zarya", "role": "Transfer compartment", "face": "forward" }
       ]
+    },
+    {
+      "id": "kibo-ef",
+      "name": "JEM-EF",
+      "aka": "Exposed Facility",
+      "partner": "JAXA",
+      "lengthM": 5.6,
+      "diameterM": 5.0,
+      "shape": "porch",
+      "axis": "z",
+      "credits": "Schematic of the Exposed Facility deck. Not a pressurized room.",
+      "source": "JAXA — JEM-EF experiment pallets and JEMRMS.",
+      "camera": { "x": 0, "y": 1.55, "z": 0.4 },
+      "hardware": [
+        { "id": "jem-ef-maxi", "name": "MAXI", "role": "Monitor of All-sky X-ray Image", "face": "port" },
+        { "id": "jem-ef-calet", "name": "CALET", "role": "Calorimetric Electron Telescope", "face": "starboard" },
+        { "id": "jemrms", "name": "JEMRMS", "role": "Japanese Experiment Module Remote Manipulator System", "face": "overhead", "hint": "Japan’s robot arm" },
+        { "id": "jem-ef-airlock", "name": "JEM airlock", "role": "Passage from the Pressurized Module", "face": "aft" }
+      ]
+    },
+    {
+      "id": "ida2",
+      "name": "IDA-2",
+      "aka": "NASA Docking System",
+      "partner": "NASA",
+      "lengthM": 1.1,
+      "diameterM": 1.6,
+      "shape": "tunnel",
+      "axis": "z",
+      "credits": "Schematic of the IDA-2 docking tunnel. Not a crew cabin.",
+      "source": "NASA — International Docking Adapter on Harmony forward.",
+      "camera": { "x": 0, "y": 0, "z": -0.35 },
+      "hardware": [
+        { "id": "ida2-ring", "name": "Soft-capture ring", "role": "NASA Docking System", "face": "forward" },
+        { "id": "ida2-petals", "name": "Guide petals", "role": "Hard capture follows soft capture", "face": "forward" },
+        { "id": "ida2-hatch", "name": "Hatch to Harmony", "role": "Forward CBM / PMA", "face": "aft" }
+      ]
+    },
+    {
+      "id": "ida3",
+      "name": "IDA-3",
+      "aka": "NASA Docking System",
+      "partner": "NASA",
+      "lengthM": 1.1,
+      "diameterM": 1.6,
+      "shape": "tunnel",
+      "axis": "z",
+      "credits": "Schematic of the IDA-3 docking tunnel. Not a crew cabin.",
+      "source": "NASA — International Docking Adapter on Harmony zenith.",
+      "camera": { "x": 0, "y": 0, "z": -0.35 },
+      "hardware": [
+        { "id": "ida3-ring", "name": "Soft-capture ring", "role": "NASA Docking System", "face": "forward" },
+        { "id": "ida3-petals", "name": "Guide petals", "role": "Hard capture follows soft capture", "face": "forward" },
+        { "id": "ida3-hatch", "name": "Hatch to Harmony", "role": "Zenith port", "face": "aft" }
+      ]
     }
   ]
 }

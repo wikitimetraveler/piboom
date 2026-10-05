@@ -1,0 +1,25 @@
+{
+  "credit": "NASA Johnson Space Center, Houston Audio Control Room. Public Domain Mark 1.0 via the Internet Archive NASA Audio Collection. Transcripts are the reported air-to-ground from contemporaneous press accounts of these releases, not a word-for-word dump of each file.",
+  "clips": [
+    {
+      "id": "sts135-separation",
+      "title": "Atlantis final separation from the ISS",
+      "date": "2011-07-19",
+      "speaker": "Chris Ferguson, Atlantis, and Ron Garan, Expedition 28",
+      "gallery": "docking",
+      "transcript": "Physical separation. Ron Garan, ringing the ship’s bell in Harmony: Atlantis, departing the International Space Station for the last time. Ferguson: Farewell, ISS. Make us proud.",
+      "sourcePage": "https://archive.org/details/STS-135",
+      "audioUrl": "https://archive.org/download/STS-135/07-19-11_STS-135_FD12_Comments-At-Atlantis-Final-Separation-From-ISS.mp3"
+    },
+    {
+      "id": "sts135-farewell",
+      "title": "STS-135 farewell before undocking",
+      "date": "2011-07-18",
+      "speaker": "STS-135 crew and Expedition 28",
+      "gallery": "station",
+      "transcript": "Farewell ceremony aboard the station on the day before Atlantis undocked. The Houston Audio Control Room release is the ceremony itself.",
+      "sourcePage": "https://archive.org/details/STS-135",
+      "audioUrl": "https://archive.org/download/STS-135/07-18-11_STS-135_FD11_Farewell-Ceremony.mp3"
+    }
+  ]
+}

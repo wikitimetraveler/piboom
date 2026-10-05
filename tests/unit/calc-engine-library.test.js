@@ -45,6 +45,36 @@ describe('calcEngineLibrary helpers', () => {
     expect(calcMath.gseLtvPercent([100, 0])).toBe(0);
   });
 
+  test('gseCltvPercent adds subordinate liens to the first lien', () => {
+    expect(calcMath.gseCltvPercent([725000, 12200, 760000])).toBe(97);
+    expect(calcMath.gseCltvPercent(['380000', '', '400000'])).toBe(95);
+    expect(calcMath.gseCltvPercent([380000, -5000, 400000])).toBe(95);
+    expect(calcMath.gseCltvPercent([380000, 20000, 0])).toBe(0);
+  });
+
+  test('gseAmiPercent divides income by area median income', () => {
+    expect(calcMath.gseAmiPercent([85000, 109000])).toBe(77.98);
+    expect(calcMath.gseAmiPercent(['85000', '100000'])).toBe(85);
+    expect(calcMath.gseAmiPercent([85000, ''])).toBe('');
+    expect(calcMath.gseAmiPercent([85000, 0])).toBe('');
+  });
+
+  test('monthlyPrincipalInterest amortizes a fixed-rate loan', () => {
+    expect(calcMath.monthlyPrincipalInterest([300000, 6.5, 360])).toBe(1896.2);
+    expect(calcMath.monthlyPrincipalInterest(['200000', '0', '240'])).toBe(833.33);
+    expect(calcMath.monthlyPrincipalInterest([0, 6.5, 360])).toBe(0);
+    expect(calcMath.monthlyPrincipalInterest([300000, 6.5, 0])).toBe(0);
+  });
+
+  test('addBusinessDays skips Sundays and optionally Saturdays', () => {
+    expect(calcMath.addBusinessDays(['2026-10-05', 3, false])).toBe('2026-10-08');
+    expect(calcMath.addBusinessDays(['2026-10-08', 3, false])).toBe('2026-10-13');
+    expect(calcMath.addBusinessDays(['2026-10-08', 3, true])).toBe('2026-10-12');
+    expect(calcMath.addBusinessDays(['2026-10-13', -3, true])).toBe('2026-10-09');
+    expect(calcMath.addBusinessDays(['2026-10-13', -3, false])).toBe('2026-10-08');
+    expect(calcMath.addBusinessDays(['10/13/2026', 3])).toBe('');
+  });
+
   test('gseConformingBand', () => {
     expect(calcMath.gseConformingBand([500000, 806500])).toBe('within-limit');
     expect(calcMath.gseConformingBand([900000, 806500])).toBe('above-limit');

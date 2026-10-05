@@ -14,7 +14,8 @@
     { id: 'iran', href: '/iran/', label: 'Iran', ar: 'إيران' },
     { id: 'iraq', href: '/iraq/', label: 'Iraq', ar: 'العراق' },
     { id: 'lebanon', href: '/lebanon/', label: 'Lebanon', ar: 'لبنان' },
-    { id: 'egypt', href: '/egypt/', label: 'Egypt', ar: 'مصر' }
+    { id: 'egypt', href: '/egypt/', label: 'Egypt', ar: 'مصر' },
+    { id: 'silk-road', href: '/silk-road/', label: 'Silk Road', ar: 'طريق الحرير' }
   ];
 
   function activeId() {
@@ -27,6 +28,7 @@
     if (path.startsWith('/iraq')) return 'iraq';
     if (path.startsWith('/lebanon')) return 'lebanon';
     if (path.startsWith('/egypt')) return 'egypt';
+    if (path.startsWith('/silk-road')) return 'silk-road';
     return 'home';
   }
 

@@ -53,6 +53,7 @@
 
   function setSpeaking(on) {
     if (els.zigzag) els.zigzag.classList.toggle('is-speaking', Boolean(on));
+    document.dispatchEvent(new CustomEvent('planetarium-voice', { detail: { speaking: Boolean(on) } }));
   }
 
   function setSceneKeepAlive(on) {

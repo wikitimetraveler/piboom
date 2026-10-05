@@ -1,7 +1,7 @@
 /**
  * Development work by David Lane
  */
-/* global agGrid */
+/* global agGrid, CalculationsEngine, createGseScenarioConfig */
 
 (function () {
   'use strict';
@@ -14,6 +14,10 @@
   let productFilter = 'all';
   let voiceWidgetInstance;
   let lastSummarySnapshot = null;
+  let scenarioCalc = null;
+  let analyzeSeq = 0;
+  let autoAnalyzeTimer = null;
+  const AUTO_ANALYZE_MS = 650;
 
   function setBusy(el, busy) {
     if (!el) return;
@@ -409,6 +413,17 @@
     $('purchasePrice').value = String(l.purchasePrice ?? '');
     $('ltv').value = String(l.ltv ?? '');
     $('cltv').value = String(l.cltv ?? '');
+    const loanAmt = Number(l.loanAmount);
+    const price = Number(l.purchasePrice);
+    const statedCltv = Number(l.cltv);
+    if (price > 0 && Number.isFinite(loanAmt) && Number.isFinite(statedCltv) && l.cltv != null && l.cltv !== '') {
+      $('subordinateFinancing').value = String(Math.max(0, Math.round((statedCltv / 100) * price - loanAmt)));
+    }
+    const statedAmi = Number(b.amiPercent);
+    const incomeAmt = Number(b.income);
+    if (b.amiPercent != null && statedAmi > 0 && incomeAmt > 0) {
+      $('areaMedianIncome').value = String(Math.round(incomeAmt / (statedAmi / 100)));
+    }
     $('occupancy').value = l.occupancy || 'primary';
     $('purpose').value = l.purpose || 'purchase';
     $('propertyType').value = l.propertyType || 'singleFamily';
@@ -422,6 +437,68 @@
     else if (l.usdaEligibleArea === false) $('usdaEligibleArea').value = 'false';
     else $('usdaEligibleArea').value = '';
     $('jsonPaste').value = '';
+    recalcScenario();
+    scheduleAutoAnalyze();
+  }
+
+  function updateAmiWorkedExample() {
+    const el = $('gseAmiWorked');
+    if (!el) return;
+    const income = Number($('income').value);
+    const median = Number($('areaMedianIncome').value);
+    const pct = $('amiPercent').value;
+    el.textContent =
+      median > 0 && pct !== ''
+        ? `$${income.toLocaleString()} ÷ $${median.toLocaleString()} = ${pct}%`
+        : 'enter an area median income to calculate';
+  }
+
+  function onScenarioCellComputed({ resultId, value }) {
+    if (resultId === 'gseLiveRisk') {
+      $('gseRisk').textContent = value || '—';
+    } else if (resultId === 'gseLiveConforming') {
+      $('gseConf').textContent = value || '—';
+    } else if (resultId === 'amiPercent') {
+      updateAmiWorkedExample();
+    }
+  }
+
+  function initScenarioCalc() {
+    if (typeof CalculationsEngine !== 'function' || typeof createGseScenarioConfig !== 'function') {
+      console.warn('GSE analyzer: calculation engine not loaded; live recalc disabled.');
+      const badge = $('gseLiveBadge');
+      if (badge) badge.classList.add('d-none');
+      return;
+    }
+    scenarioCalc = new CalculationsEngine(createGseScenarioConfig(), {
+      onCellComputed: onScenarioCellComputed
+    });
+    recalcScenario();
+  }
+
+  function recalcScenario() {
+    if (!scenarioCalc) return;
+    scenarioCalc.recalculateAll();
+    onScenarioCellComputed({ resultId: 'gseLiveRisk', value: $('gseLiveRisk').value });
+    onScenarioCellComputed({ resultId: 'gseLiveConforming', value: $('gseLiveConforming').value });
+    updateAmiWorkedExample();
+  }
+
+  function scheduleAutoAnalyze() {
+    if ($('jsonPaste').value.trim()) return;
+    clearTimeout(autoAnalyzeTimer);
+    autoAnalyzeTimer = setTimeout(() => runAnalyze({ silent: true }), AUTO_ANALYZE_MS);
+  }
+
+  function bindScenarioAutoAnalyze() {
+    const card = document.querySelector('.gse-scenario-card');
+    if (!card) return;
+    const onEdit = (ev) => {
+      if (ev.target && ev.target.id === 'jsonPaste') return;
+      scheduleAutoAnalyze();
+    };
+    card.addEventListener('input', onEdit);
+    card.addEventListener('change', onEdit);
   }
 
   function setPipelineStatus(html, isError) {
@@ -689,6 +766,10 @@
     $('gseOverlayIssues').textContent = summary ? String(summary.failedOverlayCount ?? '—') : '—';
     const lim = summary && summary.loanLimit;
     $('gseLimit').textContent = lim ? `$${lim.amount.toLocaleString()} (${lim.year}${lim.highCostArea ? ', high-cost' : ''})` : '—';
+    if (summary) {
+      $('gseLimitAmount').value = lim ? String(lim.amount) : '';
+      recalcScenario();
+    }
     const wEl = $('gseInputWarnings');
     if (warnings && warnings.length) {
       wEl.textContent = warnings.join(' ');
@@ -700,15 +781,27 @@
     wEl.setAttribute('role', warnings && warnings.length ? 'alert' : 'status');
   }
 
+  function showSilentAnalyzeIssue(msg) {
+    const wEl = $('gseInputWarnings');
+    if (!wEl) return;
+    wEl.textContent = msg;
+    wEl.classList.remove('d-none');
+    wEl.setAttribute('role', 'status');
+  }
+
   async function runAnalyze(options = {}) {
+    const silent = options.silent === true;
     const btn = $('btnAnalyze');
-    setBusy(btn, true);
+    const seq = ++analyzeSeq;
+    clearTimeout(autoAnalyzeTimer);
+    if (!silent) setBusy(btn, true);
     try {
       let body;
       const raw = $('jsonPaste').value.trim();
       if (raw) {
         body = JSON.parse(raw);
       } else {
+        recalcScenario();
         body = readScenarioFromForm();
       }
       const res = await fetch('/api/gse/analyze-scenario', {
@@ -717,8 +810,13 @@
         body: JSON.stringify(body)
       });
       const data = await res.json();
+      if (seq !== analyzeSeq) return;
       if (!res.ok || !data.success) {
         const msg = (data.errors && data.errors.join('; ')) || data.error || 'Request failed';
+        if (silent) {
+          showSilentAnalyzeIssue(msg);
+          return;
+        }
         if (options.voiceFeedback) speak(msg);
         alert(msg);
         return;
@@ -737,10 +835,15 @@
         speakGseSummary();
       }
     } catch (e) {
+      if (seq !== analyzeSeq) return;
+      if (silent) {
+        showSilentAnalyzeIssue(e.message || String(e));
+        return;
+      }
       if (options.voiceFeedback) speak(e.message || String(e));
       alert(e.message || String(e));
     } finally {
-      setBusy(btn, false);
+      if (!silent) setBusy(btn, false);
     }
   }
 
@@ -1204,7 +1307,9 @@
     loadMeta();
     loadKnowledgeBank();
     bootKnowledgeConstellation();
-    $('btnAnalyze').addEventListener('click', runAnalyze);
+    initScenarioCalc();
+    bindScenarioAutoAnalyze();
+    $('btnAnalyze').addEventListener('click', () => runAnalyze());
     $('btnLoanLimits').addEventListener('click', runLoanLimits);
     const loadBtn = $('btnLoadPipeline');
     if (loadBtn) loadBtn.addEventListener('click', loadFromPipeline);
@@ -1230,6 +1335,7 @@
     bindFilter('gseFilterVa', 'va');
     bindFilter('gseFilterUsda', 'usda');
     applyProductFilter();
+    runAnalyze({ silent: true });
     initializeVoiceWidget();
 
     const askBtn = $('btnAskLoanExpert');

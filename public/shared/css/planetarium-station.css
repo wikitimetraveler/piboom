@@ -8,10 +8,11 @@ body.plan-station {
   --st-ice: #9ad4ff;
   --st-hull: #e8e4dc;
   --st-muted: rgba(232, 228, 220, 0.78);
-  --st-partner-nasa: #d8d4cc;
-  --st-partner-ros: #8a9099;
-  --st-partner-esa: #9ad4ff;
-  --st-partner-jaxa: #e8dcc8;
+  /* Keep in sync with OWNER_TINT in planetarium-station-scene.js */
+  --st-partner-nasa: #6c9cff;
+  --st-partner-ros: #ff6f61;
+  --st-partner-esa: #4fd1c5;
+  --st-partner-jaxa: #ff9ec4;
   --st-partner-csa: #ffd278;
   --st-partner-structure: #6a7380;
 }
@@ -130,6 +131,7 @@ body.plan-station {
 
 .st-stage-block {
   position: relative;
+  container: st-stage-block / inline-size;
   margin: 0;
   border-radius: 1.1rem;
   overflow: hidden;
@@ -150,7 +152,18 @@ body.plan-station {
   flex-wrap: wrap;
   gap: 0.45rem;
   justify-content: flex-end;
-  max-width: calc(100% - 7.5rem);
+  max-width: calc(100% - 15rem);
+}
+
+/* Toolbar and chrome dock share the top row; drop dock labels before they collide. */
+@container st-stage-block (max-width: 900px) {
+  .st-stage-toolbar {
+    max-width: calc(100% - 6.5rem);
+  }
+
+  .st-chrome-btn__label {
+    display: none;
+  }
 }
 
 .st-chrome-dock {
@@ -169,6 +182,80 @@ body.plan-station {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
+}
+
+.st-owners {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 2.6rem;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.25rem;
+  padding: 0.45rem 0.5rem 0.5rem;
+  border-radius: 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--st-ice) 22%, transparent);
+  background: rgba(6, 8, 14, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+.st-owners__title {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--st-muted);
+  margin: 0 0 0.1rem;
+}
+
+.st-owner {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid var(--plan-line, rgba(255, 255, 255, 0.14));
+  background: transparent;
+  color: var(--st-hull);
+  font: inherit;
+  font-size: 0.74rem;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+}
+
+.st-owner:hover {
+  border-color: color-mix(in srgb, var(--st-gold) 55%, transparent);
+}
+
+.st-owner.is-on {
+  border-color: var(--st-gold);
+  color: var(--st-gold);
+}
+
+.st-owner:focus-visible {
+  outline: 2px solid var(--st-ice);
+  outline-offset: 2px;
+}
+
+.st-owner__dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--st-partner-structure);
+}
+
+.st-owner[data-owner='NASA'] .st-owner__dot { background: var(--st-partner-nasa); }
+.st-owner[data-owner='Roscosmos'] .st-owner__dot { background: var(--st-partner-ros); }
+.st-owner[data-owner='ESA'] .st-owner__dot { background: var(--st-partner-esa); }
+.st-owner[data-owner='JAXA'] .st-owner__dot { background: var(--st-partner-jaxa); }
+.st-owner[data-owner='CSA'] .st-owner__dot { background: var(--st-partner-csa); }
+
+.st-stage-block.is-walk .st-owners {
+  display: none;
 }
 
 .st-modes,
@@ -821,6 +908,18 @@ body.plan-station {
     margin: 0.45rem 0.65rem 0;
   }
 
+  .st-owners {
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 0.45rem 0.65rem 0;
+  }
+
+  .st-owners__title {
+    width: 100%;
+  }
+
   .st-hud {
     max-width: min(16rem, calc(100% - 1.5rem));
     left: 0.65rem;
@@ -853,26 +952,47 @@ body.plan-station {
     height: 3.75rem;
   }
 
+  /* Dock sits on its own row here, so the labels fit. */
   .st-chrome-btn__label {
-    display: none;
+    display: inline;
   }
 }
 
 /* Showcase: hide chrome, keep dock for restore + fullscreen */
 body.plan-station.is-st-chrome-hidden .st-stage-toolbar,
 body.plan-station.is-st-chrome-hidden .st-live--ticker,
+body.plan-station.is-st-chrome-hidden .st-owners,
 body.plan-station.is-st-chrome-hidden .st-hud,
 body.plan-station.is-st-chrome-hidden .st-pick-hud,
-body.plan-station.is-st-chrome-hidden .st-tour {
+body.plan-station.is-st-chrome-hidden .st-tour,
+body.plan-station.is-st-chrome-hidden .st-scale,
+body.plan-station.is-st-chrome-hidden modern-navbar,
+body.plan-station.is-st-chrome-hidden .pw-masthead,
+body.plan-station.is-st-chrome-hidden .st-status,
+body.plan-station.is-st-chrome-hidden #aiChatButton {
   display: none !important;
 }
 
 body.plan-station.is-st-chrome-hidden .st-chrome-dock {
+  position: absolute;
+  top: 0.65rem;
+  left: 0.65rem;
+  right: auto;
   background: rgba(6, 8, 14, 0.72);
   border: 1px solid color-mix(in srgb, var(--st-ice) 28%, transparent);
   border-radius: 0.5rem;
   padding: 0.25rem;
   backdrop-filter: blur(8px);
+}
+
+body.plan-station.is-st-chrome-hidden .st-chrome-btn__label {
+  display: inline;
+}
+
+/* Inline (not fullscreen) showcase: stage takes the viewport. */
+body.plan-station.is-st-chrome-hidden .st-stage-block:not(:fullscreen) .st-stage {
+  height: calc(100dvh - 1.5rem);
+  min-height: 20rem;
 }
 
 /* Fullscreen showcase panes */
@@ -911,4 +1031,209 @@ body.plan-station.is-st-chrome-hidden .st-chrome-dock {
 .st-display:fullscreen .st-display__grid,
 .st-display:-webkit-full-screen .st-display__grid {
   max-height: none;
+}
+
+.st-hud__plain {
+  margin: 0.2rem 0 0;
+  color: var(--st-gold);
+  font-size: 0.92rem;
+}
+
+.st-rack .st-hud__plain {
+  display: block;
+  margin-top: 0.28rem;
+  font-size: 0.72rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.st-comms,
+.st-hall,
+.st-arrivals,
+.st-case,
+.st-tv {
+  margin: 1rem 0 0;
+  padding: 0.9rem 1rem;
+  border-radius: 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--st-ice) 28%, transparent);
+  background: rgba(6, 8, 14, 0.55);
+}
+
+.st-comms__kicker,
+.st-comms__who,
+.st-comms__credit,
+.st-tv__lead,
+.st-tv__credit {
+  margin: 0.25rem 0;
+  color: var(--st-muted);
+}
+
+.st-comms__title,
+.st-comms__transcript,
+.st-hall__line,
+.st-step__text {
+  margin: 0.35rem 0;
+}
+
+.st-comms__controls,
+.st-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.55rem;
+}
+
+.st-hunt {
+  margin: 0.75rem 0 0;
+}
+
+/* Launch to dock */
+.st-arrivals__lead,
+.st-arrivals__src {
+  margin: 0.3rem 0 0.6rem;
+  color: var(--st-muted);
+  font-size: 0.86rem;
+}
+
+.st-arrivals__src {
+  margin: 0.6rem 0 0;
+  font-size: 0.74rem;
+}
+
+.st-arrivals__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 0.6rem;
+}
+
+.st-arrivals__empty {
+  color: var(--st-muted);
+}
+
+.st-arrival {
+  padding: 0.65rem 0.75rem 0.75rem;
+  border-radius: 0.65rem;
+  border: 1px solid color-mix(in srgb, var(--st-ice) 22%, transparent);
+  background: rgba(10, 14, 24, 0.7);
+}
+
+.st-arrival.is-next {
+  border-color: color-mix(in srgb, var(--st-gold) 55%, transparent);
+}
+
+.st-arrival.is-active {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--st-ok) 55%, transparent);
+}
+
+.st-arrival__head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.st-arrival__badge {
+  padding: 0.05rem 0.4rem;
+  border-radius: 0.3rem;
+  background: var(--st-gold);
+  color: #1a1206;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.st-arrival__vehicle {
+  font-weight: 700;
+  color: var(--st-hull);
+}
+
+.st-arrival__status {
+  margin-left: auto;
+  font-size: 0.7rem;
+  color: var(--st-ok);
+  letter-spacing: 0.05em;
+}
+
+.st-arrival__name,
+.st-arrival__when,
+.st-arrival__meta,
+.st-arrival__port {
+  margin: 0.2rem 0 0;
+  font-size: 0.82rem;
+}
+
+.st-arrival__when strong {
+  color: var(--st-gold);
+  font-variant-numeric: tabular-nums;
+}
+
+.st-arrival__meta,
+.st-arrival__port {
+  color: var(--st-muted);
+}
+
+.st-arrival .pw-btn {
+  margin-top: 0.55rem;
+}
+
+.st-arrivals__run {
+  margin-top: 0.75rem;
+}
+
+.st-arrivals__steps {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+}
+
+.st-arrivals__steps li {
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--st-ice) 25%, transparent);
+  font-size: 0.76rem;
+  color: var(--st-muted);
+}
+
+.st-arrivals__steps li.is-on {
+  border-color: var(--st-gold);
+  color: var(--st-gold);
+}
+
+.st-arrivals__steps li.is-done {
+  border-color: color-mix(in srgb, var(--st-ok) 60%, transparent);
+  color: var(--st-ok);
+}
+
+.st-arrivals__caption {
+  margin: 0.5rem 0;
+}
+
+.st-ports {
+  margin: 0.4rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.st-ports li {
+  margin: 0.35rem 0;
+}
+
+.st-tv__frame {
+  position: relative;
+  margin-top: 0.6rem;
+  aspect-ratio: 16 / 9;
+  background: #05070c;
+}
+
+.st-tv__frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
 }

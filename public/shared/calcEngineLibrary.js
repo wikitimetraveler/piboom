@@ -227,6 +227,30 @@
     },
 
     /**
+     * GSE scenario support: CLTV% from first lien + subordinate liens over purchase price.
+     * @param {number[]} values [loanAmount, subordinateFinancing, purchasePrice]
+     */
+    gseCltvPercent(values = []) {
+      const loan = toNumber(values[0]);
+      const sub = Math.max(0, toNumber(values[1]));
+      const price = toNumber(values[2]);
+      if (price <= 0) return 0;
+      return round2(((loan + sub) / price) * 100);
+    },
+
+    /**
+     * GSE scenario support: borrower qualifying income as a percent of area median income (AMI).
+     * Returns '' when AMI is blank or zero so the optional field stays empty.
+     * @param {number[]} values [annualIncome, areaMedianIncome]
+     */
+    gseAmiPercent(values = []) {
+      const income = toNumber(values[0]);
+      const ami = toNumber(values[1]);
+      if (!(ami > 0)) return '';
+      return round2((income / ami) * 100);
+    },
+
+    /**
      * Compare loan amount to one conforming limit for the subject unit count (FHFA / county).
      * @param {number[]} values [loanAmount, conformingLimit]
      * @returns {'within-limit'|'above-limit'|'unknown'}
@@ -256,6 +280,45 @@
       if (pts >= 4) return 'high';
       if (pts >= 2) return 'medium';
       return 'low';
+    },
+
+    /**
+     * Fully amortizing monthly principal + interest.
+     * @param {number[]} values [loanAmount, annualRatePercent, termMonths]
+     */
+    monthlyPrincipalInterest(values = []) {
+      const loan = toNumber(values[0]);
+      const rate = toNumber(values[1]);
+      const term = Math.trunc(toNumber(values[2]));
+      if (!(loan > 0) || !(term > 0)) return 0;
+      const r = rate / 100 / 12;
+      if (r === 0) return round2(loan / term);
+      const growth = Math.pow(1 + r, term);
+      return round2((loan * r * growth) / (growth - 1));
+    },
+
+    /**
+     * Shift a calendar date by business days (negative counts backward). Sundays never count;
+     * Saturdays count only when the third value is true. Federal holidays are not modeled.
+     * @param {Array} values [isoDate 'YYYY-MM-DD', days, saturdayCounts]
+     * @returns {string} ISO date or '' for invalid input
+     */
+    addBusinessDays(values = []) {
+      const m = String(values[0] ?? '').trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (!m) return '';
+      const dt = new Date(Date.UTC(Number(m[1]), Number(m[2]) - 1, Number(m[3])));
+      if (Number.isNaN(dt.getTime())) return '';
+      const days = Math.trunc(toNumber(values[1]));
+      const saturdayCounts = values[2] === true || values[2] === 'true';
+      const step = days < 0 ? -1 : 1;
+      let left = Math.abs(days);
+      while (left > 0) {
+        dt.setUTCDate(dt.getUTCDate() + step);
+        const dow = dt.getUTCDay();
+        if (dow === 0 || (dow === 6 && !saturdayCounts)) continue;
+        left -= 1;
+      }
+      return dt.toISOString().slice(0, 10);
     },
 
     /**

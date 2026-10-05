@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Loan file flight simulator - Worksheets</title>
+    <meta name="description" content="Fly a synthetic loan file from application to funding: TRID timing, LTV, DTI fixes and conditions, scored with the shared calculation engine." />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="/shared/styles.css" />
+    <link rel="stylesheet" href="/finance/css/loan-flight-sim.css?v=1" />
+    <script src="/shared/menu-config.js"></script>
+    <script src="/shared/modern-navbar.js" defer></script>
+    <script src="/shared/dark-mode.js" defer></script>
+  </head>
+  <body class="lfs-page">
+    <modern-navbar></modern-navbar>
+
+    <main class="container-xl lfs-main">
+      <header class="lfs-hero">
+        <div>
+          <p class="lfs-kicker"><i class="bi bi-airplane-fill" aria-hidden="true"></i> Worksheets · training sim</p>
+          <h1 class="lfs-title">Loan file flight simulator</h1>
+          <p class="lfs-lead">Fly one synthetic loan from application to funding. Each stage is a checkpoint: get the call right on the first try to score.</p>
+          <span class="lfs-badge"><i class="bi bi-shield-lock" aria-hidden="true"></i> Synthetic loan · no real borrower data</span>
+        </div>
+        <div class="lfs-hero__side">
+          <div class="lfs-flight-no">
+            <span>Flight</span>
+            <strong id="lfsFlightNo">LF-0000</strong>
+          </div>
+          <div class="lfs-score">
+            <span>Score</span>
+            <strong id="lfsScore">0</strong>
+          </div>
+          <button type="button" class="btn lfs-btn" id="lfsNewFlight">
+            <i class="bi bi-arrow-repeat" aria-hidden="true"></i> New flight
+          </button>
+        </div>
+      </header>
+
+      <nav class="lfs-path" aria-label="Flight path">
+        <div class="lfs-path__track"><div class="lfs-path__fill" id="lfsPathFill"></div></div>
+        <i class="bi bi-airplane-fill lfs-path__plane" id="lfsPlane" aria-hidden="true"></i>
+        <ol class="lfs-path__stops" id="lfsPathStops"></ol>
+      </nav>
+
+      <div class="row g-4">
+        <div class="col-lg-7">
+          <section class="lfs-card lfs-challenge" id="lfsChallenge" aria-live="polite">
+            <p class="lfs-challenge__stage" id="lfsStageLabel"></p>
+            <h2 class="lfs-challenge__title" id="lfsStageTitle"></h2>
+            <p class="lfs-challenge__brief" id="lfsBrief"></p>
+            <p class="lfs-challenge__question" id="lfsQuestion"></p>
+            <div class="lfs-options" id="lfsOptions" role="group" aria-labelledby="lfsQuestion"></div>
+            <div class="lfs-feedback" id="lfsFeedback" hidden></div>
+            <div class="lfs-challenge__actions">
+              <button type="button" class="btn lfs-btn lfs-btn--go" id="lfsContinue" hidden>
+                Continue <i class="bi bi-arrow-right" aria-hidden="true"></i>
+              </button>
+            </div>
+          </section>
+
+          <section class="lfs-card lfs-report" id="lfsReport" hidden aria-labelledby="lfsReportTitle">
+            <p class="lfs-challenge__stage">Pilot report</p>
+            <h2 class="lfs-challenge__title" id="lfsReportTitle"></h2>
+            <p class="lfs-report__summary" id="lfsReportSummary"></p>
+            <ol class="lfs-log" id="lfsReportLog"></ol>
+            <div class="lfs-gse" id="lfsGse">
+              <button type="button" class="btn lfs-btn" id="lfsGseRun">
+                <i class="bi bi-graph-up-arrow" aria-hidden="true"></i> Run the GSE scenario check
+              </button>
+              <div class="lfs-gse__out" id="lfsGseOut" hidden></div>
+            </div>
+            <button type="button" class="btn lfs-btn lfs-btn--go" id="lfsFlyAgain">
+              <i class="bi bi-airplane" aria-hidden="true"></i> Fly another file
+            </button>
+          </section>
+        </div>
+
+        <div class="col-lg-5">
+          <section class="lfs-card" aria-labelledby="lfsInstrumentsTitle">
+            <h2 class="lfs-card__title" id="lfsInstrumentsTitle"><i class="bi bi-speedometer2" aria-hidden="true"></i> Instruments</h2>
+            <div class="lfs-gauges">
+              <label class="lfs-gauge" data-gauge="ltv">
+                <span>LTV %</span>
+                <input id="lfsLtv" readonly tabindex="-1" />
+              </label>
+              <label class="lfs-gauge">
+                <span>P&amp;I</span>
+                <input id="lfsPi" readonly tabindex="-1" />
+              </label>
+              <label class="lfs-gauge">
+                <span>Housing</span>
+                <input id="lfsHousing" readonly tabindex="-1" />
+              </label>
+              <label class="lfs-gauge">
+                <span>Front DTI %</span>
+                <input id="lfsFrontDti" readonly tabindex="-1" />
+              </label>
+              <label class="lfs-gauge" data-gauge="dti">
+                <span>Back DTI %</span>
+                <input id="lfsBackDti" readonly tabindex="-1" />
+              </label>
+              <label class="lfs-gauge">
+                <span>Reserves (mo)</span>
+                <input id="lfsReserves" readonly tabindex="-1" />
+              </label>
+              <label class="lfs-gauge lfs-gauge--wide" data-gauge="risk">
+                <span>Risk tier</span>
+                <input id="lfsRisk" readonly tabindex="-1" />
+              </label>
+            </div>
+            <p class="lfs-fineprint">Live from the shared calculation engine. Risk tier is a coarse UI color, not an underwriting decision.</p>
+          </section>
+
+          <section class="lfs-card" aria-labelledby="lfsFileTitle">
+            <h2 class="lfs-card__title" id="lfsFileTitle"><i class="bi bi-folder2-open" aria-hidden="true"></i> Loan file</h2>
+            <dl class="lfs-file" id="lfsFileMeta"></dl>
+            <div class="lfs-fields">
+              <label>Purchase price <input id="lfsPrice" readonly tabindex="-1" /></label>
+              <label>Loan amount <input id="lfsLoanAmount" readonly tabindex="-1" /></label>
+              <label>Rate % <input id="lfsRate" readonly tabindex="-1" /></label>
+              <label>Term (mo) <input id="lfsTerm" readonly tabindex="-1" /></label>
+              <label>Taxes + insurance / mo <input id="lfsEscrow" readonly tabindex="-1" /></label>
+              <label>Other debts / mo <input id="lfsDebts" readonly tabindex="-1" /></label>
+              <label>Annual income <input id="lfsIncome" readonly tabindex="-1" /></label>
+              <label>Liquid assets <input id="lfsAssets" readonly tabindex="-1" /></label>
+              <input id="lfsTotalPayment" type="hidden" />
+              <input id="lfsMonthlyIncome" type="hidden" />
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <p class="lfs-note">Training simulation. Rules are simplified: TRID timing ignores federal holidays, and the DTI ceiling and risk tiers are illustrative, not investor guidelines.</p>
+    </main>
+
+    <script src="/shared/calcEngineLibrary.js"></script>
+    <script src="/shared/calculationEngine.js"></script>
+    <script src="/finance/js/loan-flight-sim.js?v=1"></script>
+  </body>
+</html>

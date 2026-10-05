@@ -225,6 +225,9 @@ describe('station page wiring', () => {
     expect(css).toContain('is-st-chrome-hidden');
     expect(css).toContain(':fullscreen');
     expect(css).toContain('.st-chrome-dock');
+    expect(css).toContain('body.plan-station.is-st-chrome-hidden modern-navbar');
+    expect(css).toContain('body.plan-station.is-st-chrome-hidden .pw-masthead');
+    expect(css).toContain('.st-stage-block:not(:fullscreen) .st-stage');
     expect(css).toContain('.st-scale');
     expect(css).toContain('.st-tour__beats');
     expect(css).toContain('.is-cupola');
@@ -243,12 +246,58 @@ describe('station page wiring', () => {
     expect(scene).toContain('aria-label');
     expect(interiorsJs).toContain('BackSide');
     expect(interiorsJs).toContain('createInteriorManager');
+    const showSrc = interiorsJs.slice(interiorsJs.indexOf('show(id)'), interiorsJs.indexOf('hide()'));
+    expect(showSrc.indexOf('ensureRoom(')).toBeGreaterThan(-1);
+    expect(showSrc.indexOf('ensureRoom(')).toBeLessThan(showSrc.indexOf('entry.group.visible'));
     expect(menu).toContain('/planetarium/station.html');
     expect(menu).toContain('/entertainment/astrology.html');
     expect(home).toContain('/planetarium/station.html');
     expect(home).toContain('/entertainment/astrology.html');
     expect(guide).toContain('WELCOME_STATION');
     expect(guide).toContain('planetarium-carl-station');
+  });
+
+  test('Cupola debris shutters hinge on the schematic and in the walk room', () => {
+    expect(page).toContain('id="stShutters"');
+    expect(scene).toContain('SHUTTER_OPEN_ANGLE');
+    expect(scene).toContain('shutterPivots');
+    expect(scene).toContain('setShutters');
+    expect(scene).toContain('toggleShutter');
+    expect(scene).toContain('onShutters');
+    expect(scene).toContain('STREAK_LANES');
+    expect(scene).toMatch(/shuttersBusy\(\)[\s\S]*orbit\.theta \+=/);
+    expect(interiorsJs).toContain('cupola-shutters');
+    expect(interiorsJs).toContain('shutterIndex');
+    expect(interiorsJs).toContain('setShutterValues');
+    expect(js).toContain("q.set('shutters', 'closed')");
+    expect(js).toContain('toggleShutters');
+    expect(js).toContain('micrometeoroid / debris protection');
+  });
+
+  test('solar arrays tilt toward the drifting sun instead of spinning on Y', () => {
+    expect(scene).toContain('solarArray');
+    expect(scene).toContain('arrayTiltTarget');
+    expect(scene).toContain('placeSun');
+    expect(scene).not.toContain('userData.spin');
+    expect(scene).not.toMatch(/rotation\.y \+= dt \* 0\.12/);
+  });
+
+  test('who-owns-what legend isolates USA, Russia, Europe, Japan, Canada', () => {
+    expect(page).toContain('id="stOwners"');
+    [
+      ['NASA', 'USA'],
+      ['Roscosmos', 'Russia'],
+      ['ESA', 'Europe'],
+      ['JAXA', 'Japan'],
+      ['CSA', 'Canada'],
+    ].forEach(([agency, country]) => {
+      expect(page).toMatch(new RegExp('data-owner="' + agency + '"[^>]*>[\\s\\S]*?' + country));
+      expect(page).toMatch(new RegExp('data-dock-filter="' + agency + '"[^>]*>' + country + '<'));
+    });
+    expect(js).toContain('setOwner');
+    expect(scene).toContain('setOwner');
+    expect(scene).toContain('OWNER_TINT');
+    expect(css).toContain('.st-owners');
   });
 
   test('tour visits Destiny Harmony Columbus Kibo Cupola Zvezda', () => {
@@ -270,6 +319,70 @@ describe('station page wiring', () => {
     expect(tourJs).toContain('stStage');
     expect(tourJs).toContain('setKeepAlive');
     expect(tourJs).toContain('reducedMotion()');
+  });
+
+  test('hall covers comms, JEM-EF, jointed Canadarm2, photoreal, hunt, and docking', () => {
+    const comms = JSON.parse(
+      fs.readFileSync(path.join(process.cwd(), 'data', 'planetarium', 'iss-comms.json'), 'utf8')
+    );
+    comms.clips.forEach((clip) => {
+      expect(clip.transcript).toBeTruthy();
+      expect(clip.speaker).toBeTruthy();
+      expect(clip.sourcePage).toMatch(/^https:\/\//);
+      expect(clip.audioUrl).toMatch(/\.mp3$/);
+    });
+    const modules = JSON.parse(
+      fs.readFileSync(path.join(process.cwd(), 'data', 'planetarium', 'iss-modules.json'), 'utf8')
+    );
+    const byId = (id) => modules.modules.find((m) => m.id === id);
+    expect(byId('kibo-elm').hint).toMatch(/storage attic/);
+    expect(byId('kibo-ef').hint).toMatch(/porch/);
+    expect(byId('kibo-ef').interior).toBe(true);
+    expect(byId('ida2').interior).toBe(true);
+    expect(byId('ida3').interior).toBe(true);
+    expect(scene).toContain('JEMRMS');
+    expect(scene).toContain('MAXI');
+    expect(scene).toContain('CALET');
+    expect(scene).toContain('armJoints');
+    expect(scene).toContain('iss-photoreal.glb');
+    expect(scene).toContain('startPassThrough');
+    expect(page).toContain('stPhotoreal');
+    expect(page).toContain('stDocking');
+    expect(js).toContain('toggleDocking');
+    expect(scene).toContain('addSoftCapture');
+    expect(scene).toContain('setDocking');
+    expect(byId('ida2').layout.axis).toBe('x');
+    expect(page).toContain('stHuntScore');
+    expect(page).toContain('stPassEf');
+    expect(page).toContain('NASA TV');
+    expect(page).toContain('nasa.gov/live');
+    expect(js).toContain('HUNT_IDS');
+    expect(js).toContain('stHuntFound');
+    const docking = fs.readFileSync(path.join(process.cwd(), 'public', 'planetarium', 'docking.html'), 'utf8');
+    expect(docking).toContain('probe-and-drogue');
+    expect(docking).toContain('Common Berthing Mechanism');
+    expect(docking).toContain('UDMH / NTO');
+    expect(docking).toContain('Crew Dragon');
+    expect(docking).toContain('Cygnus');
+    expect(docking).toContain('Soft capture');
+    expect(docking).toContain('Hard capture');
+    expect(docking).toContain('a gentle grab');
+    expect(docking).toContain('the bolts lock');
+    expect(docking).toContain('Zvezda aft');
+    expect(docking).toContain('?module=zvezda');
+    const interiors = JSON.parse(
+      fs.readFileSync(path.join(process.cwd(), 'data', 'planetarium', 'iss-interiors.json'), 'utf8')
+    );
+    const porch = interiors.rooms.find((room) => room.id === 'kibo-ef');
+    const arm = porch.hardware.find((hw) => hw.id === 'jemrms');
+    expect(arm.hint).toMatch(/Japan’s robot arm/);
+    expect(scene).toContain('jemrms-forearm');
+    expect(scene).toContain('jemrms-upper');
+    const hall = JSON.parse(
+      fs.readFileSync(path.join(process.cwd(), 'data', 'planetarium', 'iss-hall.json'), 'utf8')
+    );
+    expect(hall.beats.map((b) => b.id)).toEqual(['comms', 'kibo', 'porch', 'ida']);
+    expect(fs.existsSync(path.join(process.cwd(), 'public', 'planetarium', 'assets', 'station', 'iss-photoreal.glb'))).toBe(true);
   });
 });
 

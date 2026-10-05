@@ -99,6 +99,10 @@ function forSpeech(text) {
     .slice(0, 900);
 }
 
+function setCarlSpeaking(on) {
+  document.dispatchEvent(new CustomEvent('planetarium-voice', { detail: { speaking: Boolean(on) } }));
+}
+
 async function speakReply(text) {
   const clean = forSpeech(text);
   if (!clean) return;
@@ -109,20 +113,29 @@ async function speakReply(text) {
   } catch (_) {
     /* ignore */
   }
+  setCarlSpeaking(true);
+  const jobs = [];
   if (typeof window.speakWithGoogle === 'function') {
-    window.speakWithGoogle(clean, 'en-US-Standard-D');
+    jobs.push(window.speakWithGoogle(clean, 'en-US-Standard-D'));
   }
   const heygen = window.PlanetariumHeygen;
   if (heygen?.isLive?.() && typeof heygen.speak === 'function') {
-    try {
-      await heygen.speak(ALIENIGENA_HANDOFF);
-      await heygen.speak(clean);
-    } catch (_) {
-      /* TTS optional */
-    }
-    return;
+    jobs.push(
+      (async () => {
+        await heygen.speak(ALIENIGENA_HANDOFF);
+        await heygen.speak(clean);
+      })()
+    );
+  } else {
+    heygen?.speak?.(clean);
   }
-  heygen?.speak?.(clean);
+  try {
+    await Promise.all(jobs);
+  } catch (_) {
+    /* TTS optional */
+  } finally {
+    setCarlSpeaking(false);
+  }
 }
 
 /** Fresh dome / world snapshot every Carl turn. */

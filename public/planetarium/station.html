@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/shared/styles.css"/>
   <link rel="stylesheet" href="/shared/css/planetarium-world.css?v=2"/>
-  <link rel="stylesheet" href="/shared/css/planetarium-station.css?v=7"/>
+  <link rel="stylesheet" href="/shared/css/planetarium-station.css?v=14"/>
   <script src="/shared/modern-navbar.js"></script>
   <script type="importmap">
   {
@@ -38,6 +38,8 @@
         <a class="pw-btn" href="/planetarium/worlds/"><i class="bi bi-globe2" aria-hidden="true"></i> Worlds</a>
         <a class="pw-btn" href="/planetarium/spacex.html"><i class="bi bi-rocket-takeoff" aria-hidden="true"></i> SpaceX</a>
         <a class="pw-btn" href="#stTour"><i class="bi bi-chat-quote" aria-hidden="true"></i> Module tour</a>
+        <a class="pw-btn" href="/planetarium/docking.html"><i class="bi bi-link-45deg" aria-hidden="true"></i> Docking</a>
+        <a class="pw-btn" href="#stHall"><i class="bi bi-collection-play" aria-hidden="true"></i> Walk the hall</a>
         <button type="button" class="pw-btn pw-btn--primary" id="planAskCarl">
           <i class="bi bi-mic-fill" aria-hidden="true"></i> Ask Carl
         </button>
@@ -65,6 +67,13 @@
               <button type="button" class="pw-btn" data-mode="explode" id="stModeExplode" title="Separate modules" aria-pressed="false">Explode</button>
               <button type="button" class="pw-btn" data-mode="walk" id="stModeWalk" aria-pressed="false">Look inside</button>
             </div>
+            <button type="button" class="pw-btn st-shutter-btn" id="stShutters" aria-pressed="false" title="Close Cupola debris shutters (S)">
+              <i class="bi bi-shield" aria-hidden="true"></i> Shutters
+            </button>
+            <button type="button" class="pw-btn" id="stDocking" aria-pressed="false" title="Extend the IDA soft-capture rings (stowed unless a vehicle is docking)">
+              <i class="bi bi-link-45deg" aria-hidden="true"></i> Docking
+            </button>
+            <button type="button" class="pw-btn" id="stPhotoreal" aria-pressed="false" title="NASA public-domain ISS model">Photoreal</button>
             <div class="st-mod-nav" role="group" aria-label="Module navigation">
               <button type="button" class="pw-btn" id="stPrevMod" aria-label="Previous pressurized module">
                 <i class="bi bi-chevron-left" aria-hidden="true"></i> Prev
@@ -73,6 +82,15 @@
                 Next <i class="bi bi-chevron-right" aria-hidden="true"></i>
               </button>
             </div>
+          </div>
+          <div class="st-owners" id="stOwners" role="group" aria-label="Who owns what">
+            <span class="st-owners__title">Who owns what</span>
+            <button type="button" class="st-owner is-on" data-owner="" aria-pressed="true">All</button>
+            <button type="button" class="st-owner" data-owner="NASA" aria-pressed="false" title="NASA modules"><span class="st-owner__dot" aria-hidden="true"></span>USA</button>
+            <button type="button" class="st-owner" data-owner="Roscosmos" aria-pressed="false" title="Roscosmos modules"><span class="st-owner__dot" aria-hidden="true"></span>Russia</button>
+            <button type="button" class="st-owner" data-owner="ESA" aria-pressed="false" title="ESA modules"><span class="st-owner__dot" aria-hidden="true"></span>Europe</button>
+            <button type="button" class="st-owner" data-owner="JAXA" aria-pressed="false" title="JAXA modules"><span class="st-owner__dot" aria-hidden="true"></span>Japan</button>
+            <button type="button" class="st-owner" data-owner="CSA" aria-pressed="false" title="CSA hardware"><span class="st-owner__dot" aria-hidden="true"></span>Canada</button>
           </div>
           <div class="st-live st-live--ticker" id="stLive" aria-label="Live ISS position"></div>
           <div class="st-stage" id="stStage">
@@ -92,6 +110,7 @@
             <h2 class="st-hud__title" id="stHudTitle">Unity</h2>
             <p class="st-hud__meta" id="stHudMeta">NASA · Node 1</p>
             <p class="st-hud__blurb" id="stHudBlurb">Click a module on the station or pick one from the dock.</p>
+            <p class="st-hud__plain" id="stHudPlain" hidden></p>
             <p class="st-hud__hint" id="stHudHint" hidden>Drag to look · Esc returns to orbit</p>
             <p class="st-hud__hw" id="stHudHw" hidden></p>
             <div class="st-hud__actions">
@@ -101,6 +120,7 @@
               <button type="button" class="pw-btn" id="stExitWalk" hidden>
                 <i class="bi bi-box-arrow-left" aria-hidden="true"></i> Back to orbit
               </button>
+              <button type="button" class="pw-btn" id="stPassEf" hidden>Pass to JEM-EF</button>
             </div>
           </div>
         </section>
@@ -138,6 +158,36 @@
             </div>
           </div>
         </section>
+
+        <section class="st-arrivals" id="stArrivals" aria-labelledby="stArrivalsHeading">
+          <p class="st-tour__kicker">Launch to dock</p>
+          <h2 class="st-section-title" id="stArrivalsHeading">Next arrivals</h2>
+          <p class="st-arrivals__lead">Upcoming ISS-bound launches. Pick one to watch it dock or berth at its port.</p>
+          <ol class="st-arrivals__list" id="stArrivalList" aria-label="Upcoming ISS arrivals">
+            <li class="st-arrivals__empty">Loading arrivals…</li>
+          </ol>
+          <div class="st-arrivals__run" id="stArrivalRun" hidden>
+            <ol class="st-arrivals__steps" id="stArrivalSteps" aria-label="Arrival sequence"></ol>
+            <p class="st-arrivals__caption" id="stArrivalCaption" aria-live="polite"></p>
+            <button type="button" class="pw-btn" id="stArrivalClear">Clear vehicle</button>
+          </div>
+          <p class="st-arrivals__src" id="stArrivalSrc"></p>
+        </section>
+
+        <section class="st-comms" id="stComms" aria-label="Space-to-ground"></section>
+
+        <section class="st-hall" id="stHall" aria-labelledby="stHallHeading">
+          <p class="st-tour__kicker">Exhibit hall</p>
+          <h2 class="st-section-title" id="stHallHeading">Walk the hall</h2>
+          <p class="st-hall__line" id="stHallLine" aria-live="polite">Four beats: space-to-ground, the JEM Pressurized Module, the airlock pass to JEM-EF, then IDA-2.</p>
+          <div class="st-tour__controls">
+            <button type="button" class="pw-btn pw-btn--primary" id="stHallPlay" aria-pressed="false">Play hall</button>
+            <button type="button" class="pw-btn" id="stHallPause" disabled>Pause</button>
+            <button type="button" class="pw-btn" id="stHallNext">Next</button>
+          </div>
+          <p class="st-hunt" id="stHunt">Hunt <strong id="stHuntScore">0 / 3</strong> — JEM-EF, IDA-2, Prichal</p>
+          <p><a class="pw-btn" id="stHallDock" hidden href="/planetarium/docking.html">Open the docking gallery</a></p>
+        </section>
       </div>
 
       <section class="st-display" id="stDisplay" aria-labelledby="stDisplayHeading">
@@ -165,10 +215,11 @@
       <div class="st-dock-filters" id="stDockFilters" role="group" aria-label="Filter modules" aria-controls="stDock">
         <button type="button" class="pw-btn is-on" data-dock-filter="all" aria-pressed="true">All</button>
         <button type="button" class="pw-btn" data-dock-filter="walk" aria-pressed="false">Walk</button>
-        <button type="button" class="pw-btn" data-dock-filter="NASA" aria-pressed="false">NASA</button>
-        <button type="button" class="pw-btn" data-dock-filter="Roscosmos" aria-pressed="false">Roscosmos</button>
-        <button type="button" class="pw-btn" data-dock-filter="ESA" aria-pressed="false">ESA</button>
-        <button type="button" class="pw-btn" data-dock-filter="JAXA" aria-pressed="false">JAXA</button>
+        <button type="button" class="pw-btn" data-dock-filter="NASA" aria-pressed="false" title="NASA">USA</button>
+        <button type="button" class="pw-btn" data-dock-filter="Roscosmos" aria-pressed="false" title="Roscosmos">Russia</button>
+        <button type="button" class="pw-btn" data-dock-filter="ESA" aria-pressed="false" title="ESA">Europe</button>
+        <button type="button" class="pw-btn" data-dock-filter="JAXA" aria-pressed="false" title="JAXA">Japan</button>
+        <button type="button" class="pw-btn" data-dock-filter="CSA" aria-pressed="false" title="CSA">Canada</button>
         <button type="button" class="pw-btn" data-dock-filter="structure" aria-pressed="false">Structure</button>
       </div>
       <div class="st-dock" id="stDock"></div>
@@ -183,6 +234,21 @@
     <section class="st-passes" aria-labelledby="stPassHeading">
       <h2 class="st-section-title" id="stPassHeading">Next passes over Hampton Falls, NH</h2>
       <ul id="stPassList"></ul>
+    </section>
+
+    <section class="st-tv" aria-labelledby="stTvHeading">
+      <h2 class="st-section-title" id="stTvHeading">NASA TV</h2>
+      <p class="st-tv__lead">Live NASA television. The embed is NASA’s official YouTube channel. If the player is quiet, open the NASA live page.</p>
+      <div class="st-tv__frame">
+        <iframe
+          title="NASA TV live"
+          src="https://www.youtube-nocookie.com/embed/live_stream?channel=UCLA_DiR1FfKNvjuUpBHmylQ"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          loading="lazy"
+        ></iframe>
+      </div>
+      <p class="st-tv__credit"><a href="https://www.nasa.gov/live/" rel="noopener noreferrer">nasa.gov/live</a></p>
     </section>
 
     <section class="st-carl" id="stCarl" aria-labelledby="stCarlHeading">
@@ -217,9 +283,12 @@
   <script src="/shared/tts.js"></script>
   <script src="/shared/speech-recognition.js"></script>
   <script src="/shared/js/fun-home-sky.js"></script>
-  <script src="/planetarium/js/planetarium-station.js?v=7"></script>
-  <script src="/planetarium/js/planetarium-station-tour.js?v=4"></script>
-  <script type="module" src="/planetarium/js/planetarium-station-scene.js?v=7"></script>
-  <script type="module" src="/planetarium/js/planetarium-guide.js?v=7"></script>
+  <script src="/planetarium/js/planetarium-station-comms.js?v=1"></script>
+  <script src="/planetarium/js/planetarium-station.js?v=14"></script>
+  <script src="/planetarium/js/planetarium-station-tour.js?v=5"></script>
+  <script src="/planetarium/js/planetarium-station-hall.js?v=1"></script>
+  <script src="/planetarium/js/planetarium-station-arrivals.js?v=1"></script>
+  <script type="module" src="/planetarium/js/planetarium-station-scene.js?v=19"></script>
+  <script type="module" src="/planetarium/js/planetarium-guide.js?v=8"></script>
 </body>
 </html>

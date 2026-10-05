@@ -12,11 +12,14 @@ const MODULES_PATH = path.join(__dirname, '..', 'data', 'planetarium', 'iss-modu
 const CREW_PATH = path.join(__dirname, '..', 'data', 'planetarium', 'iss-crew.json');
 
 let _modules;
+let _modulesMtime = 0;
 let _crew;
 
 export function loadModules() {
-  if (!_modules) {
+  const mtime = fs.statSync(MODULES_PATH).mtimeMs;
+  if (!_modules || mtime !== _modulesMtime) {
     _modules = JSON.parse(fs.readFileSync(MODULES_PATH, 'utf8'));
+    _modulesMtime = mtime;
   }
   return _modules;
 }
@@ -30,6 +33,7 @@ export function loadCrew() {
 
 export function resetStationCache() {
   _modules = null;
+  _modulesMtime = 0;
   _crew = null;
 }
 
