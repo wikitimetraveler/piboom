@@ -1,0 +1,72 @@
+{
+  "home": {
+    "id": "fountain-valley",
+    "name": "Fountain Valley",
+    "lat": 33.7095,
+    "lng": -117.9537,
+    "elevFt": 40
+  },
+  "disclaimer": "Desk aid only — not official Caltrans chain control or resort status.",
+  "destinations": [
+    {
+      "id": "mountain-high",
+      "name": "Mountain High",
+      "area": "Wrightwood",
+      "route": "wrightwood",
+      "dem": "wrightwood",
+      "lat": 34.377,
+      "lng": -117.678,
+      "baseFt": 6600,
+      "summitFt": 8200,
+      "typicalDriveMin": 95,
+      "highways": ["I-5 / CA-91", "I-15", "CA-138", "CA-2"],
+      "chainHighways": ["CA-2", "CA-138"],
+      "mapsDest": "Mountain High Resort, Wrightwood, CA"
+    },
+    {
+      "id": "snow-valley",
+      "name": "Snow Valley",
+      "area": "Running Springs",
+      "route": "big-bear",
+      "dem": "snow-valley",
+      "lat": 34.2253,
+      "lng": -117.0369,
+      "baseFt": 6800,
+      "summitFt": 7841,
+      "typicalDriveMin": 105,
+      "highways": ["CA-91", "I-215", "CA-330", "CA-18"],
+      "chainHighways": ["CA-330", "CA-18"],
+      "mapsDest": "Snow Valley Mountain Resort, Running Springs, CA"
+    },
+    {
+      "id": "snow-summit",
+      "name": "Snow Summit",
+      "area": "Big Bear",
+      "route": "big-bear",
+      "dem": "big-bear",
+      "lat": 34.2285,
+      "lng": -116.891,
+      "baseFt": 6920,
+      "summitFt": 8200,
+      "typicalDriveMin": 130,
+      "highways": ["CA-91", "I-215", "CA-330", "CA-18"],
+      "chainHighways": ["CA-330", "CA-18"],
+      "mapsDest": "Snow Summit, Big Bear Lake, CA"
+    },
+    {
+      "id": "bear-mountain",
+      "name": "Bear Mountain",
+      "area": "Big Bear",
+      "route": "big-bear",
+      "dem": "big-bear",
+      "lat": 34.2272,
+      "lng": -116.8603,
+      "baseFt": 7140,
+      "summitFt": 8805,
+      "typicalDriveMin": 135,
+      "highways": ["CA-91", "I-215", "CA-330", "CA-18"],
+      "chainHighways": ["CA-330", "CA-18"],
+      "mapsDest": "Bear Mountain, Big Bear Lake, CA"
+    }
+  ]
+}

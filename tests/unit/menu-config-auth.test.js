@@ -101,6 +101,13 @@ describe('menu-config auth filtering', () => {
     expect(loggedIn.length).toBeGreaterThan(loggedOut.length);
   });
 
+  test('Nature tools include Ski Drive and Ski Areas', () => {
+    const drive = MENU_CONFIG.NATURE_TOOLS.find((t) => t.label === 'Ski Drive');
+    const areas = MENU_CONFIG.NATURE_TOOLS.find((t) => t.label === 'Ski Areas');
+    expect(drive).toMatchObject({ href: '/ski/', icon: 'bi-signpost-2' });
+    expect(areas).toMatchObject({ href: '/ski/areas', icon: 'bi-snow2' });
+  });
+
   test('Entertainment menu includes Mountain High with a mountain icon', () => {
     const navItem = MENU_CONFIG.NAV_ENTERTAINMENT.find((t) => t.label === 'Mountain High');
     const hubItem = MENU_CONFIG.ENTERTAINMENT_TOOLS.find((t) => t.label === 'Mountain High');

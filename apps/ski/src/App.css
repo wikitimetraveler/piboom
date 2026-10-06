@@ -1,0 +1,922 @@
+:root {
+  --ski-night: #071018;
+  --ski-panel: #101a24;
+  --ski-ink: #e8f1f6;
+  --ski-muted: #8aa0b3;
+  --ski-ice: #7ec8e3;
+  --ski-go: #5dbe8a;
+  --ski-caution: #e0b15a;
+  --ski-nogo: #d4676a;
+  --ski-line: rgba(126, 200, 227, 0.18);
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--ski-night);
+  color: var(--ski-ink);
+}
+
+.ski-app {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 4rem;
+}
+
+.ski-switch {
+  display: flex;
+  gap: 0.45rem;
+  margin: 0 0 1rem;
+}
+
+.ski-switch button {
+  border: 1px solid var(--ski-line);
+  background: transparent;
+  color: var(--ski-ink);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  cursor: pointer;
+}
+
+.ski-switch button.is-on {
+  background: var(--ski-ice);
+  color: #071018;
+}
+
+.ski-greeter {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr;
+  gap: 0.9rem;
+  align-items: center;
+  margin: 0 0 1.1rem;
+  padding: 0.75rem;
+  background: var(--ski-panel);
+  border: 1px solid var(--ski-line);
+  border-radius: 16px;
+}
+
+.ski-greeter__photo {
+  width: 7.5rem;
+  height: 7.5rem;
+  object-fit: cover;
+  object-position: center 30%;
+  border-radius: 12px;
+  display: block;
+}
+
+.ski-greeter__name {
+  margin: 0 0 0.2rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+
+.ski-greeter__copy p {
+  margin: 0;
+  color: var(--ski-muted);
+}
+
+.ski-greeter button {
+  margin-top: 0.55rem;
+  border: 1px solid var(--ski-line);
+  background: transparent;
+  color: var(--ski-ink);
+  border-radius: 999px;
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+}
+
+.ski-greeter button:hover,
+.ski-greeter button:focus-visible {
+  background: var(--ski-ice);
+  color: #071018;
+}
+
+.ski-hero {
+  margin: 0 0 1.25rem;
+}
+
+.ski-hero h1 {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  letter-spacing: 0.02em;
+}
+
+.ski-hero p {
+  margin: 0;
+  color: var(--ski-muted);
+  max-width: 46rem;
+}
+
+.ski-disclaimer {
+  margin-top: 0.65rem;
+  font-size: 0.82rem;
+  color: var(--ski-muted);
+}
+
+.ski-board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.ski-card {
+  background: var(--ski-panel);
+  border: 1px solid var(--ski-line);
+  border-radius: 14px;
+  padding: 0.95rem 1rem;
+  text-align: left;
+  color: inherit;
+  width: 100%;
+  cursor: pointer;
+}
+
+.ski-card.is-selected {
+  outline: 2px solid var(--ski-ice);
+}
+
+.ski-card__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.ski-card h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.ski-card__area {
+  color: var(--ski-muted);
+  font-size: 0.8rem;
+}
+
+.ski-score {
+  display: inline-block;
+  margin: 0.55rem 0 0.35rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ski-score.go {
+  background: rgba(93, 190, 138, 0.18);
+  color: var(--ski-go);
+}
+
+.ski-score.caution {
+  background: rgba(224, 177, 90, 0.16);
+  color: var(--ski-caution);
+}
+
+.ski-score.no-go {
+  background: rgba(212, 103, 106, 0.16);
+  color: var(--ski-nogo);
+}
+
+.ski-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem 0.75rem;
+  margin: 0;
+  font-size: 0.84rem;
+}
+
+.ski-metrics dt {
+  color: var(--ski-muted);
+}
+
+.ski-metrics dd {
+  margin: 0;
+}
+
+.ski-alert {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+  color: var(--ski-caution);
+}
+
+.ski-drive {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--ski-line);
+  border-radius: 14px;
+  background: #0c151d;
+}
+
+.ski-drive a {
+  color: var(--ski-ice);
+}
+
+.ski-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.ski-chips button {
+  border: 1px solid var(--ski-line);
+  background: transparent;
+  color: var(--ski-ink);
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  cursor: pointer;
+}
+
+.ski-chips button.is-on {
+  background: var(--ski-ice);
+  color: #071018;
+}
+
+.ski-21 {
+  display: inline-block;
+  margin-left: 0.35rem;
+  font-size: 0.68rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 4px;
+  background: rgba(224, 177, 90, 0.2);
+  color: var(--ski-caution);
+}
+
+.ski-stops {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.7rem;
+  margin-bottom: 1.25rem;
+}
+
+.ski-stop {
+  background: var(--ski-panel);
+  border: 1px solid var(--ski-line);
+  border-radius: 12px;
+  padding: 0.75rem 0.85rem;
+}
+
+.ski-stop h3 {
+  margin: 0 0 0.25rem;
+  font-size: 0.98rem;
+}
+
+.ski-stop p {
+  margin: 0;
+  color: var(--ski-muted);
+  font-size: 0.82rem;
+}
+
+.ski-stop__meta {
+  margin-top: 0.4rem;
+  font-size: 0.72rem;
+  color: var(--ski-ice);
+}
+
+.ski-stage {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr;
+  gap: 0.85rem;
+}
+
+.ski-terrain,
+.ski-side {
+  min-height: 380px;
+  height: 380px;
+  border-radius: 14px;
+  border: 1px solid var(--ski-line);
+  background: #0a1218;
+  overflow: hidden;
+  position: relative;
+}
+
+.ski-terrain canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ski-terrain__label,
+.ski-map-status {
+  position: absolute;
+  left: 0.75rem;
+  bottom: 0.65rem;
+  font-size: 0.75rem;
+  color: var(--ski-muted);
+}
+
+.ski-profile {
+  padding: 0.9rem 1rem;
+}
+
+.ski-profile h3 {
+  margin: 0 0 0.5rem;
+}
+
+.ski-profile dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.3rem 0.8rem;
+  margin: 0;
+}
+
+.ski-profile dd {
+  margin: 0;
+}
+
+.ski-empty {
+  color: var(--ski-muted);
+  padding: 1rem 0;
+}
+
+@media (max-width: 900px) {
+  .ski-board,
+  .ski-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .ski-greeter {
+    grid-template-columns: 5.5rem 1fr;
+  }
+
+  .ski-greeter__photo {
+    width: 5.5rem;
+    height: 5.5rem;
+  }
+}
+
+/* ---- 3D trail map ---- */
+
+.ski-trail-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
+}
+
+.ski-trail-map {
+  position: relative;
+  height: 600px;
+  border-radius: 16px;
+  border: 1px solid var(--ski-line);
+  background: #081019;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.ski-stage-slot {
+  position: relative;
+  min-width: 0;
+  animation: ski-stage-in 0.45s ease-out;
+}
+
+.ski-stage-slot .ski-3d-legend {
+  max-width: calc(100% - 14rem);
+}
+
+@keyframes ski-stage-in {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ski-to-state {
+  position: absolute;
+  top: 0.7rem;
+  right: 4.2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(126, 200, 227, 0.45);
+  background: rgba(7, 16, 24, 0.82);
+  color: var(--ski-ink);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ski-to-state:hover,
+.ski-to-state:focus-visible {
+  background: var(--ski-ice);
+  color: #071018;
+}
+
+.ski-table__loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  color: var(--ski-muted);
+}
+
+.ski-table-label {
+  display: grid;
+  justify-items: center;
+  gap: 0.3rem;
+  pointer-events: auto;
+}
+
+.ski-table-label__area {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ski-muted);
+  text-shadow: 0 1px 6px #000;
+}
+
+.ski-table-label__resorts {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.ski-table-label__resorts button {
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(126, 200, 227, 0.5);
+  background: rgba(7, 16, 24, 0.86);
+  color: #fff;
+  font-size: 0.76rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ski-table-label__resorts button:hover,
+.ski-table-label__resorts button:focus-visible {
+  background: var(--ski-ice);
+  color: #071018;
+}
+
+.ski-table-home {
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(224, 177, 90, 0.18);
+  border: 1px solid rgba(224, 177, 90, 0.55);
+  color: #f3d79e;
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.ski-table-panel {
+  height: 600px;
+  overflow: auto;
+  padding: 0.9rem 1rem;
+  border-radius: 16px;
+  border: 1px solid var(--ski-line);
+  background: var(--ski-panel);
+}
+
+.ski-table-panel h2 {
+  margin: 0 0 0.2rem;
+  font-size: 1.05rem;
+}
+
+.ski-table-panel > p {
+  margin: 0 0 0.8rem;
+  font-size: 0.8rem;
+  color: var(--ski-muted);
+}
+
+.ski-table-panel ul {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ski-table-panel li button {
+  display: grid;
+  gap: 0.15rem;
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid var(--ski-line);
+  background: transparent;
+  color: var(--ski-ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ski-table-panel li button:hover:not(:disabled),
+.ski-table-panel li button:focus-visible {
+  border-color: var(--ski-ice);
+}
+
+.ski-table-panel li button:disabled {
+  opacity: 0.55;
+  cursor: progress;
+}
+
+.ski-table-panel li span {
+  font-size: 0.76rem;
+  color: var(--ski-muted);
+}
+
+.ski-trail-map--empty {
+  display: grid;
+  place-items: center;
+  color: var(--ski-muted);
+}
+
+.ski-3d-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ski-3d-labels {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.ski-3d-pin {
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(7, 16, 24, 0.82);
+  border: 1px solid rgba(126, 200, 227, 0.45);
+  color: var(--ski-ink);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+.ski-3d-tip {
+  display: grid;
+  gap: 0.1rem;
+  transform: translateY(-1.4rem);
+  padding: 0.4rem 0.6rem;
+  border-radius: 10px;
+  background: rgba(7, 16, 24, 0.92);
+  border: 1px solid rgba(126, 200, 227, 0.4);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+  white-space: nowrap;
+}
+
+.ski-3d-tip strong {
+  font-size: 0.85rem;
+  color: #fff;
+}
+
+.ski-3d-tip span {
+  font-size: 0.72rem;
+  color: var(--ski-muted);
+}
+
+.ski-3d-legend {
+  position: absolute;
+  top: 0.7rem;
+  left: 0.7rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.75rem;
+  max-width: calc(100% - 5rem);
+  padding: 0.4rem 0.65rem;
+  border-radius: 10px;
+  background: rgba(7, 16, 24, 0.72);
+  backdrop-filter: blur(6px);
+  font-size: 0.72rem;
+  color: var(--ski-ink);
+  pointer-events: none;
+}
+
+.ski-3d-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.ski-key {
+  display: inline-block;
+  width: 18px;
+  height: 4px;
+  border-radius: 2px;
+}
+
+.ski-key--green { background: #3fbf74; }
+.ski-key--blue { background: #3d8bfd; }
+.ski-key--black { background: #0b0d10; box-shadow: 0 0 0 1.5px #f2f6f8; }
+.ski-key--double { background: #0b0d10; box-shadow: 0 0 0 1.5px #ffa94d; }
+.ski-key--lift { height: 2px; background: #ffd166; }
+
+.ski-3d-compass {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(7, 16, 24, 0.72);
+  border: 1px solid var(--ski-line);
+  pointer-events: none;
+}
+
+.ski-3d-compass__needle {
+  position: absolute;
+  inset: 4px;
+  display: flex;
+  justify-content: center;
+}
+
+.ski-3d-compass__needle::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 14px solid #d4676a;
+}
+
+.ski-3d-compass__needle span {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+
+.ski-3d-foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.15rem 1rem;
+  padding: 1.2rem 0.75rem 0.5rem;
+  background: linear-gradient(to top, rgba(8, 16, 25, 0.85), transparent);
+  pointer-events: none;
+}
+
+.ski-3d-foot p {
+  margin: 0;
+  font-size: 0.7rem;
+  color: var(--ski-muted);
+}
+
+/* ---- run finder ---- */
+
+.ski-finder {
+  display: flex;
+  flex-direction: column;
+  height: 600px;
+  min-width: 0;
+  padding: 0.85rem 0.9rem 0.5rem;
+  border-radius: 16px;
+  border: 1px solid var(--ski-line);
+  background: var(--ski-panel);
+}
+
+.ski-finder__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.6rem;
+}
+
+.ski-finder__head h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.ski-finder__count {
+  font-size: 0.75rem;
+  color: var(--ski-muted);
+}
+
+.ski-finder__tiers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+  margin-bottom: 0.6rem;
+}
+
+.ski-finder__tiers button {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--ski-line);
+  background: transparent;
+  color: var(--ski-ink);
+  font-size: 0.74rem;
+  cursor: pointer;
+}
+
+.ski-finder__tiers button.is-on {
+  border-color: var(--ski-ice);
+  background: rgba(126, 200, 227, 0.14);
+}
+
+.ski-finder__row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+.ski-finder__row label {
+  display: grid;
+  gap: 0.2rem;
+  font-size: 0.68rem;
+  color: var(--ski-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ski-finder__row select {
+  width: 100%;
+  padding: 0.3rem 0.35rem;
+  border-radius: 8px;
+  border: 1px solid var(--ski-line);
+  background: #0b141c;
+  color: var(--ski-ink);
+  font-size: 0.78rem;
+}
+
+.ski-finder__check {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.55rem 0 0.4rem;
+  font-size: 0.76rem;
+  color: var(--ski-muted);
+}
+
+.ski-finder__list {
+  flex: 1;
+  overflow-y: auto;
+  margin: 0 -0.4rem;
+  padding: 0;
+  list-style: none;
+  scrollbar-width: thin;
+}
+
+.ski-finder__list li button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.45rem;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ski-ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ski-finder__list li button:hover,
+.ski-finder__list li button:focus-visible {
+  background: rgba(126, 200, 227, 0.08);
+  outline: none;
+}
+
+.ski-finder__list li button.is-on {
+  background: rgba(126, 200, 227, 0.18);
+  box-shadow: inset 2px 0 0 var(--ski-ice);
+}
+
+.ski-run__name,
+.ski-run__pitch {
+  display: grid;
+  min-width: 0;
+  font-size: 0.86rem;
+}
+
+.ski-run__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ski-run__pitch {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.ski-run__name small,
+.ski-run__pitch small {
+  font-size: 0.7rem;
+  color: var(--ski-muted);
+}
+
+.ski-sym {
+  flex: none;
+  display: block;
+}
+
+/* ---- detail row ---- */
+
+.ski-detail-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 0.85rem;
+  align-items: start;
+}
+
+.ski-detail-row > .ski-profile,
+.ski-side-stack > .ski-profile {
+  border-radius: 14px;
+  border: 1px solid var(--ski-line);
+  background: var(--ski-panel);
+}
+
+.ski-side-stack {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.ski-run-detail__head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ski-run-detail__head h3 {
+  flex: 1;
+  margin: 0;
+}
+
+.ski-run-detail__clear {
+  border: 0;
+  background: transparent;
+  color: var(--ski-muted);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ski-run-detail__tier {
+  margin: 0.15rem 0 0.6rem;
+  font-size: 0.8rem;
+  color: var(--ski-muted);
+}
+
+.ski-run-profile {
+  width: 100%;
+  height: auto;
+  margin-top: 0.75rem;
+}
+
+.ski-run-profile__label {
+  fill: var(--ski-muted);
+  font-size: 9px;
+}
+
+.ski-run-profile__key {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  margin: 0.35rem 0 0;
+  font-size: 0.7rem;
+  color: var(--ski-muted);
+}
+
+.ski-run-profile__key i {
+  display: inline-block;
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+@media (max-width: 1000px) {
+  .ski-trail-stage,
+  .ski-detail-row {
+    grid-template-columns: 1fr;
+  }
+
+  .ski-trail-map {
+    height: 440px;
+  }
+
+  .ski-finder {
+    height: 420px;
+  }
+
+  .ski-table-panel {
+    height: auto;
+  }
+
+  .ski-stage-slot .ski-3d-legend {
+    max-width: calc(100% - 1.4rem);
+    top: 3rem;
+  }
+}

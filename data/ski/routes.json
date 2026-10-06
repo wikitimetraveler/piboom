@@ -1,0 +1,29 @@
+{
+  "wrightwood": {
+    "id": "wrightwood",
+    "label": "Fountain Valley → Wrightwood",
+    "highways": ["I-5 / CA-91", "I-15", "CA-138", "CA-2"],
+    "mapsDest": "Mountain High Resort, Wrightwood, CA",
+    "waypoints": [
+      { "id": "fountain-valley", "name": "Fountain Valley", "lat": 33.7095, "lng": -117.9537 },
+      { "id": "corona-91", "name": "Corona / 91", "lat": 33.8753, "lng": -117.5664 },
+      { "id": "rancho-cucamonga", "name": "Rancho Cucamonga", "lat": 34.1064, "lng": -117.5931 },
+      { "id": "cajon", "name": "Cajon Pass", "lat": 34.3114, "lng": -117.4737 },
+      { "id": "phelan", "name": "Phelan", "lat": 34.4261, "lng": -117.5723 },
+      { "id": "wrightwood", "name": "Wrightwood", "lat": 34.3608, "lng": -117.6281 }
+    ]
+  },
+  "big-bear": {
+    "id": "big-bear",
+    "label": "Fountain Valley → Big Bear",
+    "highways": ["CA-91", "I-215", "CA-330", "CA-18"],
+    "mapsDest": "Big Bear Village, Big Bear Lake, CA",
+    "waypoints": [
+      { "id": "fountain-valley", "name": "Fountain Valley", "lat": 33.7095, "lng": -117.9537 },
+      { "id": "riverside", "name": "Riverside", "lat": 33.9533, "lng": -117.3962 },
+      { "id": "san-bernardino", "name": "San Bernardino / Highland", "lat": 34.1283, "lng": -117.2087 },
+      { "id": "running-springs", "name": "Running Springs", "lat": 34.2078, "lng": -117.1092 },
+      { "id": "big-bear-village", "name": "Big Bear Village", "lat": 34.2439, "lng": -116.9114 }
+    ]
+  }
+}

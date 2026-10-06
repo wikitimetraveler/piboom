@@ -88,7 +88,11 @@
     "build:planetarium-catalog": "node scripts/tools/build-planetarium-catalog.mjs",
     "fetch:spacex-catalog": "node scripts/tools/fetch-spacex-catalog.mjs",
     "fetch:iss-crew": "node scripts/tools/fetch-iss-crew.mjs",
-    "fetch:iss-interiors": "node scripts/tools/fetch-iss-interiors.mjs"
+    "fetch:iss-interiors": "node scripts/tools/fetch-iss-interiors.mjs",
+    "build:ski-dem": "node scripts/tools/build-ski-dem.mjs",
+    "build:ski-trails": "node scripts/tools/build-ski-trails.mjs",
+    "dev:ski": "npm run dev --prefix apps/ski",
+    "build:ski": "npm run build --prefix apps/ski"
   },
   "dependencies": {
     "@google-cloud/speech": "^5.0.0",

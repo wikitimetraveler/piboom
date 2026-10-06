@@ -1,0 +1,59 @@
+{
+  "stops": [
+    {
+      "id": "mormon-rocks",
+      "name": "Mormon Rocks",
+      "route": "wrightwood",
+      "kind": "viewpoint",
+      "town": "Cajon Pass",
+      "note": "Tilted sandstone fins right off the I-15 Cajon climb.",
+      "lat": 34.3186,
+      "lng": -117.4817,
+      "source": "seed"
+    },
+    {
+      "id": "wrightwood-village",
+      "name": "Wrightwood village",
+      "route": "wrightwood",
+      "kind": "town",
+      "town": "Wrightwood",
+      "note": "Cocoa, pine-street shops, and a walk before the lifts.",
+      "lat": 34.3608,
+      "lng": -117.6281,
+      "source": "seed"
+    },
+    {
+      "id": "rim-overlook",
+      "name": "Rim of the World overlook",
+      "route": "big-bear",
+      "kind": "viewpoint",
+      "town": "Running Springs",
+      "note": "CA-18 pull-off over the inland valleys on the climb.",
+      "lat": 34.2105,
+      "lng": -117.1408,
+      "source": "seed"
+    },
+    {
+      "id": "big-bear-village",
+      "name": "Big Bear Village / lake",
+      "route": "big-bear",
+      "kind": "lake",
+      "town": "Big Bear Lake",
+      "note": "Stroll the village and the lake shore after the drive.",
+      "lat": 34.2439,
+      "lng": -116.9114,
+      "source": "seed"
+    },
+    {
+      "id": "oak-glen",
+      "name": "Oak Glen (via CA-38)",
+      "route": "big-bear",
+      "kind": "town",
+      "town": "Oak Glen",
+      "note": "Apple-country detour if you take 38 instead of 330.",
+      "lat": 34.0458,
+      "lng": -116.947,
+      "source": "seed"
+    }
+  ]
+}

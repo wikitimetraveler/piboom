@@ -2705,12 +2705,56 @@ body.is-intro-splash #funIntroClose {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Small ISS floating around the Earth globe */
+.fun-hero__iss {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 8;
+  width: 6.2rem;
+  height: 3.7rem;
+  pointer-events: auto;
+  display: block;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.45));
+}
+
+.fun-hero__iss[hidden] {
+  display: none !important;
+}
+
+.fun-hero__iss-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.fun-hero__iss:focus-visible {
+  outline: 2px solid rgba(255, 220, 140, 0.9);
+  outline-offset: 3px;
+  border-radius: 0.4rem;
+}
+
+.fun-hero__iss.is-near-earth {
+  width: 7rem;
+  height: 4.15rem;
+}
+
+@media (max-width: 768px) {
+  .fun-hero__iss,
+  .fun-hero__iss.is-near-earth {
+    width: 5.6rem;
+    height: 3.35rem;
+  }
+}
+
 /* Print styles */
 @media print {
   .fun-header,
   .fun-footer,
   .fun-hero__sparkles,
-  .fun-hero__scroll {
+  .fun-hero__scroll,
+  .fun-hero__iss {
     display: none;
   }
 }

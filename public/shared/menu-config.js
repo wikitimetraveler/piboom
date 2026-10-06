@@ -10,7 +10,7 @@
   const DOMAIN_TILES = [
     { href: '/music/music-research.html', icon: 'bi-music-note-beamed', label: 'Music', domain: 'music', title: 'Field research: artist dossiers, members, birthplaces', demoOnly: false },
     { href: '/finance/disasters-unified.html', icon: 'bi-shield-exclamation', label: 'Unified Disasters', domain: 'disasters', title: 'Unified Disasters — hazard monitoring and pipeline risk', demoOnly: false },
-    { href: '/nature/nature-hub.html', icon: 'bi-tree-fill', label: 'Nature', domain: 'nature', title: 'Trees, critters, field guide', demoOnly: false },
+    { href: '/nature/nature-hub.html', icon: 'bi-tree-fill', label: 'Nature', domain: 'nature', title: 'Trees, critters, ski topo, field guide', demoOnly: false },
     { href: '/family/lane-family.html', icon: 'bi-house-heart', label: 'Lane Family', domain: 'family', title: 'Lane Family hub — tree, museum, and tools', demoOnly: false },
     { href: '/finance/index.html', icon: 'bi-bank', label: 'Worksheets', domain: 'finance', title: 'Worksheets — Encompass, calculators, unit tests', demoOnly: false, requiresAuth: true },
     { href: '/finance/encompass-hub.html', icon: 'bi-columns-gap', label: 'Encompass Hub', domain: 'encompass', title: 'Encompass Hub, pipeline, loan APIs', demoOnly: true },
@@ -150,6 +150,8 @@
     { href: '/ai/assistant.html', icon: 'bi-chat-dots', label: 'Levi Assistant' },
     { href: '/ai/voice-guide.html', icon: 'bi-book', label: 'Voice Guide' },
     { href: '/family/lane-family.html', icon: 'bi-house-heart', label: 'Lane Family' },
+    { href: '/ski/', icon: 'bi-signpost-2', label: 'Ski Drive', title: 'Fountain Valley drive desk — weather and on-the-way stops' },
+    { href: '/ski/areas', icon: 'bi-snow2', label: 'Ski Areas', title: 'Wrightwood and Big Bear ski-area topography' },
     { href: '/nature/tree-discovery.html', icon: 'bi-tree-fill', label: 'Tree Discovery' },
     { href: '/nature/tree-collection.html', icon: 'bi-trees', label: 'Tree Collection' },
     { href: '/nature/critter-discovery.html', icon: 'bi-bug-fill', label: 'Critter Discovery' },
@@ -261,6 +263,8 @@
 
   /** Nature hub tool grid */
   const NATURE_TOOLS = [
+    { href: '/ski/', icon: 'bi-signpost-2', label: 'Ski Drive', title: 'Fountain Valley drive desk — weather, chains, on-the-way stops' },
+    { href: '/ski/areas', icon: 'bi-snow2', label: 'Ski Areas', title: 'Wrightwood and Big Bear ski-area topography — DEM, slope, aspect' },
     { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Bud Master, embedded origins map' },
     { href: '/nature/cannabis-origins.html', icon: 'bi-globe2', label: 'Cannabis Origins', title: 'Password-gated landrace map (standalone)' },
     { href: '/nature/tree-discovery.html', icon: 'bi-tree', label: 'Tree Discovery', title: 'Discover trees' },
