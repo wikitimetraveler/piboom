@@ -1,22 +1,22 @@
 {
   "station": "ISS",
   "expedition": "Current increment",
-  "fetchedAt": "2026-09-13T05:00:00.000Z",
+  "fetchedAt": "2026-10-06T05:35:02.035Z",
   "source": "Launch Library 2",
   "sourceUrl": "https://ll.thespacedevs.com/2.2.0/astronaut/?in_space=true",
   "credit": "The Space Devs Launch Library 2 — quarters mapped by craft, not official sleep-station assignments.",
   "note": "Tiangong crew and non-human entries (Starman) are excluded. Sleep modules are planetarium estimates: Crew Dragon → Harmony, Soyuz → Rassvet / Poisk / Zvezda.",
   "people": [
     {
-      "id": 573,
-      "name": "Jessica Meir",
-      "agency": "NASA",
-      "nationality": "American",
+      "id": 732,
+      "name": "Andrei Fedyaev",
+      "agency": "Roscosmos",
+      "nationality": "Russian",
       "role": "Flight engineer",
       "craft": "Crew Dragon",
       "arrival": "2026-02-13T10:15:56Z",
-      "photo": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305190924.jpeg",
-      "wiki": "https://en.wikipedia.org/wiki/Jessica_Meir",
+      "photo": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305190412.jpeg",
+      "wiki": "https://en.wikipedia.org/wiki/Andrey_Fedyaev",
       "quartersModuleId": "harmony"
     },
     {
@@ -32,6 +32,18 @@
       "quartersModuleId": "harmony"
     },
     {
+      "id": 573,
+      "name": "Jessica Meir",
+      "agency": "NASA",
+      "nationality": "American",
+      "role": "Flight engineer",
+      "craft": "Crew Dragon",
+      "arrival": "2026-02-13T10:15:56Z",
+      "photo": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305190924.jpeg",
+      "wiki": "https://en.wikipedia.org/wiki/Jessica_Meir",
+      "quartersModuleId": "harmony"
+    },
+    {
       "id": 747,
       "name": "Sophie Adenot",
       "agency": "ESA",
@@ -44,16 +56,16 @@
       "quartersModuleId": "harmony"
     },
     {
-      "id": 732,
-      "name": "Andrei Fedyaev",
-      "agency": "Roscosmos",
-      "nationality": "Russian",
+      "id": 713,
+      "name": "Anil Menon",
+      "agency": "NASA",
+      "nationality": "American",
       "role": "Flight engineer",
-      "craft": "Crew Dragon",
-      "arrival": "2026-02-13T10:15:56Z",
-      "photo": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305190412.jpeg",
-      "wiki": "https://en.wikipedia.org/wiki/Andrey_Fedyaev",
-      "quartersModuleId": "harmony"
+      "craft": "Soyuz",
+      "arrival": "2026-07-14T14:47:43Z",
+      "photo": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305190559.jpeg",
+      "wiki": "https://en.wikipedia.org/wiki/Anil_Menon_(astronaut)",
+      "quartersModuleId": "zvezda"
     },
     {
       "id": 649,
@@ -80,16 +92,52 @@
       "quartersModuleId": "poisk"
     },
     {
-      "id": 713,
-      "name": "Anil Menon",
+      "id": 582,
+      "name": "Jessica Watkins",
       "agency": "NASA",
       "nationality": "American",
       "role": "Flight engineer",
-      "craft": "Soyuz",
-      "arrival": "2026-07-14T14:47:43Z",
-      "photo": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305190559.jpeg",
-      "wiki": "https://en.wikipedia.org/wiki/Anil_Menon_(astronaut)",
-      "quartersModuleId": "zvezda"
+      "craft": "Crew Dragon",
+      "arrival": "2026-10-01T15:10:06Z",
+      "photo": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305190244.jpeg",
+      "wiki": "https://en.wikipedia.org/wiki/Jessica_Watkins",
+      "quartersModuleId": "harmony"
+    },
+    {
+      "id": 642,
+      "name": "Joshua Kutryk",
+      "agency": "CSA",
+      "nationality": "Canadian",
+      "role": "Flight engineer",
+      "craft": "Crew Dragon",
+      "arrival": "2026-10-01T15:10:06Z",
+      "photo": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305185947.jpeg",
+      "wiki": "https://en.wikipedia.org/wiki/Joshua_Kutryk",
+      "quartersModuleId": "harmony"
+    },
+    {
+      "id": 710,
+      "name": "Luke Delaney",
+      "agency": "NASA",
+      "nationality": "American",
+      "role": "Flight engineer",
+      "craft": "Crew Dragon",
+      "arrival": "2026-10-01T15:10:06Z",
+      "photo": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/255bauto255d__image_thumbnail_20240305190723.jpeg",
+      "wiki": "https://en.wikipedia.org/wiki/Luke_Delaney_(astronaut)",
+      "quartersModuleId": "harmony"
+    },
+    {
+      "id": 915,
+      "name": "Sergey Teteryatnikov",
+      "agency": "Roscosmos",
+      "nationality": "Russian",
+      "role": "Flight engineer",
+      "craft": "Crew Dragon",
+      "arrival": "2026-10-01T15:10:06Z",
+      "photo": "https://thespacedevs-prod.nyc3.digitaloceanspaces.com/media/images/sergey_teteryat_image_thumbnail_20260424073411.jpeg",
+      "wiki": "",
+      "quartersModuleId": "harmony"
     }
   ]
 }
