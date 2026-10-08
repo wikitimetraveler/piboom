@@ -1819,6 +1819,10 @@ body[data-theme="dark"] .fun-projects__title {
   --fun-card-accent: var(--fun-nature);
 }
 
+.fun-card--thrift {
+  --fun-card-accent: #c45c26;
+}
+
 .fun-card--valley {
   --fun-card-accent: var(--fun-valley);
 }
@@ -1925,6 +1929,12 @@ body[data-theme="dark"] .fun-card:hover {
   filter: blur(14px);
 }
 
+.fun-card--thrift:hover .fun-card__glow {
+  opacity: 0.75;
+  background: radial-gradient(circle at 50% 0%, rgba(196, 92, 38, 0.28), rgba(196, 92, 38, 0.08) 40%, transparent 70%);
+  filter: blur(14px);
+}
+
 .fun-card--nature:hover .fun-card__glow {
   opacity: 0.7;
   background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.08) 40%, transparent 70%);
@@ -2011,6 +2021,11 @@ body[data-theme="dark"] .fun-card:hover {
 .fun-card--music .fun-card__icon {
   background: rgba(47, 111, 126, 0.12);
   color: var(--fun-music);
+}
+
+.fun-card--thrift .fun-card__icon {
+  background: rgba(196, 92, 38, 0.12);
+  color: #c45c26;
 }
 
 .fun-card--nature .fun-card__icon {

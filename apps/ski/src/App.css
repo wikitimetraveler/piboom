@@ -237,16 +237,6 @@ body {
   color: #071018;
 }
 
-.ski-21 {
-  display: inline-block;
-  margin-left: 0.35rem;
-  font-size: 0.68rem;
-  padding: 0.05rem 0.35rem;
-  border-radius: 4px;
-  background: rgba(224, 177, 90, 0.2);
-  color: var(--ski-caution);
-}
-
 .ski-stops {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -540,6 +530,19 @@ body {
   position: absolute;
   inset: 0;
   pointer-events: none;
+}
+
+.ski-table-leads {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.ski-table-leads line {
+  stroke: rgba(232, 240, 246, 0.45);
+  stroke-width: 1;
 }
 
 .ski-3d-pin {
@@ -897,13 +900,157 @@ body {
   border-radius: 2px;
 }
 
+.ski-mode-switch {
+  display: inline-flex;
+  gap: 0.25rem;
+  margin-top: 0.55rem;
+  padding: 0.22rem;
+  border-radius: 999px;
+  background: var(--ski-panel, rgba(16, 26, 36, 0.9));
+  border: 1px solid var(--ski-line);
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.ski-mode-switch button {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 36px;
+  padding: 0 0.85rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ski-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ski-mode-switch button.is-on {
+  background: var(--ski-ice);
+  color: #071018;
+}
+
+.ski-gmap,
+.ski-earth {
+  position: relative;
+  height: 600px;
+  border-radius: 16px;
+  border: 1px solid var(--ski-line);
+  background: #081019;
+  overflow: hidden;
+}
+
+.ski-gmap__canvas,
+.ski-earth__host,
+.ski-earth__map {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ski-gmap__status {
+  position: absolute;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  max-width: min(92%, 30rem);
+  margin: 0;
+  padding: 0.5rem 0.85rem;
+  border-radius: 12px;
+  background: rgba(7, 16, 24, 0.88);
+  border: 1px solid var(--ski-line);
+  color: var(--ski-ink);
+  font-size: 0.82rem;
+  text-align: center;
+  pointer-events: none;
+}
+
+.ski-gmap__status--error {
+  border-color: rgba(255, 120, 120, 0.6);
+}
+
+.ski-earth__orbit {
+  position: absolute;
+  left: 0.7rem;
+  bottom: 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 36px;
+  padding: 0 0.8rem;
+  border-radius: 999px;
+  border: 1px solid rgba(126, 200, 227, 0.45);
+  background: rgba(7, 16, 24, 0.82);
+  color: var(--ski-ink);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ski-3d-mark,
+.ski-gm-mark {
+  display: grid;
+  place-items: center;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  font-weight: 700;
+  color: #071018;
+}
+
+.ski-3d-mark--crew,
+.ski-gm-mark--crew {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--mark);
+  font-size: 0.72rem;
+}
+
+.ski-3d-mark--photo,
+.ski-gm-mark--photo {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 9px;
+  border-color: var(--mark);
+  background: #081019;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.ski-3d-mark img,
+.ski-gm-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ski-3d-mark.is-stale,
+.ski-gm-mark.is-stale {
+  opacity: 0.5;
+  filter: grayscale(0.6);
+}
+
+.ski-trail-map--compact {
+  height: 100%;
+  border-radius: inherit;
+  border: 0;
+}
+
 @media (max-width: 1000px) {
   .ski-trail-stage,
   .ski-detail-row {
     grid-template-columns: 1fr;
   }
 
-  .ski-trail-map {
+  .ski-trail-map,
+  .ski-gmap,
+  .ski-earth {
     height: 440px;
   }
 

@@ -6,6 +6,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { randomUUID } from 'crypto';
 import { getGoogleBrowserApiKey } from '../lib/google-api-key.js';
+import { getThriftNearFountainValley } from '../services/local-thrift.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -70,6 +71,16 @@ export async function listSpots(req, res) {
   } catch (error) {
     console.error('Local spots list error:', error);
     res.status(500).json({ success: false, error: 'Failed to list spots', message: error.message });
+  }
+}
+
+export async function listThriftNear(req, res) {
+  try {
+    const payload = await getThriftNearFountainValley();
+    res.json({ success: true, ...payload });
+  } catch (error) {
+    console.error('Local thrift radius error:', error);
+    res.status(500).json({ success: false, error: 'Failed to list thrift stores', message: error.message });
   }
 }
 

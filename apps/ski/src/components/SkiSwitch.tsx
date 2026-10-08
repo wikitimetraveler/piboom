@@ -10,6 +10,9 @@ export default function SkiSwitch({ page }: { page: SkiPage }) {
       <button type="button" className={page === 'areas' ? 'is-on' : ''} onClick={() => goPage('areas')}>
         Ski areas
       </button>
+      <button type="button" className={page === 'log' ? 'is-on' : ''} onClick={() => goPage('log')}>
+        Crew log
+      </button>
     </nav>
   );
 }

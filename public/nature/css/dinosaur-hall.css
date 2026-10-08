@@ -603,6 +603,61 @@
   font-weight: 600;
 }
 
+.dh-museums {
+  margin: 0 0 1rem;
+}
+
+.dh-museums h3 {
+  font-family: Fraunces, Georgia, serif;
+  font-size: 1.15rem;
+  margin: 0 0 0.25rem;
+}
+
+.dh-museums-lead {
+  color: var(--dh-muted);
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.dh-museums ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.dh-museum-item {
+  padding: 0.7rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid var(--dh-line);
+  background: #fff;
+}
+
+.dh-museum-item a {
+  font-weight: 700;
+  color: var(--dh-fern-deep);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.dh-museum-meta,
+.dh-museum-holds {
+  display: block;
+  font-size: 0.82rem;
+}
+
+.dh-museum-meta {
+  margin-top: 0.15rem;
+  font-weight: 600;
+  color: var(--dh-amber);
+}
+
+.dh-museum-holds {
+  margin-top: 0.2rem;
+  color: var(--dh-ink);
+}
+
 .dh-compare-result {
   margin-top: 1.25rem;
   padding: 1.1rem;
@@ -811,15 +866,22 @@ body.dark-mode .dh-card,
 body.dark-mode .dh-compare-result,
 body.dark-mode .dh-quiz-card,
 body.dark-mode .dh-detail-media,
+body.dark-mode .dh-museum-item,
 .dark-mode .dh-onboarding,
 .dark-mode .dh-era-panel,
 .dark-mode .dh-card,
 .dark-mode .dh-compare-result,
 .dark-mode .dh-quiz-card,
-.dark-mode .dh-detail-media {
+.dark-mode .dh-detail-media,
+.dark-mode .dh-museum-item {
   background: #1e2a24;
   color: var(--dh-ink);
   border-color: var(--dh-line);
+}
+
+body.dark-mode .dh-museum-item a,
+.dark-mode .dh-museum-item a {
+  color: #e7c27a;
 }
 
 body.dark-mode .dh-chip,

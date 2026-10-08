@@ -98,7 +98,7 @@
       <section class="dh-section" id="dhSpecies">
         <div class="dh-section-head">
           <h2>Species hall</h2>
-          <p>Filter by era or diet. Cards open evidence labels and spotlight the diorama mesh.</p>
+          <p>Filter by era or diet. Cards open evidence labels, spotlight the diorama, and link every museum — large halls and smaller houses — that holds the bones.</p>
         </div>
         <div class="dh-filters" id="dhSpeciesFilters" role="group" aria-label="Filter species">
           <button type="button" class="dh-chip is-active" data-filter="all">All</button>
@@ -134,6 +134,11 @@
               <div><dt>Length</dt><dd id="dhDetailLength"></dd></div>
               <div><dt>Clade</dt><dd id="dhDetailClade"></dd></div>
             </dl>
+            <div class="dh-museums" id="dhDetailMuseums" hidden>
+              <h3>Where the bones are</h3>
+              <p class="dh-museums-lead">Original fossils and historic mounts. Large national halls sit beside smaller quarries, university cabinets, and town museums.</p>
+              <ul id="dhMuseumList"></ul>
+            </div>
             <button type="button" class="dh-btn dh-btn-primary dh-btn-sm" id="dhDetailSpotlight">
               <i class="bi bi-bullseye"></i> Spotlight in diorama
             </button>

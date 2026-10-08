@@ -17,7 +17,7 @@ export default function DriveDesk({ brief, dest, selectedId, onSelect, stops }: 
       <header className="ski-hero">
         <h1>Ski Drive</h1>
         <p>
-          Weather desk for the Fountain Valley run to Wrightwood and Big Bear. Chains and
+          Weather desk for the Fountain Valley run to Wrightwood, Big Bear, and Mammoth. Chains and
           on-the-way stops live here. Mountain topography is on Ski Areas.
         </p>
         <p className="ski-disclaimer">{brief.disclaimer}</p>

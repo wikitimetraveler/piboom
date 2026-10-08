@@ -67,6 +67,36 @@
       "highways": ["CA-91", "I-215", "CA-330", "CA-18"],
       "chainHighways": ["CA-330", "CA-18"],
       "mapsDest": "Bear Mountain, Big Bear Lake, CA"
+    },
+    {
+      "id": "mammoth",
+      "name": "Mammoth Mountain",
+      "area": "Mammoth Lakes",
+      "route": "eastern-sierra",
+      "dem": "mammoth",
+      "lat": 37.6365,
+      "lng": -119.029,
+      "baseFt": 7953,
+      "summitFt": 11053,
+      "typicalDriveMin": 315,
+      "highways": ["CA-91", "I-15", "US-395", "CA-203"],
+      "chainHighways": ["US-395", "CA-203"],
+      "mapsDest": "Mammoth Mountain Main Lodge, Mammoth Lakes, CA"
+    },
+    {
+      "id": "june",
+      "name": "June Mountain",
+      "area": "June Lake",
+      "route": "eastern-sierra",
+      "dem": "june",
+      "lat": 37.7555,
+      "lng": -119.0745,
+      "baseFt": 7545,
+      "summitFt": 10090,
+      "typicalDriveMin": 335,
+      "highways": ["CA-91", "I-15", "US-395", "CA-158"],
+      "chainHighways": ["US-395", "CA-158"],
+      "mapsDest": "June Mountain Ski Area, June Lake, CA"
     }
   ]
 }

@@ -4,13 +4,12 @@ import { mapsDirUrl } from '../lib/goNoGo';
 
 const CHIPS = [
   { id: 'all', label: 'All' },
-  { id: 'smoke', label: 'Smoke' },
-  { id: 'dispensary', label: 'Dispensary' },
   { id: 'thrift', label: 'Thrift' },
   { id: 'scenic', label: 'Scenic' },
 ];
 
 const SCENIC = new Set(['viewpoint', 'town', 'food', 'lake']);
+const HIDDEN = new Set(['smoke', 'dispensary']);
 
 interface Props {
   stops: OnTheWayStop[];
@@ -19,9 +18,10 @@ interface Props {
 export default function OnTheWay({ stops }: Props) {
   const [kind, setKind] = useState('all');
   const shown = useMemo(() => {
-    if (kind === 'all') return stops;
-    if (kind === 'scenic') return stops.filter((s) => SCENIC.has(s.kind));
-    return stops.filter((s) => s.kind === kind);
+    const visible = stops.filter((s) => !HIDDEN.has(s.kind));
+    if (kind === 'all') return visible;
+    if (kind === 'scenic') return visible.filter((s) => SCENIC.has(s.kind));
+    return visible.filter((s) => s.kind === kind);
   }, [kind, stops]);
 
   return (
@@ -45,13 +45,9 @@ export default function OnTheWay({ stops }: Props) {
         <div className="ski-stops">
           {shown.map((stop) => {
             const dest = stop.lat != null && stop.lng != null ? `${stop.lat},${stop.lng}` : stop.name;
-            const plus21 = stop.kind === 'smoke' || stop.kind === 'dispensary' || stop.ageRestricted;
             return (
               <article key={stop.id} className="ski-stop">
-                <h3>
-                  {stop.name}
-                  {plus21 ? <span className="ski-21">21+</span> : null}
-                </h3>
+                <h3>{stop.name}</h3>
                 <p>{stop.note || stop.town}</p>
                 <div className="ski-stop__meta">
                   {stop.kind} · {stop.town || stop.route} · {stop.source || 'seed'} ·{' '}

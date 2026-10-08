@@ -65,7 +65,28 @@ describe('Dinosaur Hall content', () => {
       expect(sp.evidence.length).toBeGreaterThan(20);
       expect(sp.bodyPlan).toBeTruthy();
       expect(typeof sp.isDinosaur).toBe('boolean');
-      expect(String(sp.image || '')).toMatch(/^https:\/\//);
+      expect(String(sp.image || '')).toMatch(/^(\/nature\/assets\/dinosaur\/|https:\/\/)/);
+    }
+  });
+
+  test('every species links large and small museums that hold the bones', () => {
+    for (const sp of content.species) {
+      expect(Array.isArray(sp.museums)).toBe(true);
+      expect(sp.museums.length).toBeGreaterThanOrEqual(4);
+      const scales = new Set(sp.museums.map((m) => m.scale));
+      expect(scales.has('large')).toBe(true);
+      expect(scales.has('small')).toBe(true);
+      const urls = new Set();
+      for (const museum of sp.museums) {
+        expect(museum.name.length).toBeGreaterThan(3);
+        expect(museum.place.length).toBeGreaterThan(3);
+        expect(museum.holds.length).toBeGreaterThan(20);
+        expect(museum.url).toMatch(/^https:\/\//);
+        expect(['large', 'small']).toContain(museum.scale);
+        expect(['original', 'cast']).toContain(museum.kind);
+        expect(urls.has(museum.url)).toBe(false);
+        urls.add(museum.url);
+      }
     }
   });
 
@@ -101,6 +122,7 @@ describe('Dinosaur Hall page and scripts', () => {
     expect(page).toContain('id="dhSpeciesGrid"');
     expect(page).toContain('id="dhCompare"');
     expect(page).toContain('id="dhQuiz"');
+    expect(page).toContain('id="dhMuseumList"');
     expect(page).toContain('id="dhStoryPlay"');
     expect(page).toContain('dinosaur-hall-scene.js');
     expect(page).toContain('dinosaur-hall.js');
@@ -117,6 +139,9 @@ describe('Dinosaur Hall page and scripts', () => {
     expect(sceneJs).toContain('setEra');
     expect(sceneJs).toContain('spotlight');
     expect(sceneJs).toContain('DinosaurHallScene');
+    expect(sceneJs).toContain('softTissue');
+    expect(sceneJs).toContain('feathered');
+    expect(sceneJs).toContain('ACESFilmicToneMapping');
   });
 
   test('UI supports deep links and DinosaurHall API', () => {
@@ -125,6 +150,8 @@ describe('Dinosaur Hall page and scripts', () => {
     expect(uiJs).toContain("params.get('quiz')");
     expect(uiJs).toContain('window.DinosaurHall');
     expect(uiJs).toContain('runCompare');
+    expect(uiJs).toContain('dhMuseumList');
+    expect(uiJs).toContain('renderMuseums');
   });
 
   test('reel loads scenes and uses Google TTS first', () => {

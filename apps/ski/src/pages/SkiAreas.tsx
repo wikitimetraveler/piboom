@@ -4,6 +4,11 @@ import ResortProfile from '../components/ResortProfile';
 import RunDetail from '../components/RunDetail';
 import RunFinder from '../components/RunFinder';
 import TerrainScene from '../components/TerrainScene';
+import GoogleEarthView from '../components/GoogleEarthView';
+import GoogleMapView from '../components/GoogleMapView';
+import MapModeSwitch, { useMapMode } from '../components/MapModeSwitch';
+import { boundsOf } from '../lib/googleMaps';
+import { demHeightFt } from '../lib/terrainData';
 import type { BriefPayload, DemGrid, DestinationBrief, TrailsPayload } from '../lib/types';
 import { formatFt } from '../lib/goNoGo';
 import { filterActive, filterRuns, sortRuns, type RunFilter, type SortKey } from '../lib/trails';
@@ -49,6 +54,12 @@ export default function SkiAreas(props: Props) {
     [filter, shown]
   );
   const selectedRun = resortRuns.find((r) => r.id === selectedRunId) || null;
+  const [mapMode, setMapMode] = useMapMode();
+  const resortBox = useMemo(() => {
+    const lifts = trails && dem && trails.id === dem.id ? trails.lifts.filter((l) => l.resort === dest?.id) : [];
+    const pts = [...resortRuns.flatMap((r) => r.paths.flat()), ...lifts.flatMap((l) => l.coords)];
+    return boundsOf(pts.map(([lat, lng]) => ({ lat, lng })));
+  }, [resortRuns, trails, dem, dest]);
 
   const pickResort = (id: string) => {
     if (view === 'resort') {
@@ -73,9 +84,9 @@ export default function SkiAreas(props: Props) {
       <header className="ski-hero">
         <h1>Ski Areas</h1>
         <p>
-          Start on the California table, then fly onto the mountain. Mountain High, Snow Valley, Snow Summit, and Bear
-          Mountain carry real OpenStreetMap runs and lifts draped on a USGS 3DEP elevation model, with pitch and facing
-          measured run by run.
+          Start on the California table, then fly onto the mountain. Mountain High, Snow Valley, Snow Summit, Bear
+          Mountain, Mammoth, and June carry real OpenStreetMap runs and lifts draped on a USGS 3DEP elevation model,
+          with pitch and facing measured run by run.
         </p>
       </header>
       <div className="ski-chips" role="tablist" aria-label="Ski area">
@@ -125,16 +136,36 @@ export default function SkiAreas(props: Props) {
             />
           ) : (
             <>
-              <TerrainScene
-                dem={dem}
-                trails={trails}
-                destinations={brief.destinations}
-                resortId={dest?.id}
-                selectedRunId={selectedRunId}
-                previewRunId={previewRunId}
-                matchIds={matchIds}
-                onSelectRun={onSelectRun}
-              />
+              {mapMode === 'topo' || !dem ? (
+                <TerrainScene
+                  dem={dem}
+                  trails={trails}
+                  destinations={brief.destinations}
+                  resortId={dest?.id}
+                  selectedRunId={selectedRunId}
+                  previewRunId={previewRunId}
+                  matchIds={matchIds}
+                  onSelectRun={onSelectRun}
+                />
+              ) : mapMode === 'maps' ? (
+                <GoogleMapView
+                  frame={resortBox || dem}
+                  trails={trails && trails.id === dem.id ? trails : null}
+                  resortId={dest?.id}
+                  selectedRunId={selectedRunId}
+                  onSelectRun={onSelectRun}
+                  fitKey={`${dest?.id}:${dem.id}:${resortBox ? 1 : 0}`}
+                />
+              ) : (
+                <GoogleEarthView
+                  frame={resortBox || dem}
+                  groundFt={(lat, lng) => demHeightFt(dem, lat, lng)}
+                  trails={trails && trails.id === dem.id ? trails : null}
+                  resortId={dest?.id}
+                  fitKey={`${dest?.id}:${dem.id}:${resortBox ? 1 : 0}`}
+                />
+              )}
+              <MapModeSwitch mode={mapMode} onMode={setMapMode} />
               <button type="button" className="ski-to-state" onClick={toCalifornia}>
                 <i className="bi bi-arrow-up-left" aria-hidden="true" /> California
               </button>

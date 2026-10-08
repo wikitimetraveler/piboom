@@ -25,5 +25,23 @@
       { "id": "running-springs", "name": "Running Springs", "lat": 34.2078, "lng": -117.1092 },
       { "id": "big-bear-village", "name": "Big Bear Village", "lat": 34.2439, "lng": -116.9114 }
     ]
+  },
+  "eastern-sierra": {
+    "id": "eastern-sierra",
+    "label": "Fountain Valley → Mammoth & June Lake",
+    "highways": ["CA-91", "I-15", "US-395"],
+    "mapsDest": "Mammoth Lakes, CA",
+    "waypoints": [
+      { "id": "fountain-valley", "name": "Fountain Valley", "lat": 33.7095, "lng": -117.9537 },
+      { "id": "corona-91", "name": "Corona / 91", "lat": 33.8753, "lng": -117.5664 },
+      { "id": "cajon", "name": "Cajon Pass", "lat": 34.3114, "lng": -117.4737 },
+      { "id": "adelanto", "name": "Adelanto / US-395", "lat": 34.5828, "lng": -117.4092 },
+      { "id": "kramer-junction", "name": "Kramer Junction", "lat": 34.9936, "lng": -117.5403 },
+      { "id": "inyokern", "name": "Inyokern", "lat": 35.6469, "lng": -117.8126 },
+      { "id": "lone-pine", "name": "Lone Pine", "lat": 36.6060, "lng": -118.0629 },
+      { "id": "bishop", "name": "Bishop", "lat": 37.3635, "lng": -118.3951 },
+      { "id": "mammoth-lakes", "name": "Mammoth Lakes", "lat": 37.6485, "lng": -118.9721 },
+      { "id": "june-lake", "name": "June Lake", "lat": 37.7799, "lng": -119.0743 }
+    ]
   }
 }

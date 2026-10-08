@@ -11,19 +11,15 @@ import {
 } from './ski-topo.service.js';
 
 const CACHE_MS = 6 * 60 * 60 * 1000;
-const LIVE_KINDS = ['smoke', 'dispensary', 'thrift'];
+const LIVE_KINDS = ['thrift'];
 const PER_KIND_CAP = 8;
 const RADIUS_M = 5000;
 
 const PLACE_QUERIES = {
-  smoke: 'smoke shop',
-  dispensary: 'cannabis dispensary',
   thrift: 'thrift store',
 };
 
 const OVERPASS_SHOPS = {
-  smoke: ['tobacco', 'e-cigarette'],
-  dispensary: ['cannabis'],
   thrift: ['second_hand', 'charity'],
 };
 
@@ -69,7 +65,6 @@ function mapPlace(result, kind, route, town) {
     lng: loc.lng,
     placeId: result.place_id || null,
     source: 'live',
-    ageRestricted: kind === 'smoke' || kind === 'dispensary',
   };
 }
 
@@ -116,7 +111,6 @@ export async function fetchOverpassAtWaypoint(waypoint, kind, route, fetchFn = f
     lng: el.lon,
     placeId: `osm:${el.id}`,
     source: 'live',
-    ageRestricted: kind === 'smoke' || kind === 'dispensary',
   }));
 }
 

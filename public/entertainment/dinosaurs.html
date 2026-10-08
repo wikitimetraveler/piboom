@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>Dinosaurs · Mesozoic Theater | Lane AI Labs</title>
+  <meta name="description" content="A Mesozoic theater: live 3D dinosaurs, a shifting Triassic, Jurassic, and Cretaceous sky, amber specimen cards, and a scale parade against a human."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="/shared/design-tokens.css"/>
+  <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/entertainment/css/dinosaurs.css"/>
+  <script src="/shared/modern-navbar.js"></script>
+</head>
+<body class="dino-page" data-era="cretaceous">
+  <a class="dino-skip" href="#dinoStage">Skip to the 3D stage</a>
+  <canvas id="dinoSky" class="dino-sky" aria-hidden="true"></canvas>
+  <canvas id="dinoSim" class="dino-sim" aria-hidden="true"></canvas>
+  <div class="dino-vignette" aria-hidden="true"></div>
+  <div class="dino-grain" aria-hidden="true"></div>
+  <div class="dino-flash" id="dinoFlash" aria-hidden="true"></div>
+
+  <modern-navbar></modern-navbar>
+
+  <main class="dino-wrap">
+    <header class="dino-hero">
+      <div class="dino-hero__intro">
+        <p class="dino-kicker"><i class="bi bi-hourglass-split" aria-hidden="true"></i> Mesozoic theater · 252–66 million years ago</p>
+        <h1 class="dino-title">Dinosaurs</h1>
+        <p class="dino-lead">Pick an era, wake an animal, and stand it next to a human. Every creature here is built live in your browser.</p>
+      </div>
+
+      <div class="dino-hero__details">
+        <article class="dino-readout" id="dinoReadout" aria-live="polite">
+          <p class="dino-readout__era" id="dinoReadoutEra">Cretaceous</p>
+          <h2 class="dino-readout__name" id="dinoReadoutName">Tyrannosaurus</h2>
+          <p class="dino-readout__meaning" id="dinoReadoutMeaning">Tyrant lizard</p>
+          <dl class="dino-stats">
+            <div><dt>Length</dt><dd id="dinoStatLength">12.3 m · 40 ft</dd></div>
+            <div><dt>Lived</dt><dd id="dinoStatMa">68–66 Ma</dd></div>
+            <div><dt>Diet</dt><dd id="dinoStatDiet">Carnivore</dd></div>
+            <div><dt>Found</dt><dd id="dinoStatFound">Hell Creek Formation, Montana</dd></div>
+          </dl>
+          <p class="dino-readout__blurb" id="dinoReadoutBlurb"></p>
+        </article>
+
+        <div class="dino-controls" role="toolbar" aria-label="Stage controls">
+          <button type="button" class="dino-btn dino-btn--hot" id="dinoRoar"><i class="bi bi-megaphone-fill" aria-hidden="true"></i> Roar</button>
+          <button type="button" class="dino-btn" id="dinoTurnLeft" aria-label="Turn left"><i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i></button>
+          <button type="button" class="dino-btn" id="dinoTurnRight" aria-label="Turn right"><i class="bi bi-arrow-clockwise" aria-hidden="true"></i></button>
+          <button type="button" class="dino-btn" id="dinoSpin" aria-pressed="true"><i class="bi bi-arrow-repeat" aria-hidden="true"></i> Spin</button>
+          <button type="button" class="dino-btn" id="dinoSound" aria-pressed="true"><i class="bi bi-volume-up-fill" aria-hidden="true"></i> Sound</button>
+          <button type="button" class="dino-btn dino-btn--impact" id="dinoImpact"><i class="bi bi-fire" aria-hidden="true"></i> 66 Ma impact</button>
+        </div>
+      </div>
+
+      <div class="dino-stage" id="dinoStage" tabindex="0" role="img" aria-label="3D Tyrannosaurus on a Cretaceous plain">
+        <div class="dino-stage__fallback" id="dinoStageFallback" aria-hidden="true">
+          <span id="dinoFallbackGlyph">T</span>
+        </div>
+        <div class="dino-stage__ring" aria-hidden="true"></div>
+        <p class="dino-stage__hint" aria-hidden="true">Drag to turn · tap to roar</p>
+      </div>
+    </header>
+
+    <section class="dino-section dino-strata" aria-labelledby="dinoStrataHeading">
+      <header class="dino-section__head">
+        <p class="dino-kicker">Dig through time</p>
+        <h2 id="dinoStrataHeading">Era strata</h2>
+        <p>Youngest rock on top. Choose a layer to repaint the sky and wake its signature animal.</p>
+      </header>
+      <div class="dino-strata__stack" id="dinoEras" role="radiogroup" aria-label="Geologic era"></div>
+    </section>
+
+    <section class="dino-section dino-herd" aria-labelledby="dinoHerdHeading">
+      <header class="dino-section__head">
+        <p class="dino-kicker">Specimens in amber</p>
+        <h2 id="dinoHerdHeading">The herd</h2>
+        <p>Nine animals across three periods. Tap a card to bring it to the stage and flip it for field notes.</p>
+      </header>
+      <div class="dino-herd__grid" id="dinoHerd"></div>
+    </section>
+
+    <section class="dino-section dino-scale" aria-labelledby="dinoScaleHeading">
+      <header class="dino-section__head">
+        <p class="dino-kicker">Nose to tail</p>
+        <h2 id="dinoScaleHeading">Scale parade</h2>
+        <p>How the stage animal measures up against you, a school bus, and the longest beast in the herd.</p>
+      </header>
+      <div class="dino-scale__panel">
+        <div class="dino-scale__track" id="dinoScale"></div>
+        <div class="dino-scale__bones" id="dinoBones" aria-hidden="true"></div>
+        <p class="dino-scale__caption" id="dinoScaleCaption" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <p class="dino-note">
+      Lengths are commonly cited adult estimates; colors are artistic guesses — skin pigment rarely fossilizes.
+      For the sky as it really is tonight, open the <a href="/planetarium/">Planetarium</a>.
+    </p>
+  </main>
+
+  <footer class="dino-footer">
+    Lane AI Labs — Dinosaurs · Mesozoic theater — <span id="dinoDate"></span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="/entertainment/js/dinosaurs-catalog.js"></script>
+  <script src="/shared/js/webgpu-runtime.js"></script>
+  <script src="/entertainment/js/dinosaurs-sky.js"></script>
+  <script src="/entertainment/js/dinosaurs-sim.js"></script>
+  <script src="/entertainment/js/dinosaurs-scene.js"></script>
+  <script src="/entertainment/js/dinosaurs.js"></script>
+  <script>
+    document.getElementById('dinoDate').textContent = new Date().toLocaleDateString();
+  </script>
+</body>
+</html>

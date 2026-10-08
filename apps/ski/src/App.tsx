@@ -5,6 +5,7 @@ import SkiSwitch from './components/SkiSwitch';
 import { pageFromPath, type SkiPage } from './lib/page';
 import type { BriefPayload, DemGrid, OnTheWayStop, TrailsPayload } from './lib/types';
 import { runTitle } from './lib/trails';
+import CrewLog from './pages/CrewLog';
 import DriveDesk from './pages/DriveDesk';
 import SkiAreas from './pages/SkiAreas';
 
@@ -191,9 +192,11 @@ export default function App() {
   return (
     <main className="ski-app">
       <SkiSwitch page={page} />
-      <Greeter />
-      {status ? <p className="ski-disclaimer">{status}</p> : null}
-      {page === 'drive' ? (
+      {page === 'log' ? null : <Greeter />}
+      {status && page !== 'log' ? <p className="ski-disclaimer">{status}</p> : null}
+      {page === 'log' ? (
+        <CrewLog destinations={brief.destinations} />
+      ) : page === 'drive' ? (
         <DriveDesk
           brief={brief}
           dest={dest}

@@ -1,6 +1,6 @@
 export type GoScore = 'go' | 'caution' | 'no-go';
 
-export type StopKind = 'smoke' | 'dispensary' | 'thrift' | 'viewpoint' | 'town' | 'food' | 'lake';
+export type StopKind = 'thrift' | 'viewpoint' | 'town' | 'food' | 'lake';
 
 export interface WeatherSnap {
   tempF?: number | null;
@@ -20,8 +20,8 @@ export interface DestinationBrief {
   id: string;
   name: string;
   area: string;
-  route: 'wrightwood' | 'big-bear';
-  dem: 'wrightwood' | 'big-bear' | 'snow-valley';
+  route: 'wrightwood' | 'big-bear' | 'eastern-sierra';
+  dem: 'wrightwood' | 'big-bear' | 'snow-valley' | 'mammoth' | 'june';
   lat: number;
   lng: number;
   baseFt: number;
@@ -57,7 +57,6 @@ export interface OnTheWayStop {
   lat?: number;
   lng?: number;
   source?: 'seed' | 'live' | string;
-  ageRestricted?: boolean;
 }
 
 export type LatLng = [number, number];

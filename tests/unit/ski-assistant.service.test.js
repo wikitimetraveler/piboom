@@ -23,14 +23,14 @@ describe('ski-assistant.service', () => {
       ],
       stops: [
         { name: 'Pine Thrift', kind: 'thrift', town: 'Wrightwood', source: 'live' },
-        { name: 'Summit Smoke', kind: 'smoke', town: 'Cajon', source: 'live' },
+        { name: 'Cajon Lookout', kind: 'viewpoint', town: 'Cajon', source: 'seed' },
       ],
       pageContext: { selectedDestination: 'mountain-high', page: 'drive' },
     });
     expect(prompt).toContain('Ridge');
-    expect(prompt).toContain('21');
+    expect(prompt).toMatch(/does not list smoke shops or cannabis dispensaries/);
     expect(prompt).toContain('Pine Thrift');
-    expect(prompt).toContain('Summit Smoke');
+    expect(prompt).toContain('Cajon Lookout');
     expect(prompt).toContain('Mountain High');
     expect(prompt).toMatch(/Medicinals/);
     expect(prompt).toMatch(/Do not invent hours|Never invent hours/i);

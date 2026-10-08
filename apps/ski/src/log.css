@@ -1,0 +1,606 @@
+/* Crew log — phone-first. Tap targets ≥ 44px. */
+
+.log,
+.log-gate {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.log-gate h1,
+.log-head h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.log-lede {
+  color: var(--ski-muted);
+  margin: 0.35rem 0 1.1rem;
+  line-height: 1.45;
+}
+
+.log-fine {
+  color: var(--ski-muted);
+  font-size: 0.8rem;
+  margin-top: 1rem;
+}
+
+.log-saved {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.log-saved h2,
+.log-h {
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ski-muted);
+  margin: 0.4rem 0 0.2rem;
+}
+
+.log-saved__trip {
+  display: grid;
+  gap: 0.15rem;
+  text-align: left;
+  padding: 0.8rem 1rem;
+  border-radius: 14px;
+  border: 1px solid var(--ski-line);
+  background: var(--ski-panel);
+  color: var(--ski-ink);
+  font-size: 1rem;
+}
+
+.log-saved__trip small {
+  color: var(--ski-muted);
+}
+
+.log-seg,
+.log-tabs {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 0.3rem;
+  padding: 0.25rem;
+  border-radius: 999px;
+  background: var(--ski-panel);
+  border: 1px solid var(--ski-line);
+  margin: 0 0 1rem;
+}
+
+.log-seg button,
+.log-tabs button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ski-ink);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.log-seg button.is-on,
+.log-tabs button.is-on {
+  background: var(--ski-ice);
+  color: #071018;
+  font-weight: 600;
+}
+
+.log-tabs {
+  position: sticky;
+  top: 0.5rem;
+  z-index: 5;
+  backdrop-filter: blur(8px);
+  background: rgba(16, 26, 36, 0.92);
+}
+
+.log-form {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.log-form label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--ski-muted);
+}
+
+.log-form input,
+.log-form select,
+.log-today__bar select,
+.log-photo-form input,
+.log-photo-form select {
+  min-height: 44px;
+  padding: 0 0.8rem;
+  border-radius: 12px;
+  border: 1px solid var(--ski-line);
+  background: #0b141d;
+  color: var(--ski-ink);
+  font-size: 16px; /* stops iOS zoom on focus */
+}
+
+.log-primary,
+.log-big {
+  min-height: 52px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--ski-ice);
+  color: #071018;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.log-primary:disabled,
+.log-big:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.log-ghost {
+  min-height: 40px;
+  padding: 0 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--ski-line);
+  background: transparent;
+  color: var(--ski-ink);
+  cursor: pointer;
+}
+
+.log-error {
+  color: var(--ski-nogo);
+  margin: 0.4rem 0;
+}
+
+.log-note,
+.log-preview,
+.log-gps,
+.log-last {
+  color: var(--ski-muted);
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}
+
+.log-preview {
+  color: var(--ski-go);
+}
+
+.log-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.log-head p {
+  margin: 0.2rem 0 0;
+  color: var(--ski-muted);
+  font-size: 0.9rem;
+}
+
+.log-head__actions {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.log-code {
+  display: grid;
+  min-height: 44px;
+  padding: 0.2rem 0.75rem;
+  border-radius: 12px;
+  border: 1px dashed var(--ski-ice);
+  background: transparent;
+  color: var(--ski-ice);
+  font: 600 0.95rem ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.log-code small {
+  font: 0.65rem system-ui, sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ski-muted);
+}
+
+/* Ski tab */
+.log-ski {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.log-tally,
+.log-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.log-tally div,
+.log-stats > div {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.75rem 0.6rem;
+  border-radius: 14px;
+  background: var(--ski-panel);
+  border: 1px solid var(--ski-line);
+  text-align: center;
+}
+
+.log-tally strong,
+.log-stats strong {
+  font-size: 1.25rem;
+}
+
+.log-tally span,
+.log-stats span {
+  color: var(--ski-muted);
+  font-size: 0.75rem;
+}
+
+.log-stats .log-mix {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.9rem;
+  font-size: 0.9rem;
+  color: var(--ski-ink);
+}
+
+.log-mix span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--ski-ink);
+  font-size: 0.9rem;
+}
+
+.log-big {
+  display: grid;
+  gap: 0.25rem;
+  width: 100%;
+  padding: 1.1rem 1rem;
+  text-align: center;
+}
+
+.log-big strong {
+  font-size: 1.2rem;
+}
+
+.log-big span {
+  font-size: 0.8rem;
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+.log-big--stop {
+  background: var(--ski-nogo);
+  color: #fff;
+}
+
+.log-big--checkin {
+  background: #1b2c3b;
+  color: var(--ski-ink);
+  border: 1px solid var(--ski-ice);
+}
+
+.log-big--photo {
+  background: #1b2c3b;
+  color: var(--ski-ink);
+  border: 1px solid var(--ski-line);
+}
+
+.log-cands {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.6rem;
+}
+
+.log-cands p {
+  margin: 0;
+  color: var(--ski-muted);
+}
+
+.log-cands button {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 48px;
+  padding: 0 0.9rem;
+  border-radius: 12px;
+  border: 1px solid var(--ski-line);
+  background: var(--ski-panel);
+  color: var(--ski-ink);
+  font-size: 1rem;
+  text-align: left;
+}
+
+.log-cands button span {
+  flex: 1;
+}
+
+.log-cands button small {
+  color: var(--ski-muted);
+}
+
+.log-cands .log-cands__none {
+  justify-content: center;
+  color: var(--ski-muted);
+}
+
+/* Today tab */
+.log-today {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.log-today__bar {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.log-today__bar select {
+  flex: 1;
+}
+
+.log-chips {
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  padding-bottom: 0.2rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.log-chips button {
+  --chip: var(--ski-ice);
+  flex: none;
+  min-height: 38px;
+  padding: 0 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--chip);
+  background: transparent;
+  color: var(--ski-ink);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.log-chips button.is-on {
+  background: var(--chip);
+  color: #071018;
+  font-weight: 600;
+}
+
+.log-board {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.log-board li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 12px;
+  background: var(--ski-panel);
+  font-size: 0.9rem;
+}
+
+.log-board__rank {
+  width: 1.2rem;
+  color: var(--ski-muted);
+}
+
+.log-board__dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+}
+
+.log-board__name {
+  flex: 1;
+  font-weight: 600;
+}
+
+.log-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.log-seg-row {
+  display: grid;
+  grid-template-columns: 4.2rem 1.6rem 1fr;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 12px;
+  background: var(--ski-panel);
+  border-left: 3px solid var(--ski-ice);
+}
+
+.log-seg-row--lift {
+  background: transparent;
+  border-left-color: #f4c95d;
+  opacity: 0.85;
+}
+
+.log-seg-row__time {
+  color: var(--ski-muted);
+  font-size: 0.8rem;
+}
+
+.log-seg-row__icon {
+  display: flex;
+  justify-content: center;
+  color: #f4c95d;
+}
+
+.log-seg-row__main {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.log-seg-row__main small {
+  color: var(--ski-muted);
+  font-size: 0.78rem;
+}
+
+/* Photos + import */
+.log-photo-form {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.log-photo-form img {
+  width: 100%;
+  max-height: 50vh;
+  object-fit: contain;
+  border-radius: 14px;
+  background: #000;
+}
+
+.log-photo-form__row {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.log-photo-form__row .log-primary {
+  min-height: 44px;
+  padding: 0 1.2rem;
+}
+
+.log-photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 0.4rem;
+}
+
+.log-photos button {
+  padding: 0;
+  border: 2px solid var(--ski-line);
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  background: #000;
+  cursor: pointer;
+}
+
+.log-photos img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.log-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(3, 7, 11, 0.92);
+}
+
+.log-lightbox figure {
+  margin: 0;
+  display: grid;
+  gap: 0.6rem;
+  max-width: min(100%, 900px);
+}
+
+.log-lightbox img {
+  max-width: 100%;
+  max-height: 72vh;
+  border-radius: 12px;
+  justify-self: center;
+}
+
+.log-lightbox figcaption {
+  display: grid;
+  gap: 0.2rem;
+  color: var(--ski-muted);
+}
+
+.log-lightbox figcaption strong {
+  color: var(--ski-ink);
+}
+
+.log-import {
+  border: 1px solid var(--ski-line);
+  border-radius: 14px;
+  padding: 0.7rem 0.9rem;
+  background: var(--ski-panel);
+}
+
+.log-import summary {
+  cursor: pointer;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.log-import ul {
+  padding-left: 1.1rem;
+  color: var(--ski-muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.log-import strong {
+  color: var(--ski-ink);
+}
+
+.log-map {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.log-map .ski-mode-switch {
+  margin-top: 0;
+  justify-self: start;
+}
+
+.log-map__stage {
+  position: relative;
+  height: min(62vh, 560px);
+  min-height: 340px;
+  border-radius: 16px;
+  border: 1px solid var(--ski-line);
+  background: #081019;
+  overflow: hidden;
+}
+
+.log-map__stage > .ski-trail-map,
+.log-map__stage > .ski-gmap,
+.log-map__stage > .ski-earth {
+  height: 100%;
+  border: 0;
+  border-radius: inherit;
+}
+
+.log-map__stage > .log-note {
+  margin: 1rem;
+}
+
+.log-map__foot {
+  margin: 0;
+  color: var(--ski-muted);
+  font-size: 0.82rem;
+}
+
+.log-map__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}

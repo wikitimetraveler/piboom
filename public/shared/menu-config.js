@@ -97,6 +97,7 @@
     { href: '/planetarium/station.html', icon: 'bi-hdd-stack', label: 'ISS station', title: 'Walk the International Space Station module by module — crew, Cupola, 3D schematic' },
     { href: '/planetarium/docking.html', icon: 'bi-link-45deg', label: 'ISS docking', title: 'IDA, probe-and-drogue, CBM berthing, and Progress propellant transfer' },
     { href: '/entertainment/astrology.html', icon: 'bi-moon-stars', label: 'Astrology', title: 'Rose reads twelve sign cards — gold wheel, flips, birthday finder' },
+    { href: '/entertainment/dinosaurs.html', icon: 'bi-hourglass-split', label: 'Dinosaurs', title: 'Mesozoic theater — live 3D dinosaurs, era skies, WebGPU embers, scale parade' },
     { href: '/entertainment/blacklight.html', icon: 'bi-lightning', label: 'Black Light Zone' },
     { href: '/entertainment/blacklight-poster.html', icon: 'bi-lightbulb', label: 'Black Light Poster' },
     { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Bud Master, locksmith Long Beach & L.A.' },
@@ -120,6 +121,7 @@
     { href: '/planetarium/station.html', icon: 'bi-hdd-stack', label: 'ISS station', title: 'Walk the International Space Station module by module — crew, Cupola, 3D schematic' },
     { href: '/planetarium/docking.html', icon: 'bi-link-45deg', label: 'ISS docking', title: 'IDA, probe-and-drogue, CBM berthing, and Progress propellant transfer' },
     { href: '/entertainment/astrology.html', icon: 'bi-moon-stars', label: 'Astrology', title: 'Rose reads twelve sign cards — a gold wheel, flips, and a birthday finder' },
+    { href: '/entertainment/dinosaurs.html', icon: 'bi-hourglass-split', label: 'Dinosaurs', title: 'Mesozoic theater — procedural 3D dinosaurs, Triassic to Cretaceous skies, amber specimen cards, and a scale parade' },
     { href: '/entertainment/blacklight.html', icon: 'bi-lightning', label: 'Black Light Zone', title: 'Black light neon scene' },
     { href: '/entertainment/blacklight-poster.html', icon: 'bi-lightbulb', label: 'Black Light Poster', title: 'Sound-reactive black-light poster' },
     { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Bud Master, locksmith Long Beach & L.A.' },
@@ -156,6 +158,7 @@
     { href: '/nature/tree-collection.html', icon: 'bi-trees', label: 'Tree Collection' },
     { href: '/nature/critter-discovery.html', icon: 'bi-bug-fill', label: 'Critter Discovery' },
     { href: '/nature/critter-collection.html', icon: 'bi-bug', label: 'Critter Collection' },
+    { href: '/local/local-spots.html#fvThrift', icon: 'bi-shop', label: 'Thrift near Fountain Valley', title: 'Thrift stores within 30 miles of Fountain Valley, with a map' },
     { href: '/local/local-spots.html', icon: 'bi-geo-alt-fill', label: 'Local Spots' },
     { href: '/finds/index.html', icon: 'bi-search-heart', label: 'Finds' },
     { divider: true },
@@ -263,6 +266,7 @@
 
   /** Nature hub tool grid */
   const NATURE_TOOLS = [
+    { href: '/local/local-spots.html#fvThrift', icon: 'bi-shop', label: 'Thrift near Fountain Valley', title: 'Thrift stores within 30 miles of Fountain Valley, with a map and directions' },
     { href: '/ski/', icon: 'bi-signpost-2', label: 'Ski Drive', title: 'Fountain Valley drive desk — weather, chains, on-the-way stops' },
     { href: '/ski/areas', icon: 'bi-snow2', label: 'Ski Areas', title: 'Wrightwood and Big Bear ski-area topography — DEM, slope, aspect' },
     { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Bud Master, embedded origins map' },

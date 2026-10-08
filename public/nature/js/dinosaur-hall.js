@@ -102,7 +102,8 @@
         const tags = [
           `<span class="dh-tag">${esc(sp.era)}</span>`,
           `<span class="dh-tag">${esc(sp.diet)}</span>`,
-          sp.isDinosaur === false ? '<span class="dh-tag dh-tag--warn">Not a dinosaur</span>' : ''
+          sp.isDinosaur === false ? '<span class="dh-tag dh-tag--warn">Not a dinosaur</span>' : '',
+          Array.isArray(sp.museums) && sp.museums.length ? `<span class="dh-tag">${sp.museums.length} museums</span>` : ''
         ]
           .filter(Boolean)
           .join('');
@@ -172,6 +173,7 @@
     set('dhDetailLength', `${sp.lengthM} m`);
     set('dhDetailClade', sp.isDinosaur === false ? 'Not a dinosaur' : 'Dinosaur');
     set('dhDetailCredit', sp.imageCredit || 'Wikimedia Commons');
+    renderMuseums(sp);
     const img = document.getElementById('dhDetailImg');
     if (img) {
       img.src = sp.image || '';
@@ -181,6 +183,25 @@
       };
       img.style.display = '';
     }
+  }
+
+  function renderMuseums(sp) {
+    const wrap = document.getElementById('dhDetailMuseums');
+    const list = document.getElementById('dhMuseumList');
+    const museums = Array.isArray(sp.museums) ? sp.museums : [];
+    if (!wrap || !list) return;
+    wrap.hidden = museums.length === 0;
+    list.innerHTML = museums
+      .map((m) => {
+        const scale = m.scale === 'small' ? 'Smaller museum' : 'Large museum';
+        const kind = m.kind === 'cast' ? 'Cast or historic replica' : 'Original bones';
+        return `<li class="dh-museum-item">
+          <a href="${esc(m.url)}" target="_blank" rel="noopener noreferrer">${esc(m.name)}</a>
+          <span class="dh-museum-meta">${esc(m.place)} · ${scale} · ${kind}</span>
+          <span class="dh-museum-holds">${esc(m.holds)}</span>
+        </li>`;
+      })
+      .join('');
   }
 
   function fillCompareSelects() {

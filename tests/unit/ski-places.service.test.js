@@ -2,7 +2,7 @@
  * Development work by David Lane
  */
 import { jest } from '@jest/globals';
-import {
+import skiPlaces, {
   placesQueryForKind,
   overpassShopsForKind,
   fetchLiveStopsForRoute,
@@ -26,11 +26,14 @@ describe('ski-places.service', () => {
   });
 
   test('maps kinds to Places keywords and Overpass shop tags', () => {
-    expect(placesQueryForKind('smoke')).toBe('smoke shop');
-    expect(placesQueryForKind('dispensary')).toBe('cannabis dispensary');
     expect(placesQueryForKind('thrift')).toBe('thrift store');
     expect(overpassShopsForKind('thrift')).toEqual(['second_hand', 'charity']);
-    expect(overpassShopsForKind('smoke')).toEqual(['tobacco', 'e-cigarette']);
+  });
+
+  test('live search covers thrift only — no smoke shops or dispensaries', () => {
+    expect(skiPlaces.LIVE_KINDS).toEqual(['thrift']);
+    expect(overpassShopsForKind('smoke')).toEqual([]);
+    expect(overpassShopsForKind('dispensary')).toEqual([]);
   });
 
   test('Overpass fallback returns live rows and caches the route', async () => {

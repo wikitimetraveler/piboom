@@ -54,6 +54,50 @@
       "lat": 34.0458,
       "lng": -116.947,
       "source": "seed"
+    },
+    {
+      "id": "alabama-hills",
+      "name": "Alabama Hills / Mount Whitney view",
+      "route": "eastern-sierra",
+      "kind": "viewpoint",
+      "town": "Lone Pine",
+      "note": "Boulder arches under Whitney, two minutes off 395 on Whitney Portal Road.",
+      "lat": 36.6066,
+      "lng": -118.1245,
+      "source": "seed"
+    },
+    {
+      "id": "schats-bakery",
+      "name": "Erick Schat's Bakkerÿ",
+      "route": "eastern-sierra",
+      "kind": "food",
+      "town": "Bishop",
+      "note": "The classic 395 stop for sheepherder bread and sandwiches.",
+      "lat": 37.3636,
+      "lng": -118.3952,
+      "source": "seed"
+    },
+    {
+      "id": "convict-lake",
+      "name": "Convict Lake",
+      "route": "eastern-sierra",
+      "kind": "lake",
+      "town": "Mammoth Lakes",
+      "note": "Short spur off 395 just south of the Mammoth turnoff — big peaks over the water.",
+      "lat": 37.5925,
+      "lng": -118.8536,
+      "source": "seed"
+    },
+    {
+      "id": "june-lake-village",
+      "name": "June Lake village",
+      "route": "eastern-sierra",
+      "kind": "town",
+      "town": "June Lake",
+      "note": "Quiet loop town on CA-158 at the foot of June Mountain.",
+      "lat": 37.7799,
+      "lng": -119.0743,
+      "source": "seed"
     }
   ]
 }

@@ -11,10 +11,11 @@ import {
   loadDestinations,
   loadOnTheWaySeed,
   getBrief,
+  fetchOpenMeteo,
 } from '../../services/ski-topo.service.js';
 
 describe('ski-topo.service', () => {
-  test('catalog has Fountain Valley home and four resorts', async () => {
+  test('catalog has Fountain Valley home and six resorts', async () => {
     const catalog = await loadDestinations();
     expect(catalog.home.name).toBe('Fountain Valley');
     expect(catalog.destinations.map((d) => d.id)).toEqual([
@@ -22,8 +23,25 @@ describe('ski-topo.service', () => {
       'snow-valley',
       'snow-summit',
       'bear-mountain',
+      'mammoth',
+      'june',
     ]);
     expect(catalog.destinations.every((d) => d.baseFt && d.summitFt)).toBe(true);
+  });
+
+  test('every destination points at a known route and a baked DEM', async () => {
+    const catalog = await loadDestinations();
+    const routes = JSON.parse(
+      await readFile(path.join(process.cwd(), 'data', 'ski', 'routes.json'), 'utf8')
+    );
+    const { SKI_DEM_SPECS } = await import('../../services/ski-dem.service.js');
+    for (const d of catalog.destinations) {
+      expect(routes[d.route]).toBeDefined();
+      expect(SKI_DEM_SPECS.some((s) => s.id === d.dem)).toBe(true);
+    }
+    const sierra = routes['eastern-sierra'].waypoints.map((w) => w.id);
+    expect(sierra[0]).toBe('fountain-valley');
+    expect(sierra).toEqual(expect.arrayContaining(['bishop', 'mammoth-lakes', 'june-lake']));
   });
 
   test('scoreGoNoGo: blizzard warning is no-go; missing weather is caution; clear is go', () => {
@@ -119,10 +137,40 @@ describe('ski-topo.service', () => {
     };
     const brief = await getBrief({ fetchFn });
     expect(brief.home.name).toBe('Fountain Valley');
-    expect(brief.destinations).toHaveLength(4);
+    expect(brief.destinations).toHaveLength(6);
     expect(brief.destinations[0].weather.tempF).toBe(28);
     expect(brief.destinations[0].score).toBe('go');
     expect(brief.disclaimer).toMatch(/not official/i);
+  });
+
+  test('Open-Meteo lengths: feet stay feet (inch precip units), meters convert', async () => {
+    const reply = (body) => async () => ({ ok: true, json: async () => body });
+    const imperial = await fetchOpenMeteo(
+      34.2,
+      -117,
+      reply({
+        current_units: { snow_depth: 'ft' },
+        hourly_units: { freezing_level_height: 'ft' },
+        current: { temperature_2m: 30, snow_depth: 1.5 },
+        hourly: { freezing_level_height: [4000] },
+      })
+    );
+    expect(imperial.freezeLevelFt).toBe(4000);
+    expect(imperial.snowDepthIn).toBe(18);
+    expect(chainsLikely({ freezeLevelFt: imperial.freezeLevelFt })).toBe(true);
+
+    const metric = await fetchOpenMeteo(
+      34.2,
+      -117,
+      reply({
+        current_units: { snow_depth: 'm' },
+        hourly_units: { freezing_level_height: 'm' },
+        current: { temperature_2m: 30, snow_depth: 0.5 },
+        hourly: { freezing_level_height: [2000] },
+      })
+    );
+    expect(metric.freezeLevelFt).toBe(6562);
+    expect(metric.snowDepthIn).toBeCloseTo(19.7, 1);
   });
 
   test('seed file exists and is scenic-only', async () => {

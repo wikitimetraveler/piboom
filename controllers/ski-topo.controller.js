@@ -40,8 +40,11 @@ router.get('/stops', async (req, res) => {
   try {
     const route = String(req.query.route || '').trim();
     const kind = String(req.query.kind || '').trim();
-    if (route && !['wrightwood', 'big-bear'].includes(route)) {
-      return res.status(400).json({ error: 'route must be wrightwood or big-bear' });
+    if (route) {
+      const routes = await skiTopoService.loadRoutes();
+      if (!Object.prototype.hasOwnProperty.call(routes, route)) {
+        return res.status(400).json({ error: `route must be one of: ${Object.keys(routes).join(', ')}` });
+      }
     }
     const stops = await skiPlacesService.getStops({ route, kind });
     res.json({ route: route || null, kind: kind || 'all', stops });

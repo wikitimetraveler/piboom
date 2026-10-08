@@ -125,15 +125,19 @@ export async function fetchOpenMeteo(lat, lng, fetchFn = fetch) {
   const data = await fetchJson(url, { 'User-Agent': NWS_UA }, fetchFn);
   const current = data.current || {};
   const hourly = data.hourly || {};
-  const freezeM = Array.isArray(hourly.freezing_level_height)
+  const freeze = Array.isArray(hourly.freezing_level_height)
     ? hourly.freezing_level_height.find((v) => v != null)
     : null;
+  // precipitation_unit=inch switches Open-Meteo lengths (freezing level, snow depth) to feet.
+  const freezeToFt = data.hourly_units?.freezing_level_height === 'ft' ? 1 : 3.28084;
+  const depthUnit = data.current_units?.snow_depth;
+  const depthToIn = depthUnit === 'ft' ? 12 : depthUnit === 'm' ? 39.3701 : 1;
   return {
     tempF: current.temperature_2m ?? null,
     precipIn: current.precipitation ?? 0,
     snowfallIn: current.snowfall ?? 0,
-    snowDepthIn: current.snow_depth ?? null,
-    freezeLevelFt: freezeM == null ? null : Math.round(Number(freezeM) * 3.28084),
+    snowDepthIn: current.snow_depth == null ? null : Math.round(Number(current.snow_depth) * depthToIn * 10) / 10,
+    freezeLevelFt: freeze == null ? null : Math.round(Number(freeze) * freezeToFt),
   };
 }
 

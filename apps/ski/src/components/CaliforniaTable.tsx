@@ -22,6 +22,38 @@ interface Waypoint {
   lng: number;
 }
 
+type Slot = readonly [number, number];
+
+interface AreaTag {
+  obj: CSS2DObject;
+  el: HTMLElement;
+  lead: SVGLineElement;
+  x: number;
+  pref: Slot;
+  slot: Slot;
+  w: number;
+  h: number;
+}
+
+interface Rect {
+  l: number;
+  r: number;
+  t: number;
+  b: number;
+}
+
+/** CSS2D `center` slots around an area anchor: above, below, right, left, then two and three rows out. */
+const TAG_SLOTS: Slot[] = [
+  [0.5, 1.15],
+  [0.5, -0.35],
+  [-0.06, 0.5],
+  [1.06, 0.5],
+  [0.5, 2.35],
+  [0.5, -1.55],
+  [0.5, 3.55],
+  [0.5, -2.75],
+];
+
 interface Pose {
   target: THREE.Vector3;
   radius: number;
@@ -226,6 +258,10 @@ export default function CaliforniaTable({ destinations, home, returnFrom, flyReq
     labels.setSize(width, height);
     labels.domElement.className = 'ski-3d-labels';
     el.appendChild(labels.domElement);
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    const leads = document.createElementNS(SVG_NS, 'svg');
+    leads.setAttribute('class', 'ski-table-leads');
+    labels.domElement.appendChild(leads);
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x060c13);
@@ -321,7 +357,7 @@ export default function CaliforniaTable({ destinations, home, returnFrom, flyReq
     const anchors = new Map<string, THREE.Vector3>();
     const pickables: THREE.Mesh[] = [];
     const bounds = new THREE.Box3().expandByPoint(new THREE.Vector3(homeXZ.x, 0, homeXZ.z));
-    const areaTags: { obj: CSS2DObject; x: number }[] = [];
+    const areaTags: AreaTag[] = [];
 
     const fly = (id: string) => {
       const anchor = anchors.get(id);
@@ -380,14 +416,92 @@ export default function CaliforniaTable({ destinations, home, returnFrom, flyReq
       const obj = new CSS2DObject(tag);
       obj.position.set(model.center.x, topY + 2.2, model.center.z);
       scene.add(obj);
-      areaTags.push({ obj, x: model.center.x });
+      const lead = document.createElementNS(SVG_NS, 'line');
+      lead.style.display = 'none';
+      leads.appendChild(lead);
+      areaTags.push({ obj, el: tag, lead, x: model.center.x, pref: TAG_SLOTS[0], slot: TAG_SLOTS[0], w: 0, h: 0 });
     }
-    // Neighbouring areas are only ~15 km apart, so alternate tags above and below their models.
+    // Neighbouring areas are only ~15 km apart, so default to alternating above and below their models.
     areaTags
       .sort((a, b) => a.x - b.x)
-      .forEach(({ obj }, i) => {
-        obj.center.set(0.5, i % 2 ? -0.35 : 1.15);
+      .forEach((t, i) => {
+        t.pref = i % 2 ? TAG_SLOTS[1] : TAG_SLOTS[0];
+        t.slot = t.pref;
+        t.obj.center.set(t.slot[0], t.slot[1]);
       });
+
+    const proj = new THREE.Vector3();
+    const homeBox = { w: 0, h: 0 };
+    const screenOf = (obj: CSS2DObject, width: number, height: number) => {
+      proj.setFromMatrixPosition(obj.matrixWorld).project(camera);
+      if (proj.z > 1) return null;
+      return { x: (proj.x + 1) * 0.5 * width, y: (1 - proj.y) * 0.5 * height };
+    };
+    // The state-wide view squeezes the SoCal areas together, so move any tag that would overlap into the next free slot.
+    const declutter = () => {
+      const { width, height } = labels.getSize();
+      const placed: Rect[] = [];
+      const home = screenOf(homeObj, width, height);
+      if (!homeBox.w) {
+        homeBox.w = homeTag.offsetWidth;
+        homeBox.h = homeTag.offsetHeight;
+      }
+      if (home && homeBox.w) {
+        const l = home.x + 0.08 * homeBox.w;
+        placed.push({ l, r: l + homeBox.w, t: home.y - homeBox.h / 2, b: home.y + homeBox.h / 2 });
+      }
+      for (const t of areaTags) {
+        t.lead.style.display = 'none';
+        const s = screenOf(t.obj, width, height);
+        if (!s) continue;
+        if (!t.w) {
+          t.w = t.el.offsetWidth;
+          t.h = t.el.offsetHeight;
+        }
+        if (!t.w) continue;
+        const rectAt = ([cx, cy]: Slot): Rect => {
+          const left = s.x - cx * t.w;
+          const top = s.y - cy * t.h;
+          return { l: left, r: left + t.w, t: top, b: top + t.h };
+        };
+        const overlap = (slot: Slot) => {
+          const a = rectAt(slot);
+          const insideW = Math.max(0, Math.min(a.r, width) - Math.max(a.l, 0));
+          const insideH = Math.max(0, Math.min(a.b, height) - Math.max(a.t, 0));
+          let sum = t.w * t.h - insideW * insideH;
+          for (const p of placed) {
+            const ow = Math.min(a.r, p.r) - Math.max(a.l, p.l);
+            const oh = Math.min(a.b, p.b) - Math.max(a.t, p.t);
+            if (ow > 0 && oh > 0) sum += ow * oh;
+          }
+          return sum;
+        };
+        let best = t.pref;
+        let bestCost = Infinity;
+        for (const slot of [t.pref, t.slot, ...TAG_SLOTS]) {
+          const cost = overlap(slot);
+          if (cost < bestCost) {
+            best = slot;
+            bestCost = cost;
+          }
+          if (cost === 0) break;
+        }
+        if (best !== t.slot) {
+          t.slot = best;
+          t.obj.center.set(best[0], best[1]);
+        }
+        const box = rectAt(best);
+        placed.push(box);
+        const displaced = best !== TAG_SLOTS[0] && best !== TAG_SLOTS[1];
+        t.lead.style.display = displaced ? '' : 'none';
+        if (displaced) {
+          t.lead.setAttribute('x1', s.x.toFixed(1));
+          t.lead.setAttribute('y1', s.y.toFixed(1));
+          t.lead.setAttribute('x2', THREE.MathUtils.clamp(s.x, box.l, box.r).toFixed(1));
+          t.lead.setAttribute('y2', THREE.MathUtils.clamp(s.y, box.t, box.b).toFixed(1));
+        }
+      }
+    };
 
     const tableCenter = bounds.getCenter(new THREE.Vector3()).setY(0);
     const tableSize = bounds.getSize(new THREE.Vector3());
@@ -499,6 +613,7 @@ export default function CaliforniaTable({ destinations, home, returnFrom, flyReq
     const tick = () => {
       if (!tweening) controls.update();
       renderer.render(scene, camera);
+      declutter();
       labels.render(scene, camera);
       raf = requestAnimationFrame(tick);
     };

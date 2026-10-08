@@ -1,11 +1,14 @@
-export type SkiPage = 'drive' | 'areas';
+export type SkiPage = 'drive' | 'areas' | 'log';
+
+const PATHS: Record<SkiPage, string> = { drive: '/ski/', areas: '/ski/areas', log: '/ski/log' };
 
 export function pageFromPath(pathname = window.location.pathname): SkiPage {
-  return /\/areas\/?$/.test(pathname) ? 'areas' : 'drive';
+  if (/\/areas\/?$/.test(pathname)) return 'areas';
+  if (/\/log\/?$/.test(pathname)) return 'log';
+  return 'drive';
 }
 
 export function goPage(page: SkiPage) {
-  const href = page === 'areas' ? '/ski/areas' : '/ski/';
-  window.history.pushState({ page }, '', href);
+  window.history.pushState({ page }, '', PATHS[page]);
   window.dispatchEvent(new PopStateEvent('popstate'));
 }

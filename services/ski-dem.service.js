@@ -61,6 +61,38 @@ export const SKI_DEM_SPECS = [
       { lat: 34.2439, lng: -116.9114, elevFt: 6750, sigma: 0.016 },
     ],
   },
+  {
+    id: 'mammoth',
+    name: 'Mammoth Mountain',
+    file: 'mammoth-dem.json',
+    south: 37.612,
+    north: 37.667,
+    west: -119.07,
+    east: -118.972,
+    rows: 154,
+    cols: 217,
+    floorFt: 7800,
+    peaks: [
+      { lat: 37.6308, lng: -119.0326, elevFt: 11053, sigma: 0.013 },
+      { lat: 37.6455, lng: -119.04, elevFt: 10400, sigma: 0.008 },
+    ],
+  },
+  {
+    id: 'june',
+    name: 'June Mountain',
+    file: 'june-dem.json',
+    south: 37.73,
+    north: 37.78,
+    west: -119.105,
+    east: -119.045,
+    rows: 140,
+    cols: 133,
+    floorFt: 7500,
+    peaks: [
+      { lat: 37.749, lng: -119.082, elevFt: 10090, sigma: 0.009 },
+      { lat: 37.756, lng: -119.072, elevFt: 9200, sigma: 0.008 },
+    ],
+  },
 ];
 
 export function pointInDemBounds(dem, lat, lng) {

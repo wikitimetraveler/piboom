@@ -1,0 +1,1068 @@
+/**
+ * Dinosaurs · Mesozoic theater.
+ * Development work by David Lane
+ */
+
+:root {
+  --dn-void: #0b0807;
+  --dn-ink: #f6ecd8;
+  --dn-muted: #cdbd9f;
+  --dn-amber: #f0a73c;
+  --dn-amber-deep: #a8561a;
+  --dn-bone: #efe0c0;
+  --dn-fern: #8fbf62;
+  --dn-ember: #ff6a2a;
+  --dn-era: #ff7a3a;
+  --dn-era-soft: rgba(255, 122, 58, 0.18);
+  --dn-panel: rgba(16, 11, 9, 0.62);
+  --dn-line: rgba(240, 167, 60, 0.28);
+  --dn-display: "Anton", "Impact", "Haettenschweiler", sans-serif;
+  --dn-sans: "Outfit", "Segoe UI", sans-serif;
+}
+
+body.dino-page[data-era="triassic"] { --dn-era: #ffb36b; --dn-era-soft: rgba(255, 179, 107, 0.18); }
+body.dino-page[data-era="jurassic"] { --dn-era: #bfe59a; --dn-era-soft: rgba(191, 229, 154, 0.16); }
+body.dino-page[data-era="cretaceous"] { --dn-era: #ff7a3a; --dn-era-soft: rgba(255, 122, 58, 0.18); }
+
+html,
+body.dino-page {
+  min-height: 100%;
+}
+
+body.dino-page {
+  margin: 0;
+  color: var(--dn-ink);
+  font-family: var(--dn-sans);
+  background: var(--dn-void);
+  overflow-x: hidden;
+}
+
+body.dino-page modern-navbar {
+  position: relative;
+  z-index: 40;
+}
+
+/* ---------- atmosphere layers ---------- */
+
+.dino-sky {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 40% at 70% 78%, color-mix(in srgb, var(--dn-era) 55%, transparent), transparent 70%),
+    linear-gradient(180deg, #140c18 0%, #3a1a1c 55%, #e0542c 100%);
+  transition: background 1s ease;
+}
+
+.dino-sim {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.dino-vignette,
+.dino-grain,
+.dino-flash {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.dino-vignette {
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 120% 90% at 50% 40%, transparent 55%, rgba(5, 3, 2, 0.75) 100%),
+    linear-gradient(180deg, transparent 60%, rgba(8, 5, 4, 0.55) 100%);
+}
+
+.dino-grain {
+  z-index: 1;
+  opacity: 0.16;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");
+}
+
+.dino-flash {
+  z-index: 60;
+  opacity: 0;
+  background: radial-gradient(circle at 70% 25%, #fff8e6 0%, #ffd27a 30%, rgba(255, 106, 42, 0.6) 60%, rgba(40, 10, 4, 0.2) 100%);
+}
+
+.dino-flash.is-firing {
+  animation: dinoFlash 2.6s ease-out forwards;
+}
+
+@keyframes dinoFlash {
+  0% { opacity: 0; }
+  6% { opacity: 1; }
+  30% { opacity: 0.55; }
+  100% { opacity: 0; }
+}
+
+body.dino-page.is-quaking .dino-wrap {
+  animation: dinoQuake 0.9s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes dinoQuake {
+  10%, 90% { transform: translate3d(-2px, 1px, 0); }
+  20%, 80% { transform: translate3d(4px, -2px, 0); }
+  30%, 50%, 70% { transform: translate3d(-7px, 3px, 0); }
+  40%, 60% { transform: translate3d(7px, -3px, 0); }
+}
+
+.dino-skip {
+  position: absolute;
+  left: 0.75rem;
+  top: -3rem;
+  z-index: 70;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.4rem;
+  background: var(--dn-amber);
+  color: #1a0f05;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.dino-skip:focus {
+  top: 0.75rem;
+}
+
+/* ---------- layout ---------- */
+
+.dino-wrap {
+  position: relative;
+  z-index: 2;
+  width: min(1180px, calc(100% - 1.5rem));
+  margin: 0 auto;
+  padding: 1rem 0 3.5rem;
+}
+
+.dino-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 0.5rem;
+  color: var(--dn-era);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transition: color 0.8s ease;
+}
+
+/* ---------- hero ---------- */
+
+.dino-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.35fr);
+  grid-template-areas:
+    "intro stage"
+    "details stage";
+  grid-template-rows: auto 1fr;
+  gap: 0.75rem 2rem;
+  align-items: start;
+  min-height: min(82vh, 780px);
+  padding-top: 1.5rem;
+}
+
+.dino-hero__intro { grid-area: intro; }
+.dino-hero__details { grid-area: details; }
+
+.dino-title {
+  margin: 0;
+  font-family: var(--dn-display);
+  font-weight: 400;
+  font-size: clamp(3.6rem, 11vw, 8.4rem);
+  line-height: 0.88;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: transparent;
+  background:
+    linear-gradient(176deg, #fff6e2 0%, var(--dn-bone) 32%, var(--dn-amber) 58%, var(--dn-amber-deep) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.35)) drop-shadow(0 0 32px var(--dn-era-soft));
+}
+
+.dino-lead {
+  max-width: 30rem;
+  margin: 0.9rem 0 0;
+  color: var(--dn-muted);
+  font-size: 1.06rem;
+  line-height: 1.55;
+}
+
+.dino-readout {
+  position: relative;
+  padding: 1.1rem 1.2rem 1.15rem;
+  border: 1px solid var(--dn-line);
+  border-radius: 1.1rem;
+  background:
+    linear-gradient(160deg, rgba(255, 210, 140, 0.08), transparent 45%),
+    var(--dn-panel);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 230, 190, 0.08);
+}
+
+.dino-readout::before {
+  content: "";
+  position: absolute;
+  left: 1.2rem;
+  right: 1.2rem;
+  top: -1px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--dn-era), transparent);
+  transition: background 0.8s ease;
+}
+
+.dino-readout__era {
+  margin: 0;
+  color: var(--dn-era);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.dino-readout__name {
+  margin: 0.15rem 0 0;
+  font-family: var(--dn-display);
+  font-weight: 400;
+  font-size: clamp(1.9rem, 3.4vw, 2.6rem);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.dino-readout__meaning {
+  margin: 0.2rem 0 0.75rem;
+  color: var(--dn-muted);
+  font-style: italic;
+}
+
+.dino-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem 1rem;
+  margin: 0 0 0.75rem;
+}
+
+.dino-stats div {
+  padding-left: 0.6rem;
+  border-left: 2px solid var(--dn-line);
+}
+
+.dino-stats dt {
+  color: var(--dn-muted);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.dino-stats dd {
+  margin: 0.1rem 0 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.dino-readout__blurb {
+  margin: 0;
+  color: #e8dcc4;
+  line-height: 1.55;
+}
+
+.dino-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.dino-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.6rem;
+  padding: 0.45rem 0.95rem;
+  border: 1px solid rgba(240, 167, 60, 0.4);
+  border-radius: 999px;
+  background: rgba(20, 13, 10, 0.7);
+  color: var(--dn-ink);
+  font: 600 0.9rem/1 var(--dn-sans);
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dino-btn:hover {
+  transform: translateY(-1px);
+  border-color: var(--dn-amber);
+  box-shadow: 0 6px 18px rgba(240, 167, 60, 0.18);
+}
+
+.dino-btn:focus-visible,
+.dino-stage:focus-visible,
+.dino-stratum:focus-visible,
+.dino-card:focus-visible {
+  outline: 3px solid var(--dn-era);
+  outline-offset: 3px;
+}
+
+.dino-btn[aria-pressed="false"] {
+  opacity: 0.6;
+}
+
+.dino-btn--hot {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--dn-amber), var(--dn-ember));
+  color: #1e0d04;
+  box-shadow: 0 8px 22px rgba(255, 106, 42, 0.32);
+}
+
+.dino-btn--hot:hover {
+  background: linear-gradient(135deg, #ffc061, #ff7d42);
+}
+
+.dino-btn--impact {
+  border-color: rgba(255, 106, 42, 0.6);
+  color: #ffd0b0;
+}
+
+body.dino-page:not([data-era="cretaceous"]) .dino-btn--impact {
+  display: none;
+}
+
+/* ---------- stage ---------- */
+
+.dino-stage {
+  grid-area: stage;
+  position: relative;
+  align-self: stretch;
+  min-height: 28rem;
+  border-radius: 1.6rem;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: pan-y;
+  isolation: isolate;
+}
+
+.dino-stage.is-dragging {
+  cursor: grabbing;
+}
+
+.dino-stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  z-index: 1;
+}
+
+.dino-stage__ring {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    inset 0 0 0 1px rgba(240, 167, 60, 0.22),
+    inset 0 -120px 120px -60px rgba(6, 4, 3, 0.55);
+}
+
+.dino-stage__fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 60% 25% at 50% 82%, rgba(0, 0, 0, 0.45), transparent 70%),
+    radial-gradient(circle at 50% 45%, var(--dn-era-soft), transparent 60%);
+}
+
+.dino-stage__fallback span {
+  font-family: var(--dn-display);
+  font-size: clamp(8rem, 20vw, 14rem);
+  color: rgba(240, 220, 180, 0.12);
+}
+
+.dino-stage.is-live .dino-stage__fallback span {
+  display: none;
+}
+
+.dino-stage__hint {
+  position: absolute;
+  left: 50%;
+  bottom: 0.9rem;
+  z-index: 3;
+  margin: 0;
+  padding: 0.3rem 0.8rem;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: rgba(10, 7, 5, 0.55);
+  color: var(--dn-muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ---------- sections ---------- */
+
+.dino-section {
+  margin-top: 4.5rem;
+}
+
+.dino-section__head {
+  max-width: 40rem;
+  margin-bottom: 1.6rem;
+}
+
+.dino-section__head h2 {
+  margin: 0 0 0.4rem;
+  font-family: var(--dn-display);
+  font-weight: 400;
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.dino-section__head p:not(.dino-kicker) {
+  margin: 0;
+  color: var(--dn-muted);
+  line-height: 1.55;
+}
+
+/* ---------- era strata ---------- */
+
+.dino-strata__stack {
+  display: grid;
+  gap: 0.35rem;
+  perspective: 1400px;
+  perspective-origin: 50% 0%;
+}
+
+.dino-stratum {
+  --tilt: 18deg;
+  --lift: 0px;
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1.25rem;
+  width: 100%;
+  min-height: 7.2rem;
+  padding: 1.1rem 1.5rem;
+  border: 0;
+  border-radius: 0.9rem;
+  color: var(--dn-ink);
+  text-align: left;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--tilt)) translateZ(var(--lift));
+  transform-origin: 50% 100%;
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.45s ease, filter 0.45s ease;
+  background: var(--stratum-bg);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.35),
+    0 14px 26px rgba(0, 0, 0, 0.4);
+  filter: saturate(0.75) brightness(0.82);
+  overflow: hidden;
+}
+
+.dino-stratum::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(176deg, transparent 0 9px, rgba(0, 0, 0, 0.12) 9px 11px, transparent 11px 23px),
+    repeating-linear-gradient(183deg, transparent 0 15px, rgba(255, 240, 210, 0.06) 15px 16px, transparent 16px 31px);
+  mix-blend-mode: multiply;
+}
+
+.dino-stratum::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 50% 120% at var(--mx, 50%) 0%, rgba(255, 240, 210, 0.22), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.dino-stratum:hover {
+  --tilt: 8deg;
+  --lift: 18px;
+  filter: saturate(0.95) brightness(0.95);
+}
+
+.dino-stratum:hover::after {
+  opacity: 1;
+}
+
+.dino-stratum[aria-checked="true"] {
+  --tilt: 0deg;
+  --lift: 34px;
+  filter: none;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.35),
+    0 0 0 2px var(--dn-era),
+    0 22px 46px rgba(0, 0, 0, 0.5),
+    0 0 60px var(--dn-era-soft);
+}
+
+.dino-stratum[data-era="cretaceous"] {
+  --stratum-bg: linear-gradient(180deg, #4a3226 0%, #2d1e17 55%, #3d2416 100%);
+}
+
+.dino-stratum[data-era="jurassic"] {
+  --stratum-bg: linear-gradient(180deg, #4e5a35 0%, #39432a 50%, #2a3320 100%);
+}
+
+.dino-stratum[data-era="triassic"] {
+  --stratum-bg: linear-gradient(180deg, #a5502c 0%, #7c3a1f 55%, #5c2617 100%);
+}
+
+.dino-stratum__ma {
+  position: relative;
+  z-index: 1;
+  min-width: 6.5rem;
+  font-family: var(--dn-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  color: rgba(255, 236, 206, 0.75);
+}
+
+.dino-stratum__body {
+  position: relative;
+  z-index: 1;
+}
+
+.dino-stratum__name {
+  display: block;
+  font-family: var(--dn-display);
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  line-height: 1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.dino-stratum__kicker {
+  display: block;
+  margin-top: 0.15rem;
+  color: rgba(255, 236, 206, 0.8);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.dino-stratum__blurb {
+  display: block;
+  max-width: 42rem;
+  margin-top: 0.45rem;
+  color: rgba(255, 236, 206, 0.78);
+  font-size: 0.93rem;
+  line-height: 1.5;
+}
+
+.dino-stratum__cast {
+  display: block;
+  margin-top: 0.5rem;
+  color: var(--dn-amber);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.dino-stratum__fossil {
+  position: relative;
+  z-index: 1;
+  width: 4.2rem;
+  height: 4.2rem;
+  color: rgba(255, 236, 206, 0.9);
+  opacity: 0.55;
+  transition: opacity 0.4s ease, transform 0.6s ease;
+}
+
+.dino-stratum[aria-checked="true"] .dino-stratum__fossil {
+  opacity: 0.95;
+  transform: rotate(-12deg) scale(1.08);
+}
+
+.dino-stratum__fossil svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- herd (amber flip cards) ---------- */
+
+.dino-herd__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.1rem;
+}
+
+.dino-card {
+  --rx: 0deg;
+  --ry: 0deg;
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 21rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  perspective: 1100px;
+  border-radius: 1.1rem;
+}
+
+.dino-card__inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx)) rotateY(calc(var(--ry) + var(--flip, 0deg)));
+  transition: transform 0.75s cubic-bezier(0.2, 0.85, 0.25, 1);
+}
+
+.dino-card.is-tilting .dino-card__inner {
+  transition: transform 0.12s linear;
+}
+
+.dino-card.is-flipped {
+  --flip: 180deg;
+}
+
+.dino-card__face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 1.1rem;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.dino-card__front {
+  background:
+    radial-gradient(circle at 22% 18%, rgba(255, 246, 214, 0.55) 0 2px, transparent 3px),
+    radial-gradient(circle at 74% 30%, rgba(255, 246, 214, 0.45) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle at 62% 72%, rgba(255, 246, 214, 0.4) 0 2.5px, transparent 3.5px),
+    radial-gradient(circle at 15% 64%, rgba(255, 246, 214, 0.35) 0 1px, transparent 2px),
+    radial-gradient(ellipse 80% 60% at 50% 40%, #ffcf6e 0%, #f0a73c 35%, #b8661c 75%, #6e3510 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 228, 170, 0.55),
+    inset 0 0 40px rgba(110, 53, 16, 0.65),
+    0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
+.dino-card__front::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.28) 46%, transparent 58%);
+  transform: translateX(calc(var(--ry) * 4));
+  mix-blend-mode: soft-light;
+}
+
+.dino-card__art {
+  position: relative;
+  flex: 1;
+  display: grid;
+  place-items: center;
+  min-height: 12rem;
+}
+
+.dino-card__art img {
+  width: 100%;
+  height: 100%;
+  max-height: 14rem;
+  object-fit: contain;
+  filter: sepia(0.55) saturate(1.3) contrast(1.05) drop-shadow(0 10px 12px rgba(80, 30, 5, 0.55));
+  transform: translateZ(0);
+  transition: transform 0.5s ease;
+}
+
+.dino-card:hover .dino-card__art img {
+  transform: scale(1.05);
+}
+
+.dino-card__monogram {
+  font-family: var(--dn-display);
+  font-size: 6rem;
+  color: rgba(80, 30, 5, 0.35);
+}
+
+.dino-card__label {
+  position: relative;
+  padding: 0.8rem 1rem 1rem;
+  background: linear-gradient(180deg, transparent, rgba(60, 25, 5, 0.6));
+  color: #fff4dc;
+}
+
+.dino-card__name {
+  display: block;
+  font-family: var(--dn-display);
+  font-size: 1.65rem;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 0 rgba(60, 25, 5, 0.6);
+}
+
+.dino-card__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 238, 205, 0.85);
+}
+
+.dino-card__back {
+  transform: rotateY(180deg);
+  padding: 1.1rem 1.15rem;
+  gap: 0.5rem;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 23px, rgba(110, 80, 40, 0.12) 23px 24px),
+    linear-gradient(160deg, #f5ead0, #e3d1aa);
+  color: #2e1f10;
+  box-shadow: inset 0 0 0 1px rgba(110, 80, 40, 0.35), 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
+.dino-card__title {
+  display: block;
+  font-family: var(--dn-display);
+  font-size: 1.5rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.dino-card__facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.2rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.dino-card__facts .k {
+  color: #7a5a30;
+  font-weight: 600;
+}
+
+.dino-card__blurb {
+  display: block;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.dino-card__cta {
+  display: block;
+  margin-top: auto;
+  color: #a8561a;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.dino-card.is-active .dino-card__front,
+.dino-card.is-active .dino-card__back {
+  box-shadow:
+    0 0 0 3px var(--dn-era),
+    0 0 50px var(--dn-era-soft),
+    0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
+.dino-card__era {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 2;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(50, 20, 5, 0.6);
+  color: #ffe2b0;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ---------- scale parade ---------- */
+
+.dino-scale__panel {
+  padding: 1.4rem 1.4rem 1.2rem;
+  border: 1px solid var(--dn-line);
+  border-radius: 1.2rem;
+  background: var(--dn-panel);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.dino-scale__track {
+  position: relative;
+  display: grid;
+  gap: 0.85rem;
+  padding-bottom: 1.6rem;
+}
+
+.dino-scale__row {
+  display: grid;
+  grid-template-columns: 8.5rem 1fr;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.dino-scale__label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dn-muted);
+}
+
+.dino-scale__row.is-hero .dino-scale__label {
+  color: var(--dn-ink);
+  font-family: var(--dn-display);
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+}
+
+.dino-scale__lane {
+  position: relative;
+  height: 2.2rem;
+  border-radius: 0.5rem;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 236, 206, 0.08) 0 1px, transparent 1px var(--meter-step, 4.5%)),
+    rgba(255, 236, 206, 0.03);
+}
+
+.dino-scale__bar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  border-radius: 0.5rem;
+  background: linear-gradient(90deg, rgba(240, 167, 60, 0.25), rgba(240, 167, 60, 0.55));
+  transition: width 1s cubic-bezier(0.2, 0.85, 0.25, 1);
+}
+
+.dino-scale__row.is-hero .dino-scale__bar {
+  background:
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.08) 0 8px, transparent 8px 16px),
+    linear-gradient(90deg, var(--dn-amber-deep), var(--dn-amber) 70%, var(--dn-era));
+  box-shadow: 0 0 24px var(--dn-era-soft);
+}
+
+.dino-scale__row.is-ghost .dino-scale__bar {
+  background: repeating-linear-gradient(90deg, rgba(255, 236, 206, 0.18) 0 6px, transparent 6px 10px);
+}
+
+.dino-scale__value {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--w, 0%) + 0.6rem);
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--dn-ink);
+  transition: left 1s cubic-bezier(0.2, 0.85, 0.25, 1);
+}
+
+.dino-scale__value.is-inside {
+  left: auto;
+  right: calc(100% - var(--w, 0%) + 0.6rem);
+  color: #1e0d04;
+}
+
+.dino-scale__human {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 100%;
+  width: auto;
+  color: var(--dn-bone);
+}
+
+.dino-scale__axis {
+  position: absolute;
+  left: calc(8.5rem + 0.9rem);
+  right: 0;
+  bottom: 0;
+  height: 1.2rem;
+  font-size: 0.7rem;
+  color: var(--dn-muted);
+}
+
+.dino-scale__axis span {
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.dino-scale__bones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  min-height: 2rem;
+  margin: 0.6rem 0 0.4rem calc(8.5rem + 0.9rem);
+}
+
+.dino-bone {
+  width: 2.1rem;
+  height: 1.05rem;
+  color: var(--dn-bone);
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.45));
+}
+
+.dino-bone svg {
+  width: 100%;
+  height: 100%;
+}
+
+.dino-scale__caption {
+  margin: 0.4rem 0 0;
+  color: var(--dn-muted);
+  font-size: 0.95rem;
+}
+
+.dino-scale__caption strong {
+  color: var(--dn-ink);
+}
+
+/* ---------- footer ---------- */
+
+.dino-note {
+  max-width: 44rem;
+  margin: 3rem auto 0;
+  color: var(--dn-muted);
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.dino-note a {
+  color: var(--dn-amber);
+}
+
+.dino-footer {
+  position: relative;
+  z-index: 2;
+  padding: 1.2rem;
+  color: var(--dn-muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 991.98px) {
+  .dino-hero {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "intro"
+      "stage"
+      "details";
+    grid-template-rows: auto;
+    min-height: 0;
+    padding-top: 0.75rem;
+  }
+
+  .dino-stage {
+    min-height: 0;
+    height: min(62vh, 30rem);
+  }
+
+  .dino-herd__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .dino-stage {
+    height: 22rem;
+    border-radius: 1.1rem;
+  }
+
+  .dino-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .dino-stratum {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+    padding: 1rem 1.1rem;
+  }
+
+  .dino-stratum__fossil {
+    position: absolute;
+    top: 0.8rem;
+    right: 0.9rem;
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .dino-stratum__blurb {
+    display: none;
+  }
+
+  .dino-herd__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dino-card {
+    min-height: 19rem;
+  }
+
+  .dino-scale__row {
+    grid-template-columns: 5.5rem 1fr;
+  }
+
+  .dino-scale__axis,
+  .dino-scale__bones {
+    left: calc(5.5rem + 0.9rem);
+    margin-left: calc(5.5rem + 0.9rem);
+  }
+
+  .dino-scale__axis {
+    margin-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dino-stratum,
+  .dino-card__inner,
+  .dino-scale__bar,
+  .dino-scale__value,
+  .dino-card__art img {
+    transition: none !important;
+  }
+
+  .dino-flash.is-firing,
+  body.dino-page.is-quaking .dino-wrap {
+    animation: none !important;
+  }
+}

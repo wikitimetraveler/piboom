@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type MutableRefObject } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { Line2 } from 'three/examples/jsm/lines/Line2.js';
@@ -7,6 +7,33 @@ import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import type { DemGrid, DestinationBrief, LatLng, SkiLift, SkiRun, TrailsPayload } from '../lib/types';
 import { fmtDeg, fmtFt, liftTitle, runTitle, TIER_META, tierOf } from '../lib/trails';
+
+export interface OverlayTrack {
+  id: string;
+  color: string;
+  points: LatLng[];
+  width?: number;
+}
+
+export interface OverlayPin {
+  id: string;
+  lat: number;
+  lng: number;
+  color: string;
+  label: string;
+  kind: 'crew' | 'photo';
+  imageUrl?: string;
+  stale?: boolean;
+}
+
+/** Camera and overlay hooks for the Crew log map and recap reel. */
+export interface SceneControls {
+  frameTracks: () => void;
+  frameRun: (runId: string) => void;
+  frameResort: (resortId?: string) => void;
+  setProgress: (t: number) => void;
+  orbit: (on: boolean) => void;
+}
 
 interface Props {
   dem: DemGrid | null;
@@ -17,6 +44,15 @@ interface Props {
   previewRunId: string | null;
   matchIds: Set<string> | null;
   onSelectRun: (id: string | null) => void;
+  tracks?: OverlayTrack[];
+  pins?: OverlayPin[];
+  controlsRef?: MutableRefObject<SceneControls | null>;
+  compact?: boolean;
+}
+
+interface Overlay {
+  tracks: OverlayTrack[];
+  pins: OverlayPin[];
 }
 
 interface StyleState {
@@ -30,6 +66,7 @@ interface SceneApi {
   applyStyles: (s: StyleState) => void;
   frameResort: (resortId: string | undefined) => void;
   frameRun: (runId: string) => void;
+  setOverlay: (o: Overlay) => void;
 }
 
 const WIDTH = 3;
@@ -186,6 +223,7 @@ interface LiftHandle {
 
 export default function TerrainScene(props: Props) {
   const { dem, trails, destinations, resortId, selectedRunId, previewRunId, matchIds, onSelectRun } = props;
+  const { tracks, pins, controlsRef, compact } = props;
   const host = useRef<HTMLDivElement>(null);
   const compass = useRef<HTMLDivElement>(null);
   const api = useRef<SceneApi | null>(null);
@@ -193,6 +231,10 @@ export default function TerrainScene(props: Props) {
   styleRef.current = { resortId, selectedRunId, previewRunId, matchIds };
   const selectRef = useRef(onSelectRun);
   selectRef.current = onSelectRun;
+  const overlayRef = useRef<Overlay>({ tracks: [], pins: [] });
+  overlayRef.current = { tracks: tracks || [], pins: pins || [] };
+  const controlsOut = useRef(controlsRef);
+  controlsOut.current = controlsRef;
 
   useEffect(() => {
     const el = host.current;
@@ -429,7 +471,83 @@ export default function TerrainScene(props: Props) {
     };
     controls.addEventListener('start', () => {
       goal.active = false;
+      controls.autoRotate = false;
     });
+
+    const overlayMats: LineMaterial[] = [];
+    const overlayLines: { line: Line2; segs: number }[] = [];
+    const overlayPins: CSS2DObject[] = [];
+    const overlayBox = new THREE.Box3();
+    let progress = 1;
+    const inDem = (lat: number, lng: number) =>
+      lat >= dem.south && lat <= dem.north && lng >= dem.west && lng <= dem.east;
+    const setProgress = (t: number) => {
+      progress = Math.min(1, Math.max(0, t));
+      for (const o of overlayLines) {
+        (o.line.geometry as LineGeometry).instanceCount = Math.max(1, Math.round(o.segs * progress));
+      }
+    };
+    const setOverlay = (o: Overlay) => {
+      for (const { line } of overlayLines.splice(0)) {
+        scene.remove(line);
+        line.geometry.dispose();
+      }
+      for (const m of overlayMats.splice(0)) m.dispose();
+      for (const p of overlayPins.splice(0)) {
+        scene.remove(p);
+        p.element.remove();
+      }
+      overlayBox.makeEmpty();
+      for (const t of o.tracks) {
+        const pts = t.points.filter(([lat, lng]) => inDem(lat, lng));
+        if (pts.length < 2) continue;
+        const world = drape(frame, pts, 8);
+        const mat = new LineMaterial({
+          color: new THREE.Color(t.color).getHex(),
+          linewidth: t.width ?? 3.5,
+          worldUnits: false,
+          depthTest: false,
+          depthWrite: false,
+        });
+        mat.resolution.copy(resolution);
+        overlayMats.push(mat);
+        const line = makeLine(world, mat);
+        line.renderOrder = 9;
+        scene.add(line);
+        overlayLines.push({ line, segs: world.length - 1 });
+        for (const p of world) overlayBox.expandByPoint(p);
+      }
+      for (const p of o.pins) {
+        if (!inDem(p.lat, p.lng)) continue;
+        const el = document.createElement('div');
+        el.className = `ski-3d-mark ski-3d-mark--${p.kind}${p.stale ? ' is-stale' : ''}`;
+        el.style.setProperty('--mark', p.color);
+        el.title = p.label;
+        if (p.imageUrl) {
+          const img = document.createElement('img');
+          img.src = p.imageUrl;
+          img.alt = p.label;
+          el.append(img);
+        } else {
+          el.textContent = p.label;
+        }
+        const obj = new CSS2DObject(el);
+        const w = frame.toWorld(p.lat, p.lng, 12);
+        obj.position.copy(w);
+        scene.add(obj);
+        overlayPins.push(obj);
+        overlayBox.expandByPoint(w);
+      }
+      setProgress(progress);
+    };
+    const frameTracks = () => {
+      if (overlayBox.isEmpty()) frameResort(styleRef.current.resortId);
+      else flyTo(overlayBox, 0.5);
+    };
+    const orbit = (on: boolean) => {
+      controls.autoRotate = on && !reduced;
+      controls.autoRotateSpeed = 0.7;
+    };
 
     const raycaster = new THREE.Raycaster();
     raycaster.params.Line2 = { threshold: 7 };
@@ -512,6 +630,7 @@ export default function TerrainScene(props: Props) {
       camera.updateProjectionMatrix();
       resolution.set(w, h);
       for (const m of lineMats) m.resolution.copy(resolution);
+      for (const m of overlayMats) m.resolution.copy(resolution);
     };
     const ro = new ResizeObserver(resize);
     ro.observe(el);
@@ -521,9 +640,14 @@ export default function TerrainScene(props: Props) {
     };
     document.addEventListener('visibilitychange', vis);
 
-    api.current = { applyStyles, frameResort, frameRun };
+    api.current = { applyStyles, frameResort, frameRun, setOverlay };
+    if (controlsOut.current) {
+      controlsOut.current.current = { frameTracks, frameRun, frameResort, setProgress, orbit };
+    }
     applyStyles(styleRef.current);
-    frameResort(styleRef.current.resortId);
+    setOverlay(overlayRef.current);
+    if (overlayBox.isEmpty()) frameResort(styleRef.current.resortId);
+    else flyTo(overlayBox, 0.5);
     if (!reduced) {
       camera.position.copy(goal.position).add(new THREE.Vector3(0.6, 0.5, -0.6));
       controls.target.copy(goal.target);
@@ -541,6 +665,8 @@ export default function TerrainScene(props: Props) {
       canvas.removeEventListener('pointerup', onUp);
       controls.dispose();
       api.current = null;
+      if (controlsOut.current) controlsOut.current.current = null;
+      for (const m of overlayMats) m.dispose();
       scene.traverse((obj) => {
         const mesh = obj as THREE.Mesh;
         mesh.geometry?.dispose?.();
@@ -560,7 +686,11 @@ export default function TerrainScene(props: Props) {
   }, [resortId, selectedRunId, previewRunId, matchIds]);
 
   useEffect(() => {
-    api.current?.frameResort(resortId);
+    api.current?.setOverlay(overlayRef.current);
+  }, [tracks, pins]);
+
+  useEffect(() => {
+    if (!overlayRef.current.tracks.length) api.current?.frameResort(resortId);
   }, [resortId]);
 
   useEffect(() => {
@@ -577,6 +707,18 @@ export default function TerrainScene(props: Props) {
 
   const runCount = trails && trails.id === dem.id ? trails.runs.length : 0;
   const liftCount = trails && trails.id === dem.id ? trails.lifts.length : 0;
+  if (compact) {
+    return (
+      <div className="ski-trail-map ski-trail-map--compact" ref={host} role="application" aria-label={`${dem.name} 3D map`}>
+        <div className="ski-3d-compass" aria-hidden="true">
+          <div ref={compass} className="ski-3d-compass__needle">
+            <span>N</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="ski-trail-map" ref={host} role="application" aria-label={`${dem.name} 3D trail map`}>
       <div className="ski-3d-legend" aria-hidden="true">
