@@ -185,7 +185,7 @@
     messagesEl.innerHTML = '';
     addMessage(
       'ai',
-      'Cleared. Ask about types vs templates, persona access, the handoff pack, or Postman create order.',
+      'Cleared. Ask about types vs templates, role-based access, the handoff pack, or Postman create order.',
     );
     try {
       await fetch(`${API}/history?userId=${encodeURIComponent(USER_ID)}&sessionId=${encodeURIComponent(SESSION_ID)}`, {
@@ -202,7 +202,7 @@
 
   addMessage(
     'ai',
-    'I consolidate Enhanced Conditions migration guidance, ICE APIs, persona access rules, and your local handoff pack. What do you want to clarify first?',
+    'I consolidate Enhanced Conditions migration guidance, ICE APIs, role-based access rules, and your local handoff pack. What do you want to clarify first?',
   );
   refreshStatus();
 })();

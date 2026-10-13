@@ -244,7 +244,7 @@
       <section class="ece-hero">
         <h1>Enhanced Conditions Expert</h1>
         <p class="lead">
-          Ask about types vs templates, persona access (not users), the Condition Manager dry-run,
+          Ask about types vs templates, role-based access (not users), the Condition Manager dry-run,
           ICE APIs, and the admin handoff pack. Live CRUD is on the Enhanced Conditions page.
         </p>
         <div class="d-flex flex-wrap gap-2 align-items-center">
@@ -272,7 +272,7 @@
         <aside class="ece-panel">
           <h2>Ask about</h2>
           <button class="ece-chip" type="button" data-q="Do we import users or roles for Enhanced Conditions?">
-            Users vs roles vs personas
+            Users vs roles
           </button>
           <button class="ece-chip" type="button" data-q="What is the difference between condition types and condition templates?">
             Types vs templates
@@ -286,8 +286,8 @@
           <button class="ece-chip" type="button" data-q="How does Condition Manager dry-run conversion work and what does it not write?">
             Condition Manager dry-run
           </button>
-          <button class="ece-chip" type="button" data-q="How should we reconcile legacy ConditionAccess names against personas?">
-            Persona reconciliation
+          <button class="ece-chip" type="button" data-q="How should we reconcile legacy ConditionAccess names against Encompass roles?">
+            Role reconciliation
           </button>
           <button class="ece-chip" type="button" data-q="Explain how you use hybrid RAG — two currents, one dock. Cover the curated Enhanced Conditions fact sheet, ICE knowledge, Encompass docs, pgvector vs keyword, and how that differs from disaster GraphRAG.">
             How RAG works
@@ -320,7 +320,7 @@
             <textarea
               id="messageInput"
               rows="2"
-              placeholder="Ask about Enhanced Conditions migration, APIs, personas, Postman…"
+              placeholder="Ask about Enhanced Conditions migration, APIs, roles, Postman…"
               required
             ></textarea>
             <button class="btn btn-primary" type="submit" id="sendBtn">

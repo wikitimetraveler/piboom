@@ -11,15 +11,15 @@ import {
   renderMigrationReport,
 } from '../services/encompass-conditions-migration.service.js';
 
-function normalizePersonas(input) {
+function normalizeRoles(input) {
   if (input == null || input === '') return [];
   if (Array.isArray(input)) return input;
-  if (typeof input === 'object') return input.personas || input.items || input.value || [];
+  if (typeof input === 'object') return input.roles || input.items || input.value || [];
   return null;
 }
 
 export async function postConvertConditionsCdo(req, res) {
-  const { cdo, personas, personaSource } = req.body || {};
+  const { cdo, roles, roleSource } = req.body || {};
 
   if (!cdo || (typeof cdo !== 'string' && typeof cdo !== 'object')) {
     return res.status(400).json({
@@ -27,13 +27,13 @@ export async function postConvertConditionsCdo(req, res) {
     });
   }
 
-  const personaList = normalizePersonas(personas);
-  if (personaList === null) {
-    return res.status(400).json({ error: '`personas` must be an array or a response object containing one' });
+  const roleList = normalizeRoles(roles);
+  if (roleList === null) {
+    return res.status(400).json({ error: '`roles` must be an array or a response object containing one' });
   }
 
-  if (personaSource != null && typeof personaSource !== 'string') {
-    return res.status(400).json({ error: '`personaSource` must be a label such as "UAT" or "Production"' });
+  if (roleSource != null && typeof roleSource !== 'string') {
+    return res.status(400).json({ error: '`roleSource` must be a label such as "UAT" or "Production"' });
   }
 
   // Decoding is separated from conversion so a malformed upload is reported as a bad
@@ -47,7 +47,7 @@ export async function postConvertConditionsCdo(req, res) {
   }
 
   try {
-    const bundle = buildMigrationBundle(xml, { personas: personaList, personaSource });
+    const bundle = buildMigrationBundle(xml, { roles: roleList, roleSource });
     return res.json({ bundle, inputFormat, reportMarkdown: renderMigrationReport(bundle) });
   } catch (error) {
     console.error('Error converting Conditions CDO:', error.message);

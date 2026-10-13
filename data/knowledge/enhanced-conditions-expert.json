@@ -6,7 +6,7 @@
   },
   "overview": [
     "Enhanced Conditions (Encompass 20.2+) replace flat standard/eFolder conditions with a tiered model: condition types own shared vocabularies; condition templates reference a type.",
-    "Access is configured on personas (Company/User Setup > Personas > Enhanced Conditions tab), not on individual user accounts and not as a per-condition ACL like the legacy ConditionsTemplate.xml CDO.",
+    "Access is role-based: rights are granted to Encompass roles (GET /encompass/v3/settings/roles), not to individual user accounts and not as a per-condition ACL like the legacy ConditionsTemplate.xml CDO.",
     "DevConnect Labs Condition Manager converts the legacy ConditionsTemplate.xml Custom Data Object into dry-run Enhanced Conditions payloads. Live create/read/update/delete against ICE APIs is on the Enhanced Conditions pages (Live CRUD console) via /api/encompass-conditions."
   ],
   "concepts": [
@@ -27,12 +27,12 @@
       "summary": "Instances of templates/conditions on a loan file. Managed with /encompass/v3/loans/{loanId}/conditions. Loan flag ENHANCEDCOND.X1 / useEnhancedConditionIndicator selects Enhanced vs Standard."
     },
     {
-      "name": "Persona access",
-      "summary": "Who can Add, edit details, comments, and set statuses (Opened, Fulfilled, Re-requested, Received, Not-Fulfilled, Deactivated, Waived). Configured on the persona, not per template row."
+      "name": "Role access",
+      "summary": "Who can Add, edit details, comments, and set statuses (Opened, Fulfilled, Re-requested, Received, Not-Fulfilled, Deactivated, Waived). Granted by role, not per template row."
     },
     {
-      "name": "Workflow roles vs personas",
-      "summary": "Milestone/loan-team Roles are a different Encompass object. Legacy CDO ConditionAccess lists are persona names. Do not import users for this migration."
+      "name": "Roles vs personas vs users",
+      "summary": "Legacy CDO ConditionAccess lists are Encompass role names (matched on roleName or roleAbbr). Roles carry the personas and user groups attached to them; users inherit through their role. Do not import users or personas for this migration."
     }
   ],
   "migration": {
@@ -40,21 +40,21 @@
     "tools": [
       "UI: /finance/condition-manager.html",
       "API dry-run: POST /api/encompass-conditions/convert",
-      "CLI: npm run convert:conditions-cdo -- --input <cdo.json> [--personas <personas.json>] [--persona-source Production|UAT]"
+      "CLI: npm run convert:conditions-cdo -- --input <cdo.json> [--roles <roles.json>] [--role-source Production|UAT]"
     ],
     "outputs": [
       "condition-types.json — one type per stage (Pre-Purchase, Post-Purchase in the AmeriHome CDO)",
       "condition-templates.json — one template per legacy condition; internalId = legacy code",
-      "acl-profiles.json — collapsed persona permission patterns for admin handoff",
+      "acl-profiles.json — collapsed role permission patterns for admin handoff",
       "data-quality-report.md — review queue and auto-fixes"
     ],
-    "iceAdminTool": "Encompass Admin Tools > Enhanced Conditions Tool: Convert Standard to Enhanced Conditions, or Migrate Enhanced Conditions between instances. Converted conditions stay inactive until an admin activates them. Prerequisites: condition types (matching Category/Prior To/Source/Recipient), documents, matching roles/personas, Enable Enhanced Conditions.",
+    "iceAdminTool": "Encompass Admin Tools > Enhanced Conditions Tool: Convert Standard to Enhanced Conditions, or Migrate Enhanced Conditions between instances. Converted conditions stay inactive until an admin activates them. Prerequisites: condition types (matching Category/Prior To/Source/Recipient), documents, matching roles, Enable Enhanced Conditions.",
     "rules": [
       "Dry-run conversion stays in Condition Manager / convert until an admin uses Live CRUD or Postman. Live writes go through /api/encompass-conditions (catalog + invoke + REST) on the Enhanced Conditions pages.",
       "Create condition types first, then templates.",
-      "Apply ACL profiles on personas; Enhanced Conditions has no per-condition ACL.",
-      "Reconcile CDO role names against GET /encompass/v3/settings/personas. Only a Production persona list is authoritative; UAT is provisional.",
-      "Persona names are capped at 20 characters in Encompass; truncated or merged names need a human decision."
+      "Apply ACL profiles by role; Enhanced Conditions has no per-condition ACL.",
+      "Reconcile CDO role names against GET /encompass/v3/settings/roles (name or abbreviation). Only a Production role list is authoritative; UAT is provisional.",
+      "The legacy CDO stored role names in a 20-character field; truncated or merged names need a human decision."
     ]
   },
   "apis": {
@@ -120,9 +120,9 @@
         "path": "/encompass/v3/calculators/automatedConditions?loanId={{loanId}}"
       },
       {
-        "title": "List personas (ACL reconciliation)",
+        "title": "List roles (ACL reconciliation)",
         "method": "GET",
-        "path": "/encompass/v3/settings/personas"
+        "path": "/encompass/v3/settings/roles?entities=Summary"
       }
     ],
     "loan": [
@@ -162,7 +162,7 @@
       "4. PATCH activate types if needed",
       "5. PATCH create a small smoke batch of templates (not all 826 at once)",
       "6. GET templates to verify",
-      "7. Configure persona Enhanced Conditions rights from acl-profiles.json",
+      "7. Configure role-based Enhanced Conditions rights from acl-profiles.json",
       "8. Only then consider Production"
     ],
     "handoffDir": "data/encompass-conditions/handoff/"
@@ -243,12 +243,12 @@
     {
       "name": "Enhanced Conditions CRUD",
       "path": "/finance/enhanced-conditions.html",
-      "purpose": "Live ICE CRUD UI for types, templates, sets, loan conditions, personas"
+      "purpose": "Live ICE CRUD UI for types, templates, sets, loan conditions, roles"
     },
     {
       "name": "Enhanced Conditions Expert",
       "path": "/finance/enhanced-conditions-expert.html",
-      "purpose": "This chat — migration, API, persona, and Postman guidance"
+      "purpose": "This chat — migration, API, role, and Postman guidance"
     },
     {
       "name": "Convert API",
@@ -258,7 +258,7 @@
     {
       "name": "Live ICE APIs",
       "path": "/api/encompass-conditions/catalog and POST /api/encompass-conditions/invoke",
-      "purpose": "Allowlisted CRUD proxy for types, templates, sets, personas, and loan conditions"
+      "purpose": "Allowlisted CRUD proxy for types, templates, sets, roles, and loan conditions"
     },
     {
       "name": "Expert API",
@@ -269,11 +269,11 @@
   "faqs": [
     {
       "q": "Do we import users?",
-      "a": "No. Import/create condition types and templates. Configure access on personas. Users already exist and inherit persona rights."
+      "a": "No. Import/create condition types and templates. Configure access by role. Users already exist and inherit rights through their role."
     },
     {
       "q": "Do we import roles?",
-      "a": "Not as a bulk user/role import. Ensure persona names referenced by the legacy ACL lists exist, then configure Enhanced Conditions rights on those personas. Workflow milestone Roles are separate."
+      "a": "No bulk import. Reconcile the role names referenced by the legacy ACL lists against GET /encompass/v3/settings/roles, create any missing roles in admin, then grant Enhanced Conditions rights to those roles."
     },
     {
       "q": "What is the admin handoff pack?",

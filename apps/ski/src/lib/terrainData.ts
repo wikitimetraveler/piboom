@@ -1,5 +1,18 @@
 import type { DemGrid, TrailsPayload } from './types';
 
+const AREA_NAMES: Record<string, string> = {
+  'mt-baldy': 'Mt. Baldy',
+  wrightwood: 'Wrightwood',
+  'big-bear': 'Big Bear',
+  'snow-valley': 'Snow Valley',
+  mammoth: 'Mammoth',
+  june: 'June',
+};
+
+export function areaName(demId: string): string {
+  return AREA_NAMES[demId] || demId;
+}
+
 const demCache = new Map<string, Promise<DemGrid>>();
 const trailCache = new Map<string, Promise<TrailsPayload>>();
 

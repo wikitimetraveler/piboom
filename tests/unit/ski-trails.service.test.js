@@ -180,7 +180,9 @@ describe('ski-trails.service', () => {
       for (const resort of raw.resorts) {
         const named = enriched.runs.filter((r) => r.resort === resort.id && r.name);
         expect(named.length).toBeGreaterThan(10);
-        const northish = named.filter((r) => ['N', 'NE', 'NW'].includes(r.aspect)).length;
+        // Baldy's Thunder Mountain runs fall off the west and northwest flanks.
+        const snowSide = spec.id === 'mt-baldy' ? ['N', 'NE', 'NW', 'W'] : ['N', 'NE', 'NW'];
+        const northish = named.filter((r) => snowSide.includes(r.aspect)).length;
         expect(northish / named.length).toBeGreaterThan(0.6);
       }
     }

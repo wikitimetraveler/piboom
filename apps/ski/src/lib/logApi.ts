@@ -113,6 +113,15 @@ export function getTrip(pass: TripPass) {
   return call<{ trip: TripInfo; me: Member; members: Member[] }>(`/trips/${pass.code}`, {}, pass);
 }
 
+export function keepTrip(pass: TripPass) {
+  return call<{ trip: TripInfo }>(`/trips/${pass.code}/keep`, { method: 'POST', body: JSON.stringify({ keep: true }) }, pass);
+}
+
+/** Site sign-in cookie (set by the main login). Signed-in trips never expire. */
+export function signedIn() {
+  return document.cookie.split(';').some((part) => part.trim() === 'dc_finance_session=1');
+}
+
 export function uploadPoints(pass: TripPass, points: unknown[], keepalive = false) {
   return call<{ received: number; kept: number; inserted: number }>(
     `/trips/${pass.code}/points`,

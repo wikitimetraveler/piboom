@@ -179,7 +179,7 @@ export const CONDITIONS_CATALOG = [
     queryKeys: ['action', 'view'],
     defaultQuery: { action: 'add', view: 'entity' },
     idParam: 'loanId',
-    sampleBody: [{ title: 'Sample condition', conditionType: { id: '' } }],
+    sampleBody: [{ title: 'Sample condition', conditionType: 'Pre-Purchase', category: '', priorTo: '' }],
   }),
   op({
     id: 'ec.loan.update',
@@ -285,13 +285,13 @@ export const CONDITIONS_CATALOG = [
     sampleBody: {},
   }),
   op({
-    id: 'ec.personas.list',
-    group: 'Personas',
-    name: 'List personas (ACL reconciliation)',
+    id: 'ec.roles.list',
+    group: 'Roles',
+    name: 'List roles (ACL reconciliation)',
     action: 'list',
     method: 'GET',
-    path: '/encompass/v3/settings/personas',
-    queryKeys: ['start', 'limit'],
+    path: '/encompass/v3/settings/roles',
+    queryKeys: ['entities', 'start', 'limit'],
   }),
 ];
 

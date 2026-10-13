@@ -206,6 +206,64 @@
   color: var(--ski-muted);
 }
 
+.log-invite {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  padding: 1rem;
+  margin: 0 0 1rem;
+  border-radius: 18px;
+  border: 1px solid var(--ski-line);
+  background: var(--ski-panel);
+  text-align: center;
+}
+
+.log-invite__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.log-qr {
+  width: min(240px, 70vw);
+  height: auto;
+  border-radius: 12px;
+}
+
+.log-invite__code {
+  margin: 0;
+  font: 700 1.6rem ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.12em;
+  color: var(--ski-ice);
+}
+
+.log-invite__how {
+  margin: 0;
+  max-width: 34ch;
+  color: var(--ski-muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.log-invite .log-primary {
+  width: 100%;
+}
+
+.log-invite .log-fine {
+  margin: 0.2rem 0 0;
+}
+
+.log-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ski-ice);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 /* Ski tab */
 .log-ski {
   display: grid;
@@ -603,4 +661,102 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+}
+
+/* Recap — end-of-day card + flythrough */
+
+.log-recap {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.log-recap__head h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.log-recap__head p {
+  margin: 0.2rem 0 0;
+  color: var(--ski-muted);
+  font-size: 0.85rem;
+}
+
+.log-recap__stage {
+  position: relative;
+  height: min(52vh, 480px);
+  min-height: 300px;
+  border-radius: 16px;
+  border: 1px solid var(--ski-line);
+  background: #081019;
+  overflow: hidden;
+}
+
+.log-recap__stage > .ski-trail-map {
+  height: 100%;
+  border: 0;
+  border-radius: inherit;
+}
+
+.log-recap__stage > .log-note {
+  margin: 1rem;
+}
+
+.log-recap__reel {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.log-recap__reel input[type='range'] {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--ski-ice);
+}
+
+.log-recap__play {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 44px;
+  padding: 0 1rem;
+  border-radius: 999px;
+  border: 0;
+  background: var(--ski-ice);
+  color: #071018;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.log-recap__play:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.log-recap__clock {
+  min-width: 4.5rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--ski-muted);
+  font-size: 0.85rem;
+}
+
+.log-recap__fact {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.log-recap__empty {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  padding: 2rem 1rem;
+  border-radius: 16px;
+  border: 1px dashed var(--ski-line);
+  color: var(--ski-muted);
+  text-align: center;
+}
+
+.log-recap__empty p {
+  margin: 0;
 }

@@ -47,17 +47,17 @@ async function loadHandoffSummary() {
     handoffCache = {
       available: true,
       summary: parsed.summary || null,
-      personaSource: parsed.personaReconciliation
+      roleSource: parsed.roleReconciliation
         ? {
-            roleCount: parsed.personaReconciliation.roleCount,
-            unmatched: parsed.personaReconciliation.unmatched?.length ?? 0,
-            personaCount: parsed.personaReconciliation.personaCount,
+            roleCount: parsed.roleReconciliation.roleCount,
+            unmatched: parsed.roleReconciliation.unmatched?.length ?? 0,
+            encompassRoleCount: parsed.roleReconciliation.encompassRoleCount,
           }
         : null,
       path: 'data/encompass-conditions/handoff/',
     };
   } catch {
-    handoffCache = { available: false, summary: null, personaSource: null, path: 'data/encompass-conditions/handoff/' };
+    handoffCache = { available: false, summary: null, roleSource: null, path: 'data/encompass-conditions/handoff/' };
   }
   handoffLoadedAt = now;
   return handoffCache;
@@ -90,11 +90,11 @@ function factSheet(knowledge, handoff) {
     lines.push(`- Condition types: ${s.conditionTypes}`);
     lines.push(`- ACL profiles: ${s.aclProfiles}`);
     lines.push(`- Needs review: ${s.needsReview}; auto-fixed: ${s.autoFixed}`);
-    lines.push(`- Distinct persona names in CDO: ${s.distinctRoles}`);
-    if (handoff.personaSource) {
+    lines.push(`- Distinct role names in CDO: ${s.distinctRoles}`);
+    if (handoff.roleSource) {
       lines.push(
-        `- Persona reconciliation file: ${handoff.personaSource.personaCount || 0} personas loaded, `
-          + `${handoff.personaSource.unmatched} unmatched role names`,
+        `- Role reconciliation: ${handoff.roleSource.encompassRoleCount || 0} Encompass roles loaded, `
+          + `${handoff.roleSource.unmatched} unmatched role names`,
       );
     }
   } else {
@@ -188,7 +188,7 @@ function buildSystemPrompt(knowledge, handoff, docsContext, ragNote = '') {
   return `You are the ${knowledge.guide?.name || 'Enhanced Conditions Expert'} for DevConnect Labs.
 
 ## Role
-Help Encompass admins and developers migrate legacy ConditionsTemplate.xml CDOs to Enhanced Conditions, configure types/templates/persona access, and use ICE Developer Connect APIs / Postman safely.
+Help Encompass admins and developers migrate legacy ConditionsTemplate.xml CDOs to Enhanced Conditions, configure types/templates/role-based access, and use ICE Developer Connect APIs / Postman safely.
 
 ## Grounding (prefer this over guesses)
 ${factSheet(knowledge, handoff)}
@@ -197,7 +197,7 @@ ${docsContext}
 ## Response style
 1. Accurate and concise. Prefer the grounding facts and retrieved docs.
 2. Cite retrieved docs as [S1], [S2] when they support the answer.
-3. Distinguish clearly: personas (access) vs workflow roles vs users; types vs templates; dry-run conversion vs live ICE write APIs.
+3. Access is role-based: legacy ConditionAccess names are Encompass roles (GET /encompass/v3/settings/roles), not personas or users. Distinguish clearly: roles vs users; types vs templates; dry-run conversion vs live ICE write APIs.
 4. Condition Manager and POST /api/encompass-conditions/convert remain dry-run. Live writes use /finance/enhanced-conditions.html (POST /api/encompass-conditions/invoke and REST /types /templates /loans/:id/conditions).
 5. For Postman or Live CRUD, give method, path, required vars, and body shape. Warn to use UAT first and smoke-test templates before bulk (826) loads.
 6. Keep answers speakable: short paragraphs or tight bullets; users may use TTS.

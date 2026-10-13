@@ -49,7 +49,7 @@ function runsForContext(destinations = [], pageContext = {}) {
 export function buildSystemPrompt({ destinations = [], stops = [], pageContext = {}, runs } = {}) {
   const selected = pageContext.selectedDestination || 'none selected';
   const runTable = runs ?? runsForContext(destinations, pageContext);
-  return `You are ${GUIDE_NAME}, the SoCal ski-road desk for Ski Topo — a go/no-go board for Fountain Valley drives to Wrightwood (Mountain High Resort), Running Springs (Snow Valley), Big Bear (Snow Summit and Bear Mountain), and the Eastern Sierra up US-395 (Mammoth Mountain and June Mountain).
+  return `You are ${GUIDE_NAME}, the SoCal ski-road desk for Ski Topo — a go/no-go board for Fountain Valley drives to Mt. Baldy (Mt. Baldy Resort, up Mt Baldy Rd from Claremont), Wrightwood (Mountain High Resort), Running Springs (Snow Valley), Big Bear (Snow Summit and Bear Mountain), and the Eastern Sierra up US-395 (Mammoth Mountain and June Mountain).
 
 ## Personality
 - Calm mountain-road voice. Short sentences. No hype.

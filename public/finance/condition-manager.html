@@ -174,7 +174,7 @@
         max-height: 480px;
         overflow-y: auto;
       }
-      .persona-chip {
+      .role-chip {
         display: inline-block;
         padding: 2px 10px;
         margin: 2px 4px 2px 0;
@@ -182,7 +182,7 @@
         background: rgba(74, 144, 164, 0.12);
         font-size: 0.78rem;
       }
-      .persona-chip.missing {
+      .role-chip.missing {
         background: rgba(220, 38, 38, 0.12);
         color: #991b1b;
       }
@@ -211,7 +211,7 @@
         <h1>Condition Manager</h1>
         <p class="lead">
           Converts the legacy <code>ConditionsTemplate.xml</code> custom data object into Encompass
-          Enhanced Conditions — condition types, condition templates, and the persona access
+          Enhanced Conditions — condition types, condition templates, and the role access
           patterns the tiered model can no longer store per condition. Conversion is still a dry
           run. After you review the payloads, write them with
           <a href="/finance/enhanced-conditions.html">Enhanced Conditions CRUD</a>.
@@ -258,28 +258,28 @@
             <div class="form-text">Paste the whole Save Response body — do not decode the base64 yourself.</div>
           </div>
           <div class="col-lg-6">
-            <label class="form-label fw-semibold" for="personaFile">Personas (optional)</label>
-            <div class="dropzone" id="personaDrop">
+            <label class="form-label fw-semibold" for="roleFile">Roles (optional)</label>
+            <div class="dropzone" id="roleDrop">
               <i class="bi bi-people"></i>
-              <div class="mt-2">Drop the persona list here, or click to choose</div>
-              <div class="small text-muted">Response from <code>GET /encompass/v3/settings/personas</code> — or list personas in Live CRUD above</div>
-              <div class="dropzone-file mt-2" id="personaFileName">No file chosen</div>
+              <div class="mt-2">Drop the role list here, or click to choose</div>
+              <div class="small text-muted">Response from <code>GET /encompass/v3/settings/roles</code> — or list roles in <a href="/finance/enhanced-conditions.html">Enhanced Conditions CRUD</a></div>
+              <div class="dropzone-file mt-2" id="roleFileName">No file chosen</div>
             </div>
-            <input type="file" id="personaFile" class="d-none" accept=".json" />
-            <label class="form-label fw-semibold mt-3 mb-1" for="personaSource">Persona list came from</label>
+            <input type="file" id="roleFile" class="d-none" accept=".json" />
+            <label class="form-label fw-semibold mt-3 mb-1" for="roleSource">Role list came from</label>
             <input
               class="form-control"
-              id="personaSource"
-              list="personaSourceOptions"
+              id="roleSource"
+              list="roleSourceOptions"
               placeholder="UAT"
               maxlength="40"
             />
-            <datalist id="personaSourceOptions">
+            <datalist id="roleSourceOptions">
               <option value="UAT"></option>
               <option value="Production"></option>
             </datalist>
             <div class="form-text">
-              Anything other than Production is treated as provisional — persona names drift
+              Anything other than Production is treated as provisional — role names drift
               between environments.
             </div>
           </div>
@@ -394,7 +394,7 @@
           <div id="sectionAcl" class="accordion-collapse collapse" data-bs-parent="#resultsAccordion">
             <div class="accordion-body">
               <p class="text-muted small">
-                Enhanced Conditions has no per-condition ACL — access is configured on the persona.
+                Enhanced Conditions has no per-condition ACL — access is configured by role.
                 Each profile below is one access pattern to set up once instead of per condition.
                 Select a row to see its eleven permission lists.
               </p>
@@ -414,22 +414,22 @@
 
         <div class="accordion-item">
           <h2 class="accordion-header d-flex align-items-center">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sectionPersonas">
-              <i class="bi bi-people me-2"></i> Persona reconciliation
-              <span class="badge text-bg-secondary section-count" id="countPersonas">0</span>
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sectionRoles">
+              <i class="bi bi-people me-2"></i> Role reconciliation
+              <span class="badge text-bg-secondary section-count" id="countRoles">0</span>
             </button>
-            <button class="listen-btn me-3" type="button" data-listen="personas" title="Listen to this section">
+            <button class="listen-btn me-3" type="button" data-listen="roles" title="Listen to this section">
               <i class="bi bi-volume-up"></i>
             </button>
           </h2>
-          <div id="sectionPersonas" class="accordion-collapse collapse" data-bs-parent="#resultsAccordion">
+          <div id="sectionRoles" class="accordion-collapse collapse" data-bs-parent="#resultsAccordion">
             <div class="accordion-body">
-              <div class="alert alert-warning d-none" id="personaHint">
-                No persona list supplied, so every role name is reported as unmatched. Load
-                <code>GET /encompass/v3/settings/personas</code> above to reconcile them.
+              <div class="alert alert-warning d-none" id="roleHint">
+                No role list supplied, so every role name is reported as unmatched. Load
+                <code>GET /encompass/v3/settings/roles</code> above to reconcile them.
               </div>
-              <div class="alert alert-warning d-none" id="personaProvisional"></div>
-              <div class="grid-host ag-theme-alpine" id="personaGrid"></div>
+              <div class="alert alert-warning d-none" id="roleProvisional"></div>
+              <div class="grid-host ag-theme-alpine" id="roleGrid"></div>
             </div>
           </div>
         </div>

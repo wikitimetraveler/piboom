@@ -11,11 +11,11 @@ import {
   buildConditionTypePayloads,
   buildMigrationBundle,
   decodeConditionsCdo,
-  describePersonaSource,
+  describeRoleSource,
   normalizeConditions,
   parseConditionsXml,
   readConditionsCdo,
-  reconcilePersonas,
+  reconcileRoles,
   renderMigrationReport,
 } from '../../services/encompass-conditions-migration.service.js';
 
@@ -265,35 +265,57 @@ describe('encompass-conditions-migration.service', () => {
     });
   });
 
-  describe('reconcilePersonas', () => {
-    const personas = [
-      { id: '15', name: 'Funder' },
-      { id: '133', name: 'ND Underwriter 1' },
-      { id: '115', name: 'Business Intelligence' },
+  describe('reconcileRoles', () => {
+    const roles = [
+      { roleID: 15, roleName: 'Funder', roleAbbr: 'FND' },
+      { roleID: 7, roleName: 'Underwriter', roleAbbr: 'UW' },
+      { roleID: 133, roleName: 'ND Underwriter 1', roleAbbr: 'NDU1' },
+      { roleID: 115, roleName: 'Business Intelligence', roleAbbr: 'BI' },
     ];
 
     it('matches role names that exist verbatim', () => {
       const { conditions } = parseFixture(wrap(condition({ access: { Add: 'Funder' } })));
-      const { matched } = reconcilePersonas(conditions, personas);
-      expect(matched).toContainEqual({ role: 'Funder', persona: { id: '15', name: 'Funder' } });
+      const { matched } = reconcileRoles(conditions, roles);
+      expect(matched).toContainEqual({
+        role: 'Funder',
+        encompassRole: { id: 15, name: 'Funder', abbr: 'FND' },
+        via: 'name',
+      });
     });
 
-    it('suggests the spelled-out persona for an abbreviated role name', () => {
+    it('matches a legacy name that is the role abbreviation', () => {
+      const { conditions } = parseFixture(wrap(condition({ access: { Add: 'UW' } })));
+      const { matched } = reconcileRoles(conditions, roles);
+      expect(matched).toContainEqual({
+        role: 'UW',
+        encompassRole: { id: 7, name: 'Underwriter', abbr: 'UW' },
+        via: 'abbreviation',
+      });
+    });
+
+    it('accepts a plain list of role names', () => {
+      const { conditions } = parseFixture(wrap(condition({ access: { Add: 'Funder' } })));
+      const result = reconcileRoles(conditions, ['Funder']);
+      expect(result.encompassRoleCount).toBe(1);
+      expect(result.matched[0].encompassRole).toMatchObject({ name: 'Funder' });
+    });
+
+    it('suggests the spelled-out role for an abbreviated name', () => {
       const { conditions } = parseFixture(wrap(condition({ access: { Add: 'ND UW 1' } })));
-      const entry = reconcilePersonas(conditions, personas).unmatched.find((u) => u.role === 'ND UW 1');
+      const entry = reconcileRoles(conditions, roles).unmatched.find((u) => u.role === 'ND UW 1');
       expect(entry.candidates[0]).toMatchObject({ name: 'ND Underwriter 1' });
     });
 
-    it('marks a name cut off at the persona length limit as truncated', () => {
+    it('marks a name cut off at the legacy length limit as truncated', () => {
       const { conditions } = parseFixture(wrap(condition({ access: { Add: 'Business Intelligenc' } })));
-      const entry = reconcilePersonas(conditions, personas).unmatched.find((u) => u.role === 'Business Intelligenc');
+      const entry = reconcileRoles(conditions, roles).unmatched.find((u) => u.role === 'Business Intelligenc');
       expect(entry.likelyTruncated).toBe(true);
       expect(entry.candidates[0]).toMatchObject({ name: 'Business Intelligence' });
     });
 
     it('returns no candidates for a role with no plausible counterpart', () => {
       const { conditions } = parseFixture(wrap(condition({ access: { Add: 'Head of Credit' } })));
-      const entry = reconcilePersonas(conditions, personas).unmatched.find((u) => u.role === 'Head of Credit');
+      const entry = reconcileRoles(conditions, roles).unmatched.find((u) => u.role === 'Head of Credit');
       expect(entry.candidates).toEqual([]);
     });
   });
@@ -304,7 +326,7 @@ describe('encompass-conditions-migration.service', () => {
         condition({ code: 'A1', stage: 'Pre Purchase' }),
         condition({ code: 'A2', stage: 'Post-Purchase' }),
       );
-      const bundle = buildMigrationBundle(xml, { personas: [{ id: '15', name: 'Funder' }] });
+      const bundle = buildMigrationBundle(xml, { roles: [{ roleID: 15, roleName: 'Funder' }] });
 
       expect(bundle.summary).toMatchObject({
         conditionsParsed: 2,
@@ -317,47 +339,47 @@ describe('encompass-conditions-migration.service', () => {
     });
   });
 
-  describe('persona source', () => {
-    const personas = [{ id: '15', name: 'Funder' }];
+  describe('role source', () => {
+    const roles = [{ roleID: 15, roleName: 'Funder', roleAbbr: 'FND' }];
     const xml = wrap(condition());
 
     it('treats a production list as authoritative', () => {
-      const source = describePersonaSource('Production', 1);
+      const source = describeRoleSource('Production', 1);
       expect(source).toMatchObject({ label: 'Production', supplied: true, production: true, provisional: false });
     });
 
     it('treats any other environment as provisional', () => {
-      expect(describePersonaSource('UAT', 1)).toMatchObject({ production: false, provisional: true });
+      expect(describeRoleSource('UAT', 1)).toMatchObject({ production: false, provisional: true });
     });
 
     it('treats a supplied list with no label as provisional', () => {
-      expect(describePersonaSource('', 1)).toMatchObject({ label: null, supplied: true, provisional: true });
+      expect(describeRoleSource('', 1)).toMatchObject({ label: null, supplied: true, provisional: true });
     });
 
-    it('reports no persona list as unsupplied', () => {
-      expect(describePersonaSource('UAT', 0)).toMatchObject({ supplied: false, provisional: true });
+    it('reports no role list as unsupplied', () => {
+      expect(describeRoleSource('UAT', 0)).toMatchObject({ supplied: false, provisional: true });
     });
 
     it('carries the source through the bundle', () => {
-      const bundle = buildMigrationBundle(xml, { personas, personaSource: 'UAT' });
-      expect(bundle.personaSource).toMatchObject({ label: 'UAT', supplied: true, provisional: true });
+      const bundle = buildMigrationBundle(xml, { roles, roleSource: 'UAT' });
+      expect(bundle.roleSource).toMatchObject({ label: 'UAT', supplied: true, provisional: true });
     });
 
-    it('warns in the report when the personas did not come from production', () => {
-      const report = renderMigrationReport(buildMigrationBundle(xml, { personas, personaSource: 'UAT' }));
-      expect(report).toContain('Persona source: UAT — provisional');
+    it('warns in the report when the roles did not come from production', () => {
+      const report = renderMigrationReport(buildMigrationBundle(xml, { roles, roleSource: 'UAT' }));
+      expect(report).toContain('Role source: UAT — provisional');
       expect(report).toContain('not production');
     });
 
-    it('does not warn when the personas came from production', () => {
-      const report = renderMigrationReport(buildMigrationBundle(xml, { personas, personaSource: 'Production' }));
-      expect(report).toContain('Persona source: Production — authoritative.');
+    it('does not warn when the roles came from production', () => {
+      const report = renderMigrationReport(buildMigrationBundle(xml, { roles, roleSource: 'Production' }));
+      expect(report).toContain('Role source: Production — authoritative.');
       expect(report).not.toContain('provisional');
     });
 
-    it('records that reconciliation was skipped when no personas were supplied', () => {
+    it('records that reconciliation was skipped when no roles were supplied', () => {
       const report = renderMigrationReport(buildMigrationBundle(xml));
-      expect(report).toContain('Persona source: none supplied');
+      expect(report).toContain('Role source: none supplied');
     });
   });
 });

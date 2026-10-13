@@ -45,7 +45,7 @@ router.get('/templates/:id', restHandler('conditions', 'ec.templates.get', { id:
 router.get('/sets', restHandler('conditions', 'ec.sets.list'));
 router.get('/sets/:id', restHandler('conditions', 'ec.sets.get', { id: 'setId' }));
 
-router.get('/personas', restHandler('conditions', 'ec.personas.list'));
+router.get('/roles', restHandler('conditions', 'ec.roles.list'));
 router.post('/automated-conditions', restHandler('conditions', 'ec.automated.evaluate'));
 
 router.get('/loans/:loanId/conditions', restHandler('conditions', 'ec.loan.list', { loanId: 'loanId' }));

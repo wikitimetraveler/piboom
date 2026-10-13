@@ -9,6 +9,7 @@ import {
   MAX_MEMBERS,
   MAX_TRIP_PHOTOS,
   SKI_TZ,
+  TRIP_TTL_DAYS,
   buildTripDay,
   cleanPoints,
   dayBounds,
@@ -51,6 +52,12 @@ async function createSchema(pool) {
       created_at TIMESTAMPTZ DEFAULT now()
     )
   `);
+  const hadKeep = await pool.query(
+    "SELECT 1 FROM information_schema.columns WHERE table_name = 'ski_trips' AND column_name = 'keep'"
+  );
+  await pool.query('ALTER TABLE ski_trips ADD COLUMN IF NOT EXISTS keep BOOLEAN NOT NULL DEFAULT false');
+  // Trips that predate expiry were all the site owner's, so they never expire.
+  if (!hadKeep.rowCount) await pool.query('UPDATE ski_trips SET keep = true');
   await pool.query(`
     CREATE TABLE IF NOT EXISTS ski_trip_members (
       id SERIAL PRIMARY KEY,
@@ -143,21 +150,28 @@ export async function initSkiLogSchema() {
 const isoDate = (v) => (v instanceof Date ? v.toISOString().slice(0, 10) : String(v || '').slice(0, 10));
 
 function mapTrip(row) {
-  return { id: row.id, code: row.code, name: row.name, resortId: row.resort_id, startDate: isoDate(row.start_date) };
+  return {
+    id: row.id,
+    code: row.code,
+    name: row.name,
+    resortId: row.resort_id,
+    startDate: isoDate(row.start_date),
+    keep: Boolean(row.keep),
+  };
 }
 
 function mapMember(row) {
   return { id: row.id, tripId: row.trip_id, name: row.display_name, color: row.color, isOwner: row.is_owner };
 }
 
-export async function createTrip({ name, resortId, startDate, displayName }) {
+export async function createTrip({ name, resortId, startDate, displayName, keep = false }) {
   const pool = await initSkiLogSchema();
   let trip = null;
   for (let attempt = 0; attempt < 6 && !trip; attempt++) {
     const res = await pool.query(
-      `INSERT INTO ski_trips (code, name, resort_id, start_date) VALUES ($1, $2, $3, $4)
+      `INSERT INTO ski_trips (code, name, resort_id, start_date, keep) VALUES ($1, $2, $3, $4, $5)
        ON CONFLICT (code) DO NOTHING RETURNING *`,
-      [generateTripCode(), name, resortId, startDate]
+      [generateTripCode(), name, resortId, startDate, Boolean(keep)]
     );
     trip = res.rows[0] || null;
   }
@@ -174,6 +188,51 @@ export async function createTrip({ name, resortId, startDate, displayName }) {
 export async function getTripByCode(code) {
   const pool = await initSkiLogSchema();
   const res = await pool.query('SELECT * FROM ski_trips WHERE code = $1', [code]);
+  return res.rows[0] ? mapTrip(res.rows[0]) : null;
+}
+
+/** Delete unkept trips with no new riders, points, check-ins, or photos in `days`. Returns the deleted codes. */
+export async function purgeExpiredTrips({ days = TRIP_TTL_DAYS, now = Date.now() } = {}) {
+  const pool = await initSkiLogSchema();
+  const cutoffMs = Math.round(now - days * 86_400_000);
+  const res = await pool.query(
+    `DELETE FROM ski_trips t
+     WHERE NOT t.keep
+       AND t.created_at < $1::timestamptz
+       AND NOT EXISTS (SELECT 1 FROM ski_trip_members m WHERE m.trip_id = t.id AND m.created_at >= $1::timestamptz)
+       AND NOT EXISTS (SELECT 1 FROM ski_trip_members m JOIN ski_log_points p ON p.member_id = m.id
+                       WHERE m.trip_id = t.id AND p.ts >= $2::bigint)
+       AND NOT EXISTS (SELECT 1 FROM ski_trip_members m JOIN ski_log_checkins c ON c.member_id = m.id
+                       WHERE m.trip_id = t.id AND (c.ts >= $2::bigint OR c.created_at >= $1::timestamptz))
+       AND NOT EXISTS (SELECT 1 FROM ski_log_photos ph
+                       WHERE ph.trip_id = t.id AND (ph.ts >= $2::bigint OR ph.created_at >= $1::timestamptz))
+     RETURNING t.code`,
+    [new Date(cutoffMs), cutoffMs]
+  );
+  return res.rows.map((r) => r.code);
+}
+
+const PURGE_EVERY_MS = 6 * 60 * 60 * 1000;
+let lastPurgeAt = 0;
+
+/** Fire-and-forget purge, at most once every six hours per process. Never throws. */
+export function maybePurgeExpiredTrips(now = Date.now()) {
+  if (now - lastPurgeAt < PURGE_EVERY_MS) return null;
+  lastPurgeAt = now;
+  return purgeExpiredTrips({ now })
+    .then((codes) => {
+      if (codes.length) console.log(`Crew log: expired ${codes.length} idle trip(s): ${codes.join(', ')}`);
+      return codes;
+    })
+    .catch((err) => {
+      console.warn('Crew log purge skipped:', err.message);
+      return [];
+    });
+}
+
+export async function setTripKeep(code, keep) {
+  const pool = await initSkiLogSchema();
+  const res = await pool.query('UPDATE ski_trips SET keep = $2 WHERE code = $1 RETURNING *', [code, Boolean(keep)]);
   return res.rows[0] ? mapTrip(res.rows[0]) : null;
 }
 
@@ -507,6 +566,9 @@ export default {
   initSkiLogSchema,
   createTrip,
   getTripByCode,
+  purgeExpiredTrips,
+  maybePurgeExpiredTrips,
+  setTripKeep,
   joinTrip,
   authMember,
   listMembers,

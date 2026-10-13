@@ -4,6 +4,7 @@
  */
 import express, { Router } from 'express';
 import multer from 'multer';
+import { hasFinanceSession } from '../lib/finance-session.js';
 import skiTopoService from '../services/ski-topo.service.js';
 import { MAX_PHOTO_BYTES } from '../services/ski-log-media.service.js';
 import store, { SkiLogError } from '../services/ski-log-store.service.js';
@@ -72,7 +73,9 @@ router.post('/trips', async (req, res) => {
     if (!(catalog.destinations || []).some((d) => d.id === resortId)) {
       return res.status(400).json({ error: 'Pick a resort from the list.' });
     }
-    res.status(201).json(await store.createTrip({ name, resortId, startDate, displayName }));
+    const keep = hasFinanceSession(req);
+    res.status(201).json(await store.createTrip({ name, resortId, startDate, displayName, keep }));
+    store.maybePurgeExpiredTrips();
   } catch (error) {
     fail(res, error);
   }
@@ -108,6 +111,15 @@ router.post('/trips/:code/join', async (req, res) => {
 router.get('/trips/:code', withMember, async (req, res) => {
   try {
     res.json({ trip: req.skiTrip, me: req.skiMember, members: await store.listMembers(req.skiTrip.id) });
+  } catch (error) {
+    fail(res, error);
+  }
+});
+
+router.post('/trips/:code/keep', withMember, async (req, res) => {
+  try {
+    if (!hasFinanceSession(req)) return res.status(403).json({ error: 'Sign in to the site to keep a trip.' });
+    res.json({ trip: await store.setTripKeep(req.skiTrip.code, req.body?.keep !== false) });
   } catch (error) {
     fail(res, error);
   }

@@ -19,6 +19,8 @@ const SNOW_VALLEY = { lat: 34.2253, lng: -117.0369 };
 const MAMMOTH_LODGE = { lat: 37.6511, lng: -119.0268 };
 const MAMMOTH_SUMMIT = { lat: 37.6308, lng: -119.0326 };
 const JUNE_LODGE = { lat: 37.7685, lng: -119.0905 };
+const BALDY_BASE = { lat: 34.2706, lng: -117.6215 };
+const BALDY_NOTCH = { lat: 34.2741, lng: -117.6104 };
 
 describe('ski DEM', () => {
   test('Wrightwood DEM covers Mountain High only — not Fountain Valley', () => {
@@ -51,6 +53,14 @@ describe('ski DEM', () => {
     expect(pointInDemBounds(mammoth, JUNE_LODGE.lat, JUNE_LODGE.lng)).toBe(false);
     expect(pointInDemBounds(june, JUNE_LODGE.lat, JUNE_LODGE.lng)).toBe(true);
     expect(pointInDemBounds(june, MAMMOTH_LODGE.lat, MAMMOTH_LODGE.lng)).toBe(false);
+  });
+
+  test('Mt. Baldy DEM covers the base and the Notch — not Mountain High or Fountain Valley', () => {
+    const spec = SKI_DEM_SPECS.find((s) => s.id === 'mt-baldy');
+    expect(pointInDemBounds(spec, BALDY_BASE.lat, BALDY_BASE.lng)).toBe(true);
+    expect(pointInDemBounds(spec, BALDY_NOTCH.lat, BALDY_NOTCH.lng)).toBe(true);
+    expect(pointInDemBounds(spec, MH.lat, MH.lng)).toBe(false);
+    expect(pointInDemBounds(spec, FOUNTAIN_VALLEY.lat, FOUNTAIN_VALLEY.lng)).toBe(false);
   });
 
   test('interpolation returns a height inside the mesh and null outside', () => {
@@ -121,5 +131,8 @@ describe('ski DEM', () => {
     expect(interpolateDem(mm, MAMMOTH_LODGE.lat, MAMMOTH_LODGE.lng)).toBeGreaterThan(8400);
     const jm = loadDem('june');
     expect(interpolateDem(jm, JUNE_LODGE.lat, JUNE_LODGE.lng)).toBeGreaterThan(7300);
+    const mb = loadDem('mt-baldy');
+    expect(interpolateDem(mb, BALDY_BASE.lat, BALDY_BASE.lng)).toBeGreaterThan(6000);
+    expect(interpolateDem(mb, BALDY_NOTCH.lat, BALDY_NOTCH.lng)).toBeGreaterThan(7500);
   });
 });

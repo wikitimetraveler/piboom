@@ -29,6 +29,23 @@ export const SKI_DEM_SPECS = [
     ],
   },
   {
+    id: 'mt-baldy',
+    name: 'Mt. Baldy',
+    file: 'mt-baldy-dem.json',
+    south: 34.256,
+    north: 34.291,
+    west: -117.638,
+    east: -117.592,
+    rows: 98,
+    cols: 107,
+    floorFt: 6200,
+    peaks: [
+      { lat: 34.2815, lng: -117.6165, elevFt: 8600, sigma: 0.007 },
+      { lat: 34.2741, lng: -117.6104, elevFt: 7800, sigma: 0.006 },
+      { lat: 34.2655, lng: -117.6065, elevFt: 8200, sigma: 0.006 },
+    ],
+  },
+  {
     id: 'snow-valley',
     name: 'Snow Valley',
     file: 'snow-valley-dem.json',

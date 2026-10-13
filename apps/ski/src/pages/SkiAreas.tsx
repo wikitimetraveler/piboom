@@ -84,7 +84,7 @@ export default function SkiAreas(props: Props) {
       <header className="ski-hero">
         <h1>Ski Areas</h1>
         <p>
-          Start on the California table, then fly onto the mountain. Mountain High, Snow Valley, Snow Summit, Bear
+          Start on the California table, then fly onto the mountain. Mt. Baldy, Mountain High, Snow Valley, Snow Summit, Bear
           Mountain, Mammoth, and June carry real OpenStreetMap runs and lifts draped on a USGS 3DEP elevation model,
           with pitch and facing measured run by run.
         </p>

@@ -6,8 +6,8 @@
  * payloads plus a data-quality report. Writes files only; never calls the Encompass API.
  *
  * Usage:
- *   node scripts/tools/convert-conditions-cdo.mjs --input <cdo.json|cdo.xml> [--personas <personas.json>]
- *     [--persona-source <UAT|Production|label>] [--out <dir>]
+ *   node scripts/tools/convert-conditions-cdo.mjs --input <cdo.json|cdo.xml> [--roles <roles.json>]
+ *     [--role-source <UAT|Production|label>] [--out <dir>]
  */
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -23,21 +23,21 @@ const DEFAULT_OUT = path.join('data', 'encompass-conditions');
 // npm strips `--flag value` pairs it mistakes for its own config, so positional
 // arguments are accepted as a fallback for `npm run convert:conditions-cdo -- ...`.
 function parseArgs(argv) {
-  const args = { input: null, personas: null, personaSource: null, out: DEFAULT_OUT };
+  const args = { input: null, roles: null, roleSource: null, out: DEFAULT_OUT };
   const positional = [];
 
   for (let i = 0; i < argv.length; i += 1) {
     const flag = argv[i];
     if (flag === '--input' || flag === '-i') args.input = argv[++i];
-    else if (flag === '--personas' || flag === '-p') args.personas = argv[++i];
-    else if (flag === '--persona-source' || flag === '-s') args.personaSource = argv[++i];
+    else if (flag === '--roles' || flag === '-r') args.roles = argv[++i];
+    else if (flag === '--role-source' || flag === '-s') args.roleSource = argv[++i];
     else if (flag === '--out' || flag === '-o') args.out = argv[++i];
     else if (flag === '--help' || flag === '-h') args.help = true;
     else if (!flag.startsWith('-')) positional.push(flag);
   }
 
   args.input ??= positional[0] ?? null;
-  args.personas ??= positional[1] ?? null;
+  args.roles ??= positional[1] ?? null;
   if (args.out === DEFAULT_OUT && positional[2]) args.out = positional[2];
   return args;
 }
@@ -46,24 +46,24 @@ function parseArgs(argv) {
 // be UTF-16 or gzipped, and decoding it as UTF-8 here would corrupt it before it arrives.
 const readCdo = (inputPath) => fs.readFile(inputPath);
 
-async function readPersonas(personasPath) {
-  if (!personasPath) return [];
-  const parsed = JSON.parse(await fs.readFile(personasPath, 'utf8'));
+async function readRoles(rolesPath) {
+  if (!rolesPath) return [];
+  const parsed = JSON.parse(await fs.readFile(rolesPath, 'utf8'));
   if (Array.isArray(parsed)) return parsed;
-  return parsed.personas || parsed.items || parsed.value || [];
+  return parsed.roles || parsed.items || parsed.value || [];
 }
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
 
   if (args.help || !args.input) {
-    console.log('Usage: node scripts/tools/convert-conditions-cdo.mjs --input <cdo.json|cdo.xml> [--personas <file>] [--persona-source <UAT|Production|label>] [--out <dir>]');
+    console.log('Usage: node scripts/tools/convert-conditions-cdo.mjs --input <cdo.json|cdo.xml> [--roles <file>] [--role-source <UAT|Production|label>] [--out <dir>]');
     process.exit(args.help ? 0 : 1);
   }
 
   const { xml, notes } = readConditionsCdo(await readCdo(args.input));
-  const personas = await readPersonas(args.personas);
-  const bundle = buildMigrationBundle(xml, { personas, personaSource: args.personaSource });
+  const roles = await readRoles(args.roles);
+  const bundle = buildMigrationBundle(xml, { roles, roleSource: args.roleSource });
 
   await fs.mkdir(args.out, { recursive: true });
   const write = (name, value) =>
@@ -74,7 +74,7 @@ async function main() {
     write('condition-templates.json', bundle.conditionTemplates),
     write('acl-profiles.json', { profiles: bundle.aclProfiles, assignments: bundle.aclAssignments }),
     write('normalized-conditions.json', bundle.conditions),
-    write('data-quality-report.json', { summary: bundle.summary, issues: bundle.issues, personaReconciliation: bundle.personaReconciliation }),
+    write('data-quality-report.json', { summary: bundle.summary, issues: bundle.issues, roleReconciliation: bundle.roleReconciliation }),
     write('data-quality-report.md', renderMigrationReport(bundle)),
   ]);
 
@@ -82,12 +82,12 @@ async function main() {
   console.log(`Wrote dry-run artifacts to ${args.out}`);
   for (const [key, value] of Object.entries(bundle.summary)) console.log(`  ${key}: ${value}`);
 
-  if (!personas.length) {
-    console.log('\nPersona reconciliation skipped (no --personas supplied).');
-  } else if (bundle.personaSource.provisional) {
+  if (!roles.length) {
+    console.log('\nRole reconciliation skipped (no --roles supplied).');
+  } else if (bundle.roleSource.provisional) {
     console.log(
-      `\nPersona list treated as provisional (${bundle.personaSource.label || 'unlabelled'}).`
-      + ' Re-run with --persona-source Production before configuring anything.',
+      `\nRole list treated as provisional (${bundle.roleSource.label || 'unlabelled'}).`
+      + ' Re-run with --role-source Production before configuring anything.',
     );
   }
 }

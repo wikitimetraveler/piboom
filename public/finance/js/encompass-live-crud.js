@@ -10,7 +10,7 @@
       catalogUrl: '/api/encompass-conditions/catalog',
       invokeUrl: '/api/encompass-conditions/invoke',
       title: 'Live Enhanced Conditions APIs',
-      lead: 'CRUD against condition types, templates, sets, personas, and loan conditions. Condition Manager conversion remains a dry-run; this console writes to Encompass.',
+      lead: 'CRUD against condition types, templates, sets, roles, and loan conditions. Condition Manager conversion remains a dry-run; this console writes to Encompass.',
     },
   };
 
@@ -29,7 +29,7 @@
   function asList(data) {
     if (Array.isArray(data)) return data;
     if (!data || typeof data !== 'object') return [];
-    return data.items || data.results || data.types || data.templates || data.conditions || data.personas || [];
+    return data.items || data.results || data.types || data.templates || data.conditions || data.roles || [];
   }
 
   function guessId(row) {

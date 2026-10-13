@@ -13,6 +13,19 @@
       { "id": "wrightwood", "name": "Wrightwood", "lat": 34.3608, "lng": -117.6281 }
     ]
   },
+  "mt-baldy": {
+    "id": "mt-baldy",
+    "label": "Fountain Valley → Mt. Baldy",
+    "highways": ["CA-57", "I-10 / CA-210", "Mt Baldy Rd"],
+    "mapsDest": "Mt. Baldy Resort, Mt Baldy, CA",
+    "waypoints": [
+      { "id": "fountain-valley", "name": "Fountain Valley", "lat": 33.7095, "lng": -117.9537 },
+      { "id": "brea-57", "name": "Brea / 57", "lat": 33.9167, "lng": -117.889 },
+      { "id": "claremont", "name": "Claremont", "lat": 34.0967, "lng": -117.7198 },
+      { "id": "mt-baldy-village", "name": "Mt Baldy Village", "lat": 34.2367, "lng": -117.6584 },
+      { "id": "manker-flats", "name": "Manker Flats", "lat": 34.2667, "lng": -117.6262 }
+    ]
+  },
   "big-bear": {
     "id": "big-bear",
     "label": "Fountain Valley → Big Bear",

@@ -23,6 +23,28 @@
       "source": "seed"
     },
     {
+      "id": "claremont-village",
+      "name": "Claremont Village",
+      "route": "mt-baldy",
+      "kind": "town",
+      "town": "Claremont",
+      "note": "Walkable college-town blocks right before Mountain Ave starts the climb.",
+      "lat": 34.0967,
+      "lng": -117.7198,
+      "source": "seed"
+    },
+    {
+      "id": "mt-baldy-village",
+      "name": "Mt Baldy Village",
+      "route": "mt-baldy",
+      "kind": "viewpoint",
+      "town": "Mt Baldy",
+      "note": "Canyon hamlet under the peaks on Mt Baldy Rd — last stop before Manker Flats.",
+      "lat": 34.2367,
+      "lng": -117.6584,
+      "source": "seed"
+    },
+    {
       "id": "rim-overlook",
       "name": "Rim of the World overlook",
       "route": "big-bear",

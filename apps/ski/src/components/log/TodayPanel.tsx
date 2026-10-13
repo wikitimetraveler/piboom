@@ -16,7 +16,7 @@ interface Props {
   children?: ReactNode;
 }
 
-function StatGrid({ stats }: { stats: DayStats }) {
+export function StatGrid({ stats }: { stats: DayStats }) {
   return (
     <div className="log-stats">
       <div>

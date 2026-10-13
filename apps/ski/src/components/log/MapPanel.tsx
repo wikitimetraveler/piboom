@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import GoogleEarthView from '../GoogleEarthView';
 import GoogleMapView from '../GoogleMapView';
 import MapModeSwitch, { useMapMode } from '../MapModeSwitch';
@@ -6,8 +6,9 @@ import TerrainScene, { type OverlayPin, type OverlayTrack } from '../TerrainScen
 import { exportKml, photoUrl } from '../../lib/logApi';
 import type { CrewPosition, LogPhoto, TripDay, TripPass } from '../../lib/logTypes';
 import { fmtAgo, initials, todayLocal } from '../../lib/logFormat';
-import { demHeightFt, loadDemGrid, loadTrailsFor } from '../../lib/terrainData';
-import type { DemGrid, DestinationBrief, TrailsPayload } from '../../lib/types';
+import { areaName, demHeightFt } from '../../lib/terrainData';
+import type { DestinationBrief } from '../../lib/types';
+import { useMountain, useTripAreas } from '../../lib/useMountain';
 import PhotoLightbox from './PhotoLightbox';
 
 interface Props {
@@ -22,41 +23,16 @@ interface Props {
 }
 
 const STALE_MS = 15 * 60 * 1000;
-const AREA_NAMES: Record<string, string> = {
-  wrightwood: 'Wrightwood',
-  'big-bear': 'Big Bear',
-  'snow-valley': 'Snow Valley',
-  mammoth: 'Mammoth',
-  june: 'June',
-};
 
 export default function MapPanel({ pass, day, date, focus, onFocus, destinations, live, onChanged }: Props) {
   const [mode, setMode] = useMapMode();
   const resort = destinations.find((d) => d.id === pass.resortId);
-  const areas = useMemo(() => {
-    const list = [...(day?.areas || [])];
-    if (resort?.dem && !list.includes(resort.dem)) list.unshift(resort.dem);
-    return list;
-  }, [day?.areas, resort?.dem]);
   const [area, setArea] = useState<string | null>(null);
-  const demId = area && areas.includes(area) ? area : (day?.areas[0] ?? resort?.dem ?? null);
-  const [dem, setDem] = useState<DemGrid | null>(null);
-  const [trails, setTrails] = useState<TrailsPayload | null>(null);
+  const { areas, demId } = useTripAreas(day, resort, area);
+  const { dem, trails } = useMountain(demId);
   const [open, setOpen] = useState<LogPhoto | null>(null);
   const [kmlNote, setKmlNote] = useState('');
   const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    if (!demId) return;
-    let alive = true;
-    setDem(null);
-    setTrails(null);
-    loadDemGrid(demId).then((d) => alive && setDem(d)).catch(() => undefined);
-    loadTrailsFor(demId).then((t) => alive && setTrails(t)).catch(() => undefined);
-    return () => {
-      alive = false;
-    };
-  }, [demId]);
 
   const riders = useMemo(
     () => (day?.members || []).filter((m) => focus === 'crew' || m.id === focus),
@@ -158,7 +134,7 @@ export default function MapPanel({ pass, day, date, focus, onFocus, destinations
         <div className="log-chips" role="group" aria-label="Mountain">
           {areas.map((a) => (
             <button key={a} type="button" className={a === demId ? 'is-on' : ''} onClick={() => setArea(a)}>
-              {AREA_NAMES[a] || a}
+              {areaName(a)}
             </button>
           ))}
         </div>

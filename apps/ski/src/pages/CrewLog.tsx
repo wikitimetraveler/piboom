@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import ImportTrack from '../components/log/ImportTrack';
+import InvitePanel from '../components/log/InvitePanel';
 import MapPanel from '../components/log/MapPanel';
 import PhotoButton from '../components/log/PhotoButton';
 import PhotoStrip from '../components/log/PhotoStrip';
+import RecapPanel from '../components/log/RecapPanel';
 import SkiPanel from '../components/log/SkiPanel';
 import TodayPanel from '../components/log/TodayPanel';
 import TripGate from '../components/log/TripGate';
-import { currentPass, getDay, shareUrl, switchPass } from '../lib/logApi';
+import { currentPass, getDay, listPasses, switchPass } from '../lib/logApi';
 import type { TripDay, TripPass } from '../lib/logTypes';
 import { todayLocal } from '../lib/logFormat';
 import { Tracker, type TrackerState } from '../lib/tracker';
@@ -28,8 +30,17 @@ interface Props {
   destinations: DestinationBrief[];
 }
 
+/** An invite link for another trip opens that trip (or its join screen), not the last one used. */
+function startingPass(): TripPass | null {
+  const invite = (new URLSearchParams(window.location.search).get('trip') || '').toUpperCase();
+  if (!invite) return currentPass();
+  const saved = listPasses().find((p) => p.code === invite);
+  if (saved) switchPass(saved.code);
+  return saved || null;
+}
+
 export default function CrewLog({ destinations: briefed }: Props) {
-  const [pass, setPass] = useState<TripPass | null>(() => currentPass());
+  const [pass, setPass] = useState<TripPass | null>(startingPass);
   const [catalog, setCatalog] = useState<DestinationBrief[]>([]);
   useEffect(() => {
     if (briefed.length) return;
@@ -65,7 +76,7 @@ function TripView({ pass, destinations, onLeave }: { pass: TripPass; destination
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [tracker, setTracker] = useState<TrackerState>(IDLE);
-  const [shared, setShared] = useState('');
+  const [inviting, setInviting] = useState(false);
   const trackerRef = useRef<Tracker | null>(null);
   const resort = destinations.find((d) => d.id === pass.resortId);
 
@@ -116,20 +127,6 @@ function TripView({ pass, destinations, onLeave }: { pass: TripPass; destination
     } else t.start();
   };
 
-  async function share() {
-    const url = shareUrl(pass.code);
-    const text = `Join "${pass.tripName}" on Crew log — code ${pass.code}`;
-    try {
-      if (navigator.share) await navigator.share({ title: pass.tripName, text, url });
-      else {
-        await navigator.clipboard.writeText(`${text}\n${url}`);
-        setShared('Invite link copied.');
-      }
-    } catch {
-      /* share sheet dismissed */
-    }
-  }
-
   const mine = day?.members.find((m) => m.id === pass.memberId) || null;
 
   return (
@@ -142,7 +139,13 @@ function TripView({ pass, destinations, onLeave }: { pass: TripPass; destination
           </p>
         </div>
         <div className="log-head__actions">
-          <button type="button" className="log-code" onClick={share} title="Share the trip">
+          <button
+            type="button"
+            className="log-code"
+            onClick={() => setInviting((v) => !v)}
+            aria-expanded={inviting}
+            title="Invite riders with a QR code"
+          >
             {pass.code}
             <small>Invite</small>
           </button>
@@ -151,7 +154,9 @@ function TripView({ pass, destinations, onLeave }: { pass: TripPass; destination
           </button>
         </div>
       </header>
-      {shared ? <p className="log-note">{shared}</p> : null}
+      {inviting ? (
+        <InvitePanel pass={pass} resortName={resort?.name || pass.resortId} onClose={() => setInviting(false)} />
+      ) : null}
 
       <nav className="log-tabs" role="tablist" aria-label="Crew log">
         {TABS.map((t) => (
@@ -207,7 +212,18 @@ function TripView({ pass, destinations, onLeave }: { pass: TripPass; destination
           onChanged={refresh}
         />
       ) : null}
-      {tab === 'recap' ? <p className="log-note">Recaps are coming next.</p> : null}
+      {tab === 'recap' ? (
+        <RecapPanel
+          pass={pass}
+          day={day}
+          date={date}
+          onDate={setDate}
+          destinations={destinations}
+          loading={loading}
+          onGoSki={() => setTab('ski')}
+          onChanged={refresh}
+        />
+      ) : null}
     </section>
   );
 }

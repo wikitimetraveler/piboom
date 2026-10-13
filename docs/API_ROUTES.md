@@ -29,10 +29,10 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | POST | `/api/encompass-hub/update-fields` | Update custom fields (tool4 JSON payload for Modify rows) |
 | POST | `/api/encompass-hub/automator/parse-field-image` | Parse field-definition rows from image via vision API (`{ imageData }`) |
 | POST | `/api/encompass-hub/loan-batch/update-requests` | Proxy to Encompass `POST …/loanBatch/updateRequests` (body: loanIds + loanData or filter + loanData) |
-| GET | `/api/encompass-conditions/catalog` | Allowlisted Enhanced Conditions ICE operations (types, templates, sets, loan conditions, personas) |
+| GET | `/api/encompass-conditions/catalog` | Allowlisted Enhanced Conditions ICE operations (types, templates, sets, loan conditions, roles) |
 | POST | `/api/encompass-conditions/invoke` | Invoke a catalog operation; PATCH `?action=add\|update\|delete` for types/templates/loan conditions |
-| * | `/api/encompass-conditions/types`, `/templates`, `/sets`, `/personas`, `/loans/:loanId/conditions` | REST CRUD aliases; convert + expert remain under the same mount |
-| POST | `/api/encompass-conditions/convert` | Dry-run CDO → Enhanced Conditions payload conversion |
+| * | `/api/encompass-conditions/types`, `/templates`, `/sets`, `/roles`, `/loans/:loanId/conditions` | REST CRUD aliases (`/roles` is read-only: `GET /encompass/v3/settings/roles`); convert + expert remain under the same mount |
+| POST | `/api/encompass-conditions/convert` | Dry-run CDO → Enhanced Conditions payload conversion; optional `roles` (Settings Roles API response or list) + `roleSource` label reconcile legacy ConditionAccess names |
 | * | `/api/encompass/*` | Encompass Assistant (search, chat, summary) |
 | POST | `/api/webhooks/encompass` | Encompass webhook receiver |
 | POST | `/api/reviewer/ai/chat` | The Screen Test AI |

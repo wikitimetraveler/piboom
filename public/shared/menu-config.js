@@ -205,7 +205,7 @@
     { href: '/finance/encompass-custom-fields.html', icon: 'bi-sliders', label: 'Custom Fields', title: 'Custom Loan Fields' },
     { href: '/finance/condition-manager.html', icon: 'bi-clipboard-check', label: 'Condition Manager', title: 'Convert the legacy Conditions CDO into Enhanced Conditions' },
     { href: '/finance/enhanced-conditions.html', icon: 'bi-ui-checks-grid', label: 'Enhanced Conditions', title: 'Live Enhanced Conditions CRUD — types, templates, loan conditions' },
-    { href: '/finance/enhanced-conditions-expert.html', icon: 'bi-journal-richtext', label: 'EC Expert', title: 'Enhanced Conditions AI expert — APIs, personas, handoff pack' },
+    { href: '/finance/enhanced-conditions-expert.html', icon: 'bi-journal-richtext', label: 'EC Expert', title: 'Enhanced Conditions AI expert — APIs, roles, handoff pack' },
     { href: '/finance/tpo-connect.html', icon: 'bi-people', label: 'TPO Connect', title: 'TPO Connect — guest apps, SSF objects, LoanContractTPO fields' },
     { href: '/finance/encompass-hub-test.html', icon: 'bi-plug', label: 'Test Endpoints', title: 'Test API endpoints' },
     { href: '/finance/tool2.html', icon: 'bi-code-slash', label: 'Parser', title: 'The Parser' },

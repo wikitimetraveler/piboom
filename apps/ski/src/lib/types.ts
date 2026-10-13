@@ -20,8 +20,8 @@ export interface DestinationBrief {
   id: string;
   name: string;
   area: string;
-  route: 'wrightwood' | 'big-bear' | 'eastern-sierra';
-  dem: 'wrightwood' | 'big-bear' | 'snow-valley' | 'mammoth' | 'june';
+  route: 'mt-baldy' | 'wrightwood' | 'big-bear' | 'eastern-sierra';
+  dem: 'mt-baldy' | 'wrightwood' | 'big-bear' | 'snow-valley' | 'mammoth' | 'june';
   lat: number;
   lng: number;
   baseFt: number;

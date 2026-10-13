@@ -15,11 +15,12 @@ import {
 } from '../../services/ski-topo.service.js';
 
 describe('ski-topo.service', () => {
-  test('catalog has Fountain Valley home and six resorts', async () => {
+  test('catalog has Fountain Valley home and seven resorts', async () => {
     const catalog = await loadDestinations();
     expect(catalog.home.name).toBe('Fountain Valley');
     expect(catalog.destinations.map((d) => d.id)).toEqual([
       'mountain-high',
+      'mt-baldy',
       'snow-valley',
       'snow-summit',
       'bear-mountain',
@@ -137,7 +138,7 @@ describe('ski-topo.service', () => {
     };
     const brief = await getBrief({ fetchFn });
     expect(brief.home.name).toBe('Fountain Valley');
-    expect(brief.destinations).toHaveLength(6);
+    expect(brief.destinations).toHaveLength(7);
     expect(brief.destinations[0].weather.tempF).toBe(28);
     expect(brief.destinations[0].score).toBe('go');
     expect(brief.disclaimer).toMatch(/not official/i);

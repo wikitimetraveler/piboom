@@ -13,6 +13,8 @@ export const SKI_TZ = 'America/Los_Angeles';
 export const MAX_ACCURACY_M = 50;
 export const MAX_SPEED_MPS = 40;
 export const MAX_MEMBERS = 24;
+/** Trips with no new riders, points, check-ins, or photos for this long are deleted (unless kept). */
+export const TRIP_TTL_DAYS = 30;
 
 const RUN_SNAP_M = 40;
 const LIFT_SNAP_M = 45;

@@ -7,6 +7,7 @@ export interface TripInfo {
   name: string;
   resortId: string;
   startDate: string;
+  keep?: boolean;
 }
 
 export interface Member {

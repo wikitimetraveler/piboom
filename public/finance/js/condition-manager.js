@@ -17,14 +17,14 @@ const metricGrid = document.getElementById('metricGrid');
 const briefingText = document.getElementById('briefingText');
 const inputFormatNote = document.getElementById('inputFormatNote');
 const aclDetail = document.getElementById('aclDetail');
-const personaHint = document.getElementById('personaHint');
-const personaProvisional = document.getElementById('personaProvisional');
-const personaSourceInput = document.getElementById('personaSource');
+const roleHint = document.getElementById('roleHint');
+const roleProvisional = document.getElementById('roleProvisional');
+const roleSourceInput = document.getElementById('roleSource');
 const downloadButtons = document.getElementById('downloadButtons');
 const reportPreview = document.getElementById('reportPreview');
 
 let cdoPayload = null;
-let personaPayload = null;
+let rolePayload = null;
 let bundle = null;
 let reportMarkdown = '';
 
@@ -149,13 +149,13 @@ cdoPaste?.addEventListener('input', () => {
   }
 });
 
-wireDropzone('personaDrop', 'personaFile', 'personaFileName', (buffer) => {
+wireDropzone('roleDrop', 'roleFile', 'roleFileName', (buffer) => {
   clearError();
   try {
-    personaPayload = JSON.parse(decodeFileBytes(buffer));
+    rolePayload = JSON.parse(decodeFileBytes(buffer));
   } catch (error) {
-    personaPayload = null;
-    showError(`Persona list is not valid JSON: ${error.message}`);
+    rolePayload = null;
+    showError(`Role list is not valid JSON: ${error.message}`);
   }
 });
 
@@ -222,7 +222,7 @@ const GRID_BUILDERS = {
     columnDefs: [
       { colId: 'profileId', headerName: 'Profile', field: 'profileId', minWidth: 110 },
       { colId: 'conditionCount', headerName: 'Conditions', field: 'conditionCount', filter: 'agNumberColumnFilter', minWidth: 120 },
-      { colId: 'distinctPersonas', headerName: 'Personas', field: 'distinctPersonas', filter: 'agNumberColumnFilter', minWidth: 110 },
+      { colId: 'distinctRoles', headerName: 'Roles', field: 'distinctRoles', filter: 'agNumberColumnFilter', minWidth: 110 },
       { colId: 'addCount', headerName: 'Can add', field: 'addCount', filter: 'agNumberColumnFilter', minWidth: 110 },
       { colId: 'waiveCount', headerName: 'Can waive', field: 'waiveCount', filter: 'agNumberColumnFilter', minWidth: 120 },
     ],
@@ -232,20 +232,20 @@ const GRID_BUILDERS = {
       return {
         profileId: profile.profileId,
         conditionCount: profile.conditionCount,
-        distinctPersonas: new Set(lists.flat()).size,
+        distinctRoles: new Set(lists.flat()).size,
         addCount: (profile.permissions.Add || []).length,
         waiveCount: (profile.permissions.SetStatusWaived || []).length,
       };
     }),
   }),
-  personaGrid: () => ({
+  roleGrid: () => ({
     columnDefs: [
       { colId: 'role', headerName: 'Role name in CDO', field: 'role', minWidth: 220 },
       { colId: 'status', headerName: 'Status', field: 'status', minWidth: 130 },
       { colId: 'cause', headerName: 'Likely cause', field: 'cause', minWidth: 180 },
-      { colId: 'candidates', headerName: 'Candidates in Encompass', field: 'candidates', minWidth: 300 },
+      { colId: 'candidates', headerName: 'Encompass role', field: 'candidates', minWidth: 300 },
     ],
-    rows: () => personaRows(),
+    rows: () => roleRows(),
   }),
 };
 
@@ -279,13 +279,13 @@ function issueRow(issue) {
   };
 }
 
-function personaRows() {
-  const { matched, unmatched } = bundle.personaReconciliation;
+function roleRows() {
+  const { matched, unmatched } = bundle.roleReconciliation;
   const matchedRows = matched.map((entry) => ({
     role: entry.role,
     status: 'Matched',
-    cause: '',
-    candidates: entry.persona?.name || '',
+    cause: entry.via === 'abbreviation' ? 'matched by abbreviation' : '',
+    candidates: entry.encompassRole?.name || '',
   }));
   const unmatchedRows = unmatched.map((entry) => ({
     role: entry.role,
@@ -301,22 +301,22 @@ function personaRows() {
 }
 
 function unresolvedRoleSet() {
-  return new Set(bundle.personaReconciliation.unmatched.map((entry) => entry.role));
+  return new Set(bundle.roleReconciliation.unmatched.map((entry) => entry.role));
 }
 
 function renderAclDetail(profileId) {
   const profile = bundle.aclProfiles.find((entry) => entry.profileId === profileId);
   if (!profile) return;
   const unresolved = unresolvedRoleSet();
-  const suppliedPersonas = bundle.personaReconciliation.personaCount > 0;
+  const suppliedRoles = bundle.roleReconciliation.encompassRoleCount > 0;
 
   const lists = Object.entries(profile.permissions)
     .map(([permission, roles]) => {
       const chips = roles.length
         ? roles
           .map((role) => {
-            const missing = suppliedPersonas && unresolved.has(role);
-            return `<span class="persona-chip${missing ? ' missing' : ''}">${escapeHtml(role)}</span>`;
+            const missing = suppliedRoles && unresolved.has(role);
+            return `<span class="role-chip${missing ? ' missing' : ''}">${escapeHtml(role)}</span>`;
           })
           .join('')
         : '<span class="text-muted small">nobody</span>';
@@ -375,7 +375,7 @@ const SECTION_GRIDS = {
   sectionReview: 'reviewGrid',
   sectionFixed: 'fixedGrid',
   sectionAcl: 'aclGrid',
-  sectionPersonas: 'personaGrid',
+  sectionRoles: 'roleGrid',
 };
 
 Object.entries(SECTION_GRIDS).forEach(([sectionId, hostId]) => {
@@ -429,10 +429,10 @@ const NARRATION = {
       `${s.autoFixed} cleanups were applied automatically and ${s.needsReview} items need a decision from you.`,
       `The eleven per-condition permission lists collapse into ${s.aclProfiles} distinct access profiles.`,
       s.unresolvedRoles
-        ? `${s.unresolvedRoles} of the ${s.distinctRoles} persona names referenced could not be matched.`
-        : `All ${s.distinctRoles} persona names matched a persona in Encompass.`,
-      bundle.personaSource.supplied && bundle.personaSource.provisional
-        ? `That comparison used the ${bundle.personaSource.label || 'unlabelled'} persona list, so it is provisional.`
+        ? `${s.unresolvedRoles} of the ${s.distinctRoles} role names referenced could not be matched.`
+        : `All ${s.distinctRoles} role names matched a role in Encompass.`,
+      bundle.roleSource.supplied && bundle.roleSource.provisional
+        ? `That comparison used the ${bundle.roleSource.label || 'unlabelled'} role list, so it is provisional.`
         : '',
     ].filter(Boolean).join(' ');
   },
@@ -466,21 +466,21 @@ const NARRATION = {
     return `The per-condition access lists collapse into ${s.aclProfiles} distinct profiles. `
       + `The largest covers ${largest.conditionCount} conditions. `
       + `${s.singleUseAclProfiles} profiles are used by a single condition, which usually means drift rather than intent. `
-      + 'Enhanced Conditions cannot store these, so each profile is a persona configuration to apply once in admin.';
+      + 'Enhanced Conditions cannot store these, so each profile is a role configuration to apply once in admin.';
   },
-  personas: () => {
-    const rec = bundle.personaReconciliation;
-    const source = bundle.personaSource;
+  roles: () => {
+    const rec = bundle.roleReconciliation;
+    const source = bundle.roleSource;
     const caveat = source.supplied && source.provisional
       ? ` These matches come from ${source.label || 'an unlabelled list'}, not production, so treat them as provisional.`
       : '';
-    if (!rec.personaCount) {
-      return `The custom data object references ${rec.roleCount} distinct persona names, but no persona list was supplied, `
-        + 'so none of them could be reconciled. Load the personas export to see which names still exist.';
+    if (!rec.encompassRoleCount) {
+      return `The custom data object references ${rec.roleCount} distinct role names, but no role list was supplied, `
+        + 'so none of them could be reconciled. Load the roles export to see which names still exist.';
     }
     const truncated = rec.unmatched.filter((entry) => entry.likelyTruncated).length;
     const merged = rec.unmatched.filter((entry) => entry.likelyMerged).length;
-    return `Of ${rec.roleCount} persona names, ${rec.matched.length} match a persona in Encompass and ${rec.unmatched.length} do not. `
+    return `Of ${rec.roleCount} role names, ${rec.matched.length} match a role in Encompass and ${rec.unmatched.length} do not. `
       + `${truncated} look cut off at the twenty character limit and ${merged} look like two names run together. `
       + `${rec.impact.permissionListsGrantingNobody} permission lists currently grant access to nobody at all.${caveat}`;
   },
@@ -517,12 +517,12 @@ function download(name, value) {
 }
 
 /**
- * Browser downloads all land in one folder, so the persona source rides in the filename.
+ * Browser downloads all land in one folder, so the role source rides in the filename.
  * A UAT reconciliation opened three weeks later should announce itself as one.
  */
 function stampFileName(name) {
-  const label = bundle.personaSource.label;
-  if (!label || !bundle.personaSource.supplied) return name;
+  const label = bundle.roleSource.label;
+  if (!label || !bundle.roleSource.supplied) return name;
   const slug = label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   if (!slug) return name;
   const dot = name.lastIndexOf('.');
@@ -538,7 +538,7 @@ function renderDownloads() {
     ['data-quality-report.json', () => ({
       summary: bundle.summary,
       issues: bundle.issues,
-      personaReconciliation: bundle.personaReconciliation,
+      roleReconciliation: bundle.roleReconciliation,
     })],
     ['data-quality-report.md', () => reportMarkdown],
   ];
@@ -572,7 +572,7 @@ function renderSummary() {
     metric('Access profiles', s.aclProfiles),
     metric('Applied automatically', s.autoFixed),
     metric('Needs a decision', s.needsReview, s.needsReview ? 'warn' : ''),
-    metric('Unmatched personas', s.unresolvedRoles, s.unresolvedRoles ? 'danger' : ''),
+    metric('Unmatched roles', s.unresolvedRoles, s.unresolvedRoles ? 'danger' : ''),
     metric('Lists granting nobody', s.permissionListsGrantingNobody, s.permissionListsGrantingNobody ? 'danger' : ''),
   ].join('');
 
@@ -582,15 +582,15 @@ function renderSummary() {
   document.getElementById('countReview').textContent = s.needsReview;
   document.getElementById('countFixed').textContent = s.autoFixed;
   document.getElementById('countAcl').textContent = s.aclProfiles;
-  document.getElementById('countPersonas').textContent = bundle.personaReconciliation.roleCount;
+  document.getElementById('countRoles').textContent = bundle.roleReconciliation.roleCount;
 
-  const source = bundle.personaSource;
-  personaHint.classList.toggle('d-none', source.supplied);
-  personaProvisional.classList.toggle('d-none', !source.supplied || !source.provisional);
+  const source = bundle.roleSource;
+  roleHint.classList.toggle('d-none', source.supplied);
+  roleProvisional.classList.toggle('d-none', !source.supplied || !source.provisional);
   if (source.supplied && source.provisional) {
-    personaProvisional.innerHTML = `These matches come from <strong>${escapeHtml(source.label || 'an unlabelled list')}</strong>, `
-      + 'not production. Persona names drift between environments, so re-run against the '
-      + 'production list before anyone configures personas from this.';
+    roleProvisional.innerHTML = `These matches come from <strong>${escapeHtml(source.label || 'an unlabelled list')}</strong>, `
+      + 'not production. Role names drift between environments, so re-run against the '
+      + 'production list before anyone configures roles from this.';
   }
 }
 
@@ -633,8 +633,8 @@ async function convert() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           cdo: cdoPayload,
-          personas: personaPayload,
-          personaSource: personaSourceInput.value,
+          roles: rolePayload,
+          roleSource: roleSourceInput.value,
         }),
       });
     } catch (networkError) {
@@ -681,16 +681,16 @@ clearBtn.addEventListener('click', () => {
   stopSpeaking();
   clearError();
   cdoPayload = null;
-  personaPayload = null;
+  rolePayload = null;
   bundle = null;
   reportMarkdown = '';
   document.getElementById('cdoFile').value = '';
-  document.getElementById('personaFile').value = '';
+  document.getElementById('roleFile').value = '';
   document.getElementById('cdoFileName').textContent = 'No file chosen';
-  document.getElementById('personaFileName').textContent = 'No file chosen';
+  document.getElementById('roleFileName').textContent = 'No file chosen';
   if (cdoPaste) cdoPaste.value = '';
   inputFormatNote.classList.add('d-none');
-  personaSourceInput.value = '';
+  roleSourceInput.value = '';
   convertBtn.disabled = true;
   accordion.classList.add('d-none');
   emptyState.classList.remove('d-none');

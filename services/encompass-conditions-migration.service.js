@@ -5,10 +5,10 @@
  * Enhanced Conditions model (condition types + condition templates).
  *
  * The legacy CDO is flat: every condition carries its own copy of six detail fields and
- * eleven comma-delimited persona ACLs. Enhanced Conditions is tiered — a condition type
+ * eleven comma-delimited role ACLs. Enhanced Conditions is tiered — a condition type
  * owns the option vocabularies and tracking milestones, templates reference the type.
- * Enhanced Conditions has no per-condition ACL at all; persona access is configured on
- * the persona. So the ACLs are collapsed into named profiles for admin configuration
+ * Enhanced Conditions has no per-condition ACL at all; access is configured by Encompass
+ * role in admin. So the ACLs are collapsed into named profiles for admin configuration
  * rather than converted into payloads.
  */
 import { gunzipSync, inflateSync } from 'node:zlib';
@@ -46,13 +46,13 @@ const STAGE_CANONICAL = { pre: 'Pre-Purchase', post: 'Post-Purchase' };
 const RECIPIENT_EXTERNAL = 'Borrower / TPO';
 const RECIPIENT_INTERNAL = 'Internal Only';
 
-/** Encompass caps persona names at 20 characters, so anything at exactly 20 may be cut off. */
-const PERSONA_NAME_MAX = 20;
+/** The legacy CDO stored access names in a 20-character field, so anything at exactly 20 may be cut off. */
+const LEGACY_ROLE_NAME_MAX = 20;
 
-/** Only a production persona list settles whether a persona really exists. */
+/** Only a production role list settles whether a role really exists. */
 const PRODUCTION_SOURCE = /^(prod|production)$/i;
 
-const PERSONA_SOURCE_LABEL_MAX = 40;
+const ROLE_SOURCE_LABEL_MAX = 40;
 
 const TITLE_MAX = 80;
 
@@ -418,7 +418,7 @@ function canonicalSpellings(values) {
 }
 
 /**
- * Strips artifacts that are unambiguously not part of a persona name: a leading `=`
+ * Strips artifacts that are unambiguously not part of a role name: a leading `=`
  * (spreadsheet export), a trailing period, and stray internal whitespace.
  */
 function cleanRoleName(role) {
@@ -427,8 +427,8 @@ function cleanRoleName(role) {
 }
 
 /**
- * Detects two persona names concatenated without a delimiter, e.g.
- * `Post Purchase MgrSr. Ops Manager`. Such an entry grants access to neither persona,
+ * Detects two role names concatenated without a delimiter, e.g.
+ * `Post Purchase MgrSr. Ops Manager`. Such an entry grants access to neither role,
  * so it is a live defect rather than cosmetic drift.
  */
 function looksMerged(role) {
@@ -548,7 +548,7 @@ export function normalizeConditions(rawConditions) {
         const cleaned = cleanRoleName(rawRole);
         if (cleaned !== rawRole) noteRoleDefect('role_artifact', rawRole, code, { cleaned });
         if (looksMerged(cleaned)) noteRoleDefect('merged_role_names', cleaned, code);
-        if (cleaned.length === PERSONA_NAME_MAX) noteRoleDefect('possible_truncated_role', cleaned, code);
+        if (cleaned.length === LEGACY_ROLE_NAME_MAX) noteRoleDefect('possible_truncated_role', cleaned, code);
         roles.push(canonicalRole.get(foldKey(cleaned)) || cleaned);
       }
       access[tag] = [...new Set(roles)].sort();
@@ -626,7 +626,7 @@ function aclFingerprint(access) {
 
 /**
  * Collapses the per-condition ACLs into distinct profiles. Enhanced Conditions cannot
- * store these, so the output is a configuration worksheet: each profile is a persona
+ * store these, so the output is a configuration worksheet: each profile is a role
  * access pattern an administrator applies once, rather than 826 times.
  */
 export function buildAclProfiles(conditions) {
@@ -721,7 +721,7 @@ export function buildConditionTemplatePayloads(conditions) {
     }));
 }
 
-/** Abbreviations the CDO uses where the persona list spells the word out. */
+/** Abbreviations the CDO uses where the role list spells the word out. */
 const ROLE_ABBREVIATIONS = new Map([
   ['mgr', 'manager'],
   ['mgrs', 'managers'],
@@ -751,47 +751,74 @@ function tokenSimilarity(a, b) {
 }
 
 /**
- * Matches the role names found in the CDO against the personas that actually exist in
- * Encompass. Unmatched names cannot be configured and must be resolved by hand, so each
- * one is returned with ranked candidates and a probable cause.
+ * Accepts the `GET /encompass/v3/settings/roles` (or v1) response shape — `roleID`,
+ * `roleName`, `roleAbbr` — as well as plain names and `{ id, name }` objects.
  */
-export function reconcilePersonas(conditions, personas = []) {
+function normalizeRole(entry) {
+  if (typeof entry === 'string') return entry.trim() ? { id: null, name: entry.trim(), abbr: null } : null;
+  if (!entry || typeof entry !== 'object') return null;
+  const name = String(entry.roleName ?? entry.name ?? '').trim();
+  if (!name) return null;
+  const abbr = String(entry.roleAbbr ?? entry.abbr ?? '').trim();
+  return { id: entry.roleID ?? entry.roleId ?? entry.id ?? null, name, abbr: abbr || null };
+}
+
+/**
+ * Matches the access names found in the CDO against the roles that actually exist in
+ * Encompass, by full role name or role abbreviation. Unmatched names cannot be configured
+ * and must be resolved by hand, so each one is returned with ranked candidates and a
+ * probable cause.
+ */
+export function reconcileRoles(conditions, roles = []) {
   const roleNames = new Set();
   for (const condition of conditions) {
     for (const tag of ACCESS_TAGS) for (const role of condition.access[tag]) roleNames.add(role);
   }
 
-  const known = personas
-    .map((persona) => (typeof persona === 'string' ? { name: persona } : persona))
-    .filter((persona) => persona?.name);
-  const byFold = new Map(known.map((persona) => [foldKey(persona.name), persona]));
+  const known = [];
+  const seen = new Set();
+  for (const entry of Array.isArray(roles) ? roles : []) {
+    const role = normalizeRole(entry);
+    if (!role || seen.has(foldKey(role.name))) continue;
+    seen.add(foldKey(role.name));
+    known.push(role);
+  }
+  const byFold = new Map();
+  for (const role of known) byFold.set(foldKey(role.name), role);
+  for (const role of known) {
+    if (role.abbr && !byFold.has(foldKey(role.abbr))) byFold.set(foldKey(role.abbr), role);
+  }
 
   const matched = [];
   const unmatched = [];
 
-  for (const role of [...roleNames].sort()) {
-    const exact = byFold.get(foldKey(role));
+  for (const name of [...roleNames].sort()) {
+    const exact = byFold.get(foldKey(name));
     if (exact) {
-      matched.push({ role, persona: { id: exact.id, name: exact.name } });
+      matched.push({
+        role: name,
+        encompassRole: { id: exact.id, name: exact.name, abbr: exact.abbr },
+        via: foldKey(exact.name) === foldKey(name) ? 'name' : 'abbreviation',
+      });
       continue;
     }
 
-    const fold = foldKey(role);
+    const fold = foldKey(name);
     const candidates = known
-      .map((persona) => {
-        const personaFold = foldKey(persona.name);
-        const prefix = personaFold.startsWith(fold) || fold.startsWith(personaFold);
-        const score = Math.max(tokenSimilarity(role, persona.name), prefix ? 0.75 : 0);
-        return { id: persona.id, name: persona.name, score: Number(score.toFixed(2)) };
+      .map((role) => {
+        const roleFold = foldKey(role.name);
+        const prefix = roleFold.startsWith(fold) || fold.startsWith(roleFold);
+        const score = Math.max(tokenSimilarity(name, role.name), prefix ? 0.75 : 0);
+        return { id: role.id, name: role.name, abbr: role.abbr, score: Number(score.toFixed(2)) };
       })
       .filter((candidate) => candidate.score >= 0.5)
       .sort((a, b) => b.score - a.score)
       .slice(0, 3);
 
     unmatched.push({
-      role,
-      likelyTruncated: role.length === PERSONA_NAME_MAX,
-      likelyMerged: looksMerged(role),
+      role: name,
+      likelyTruncated: name.length === LEGACY_ROLE_NAME_MAX,
+      likelyMerged: looksMerged(name),
       candidates,
     });
   }
@@ -800,13 +827,13 @@ export function reconcilePersonas(conditions, personas = []) {
     roleCount: roleNames.size,
     matched,
     unmatched,
-    personaCount: byFold.size,
+    encompassRoleCount: known.length,
     impact: measureStaleness(conditions, new Set(unmatched.map((entry) => entry.role))),
   };
 }
 
 /**
- * Measures how much of the legacy ACL still refers to personas that exist. A permission
+ * Measures how much of the legacy ACL still refers to roles that exist. A permission
  * list whose every role is gone currently grants access to nobody, so it is a silent
  * lockout rather than a naming inconsistency.
  */
@@ -836,13 +863,13 @@ function measureStaleness(conditions, unresolvedRoles) {
 }
 
 /**
- * Records where the persona list came from. A reconciliation run against anything but
- * production is provisional: persona names drift between environments, so a clean match
- * in UAT does not prove the persona exists where the conditions will be configured.
+ * Records where the role list came from. A reconciliation run against anything but
+ * production is provisional: role names drift between environments, so a clean match
+ * in UAT does not prove the role exists where the conditions will be configured.
  */
-export function describePersonaSource(source, personaCount = 0) {
-  const label = String(source ?? '').trim().slice(0, PERSONA_SOURCE_LABEL_MAX);
-  const supplied = personaCount > 0;
+export function describeRoleSource(source, roleCount = 0) {
+  const label = String(source ?? '').trim().slice(0, ROLE_SOURCE_LABEL_MAX);
+  const supplied = roleCount > 0;
   return {
     label: label || null,
     supplied,
@@ -851,15 +878,15 @@ export function describePersonaSource(source, personaCount = 0) {
   };
 }
 
-function personaSourceSentence(personaSource) {
-  if (!personaSource.supplied) {
-    return 'Persona source: none supplied — persona reconciliation was skipped.';
+function roleSourceSentence(roleSource) {
+  if (!roleSource.supplied) {
+    return 'Role source: none supplied — role reconciliation was skipped.';
   }
-  if (personaSource.production) {
-    return `Persona source: ${personaSource.label} — authoritative.`;
+  if (roleSource.production) {
+    return `Role source: ${roleSource.label} — authoritative.`;
   }
-  const named = personaSource.label ? `${personaSource.label}` : 'unlabelled';
-  return `Persona source: ${named} — provisional. Persona names drift between environments, `
+  const named = roleSource.label ? `${roleSource.label}` : 'unlabelled';
+  return `Role source: ${named} — provisional. Role names drift between environments, `
     + 're-run against production before configuring anything.';
 }
 
@@ -886,7 +913,7 @@ export function renderMigrationReport(bundle) {
   push();
   push(`Generated ${bundle.generatedAt}`);
   push();
-  push(personaSourceSentence(bundle.personaSource));
+  push(roleSourceSentence(bundle.roleSource));
   push();
   push('| Metric | Value |');
   push('| --- | --- |');
@@ -895,10 +922,10 @@ export function renderMigrationReport(bundle) {
   push(`| Condition types generated | ${summary.conditionTypes} |`);
   push(`| Distinct ACL profiles | ${summary.aclProfiles} |`);
   push(`| ACL profiles used by one condition | ${summary.singleUseAclProfiles} |`);
-  push(`| Distinct persona names referenced | ${summary.distinctRoles} |`);
-  push(`| Persona names not matched | ${summary.unresolvedRoles} |`);
-  push(`| Conditions referencing a missing persona | ${summary.conditionsWithUnresolvedRoles} |`);
-  push(`| Permission lists granting access to nobody | ${summary.permissionListsGrantingNobody} of ${bundle.personaReconciliation.impact.permissionLists} |`);
+  push(`| Distinct role names referenced | ${summary.distinctRoles} |`);
+  push(`| Role names not matched | ${summary.unresolvedRoles} |`);
+  push(`| Conditions referencing a missing role | ${summary.conditionsWithUnresolvedRoles} |`);
+  push(`| Permission lists granting access to nobody | ${summary.permissionListsGrantingNobody} of ${bundle.roleReconciliation.impact.permissionLists} |`);
   push(`| Automatic fixes applied | ${summary.autoFixed} |`);
   push(`| Items needing a decision | ${summary.needsReview} |`);
   push();
@@ -937,35 +964,35 @@ export function renderMigrationReport(bundle) {
 
   push('## ACL profiles');
   push();
-  push('Enhanced Conditions has no per-condition ACL. Each profile below is a persona access');
+  push('Enhanced Conditions has no per-condition ACL. Each profile below is a role access');
   push('pattern to configure once in Encompass admin, replacing the per-condition role lists.');
   push();
   push('| Profile | Conditions | Add | Waive |');
   push('| --- | --- | --- | --- |');
   for (const profile of bundle.aclProfiles.slice(0, 25)) {
     push(
-      `| ${profile.profileId} | ${profile.conditionCount} | ${profile.permissions.Add.length} personas | ${profile.permissions.SetStatusWaived.length} personas |`,
+      `| ${profile.profileId} | ${profile.conditionCount} | ${profile.permissions.Add.length} roles | ${profile.permissions.SetStatusWaived.length} roles |`,
     );
   }
   if (bundle.aclProfiles.length > 25) push(`| _...${bundle.aclProfiles.length - 25} more_ | | | |`);
   push();
 
-  if (bundle.personaReconciliation.personaCount === 0) {
-    push('## Persona reconciliation');
+  if (bundle.roleReconciliation.encompassRoleCount === 0) {
+    push('## Role reconciliation');
     push();
-    push('Skipped — no persona list supplied. Re-run with `--personas` once you have');
-    push('`GET /encompass/v3/settings/personas` saved to disk.');
+    push('Skipped — no role list supplied. Re-run with `--roles` once you have');
+    push('`GET /encompass/v3/settings/roles` saved to disk.');
     push();
   } else {
-    push('## Unresolved persona names');
+    push('## Unresolved role names');
     push();
-    if (bundle.personaSource.provisional) {
-      push(`_Matched against ${bundle.personaSource.label || 'an unlabelled list'}, not production._`);
+    if (bundle.roleSource.provisional) {
+      push(`_Matched against ${bundle.roleSource.label || 'an unlabelled list'}, not production._`);
       push();
     }
     push('| CDO role name | Likely cause | Candidates in Encompass |');
     push('| --- | --- | --- |');
-    for (const entry of bundle.personaReconciliation.unmatched) {
+    for (const entry of bundle.roleReconciliation.unmatched) {
       const cause = entry.likelyMerged
         ? 'two names merged'
         : entry.likelyTruncated
@@ -981,20 +1008,20 @@ export function renderMigrationReport(bundle) {
 }
 
 /** Assembles the dry-run bundle: payloads to review, plus everything needing a decision. */
-export function buildMigrationBundle(cdoInput, { personas = [], personaSource = null } = {}) {
+export function buildMigrationBundle(cdoInput, { roles = [], roleSource = null } = {}) {
   const xml = decodeConditionsCdo(cdoInput);
   const raw = parseConditionsXml(xml);
   const { conditions, issues } = normalizeConditions(raw);
   const { profiles, assignments } = buildAclProfiles(conditions);
-  const personaReconciliation = reconcilePersonas(conditions, personas);
-  const describedSource = describePersonaSource(personaSource, personaReconciliation.personaCount);
+  const roleReconciliation = reconcileRoles(conditions, roles);
+  const describedSource = describeRoleSource(roleSource, roleReconciliation.encompassRoleCount);
 
   const conditionTypes = buildConditionTypePayloads(conditions);
   const conditionTemplates = buildConditionTemplatePayloads(conditions);
 
   return {
     generatedAt: new Date().toISOString(),
-    personaSource: describedSource,
+    roleSource: describedSource,
     summary: {
       conditionsParsed: raw.length,
       conditionsConverted: conditionTemplates.length,
@@ -1003,17 +1030,17 @@ export function buildMigrationBundle(cdoInput, { personas = [], personaSource = 
       singleUseAclProfiles: profiles.filter((p) => p.singleUse).length,
       autoFixed: issues.filter((i) => i.severity === 'auto_fixed').length,
       needsReview: issues.filter((i) => i.severity === 'needs_review').length,
-      distinctRoles: personaReconciliation.roleCount,
-      unresolvedRoles: personaReconciliation.unmatched.length,
-      conditionsWithUnresolvedRoles: personaReconciliation.impact.conditionsWithUnresolvedRoles,
-      permissionListsGrantingNobody: personaReconciliation.impact.permissionListsGrantingNobody,
+      distinctRoles: roleReconciliation.roleCount,
+      unresolvedRoles: roleReconciliation.unmatched.length,
+      conditionsWithUnresolvedRoles: roleReconciliation.impact.conditionsWithUnresolvedRoles,
+      permissionListsGrantingNobody: roleReconciliation.impact.permissionListsGrantingNobody,
     },
     conditions,
     conditionTypes,
     conditionTemplates,
     aclProfiles: profiles,
     aclAssignments: assignments,
-    personaReconciliation,
+    roleReconciliation,
     issues,
   };
 }

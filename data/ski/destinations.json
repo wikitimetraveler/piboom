@@ -24,6 +24,21 @@
       "mapsDest": "Mountain High Resort, Wrightwood, CA"
     },
     {
+      "id": "mt-baldy",
+      "name": "Mt. Baldy",
+      "area": "Mt Baldy",
+      "route": "mt-baldy",
+      "dem": "mt-baldy",
+      "lat": 34.2706,
+      "lng": -117.6215,
+      "baseFt": 6500,
+      "summitFt": 8600,
+      "typicalDriveMin": 75,
+      "highways": ["CA-57", "I-10 / CA-210", "Mt Baldy Rd"],
+      "chainHighways": ["Mt Baldy Rd"],
+      "mapsDest": "Mt. Baldy Resort, Mt Baldy, CA"
+    },
+    {
       "id": "snow-valley",
       "name": "Snow Valley",
       "area": "Running Springs",
