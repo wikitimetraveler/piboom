@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<!--
+  Genealogy source file.
+  Author: Levi Lane.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lane Relationships &amp; 1891 Register — DevConnect Labs</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" crossorigin="anonymous"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/family/css/lane-shell.css"/>
+  <link rel="stylesheet" href="/family/css/genealogy-tree-page.css"/>
+  <link rel="stylesheet" href="/family/css/lane-tts.css"/>
+  <link rel="stylesheet" href="/family/css/lane-family-pill-nav.css"/>
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/family/js/lane-family-pill-nav.js" defer></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body class="genealogy-tree-page lane-relationships-page">
+<div class="particles" id="particles"></div>
+<modern-navbar></modern-navbar>
+
+<div class="container mt-4 mb-5 lane-tools-page" data-lane-tts-main>
+  <nav class="lane-family-crumb mb-2" aria-label="Breadcrumb">
+    <a href="/family/lane-family.html">Lane Family hub</a>
+    <span aria-hidden="true"> · </span>
+    <a href="/family/genealogy.html">Family tree</a>
+    <span aria-hidden="true"> · </span>
+    <span>Relationships &amp; register</span>
+  </nav>
+
+  <header class="lane-page-head mb-3">
+    <h1 class="lane-page-title">
+      <i class="bi bi-link-45deg" aria-hidden="true"></i>
+      <span class="lane-page-title__text">Lane Relationships &amp; 1891 Register</span>
+    </h1>
+    <p class="lane-page-lead text-muted mb-2">
+      Browse father, mother, and spouse links decoded from <em>Lane Genealogies</em> (1891)—numbered families,
+      carry-forward children, and the PDF page each edge came from.
+    </p>
+    <p class="small border-start border-2 ps-3 mb-0" style="border-color: rgba(0,0,0,0.15) !important;">
+      <strong>Context:</strong> how the printed register is organized.
+      <strong>Evidence:</strong> each link’s book code and PDF page in Postgres (or the in-memory graph fallback).
+    </p>
+  </header>
+
+  <div class="d-flex flex-wrap gap-2 mb-3">
+    <a class="btn btn-outline-secondary btn-sm" href="/family/lane-family.html"><i class="bi-house-heart"></i> Hub</a>
+    <a class="btn btn-outline-secondary btn-sm" href="/family/genealogy.html"><i class="bi-diagram-3"></i> Full tree page</a>
+    <a class="btn btn-outline-info btn-sm" href="/family/lane-pdf-gallery.html"><i class="bi-images"></i> Book plates</a>
+    <a class="btn btn-outline-secondary btn-sm" href="/family/lane-direct-ancestor-story.html"><i class="bi-signpost-2"></i> Direct line</a>
+  </div>
+
+  <div class="mb-3">
+    <p class="small text-muted text-uppercase mb-2" style="font-size:0.65rem;letter-spacing:0.08em">Quick jumps · numbered families</p>
+    <div class="d-flex flex-wrap gap-2" role="group" aria-label="Notable register families">
+      <button type="button" class="btn btn-sm btn-outline-primary" data-show-family="1" data-section="boston" data-family-no="1">
+        No. 1 · William Lane of Boston
+      </button>
+      <button type="button" class="btn btn-sm btn-outline-primary" data-show-family="2" data-section="boston" data-family-no="2">
+        No. 2 · Samuel Lane
+      </button>
+      <button type="button" class="btn btn-sm btn-outline-primary" data-show-family="3" data-section="boston" data-family-no="3">
+        No. 3 · William Lane II
+      </button>
+      <button type="button" class="btn btn-sm btn-outline-primary" data-show-family="1" data-section="buxton" data-family-no="1">
+        Buxton · No. 1
+      </button>
+    </div>
+  </div>
+
+  <div id="relStatsBar" class="rel-stats-bar small mb-4" aria-live="polite"></div>
+
+  <div class="row g-4">
+    <div class="col-12 col-xl-7">
+      <section class="family-tree-container h-100" aria-labelledby="relGraphHeading">
+        <h2 class="h4" id="relGraphHeading"><i class="bi-diagram-3"></i> Relationship graph</h2>
+        <p class="text-muted small mb-3">
+          Links from the 1891 register —
+          <strong>No.&nbsp;N</strong> family blocks, <strong>(N)</strong> carry-forward children, and pedigree chains —
+          stored with the book page each link came from.
+        </p>
+
+        <form class="row g-2 align-items-end mb-2" id="graphControls" onsubmit="return false;">
+          <div class="col-6 col-md-3">
+            <label class="form-label small mb-1" for="graphScope">Show</label>
+            <select class="form-select form-select-sm" id="graphScope">
+              <option value="register">Book register (all coded links)</option>
+              <option value="family" selected>One family + descendants</option>
+            </select>
+          </div>
+          <div class="col-6 col-md-3">
+            <label class="form-label small mb-1" for="graphSection">Book part</label>
+            <select class="form-select form-select-sm" id="graphSection">
+              <option value="">All parts</option>
+              <option value="boston" selected>Part I · William Lane of Boston</option>
+              <option value="buxton">Part II · Buxton</option>
+              <option value="fishersfield">Part III · Fishersfield</option>
+              <option value="additions">Additions</option>
+            </select>
+          </div>
+          <div class="col-4 col-md-2">
+            <label class="form-label small mb-1" for="graphFamilyNo">Family No.</label>
+            <input type="text" inputmode="numeric" class="form-control form-control-sm" id="graphFamilyNo" value="1" placeholder="e.g. 3">
+          </div>
+          <div class="col-4 col-md-2">
+            <label class="form-label small mb-1" for="graphDepth">Generations</label>
+            <select class="form-select form-select-sm" id="graphDepth">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="5">5</option>
+              <option value="0" selected>Whole family</option>
+            </select>
+          </div>
+          <div class="col-4 col-md-2 d-grid">
+            <button type="button" class="btn btn-primary btn-sm" id="graphApply"><i class="bi-arrow-repeat"></i> Draw</button>
+          </div>
+          <div class="col-12 d-flex flex-wrap gap-3 small">
+            <label class="form-check-label"><input type="checkbox" class="form-check-input me-1" data-graph-relation="father" checked>Father</label>
+            <label class="form-check-label"><input type="checkbox" class="form-check-input me-1" data-graph-relation="mother" checked>Mother</label>
+            <label class="form-check-label"><input type="checkbox" class="form-check-input me-1" data-graph-relation="spouse" checked>Spouse</label>
+            <label class="form-check-label"><input type="checkbox" class="form-check-input me-1" id="graphBookOnly">Book-coded links only</label>
+          </div>
+        </form>
+
+        <div id="d3-visualization" class="genealogy-graph" aria-label="Relationship graph">
+          <p class="text-muted mb-0">Loading relationship graph…</p>
+        </div>
+        <div class="genealogy-graph-legend small mt-2" aria-hidden="true">
+          <span><i class="legend-line legend-father"></i> father</span>
+          <span><i class="legend-line legend-mother"></i> mother</span>
+          <span><i class="legend-line legend-spouse"></i> spouse</span>
+          <span><i class="legend-line legend-legacy"></i> earlier tree link (not from book code)</span>
+          <span><i class="legend-dot legend-head"></i> heads a numbered family</span>
+          <span class="text-muted" id="graphSummary"></span>
+        </div>
+
+        <div id="registerFamilyPanel" class="mt-3"></div>
+      </section>
+    </div>
+
+    <div class="col-12 col-xl-5">
+      <section class="family-tree-container h-100" aria-labelledby="relExplorerHeading">
+        <h2 class="h4" id="relExplorerHeading"><i class="bi-search"></i> Relationships explorer</h2>
+        <p class="text-muted small mb-3">
+          Every parent / spouse link in <code>lane_relationship</code>. Book-coded rows show the register
+          code (family No., child numeral, carry-forward) and the PDF page.
+        </p>
+
+        <form class="row g-2 align-items-end mb-3" id="relFilters" onsubmit="return false;">
+          <div class="col-12 col-md-6">
+            <label class="form-label small mb-1" for="relQ">Name</label>
+            <input type="search" class="form-control form-control-sm" id="relQ" placeholder="e.g. Joshua">
+          </div>
+          <div class="col-6 col-md-6">
+            <label class="form-label small mb-1" for="relRelation">Relation</label>
+            <select class="form-select form-select-sm" id="relRelation">
+              <option value="">Any</option>
+              <option value="father">Father</option>
+              <option value="mother">Mother</option>
+              <option value="spouse">Spouse</option>
+              <option value="associated">Associated</option>
+            </select>
+          </div>
+          <div class="col-6 col-md-4">
+            <label class="form-label small mb-1" for="relSection">Book part</label>
+            <select class="form-select form-select-sm" id="relSection">
+              <option value="">Any</option>
+              <option value="boston">Part I · Boston</option>
+              <option value="buxton">Part II · Buxton</option>
+              <option value="fishersfield">Part III · Fishersfield</option>
+              <option value="additions">Additions</option>
+            </select>
+          </div>
+          <div class="col-4 col-md-2">
+            <label class="form-label small mb-1" for="relFamilyNo">No.</label>
+            <input type="number" min="1" class="form-control form-control-sm" id="relFamilyNo">
+          </div>
+          <div class="col-4 col-md-2">
+            <label class="form-label small mb-1" for="relPdfPage">PDF p.</label>
+            <input type="number" min="1" class="form-control form-control-sm" id="relPdfPage">
+          </div>
+          <div class="col-4 col-md-2 d-flex align-items-center pt-3">
+            <label class="form-check-label small"><input type="checkbox" class="form-check-input me-1" id="relBookOnly">Book</label>
+          </div>
+          <div class="col-12 d-grid">
+            <button type="button" class="btn btn-primary btn-sm" id="relSearch"><i class="bi-search"></i> Find links</button>
+          </div>
+        </form>
+        <div id="relResults"></div>
+      </section>
+    </div>
+  </div>
+
+  <details class="mt-4 small text-muted">
+    <summary>How register codes work</summary>
+    <ul class="mt-2 mb-0">
+      <li><strong>No.&nbsp;N</strong> — a numbered family block in the book (head, wife, children).</li>
+      <li><strong>(N)</strong> before a child’s roman numeral — that child heads family No.&nbsp;N later in the register.</li>
+      <li><strong>Pedigree</strong> — abbreviated father → grandfather chain printed after the head’s name.</li>
+      <li>Unmatched names stay on a review list; this tool never invents new people.</li>
+    </ul>
+    <p class="mt-2 mb-0">
+      Deep link examples:
+      <code>?familyNo=3&amp;section=boston</code>,
+      <code>?q=Lane&amp;relation=father&amp;bookOnly=1</code>,
+      <code>?id=10</code>.
+    </p>
+  </details>
+</div>
+
+<!-- Person Details Modal -->
+<div class="modal fade" id="personDetailModal" tabindex="-1" role="dialog" aria-labelledby="personDetailModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="personDetailModalTitle">Person Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="personDetailModalBody">
+        <p class="text-muted mb-0">Select a person to view details.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container text-center mt-2 mb-4" data-lane-site-credit></div>
+<script src="/family/js/lane-site-credit.js"></script>
+<script src="/family/js/genealogy-relationships.js"></script>
+<script src="/shared/tts.js"></script>
+<script src="/family/js/lane-tts.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+<script src="/shared/dark-mode.js"></script>
+</body>
+</html>

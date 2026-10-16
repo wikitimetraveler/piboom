@@ -71,6 +71,7 @@
     "generate:lane-labs-intro-chat": "node scripts/tools/generate-lane-labs-intro-chat.mjs --force --wait --cache-local",
     "smoke:heygen-lane": "node scripts/tools/generate-lane-heygen-line.mjs --person jonathan-homer-lane --photo --short --smoke --force --direct --cache-local",
     "migrate:lane-json-postgres": "node scripts/migrate-lane-json-to-postgres.mjs",
+    "resolve:lane-genealogy-codes": "node scripts/resolve-lane-genealogy-codes.mjs",
     "build:us-geo": "node scripts/tools/build-us-geo-assets.mjs",
     "ingest:newport-pier": "node scripts/tools/ingest-newport-pier-video.mjs --input \"C:/Users/levij/Downloads/IMG_0847.MOV\"",
     "download:newport-pier-fish": "node scripts/tools/download-newport-pier-fish-images.mjs",

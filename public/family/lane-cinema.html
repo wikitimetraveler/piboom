@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<!--
+  Genealogy source file.
+  Author: Levi Lane.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lane Family Cinema — The Lane Chronicle</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="/shared/styles.css" />
+  <link rel="stylesheet" href="/family/css/lane-shell.css" />
+  <link rel="stylesheet" href="/family/css/lane-tts.css" />
+  <link rel="stylesheet" href="/family/css/lane-family-pill-nav.css" />
+  <link rel="stylesheet" href="/family/css/lane-cinema.css" />
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/family/js/lane-family-pill-nav.js" defer></script>
+</head>
+<body class="lane-cinema-page">
+  <div class="particles" id="particles"></div>
+  <modern-navbar></modern-navbar>
+
+  <div class="container mt-4 mb-5 lane-tools-page lane-cinema-wrap" data-lane-tts-main>
+    <nav class="lane-family-crumb" aria-label="Breadcrumb">
+      <a href="/family/lane-family.html">Lane Family hub</a>
+      <span aria-hidden="true"> · </span>
+      <span>Cinema</span>
+    </nav>
+
+    <header class="lane-cinema-hero mb-4">
+      <p class="lane-cinema-kicker">Lane Family Cinema · 16:9 featurette</p>
+      <h1 class="lane-cinema-title">The Lane Chronicle</h1>
+      <p class="lane-cinema-lede text-muted mb-0">
+        Four centuries in code and voice — HeyGen ancestor portraits, 1891 register codes, and the live Postgres relationship graph.
+        ~2&nbsp;min&nbsp;30&nbsp;sec · Evidence vs Context on every beat.
+      </p>
+    </header>
+
+    <div class="alert alert-secondary border lane-cinema-onboard mb-4" role="region" aria-label="How to watch">
+      <strong>How to watch.</strong>
+      Press <em>Play chronicle</em> for the continuous Live Stage (HeyGen clips + register cards).
+      Jump chapters anytime. Open Evidence / Context below the stage for citations and deep links.
+      Prefer a single MP4 when rendered? Use <em>Director’s cut</em>.
+    </div>
+
+    <div class="lane-cinema-toolbar d-flex flex-wrap gap-2 align-items-center mb-3">
+      <button type="button" class="btn btn-primary" id="lcPlay" aria-pressed="false">
+        <i class="bi bi-play-fill" aria-hidden="true"></i> Play chronicle
+      </button>
+      <button type="button" class="btn btn-outline-secondary" id="lcPause" disabled>
+        <i class="bi bi-pause-fill" aria-hidden="true"></i> Pause
+      </button>
+      <button type="button" class="btn btn-outline-secondary" id="lcRestart">
+        <i class="bi bi-skip-start-fill" aria-hidden="true"></i> Restart
+      </button>
+      <div class="form-check form-switch ms-md-2 mb-0">
+        <input class="form-check-input" type="checkbox" id="lcRenderedMode" />
+        <label class="form-check-label small" for="lcRenderedMode">Director’s cut (MP4)</label>
+      </div>
+      <span class="small text-muted ms-auto" id="lcClock" aria-live="polite">0:00 / 2:30</span>
+    </div>
+
+    <nav class="lane-cinema-chapters mb-3" id="lcChapters" aria-label="Chronicle chapters"></nav>
+
+    <div class="lane-cinema-stage-wrap mb-3">
+      <div id="lcLiveStage" class="lane-cinema-stage" aria-label="Live stage player">
+        <div class="lane-cinema-stage__glow" aria-hidden="true"></div>
+        <div class="lane-cinema-stage__grid">
+          <div class="lane-cinema-av" id="lcAv">
+            <video id="lcVideo" playsinline controlsList="nodownload" poster=""></video>
+            <video id="lcVideoSecondary" playsinline muted hidden></video>
+            <img id="lcStill" class="lane-cinema-still" alt="" hidden />
+          </div>
+          <div class="lane-cinema-copy">
+            <p class="lane-cinema-stage-kicker" id="lcKicker"></p>
+            <h2 class="lane-cinema-stage-title" id="lcTitle"></h2>
+            <p class="lane-cinema-badge" id="lcBadge" hidden></p>
+            <p class="lane-cinema-detail" id="lcDetail"></p>
+            <div class="lane-cinema-stats" id="lcStats" hidden>
+              <div class="lane-cinema-stat"><span class="lane-cinema-stat__label">Families</span><span class="lane-cinema-stat__value" id="lcStatFamilies">180</span></div>
+              <div class="lane-cinema-stat"><span class="lane-cinema-stat__label">Coded</span><span class="lane-cinema-stat__value" id="lcStatCoded">650</span></div>
+              <div class="lane-cinema-stat"><span class="lane-cinema-stat__label">Book links</span><span class="lane-cinema-stat__value" id="lcStatLinks">567</span></div>
+            </div>
+            <div class="lane-cinema-legend" id="lcLegend" hidden aria-hidden="true">
+              <span><i class="lane-cinema-swatch lane-cinema-swatch--father"></i>father</span>
+              <span><i class="lane-cinema-swatch lane-cinema-swatch--mother"></i>mother</span>
+              <span><i class="lane-cinema-swatch lane-cinema-swatch--spouse"></i>spouse</span>
+            </div>
+            <div class="lane-cinema-quartet" id="lcQuartet" hidden></div>
+          </div>
+        </div>
+        <div class="lane-cinema-progress" aria-hidden="true">
+          <div class="lane-cinema-progress__bar" id="lcProgress"></div>
+        </div>
+      </div>
+
+      <div id="lcRenderedWrap" class="lane-cinema-rendered d-none" aria-label="Director’s cut MP4">
+        <video id="lcRenderedVideo" controls playsinline class="w-100"></video>
+        <p class="small text-muted mt-2 mb-0" id="lcRenderedHint">
+          Rendered HyperFrames MP4 appears here when available at
+          <code>/family/assets/video/lane-chronicle-movie.mp4</code>.
+        </p>
+      </div>
+    </div>
+
+    <section class="lane-cinema-inspector card border-0 shadow-sm mb-4" aria-labelledby="lcInspectorHeading">
+      <div class="card-body">
+        <h2 class="h5 mb-3" id="lcInspectorHeading">Evidence vs Context</h2>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <p class="lane-cinema-panel-label">Evidence</p>
+            <p class="mb-2" id="lcEvidence"></p>
+            <div class="d-flex flex-wrap gap-2" id="lcEvidenceLinks"></div>
+          </div>
+          <div class="col-md-6">
+            <p class="lane-cinema-panel-label">Context</p>
+            <p class="mb-0" id="lcContext"></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <details class="lane-cinema-drawer mb-4">
+      <summary>Director’s beat sheet &amp; teleprompter</summary>
+      <div class="lane-cinema-drawer__body">
+        <p class="small text-muted">
+          Full production notes live in the repo at
+          <code>docs/LANE_CHRONICLE_MOVIE_SCRIPT.md</code>
+          · HyperFrames project <code>video/lane-chronicle/</code>
+          · Catalog <code>/data/lane-chronicle-movie.json</code>
+        </p>
+        <div id="lcBeatSheet"></div>
+        <h3 class="h6 mt-3">Teleprompter (active beat)</h3>
+        <blockquote class="lane-cinema-teleprompt" id="lcTeleprompter"></blockquote>
+      </div>
+    </details>
+
+    <p class="small text-muted mb-4">
+      Continue in
+      <a href="/family/genealogy.html">relationship graph</a>,
+      <a href="/family/lane-pdf-gallery.html">book plates</a>,
+      <a href="/family/lane-museum.html">museum</a>, or
+      <a href="/heygen-hub.html">HeyGen hub</a>.
+    </p>
+    <div class="text-center" data-lane-site-credit></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="/family/js/lane-site-credit.js"></script>
+  <script src="/family/js/lane-cinema.js"></script>
+</body>
+</html>

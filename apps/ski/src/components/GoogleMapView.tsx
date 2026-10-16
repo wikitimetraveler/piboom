@@ -21,11 +21,14 @@ interface Props {
   onPin?: (id: string) => void;
   onSelectRun?: (id: string | null) => void;
   fitKey?: string;
+  /** Opens centered here (e.g. the base lodge) instead of fitting the whole frame, when there are no tracks or pins. */
+  focus?: { lat: number; lng: number } | null;
 }
 
 const hex = (n: number) => `#${n.toString(16).padStart(6, '0')}`;
+const FOCUS_ZOOM = 16;
 
-export default function GoogleMapView({ frame, trails, resortId, selectedRunId, tracks, pins, onPin, onSelectRun, fitKey }: Props) {
+export default function GoogleMapView({ frame, trails, resortId, selectedRunId, tracks, pins, onPin, onSelectRun, fitKey, focus }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<GMaps | null>(null);
   const [lib, setLib] = useState<{ maps: GMaps; Marker: GMaps } | null>(null);
@@ -47,8 +50,8 @@ export default function GoogleMapView({ frame, trails, resortId, selectedRunId, 
       const m = new Map(host.current, {
         mapId: 'DEMO_MAP_ID',
         mapTypeId: 'hybrid',
-        center: { lat: (frame.south + frame.north) / 2, lng: (frame.west + frame.east) / 2 },
-        zoom: 14,
+        center: focus ? { lat: focus.lat, lng: focus.lng } : { lat: (frame.south + frame.north) / 2, lng: (frame.west + frame.east) / 2 },
+        zoom: focus ? FOCUS_ZOOM : 14,
         gestureHandling: 'greedy',
         streetViewControl: false,
         fullscreenControl: true,
@@ -161,6 +164,11 @@ export default function GoogleMapView({ frame, trails, resortId, selectedRunId, 
       ...(tracks || []).flatMap((t) => t.points.map(([lat, lng]) => ({ lat, lng }))),
       ...(pins || []).map((p) => ({ lat: p.lat, lng: p.lng })),
     ];
+    if (!pts.length && focus) {
+      map.setCenter({ lat: focus.lat, lng: focus.lng });
+      map.setZoom(FOCUS_ZOOM);
+      return;
+    }
     const box = boundsOf(pts) || frame;
     map.fitBounds({ south: box.south, north: box.north, west: box.west, east: box.east }, 40);
     // Refit only when the caller says the subject changed, not on every live update.

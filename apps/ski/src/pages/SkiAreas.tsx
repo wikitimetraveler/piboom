@@ -8,7 +8,7 @@ import GoogleEarthView from '../components/GoogleEarthView';
 import GoogleMapView from '../components/GoogleMapView';
 import MapModeSwitch, { useMapMode } from '../components/MapModeSwitch';
 import { boundsOf } from '../lib/googleMaps';
-import { demHeightFt } from '../lib/terrainData';
+import { demHeightFt, resortBaseView } from '../lib/terrainData';
 import type { BriefPayload, DemGrid, DestinationBrief, TrailsPayload } from '../lib/types';
 import { formatFt } from '../lib/goNoGo';
 import { filterActive, filterRuns, sortRuns, type RunFilter, type SortKey } from '../lib/trails';
@@ -55,11 +55,18 @@ export default function SkiAreas(props: Props) {
   );
   const selectedRun = resortRuns.find((r) => r.id === selectedRunId) || null;
   const [mapMode, setMapMode] = useMapMode();
+  const resortLifts = useMemo(
+    () => (trails && dem && trails.id === dem.id ? trails.lifts.filter((l) => l.resort === dest?.id) : []),
+    [trails, dem, dest]
+  );
   const resortBox = useMemo(() => {
-    const lifts = trails && dem && trails.id === dem.id ? trails.lifts.filter((l) => l.resort === dest?.id) : [];
-    const pts = [...resortRuns.flatMap((r) => r.paths.flat()), ...lifts.flatMap((l) => l.coords)];
+    const pts = [...resortRuns.flatMap((r) => r.paths.flat()), ...resortLifts.flatMap((l) => l.coords)];
     return boundsOf(pts.map(([lat, lng]) => ({ lat, lng })));
-  }, [resortRuns, trails, dem, dest]);
+  }, [resortRuns, resortLifts]);
+  const baseView = useMemo(
+    () => (dem ? resortBaseView(dem, resortLifts, resortRuns) : null),
+    [dem, resortLifts, resortRuns]
+  );
 
   const pickResort = (id: string) => {
     if (view === 'resort') {
@@ -154,7 +161,8 @@ export default function SkiAreas(props: Props) {
                   resortId={dest?.id}
                   selectedRunId={selectedRunId}
                   onSelectRun={onSelectRun}
-                  fitKey={`${dest?.id}:${dem.id}:${resortBox ? 1 : 0}`}
+                  focus={baseView}
+                  fitKey={`${dest?.id}:${dem.id}:${resortBox ? 1 : 0}:${baseView ? 1 : 0}`}
                 />
               ) : (
                 <GoogleEarthView
@@ -162,7 +170,8 @@ export default function SkiAreas(props: Props) {
                   groundFt={(lat, lng) => demHeightFt(dem, lat, lng)}
                   trails={trails && trails.id === dem.id ? trails : null}
                   resortId={dest?.id}
-                  fitKey={`${dest?.id}:${dem.id}:${resortBox ? 1 : 0}`}
+                  focus={baseView}
+                  fitKey={`${dest?.id}:${dem.id}:${resortBox ? 1 : 0}:${baseView ? 1 : 0}`}
                 />
               )}
               <MapModeSwitch mode={mapMode} onMode={setMapMode} />

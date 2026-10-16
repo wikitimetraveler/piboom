@@ -2,6 +2,31 @@
   "version": 1,
   "videos": [
     {
+      "id": "lane-chronicle-featurette",
+      "kind": "hyperframes",
+      "videoId": null,
+      "title": "The Lane Chronicle: Four Centuries in Code and Voice",
+      "domain": "lane",
+      "variant": "featurette",
+      "videoUrl": "/family/assets/video/lane-chronicle-movie.mp4",
+      "portraitUrl": "/family/assets/lane-historians/frontispiece-title-1891.png",
+      "sourcePage": "/family/lane-cinema.html",
+      "studioPage": "/family/lane-cinema.html?play=1",
+      "projectDir": "video/lane-chronicle",
+      "subtitle": "2.5-minute 16:9 · HeyGen ancestors + 1891 codes",
+      "scriptPreview": "In eighteen ninety-one, Jacob Chapman and James Fitts printed Volume One of Lane Genealogies in Exeter, New Hampshire. Inside its pages, a nineteenth-century register code linked four centuries of New England lives.",
+      "tags": [
+        "lane",
+        "chronicle",
+        "hyperframes",
+        "heygen",
+        "genealogy-codes",
+        "featurette"
+      ],
+      "generatedAt": "2026-10-16T04:00:00.000Z",
+      "hostedLocally": true
+    },
+    {
       "id": "disasters-briefing-8d358bc039b84fa4b8d195f474b53d9a",
       "kind": "heygen",
       "videoId": "8d358bc039b84fa4b8d195f474b53d9a",

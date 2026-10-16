@@ -19,6 +19,9 @@ import {
   getPeopleAliveDuring,
   getPeopleByGeneration,
   getFamilyStats,
+  listRelationships,
+  getRelationshipStats,
+  getGenealogyCodeRegister,
   getMuseumContent,
   getFeaturedStory,
   getProminentLanes,
@@ -294,6 +297,49 @@ export async function getStats(req, res) {
       success: false,
       error: error.message
     });
+  }
+}
+
+/**
+ * Relationship explorer (Postgres lane_relationship): ?relation=&section=&familyNo=&pdfPage=&personId=&q=&bookOnly=&limit=&offset=
+ */
+export async function getRelationshipList(req, res) {
+  try {
+    const result = await listRelationships(req.query || {});
+    res.json({ success: true, ...result });
+  } catch (error) {
+    console.error('Error listing relationships:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+export async function getRelationshipStatsData(req, res) {
+  try {
+    const stats = await getRelationshipStats();
+    res.json({ success: true, stats });
+  } catch (error) {
+    console.error('Error getting relationship stats:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+/**
+ * Decoded 1891 register: GET /genealogy-codes (index) or /genealogy-codes/:section/:familyNo (one family).
+ */
+export async function getGenealogyCodes(req, res) {
+  try {
+    const { section, familyNo } = req.params || {};
+    const register = getGenealogyCodeRegister({ section: section || 'boston', familyNo: familyNo ?? null });
+    if (!register) {
+      return res.status(404).json({
+        success: false,
+        error: familyNo ? 'Family not found in the decoded register' : 'Genealogy code register not built (npm run resolve:lane-genealogy-codes)'
+      });
+    }
+    res.json({ success: true, ...register });
+  } catch (error) {
+    console.error('Error getting genealogy codes:', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 }
 

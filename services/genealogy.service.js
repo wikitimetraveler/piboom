@@ -11,8 +11,11 @@ import { fileURLToPath } from 'url';
 import {
   backfillLaneDataFromFilesystem,
   getAllLaneDatasetsFromPostgres,
-  getLaneGraphDataFromPostgres
+  getLaneGraphDataFromPostgres,
+  getLaneRelationshipStatsFromPostgres,
+  queryLaneRelationshipsFromPostgres
 } from './lane-postgres.service.js';
+import { SECTION_LABELS as GENEALOGY_SECTION_LABELS } from './lane-genealogy-codes.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1943,7 +1946,8 @@ export function getRelationships(personId) {
     return {
       relation: rel.relation,
       person: otherPerson,
-      direction: isSource ? 'from' : 'to'
+      direction: isSource ? 'from' : 'to',
+      provenance: rel.provenance || null
     };
   });
 }
@@ -2098,7 +2102,184 @@ export function getFamilyStats() {
     generationCounts,
     genderCounts,
     yearRange: { min: minYear, max: maxYear },
-    timespan: maxYear - minYear
+    timespan: maxYear - minYear,
+    relationshipBreakdown: summarizeRelationships(links),
+    genealogyCodes: {
+      codedPeople: people.filter((p) => p && p.genealogyCode).length,
+      source: 'lanegenealogies01chap.pdf'
+    }
+  };
+}
+
+function summarizeRelationships(links = []) {
+  const byRelation = {};
+  for (const link of links) {
+    const rel = String(link?.relation || 'unknown');
+    const row = byRelation[rel] || (byRelation[rel] = { relation: rel, total: 0, fromBook: 0, confirmed: 0 });
+    row.total += 1;
+    if (link.provenance) {
+      row.fromBook += 1;
+      if (link.provenance.confirmed) row.confirmed += 1;
+    }
+  }
+  return Object.values(byRelation).sort((a, b) => a.relation.localeCompare(b.relation));
+}
+
+const RELATIONSHIP_FILTER_RELATIONS = new Set(['father', 'mother', 'spouse', 'associated']);
+
+function normalizeRelationshipFilters(filters = {}) {
+  const intOrNull = (v) => {
+    const n = Number.parseInt(v, 10);
+    return Number.isFinite(n) ? n : null;
+  };
+  const relation = String(filters.relation || '').trim().toLowerCase();
+  return {
+    relation: RELATIONSHIP_FILTER_RELATIONS.has(relation) ? relation : null,
+    section: filters.section && GENEALOGY_SECTION_LABELS[filters.section] ? String(filters.section) : null,
+    familyNo: intOrNull(filters.familyNo),
+    pdfPage: intOrNull(filters.pdfPage),
+    personId: intOrNull(filters.personId),
+    q: String(filters.q || '').trim().slice(0, 80) || null,
+    bookOnly: filters.bookOnly === true || filters.bookOnly === 'true' || filters.bookOnly === '1',
+    limit: Math.min(Math.max(intOrNull(filters.limit) || 100, 1), 500),
+    offset: Math.max(intOrNull(filters.offset) || 0, 0)
+  };
+}
+
+function listRelationshipsFromMemory(f) {
+  const data = getAllFamilyData() || { nodes: [], links: [] };
+  const byId = new Map((data.nodes || []).map((n) => [n.id, n]));
+  const q = f.q ? f.q.toLowerCase() : null;
+  const rows = [];
+  (data.links || []).forEach((link, i) => {
+    const p = link.provenance || null;
+    if (f.relation && link.relation !== f.relation) return;
+    if (f.personId != null && link.source !== f.personId && link.target !== f.personId) return;
+    if ((f.bookOnly || f.section || f.familyNo != null || f.pdfPage != null) && !p) return;
+    if (f.section && p.section !== f.section) return;
+    if (f.familyNo != null && Number(p.familyNo) !== f.familyNo) return;
+    if (f.pdfPage != null && Number(p.pdfPage) !== f.pdfPage) return;
+    const s = byId.get(link.source);
+    const t = byId.get(link.target);
+    if (!s || !t) return;
+    if (q && !String(s.name || '').toLowerCase().includes(q) && !String(t.name || '').toLowerCase().includes(q)) return;
+    rows.push({
+      id: i + 1,
+      relation: link.relation,
+      source: { id: s.id, name: s.name, birthYear: Number.parseInt(s.birthYear, 10) || null },
+      target: { id: t.id, name: t.name, birthYear: Number.parseInt(t.birthYear, 10) || null },
+      provenance: p
+    });
+  });
+  return { total: rows.length, limit: f.limit, offset: f.offset, relationships: rows.slice(f.offset, f.offset + f.limit) };
+}
+
+/**
+ * Relationship explorer: Postgres `lane_relationship` first (filterable by book provenance), in-memory graph fallback.
+ */
+export async function listRelationships(filters = {}) {
+  const f = normalizeRelationshipFilters(filters);
+  try {
+    const pg = await queryLaneRelationshipsFromPostgres(f);
+    if (pg) return { ...pg, filters: f, backend: 'postgres' };
+  } catch {
+    // fall through to the in-memory graph
+  }
+  return { ...listRelationshipsFromMemory(f), filters: f, backend: 'memory' };
+}
+
+/** Relationship counts by relation + book provenance (Postgres when available). */
+export async function getRelationshipStats() {
+  try {
+    const pg = await getLaneRelationshipStatsFromPostgres();
+    if (pg) return { ...pg, backend: 'postgres' };
+  } catch {
+    // fall through
+  }
+  const data = getAllFamilyData() || { nodes: [], links: [] };
+  return {
+    byRelation: summarizeRelationships(data.links || []),
+    codedPeople: (data.nodes || []).filter((p) => p && p.genealogyCode).length,
+    backend: 'memory'
+  };
+}
+
+let genealogyCodeRegisterCache = null;
+
+function loadGenealogyCodeRegister() {
+  const pgDoc = getLaneDatasetDoc('lane-genealogy-codes');
+  if (pgDoc) return pgDoc;
+  if (genealogyCodeRegisterCache) return genealogyCodeRegisterCache;
+  try {
+    const p = path.join(__dirname, '..', 'data', 'lane-genealogy-codes.json');
+    genealogyCodeRegisterCache = JSON.parse(fs.readFileSync(p, 'utf-8'));
+  } catch {
+    genealogyCodeRegisterCache = null;
+  }
+  return genealogyCodeRegisterCache;
+}
+
+function registerPersonRef(personId, fallbackName) {
+  if (personId == null) return { id: null, name: fallbackName || null };
+  const node = getPersonById(personId);
+  return { id: personId, name: node?.name || fallbackName || null, birthYear: node?.birthYear ?? null };
+}
+
+/**
+ * Decoded 1891 register (No. N families, carry-forward codes, pedigrees) from dataset `lane-genealogy-codes`.
+ * Without `familyNo`: legend, stats, and a compact family index. With `familyNo` (+ section): full family detail.
+ */
+export function getGenealogyCodeRegister({ section = 'boston', familyNo = null } = {}) {
+  const doc = loadGenealogyCodeRegister();
+  if (!doc) return null;
+  const families = Array.isArray(doc.families) ? doc.families : [];
+  const sectionKey = GENEALOGY_SECTION_LABELS[section] ? section : 'boston';
+  if (familyNo == null || familyNo === '') {
+    return {
+      source: doc.source,
+      generatedAt: doc.generatedAt,
+      legend: doc.legend,
+      stats: doc.stats,
+      sections: GENEALOGY_SECTION_LABELS,
+      families: families.map((f) => ({
+        section: f.section,
+        familyNo: f.familyNo,
+        familyKey: f.familyKey,
+        pdfPage: f.pdfPage,
+        generation: f.generation,
+        head: f.head ? { name: f.head.name, personId: f.head.personId ?? null, birthYear: f.head.birthYear ?? null } : null,
+        wives: (f.wives || []).map((w) => ({ name: w.name, personId: w.personId ?? null })),
+        parentFamilyNo: f.parentLink?.familyNo ?? null,
+        childCount: (f.children || []).filter((c) => c.level === 1).length
+      }))
+    };
+  }
+  const key = String(familyNo).trim();
+  const family = families.find((f) => f.section === sectionKey && (String(f.familyKey) === key || String(f.familyNo) === key));
+  if (!family) return null;
+  const parent = family.parentLink
+    ? families.find((f) => f.section === family.section && f.familyNo === family.parentLink.familyNo)
+    : null;
+  const childFamilies = families.filter((f) => f.section === family.section && f.parentLink?.familyNo === family.familyNo);
+  return {
+    source: doc.source,
+    legend: doc.legend,
+    section: family.section,
+    sectionLabel: GENEALOGY_SECTION_LABELS[family.section],
+    family: {
+      ...family,
+      head: family.head ? { ...family.head, person: registerPersonRef(family.head.personId, family.head.name) } : null,
+      wives: (family.wives || []).map((w) => ({ ...w, person: registerPersonRef(w.personId, w.name) })),
+      children: (family.children || []).map((c) => ({ ...c, person: c.personId != null ? registerPersonRef(c.personId, c.name) : null }))
+    },
+    parentFamily: parent ? { familyNo: parent.familyNo, familyKey: parent.familyKey, head: parent.head?.name || null, pdfPage: parent.pdfPage } : null,
+    childFamilies: childFamilies.map((f) => ({ familyNo: f.familyNo, familyKey: f.familyKey, head: f.head?.name || null, pdfPage: f.pdfPage })),
+    review: (doc.review || [])
+      .filter((r) => {
+        const label = family.section === 'boston' ? `No. ${family.familyKey}` : `${GENEALOGY_SECTION_LABELS[family.section]} · No. ${family.familyKey}`;
+        return r.family === label || String(r.family || '').startsWith(`${label} `);
+      })
+      .slice(0, 50)
   };
 }
 
@@ -2123,6 +2304,9 @@ export default {
   getPeopleAliveDuring,
   getPeopleByGeneration,
   getFamilyStats,
+  listRelationships,
+  getRelationshipStats,
+  getGenealogyCodeRegister,
   getMuseumContent,
   getFeaturedStory,
   getProminentLanes,

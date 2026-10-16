@@ -67,6 +67,28 @@ def test_split_segments_glued_no():
     assert any("ISAAC" in s or "Isaac" in s for s in segs)
 
 
+def test_carry_forward_child_marker():
+    """Book code "(4) I." = child I who heads family No. 4 — still a direct child (level 1)."""
+    child = p.parse_child_line("(4) I. SAMUEL 3, b. 26 Mar., 1680; m. Abi Hovey.")
+    assert child is not None
+    assert child["carryForwardNo"] == 4
+    assert child["markerLevel"] == 1
+    plain = p.parse_child_line("II. MARY 3, b. 1683.")
+    assert plain is not None
+    assert plain["carryForwardNo"] is None
+
+
+def test_split_segments_strips_running_headers():
+    page = "12 WILLIAM LANE AND FAMILY. II. MARY 3, b. 1683. NUMBER THREE. 13 III. JOHN 3, b. 1685."
+    joined = " | ".join(p.split_segments(page))
+    assert "WILLIAM LANE AND FAMILY" not in joined
+    assert "NUMBER THREE" not in joined
+    assert "MARY" in joined and "JOHN" in joined
+    buxton = " | ".join(p.split_segments("270 THE BUXTON LANE FAMILY. IV. JOHN 4, b. 1763."))
+    assert "BUXTON LANE FAMILY" not in buxton
+    assert "JOHN" in buxton
+
+
 def test_ocr_name_fix():
     assert "Jacob" in p.apply_ocr_name_fixes("Facob Lane")
 
@@ -91,6 +113,8 @@ if __name__ == "__main__":
     test_eu_dox_glued_header_line()
     test_header_lifespan_and_honorific()
     test_split_segments_glued_no()
+    test_carry_forward_child_marker()
+    test_split_segments_strips_running_headers()
     test_ocr_name_fix()
     test_split_honorifics_lieutenant_and_captain()
     test_unfuse_jammed_lieutenant_ocr()

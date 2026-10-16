@@ -73,6 +73,12 @@
     <a class="btn btn-outline-info btn-sm me-2" href="/family/lane-pdf-gallery.html">
       <i class="bi-images"></i> Book plates (PDF)
     </a>
+    <a class="btn btn-outline-primary btn-sm me-2" href="/family/lane-relationships.html">
+      <i class="bi-link-45deg"></i> Relationships &amp; register
+    </a>
+    <a class="btn btn-outline-dark btn-sm me-2" href="/family/lane-cinema.html?play=1">
+      <i class="bi-film"></i> Lane Cinema (Chronicle)
+    </a>
     <a class="btn btn-outline-info btn-sm me-2" href="/family/lane-direct-ancestor-story.html">
       <i class="bi-signpost-2"></i> Direct Ancestor Story
     </a>
@@ -119,6 +125,11 @@
       </a>
     </li>
     <li class="nav-item">
+      <a class="nav-link" id="relationships-tab" data-bs-toggle="tab" href="#relationships" role="tab">
+        <i class="bi-link-45deg"></i> Relationships (Postgres)
+      </a>
+    </li>
+    <li class="nav-item">
       <a class="nav-link" id="api-tab" data-bs-toggle="tab" href="#api" role="tab">
         <i class="bi-code-slash"></i> API Info
       </a>
@@ -130,16 +141,68 @@
     <!-- Family Tree Tab -->
     <div class="tab-pane fade show active" id="tree" role="tabpanel">
       <div class="family-tree-container">
-        <h3><i class="bi-diagram-3"></i> D3.js Family Tree Visualization</h3>
-        <p class="text-info"><i class="bi-info-circle"></i> Your Ben Garvey-style D3 visualization will embed here!</p>
-        
-        <!-- D3 Visualization Preview -->
-        <div id="d3-visualization">
-          <i class="bi-diagram-3" style="font-size: 4rem; color: #3498db; opacity: 0.5;"></i>
-          <h4 class="mt-3">Interactive D3 Family Tree Visualization</h4>
-          <p class="text-muted">Full-screen force-directed graph with timeline animation</p>
-          <p class="text-info"><strong>400+ years • 1,877 people • 3,000+ relationships</strong></p>
+        <h3><i class="bi-diagram-3"></i> Relationship Graph</h3>
+        <p class="text-muted small mb-3">
+          Links decoded from the 1891 <em>Lane Genealogies</em> register codes —
+          <strong>No.&nbsp;N</strong> family blocks, <strong>(N)</strong> carry-forward children, and pedigree chains —
+          stored in Postgres with the book page each link came from.
+        </p>
+
+        <form class="row g-2 align-items-end mb-2" id="graphControls" onsubmit="return false;">
+          <div class="col-6 col-md-3">
+            <label class="form-label small mb-1" for="graphScope">Show</label>
+            <select class="form-select form-select-sm" id="graphScope">
+              <option value="register" selected>Book register (all coded links)</option>
+              <option value="family">One family + descendants</option>
+            </select>
+          </div>
+          <div class="col-6 col-md-3">
+            <label class="form-label small mb-1" for="graphSection">Book part</label>
+            <select class="form-select form-select-sm" id="graphSection">
+              <option value="">All parts</option>
+              <option value="boston">Part I · William Lane of Boston</option>
+              <option value="buxton">Part II · Buxton</option>
+              <option value="fishersfield">Part III · Fishersfield</option>
+              <option value="additions">Additions</option>
+            </select>
+          </div>
+          <div class="col-4 col-md-2">
+            <label class="form-label small mb-1" for="graphFamilyNo">Family No.</label>
+            <input type="text" inputmode="numeric" class="form-control form-control-sm" id="graphFamilyNo" placeholder="e.g. 3">
+          </div>
+          <div class="col-4 col-md-2">
+            <label class="form-label small mb-1" for="graphDepth">Generations</label>
+            <select class="form-select form-select-sm" id="graphDepth">
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+              <option value="3">3</option>
+              <option value="5">5</option>
+            </select>
+          </div>
+          <div class="col-4 col-md-2 d-grid">
+            <button type="button" class="btn btn-primary btn-sm" id="graphApply"><i class="bi-arrow-repeat"></i> Draw</button>
+          </div>
+          <div class="col-12 d-flex flex-wrap gap-3 small">
+            <label class="form-check-label"><input type="checkbox" class="form-check-input me-1" data-graph-relation="father" checked>Father</label>
+            <label class="form-check-label"><input type="checkbox" class="form-check-input me-1" data-graph-relation="mother" checked>Mother</label>
+            <label class="form-check-label"><input type="checkbox" class="form-check-input me-1" data-graph-relation="spouse" checked>Spouse</label>
+            <label class="form-check-label"><input type="checkbox" class="form-check-input me-1" id="graphBookOnly" checked>Book-coded links only</label>
+          </div>
+        </form>
+
+        <div id="d3-visualization" class="genealogy-graph" aria-label="Relationship graph">
+          <p class="text-muted mb-0">Loading relationship graph…</p>
         </div>
+        <div class="genealogy-graph-legend small mt-2" aria-hidden="true">
+          <span><i class="legend-line legend-father"></i> father</span>
+          <span><i class="legend-line legend-mother"></i> mother</span>
+          <span><i class="legend-line legend-spouse"></i> spouse</span>
+          <span><i class="legend-line legend-legacy"></i> earlier tree link (not from book code)</span>
+          <span><i class="legend-dot legend-head"></i> heads a numbered family</span>
+          <span class="text-muted" id="graphSummary"></span>
+        </div>
+
+        <div id="registerFamilyPanel" class="mt-3"></div>
         
         <div class="mt-4">
           <button class="btn btn-success btn-lg" onclick="exportFamilyData()">
@@ -182,6 +245,59 @@
       </div>
     </div>
 
+    <!-- Relationships Explorer Tab -->
+    <div class="tab-pane fade" id="relationships" role="tabpanel">
+      <div class="family-tree-container">
+        <h3><i class="bi-link-45deg"></i> Relationships Explorer</h3>
+        <p class="text-muted small">
+          Every parent / spouse link in the <code>lane_relationship</code> table. Book-coded rows show the register
+          code they were decoded from (family No., child numeral, carry-forward) and the PDF page.
+        </p>
+        <div id="relStatsBar" class="rel-stats-bar small mb-3"></div>
+        <form class="row g-2 align-items-end mb-3" id="relFilters" onsubmit="return false;">
+          <div class="col-12 col-md-3">
+            <label class="form-label small mb-1" for="relQ">Name</label>
+            <input type="search" class="form-control form-control-sm" id="relQ" placeholder="e.g. Joshua">
+          </div>
+          <div class="col-6 col-md-2">
+            <label class="form-label small mb-1" for="relRelation">Relation</label>
+            <select class="form-select form-select-sm" id="relRelation">
+              <option value="">Any</option>
+              <option value="father">Father</option>
+              <option value="mother">Mother</option>
+              <option value="spouse">Spouse</option>
+              <option value="associated">Associated</option>
+            </select>
+          </div>
+          <div class="col-6 col-md-2">
+            <label class="form-label small mb-1" for="relSection">Book part</label>
+            <select class="form-select form-select-sm" id="relSection">
+              <option value="">Any</option>
+              <option value="boston">Part I · Boston</option>
+              <option value="buxton">Part II · Buxton</option>
+              <option value="fishersfield">Part III · Fishersfield</option>
+              <option value="additions">Additions</option>
+            </select>
+          </div>
+          <div class="col-4 col-md-1">
+            <label class="form-label small mb-1" for="relFamilyNo">No.</label>
+            <input type="number" min="1" class="form-control form-control-sm" id="relFamilyNo">
+          </div>
+          <div class="col-4 col-md-1">
+            <label class="form-label small mb-1" for="relPdfPage">PDF p.</label>
+            <input type="number" min="1" class="form-control form-control-sm" id="relPdfPage">
+          </div>
+          <div class="col-4 col-md-1 d-flex align-items-center">
+            <label class="form-check-label small"><input type="checkbox" class="form-check-input me-1" id="relBookOnly" checked>Book</label>
+          </div>
+          <div class="col-12 col-md-2 d-grid">
+            <button type="button" class="btn btn-primary btn-sm" id="relSearch"><i class="bi-search"></i> Find links</button>
+          </div>
+        </form>
+        <div id="relResults"></div>
+      </div>
+    </div>
+
     <!-- API Info Tab -->
     <div class="tab-pane fade" id="api" role="tabpanel">
       <div class="family-tree-container">
@@ -215,7 +331,15 @@
           </div>
           <div class="list-group-item">
             <code>GET /api/genealogy/stats</code>
-            <p>Get family tree statistics</p>
+            <p>Get family tree statistics (includes relationship breakdown by relation and book provenance)</p>
+          </div>
+          <div class="list-group-item">
+            <code>GET /api/genealogy/relationships?relation=&amp;section=&amp;familyNo=&amp;pdfPage=&amp;q=&amp;bookOnly=1</code>
+            <p>Filterable relationship list from Postgres with the book code + PDF page for each decoded link</p>
+          </div>
+          <div class="list-group-item">
+            <code>GET /api/genealogy/genealogy-codes</code> · <code>GET /api/genealogy/genealogy-codes/:section/:familyNo</code>
+            <p>Decoded 1891 register: family index, or one No.&nbsp;N family with head, wives, numbered children and linked families</p>
           </div>
         </div>
         
@@ -358,6 +482,56 @@ function spouseHintsFromOcrGenealogy(ocrFacts) {
   return [...new Set(ocrFacts.marriageSnippets.map((s) => String(s || '').trim()).filter((s) => s.length >= 2))];
 }
 
+const GENEALOGY_SECTION_SHORT = { boston: 'Part I', buxton: 'Part II · Buxton', fishersfield: 'Part III · Fishersfield', additions: 'Additions' };
+
+function bookCitation(prov) {
+  if (!prov) return '';
+  const part = prov.section && prov.section !== 'boston' ? `${GENEALOGY_SECTION_SHORT[prov.section] || prov.section} · ` : '';
+  const bits = [`${part}No. ${prov.familyNo}`];
+  if (prov.childOrder) bits.push(`${prov.carryForwardNo ? `(${prov.carryForwardNo}) ` : ''}${prov.childOrder}`);
+  if (prov.pdfPage) bits.push(`PDF p. ${prov.pdfPage}`);
+  return bits.join(' · ');
+}
+
+function renderGenealogyCodeBlock(person, fam) {
+  const code = person && person.genealogyCode;
+  const bookLinks = (fam.allRelationships || []).filter((r) => r && r.provenance && r.person);
+  if (!code && !bookLinks.length) return '';
+  const familyBtn = code && code.familyKey
+    ? `<button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="window.GenealogyRelationships && GenealogyRelationships.showFamily('${esc(code.section)}', '${esc(code.familyKey)}')">
+         <i class="bi-diagram-3"></i> Family No. ${esc(code.familyKey)}</button>`
+    : '';
+  const parentBtn = code && code.parentFamilyNo
+    ? `<button type="button" class="btn btn-sm btn-outline-secondary ms-2" onclick="window.GenealogyRelationships && GenealogyRelationships.showFamily('${esc(code.section)}', '${esc(code.parentFamilyNo)}')">
+         <i class="bi-arrow-up"></i> Born in No. ${esc(code.parentFamilyNo)}</button>`
+    : '';
+  const rows = bookLinks
+    .map((r) => {
+      const rel = r.direction === 'from' || r.relation === 'spouse' ? r.relation : 'child';
+      return `<li><span class="badge text-bg-light border me-1">${esc(rel)}</span>
+        <a href="#" onclick="viewPerson(${Number(r.person.id)}); return false;">${esc(formatPersonDisplayName(r.person))}</a>
+        <span class="text-muted">— ${esc(bookCitation(r.provenance))}${r.provenance.confirmed ? ' · confirms earlier link' : ''}</span></li>`;
+    })
+    .join('');
+  return `
+    <div class="genealogy-code-card mb-3">
+      ${code ? `
+      <div class="d-flex flex-wrap align-items-center gap-1 mb-1">
+        <span class="badge genealogy-code-badge" title="1891 register code">${esc(code.label || '')}</span>
+        ${familyBtn}${parentBtn}
+      </div>
+      <div class="small text-muted">
+        ${esc(code.sectionLabel || '')}${code.generation ? ` · generation ${esc(code.generation)}` : ''}${code.pdfPage ? ` · PDF p. ${esc(code.pdfPage)}` : ''}
+      </div>
+      ${code.pedigreeText ? `<div class="small mt-1"><strong>Pedigree:</strong> ${esc(code.pedigreeText)}
+        <span class="text-muted">(father, grandfather, … as printed)</span></div>` : ''}
+      ${code.lifespan ? `<div class="small"><strong>Book lifespan:</strong> ${esc(code.lifespan)}</div>` : ''}` : ''}
+      ${bookLinks.length ? `
+      <div class="small text-muted text-uppercase mt-2 mb-1" style="font-size:0.65rem;letter-spacing:0.08em">Links decoded from the book</div>
+      <ul class="small mb-0 ps-3">${rows}</ul>` : ''}
+    </div>`;
+}
+
 function renderPersonDetail(person, family, musicalEra, lanePdfPortraits) {
   const fam = family || {};
   const lp = Array.isArray(lanePdfPortraits) ? lanePdfPortraits : [];
@@ -455,6 +629,7 @@ function renderPersonDetail(person, family, musicalEra, lanePdfPortraits) {
     : '';
   return `
     ${portraitBlock}
+    ${renderGenealogyCodeBlock(person, fam)}
     <dl class="row mb-2">
       ${titleRow}
       <dt class="col-sm-3">Birth</dt><dd class="col-sm-9">${esc(formatLifeDate(person, 'birthYear', 'birthDate'))}</dd>
@@ -662,6 +837,7 @@ async function testAPI() {
 }
 </script>
 
+<script src="/family/js/genealogy-relationships.js"></script>
 <script src="/shared/tts.js"></script>
   <script src="/family/js/lane-tts.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>

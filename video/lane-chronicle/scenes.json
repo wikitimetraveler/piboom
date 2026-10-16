@@ -1,0 +1,18 @@
+{
+  "id": "lane-chronicle",
+  "title": "The Lane Chronicle: Four Centuries in Code and Voice",
+  "durationSec": 150,
+  "width": 1920,
+  "height": 1080,
+  "catalog": "../../data/lane-chronicle-movie.json",
+  "publishTarget": "../../public/family/assets/video/lane-chronicle-movie.mp4",
+  "beats": [
+    { "id": "hook", "start": 0, "duration": 16 },
+    { "id": "william", "start": 16, "duration": 24 },
+    { "id": "sarah", "start": 40, "duration": 24 },
+    { "id": "cornet", "start": 64, "duration": 24 },
+    { "id": "cosmos", "start": 88, "duration": 28 },
+    { "id": "graph", "start": 116, "duration": 20 },
+    { "id": "finale", "start": 136, "duration": 14 }
+  ]
+}

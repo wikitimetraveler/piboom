@@ -1,0 +1,320 @@
+/**
+ * Development work by David Lane
+ * Genealogy source file. Author: Levi Lane.
+ *
+ * Lane Family Cinema — The Lane Chronicle live stage.
+ */
+
+body.lane-cinema-page {
+  --lane-heritage-ink: #2c2824;
+  --lc-bg: #13151a;
+  --lc-surface: #1b1e26;
+  --lc-text: #ece8df;
+  --lc-muted: #b6b0a5;
+  --lc-accent: #ae9a78;
+  --lc-gold: #c4b896;
+  --lc-border: rgba(236, 232, 223, 0.16);
+  --lc-father: #3399ff;
+  --lc-mother: #ff3399;
+  --lc-spouse: #b8b800;
+}
+
+.lane-cinema-wrap {
+  max-width: 1100px;
+}
+
+.lane-cinema-kicker {
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--lc-accent);
+  margin-bottom: 0.4rem;
+}
+
+.lane-cinema-title {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(1.85rem, 4vw, 2.6rem);
+  color: var(--lane-heritage-ink, #2c2824);
+  margin-bottom: 0.55rem;
+}
+
+.lane-cinema-lede {
+  max-width: 46rem;
+  line-height: 1.55;
+}
+
+.lane-cinema-onboard {
+  border-left: 4px solid var(--lc-accent) !important;
+  font-size: 0.95rem;
+}
+
+.lane-cinema-chapters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.lane-cinema-chapters button {
+  border: 1px solid rgba(44, 40, 36, 0.2);
+  background: #fff;
+  color: var(--lane-heritage-ink, #2c2824);
+  border-radius: 999px;
+  padding: 0.28rem 0.75rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.lane-cinema-chapters button:hover,
+.lane-cinema-chapters button:focus-visible {
+  border-color: var(--lc-accent);
+  outline: none;
+}
+
+.lane-cinema-chapters button.is-active {
+  background: var(--lc-bg);
+  color: var(--lc-text);
+  border-color: var(--lc-bg);
+}
+
+.lane-cinema-stage {
+  position: relative;
+  background: var(--lc-bg);
+  color: var(--lc-text);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  min-height: 420px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+}
+
+.lane-cinema-stage__glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 70% 55% at 25% 35%,
+    rgba(174, 154, 120, 0.14),
+    transparent 70%
+  );
+}
+
+.lane-cinema-stage__grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(220px, 38%) 1fr;
+  gap: 1.25rem;
+  padding: 1.35rem 1.35rem 1.75rem;
+  min-height: 420px;
+  align-items: center;
+}
+
+@media (max-width: 767.98px) {
+  .lane-cinema-stage__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lane-cinema-av {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  max-height: 420px;
+  background: var(--lc-surface);
+  border: 1px solid var(--lc-border);
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+
+.lane-cinema-av video,
+.lane-cinema-still {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: #0a0b0e;
+}
+
+.lane-cinema-av.is-wide {
+  aspect-ratio: 16 / 10;
+  max-height: none;
+}
+
+.lane-cinema-av.is-diptych {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  aspect-ratio: auto;
+  max-height: 360px;
+}
+
+.lane-cinema-av.is-diptych video {
+  height: 100%;
+  min-height: 280px;
+}
+
+.lane-cinema-stage-kicker {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--lc-accent);
+  margin-bottom: 0.35rem;
+}
+
+.lane-cinema-stage-title {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  line-height: 1.15;
+  margin-bottom: 0.65rem;
+}
+
+.lane-cinema-badge {
+  display: inline-block;
+  border: 1px solid var(--lc-border);
+  border-radius: 0.25rem;
+  padding: 0.35rem 0.65rem;
+  color: var(--lc-gold);
+  font-size: 0.9rem;
+  margin-bottom: 0.65rem;
+}
+
+.lane-cinema-detail {
+  color: var(--lc-muted);
+  font-size: 0.98rem;
+  line-height: 1.45;
+  margin-bottom: 0.75rem;
+}
+
+.lane-cinema-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.lane-cinema-stat {
+  border-left: 1px solid var(--lc-accent);
+  padding-left: 0.75rem;
+}
+
+.lane-cinema-stat__label {
+  display: block;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lc-accent);
+}
+
+.lane-cinema-stat__value {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 1.55rem;
+}
+
+.lane-cinema-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: var(--lc-muted);
+  margin-bottom: 0.5rem;
+}
+
+.lane-cinema-swatch {
+  display: inline-block;
+  width: 1.25rem;
+  height: 0.28rem;
+  margin-right: 0.35rem;
+  vertical-align: middle;
+}
+
+.lane-cinema-swatch--father { background: var(--lc-father); }
+.lane-cinema-swatch--mother { background: var(--lc-mother); }
+.lane-cinema-swatch--spouse { background: var(--lc-spouse); }
+
+.lane-cinema-quartet {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.45rem;
+  margin-top: 0.5rem;
+}
+
+.lane-cinema-quartet img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border: 1px solid var(--lc-border);
+  border-radius: 0.15rem;
+}
+
+.lane-cinema-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.lane-cinema-progress__bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--lc-accent), var(--lc-gold));
+  transition: width 0.2s linear;
+}
+
+.lane-cinema-rendered video {
+  border-radius: 0.5rem;
+  background: #000;
+  max-height: 70vh;
+}
+
+.lane-cinema-panel-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lc-accent);
+  margin-bottom: 0.35rem;
+}
+
+.lane-cinema-inspector {
+  background: #f7f4ef;
+}
+
+.lane-cinema-drawer summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0.65rem 0;
+}
+
+.lane-cinema-drawer__body {
+  padding: 0.25rem 0 0.75rem;
+}
+
+.lane-cinema-beat-row {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr auto;
+  gap: 0.75rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  font-size: 0.9rem;
+}
+
+.lane-cinema-beat-row strong {
+  font-family: 'Source Serif 4', Georgia, serif;
+}
+
+.lane-cinema-teleprompt {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--lane-heritage-ink, #2c2824);
+  border-left: 3px solid var(--lc-accent);
+  padding-left: 1rem;
+  margin: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lane-cinema-progress__bar {
+    transition: none;
+  }
+}

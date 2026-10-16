@@ -192,10 +192,15 @@ class ModernNavbar extends HTMLElement {
     const financeLoggedIn = this.isUserLoggedIn();
     const navFinance = this.getFinanceNavItems();
     const navMusic = cfg.NAV_MUSIC || [];
+    const navNature = cfg.NAV_NATURE || [];
     const navEnt = cfg.NAV_ENTERTAINMENT || [];
     const navMore = cfg.NAV_MORE || [];
     this.shadowRoot.innerHTML = `
       <style>
+        /* Bootstrap Icons — @import must precede every other rule */
+        @import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css');
+        @import url('/shared/bi-mountain.css');
+
         /* Professional Modern Navigation */
         .modern-navbar {
           background: color-mix(in srgb, white 82%, var(--site-card-bg, rgba(255, 255, 255, 0.97)) 18%);
@@ -275,6 +280,8 @@ class ModernNavbar extends HTMLElement {
           background: rgba(255, 255, 255, 0.98);
           backdrop-filter: blur(20px);
           min-width: 200px;
+          max-height: calc(100vh - 80px);
+          overflow-y: auto;
           z-index: 1001;
         }
         
@@ -431,13 +438,9 @@ class ModernNavbar extends HTMLElement {
             position: static;
             box-shadow: none;
             margin-left: 1rem;
+            max-height: none;
           }
         }
-        
-        /* Bootstrap Icons CDN compatibility */
-        @import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css');
-        @import url('/shared/bi-mountain.css');
-        
         /* Encompass dark mode - when body has encompass-dark-mode */
         :host-context(body.encompass-dark-mode) .modern-navbar {
           background: #161b22 !important;
@@ -521,6 +524,65 @@ class ModernNavbar extends HTMLElement {
           border-color: rgba(210, 190, 140, 0.35) !important;
           color: #ffe8b0 !important;
         }
+
+        /* Sitewide night (dark-mode.js) — matches the home page glass palette */
+        :host-context(body.dark-mode) .modern-navbar,
+        :host-context(body.dark-mode) .modern-navbar.scrolled {
+          background: rgba(11, 18, 24, 0.92);
+          border-bottom-color: rgba(255, 255, 255, 0.1);
+          box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+        }
+        :host-context(body.dark-mode) .navbar-brand-modern {
+          background: linear-gradient(135deg, #8fd0e0, #6bb3c7);
+          -webkit-background-clip: text;
+          background-clip: text;
+        }
+        :host-context(body.dark-mode) .nav-link {
+          color: #eef4f7;
+        }
+        :host-context(body.dark-mode) .nav-link:hover,
+        :host-context(body.dark-mode) .nav-link.active-page,
+        :host-context(body.dark-mode) .nav-item.dropdown.open .nav-link {
+          color: #8fd0e0;
+          background: rgba(107, 179, 199, 0.12);
+        }
+        :host-context(body.dark-mode) .dropdown-menu {
+          background: rgba(24, 34, 50, 0.96);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          box-shadow: 0 18px 48px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+        :host-context(body.dark-mode) .dropdown-item {
+          color: #d6e2ea;
+        }
+        :host-context(body.dark-mode) .dropdown-item i {
+          color: #6bb3c7;
+        }
+        :host-context(body.dark-mode) .dropdown-item:hover,
+        :host-context(body.dark-mode) .dropdown-item.active {
+          background: rgba(107, 179, 199, 0.16);
+          color: #ffffff;
+        }
+        :host-context(body.dark-mode) .dropdown-divider {
+          border-top-color: rgba(255, 255, 255, 0.1);
+        }
+        :host-context(body.dark-mode) .nav-user-btn {
+          background: rgba(107, 179, 199, 0.12);
+          border-color: rgba(107, 179, 199, 0.35);
+          color: #eef4f7;
+        }
+        :host-context(body.dark-mode) .navbar-toggler {
+          border-color: rgba(107, 179, 199, 0.35);
+          color: #eef4f7;
+        }
+        @media (max-width: 991px) {
+          :host-context(body.dark-mode) .navbar-collapse {
+            background: #0b1218;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+          }
+          :host-context(body.dark-mode) .dropdown-menu {
+            box-shadow: none;
+          }
+        }
       </style>
       
       <nav class="modern-navbar">
@@ -596,6 +658,17 @@ class ModernNavbar extends HTMLElement {
                 </div>
               </li>
 
+              ${navNature.length ? `<!-- Nature Dropdown -->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" aria-haspopup="true" aria-expanded="false" aria-label="Nature menu">
+                  <i class="bi-tree-fill"></i> Nature
+                </a>
+                <div class="dropdown-menu">
+                  ${this.renderDropdownItems(navNature)}
+                </div>
+              </li>
+              ` : ''}
+
               ${compact ? '' : `<!-- Entertainment Dropdown -->
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" aria-haspopup="true" aria-expanded="false" aria-label="Entertainment menu">
@@ -607,7 +680,7 @@ class ModernNavbar extends HTMLElement {
               </li>
               `}
 
-              <!-- More Dropdown (Bike, AI, Family, Nature) -->
+              <!-- More Dropdown (Bike, AI, Family, atlases) -->
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" aria-haspopup="true" aria-expanded="false" aria-label="More menu">
                   <i class="bi-three-dots"></i> More

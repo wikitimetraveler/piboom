@@ -225,6 +225,165 @@ const darkModeStyles = `
     color: var(--text-primary);
   }
 
+  /* Hub tool tiles (music mini-nav, Nature Hub, Entertainment) — home glass cards */
+  body.dark-mode .domain-tile {
+    background: rgba(24, 34, 50, 0.72);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 10px 28px rgba(0, 0, 0, 0.3);
+  }
+
+  body.dark-mode .domain-tile:hover {
+    background: rgba(30, 44, 64, 0.88);
+    border-color: rgba(107, 179, 199, 0.55);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 18px 40px rgba(0, 0, 0, 0.45);
+  }
+
+  body.dark-mode .domain-tile.active {
+    background: rgba(107, 179, 199, 0.16);
+    border-color: rgba(107, 179, 199, 0.6);
+  }
+
+  body.dark-mode .domain-tile i {
+    color: #8fd0e0;
+  }
+
+  body.dark-mode .domain-tile span {
+    color: #eef4f7;
+  }
+
+  /* Music + Nature hubs — home-page night wash */
+  body.dark-mode.music-menu-page,
+  body.dark-mode.nature-hub-page {
+    background:
+      radial-gradient(ellipse 80% 50% at 15% -10%, rgba(107, 179, 199, 0.16), transparent 55%),
+      radial-gradient(ellipse 70% 45% at 90% 0%, rgba(16, 185, 129, 0.1), transparent 50%),
+      linear-gradient(180deg, #0b1218 0%, #101b26 55%, #0b1218 100%);
+    background-attachment: fixed;
+  }
+
+  body.dark-mode.nature-hub-page .hub-header {
+    background: linear-gradient(135deg, rgba(27, 94, 32, 0.85), rgba(11, 18, 24, 0.9));
+    border-bottom: 1px solid rgba(139, 195, 74, 0.25);
+  }
+
+  body.dark-mode.nature-hub-page .hub-tabs .nav-link {
+    color: #a5d6a7;
+  }
+
+  body.dark-mode.nature-hub-page .hub-tabs .nav-link.active {
+    background: #2e7d32;
+    color: #fff;
+  }
+
+  body.dark-mode.nature-hub-page .gallery-item,
+  body.dark-mode.nature-hub-page .field-guide-card,
+  body.dark-mode.nature-hub-page .card {
+    background: rgba(24, 34, 50, 0.72);
+    border-color: rgba(139, 195, 74, 0.35);
+    color: var(--text-primary);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  }
+
+  body.dark-mode.nature-hub-page .gallery-item .caption {
+    background: rgba(11, 18, 24, 0.85);
+    color: var(--text-primary);
+  }
+
+  body.dark-mode.nature-hub-page #map {
+    border-color: rgba(139, 195, 74, 0.45);
+  }
+
+  body.dark-mode.nature-hub-page .text-muted {
+    color: var(--text-secondary) !important;
+  }
+
+  /* Music research / discovery / collection panels (several set light backgrounds inline) */
+  body.dark-mode.music-menu-page .kg-widget-container,
+  body.dark-mode.music-menu-page .search-container,
+  body.dark-mode.music-menu-page .map-container,
+  body.dark-mode.music-menu-page .timeline-container,
+  body.dark-mode.music-menu-page .youtube-container,
+  body.dark-mode.music-menu-page .artist-info,
+  body.dark-mode.music-menu-page .band-members,
+  body.dark-mode.music-menu-page main > .card,
+  body.dark-mode.music-menu-page .collection-setup,
+  body.dark-mode.music-menu-page .search-filter-bar,
+  body.dark-mode.music-menu-page .release-day-panel {
+    background: rgba(24, 34, 50, 0.78) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: var(--text-primary);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 14px 40px rgba(0, 0, 0, 0.35) !important;
+  }
+
+  body.dark-mode.music-menu-page .kg-result-card,
+  body.dark-mode.music-menu-page .chat-response,
+  body.dark-mode.music-menu-page #map {
+    background: rgba(11, 18, 24, 0.6) !important;
+    color: var(--text-secondary) !important;
+  }
+
+  body.dark-mode.music-menu-page .card-header,
+  body.dark-mode.music-menu-page .card-body {
+    background: transparent;
+    color: var(--text-primary);
+  }
+
+  body.dark-mode.music-menu-page .source-select,
+  body.dark-mode.music-menu-page .search-input,
+  body.dark-mode.music-menu-page #kgBtn,
+  body.dark-mode.music-menu-page .kge-search-picker,
+  body.dark-mode.music-menu-page .kge-search-picker input {
+    background: rgba(11, 18, 24, 0.85) !important;
+    border-color: rgba(107, 179, 199, 0.35) !important;
+    color: var(--text-primary) !important;
+  }
+
+  body.dark-mode.music-menu-page .artist-suggest-list {
+    background: #182232;
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
+  body.dark-mode.music-menu-page .artist-suggest-list li:hover,
+  body.dark-mode.music-menu-page .artist-suggest-list li.is-active {
+    background: rgba(107, 179, 199, 0.16);
+  }
+
+  body.dark-mode.music-menu-page .toast {
+    background: rgba(24, 34, 50, 0.96);
+    color: var(--text-primary);
+  }
+
+  /* Global tool search (navbar Search / Ctrl+K) */
+  body.dark-mode #globalToolSearchOverlay .cp-box {
+    color-scheme: dark;
+    background: rgba(24, 34, 50, 0.97);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+
+  body.dark-mode #globalToolSearchOverlay .cp-input,
+  body.dark-mode #globalToolSearchOverlay .cp-result {
+    color: #eef4f7;
+  }
+
+  body.dark-mode #globalToolSearchOverlay .cp-kbd {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.16);
+    color: #a8b8c4;
+  }
+
+  body.dark-mode #globalToolSearchOverlay .cp-result-name mark {
+    color: #8fd0e0;
+  }
+
+  body.dark-mode #globalToolSearchOverlay .cp-footer {
+    background: rgba(11, 18, 24, 0.7);
+    border-top-color: rgba(255, 255, 255, 0.08);
+  }
+
+  body.dark-mode #globalToolSearchOverlay .cp-input-row {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+  }
+
   body.dark-mode .footer {
     background: linear-gradient(135deg, var(--site-surface), var(--site-surface-muted));
     border-top-color: var(--site-border);
@@ -477,17 +636,19 @@ function initDarkMode() {
   }
 
   const isGlazedPage = document.body.classList.contains('gz-page');
+  const isNightHub = document.body.classList.contains('music-menu-page')
+    || document.body.classList.contains('nature-hub-page');
   const isMeAtlas = isMiddleEastAtlasPage();
   const storedPref = localStorage.getItem(DARK_MODE_KEY);
   const meAtlasPref = localStorage.getItem(ME_ATLAS_DARK_MODE_KEY);
 
-  // Glazed + Middle East atlas pages default to night mode.
+  // Glazed, Music, Nature Hub, and Middle East atlas pages default to night mode.
   // ME atlas uses its own key so a light/dark choice sticks without following sitewide.
   // Other pages respect saved preference or stay light.
   let shouldBeDark = false;
   if (isMeAtlas) {
     shouldBeDark = meAtlasPref === null ? true : meAtlasPref === 'true';
-  } else if (isGlazedPage) {
+  } else if (isGlazedPage || isNightHub) {
     shouldBeDark = storedPref === null ? true : storedPref === 'true';
   } else {
     shouldBeDark = storedPref === 'true';

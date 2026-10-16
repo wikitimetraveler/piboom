@@ -52,7 +52,7 @@ describe('ski-trails.service', () => {
     expect(normalizeDifficulty(undefined)).toBe('unknown');
   });
 
-  test('normalizes Overpass elements: resort polygon, nearest fallback, merge, skip areas and stations', () => {
+  test('normalizes Overpass elements: resort polygon, nearest fallback, merge, skip areas, stations, and off-boundary lifts', () => {
     const summitPoly = [
       [34.22, -116.9],
       [34.24, -116.9],
@@ -87,6 +87,11 @@ describe('ski-trails.service', () => {
       way(21, { aerialway: 'station' }, [
         [34.23, -116.89],
         [34.2301, -116.89],
+      ]),
+      // Alpine Slide chair: nearest pin is Snow Summit, but it sits outside Snow Summit's mapped boundary.
+      way(22, { aerialway: 'chair_lift' }, [
+        [34.2383, -116.9208],
+        [34.2372, -116.9187],
       ]),
     ];
     const { runs, lifts } = normalizeOsmTrails(elements, RESORTS);

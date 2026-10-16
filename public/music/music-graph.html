@@ -130,6 +130,52 @@
       cursor: pointer;
     }
 
+    .music-mini-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .music-mini-nav .domain-tile {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      min-height: 88px;
+      padding: 0.85rem 0.5rem;
+      border-radius: 14px;
+      text-decoration: none;
+      text-align: center;
+      background: rgba(24, 34, 50, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 10px 28px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .music-mini-nav .domain-tile:hover {
+      transform: translateY(-3px);
+      background: rgba(30, 44, 64, 0.88);
+      border-color: rgba(196, 181, 253, 0.55);
+    }
+
+    .music-mini-nav .domain-tile.active {
+      background: rgba(102, 126, 234, 0.2);
+      border-color: rgba(196, 181, 253, 0.6);
+    }
+
+    .music-mini-nav .domain-tile i {
+      font-size: 1.5rem;
+      color: #c4b5fd;
+    }
+
+    .music-mini-nav .domain-tile span {
+      font-size: 0.78rem;
+      font-weight: 600;
+      line-height: 1.2;
+      color: #eef4f7;
+    }
+
     #statusMessage {
       background: rgba(255, 255, 255, 0.08) !important;
       border-color: rgba(102, 126, 234, 0.3) !important;

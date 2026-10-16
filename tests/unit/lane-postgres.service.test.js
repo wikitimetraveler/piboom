@@ -21,7 +21,9 @@ const {
   getChildrenForPersonFromPostgres,
   getSpousesForPersonFromPostgres,
   getDirectAncestorLineIdsFromPostgres,
-  getDirectDescendantLineIdsFromPostgres
+  getDirectDescendantLineIdsFromPostgres,
+  queryLaneRelationshipsFromPostgres,
+  getLaneRelationshipStatsFromPostgres
 } = await import('../../services/lane-postgres.service.js');
 
 describe('lane-postgres.service', () => {
@@ -82,5 +84,65 @@ describe('lane-postgres.service', () => {
 
     await expect(getDirectAncestorLineIdsFromPostgres(10)).resolves.toEqual([10, 2]);
     await expect(getDirectDescendantLineIdsFromPostgres(10)).resolves.toEqual([10, 20]);
+  });
+
+  test('relationship explorer query filters on book provenance with bound params', async () => {
+    queryMock
+      .mockResolvedValueOnce({
+        rows: [
+          {
+            relationship_id: 7,
+            relation: 'father',
+            source_person_id: 20,
+            target_person_id: 10,
+            source_name: 'John Lane',
+            source_birth_year: 1685,
+            target_name: 'William Lane (II)',
+            target_birth_year: 1659,
+            provenance: { familyNo: 3, childOrder: 'I', pdfPage: 22 }
+          }
+        ]
+      })
+      .mockResolvedValueOnce({ rows: [{ total: 1 }] });
+
+    const out = await queryLaneRelationshipsFromPostgres({
+      relation: 'father',
+      section: 'boston',
+      familyNo: 3,
+      q: "O'Brien",
+      bookOnly: true,
+      limit: 5000
+    });
+
+    const [sql, params] = queryMock.mock.calls[0];
+    expect(sql).toContain("r.payload ? 'provenance'");
+    expect(sql).toContain("r.payload->'provenance'->>'familyNo' = $3");
+    expect(sql).toContain('LIMIT 500 OFFSET 0');
+    expect(sql).not.toContain("O'Brien");
+    expect(params).toEqual(['father', 'boston', '3', "%o'brien%"]);
+    expect(out).toEqual({
+      total: 1,
+      limit: 500,
+      offset: 0,
+      relationships: [
+        {
+          id: 7,
+          relation: 'father',
+          source: { id: 20, name: 'John Lane', birthYear: 1685 },
+          target: { id: 10, name: 'William Lane (II)', birthYear: 1659 },
+          provenance: { familyNo: 3, childOrder: 'I', pdfPage: 22 }
+        }
+      ]
+    });
+  });
+
+  test('relationship stats split book-coded vs legacy links', async () => {
+    queryMock
+      .mockResolvedValueOnce({ rows: [{ relation: 'father', total: 10, from_book: 4, confirmed: 2 }] })
+      .mockResolvedValueOnce({ rows: [{ coded: 6 }] });
+    await expect(getLaneRelationshipStatsFromPostgres()).resolves.toEqual({
+      byRelation: [{ relation: 'father', total: 10, fromBook: 4, confirmed: 2 }],
+      codedPeople: 6
+    });
   });
 });

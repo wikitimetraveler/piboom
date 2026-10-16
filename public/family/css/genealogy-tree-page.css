@@ -116,3 +116,117 @@
   outline-offset: 2px;
   border-radius: 4px;
 }
+
+/* Relationship graph (book genealogy codes) */
+#d3-visualization.genealogy-graph {
+  overflow: hidden;
+  border-style: solid;
+  position: relative;
+}
+
+#d3-visualization.genealogy-graph svg {
+  display: block;
+  touch-action: none;
+}
+
+.genealogy-graph-label {
+  fill: #2c3e50;
+  paint-order: stroke;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 3px;
+  pointer-events: none;
+}
+
+.genealogy-graph-node:hover circle {
+  stroke: #2c3e50;
+  stroke-width: 2.5px;
+}
+
+.genealogy-graph-legend,
+.rel-stats-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.1rem;
+  align-items: center;
+}
+
+.legend-line {
+  display: inline-block;
+  width: 22px;
+  height: 0;
+  border-top: 3px solid #999;
+  vertical-align: middle;
+  margin-right: 0.25rem;
+}
+
+.legend-father { border-top-color: #3399ff; }
+.legend-mother { border-top-color: #ff3399; }
+.legend-spouse { border-top: 3px dashed #b8b800; }
+.legend-associated { border-top-color: #999; }
+.legend-legacy { border-top: 2px solid #c4c9d0; }
+
+.legend-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-right: 0.25rem;
+}
+
+.legend-head {
+  background: #8cc4ff;
+  border: 2px solid #8a5a00;
+}
+
+.genealogy-code-badge {
+  background: #f6ead2;
+  color: #5c3d00;
+  border: 1px solid #d9b871;
+  font-weight: 600;
+  white-space: normal;
+  text-align: left;
+}
+
+.genealogy-code-card,
+.register-family-card {
+  border: 1px solid rgba(138, 90, 0, 0.18);
+  border-left: 4px solid #d9b871;
+  background: rgba(246, 234, 210, 0.25);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+}
+
+.register-children {
+  list-style: none;
+  padding-left: 0;
+  columns: 2 18rem;
+}
+
+.register-children li {
+  break-inside: avoid;
+  margin-bottom: 0.15rem;
+}
+
+.register-order {
+  display: inline-block;
+  min-width: 2.6rem;
+  font-family: Georgia, 'Times New Roman', serif;
+  color: #5c3d00;
+}
+
+.rel-badge {
+  font-weight: 500;
+  background: #eef1f4;
+  color: #2c3e50;
+  border: 1px solid #d5dbe1;
+}
+
+.rel-badge-father { border-left: 4px solid #3399ff; }
+.rel-badge-mother { border-left: 4px solid #ff3399; }
+.rel-badge-spouse { border-left: 4px solid #b8b800; }
+
+.rel-table td,
+.rel-table th {
+  font-size: 0.85rem;
+}

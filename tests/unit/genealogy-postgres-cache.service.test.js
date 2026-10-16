@@ -14,7 +14,9 @@ const getDatasetsMock = jest.fn();
 await jest.unstable_mockModule('../../services/lane-postgres.service.js', () => ({
   backfillLaneDataFromFilesystem: backfillMock,
   getLaneGraphDataFromPostgres: getGraphMock,
-  getAllLaneDatasetsFromPostgres: getDatasetsMock
+  getAllLaneDatasetsFromPostgres: getDatasetsMock,
+  getLaneRelationshipStatsFromPostgres: jest.fn(async () => null),
+  queryLaneRelationshipsFromPostgres: jest.fn(async () => null)
 }));
 
 const {

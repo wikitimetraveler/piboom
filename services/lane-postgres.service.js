@@ -264,6 +264,101 @@ export async function getAllLaneDatasetsFromPostgres() {
   return out;
 }
 
+const RELATION_FILTERS = new Set(['father', 'mother', 'spouse', 'associated']);
+
+/**
+ * Filterable relationship list (child/spouse → parent/spouse) with both people's names and the
+ * `provenance` stored on book-decoded links (lanegenealogies01chap.pdf genealogy codes).
+ */
+export async function queryLaneRelationshipsFromPostgres(filters = {}) {
+  const pool = getPool();
+  if (!pool) return null;
+  const where = [];
+  const params = [];
+  const add = (sql, value) => {
+    params.push(value);
+    where.push(sql.replace('?', `$${params.length}`));
+  };
+  const relation = String(filters.relation || '').trim().toLowerCase();
+  if (RELATION_FILTERS.has(relation)) add('r.relation = ?', relation);
+  if (filters.personId != null && Number.isFinite(Number(filters.personId))) {
+    params.push(Number(filters.personId));
+    where.push(`(r.source_person_id = $${params.length} OR r.target_person_id = $${params.length})`);
+  }
+  if (filters.bookOnly) where.push(`r.payload ? 'provenance'`);
+  if (filters.section) add(`r.payload->'provenance'->>'section' = ?`, String(filters.section));
+  if (filters.familyNo != null && String(filters.familyNo).trim() !== '') {
+    add(`r.payload->'provenance'->>'familyNo' = ?`, String(Number.parseInt(filters.familyNo, 10)));
+  }
+  if (filters.pdfPage != null && String(filters.pdfPage).trim() !== '') {
+    add(`r.payload->'provenance'->>'pdfPage' = ?`, String(Number.parseInt(filters.pdfPage, 10)));
+  }
+  if (filters.q && String(filters.q).trim()) {
+    params.push(`%${String(filters.q).trim().toLowerCase()}%`);
+    where.push(`(lower(s.name) LIKE $${params.length} OR lower(t.name) LIKE $${params.length})`);
+  }
+  const limit = Math.min(Math.max(Number.parseInt(filters.limit, 10) || 100, 1), 500);
+  const offset = Math.max(Number.parseInt(filters.offset, 10) || 0, 0);
+  const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
+  const from = `
+    FROM lane_relationship r
+    JOIN lane_person s ON s.person_id = r.source_person_id
+    JOIN lane_person t ON t.person_id = r.target_person_id
+    ${whereSql}`;
+  const [rowsRes, countRes] = await Promise.all([
+    pool.query(
+      `SELECT r.relationship_id, r.relation, r.source_person_id, r.target_person_id,
+              s.name AS source_name, s.birth_year AS source_birth_year,
+              t.name AS target_name, t.birth_year AS target_birth_year,
+              r.payload->'provenance' AS provenance
+       ${from}
+       ORDER BY r.relationship_id
+       LIMIT ${limit} OFFSET ${offset}`,
+      params
+    ),
+    pool.query(`SELECT COUNT(*)::int AS total ${from}`, params)
+  ]);
+  return {
+    total: countRes.rows[0]?.total ?? 0,
+    limit,
+    offset,
+    relationships: rowsRes.rows.map((row) => ({
+      id: Number(row.relationship_id),
+      relation: String(row.relation),
+      source: { id: Number(row.source_person_id), name: row.source_name, birthYear: row.source_birth_year },
+      target: { id: Number(row.target_person_id), name: row.target_name, birthYear: row.target_birth_year },
+      provenance: row.provenance || null
+    }))
+  };
+}
+
+/** Relationship counts by relation, split into book-coded (provenance) vs legacy links. */
+export async function getLaneRelationshipStatsFromPostgres() {
+  const pool = getPool();
+  if (!pool) return null;
+  const [relRes, codedRes] = await Promise.all([
+    pool.query(
+      `SELECT relation,
+              COUNT(*)::int AS total,
+              COUNT(*) FILTER (WHERE payload ? 'provenance')::int AS from_book,
+              COUNT(*) FILTER (WHERE payload->'provenance'->>'confirmed' = 'true')::int AS confirmed
+       FROM lane_relationship
+       GROUP BY relation
+       ORDER BY relation`
+    ),
+    pool.query(`SELECT COUNT(*)::int AS coded FROM lane_person WHERE payload ? 'genealogyCode'`)
+  ]);
+  return {
+    byRelation: relRes.rows.map((row) => ({
+      relation: String(row.relation),
+      total: row.total,
+      fromBook: row.from_book,
+      confirmed: row.confirmed
+    })),
+    codedPeople: codedRes.rows[0]?.coded ?? 0
+  };
+}
+
 /**
  * Recursive CTE for direct-ancestor line via father/mother edges.
  */

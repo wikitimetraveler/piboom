@@ -143,8 +143,7 @@
     { href: '/lebanon/', icon: 'bi-globe-central-south-asia', label: 'Lebanon', title: 'Lebanon — bilingual history, food, music, café and living culture atlas with Karim (no login)' },
     { href: '/egypt/', icon: 'bi-globe-central-south-asia', label: 'Egypt', title: 'Egypt — bilingual history, food, music, café and living culture atlas with Omar (no login)' },
     { href: '/silk-road/', icon: 'bi-signpost-split', label: 'Silk Road', title: 'Silk Road — bilingual caravan journey through all eight atlases, guide to guide (no login)' },
-    { href: '/nature/shenango-valley.html', icon: 'bi-geo-alt', label: 'The Valley', title: 'West PA & East Ohio history gallery — Buhl Park hub, happening-now events, HyperFrames reel, Youngstown corridor, AI expert David' },
-    { href: '/nature/dinosaur-hall.html', icon: 'bi-hourglass-split', label: 'Dinosaur Hall', title: 'Mesozoic diorama — Triassic, Jurassic, Cretaceous field guide, size compare, HyperFrames reel' },
+    { href: '/nature/nature-hub.html', icon: 'bi-tree-fill', label: 'Nature Hub', title: 'Trees, critters, fish, rocks, ski topo, The Valley, Dinosaur Hall' },
     { href: '/gse-analyzer.html', icon: 'bi-graph-up-arrow', label: 'GSE scenario analyzer' },
     { href: '/bike-store-home.html', icon: 'bi-bicycle', label: 'Bike Store' },
     { href: '/ai/voice-dj.html', icon: 'bi-mic', label: 'Wolfman Dave' },
@@ -152,13 +151,6 @@
     { href: '/ai/assistant.html', icon: 'bi-chat-dots', label: 'Levi Assistant' },
     { href: '/ai/voice-guide.html', icon: 'bi-book', label: 'Voice Guide' },
     { href: '/family/lane-family.html', icon: 'bi-house-heart', label: 'Lane Family' },
-    { href: '/ski/', icon: 'bi-signpost-2', label: 'Ski Drive', title: 'Fountain Valley drive desk — weather and on-the-way stops' },
-    { href: '/ski/areas', icon: 'bi-snow2', label: 'Ski Areas', title: 'Wrightwood and Big Bear ski-area topography' },
-    { href: '/nature/tree-discovery.html', icon: 'bi-tree-fill', label: 'Tree Discovery' },
-    { href: '/nature/tree-collection.html', icon: 'bi-trees', label: 'Tree Collection' },
-    { href: '/nature/critter-discovery.html', icon: 'bi-bug-fill', label: 'Critter Discovery' },
-    { href: '/nature/critter-collection.html', icon: 'bi-bug', label: 'Critter Collection' },
-    { href: '/local/local-spots.html#fvThrift', icon: 'bi-shop', label: 'Thrift near Fountain Valley', title: 'Thrift stores within 30 miles of Fountain Valley, with a map' },
     { href: '/local/local-spots.html', icon: 'bi-geo-alt-fill', label: 'Local Spots' },
     { href: '/finds/index.html', icon: 'bi-search-heart', label: 'Finds' },
     { divider: true },
@@ -283,6 +275,13 @@
     { href: '/nature/dinosaur-hall.html', icon: 'bi-hourglass-split', label: 'Dinosaur Hall', title: 'Mesozoic diorama — Triassic, Jurassic, Cretaceous field guide, size compare, HyperFrames reel' },
     { href: '/nature/share-collection.html', icon: 'bi-share', label: 'Share Collection', title: 'Share your collection' },
     { href: '/nature/shenango-valley.html', icon: 'bi-geo-alt', label: 'The Valley', title: 'West PA & East Ohio gallery — happening-now events, HyperFrames, Youngstown mob history, AI expert' },
+  ];
+
+  /** Navbar Nature dropdown items */
+  const NAV_NATURE = [
+    { href: '/nature/nature-hub.html', icon: 'bi-tree-fill', label: 'Nature Hub', title: 'Unified map, photo gallery, field guide, share' },
+    { divider: true },
+    ...NATURE_TOOLS,
   ];
 
   /** Bike hub tool grid */
@@ -476,6 +475,7 @@
     NAV_FINANCE,
     NAV_ENCOMPASS,
     NAV_MUSIC,
+    NAV_NATURE,
     NAV_ENTERTAINMENT,
     NAV_MORE,
     FINANCE_TOOLS,

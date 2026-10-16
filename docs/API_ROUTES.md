@@ -177,6 +177,10 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | DELETE | `/api/critter-collection/:id` | Delete critter |
 | POST | `/api/nature-collection/share` | Share nature collection |
 | GET | `/api/nature-collection/share/:id` | Get shared nature collection |
+| GET | `/api/genealogy/relationships` | Lane relationship edges from Postgres (memory fallback); query: q, relation, personId, bookOnly, section, familyNo, pdfPage, limit, offset |
+| GET | `/api/genealogy/relationships/stats` | Edge totals per relation (all / from 1891 book / confirmed) + coded people |
+| GET | `/api/genealogy/genealogy-codes` | 1891 Lane Genealogies register index (`?section=boston\|buxton\|fishersfield\|additions`) |
+| GET | `/api/genealogy/genealogy-codes/:section/:familyNo` | One register family (No. N): head, wife, pedigree, children with carry-forward codes, review items |
 | * | `/api/genealogy/*` | Family data, people, stats |
 | GET | `/api/grateful-dead/shows/by-date?year=&month=&day=` | Grateful Dead shows on a calendar date |
 | * | `/api/grateful-dead/*` | Shows, KML, geocoding |

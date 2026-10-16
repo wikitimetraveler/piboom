@@ -39,7 +39,9 @@
       link.href = item.href;
       link.className = 'domain-tile';
       link.title = item.title || item.label;
-      if (currentPath.endsWith(item.href.split('/').pop().toLowerCase())) {
+      const file = item.href.split('/').pop().toLowerCase();
+      const isCurrent = file ? currentPath.endsWith(file) : currentPath === item.href.toLowerCase();
+      if (isCurrent) {
         link.classList.add('active');
         link.setAttribute('aria-current', 'page');
       }

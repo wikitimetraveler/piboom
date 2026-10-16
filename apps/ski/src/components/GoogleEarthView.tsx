@@ -14,6 +14,8 @@ interface Props {
   pins?: OverlayPin[];
   onPin?: (id: string) => void;
   fitKey?: string;
+  /** Stand at this point (e.g. the base lodge) looking along `heading`, when there are no tracks to frame. */
+  focus?: { lat: number; lng: number; heading: number; reachM: number } | null;
 }
 
 const hex = (n: number) => `#${n.toString(16).padStart(6, '0')}`;
@@ -24,7 +26,7 @@ function setPath(el: GMaps, pts: { lat: number; lng: number }[]) {
   else el.coordinates = pts;
 }
 
-export default function GoogleEarthView({ frame, groundFt, trails, resortId, tracks, pins, onPin, fitKey }: Props) {
+export default function GoogleEarthView({ frame, groundFt, trails, resortId, tracks, pins, onPin, fitKey, focus }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const [lib, setLib] = useState<{ maps: GMaps; m3d: GMaps; Pin: GMaps } | null>(null);
   const [map, setMap] = useState<GMaps | null>(null);
@@ -35,6 +37,26 @@ export default function GoogleEarthView({ frame, groundFt, trails, resortId, tra
   pinRef.current = onPin;
   const reduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  function viewCamera() {
+    const pts = (tracks || []).flatMap((t) => t.points.map(([lat, lng]) => ({ lat, lng })));
+    if (!pts.length && focus) {
+      return {
+        center: { lat: focus.lat, lng: focus.lng, altitude: groundFt(focus.lat, focus.lng) * 0.3048 },
+        range: Math.min(3500, Math.max(1200, focus.reachM * 0.9)),
+        tilt: 68,
+        heading: focus.heading,
+      };
+    }
+    const box = boundsOf(pts) || frame;
+    const c = boundsCenter(box);
+    return {
+      center: { ...c, altitude: groundFt(c.lat, c.lng) * 0.3048 },
+      range: Math.max(1500, boundsSpanM(box) * 1.4),
+      tilt: 64,
+      heading: 25,
+    };
+  }
+
   useEffect(() => {
     let live = true;
     let el: GMaps = null;
@@ -44,12 +66,7 @@ export default function GoogleEarthView({ frame, groundFt, trails, resortId, tra
       const [m3d, marker] = await Promise.all([maps.importLibrary('maps3d'), maps.importLibrary('marker')]);
       if (!live || !host.current) return;
       if (!m3d?.Map3DElement) throw new Error('Photorealistic 3D maps are not available for this key.');
-      el = new m3d.Map3DElement({
-        center: { ...boundsCenter(frame), altitude: groundFt(boundsCenter(frame).lat, boundsCenter(frame).lng) * 0.3048 },
-        range: Math.max(1800, boundsSpanM(frame) * 1.1),
-        tilt: 64,
-        heading: 25,
-      });
+      el = new m3d.Map3DElement(viewCamera());
       el.mode = m3d.MapMode?.HYBRID ?? 'HYBRID';
       el.classList.add('ski-earth__map');
       el.addEventListener('gmp-steadychange', (ev: GMaps) => {
@@ -165,14 +182,7 @@ export default function GoogleEarthView({ frame, groundFt, trails, resortId, tra
 
   useEffect(() => {
     if (!map) return;
-    const pts = (tracks || []).flatMap((t) => t.points.map(([lat, lng]) => ({ lat, lng })));
-    const box = boundsOf(pts) || frame;
-    const camera = {
-      center: { ...boundsCenter(box), altitude: groundFt(boundsCenter(box).lat, boundsCenter(box).lng) * 0.3048 },
-      range: Math.max(1500, boundsSpanM(box) * 1.4),
-      tilt: 64,
-      heading: 25,
-    };
+    const camera = viewCamera();
     if (!reduced && typeof map.flyCameraTo === 'function') map.flyCameraTo({ endCamera: camera, durationMillis: 2500 });
     else Object.assign(map, camera);
     // Refit only when the caller says the subject changed.

@@ -29,6 +29,15 @@
       "projectDir": "video/lane-story-reel"
     },
     {
+      "id": "lane-chronicle",
+      "domain": "lane",
+      "title": "The Lane Chronicle: Four Centuries in Code and Voice",
+      "subtitle": "HeyGen ancestors · 1891 register · Postgres graph · ~150s",
+      "videoUrl": "/family/assets/video/lane-chronicle-movie.mp4",
+      "sourcePage": "/family/lane-cinema.html",
+      "projectDir": "video/lane-chronicle"
+    },
+    {
       "id": "mojave-lane",
       "domain": "lane",
       "title": "Aaron G. Lane — Mojave Crossing",

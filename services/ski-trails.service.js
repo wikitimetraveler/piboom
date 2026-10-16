@@ -89,6 +89,20 @@ export function assignResort(lat, lng, resorts = [], areas = []) {
   return best;
 }
 
+/**
+ * Resort for one way: its midpoint's resort polygon, else any vertex's, else the nearest pin — unless that
+ * resort has a mapped boundary the way sits outside (e.g. Big Bear's Alpine Slide lifts beside Snow Summit).
+ */
+function resortForWay(coords, resorts, areas) {
+  const mid = coords[Math.floor(coords.length / 2)];
+  for (const [lat, lng] of [mid, ...coords]) {
+    const hit = areas.find((a) => areaContains(a, lat, lng));
+    if (hit) return hit.resort;
+  }
+  const nearest = assignResort(mid[0], mid[1], resorts);
+  return areas.some((a) => a.resort === nearest) ? null : nearest;
+}
+
 function resortForAreaName(name, resorts) {
   const n = String(name || '').toLowerCase();
   if (!n) return null;
@@ -125,8 +139,8 @@ export function normalizeOsmTrails(elements = [], resorts = []) {
     if (el.type !== 'way' || !el.tags) continue;
     const coords = wayCoords(el);
     if (coords.length < 2) continue;
-    const mid = coords[Math.floor(coords.length / 2)];
-    const resort = assignResort(mid[0], mid[1], resorts, areas);
+    const resort = resortForWay(coords, resorts, areas);
+    if (!resort) continue;
 
     if (el.tags['piste:type'] === 'downhill') {
       const closed =

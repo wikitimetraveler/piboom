@@ -763,11 +763,13 @@ def parse_child_line(line: str):
     line_clean = unfuse_rank_prefix_ocr(clean_text(line))
     if not re.match(r"^\(?\d+\)?\s*[IVXLCDM]+[\.\-]|^[IVXLCDM]+[\.\-]", line_clean):
         return None
+    # Book code "(M) IV." = child IV of this family, who heads family No. M later in the book
+    # (a carry-forward marker, not a deeper generation).
     marker_level = 1
-    if re.match(r"^\(\d+\)\s*[IVXLCDM]+[\.\-]", line_clean):
-        # Numbered descendant marker plus Roman numeral generally indicates
-        # a deeper descendant tier under the active parent context.
-        marker_level = 2
+    carry_forward_no = None
+    cf = re.match(r"^\((\d+)\)\s*[IVXLCDM]+[\.\-]", line_clean)
+    if cf:
+        carry_forward_no = int(cf.group(1))
     name = first_name_from_segment(line_clean)
     if not name:
         return None
@@ -780,6 +782,7 @@ def parse_child_line(line: str):
         "rawText": line_clean,
         "locations": locations,
         "markerLevel": marker_level,
+        "carryForwardNo": carry_forward_no,
     }
 
 
@@ -797,8 +800,25 @@ def looks_like_prose_or_header(line: str) -> bool:
     return False
 
 
+RUNNING_HEADER_RES = (
+    # Even pages: "12 WILLIAM LANE AND FAMILY." / "270 THE BUXTON LANE FAMILY."
+    re.compile(r"\b[0-9IlOoS]{1,3}\s*WILLIAM\s*LANE\s*AND\s*FAMILY\s*\.?"),
+    re.compile(r"\b(?:[0-9IlOoS]{1,3}\s*)?THE\s*[A-Z]{4,14}\s*LANE\s*FAMILY\s*\.?(?:\s*[0-9IlOoS]{1,3}\b)?"),
+    # Odd pages: "NUMBER THREE. 11" (family number spelled out + printed page).
+    re.compile(r"\bNUMBERS?\s*[A-Z][A-Z\-\s]{2,40}?\.\s*[0-9IlOoS]{1,3}\b"),
+)
+
+
+def strip_running_headers(text: str) -> str:
+    out = text or ""
+    for rx in RUNNING_HEADER_RES:
+        out = rx.sub(" ", out)
+    return out
+
+
 def split_segments(page_text: str):
     text = (page_text or "").replace("\n", " ")
+    text = strip_running_headers(text)
     text = re.sub(r"\s+", " ", text)
     text = unfuse_rank_prefix_ocr(text)
     text = re.sub(r"(--\s*\d+\s*of\s*\d+\s*--)", r"\n\1\n", text, flags=re.IGNORECASE)

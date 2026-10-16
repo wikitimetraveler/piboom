@@ -133,6 +133,12 @@ attachStudioRealtime(io);
 
 app.use(requireFinanceSession);
 app.use('/api', buildRoutes(io));
+app.use('/api', (req, res) => {
+  res.status(404).json({
+    success: false,
+    error: `No API route for ${req.method} ${req.originalUrl}`
+  });
+});
 app.use('/lib', express.static(path.join(__dirname, 'lib')));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/video', express.static(path.join(__dirname, 'video')));

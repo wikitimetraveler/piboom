@@ -108,6 +108,18 @@ describe('menu-config auth filtering', () => {
     expect(areas).toMatchObject({ href: '/ski/areas', icon: 'bi-snow2' });
   });
 
+  test('Nature navbar menu leads with Nature Hub and carries every nature tool', () => {
+    const nav = MENU_CONFIG.NAV_NATURE;
+    expect(nav[0]).toMatchObject({ href: '/nature/nature-hub.html', icon: 'bi-tree-fill' });
+    const navHrefs = nav.filter((t) => !t.divider).map((t) => t.href);
+    MENU_CONFIG.NATURE_TOOLS.forEach((t) => expect(navHrefs).toContain(t.href));
+
+    const moreHrefs = MENU_CONFIG.NAV_MORE.filter((t) => !t.divider).map((t) => t.href);
+    expect(moreHrefs).toContain('/nature/nature-hub.html');
+    expect(moreHrefs).not.toContain('/nature/tree-discovery.html');
+    expect(moreHrefs).not.toContain('/ski/');
+  });
+
   test('Entertainment menu includes Mountain High with a mountain icon', () => {
     const navItem = MENU_CONFIG.NAV_ENTERTAINMENT.find((t) => t.label === 'Mountain High');
     const hubItem = MENU_CONFIG.ENTERTAINMENT_TOOLS.find((t) => t.label === 'Mountain High');

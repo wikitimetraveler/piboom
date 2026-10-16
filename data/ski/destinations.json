@@ -89,14 +89,14 @@
       "area": "Mammoth Lakes",
       "route": "eastern-sierra",
       "dem": "mammoth",
-      "lat": 37.6365,
-      "lng": -119.029,
+      "lat": 37.65,
+      "lng": -118.9853,
       "baseFt": 7953,
       "summitFt": 11053,
       "typicalDriveMin": 315,
       "highways": ["CA-91", "I-15", "US-395", "CA-203"],
       "chainHighways": ["US-395", "CA-203"],
-      "mapsDest": "Mammoth Mountain Main Lodge, Mammoth Lakes, CA"
+      "mapsDest": "Eagle Lodge, Mammoth Lakes, CA"
     },
     {
       "id": "june",

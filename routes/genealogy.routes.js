@@ -15,6 +15,9 @@ import {
   getPeopleAliveInYear,
   getMusicalEraInfo,
   getStats,
+  getRelationshipList,
+  getRelationshipStatsData,
+  getGenealogyCodes,
   getMuseumContentData,
   getFeaturedStoryData,
   getProminentLanesData,
@@ -60,6 +63,12 @@ router.get('/search', search);
 
 // Get family tree statistics
 router.get('/stats', getStats);
+
+// Relationships (Postgres lane_relationship) + decoded 1891 register codes
+router.get('/relationships', getRelationshipList);
+router.get('/relationships/stats', getRelationshipStatsData);
+router.get('/genealogy-codes', getGenealogyCodes);
+router.get('/genealogy-codes/:section/:familyNo', getGenealogyCodes);
 
 // Get musical timeline
 router.get('/musical-timeline', getMusicalTimeline);
