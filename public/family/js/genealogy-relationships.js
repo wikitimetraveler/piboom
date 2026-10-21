@@ -13,12 +13,58 @@
   const RELATION_COLORS = { father: '#3399ff', mother: '#ff3399', spouse: '#b8b800', associated: '#999999' };
   const LEGACY_COLOR = '#c4c9d0';
   const MAX_NODES = 900;
-  const SECTION_SHORT = { boston: 'Part I', buxton: 'Part II · Buxton', fishersfield: 'Part III · Fishersfield', additions: 'Additions' };
+  const SECTION_SHORT = {
+    boston: 'Vol. I · Boston',
+    buxton: 'Vol. I · Buxton',
+    fishersfield: 'Vol. I · Fishersfield',
+    additions: 'Vol. I · Additions',
+    dorchester: 'Vol. II · Dorchester',
+    stratford: 'Vol. II · Stratford',
+    milford: 'Vol. II · Milford',
+    merrifield: 'Vol. II · Merrifield',
+    newlondon: 'Vol. II · New London',
+    rye: 'Vol. II · Rye',
+    rickmansworth: 'Vol. III · Rickmansworth',
+    joblane: 'Vol. III · Job Lane',
+    casco: 'Vol. III · Casco',
+    edwardlane: 'Vol. III · Edward Lane'
+  };
   const SECTION_LABELS = {
-    boston: 'Part I · William Lane of Boston',
-    buxton: 'Part II · Buxton',
-    fishersfield: 'Part III · Fishersfield',
-    additions: 'Additions'
+    boston: 'Vol. I · William Lane of Boston',
+    buxton: 'Vol. I · Buxton',
+    fishersfield: 'Vol. I · Fishersfield',
+    additions: 'Vol. I · Additions',
+    dorchester: 'Vol. II · William Lane of Dorchester',
+    stratford: 'Vol. II · Robert Lane of Stratford',
+    milford: 'Vol. II · John Lane of Milford',
+    merrifield: 'Vol. II · John Merrifield Lane',
+    newlondon: 'Vol. II · Daniel Lane of New London',
+    rye: 'Vol. II · George Lane of Rye',
+    rickmansworth: 'Vol. III · English family, Rickmansworth',
+    joblane: 'Vol. III · Job Lane of Malden & Billerica',
+    casco: 'Vol. III · James Lane of Casco Bay',
+    edwardlane: 'Vol. III · Edward Lane of Boston'
+  };
+  const ARCHIVE_BY_VOLUME = {
+    1: 'https://archive.org/details/lanegenealogies01chap',
+    2: 'https://archive.org/details/lanegenealogies02chap',
+    3: 'https://archive.org/details/lanegenealogies03chap'
+  };
+  const VOLUME_FOR_SECTION = {
+    boston: 1,
+    buxton: 1,
+    fishersfield: 1,
+    additions: 1,
+    dorchester: 2,
+    stratford: 2,
+    milford: 2,
+    merrifield: 2,
+    newlondon: 2,
+    rye: 2,
+    rickmansworth: 3,
+    joblane: 3,
+    casco: 3,
+    edwardlane: 3
   };
 
   let graphData = null;
@@ -29,6 +75,24 @@
   let relOffset = 0;
   const REL_PAGE = 50;
 
+  const TIME_BUILD_START = 1500;
+  const TIME_BUILD_YEARS_PER_SEC = 14;
+  const timeBuild = {
+    playing: false,
+    muted: false,
+    year: TIME_BUILD_START,
+    endYear: 1900,
+    fullSub: null,
+    opts: null,
+    raf: 0,
+    lastTs: 0,
+    lastDrawnBucket: null,
+    audio: null,
+    forcedDark: false,
+    eraCache: new Map(),
+    reducedMotion: false
+  };
+
   const $ = (id) => document.getElementById(id);
   const escHtml = (v) =>
     String(v ?? '')
@@ -38,6 +102,14 @@
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&#39;');
 
+  function archiveUrl(section, pdfPage) {
+    const vol = VOLUME_FOR_SECTION[section] || 1;
+    const base = ARCHIVE_BY_VOLUME[vol];
+    if (!pdfPage) return base;
+    // Internet Archive leaf index is roughly PDF page for these scans.
+    return `${base}/page/n${Math.max(0, Number(pdfPage) - 1)}/mode/2up`;
+  }
+
   function citation(prov) {
     if (!prov) return '';
     const part = prov.section && prov.section !== 'boston' ? `${SECTION_SHORT[prov.section] || prov.section} · ` : '';
@@ -45,6 +117,14 @@
     if (prov.childOrder) bits.push(`${prov.carryForwardNo ? `(${prov.carryForwardNo}) ` : ''}${prov.childOrder}`);
     if (prov.pdfPage) bits.push(`PDF p. ${prov.pdfPage}`);
     return bits.join(' · ');
+  }
+
+  function citationHtml(prov) {
+    if (!prov) return '';
+    const text = escHtml(citation(prov));
+    if (!prov.pdfPage) return text;
+    const href = archiveUrl(prov.section, prov.pdfPage);
+    return `${text} · <a href="${escHtml(href)}" target="_blank" rel="noopener noreferrer">Archive.org</a>`;
   }
 
   function personLabel(n) {
@@ -207,20 +287,29 @@
 
   async function loadGraphData() {
     if (graphData) return graphData;
+    let apiData = null;
+    let fileData = null;
     try {
       const json = await fetchJson('/api/genealogy/data');
-      if (json && json.success && json.data && Array.isArray(json.data.nodes)) {
-        return withRegisterCodes(json.data, 'api');
-      }
+      if (json && json.success && json.data && Array.isArray(json.data.nodes)) apiData = json.data;
     } catch {
       /* API missing or returned the site HTML shell */
     }
     try {
       const raw = await fetchJson('/data/laneData.json');
-      if (raw && Array.isArray(raw.nodes) && Array.isArray(raw.links)) return withRegisterCodes(raw, 'file');
+      if (raw && Array.isArray(raw.nodes) && Array.isArray(raw.links)) fileData = raw;
     } catch {
-      /* in-memory file not served */
+      /* static file not served */
     }
+    const score = (d) => {
+      if (!d) return -1;
+      const coded = (d.nodes || []).filter((n) => n && n.genealogyCode).length;
+      return (d.nodes || []).length * 10 + coded;
+    };
+    // Prefer the richer graph — a freshly enriched laneData.json can outpace a stale API cache.
+    if (score(fileData) > score(apiData) && fileData) return withRegisterCodes(fileData, 'file');
+    if (apiData) return withRegisterCodes(apiData, 'api');
+    if (fileData) return withRegisterCodes(fileData, 'file');
     const doc = await loadRegisterDoc();
     if (doc) return adoptGraph(graphFromRegister(doc), 'register');
     throw new Error('Family data unavailable');
@@ -301,7 +390,59 @@
       const c = n.genealogyCode;
       if (c && c.familyKey && String(c.familyKey) === String(familyKey) && (c.section || 'boston') === sec) return n;
     }
-    return null;
+    // Fall back to the decoded register index (Vol. II / III heads may not yet be stamped on API nodes).
+    const fam = (registerDoc?.families || []).find(
+      (f) => (f.section || 'boston') === sec && (String(f.familyKey) === String(familyKey) || String(f.familyNo) === String(familyKey))
+    );
+    if (!fam) return null;
+    if (fam.head?.personId != null && nodesById.has(Number(fam.head.personId))) {
+      const n = nodesById.get(Number(fam.head.personId));
+      n.genealogyCode = n.genealogyCode || {
+        section: sec,
+        familyKey: String(fam.familyKey),
+        label: `No. ${fam.familyKey}`,
+        pdfPage: fam.pdfPage
+      };
+      return n;
+    }
+    // Temporary display node so the family card + any resolved children still draw.
+    const synthId = 9000000 + Number(fam.familyNo || 0) + (sec.length * 1000);
+    if (!nodesById.has(synthId)) {
+      const node = {
+        id: synthId,
+        name: fam.head?.name || `No. ${fam.familyKey}`,
+        gender: 'M',
+        birthYear: fam.head?.birthYear ?? null,
+        deathYear: fam.head?.deathYear ?? null,
+        genealogyCode: {
+          section: sec,
+          familyKey: String(fam.familyKey),
+          label: `No. ${fam.familyKey}`,
+          pdfPage: fam.pdfPage,
+          sectionLabel: SECTION_LABELS[sec] || sec
+        }
+      };
+      graphData.nodes.push(node);
+      nodesById.set(synthId, node);
+      for (const c of fam.children || []) {
+        if (c.personId == null || !nodesById.has(Number(c.personId))) continue;
+        if (c.level != null && Number(c.level) !== 1) continue;
+        graphData.links.push({
+          source: Number(c.personId),
+          target: synthId,
+          relation: 'father',
+          provenance: {
+            section: sec,
+            familyNo: fam.familyNo,
+            childOrder: c.order,
+            carryForwardNo: c.carryForwardNo || null,
+            pdfPage: c.pdfPage || fam.pdfPage,
+            method: 'register-display'
+          }
+        });
+      }
+    }
+    return nodesById.get(synthId);
   }
 
   /** Nodes + links for the current controls. Family scope walks child links (source = child, target = parent). */
@@ -389,21 +530,436 @@
       });
   }
 
-  function drawGraph(sub, opts) {
+  function nodeBirthYear(n) {
+    const y = Number.parseInt(n?.birthYear, 10);
+    return Number.isFinite(y) ? y : null;
+  }
+
+  function computeTimeBuildEndYear(sub) {
+    let max = TIME_BUILD_START;
+    for (const n of sub?.nodes || []) {
+      const y = nodeBirthYear(n);
+      if (y != null && y > max) max = y;
+    }
+    return Math.max(1600, Math.min(2020, max));
+  }
+
+  function filterSubByYear(sub, year, atEnd) {
+    const visible = new Set();
+    for (const n of sub.nodes || []) {
+      const y = nodeBirthYear(n);
+      if (y == null) {
+        if (atEnd) visible.add(n.id);
+      } else if (y <= year) {
+        visible.add(n.id);
+      }
+    }
+    const nodes = (sub.nodes || []).filter((n) => visible.has(n.id));
+    const links = (sub.links || [])
+      .map((l) => ({
+        ...l,
+        source: typeof l.source === 'object' ? l.source.id : l.source,
+        target: typeof l.target === 'object' ? l.target.id : l.target
+      }))
+      .filter((l) => visible.has(l.source) && visible.has(l.target));
+    return { ...sub, nodes, links };
+  }
+
+  function flagEraForYear(year) {
+    if (year < 1607) return 'england';
+    if (year < 1776) return 'colonial';
+    if (year < 1865) return 'early-us';
+    return 'later-us';
+  }
+
+  function syncTimeBuildFlags(year) {
+    const era = flagEraForYear(year);
+    document.querySelectorAll('[data-flag-era]').forEach((el) => {
+      el.classList.toggle('is-active', el.getAttribute('data-flag-era') === era);
+    });
+  }
+
+  function setTimeBuildHud(year, eraText) {
+    const yEl = $('timeBuildYear');
+    const eEl = $('timeBuildEra');
+    const shown = Math.round(year);
+    if (yEl) yEl.textContent = String(shown);
+    if (eEl && eraText != null) eEl.textContent = eraText;
+    const scrub = $('timeBuildScrub');
+    if (scrub && !scrub.matches(':active')) scrub.value = String(shown);
+  }
+
+  function syncTimeBuildButtons() {
+    const play = $('timeBuildPlay');
+    const pause = $('timeBuildPause');
+    const restart = $('timeBuildRestart');
+    const scrub = $('timeBuildScrub');
+    if (play) play.disabled = timeBuild.playing;
+    if (pause) pause.disabled = !timeBuild.playing;
+    if (restart) restart.disabled = !timeBuild.fullSub;
+    if (scrub) {
+      scrub.disabled = !timeBuild.fullSub;
+      scrub.min = String(TIME_BUILD_START);
+      scrub.max = String(timeBuild.endYear);
+    }
+  }
+
+  function ensureTimeBuildAudio() {
+    if (timeBuild.audio) return timeBuild.audio;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    const ctx = new AC();
+    const master = ctx.createGain();
+    master.gain.value = timeBuild.muted ? 0 : 0.07;
+    master.connect(ctx.destination);
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 420;
+    filter.Q.value = 0.7;
+    filter.connect(master);
+    const osc1 = ctx.createOscillator();
+    osc1.type = 'sine';
+    osc1.frequency.value = 55;
+    const osc2 = ctx.createOscillator();
+    osc2.type = 'triangle';
+    osc2.frequency.value = 82.4;
+    const osc3 = ctx.createOscillator();
+    osc3.type = 'sine';
+    osc3.frequency.value = 110;
+    const g3 = ctx.createGain();
+    g3.gain.value = 0.35;
+    osc1.connect(filter);
+    osc2.connect(filter);
+    osc3.connect(g3);
+    g3.connect(filter);
+    osc1.start();
+    osc2.start();
+    osc3.start();
+    timeBuild.audio = { ctx, master, filter, osc1, osc2, osc3, g3 };
+    return timeBuild.audio;
+  }
+
+  function setTimeBuildMuted(muted) {
+    timeBuild.muted = !!muted;
+    if (timeBuild.audio?.master && timeBuild.audio.ctx) {
+      const g = timeBuild.audio.master.gain;
+      const t = timeBuild.audio.ctx.currentTime;
+      g.cancelScheduledValues(t);
+      g.setTargetAtTime(muted ? 0 : 0.07, t, 0.05);
+    }
+  }
+
+  function tuneTimeBuildAudio(year) {
+    const a = timeBuild.audio;
+    if (!a?.ctx) return;
+    const t = a.ctx.currentTime;
+    let base = 48;
+    let cut = 360;
+    if (year >= 1607 && year < 1776) {
+      base = 54;
+      cut = 420;
+    } else if (year >= 1776 && year < 1865) {
+      base = 62;
+      cut = 520;
+    } else if (year >= 1865) {
+      base = 70;
+      cut = 640;
+    }
+    a.osc1.frequency.setTargetAtTime(base, t, 0.4);
+    a.osc2.frequency.setTargetAtTime(base * 1.5, t, 0.4);
+    a.osc3.frequency.setTargetAtTime(base * 2, t, 0.4);
+    a.filter.frequency.setTargetAtTime(cut, t, 0.5);
+  }
+
+  function stopTimeBuildAudio() {
+    if (!timeBuild.audio) return;
+    try {
+      timeBuild.audio.osc1.stop();
+      timeBuild.audio.osc2.stop();
+      timeBuild.audio.osc3.stop();
+      timeBuild.audio.ctx.close();
+    } catch (_) {
+      /* ignore */
+    }
+    timeBuild.audio = null;
+  }
+
+  async function fetchMusicalEraLabel(year) {
+    const y = Math.round(year);
+    if (timeBuild.eraCache.has(y)) return timeBuild.eraCache.get(y);
+    try {
+      const res = await fetch(`/api/genealogy/year/${y}/music`);
+      if (!res.ok) throw new Error('era');
+      const data = await res.json();
+      const era = data.musicalEra || data;
+      const label = [era.period || era.era, era.music].filter(Boolean).join(' · ') || 'Lane family timeline';
+      timeBuild.eraCache.set(y, label);
+      return label;
+    } catch (_) {
+      const fallback =
+        y < 1600
+          ? 'Medieval/Renaissance · Early polyphony'
+          : y < 1750
+            ? 'Baroque Era · Bach, Vivaldi, Handel'
+            : y < 1820
+              ? 'Classical Era · Mozart, Haydn'
+              : y < 1900
+                ? 'Romantic Era · Beethoven, Chopin'
+                : 'Modern era';
+      timeBuild.eraCache.set(y, fallback);
+      return fallback;
+    }
+  }
+
+  function enterTimeBuildDark() {
+    const body = document.body;
+    if (!body) return;
+    if (!body.classList.contains('dark-mode')) {
+      body.classList.add('dark-mode');
+      timeBuild.forcedDark = true;
+    } else {
+      timeBuild.forcedDark = false;
+    }
+    body.setAttribute('data-time-build', 'on');
+  }
+
+  function leaveTimeBuildDark() {
+    const body = document.body;
+    if (!body) return;
+    body.removeAttribute('data-time-build');
+    if (timeBuild.forcedDark) {
+      body.classList.remove('dark-mode');
+      timeBuild.forcedDark = false;
+    }
+  }
+
+  function linkEndpointId(end) {
+    return typeof end === 'object' && end != null ? end.id : end;
+  }
+
+  function rememberNodePositions(nodes) {
+    if (!timeBuild.fullSub) return;
+    const byId = new Map((timeBuild.fullSub.nodes || []).map((n) => [n.id, n]));
+    for (const n of nodes || []) {
+      const home = byId.get(n.id);
+      if (!home) continue;
+      if (Number.isFinite(n.x)) home.x = n.x;
+      if (Number.isFinite(n.y)) home.y = n.y;
+      if (Number.isFinite(n.vx)) home.vx = n.vx;
+      if (Number.isFinite(n.vy)) home.vy = n.vy;
+    }
+  }
+
+  function applyTimeBuildYear(year, { forceDraw = false } = {}) {
+    if (!timeBuild.fullSub) return;
+    const y = Math.max(TIME_BUILD_START, Math.min(timeBuild.endYear, Number(year)));
+    timeBuild.year = y;
+    const shown = Math.round(y);
+    const atEnd = y >= timeBuild.endYear - 0.001;
+    const bucket = atEnd ? 'end' : Math.floor(shown / 10);
+    syncTimeBuildFlags(shown);
+    setTimeBuildHud(y, null);
+    tuneTimeBuildAudio(shown);
+    if (forceDraw || bucket !== timeBuild.lastDrawnBucket || atEnd) {
+      fetchMusicalEraLabel(shown).then((label) => {
+        if (Math.round(timeBuild.year) === shown) setTimeBuildHud(timeBuild.year, label);
+      });
+    }
+    if (!forceDraw && bucket === timeBuild.lastDrawnBucket && !atEnd) {
+      return;
+    }
+    timeBuild.lastDrawnBucket = bucket;
+    if (simulation) rememberNodePositions(simulation.nodes());
+    const filtered = filterSubByYear(timeBuild.fullSub, shown, atEnd);
+    const byId = new Map((timeBuild.fullSub.nodes || []).map((n) => [n.id, n]));
+    for (const n of filtered.nodes) {
+      const home = byId.get(n.id);
+      if (home && Number.isFinite(home.x)) {
+        n.x = home.x;
+        n.y = home.y;
+        n.vx = home.vx || 0;
+        n.vy = home.vy || 0;
+      }
+    }
+    drawGraph(filtered, timeBuild.opts || readControls(), { timeBuildActive: true, softRestart: true });
+  }
+
+  function timeBuildTick(ts) {
+    if (!timeBuild.playing) return;
+    if (!timeBuild.lastTs) timeBuild.lastTs = ts;
+    const dt = Math.min(0.05, Math.max(0, (ts - timeBuild.lastTs) / 1000));
+    timeBuild.lastTs = ts;
+    const next = timeBuild.year + TIME_BUILD_YEARS_PER_SEC * dt;
+    if (next >= timeBuild.endYear) {
+      applyTimeBuildYear(timeBuild.endYear, { forceDraw: true });
+      pauseTimeBuild({ finished: true });
+      return;
+    }
+    applyTimeBuildYear(next);
+    timeBuild.raf = requestAnimationFrame(timeBuildTick);
+  }
+
+  async function prepareTimeBuildSubgraph() {
+    await loadGraphData();
+    const opts = readControls();
+    if (opts.scope === 'family' && !opts.familyNo) {
+      opts.familyNo = '1';
+      if ($('graphFamilyNo')) $('graphFamilyNo').value = '1';
+    }
+    const sub = selectSubgraph(opts);
+    if (sub.error) throw new Error(sub.error);
+    timeBuild.fullSub = {
+      ...sub,
+      nodes: sub.nodes.map((n) => ({ ...n })),
+      links: sub.links.map((l) => ({
+        ...l,
+        source: linkEndpointId(l.source),
+        target: linkEndpointId(l.target)
+      }))
+    };
+    timeBuild.opts = opts;
+    timeBuild.endYear = computeTimeBuildEndYear(timeBuild.fullSub);
+    timeBuild.lastDrawnBucket = null;
+    syncTimeBuildButtons();
+    return timeBuild.fullSub;
+  }
+
+  async function playTimeBuild() {
+    timeBuild.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const resuming =
+      !!timeBuild.fullSub &&
+      timeBuild.year > TIME_BUILD_START &&
+      timeBuild.year < timeBuild.endYear;
+    if (!resuming) {
+      try {
+        await prepareTimeBuildSubgraph();
+      } catch (e) {
+        const el = $('d3-visualization');
+        if (el) el.innerHTML = `<p class="text-warning mb-0">${escHtml(e.message || String(e))}</p>`;
+        return;
+      }
+      timeBuild.year = TIME_BUILD_START;
+      timeBuild.lastDrawnBucket = null;
+    }
+    enterTimeBuildDark();
+    const audio = ensureTimeBuildAudio();
+    if (audio?.ctx?.state === 'suspended') {
+      try {
+        await audio.ctx.resume();
+      } catch (_) {
+        /* ignore */
+      }
+    }
+    setTimeBuildMuted($('timeBuildMute')?.checked);
+    if (timeBuild.reducedMotion) {
+      timeBuild.playing = false;
+      applyTimeBuildYear(timeBuild.endYear, { forceDraw: true });
+      syncTimeBuildButtons();
+      setTimeBuildHud(timeBuild.endYear, 'Reduced motion — jumped to end year');
+      return;
+    }
+    timeBuild.playing = true;
+    timeBuild.lastTs = 0;
+    applyTimeBuildYear(timeBuild.year, { forceDraw: true });
+    syncTimeBuildButtons();
+    timeBuild.raf = requestAnimationFrame(timeBuildTick);
+  }
+
+  function pauseTimeBuild({ finished = false } = {}) {
+    timeBuild.playing = false;
+    if (timeBuild.raf) {
+      cancelAnimationFrame(timeBuild.raf);
+      timeBuild.raf = 0;
+    }
+    timeBuild.lastTs = 0;
+    if (finished) {
+      stopTimeBuildAudio();
+      fetchMusicalEraLabel(timeBuild.year).then((label) =>
+        setTimeBuildHud(timeBuild.year, `${label} · complete`)
+      );
+    } else if (timeBuild.audio?.ctx) {
+      try {
+        timeBuild.audio.ctx.suspend();
+      } catch (_) {
+        /* ignore */
+      }
+    }
+    syncTimeBuildButtons();
+  }
+
+  async function restartTimeBuild() {
+    pauseTimeBuild();
+    stopTimeBuildAudio();
+    timeBuild.audio = null;
+    timeBuild.year = TIME_BUILD_START;
+    await playTimeBuild();
+  }
+
+  function exitTimeBuildSession() {
+    pauseTimeBuild();
+    stopTimeBuildAudio();
+    timeBuild.fullSub = null;
+    timeBuild.opts = null;
+    timeBuild.lastDrawnBucket = null;
+    leaveTimeBuildDark();
+    syncTimeBuildFlags(TIME_BUILD_START);
+    setTimeBuildHud(TIME_BUILD_START, 'Press Play to watch the family graph build through time');
+    syncTimeBuildButtons();
+  }
+
+  function bindTimeBuildControls() {
+    if (!$('timeBuildPlay')) return;
+    timeBuild.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    $('timeBuildPlay')?.addEventListener('click', () => {
+      playTimeBuild();
+    });
+    $('timeBuildPause')?.addEventListener('click', () => pauseTimeBuild());
+    $('timeBuildRestart')?.addEventListener('click', () => restartTimeBuild());
+    $('timeBuildMute')?.addEventListener('change', (ev) => {
+      setTimeBuildMuted(ev.target.checked);
+    });
+    $('timeBuildScrub')?.addEventListener('input', (ev) => {
+      if (!timeBuild.fullSub) return;
+      const y = Number(ev.target.value);
+      if (timeBuild.playing) pauseTimeBuild();
+      if (timeBuild.audio?.ctx?.state === 'suspended') {
+        timeBuild.audio.ctx.resume().catch(() => {});
+      }
+      applyTimeBuildYear(y, { forceDraw: true });
+    });
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key !== 'Escape') return;
+      if (!timeBuild.playing && document.body?.getAttribute('data-time-build') !== 'on') return;
+      pauseTimeBuild();
+      leaveTimeBuildDark();
+    });
+    syncTimeBuildFlags(TIME_BUILD_START);
+    syncTimeBuildButtons();
+  }
+
+  function drawGraph(sub, opts, drawOpts) {
     const el = $('d3-visualization');
     if (!el) return;
-    if (simulation) simulation.stop();
+    if (simulation) {
+      rememberNodePositions(simulation.nodes());
+      simulation.stop();
+    }
     el.innerHTML = '';
     if (typeof d3 === 'undefined') {
       el.innerHTML = '<p class="text-warning mb-0">D3 failed to load.</p>';
       return;
     }
     if (!sub.nodes.length) {
-      el.innerHTML = '<p class="text-muted mb-0">No relationships match these filters.</p>';
+      el.innerHTML =
+        document.body?.getAttribute('data-time-build') === 'on'
+          ? '<p class="text-muted mb-0 px-3 pt-5" style="position:relative;z-index:2;color:#c9c2b6">Waiting for the first births in this line…</p>'
+          : '<p class="text-muted mb-0">No relationships match these filters.</p>';
       return;
     }
     const width = el.clientWidth || 900;
     const height = el.clientHeight || 600;
+    const timeBuildActive = !!(drawOpts && drawOpts.timeBuildActive);
+    const softRestart = !!(drawOpts && drawOpts.softRestart);
     const svg = d3.select(el).append('svg').attr('width', '100%').attr('height', height).attr('viewBox', [0, 0, width, height]);
     const g = svg.append('g');
     svg.call(d3.zoom().scaleExtent([0.08, 6]).on('zoom', (event) => g.attr('transform', event.transform)));
@@ -415,7 +971,7 @@
       .join('line')
       .attr('stroke', (d) => (d.provenance ? RELATION_COLORS[d.relation] || '#999' : LEGACY_COLOR))
       .attr('stroke-width', (d) => (d.provenance ? 1.8 : 1))
-      .attr('stroke-opacity', 0.85)
+      .attr('stroke-opacity', timeBuildActive ? 0.92 : 0.85)
       .attr('stroke-dasharray', (d) => (d.relation === 'spouse' ? '4 3' : null));
     link.append('title').text((d) => {
       const s = nodesById.get(typeof d.source === 'object' ? d.source.id : d.source);
@@ -438,8 +994,17 @@
       .append('circle')
       .attr('r', (d) => (d.genealogyCode && d.genealogyCode.familyKey ? 7 : 4.5))
       .attr('fill', (d) => (d.gender === 'F' ? '#f7a8c8' : d.gender === 'M' ? '#8cc4ff' : '#d0d4da'))
-      .attr('stroke', (d) => (d.genealogyCode && d.genealogyCode.familyKey ? '#8a5a00' : '#ffffff'))
-      .attr('stroke-width', (d) => (d.genealogyCode && d.genealogyCode.familyKey ? 2 : 1));
+      .attr('stroke', (d) =>
+        d.genealogyCode && d.genealogyCode.familyKey ? (timeBuildActive ? '#e2b56a' : '#8a5a00') : timeBuildActive ? '#f5f0e6' : '#ffffff'
+      )
+      .attr('stroke-width', (d) => (d.genealogyCode && d.genealogyCode.familyKey ? 2 : 1))
+      .attr('opacity', 0)
+      .transition()
+      .duration(timeBuildActive && !timeBuild.reducedMotion ? 420 : 0)
+      .attr('opacity', 1);
+    if (timeBuildActive) {
+      node.select('circle').style('filter', 'drop-shadow(0 0 5px rgba(232, 210, 160, 0.55))');
+    }
     node.append('title').text((d) => `${personLabel(d)}${d.genealogyCode ? `\n${d.genealogyCode.label}` : ''}\nClick for details`);
     const showAllLabels = sub.nodes.length <= 140;
     node
@@ -465,10 +1030,13 @@
       .force('center', d3.forceCenter(width / 2, height / 2))
       .force('x', d3.forceX(width / 2).strength(0.03));
     if (opts.scope === 'family') {
-      const rows = Math.max(opts.depth + 2, 3);
+      const rows = Math.max((opts.depth || 0) + 2, 3);
       simulation.force('y', d3.forceY((d) => ((d._level ?? 0) + 1.5) * (height / rows)).strength(0.35));
     } else {
       simulation.force('y', d3.forceY(height / 2).strength(0.03));
+    }
+    if (softRestart) {
+      simulation.alpha(0.35).restart();
     }
     node.call(dragBehavior());
     simulation.on('tick', () => {
@@ -483,7 +1051,10 @@
     const summary = $('graphSummary');
     if (summary) {
       const book = sub.links.filter((l) => l.provenance).length;
-      const capped = sub.totalNodes > sub.nodes.length ? ` (first ${sub.nodes.length} of ${sub.totalNodes})` : '';
+      const capped =
+        !timeBuildActive && sub.totalNodes > sub.nodes.length
+          ? ` (first ${sub.nodes.length} of ${sub.totalNodes})`
+          : '';
       const via =
         graphBackend === 'file'
           ? ' · laneData.json'
@@ -492,7 +1063,11 @@
             : graphBackend.endsWith('+register')
               ? ' · register codes on the family tree'
               : '';
-      summary.textContent = `${sub.note} — ${sub.nodes.length} people${capped}, ${sub.links.length} links (${book} from the book)${via}`;
+      const yearBit =
+        timeBuildActive && timeBuild.fullSub
+          ? ` · year ${Math.round(timeBuild.year)} (${sub.nodes.length}/${timeBuild.fullSub.nodes.length} people)`
+          : '';
+      summary.textContent = `${sub.note} — ${sub.nodes.length} people${capped}, ${sub.links.length} links (${book} from the book)${via}${yearBit}`;
     }
   }
 
@@ -582,7 +1157,11 @@
             <strong>${personLink(head && head.person, head && head.name)}</strong>
             ${head && head.pedigree ? `<span class="text-muted small">${escHtml(head.pedigree)}</span>` : ''}
             ${life ? `<span class="small">${escHtml(life)}</span>` : ''}
-            <span class="small text-muted">· ${escHtml(json.sectionLabel || '')}${f.generation ? ` · generation ${escHtml(f.generation)}` : ''} · PDF p. ${escHtml(f.pdfPage)}</span>
+            <span class="small text-muted">· ${escHtml(json.sectionLabel || '')}${f.generation ? ` · generation ${escHtml(f.generation)}` : ''} · PDF p. ${escHtml(f.pdfPage)}${
+              f.pdfPage
+                ? ` · <a href="${escHtml(archiveUrl(json.section, f.pdfPage))}" target="_blank" rel="noopener noreferrer">Archive.org</a>`
+                : ''
+            }</span>
           </div>
           ${wives ? `<div class="small mb-1"><strong>Wife:</strong> ${wives}</div>` : ''}
           ${parent}${childFams}
@@ -605,7 +1184,7 @@
     }
     const tab = $('tree-tab');
     if (tab && typeof bootstrap !== 'undefined' && bootstrap.Tab) bootstrap.Tab.getOrCreateInstance(tab).show();
-    renderGraph();
+    redrawGraphFresh();
     const viz = $('d3-visualization');
     if (viz && viz.scrollIntoView) viz.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -935,17 +1514,96 @@
     }
   }
 
+  function fillRegisterDirectory(doc) {
+    const sectionSel = $('registerDirectorySection');
+    const familySel = $('registerDirectoryFamily');
+    const statsEl = $('relResearchStats');
+    if (!sectionSel || !familySel) return;
+    const families = Array.isArray(doc?.families) ? doc.families : [];
+    const sections = [...new Set(families.map((f) => f.section).filter(Boolean))];
+    sectionSel.innerHTML =
+      '<option value="">All parts</option>' +
+      sections
+        .map((s) => `<option value="${escHtml(s)}">${escHtml(SECTION_LABELS[s] || s)}</option>`)
+        .join('');
+    const rebuildFamilies = () => {
+      const sec = sectionSel.value;
+      const list = families
+        .filter((f) => !sec || f.section === sec)
+        .slice()
+        .sort((a, b) => {
+          if (a.section !== b.section) return String(a.section).localeCompare(String(b.section));
+          return Number(a.familyNo) - Number(b.familyNo);
+        });
+      familySel.disabled = !list.length;
+      familySel.innerHTML = list.length
+        ? list
+            .map((f) => {
+              const head = f.head?.name || '—';
+              const label = `${SECTION_SHORT[f.section] || f.section} · No. ${f.familyKey} · ${head}`;
+              return `<option value="${escHtml(f.section)}|${escHtml(f.familyKey)}">${escHtml(label)}</option>`;
+            })
+            .join('')
+        : '<option value="">No families in this part</option>';
+    };
+    sectionSel.onchange = rebuildFamilies;
+    rebuildFamilies();
+
+    if (statsEl) {
+      const vols = Array.isArray(doc.volumes) ? doc.volumes : [];
+      const volBits = vols
+        .map((v) => {
+          const href = ARCHIVE_BY_VOLUME[v.volume] || '#';
+          return `<a href="${escHtml(href)}" target="_blank" rel="noopener noreferrer">Vol. ${escHtml(v.volume)} (${escHtml(v.year || '')})</a>: ${(v.stats?.families || 0).toLocaleString()} families`;
+        })
+        .join(' · ');
+      const multi = doc.stats?.multiVolumeFamilies || families.length;
+      const heads = families.filter((f) => f.head?.personId != null).length;
+      statsEl.innerHTML = `
+        <strong>${multi.toLocaleString()}</strong> numbered families across
+        <strong>${vols.length || 1}</strong> volume(s) ·
+        <strong>${heads.toLocaleString()}</strong> heads matched to the tree
+        ${volBits ? `<div class="mt-1">${volBits}</div>` : ''}
+        <div class="mt-1 text-muted">Deep research report: <code>/data/lane-deep-research-report.json</code></div>`;
+    }
+  }
+
+  async function loadResearchPanel() {
+    if (!$('relResearchPanel')) return;
+    try {
+      const doc = await loadRegisterDoc();
+      if (!doc) {
+        if ($('relResearchStats')) {
+          $('relResearchStats').innerHTML =
+            '<span class="text-muted">Register index unavailable. Confirm <code>/family/data/lane-genealogy-codes.json</code>.</span>';
+        }
+        return;
+      }
+      fillRegisterDirectory(doc);
+    } catch (error) {
+      if ($('relResearchStats')) {
+        $('relResearchStats').innerHTML = `<span class="text-danger">${escHtml(error.message || String(error))}</span>`;
+      }
+    }
+  }
+
+  function redrawGraphFresh() {
+    exitTimeBuildSession();
+    return renderGraph();
+  }
+
   function init() {
     ensureViewPerson();
+    bindTimeBuildControls();
 
-    $('graphApply')?.addEventListener('click', renderGraph);
-    $('graphScope')?.addEventListener('change', renderGraph);
-    $('graphBookOnly')?.addEventListener('change', renderGraph);
-    document.querySelectorAll('[data-graph-relation]').forEach((el) => el.addEventListener('change', renderGraph));
+    $('graphApply')?.addEventListener('click', redrawGraphFresh);
+    $('graphScope')?.addEventListener('change', redrawGraphFresh);
+    $('graphBookOnly')?.addEventListener('change', redrawGraphFresh);
+    document.querySelectorAll('[data-graph-relation]').forEach((el) => el.addEventListener('change', redrawGraphFresh));
     $('graphFamilyNo')?.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         if ($('graphScope')) $('graphScope').value = 'family';
-        renderGraph();
+        redrawGraphFresh();
       }
     });
     $('relSearch')?.addEventListener('click', () => searchRelationships(true));
@@ -961,6 +1619,15 @@
       });
     });
 
+    $('registerDirectoryGo')?.addEventListener('click', () => {
+      const raw = $('registerDirectoryFamily')?.value || '';
+      const [section, familyKey] = raw.split('|');
+      if (section && familyKey) showFamily(section, familyKey);
+    });
+    $('registerDirectoryFamily')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') $('registerDirectoryGo')?.click();
+    });
+
     const params = new URLSearchParams(window.location.search);
     applyUrlFilters(params);
 
@@ -971,6 +1638,7 @@
       relLoaded = true;
       loadRelStats();
       searchRelationships(true);
+      loadResearchPanel();
     };
     if (standalone) {
       loadExplorer();
@@ -996,6 +1664,9 @@
       const pid = Number.parseInt(personId, 10);
       if (!Number.isNaN(pid)) window.viewPerson(pid);
     }
+    if (params.get('timebuild') === '1' && $('timeBuildPlay')) {
+      setTimeout(() => playTimeBuild(), 400);
+    }
   }
 
   window.GenealogyRelationships = {
@@ -1004,7 +1675,10 @@
     searchRelationships,
     loadRelStats,
     citation,
-    applyUrlFilters
+    applyUrlFilters,
+    playTimeBuild,
+    pauseTimeBuild,
+    restartTimeBuild
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

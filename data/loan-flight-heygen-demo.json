@@ -1,0 +1,18 @@
+{
+  "character": {
+    "name": "Captain Mara Voss",
+    "role": "Loan-file flight instructor",
+    "voice": "Calm cockpit brief. Short sentences. No slang."
+  },
+  "attribution": "Briefings are written for a HeyGen avatar. Until a clip is rendered, Captain Voss speaks with the browser voice.",
+  "lines": {
+    "application": "Six items make a TRID application: name, income, Social Security number, property address, estimated value, and loan amount. Documents can come after.",
+    "disclosures": "The Loan Estimate goes out within three lender-open days. In this sim, Saturday and Sunday do not count, and holidays are not removed.",
+    "processing": "Read the LTV gauge before you talk mortgage insurance. Conventional PMI sits above 80 percent. FHA, VA, and USDA are different lines.",
+    "product-lines": "Name the line before you quote the cap. HomeReady is Fannie. Home Possible is Freddie. 203(b) is FHA. IRRRL is an existing VA loan. USDA purchase needs an eligible area and a household income limit.",
+    "underwriting": "Back-end DTI is every monthly debt divided by gross monthly income. Paying off a payment or adding qualifying income can bring it down. A shorter term usually makes it worse.",
+    "conditions": "A large deposit that is not payroll needs a letter and a paper trail. An automated approval does not clear an open condition.",
+    "ctc": "The Closing Disclosure has to be in the borrower's hands at least three business days before consummation. Here, Saturday counts and Sunday does not.",
+    "funding": "The risk color reads DTI, reserves, and LTV. It is a training gauge, not a decision. Your score stays on this page. The GSE analyzer opens on its own."
+  }
+}

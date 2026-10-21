@@ -33,7 +33,7 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | POST | `/api/encompass-conditions/invoke` | Invoke a catalog operation; PATCH `?action=add\|update\|delete` for types/templates/loan conditions |
 | * | `/api/encompass-conditions/types`, `/templates`, `/sets`, `/roles`, `/loans/:loanId/conditions` | REST CRUD aliases (`/roles` is read-only: `GET /encompass/v3/settings/roles`); convert + expert remain under the same mount |
 | POST | `/api/encompass-conditions/convert` | Dry-run CDO → Enhanced Conditions payload conversion; optional `roles` (Settings Roles API response or list) + `roleSource` label reconcile legacy ConditionAccess names |
-| * | `/api/encompass/*` | Encompass Assistant (search, chat, summary) |
+| * | `/api/encompass/*` and `/api/encompass-assistant/*` | Encompass Developer AI Expert (search, chat, summary, health, graph, history) |
 | POST | `/api/webhooks/encompass` | Encompass webhook receiver |
 | POST | `/api/reviewer/ai/chat` | The Screen Test AI |
 | POST | `/api/unit-tests/files` | Upload unit test Excel to library |
@@ -90,6 +90,16 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | GET | `/api/gse/loan-limits` | Query `state`, `county`, `units` → bundled FHFA sample limit row |
 | POST | `/api/gse/loan-program-expert` | Dedicated GSE AI advisor response (recommendation, verifications, overlay risks, citations) |
 | POST | `/api/finance/loan-program-expert` | Shared finance AI advisor endpoint (same contract as `/api/gse/loan-program-expert`) |
+
+## Loan file flight simulator
+
+Question bank: `data/loan-flight-question-bank.json`. Seen question ids and the pilot's difficulty are stored in Postgres (`loan_flight_question`, `loan_flight_seen`, `loan_flight_pilot`). The pilot report links to `/gse-analyzer.html` and does not post the flight into that form.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/loan-flight/deck?clientId=` | 10 unseen questions per stage at the pilot's difficulty. Product-line questions step up at First officer and Captain. |
+| POST | `/api/loan-flight/complete` | Body: `clientId`, `difficulty`, `results[{id,correct}]`. Records seen ids. 80% or better unlocks the next difficulty. |
+| POST | `/api/loan-flight/assistant/chat` | Captain Mara Voss. Does not name the correct choice until `revealed` is true. Falls back to a short coach line when OpenAI is not configured. |
 
 ### GSE AI endpoint response shape
 

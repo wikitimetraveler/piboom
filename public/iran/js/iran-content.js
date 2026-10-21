@@ -283,7 +283,7 @@
           <button type="button" class="ir-phrase" data-phrase-index="${index}">
             <i class="bi bi-volume-up-fill ir-phrase-icon" aria-hidden="true"></i>
             <span class="ir-phrase-copy">
-              <span class="ir-phrase-ar" lang="ar" dir="rtl">${esc(phrase.ar)}</span>
+              <span class="ir-phrase-ar" lang="fa" dir="rtl">${esc(phrase.fa)}</span>
               <span class="ir-phrase-translit">${esc(phrase.translit)}</span>
               <span class="ir-phrase-en">${esc(phrase.en)}</span>
             </span>
@@ -314,11 +314,11 @@
         nowruz: 'Nowruz still greets the spring equinox',
         revolution: '1979 revolution founds the Islamic Republic'
       },
-      ar: {
-        achaemenid: 'الإمبراطورية الأخمينية تنهض على الهضبة',
-        persepolis: 'برسبوليس تُبنى عاصمة احتفالية',
-        nowruz: 'نوروز ما زال يحيّي اعتدال الربيع',
-        revolution: 'ثورة ١٩٧٩ تؤسس الجمهورية الإسلامية'
+      fa: {
+        achaemenid: 'شاهنشاهی هخامنشی بر فلات برمی‌خیزد',
+        persepolis: 'تخت جمشید همچون پایتخت آیینی ساخته می‌شود',
+        nowruz: 'نوروز هنوز اعتدال بهار را خوشامد می‌گوید',
+        revolution: 'انقلاب ۱۳۵۷ جمهوری اسلامی را بنیاد می‌گذارد'
       }
     };
     const table = map[i18n()?.lang() || 'en'] || map.en;
@@ -514,7 +514,7 @@
     const gen = ++listenGeneration;
     listenSpeakingKey = key;
     syncListenButtons();
-    // Re-prime AFTER stop, in the same click — needed for English Listen and Arabic phrases.
+    // Re-prime AFTER stop, in the same click — needed for English Listen and Persian phrases.
     if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
     i18n()?.unlockAudio();
 
@@ -620,7 +620,7 @@
 
   async function speakPhrase(index) {
     const phrase = state.data?.phrases?.[index];
-    if (!phrase?.ar) return;
+    if (!phrase?.fa) return;
     const key = `phrase:${index}`;
     if (listenSpeakingKey === key) {
       stopListenSpeech();
@@ -639,7 +639,7 @@
     try {
       const api = i18n();
       if (!api?.speak) return;
-      await api.speak(phrase.ar, { lang: 'ar', force: true });
+      await api.speak(phrase.fa, { lang: 'fa', force: true });
     } finally {
       if (gen === listenGeneration) clearListenUi();
     }

@@ -1,26 +1,25 @@
 /**
- * Iran page — language state (English / Arabic) and bilingual speech helpers.
+ * Iran page — language state (English / Farsi) and bilingual speech helpers.
  * Every other Iran script reads language through this module.
  * Development work by David Lane
  */
 (function () {
   'use strict';
 
-  /** Shared across Jordan / Syria / Holy Land / Iran so a choice sticks on every atlas page. */
-  const STORAGE_KEY = 'meAtlasLang';
-  const LEGACY_STORAGE_KEY = 'iranLang';
+  /** Iran keeps its own key so Farsi does not rewrite the shared Arabic atlas toggle. */
+  const STORAGE_KEY = 'iranLang';
   const NARRATE_KEY = 'iranStoryNarrate';
-  const LANGS = ['en', 'ar'];
+  const LANGS = ['en', 'fa'];
 
-  /** Guide voice per language — always male (Nima). Arabic falls back to browser ar-* males on mobile. */
+  /** Guide voice per language — always male (Nima). Farsi uses Google fa-IR. */
   const VOICES = {
     en: { voice: 'en-US-Neural2-D', lang: 'en-US', speakingRate: 0.98, pitch: -1, gender: 'male' },
-    ar: { voice: 'ar-XA-Wavenet-B', lang: 'ar-XA', speakingRate: 0.95, pitch: -1, gender: 'male' }
+    fa: { voice: 'fa-IR-Wavenet-B', lang: 'fa-IR', speakingRate: 0.95, pitch: -1, gender: 'male' }
   };
 
   const state = {
-    lang: 'en',
-    ui: { en: {}, ar: {} },
+    lang: 'fa',
+    ui: { en: {}, fa: {} },
     listeners: []
   };
 
@@ -78,7 +77,8 @@
   function readInitialLang() {
     try {
       const param = new URLSearchParams(window.location.search).get('lang');
-      if (LANGS.includes(param)) return param;
+      if (param === 'ar' || param === 'fa' || param === 'fa-IR') return 'fa';
+      if (param === 'en') return 'en';
     } catch (_) {
       /* ignore */
     }
@@ -88,8 +88,8 @@
     } catch (_) {
       /* ignore */
     }
-    // Default English on first visit — Arabic only via ?lang=ar or the language toggle.
-    return 'en';
+    // Farsi on first visit. English via ?lang=en or the language toggle.
+    return 'fa';
   }
 
   function lang() {
@@ -97,16 +97,16 @@
   }
 
   function isRtl() {
-    return state.lang === 'ar';
+    return state.lang === 'fa';
   }
 
-  /** Resolve a value that may be a plain string or an { en, ar } pair. */
+  /** Resolve a value that may be a plain string or an { en, fa } pair. */
   function pick(value, forcedLang) {
     if (value == null) return '';
     const key = forcedLang || state.lang;
     if (typeof value === 'string' || typeof value === 'number') return String(value);
     if (Array.isArray(value)) return value.map((v) => pick(v, key)).join(', ');
-    return String(value[key] ?? value.en ?? value.ar ?? '');
+    return String(value[key] ?? value.fa ?? value.en ?? '');
   }
 
   function t(key) {
@@ -134,7 +134,7 @@
   function applyDocumentDirection() {
     const dir = isRtl() ? 'rtl' : 'ltr';
     document.documentElement.setAttribute('dir', dir);
-    document.documentElement.setAttribute('lang', state.lang === 'ar' ? 'ar' : 'en');
+    document.documentElement.setAttribute('lang', state.lang === 'fa' ? 'fa' : 'en');
     document.body.setAttribute('dir', dir);
   }
 
@@ -169,17 +169,17 @@
   }
 
   function toggle() {
-    setLang(state.lang === 'en' ? 'ar' : 'en');
+    setLang(state.lang === 'en' ? 'fa' : 'en');
   }
 
   function updateToggleLabel() {
     const label = document.getElementById('irLangToggleLabel');
-    if (label) label.textContent = t('switchTo') || (state.lang === 'en' ? 'عربي' : 'English');
+    if (label) label.textContent = t('switchTo') || (state.lang === 'en' ? 'فارسی' : 'English');
     const btn = document.getElementById('irLangToggle');
     if (btn) {
       btn.setAttribute(
         'aria-label',
-        state.lang === 'en' ? 'Switch page to Arabic' : 'تبديل الصفحة إلى الإنجليزية'
+        state.lang === 'en' ? 'Switch page to Persian' : 'صفحه را به انگلیسی برگردان'
       );
     }
   }

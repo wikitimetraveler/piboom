@@ -34,7 +34,7 @@
     return cachedDemo;
   }
 
-  /** Read a per-language slot without cross-language fallback — an Arabic viewer must not get the English read. */
+  /** Read a per-language slot without cross-language fallback — a Farsi viewer must not get the English read. */
   function pickStrict(value) {
     if (value == null) return '';
     if (typeof value === 'string') return value;
@@ -124,14 +124,14 @@
 
   function fallbackDemo() {
     return {
-      title: { en: 'Iran — Meet Nima', ar: 'إيران — تعرّف على نیما' },
+      title: { en: 'Iran — Meet Nima', fa: 'ایران — آشنایی با نیما' },
       heygenScriptShort: {
-        en: 'Ahlan wa sahlan — I am Nima. This atlas walks Iran: Persepolis and Isfahan, Nowruz and tahdig, tar and radif. Press play on the HyperFrame tour, or ask me anything on the page.',
-        ar: 'أهلاً وسهلاً — أنا نیما. هذا الأطلس يمشي إيران: برسبوليس وأصفهان، نوروز والتهديغ، الطار والرديف. شغّل جولة HyperFrame، أو اسألني عن أي شيء في الصفحة.'
+        en: 'Salâm — I am Nima. This atlas walks Iran: Persepolis and Isfahan, Nowruz and tahdig, tar and radif. Press play on the HyperFrame tour, or ask me anything on the page.',
+        fa: 'سلام — من نیما هستم. این اطلس ایران را قدم می‌زند: تخت جمشید و اصفهان، نوروز و ته دیگ، تار و ردیف. تور تصویری را پخش کن، یا هر چه روی صفحه است از من بپرس.'
       },
-      ctaLabel: { en: 'Start the tour', ar: 'ابدأ الجولة' },
+      ctaLabel: { en: 'Start the tour', fa: 'شروع تور' },
       brand: {
-        attribution: { en: 'Guide narration', ar: 'سرد الدليل' },
+        attribution: { en: 'Guide narration', fa: 'روایت راهنما' },
         developmentBy: 'David E Lane'
       },
       avatar: { portrait: '/iran/assets/nima-guide-portrait-256.png' }

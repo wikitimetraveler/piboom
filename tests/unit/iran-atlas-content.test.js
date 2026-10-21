@@ -21,12 +21,12 @@ beforeAll(async () => {
   reelJs = await readFile(REEL_JS_PATH, 'utf8');
 });
 
-/** Every visitor-facing string is authored in both languages — nothing falls back mid-page. */
+/** Every visitor-facing string is authored in English and Farsi — nothing falls back mid-page. */
 function expectBilingual(value, label) {
   expect(typeof value === 'object' && value !== null).toBe(true);
   expect(String(value.en || '').trim().length).toBeGreaterThan(0);
-  expect(String(value.ar || '').trim().length).toBeGreaterThan(0);
-  expect(ARABIC_RE.test(value.ar)).toBe(true);
+  expect(String(value.fa || '').trim().length).toBeGreaterThan(0);
+  expect(ARABIC_RE.test(value.fa)).toBe(true);
   expect(ARABIC_RE.test(value.en)).toBe(false);
   expect(label).toBeTruthy();
 }
@@ -34,10 +34,11 @@ function expectBilingual(value, label) {
 describe('iran content', () => {
   test('UI tables cover the same keys in both languages', () => {
     const en = Object.keys(content.ui.en).sort();
-    const ar = Object.keys(content.ui.ar).sort();
-    expect(ar).toEqual(en);
+    const fa = Object.keys(content.ui.fa).sort();
+    expect(fa).toEqual(en);
     expect(content.ui.en.dir).toBe('ltr');
-    expect(content.ui.ar.dir).toBe('rtl');
+    expect(content.ui.fa.dir).toBe('rtl');
+    expect(content.ui.fa.langLabel).toBe('فارسی');
     expect(content.ui.en.heroTitle).toMatch(/Iran/);
   });
 
@@ -81,7 +82,7 @@ describe('iran content', () => {
         for (const field of ['name', 'tagline', 'history']) {
           expectBilingual(item[field], `${section} ${item.id}.${field}`);
         }
-        expect(item.tags.en.length).toBe(item.tags.ar.length);
+        expect(item.tags.en.length).toBe(item.tags.fa.length);
         if (item.siteId) expect(siteIds.has(item.siteId)).toBe(true);
       }
     }
@@ -100,13 +101,14 @@ describe('iran content', () => {
     }
   });
 
-  test('phrases are Arabic with transliteration and an English gloss', () => {
+  test('phrases are Persian with transliteration and an English gloss', () => {
     expect(content.phrases.length).toBeGreaterThan(5);
     for (const phrase of content.phrases) {
-      expect(ARABIC_RE.test(phrase.ar)).toBe(true);
+      expect(ARABIC_RE.test(phrase.fa)).toBe(true);
       expect(phrase.translit.trim().length).toBeGreaterThan(0);
       expect(phrase.en.trim().length).toBeGreaterThan(0);
     }
+    expect(content.phrases.some((phrase) => phrase.fa === 'سلام')).toBe(true);
   });
 });
 

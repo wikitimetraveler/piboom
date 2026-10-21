@@ -1,0 +1,417 @@
+{
+  "title": "Encompass Developer AI Expert",
+  "guide": {
+    "name": "Encompass Developer AI Expert",
+    "role": "ICE Mortgage Technology Encompass Developer Connect specialist for DevConnect Labs — APIs, OAuth, ICE sample repos, Postman, Hub surfaces, and hybrid RAG"
+  },
+  "overview": [
+    "Encompass Developer Connect exposes REST APIs for loan manufacturing, pipeline, settings, documents, webhooks, TPO Connect, and Enhanced Conditions. Base hosts include concept.api.elliemae.com (and production equivalents).",
+    "DevConnect Labs proxies live Hub calls through services/encompass-hub.service.js and services/encompass-auth.service.js (OAuth token cache + clearEncompassTokenCache on 401 retry). Multi-env requests use header X-Encompass-Env.",
+    "This expert uses hybrid RAG: curated fact sheet (always injected) + keyword JSON (encompass-docs.json, ice-sources.json) + optional pgvector (encompass_docs_chunks, ice_knowledge_chunks). Retrieval only — executionAllowed=false; never execute ICE APIs from RAG hits.",
+    "Encompass is web/cloud/phone — design integrations for cloud deployment, not local desktop SDK-only assumptions. Prefer V3 where available; use V1 when the surface is still V1-only (e.g. many associates endpoints)."
+  ],
+  "concepts": [
+    {
+      "name": "OAuth 2.0 / API keys",
+      "summary": "Client ID + secret from API Keys guide. Flows: client_credentials (service/ISV), authorization_code (user), resource-owner/password patterns in older samples, and token exchange (imt-exp20-token-exchange). Pass Authorization: Bearer on every call. DevConnect Labs: ensureEncompassToken() / clearEncompassTokenCache()."
+    },
+    {
+      "name": "V1 vs V3",
+      "summary": "V3 covers modern loan CRUD, field reader/writer, Enhanced Conditions, cloud attachments, and many settings surfaces. V1 remains for pipeline cursors historically, associates, and some eFolder paths. Prefer V3 when both exist; cite docs for migration (SDK to API guide)."
+    },
+    {
+      "name": "Loan Pipeline",
+      "summary": "Search loans via Pipeline APIs with filter criteria (canonicalName, MatchType, Operator). Cursor-based pagination (start/limit, x-cursor) for large sets. Data comes from Reporting Database (RDB) — async refresh; cursor snapshots are point-in-time. Canonical names: Loan.* and Fields.* (use Get Pipeline Canonical Names)."
+    },
+    {
+      "name": "Field Reader / Writer",
+      "summary": "V3 Field Reader (POST) and Field Writer (POST) read/write loan field IDs by GUID. Native fields (e.g. Fields.4000) and custom CX.* fields. DevConnect Labs Hub exposes field-reader proxies for pipeline→scenario tools (GSE analyzer)."
+    },
+    {
+      "name": "Enhanced Conditions",
+      "summary": "Types own vocabularies; templates reference types; loan conditions are instances. Access is role-based (not per-user ACL). Live CRUD: /finance/enhanced-conditions.html → /api/encompass-conditions. Dry-run migration: Condition Manager. Specialist chat: Enhanced Conditions Expert."
+    },
+    {
+      "name": "TPO Connect & SSF",
+      "summary": "Third-party originator guest apps in iframes use ICE Secure Scripting Framework (elli.script), parent/loan context objects, LoanContractTPO fields, and optional token exchange. Knowledge page: /finance/tpo-connect.html."
+    },
+    {
+      "name": "Webhooks / EFC",
+      "summary": "Subscribe to loan, document, Enhanced Conditions, org/user, EPC, trades, workflow events. Enhanced Field Change (EFC) webhook for field-level change notifications. Signing keys, custom auth, allow-list destination domains, retry/reconciliation best practices."
+    },
+    {
+      "name": "Custom forms & ScreenBindings",
+      "summary": "ICE Secure Scripting Framework for custom forms/tools/plugins. Screen Test (/finance/tool9.html) reviews manifest XML (CustomFieldList, Field, Calculation). Unit Tests library exercises SET/GET/COMPARE workbooks against calculationEngine + customFieldCalcParser."
+    },
+    {
+      "name": "CalculationsEngine",
+      "summary": "public/shared/calculationEngine.js + calcMath in calcEngineLibrary.js. Factory configs: createDTICalculatorConfig, createFHACalculatorConfig, createAssetQualifierConfig with customIds mapping to Encompass field IDs. Do not invent parallel math libraries."
+    }
+  ],
+  "apis": {
+    "auth": [
+      {
+        "title": "API Keys",
+        "method": "docs",
+        "path": "/developer-connect/docs/api-keys",
+        "notes": "Create/rotate client credentials scoped to instance/environment."
+      },
+      {
+        "title": "Authorization (OAuth 2.0)",
+        "method": "docs",
+        "path": "/developer-connect/docs/authorization",
+        "notes": "Bearer access tokens; scopes; refresh/revocation."
+      },
+      {
+        "title": "Token generate (sample bindings)",
+        "method": "POST",
+        "path": "OAuth Token API (Elli.Api.OAuth)",
+        "notes": "See imt-developerconnect-dotnet-bindings AccessToken.cs and imt-exp20-token-exchange."
+      }
+    ],
+    "loan": [
+      {
+        "title": "V3 Create / Get / Update / Delete Loan",
+        "method": "POST|GET|PATCH|DELETE",
+        "path": "/encompass/v3/loans[/{loanId}]"
+      },
+      {
+        "title": "V3 Field Reader",
+        "method": "POST",
+        "path": "/encompass/v3/loans/fieldReader"
+      },
+      {
+        "title": "V3 Field Writer",
+        "method": "POST",
+        "path": "/encompass/v3/loans/fieldWriter"
+      },
+      {
+        "title": "V1/V3 Loan Pipeline",
+        "method": "POST",
+        "path": "/encompass/v1|v3/loanPipeline",
+        "notes": "Cursor pagination; filter on canonical names; RDB lag."
+      },
+      {
+        "title": "V1 Loan Associates",
+        "method": "GET|PUT|DELETE",
+        "path": "/encompass/v1/loans/{id}/associates[/{logId}]",
+        "notes": "Milestone / milestone-free role slots; Hub processor assignment."
+      },
+      {
+        "title": "V3 Enhanced Conditions (loan)",
+        "method": "GET|PATCH",
+        "path": "/encompass/v3/loans/{loanId}/conditions"
+      },
+      {
+        "title": "V3 Resource Lock",
+        "method": "GET|POST|DELETE",
+        "path": "/encompass/v3/resourceLocks"
+      },
+      {
+        "title": "Rate Lock Requests",
+        "method": "GET|POST|PATCH|PUT",
+        "path": "/encompass/v1/loans/{id}/rateLockRequests"
+      }
+    ],
+    "settings": [
+      {
+        "title": "Custom Fields",
+        "method": "GET|PATCH",
+        "path": "/encompass/v3/settings/loan/customFields"
+      },
+      {
+        "title": "Enhanced Condition Types / Templates",
+        "method": "GET|PATCH",
+        "path": "/encompass/v3/settings/loan/conditions/{types|templates}"
+      },
+      {
+        "title": "Internal Users / Roles / Personas",
+        "method": "GET|POST|PATCH",
+        "path": "/encompass/v3/settings/users|roles|personas"
+      },
+      {
+        "title": "Loan Schema / Field Schema",
+        "method": "GET",
+        "path": "/encompass/v3/schemas/loan|/encompass/v3/schemas/field"
+      }
+    ],
+    "webhooks": [
+      {
+        "title": "Subscriptions",
+        "method": "GET|POST|PUT|DELETE",
+        "path": "/webhook/v1/subscriptions"
+      },
+      {
+        "title": "Event History",
+        "method": "GET",
+        "path": "/webhook/v1/events"
+      },
+      {
+        "title": "EFC Webhook guide",
+        "method": "docs",
+        "path": "/developer-connect/docs/efc-webhook"
+      }
+    ]
+  },
+  "iceRepos": [
+    {
+      "name": "imt-developerconnect-dotnet-bindings",
+      "url": "https://github.com/intercontinentalexchange/imt-developerconnect-dotnet-bindings",
+      "path": "knowledge-sources/ice/repos/imt-developerconnect-dotnet-bindings",
+      "summary": "Official .NET client bindings for OAuth, Loans, Pipeline, Settings, Schema, eFolder, Services, Tools."
+    },
+    {
+      "name": "imt-integration-dotnetcore-sample-application",
+      "url": "https://github.com/intercontinentalexchange/imt-integration-dotnetcore-sample-application",
+      "path": "knowledge-sources/ice/repos/imt-integration-dotnetcore-sample-application",
+      "summary": "End-to-end .NET Core sample integrating Developer Connect APIs."
+    },
+    {
+      "name": "imt-loconnect-custom-tool-sample",
+      "url": "https://github.com/intercontinentalexchange/imt-loconnect-custom-tool-sample",
+      "path": "knowledge-sources/ice/repos/imt-loconnect-custom-tool-sample",
+      "summary": "LO Connect custom tool sample (iframe / scripting patterns)."
+    },
+    {
+      "name": "imt-exp20-token-exchange",
+      "url": "https://github.com/intercontinentalexchange/imt-exp20-token-exchange",
+      "path": "knowledge-sources/ice/repos/imt-exp20-token-exchange",
+      "summary": "OAuth token exchange sample (oauth.js) for guest/partner flows."
+    },
+    {
+      "name": "imt-exp20-ifb-scripting",
+      "url": "https://github.com/intercontinentalexchange/imt-exp20-ifb-scripting",
+      "path": "knowledge-sources/ice/repos/imt-exp20-ifb-scripting",
+      "summary": "IFB / Secure Scripting Framework demo scripts."
+    },
+    {
+      "name": "imt-epc-datadocs-mockinvestor",
+      "url": "https://github.com/intercontinentalexchange/imt-epc-datadocs-mockinvestor",
+      "path": "knowledge-sources/ice/repos/imt-epc-datadocs-mockinvestor",
+      "summary": "EPC DataDocs mock investor partner sample."
+    },
+    {
+      "name": "exp24-custom-form",
+      "url": "https://github.com/intercontinentalexchange/exp24-custom-form",
+      "path": "knowledge-sources/ice/repos/exp24-custom-form",
+      "summary": "Custom form sample for Encompass scripting / form packages."
+    },
+    {
+      "name": "nyse-bqt-cloudstreaming",
+      "url": "https://github.com/intercontinentalexchange/nyse-bqt-cloudstreaming",
+      "path": "knowledge-sources/ice/repos/nyse-bqt-cloudstreaming",
+      "summary": "NYSE BQT cloud streaming sample (adjacent ICE streaming patterns)."
+    }
+  ],
+  "postman": {
+    "collectionHint": "Encompass Developer Connect Postman collection + 3-environment collection under knowledge-sources/ice/postman/",
+    "files": [
+      "knowledge-sources/ice/postman/Encompass_Developer_Connect_postman_collection*.json",
+      "knowledge-sources/ice/postman/Encompass_Developer_Connect_postman_environment*.json"
+    ],
+    "environmentVars": [
+      "API_SERVER",
+      "ACCESS_TOKEN",
+      "CLIENT_ID",
+      "CLIENT_SECRET",
+      "INSTANCE_ID",
+      "loanId"
+    ],
+    "safeOrder": [
+      "1. Set environment (concept/UAT) and obtain ACCESS_TOKEN",
+      "2. Smoke GET loan or pipeline with a known GUID",
+      "3. Try field reader with a small field list",
+      "4. Only then PATCH/PUT destructive endpoints on UAT",
+      "5. Webhooks: register subscription to an allow-listed URL"
+    ]
+  },
+  "devconnectSurfaces": [
+    {
+      "name": "Encompass Hub",
+      "path": "/finance/encompass-hub.html",
+      "purpose": "Pipeline & loan API test console (OAuth via Hub service)"
+    },
+    {
+      "name": "Encompass Assistant",
+      "path": "/finance/encompass-assistant.html",
+      "purpose": "This chat — Developer Connect + ICE RAG expert"
+    },
+    {
+      "name": "Enhanced Conditions CRUD",
+      "path": "/finance/enhanced-conditions.html",
+      "purpose": "Live types/templates/loan conditions via allowlisted proxy"
+    },
+    {
+      "name": "Condition Manager",
+      "path": "/finance/condition-manager.html",
+      "purpose": "Dry-run legacy ConditionsTemplate.xml → Enhanced Conditions"
+    },
+    {
+      "name": "EC Expert",
+      "path": "/finance/enhanced-conditions-expert.html",
+      "purpose": "Specialist AI for Enhanced Conditions migration & APIs"
+    },
+    {
+      "name": "TPO Connect",
+      "path": "/finance/tpo-connect.html",
+      "purpose": "Guest apps, SSF objects, LoanContractTPO knowledge hub"
+    },
+    {
+      "name": "Unit Tests",
+      "path": "/finance/unit-tests.html",
+      "purpose": "Excel SET/GET/COMPARE library, IIf scenarios, calc engine"
+    },
+    {
+      "name": "Screen Test",
+      "path": "/finance/tool9.html",
+      "purpose": "AI review of Encompass manifest XML form code"
+    },
+    {
+      "name": "Processor assignment",
+      "path": "/finance/processor-assignment.html",
+      "purpose": "Complexity scoring + associates assignment via Hub"
+    },
+    {
+      "name": "Custom / Native Fields",
+      "path": "/finance/encompass-custom-fields.html",
+      "purpose": "AG Grid browsers for CX.* and native Fields.*"
+    },
+    {
+      "name": "GSE scenario analyzer",
+      "path": "/gse-analyzer.html",
+      "purpose": "Agency product fit decision-support + GSE knowledge RAG"
+    },
+    {
+      "name": "Loan flight simulator",
+      "path": "/finance/loan-flight-sim.html",
+      "purpose": "Synthetic loan lifecycle instruments via calculationEngine"
+    },
+    {
+      "name": "Disasters Encompass map",
+      "path": "/finance/disasters-encompass-map.html",
+      "purpose": "Live proximity loan pins vs hazard data (ops triage scores)"
+    }
+  ],
+  "quickPrompts": [
+    {
+      "label": "OAuth & token exchange",
+      "question": "How do I authenticate with Encompass Developer Connect OAuth 2.0? Cover client credentials vs authorization code, Bearer tokens, and how DevConnect Labs uses ensureEncompassToken / clearEncompassTokenCache. Point me to the token-exchange sample repo."
+    },
+    {
+      "label": "Pipeline cursor & canonical fields",
+      "question": "How does the Loan Pipeline API work with cursor pagination and canonical field names (Loan.* / Fields.*)? Mention RDB refresh lag and how to get canonical names."
+    },
+    {
+      "label": "V3 Field Reader/Writer",
+      "question": "Show me how to use V3 Field Reader and Field Writer to read and update loan fields by ID, including custom CX.* fields. Include a short JSON body example."
+    },
+    {
+      "label": "Enhanced Conditions V3",
+      "question": "Explain Enhanced Conditions types vs templates vs loan conditions, role-based access, and which DevConnect Labs pages to use (CRUD vs Condition Manager dry-run vs EC Expert)."
+    },
+    {
+      "label": "TPO Connect & SSF",
+      "question": "What is TPO Connect? Summarize guest iframe apps, ICE Secure Scripting Framework (elli.script), LoanContractTPO, and point me to /finance/tpo-connect.html."
+    },
+    {
+      "label": "EFC Webhooks",
+      "question": "How do I set up Encompass webhooks and Enhanced Field Change (EFC) events? Cover subscriptions, signing, allow-list domains, and reconciliation best practices."
+    },
+    {
+      "label": "CalculationsEngine + customIds",
+      "question": "How do I wire CalculationsEngine factory configs (DTI, FHA, Asset Qualifier) to Encompass field IDs via customIds in DevConnect Labs?"
+    },
+    {
+      "label": "ICE GitHub repos inventory",
+      "question": "What do the ICE GitHub repositories in our knowledge base contain? Enumerate each cloned repo and Postman collection and summarize what each provides."
+    },
+    {
+      "label": "RAG & graph DBs",
+      "question": "Explain how you use hybrid RAG and graph databases — two currents, one dock. Cover ICE knowledge, encompass docs, pgvector, keyword fallback, and how GraphRAG on graph_nodes differs from live /near."
+    }
+  ],
+  "officialLinks": [
+    {
+      "group": "Start",
+      "title": "Developer Connect Welcome",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/docs/welcome"
+    },
+    {
+      "group": "Auth",
+      "title": "API Keys",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/docs/api-keys"
+    },
+    {
+      "group": "Auth",
+      "title": "Authorization",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/docs/authorization"
+    },
+    {
+      "group": "Use cases",
+      "title": "Loan Manufacturing",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/docs/loan-manufacturing"
+    },
+    {
+      "group": "Use cases",
+      "title": "Loan Pipeline",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/docs/loan-pipeline"
+    },
+    {
+      "group": "Guides",
+      "title": "Working with Enhanced Conditions",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/docs/working-with-enhanced-conditions"
+    },
+    {
+      "group": "Guides",
+      "title": "Encompass TPO Connect",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/docs/encompass-tpo-connect"
+    },
+    {
+      "group": "Guides",
+      "title": "EFC Webhook",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/docs/efc-webhook"
+    },
+    {
+      "group": "Guides",
+      "title": "SDK to API Migration",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/docs/encompass-sdk-to-api-migration"
+    },
+    {
+      "group": "Resources",
+      "title": "Postman Collection",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/docs/postman-collection"
+    },
+    {
+      "group": "Resources",
+      "title": "Best Practices",
+      "url": "https://developer.icemortgagetechnology.com/developer-connect/docs/best-practices"
+    }
+  ],
+  "faqs": [
+    {
+      "q": "Does RAG execute Encompass APIs?",
+      "a": "No. Knowledge retrieval is read-only (executionAllowed=false). Live calls go through Hub (/api/encompass-hub) or allowlisted conditions proxy after auth."
+    },
+    {
+      "q": "Keyword or vectors?",
+      "a": "Both when DATABASE_URL + OPENAI_API_KEY + pgvector are available. Keyword JSON always works offline from committed ice-sources.json and encompass-docs.json."
+    },
+    {
+      "q": "Where is OAuth handled in this repo?",
+      "a": "services/encompass-auth.service.js — ensureEncompassToken(), clearEncompassTokenCache() on 401. Env: ENCOMPASS_API_BASE, ENCOMPASS_CLIENT_ID, ENCOMPASS_CLIENT_SECRET, ENCOMPASS_INSTANCE_ID."
+    },
+    {
+      "q": "V1 or V3 for pipeline?",
+      "a": "Both exist; V3 pipeline with pagination is preferred for new work when available. Canonical names and RDB lag apply regardless. Check Get Pipeline Canonical Names."
+    },
+    {
+      "q": "How do I refresh knowledge?",
+      "a": "npm run scrape:encompass-docs and npm run build:ice-knowledge, or npm run refresh:encompass-knowledge for both. Commit updated JSON stores."
+    }
+  ],
+  "refreshJobs": [
+    "npm run scrape:encompass-docs → data/encompass-docs.json (+ encompass_docs_chunks)",
+    "npm run build:ice-knowledge → data/knowledge/ice-sources.json (+ ice_knowledge_chunks)",
+    "npm run refresh:encompass-knowledge → scrape then ICE build"
+  ]
+}

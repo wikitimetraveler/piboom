@@ -2,12 +2,12 @@
   "id": "iran-hyperframes-reel",
   "title": {
     "en": "Iran HyperFrame Tour",
-    "ar": "جولة إيران المصوّرة"
+    "fa": "تور تصویری ایران"
   },
   "portrait": "/iran/assets/nima-guide-portrait-256.png",
   "voice": {
     "en": "en-US-Neural2-D",
-    "ar": "ar-XA-Wavenet-B"
+    "fa": "fa-IR-Wavenet-B"
   },
   "pitch": -1,
   "speakingRate": 0.98,
@@ -19,19 +19,19 @@
       "durationMs": 7200,
       "kicker": {
         "en": "Welcome",
-        "ar": "أهلاً"
+        "fa": "خوش آمدید"
       },
       "title": {
         "en": "Salâm — Iran",
-        "ar": "سلام — إيران"
+        "fa": "سلام — ایران"
       },
       "copy": {
         "en": "I am Nima. Plateau, empires, and living tables — told with care.",
-        "ar": "أنا نیما. هضبة وإمبراطوريات ومائدة حية — تُروى بعناية."
+        "fa": "من نیما هستم. فلات، امپراتوری‌ها و سفره‌های زنده — با دقت روایت می‌شوند."
       },
       "narration": {
         "en": "Salâm. I am Nima. This atlas is Iran — Elam and Persepolis, Safavid Isfahan, Nowruz fire, and a living table. Give me a few minutes and I will walk you through the map, the eras, and the flavors.",
-        "ar": "سلام. أنا نیما. هذا الأطلس إيران — عيلام وبرسبوليس، وأصفهان الصفوية، ونار نوروز، ومائدة حية. أعطني دقائق وأمشيك عبر الخريطة والعصور والنكهات."
+        "fa": "سلام. من نیما هستم. این اطلس ایران است — ایلام و تخت جمشید، اصفهان صفوی، آتش نوروز و سفره‌ای زنده. چند دقیقه به من بده تا تو را از نقشه، دوران‌ها و مزه‌ها بگذرانم."
       }
     },
     {
@@ -42,19 +42,19 @@
       "durationMs": 7000,
       "kicker": {
         "en": "Atlas",
-        "ar": "أطلس"
+        "fa": "اطلس"
       },
       "title": {
         "en": "The map opens",
-        "ar": "تُفتح الخريطة"
+        "fa": "نقشه باز می‌شود"
       },
       "copy": {
         "en": "Caspian green, desert brick, Gulf heat — every pin a place you can stand.",
-        "ar": "خضرة قزوين وطوب الصحراء وحر الخليج — كل علامة مكان يمكنك الوقوف فيه."
+        "fa": "سبز خزر، خشت کویر، گرمای خلیج — هر سنجاق جایی است که می‌توانی بایستی."
       },
       "narration": {
         "en": "First, the atlas. From Tehran to Bandar Abbas, from Persepolis stone to Rasht’s rainy kitchens — history pins, food towns, and living places. Select a name and the map leans in.",
-        "ar": "أولاً الأطلس. من طهران إلى بندر عباس، من حجر برسبوليس إلى مطابخ رشت الممطرة — علامات تاريخ وبلدات طعام وأماكن حيّة. اختر اسماً فتميل الخريطة نحوه."
+        "fa": "اول اطلس. از تهران تا بندرعباس، از سنگ تخت جمشید تا آشپزخانه‌های بارانی رشت — سنجاق تاریخ، شهرهای غذا و جاهای زنده. نامی را برگزین تا نقشه به سویش خم شود."
       }
     },
     {
@@ -65,19 +65,19 @@
       "durationMs": 8200,
       "kicker": {
         "en": "Capital",
-        "ar": "العاصمة"
+        "fa": "پایتخت"
       },
       "title": {
         "en": "Tehran",
-        "ar": "طهران"
+        "fa": "تهران"
       },
       "copy": {
         "en": "Alborz backdrop and modern Iran’s crowded heart.",
-        "ar": "خلفية البرز وقلب إيران الحديثة المزدحم."
+        "fa": "پس‌زمینهٔ البرز و قلب شلوغ ایران امروز."
       },
       "narration": {
         "en": "Start in Tehran. Qajar kings made it capital; today it sprawls under the Alborz with museums, traffic, and kitchens that still argue about the best chelo kebab.",
-        "ar": "نبدأ من طهران. جعلها ملوك القاجار عاصمة؛ واليوم تمتد تحت البرز بمتاحف وزحمة ومطابخ ما زالت تتجادل حول أفضل تشيلو كباب."
+        "fa": "از تهران آغاز کن. شاهان قاجار آن را پایتخت کردند؛ امروز زیر البرز با موزه، ترافیک و آشپزخانه‌هایی پهن شده که هنوز بر سر بهترین چلوکباب بحث می‌کنند."
       }
     },
     {
@@ -88,19 +88,19 @@
       "durationMs": 7800,
       "kicker": {
         "en": "Safavid jewel",
-        "ar": "جوهرة صفوية"
+        "fa": "گوهر صفوی"
       },
       "title": {
         "en": "Isfahan",
-        "ar": "أصفهان"
+        "fa": "اصفهان"
       },
       "copy": {
         "en": "Blue tiles, bridges, and Naqsh-e Jahan.",
-        "ar": "بلاط أزرق وجسور ونقش جهان."
+        "fa": "کاشی آبی، پل‌ها و نقش جهان."
       },
       "narration": {
         "en": "Then Isfahan — half the world, the proverb says. Shah Abbas shaped the square; bridges still hold evening tea and song.",
-        "ar": "ثم أصفهان — نصف العالم كما يقول المثل. شكّل الشاه عباس الساحة؛ وما زالت الجسور تحمل شاي المساء والغناء."
+        "fa": "سپس اصفهان — نصف جهان، چنان که مثل می‌گوید. شاه عباس میدان را شکل داد؛ پل‌ها هنوز چای غروب و آواز را نگه می‌دارند."
       }
     },
     {
@@ -111,19 +111,19 @@
       "durationMs": 8000,
       "kicker": {
         "en": "Stone memory",
-        "ar": "ذاكرة حجر"
+        "fa": "حافظهٔ سنگ"
       },
       "title": {
         "en": "Persepolis",
-        "ar": "برسبوليس"
+        "fa": "تخت جمشید"
       },
       "copy": {
         "en": "Achaemenid stairs where nations once climbed.",
-        "ar": "أدراج أخمينية صعدتها الأمم يوماً."
+        "fa": "پلکان هخامنشی که ملت‌ها روزی از آن بالا رفتند."
       },
       "narration": {
         "en": "South to Persepolis. Darius built a ceremonial capital of reliefs and columns. The stairs still teach how empire wanted to be seen.",
-        "ar": "جنوباً إلى برسبوليس. بنى داريوس عاصمة احتفالية من نقوش وأعمدة. ما زالت الأدراج تعلّم كيف أرادت الإمبراطورية أن تُرى."
+        "fa": "به جنوب، به تخت جمشید. داریوش پایتختی آیینی از نقش و ستون ساخت. پلکان هنوز می‌آموزد که شاهنشاهی می‌خواست چگونه دیده شود."
       }
     },
     {
@@ -134,19 +134,19 @@
       "durationMs": 7500,
       "kicker": {
         "en": "Timeline",
-        "ar": "خط زمني"
+        "fa": "خط زمان"
       },
       "title": {
         "en": "Eras of Iran",
-        "ar": "عصور إيران"
+        "fa": "دوران‌های ایران"
       },
       "copy": {
         "en": "Elam to today — select a layer to hear it.",
-        "ar": "من عيلام إلى اليوم — اختر طبقة لتسمعها."
+        "fa": "از ایلام تا امروز — لایه‌ای را برگزین تا بشنوی."
       },
       "narration": {
         "en": "Open the timeline. Elam, Achaemenids, Sasanians, Islamic Persian revival, Safavids, Qajars, Pahlavis, and the Islamic Republic — each layer has a place on the map.",
-        "ar": "افتح الخط الزمني. عيلام والأخمينيون والساسانيون والنهضة الفارسية الإسلامية والصفويون والقاجار والبهلويون والجمهورية الإسلامية — لكل طبقة مكان على الخريطة."
+        "fa": "خط زمان را باز کن. ایلام، هخامنشیان، ساسانیان، نوزایی فارسی اسلامی، صفویان، قاجار، پهلوی و جمهوری اسلامی — هر لایه جایی روی نقشه دارد."
       }
     },
     {
@@ -157,19 +157,19 @@
       "durationMs": 7200,
       "kicker": {
         "en": "Table",
-        "ar": "مائدة"
+        "fa": "سفره"
       },
       "title": {
         "en": "Kebab and tahdig",
-        "ar": "كباب وتهديغ"
+        "fa": "کباب و ته دیگ"
       },
       "copy": {
         "en": "Flip a plate — herb stews, jeweled rice, and sangak.",
-        "ar": "اقلب طبقاً — يخنة أعشاب وأرز مرصّع وسنگک."
+        "fa": "ظرفی را برگردان — خورش سبزی، برنج جواهرنشان و سنگک."
       },
       "narration": {
         "en": "At the table, chelo kebab meets ghormeh sabzi, fesenjan darkens with walnut, and tahdig cracks like treasure. Flip a card and I will tell you why patience tastes like hospitality here.",
-        "ar": "على المائدة يلتقي تشيلو كباب بقورمه سبزي، ويغمق الفسنجان بالجوز، ويتشقق التهديغ ككنز. اقلب بطاقة وأخبرك لماذا يذوق الصبر كضيافة هنا."
+        "fa": "بر سر سفره چلوکباب به قرمه‌سبزی می‌رسد، فسنجان با گردو تیره می‌شود و ته دیگ مثل گنج می‌ترکد. کارتی را برگردان تا بگویم چرا اینجا صبر مزهٔ مهمان‌نوازی دارد."
       }
     },
     {
@@ -180,19 +180,19 @@
       "durationMs": 7000,
       "kicker": {
         "en": "Sound",
-        "ar": "صوت"
+        "fa": "صدا"
       },
       "title": {
         "en": "Tar and radif",
-        "ar": "تار ورديف"
+        "fa": "تار و ردیف"
       },
       "copy": {
         "en": "Lutes, frame drums, and living modes.",
-        "ar": "أعواد ودفوف ومقامات حية."
+        "fa": "سازهای زهی، دف و دستگاه‌های زنده."
       },
       "narration": {
         "en": "Listen for tar and setar, daf circles, Kurdish folk, and the radif that pupils still memorize. Flip a music card for the history behind the mode.",
-        "ar": "اسمع التار والسه‌تار وحلقات الدف والأغنية الكردية والرديف الذي ما زال التلاميذ يحفظونه. اقلب بطاقة موسيقى لتقرأ الحكاية خلف المقام."
+        "fa": "گوش بده به تار و سه‌تار، حلقهٔ دف، فولکلور کردی و ردیفی که شاگردان هنوز از بر می‌کنند. کارت موسیقی را برگردان تا تاریخ پشت دستگاه را بخوانی."
       }
     },
     {
@@ -203,19 +203,19 @@
       "durationMs": 6800,
       "kicker": {
         "en": "Café",
-        "ar": "مقهى"
+        "fa": "کافه"
       },
       "title": {
         "en": "Chai before smoke",
-        "ar": "شاي قبل الدخان"
+        "fa": "چای پیش از دود"
       },
       "copy": {
         "en": "Qahveh-khaneh talk — then slow qalyān.",
-        "ar": "حديث القهوه‌خانه — ثم قلیان بطيء."
+        "fa": "حرف قهوه‌خانه — بعد قلیان آرام."
       },
       "narration": {
         "en": "In the café, chai comes first. Storytellers once filled the qahveh-khaneh; today tea and talk still outlast the coals.",
-        "ar": "في المقهى يأتي الشاي أولاً. ملأ الحكّاؤون القهوه‌خانه يوماً؛ واليوم ما زال الشاي والحديث أطول عمراً من الجمر."
+        "fa": "در کافه اول چای می‌آید. نقالان روزی قهوه‌خانه را پر می‌کردند؛ امروز چای و حرف هنوز از زغال بیشتر می‌مانند."
       }
     },
     {
@@ -226,19 +226,19 @@
       "durationMs": 7200,
       "kicker": {
         "en": "Living",
-        "ar": "حياة"
+        "fa": "زندگی"
       },
       "title": {
         "en": "Nowruz and carpets",
-        "ar": "نوروز وسجاد"
+        "fa": "نوروز و فرش"
       },
       "copy": {
         "en": "Fire nights, bazaars, and taarof courtesy.",
-        "ar": "ليالي نار وأسواق وآداب التعارف."
+        "fa": "شب‌های آتش، بازار و ادب تعارف."
       },
       "narration": {
         "en": "Living culture is Nowruz and Chaharshanbe Suri fire, knotted carpets, bazaar vaults, calligraphy, and taarof. These are not museum labels — they still organize the year.",
-        "ar": "الثقافة الحيّة هي نوروز ونار چهارشنبه‌سوری، والسجاد المعقود، وأقواس البازار، والخط، والتعارف. هذه ليست بطاقات متحف — ما زالت تنظّم السنة."
+        "fa": "فرهنگ زنده نوروز و آتش چهارشنبه‌سوری است، فرش گره‌خورده، طاق بازار، خوشنویسی و تعارف. این‌ها برچسب موزه نیستند — هنوز سال را سامان می‌دهند."
       }
     },
     {
@@ -249,19 +249,19 @@
       "durationMs": 6500,
       "kicker": {
         "en": "Speak",
-        "ar": "تكلّم"
+        "fa": "سخن"
       },
       "title": {
-        "en": "Ahlan wa sahlan",
-        "ar": "أهلاً وسهلاً"
+        "en": "Salâm",
+        "fa": "سلام"
       },
       "copy": {
         "en": "Press a phrase — I will say it aloud.",
-        "ar": "اضغط عبارة — سأقولها بصوت عالٍ."
+        "fa": "عبارتی را بزن — بلند می‌گویمش."
       },
       "narration": {
-        "en": "Before you go, take a greeting. Ahlan wa sahlan. Press any phrase on the page and I will say it for you in everyday Arabic.",
-        "ar": "قبل أن تمضي، خذ تحية. أهلاً وسهلاً. اضغط أي عبارة في الصفحة وسأقولها لك بعربية يومية."
+        "en": "Before you go, take a greeting. Salâm. Press any phrase on the page and I will say it for you in everyday Persian.",
+        "fa": "پیش از رفتن، یک سلام بردار. سلام. هر عبارت صفحه را بزن تا آن را به فارسی روزمره برایت بگویم."
       }
     },
     {
@@ -272,19 +272,19 @@
       "durationMs": 7000,
       "kicker": {
         "en": "Ask me",
-        "ar": "اسألني"
+        "fa": "از من بپرس"
       },
       "title": {
         "en": "I am still here",
-        "ar": "ما زلت هنا"
+        "fa": "هنوز اینجام"
       },
       "copy": {
         "en": "Ask Nima about Persepolis, tahdig, or Nowruz.",
-        "ar": "اسأل نیما عن برسبوليس أو التهديغ أو نوروز."
+        "fa": "از نیما دربارهٔ تخت جمشید، ته دیگ یا نوروز بپرس."
       },
       "narration": {
         "en": "That is the tour. Stay on the map, flip more cards, or ask me anything — Persepolis stairs, Isfahan bridges, ghormeh sabzi, or the fires of Nowruz. Khoda hafez for now, and welcome whenever you return.",
-        "ar": "هذه هي الجولة. ابقَ على الخريطة، أو اقلب مزيداً من البطاقات، أو اسألني أي شيء — أدراج برسبوليس، وجسور أصفهان، وقورمه سبزي، أو نيران نوروز. خدا حافظ الآن، وأهلاً بك كلما عدت."
+        "fa": "تور همین است. روی نقشه بمان، کارت‌های بیشتری برگردان، یا هر چه خواستی بپرس — پلکان تخت جمشید، پل‌های اصفهان، قرمه‌سبزی یا آتش‌های نوروز. فعلاً خداحافظ، و هر بار که برگشتی خوش آمدی."
       }
     }
   ]

@@ -92,6 +92,8 @@ const darkModeStyles = `
   body.dark-mode.lane-direct-page,
   body.dark-mode.lane-scientific-page,
   body.dark-mode.lane-pdf-gallery-root,
+  body.dark-mode.lane-relationships-page,
+  body.dark-mode.genealogy-tree-page,
   body.dark-mode.music-research-page {
     --lf-bg: #1a1917;
     --lf-bg-elevated: #242220;

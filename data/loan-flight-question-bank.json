@@ -1,0 +1,508 @@
+{
+  "version": 1,
+  "perUnit": 10,
+  "passRatio": 0.8,
+  "note": "Training questions for the loan-file flight simulator. Product-line figures are the numbers in data/gse/*.json. They are not a commitment to lend and not DU, LPA, TOTAL, or GUS.",
+  "difficulties": [
+    { "level": 1, "label": "Trainee" },
+    { "level": 2, "label": "First officer" },
+    { "level": 3, "label": "Captain" }
+  ],
+  "units": [
+    { "id": "application", "label": "Application" },
+    { "id": "disclosures", "label": "Disclosures" },
+    { "id": "processing", "label": "Processing" },
+    { "id": "product-lines", "label": "Product lines" },
+    { "id": "underwriting", "label": "Underwriting" },
+    { "id": "conditions", "label": "Conditions" },
+    { "id": "ctc", "label": "Clear to close" },
+    { "id": "funding", "label": "Funding" }
+  ],
+  "questions": [
+    { "id": "app-trid", "unit": "application", "difficulty": 1, "bind": "tridMissing", "title": "Pre-flight: is this an application yet?" },
+    { "id": "app-six", "unit": "application", "difficulty": 1, "title": "The six items", "brief": "Regulation Z treats an application as six specific pieces of information.", "question": "Which set is the six-item TRID application?", "options": [
+      { "text": "Name, income, SSN, property address, estimated value, and loan amount", "correct": true },
+      { "text": "W-2s, tax returns, bank statements, and a signed contract" },
+      { "text": "Credit score, appraisal, title commitment, and homeowner's insurance" }
+    ], "explain": "The six items are name, income, Social Security number, property address, estimated property value, and the loan amount sought. Supporting documents are collected around that, but they are not the six." },
+    { "id": "app-w2", "unit": "application", "difficulty": 1, "title": "Documents versus the six", "brief": "The borrower has not uploaded tax returns yet.", "question": "Do two years of W-2s have to be in the file before a TRID application exists?", "options": [
+      { "text": "No. W-2s are documents, not one of the six items", "correct": true },
+      { "text": "Yes. Without W-2s there is no application" },
+      { "text": "Only if the loan is FHA" }
+    ], "explain": "Income is one of the six. The paper that proves it can arrive later." },
+    { "id": "app-contract", "unit": "application", "difficulty": 1, "title": "Purchase contract", "brief": "The property is identified, but the purchase contract is still with the agent.", "question": "Is a signed purchase contract one of the six items that create the application?", "options": [
+      { "text": "No", "correct": true },
+      { "text": "Yes, it replaces the property address" },
+      { "text": "Yes, but only for conventional loans" }
+    ], "explain": "The address and estimated value are in the six. The contract is important to the file, and it is not part of the six-item definition." },
+    { "id": "app-ssn", "unit": "application", "difficulty": 1, "title": "Which number counts", "brief": "You have a credit score on the screen and no Social Security number yet.", "question": "Which of these is one of the six application items?", "options": [
+      { "text": "Social Security number", "correct": true },
+      { "text": "Credit score" },
+      { "text": "A gift letter" }
+    ], "explain": "The Social Security number is one of the six. A credit score and a gift letter are underwriting evidence, not the application trigger." },
+    { "id": "app-income", "unit": "application", "difficulty": 1, "title": "Income before the stubs", "brief": "The borrower stated income. Paystubs are not in yet.", "question": "Does stated income count as the income item even if the stubs come later?", "options": [
+      { "text": "Yes. The income figure is the item; the documents support it", "correct": true },
+      { "text": "No. Income does not count until a W-2 is imaged" },
+      { "text": "Only after underwriting signs off" }
+    ], "explain": "The application item is the income, not the imaging of the proof." },
+    { "id": "app-address", "unit": "application", "difficulty": 1, "title": "Which property fact", "brief": "You have a legal description from the listing and no street address.", "question": "Which property fact is one of the six?", "options": [
+      { "text": "The property address", "correct": true },
+      { "text": "The legal description instead of an address" },
+      { "text": "The HOA budget" }
+    ], "explain": "Property address is one of the six. A legal description and HOA papers do not replace it." },
+    { "id": "app-amount", "unit": "application", "difficulty": 1, "title": "Loan amount", "brief": "The borrower asked for a specific loan amount.", "question": "Is the loan amount sought one of the six application items?", "options": [
+      { "text": "Yes", "correct": true },
+      { "text": "No. Only the purchase price counts" },
+      { "text": "Only on a refinance" }
+    ], "explain": "Loan amount is the sixth item, alongside name, income, SSN, address, and estimated value." },
+    { "id": "app-appraisal", "unit": "application", "difficulty": 1, "title": "What does not start the clock", "brief": "The appraisal is ordered for next week.", "question": "What starts the application for TRID timing in this sim?", "options": [
+      { "text": "Having the six items, not delivery of the appraisal", "correct": true },
+      { "text": "The appraisal delivery date" },
+      { "text": "The clear-to-close date" }
+    ], "explain": "The clock starts when the six items are received. The appraisal is collateral work that comes after." },
+    { "id": "app-later", "unit": "application", "difficulty": 1, "title": "Order of work", "brief": "You can already name the borrower, the income, the SSN, the address, the value, and the loan amount.", "question": "Can supporting documents be collected after the application exists?", "options": [
+      { "text": "Yes", "correct": true },
+      { "text": "No. The file must be complete before it is an application" },
+      { "text": "Only on FHA streamline" }
+    ], "explain": "The six items create the application. The rest of the file is built from there." },
+
+    { "id": "disc-le", "unit": "disclosures", "difficulty": 1, "bind": "leDue", "title": "Climb-out: Loan Estimate timing" },
+    { "id": "disc-open", "unit": "disclosures", "difficulty": 1, "title": "What counts as a business day", "brief": "The lender's offices in this sim are open Monday through Friday.", "question": "For the Loan Estimate clock in this sim, which days count?", "options": [
+      { "text": "Lender-open days, Monday through Friday", "correct": true },
+      { "text": "Every calendar day, including Sunday" },
+      { "text": "Only the closing date" }
+    ], "explain": "This sim treats an LE business day as a day the lender is open. Saturday and Sunday do not count." },
+    { "id": "disc-three", "unit": "disclosures", "difficulty": 1, "title": "How many days", "brief": "The application date is already on the file.", "question": "How soon must the Loan Estimate go out?", "options": [
+      { "text": "Within three business days of application", "correct": true },
+      { "text": "Within three calendar days, counting Sunday" },
+      { "text": "Any time before the appraisal" }
+    ], "explain": "The rule practiced here is three business days from application, using lender-open days." },
+    { "id": "disc-late", "unit": "disclosures", "difficulty": 1, "title": "The fourth open day", "brief": "Someone suggests sending the LE on the fourth day the office is open.", "question": "Is the fourth lender-open day still on time in this sim?", "options": [
+      { "text": "No. The last day is the third open day", "correct": true },
+      { "text": "Yes. You have a full week" },
+      { "text": "Yes, if the borrower has not asked for it" }
+    ], "explain": "Three open days is the deadline. The fourth open day is late." },
+    { "id": "disc-not-cd", "unit": "disclosures", "difficulty": 1, "title": "Two different disclosures", "brief": "A teammate calls the early disclosure the Closing Disclosure.", "question": "Is the Loan Estimate the same document as the Closing Disclosure?", "options": [
+      { "text": "No", "correct": true },
+      { "text": "Yes. Only the title changes at closing" },
+      { "text": "Yes, on a purchase" }
+    ], "explain": "The Loan Estimate goes out after application. The Closing Disclosure goes out before consummation. They are not the same form." },
+    { "id": "disc-start", "unit": "disclosures", "difficulty": 1, "title": "Where the clock starts", "brief": "The file shows an application date.", "question": "What date starts the Loan Estimate clock?", "options": [
+      { "text": "The application date", "correct": true },
+      { "text": "The closing date" },
+      { "text": "The day the appraisal is paid" }
+    ], "explain": "Three business days are counted from the application date." },
+    { "id": "disc-early", "unit": "disclosures", "difficulty": 1, "title": "Sending it early", "brief": "The LE is ready on day one.", "question": "May you deliver the Loan Estimate before the last legal day?", "options": [
+      { "text": "Yes. Earlier is allowed. The rule is a deadline, not a waiting period", "correct": true },
+      { "text": "No. You must wait until day three" },
+      { "text": "Only if the borrower is a first-time buyer" }
+    ], "explain": "The third business day is the last day, not the only day." },
+    { "id": "disc-revised", "unit": "disclosures", "difficulty": 1, "title": "A revised Loan Estimate", "brief": "A fee was known at application and was left off the first LE.", "question": "When is a revised Loan Estimate the right tool?", "options": [
+      { "text": "For a valid changed circumstance, not to repair a fee you could have quoted correctly", "correct": true },
+      { "text": "Whenever a number on the LE looks inconvenient" },
+      { "text": "Only after the Closing Disclosure" }
+    ], "explain": "A revised LE follows a valid changed circumstance. It is not a way to fix a fee that should have been on the original." },
+    { "id": "disc-intent", "unit": "disclosures", "difficulty": 1, "title": "Fees before intent", "brief": "The borrower has the LE and has not said they want to proceed.", "question": "Which fee can you generally charge before the borrower intends to proceed?", "options": [
+      { "text": "A credit-report fee", "correct": true },
+      { "text": "The appraisal and any lender fee" },
+      { "text": "Any fee listed on the LE" }
+    ], "explain": "Before intent to proceed, the credit-report fee is the usual exception. Other fees wait." },
+    { "id": "disc-holiday", "unit": "disclosures", "difficulty": 1, "title": "Holidays in this sim", "brief": "A weekday on the LE clock is a federal holiday.", "question": "Does this simulator skip federal holidays when it counts Loan Estimate days?", "options": [
+      { "text": "No. Weekdays count here even if they are holidays", "correct": true },
+      { "text": "Yes. Every federal holiday is removed" },
+      { "text": "Yes, but only Christmas and Thanksgiving" }
+    ], "explain": "This sim ignores federal holidays. A weekday counts as a lender-open day. Real calendars still have to be checked outside the sim." },
+
+    { "id": "proc-pmi", "unit": "processing", "difficulty": 1, "bind": "pmi", "title": "Cruise: read the LTV gauge" },
+    { "id": "proc-80", "unit": "processing", "difficulty": 1, "title": "The 80% line", "brief": "You are on a conventional loan.", "question": "When does this training sim treat conventional PMI as required?", "options": [
+      { "text": "When LTV is over 80%", "correct": true },
+      { "text": "On every conventional loan" },
+      { "text": "Only when LTV is over 97%" }
+    ], "explain": "Conventional loans above 80% LTV need private mortgage insurance in this sim." },
+    { "id": "proc-down", "unit": "processing", "difficulty": 1, "title": "Down payment and LTV", "brief": "The borrower is putting 20% down and financing the rest.", "question": "What LTV is a 20% down payment?", "options": [
+      { "text": "80%", "correct": true },
+      { "text": "20%" },
+      { "text": "97%" }
+    ], "explain": "LTV is the loan divided by the value. Twenty percent down leaves an 80% loan." },
+    { "id": "proc-formula", "unit": "processing", "difficulty": 1, "title": "How LTV is built", "brief": "The instruments show a loan amount and a purchase price.", "question": "How does this sim compute LTV?", "options": [
+      { "text": "Loan amount divided by purchase price", "correct": true },
+      { "text": "Down payment divided by income" },
+      { "text": "Rate times term" }
+    ], "explain": "LTV percent is the loan amount over the price, from the shared calculation engine." },
+    { "id": "proc-fha", "unit": "processing", "difficulty": 1, "title": "Not the same insurance", "brief": "Someone calls every premium PMI.", "question": "What is the mortgage insurance on a standard FHA loan usually called?", "options": [
+      { "text": "MIP, not conventional PMI", "correct": true },
+      { "text": "PMI, the same product as conventional" },
+      { "text": "A VA funding fee" }
+    ], "explain": "FHA uses a mortgage insurance premium. Conventional PMI is a different line." },
+    { "id": "proc-va", "unit": "processing", "difficulty": 1, "title": "VA is not PMI", "brief": "The file might be VA.", "question": "What does a VA loan use instead of conventional PMI?", "options": [
+      { "text": "A VA funding fee, unless the borrower is exempt", "correct": true },
+      { "text": "FHA MIP" },
+      { "text": "HomeReady AMI" }
+    ], "explain": "VA loans have a funding fee, with exemptions for some borrowers. They do not use conventional PMI." },
+    { "id": "proc-90", "unit": "processing", "difficulty": 1, "title": "90% conventional", "brief": "LTV on a conventional purchase is 90%.", "question": "Does that conventional loan need PMI?", "options": [
+      { "text": "Yes", "correct": true },
+      { "text": "No, because it is under 97%" },
+      { "text": "Only if it is a second home" }
+    ], "explain": "90% is above 80%, so conventional PMI applies." },
+    { "id": "proc-75", "unit": "processing", "difficulty": 1, "title": "75% conventional", "brief": "LTV on a conventional purchase is 75%.", "question": "Does that conventional loan need PMI?", "options": [
+      { "text": "No", "correct": true },
+      { "text": "Yes. PMI is required on every conventional loan" },
+      { "text": "Yes, because the rate is over 6%" }
+    ], "explain": "75% is at or under 80%, so conventional PMI is not required." },
+    { "id": "proc-cltv", "unit": "processing", "difficulty": 1, "title": "No second lien", "brief": "There is no subordinate financing on this file.", "question": "How does CLTV compare with LTV when there is no second lien?", "options": [
+      { "text": "They match", "correct": true },
+      { "text": "CLTV is always 105%" },
+      { "text": "CLTV ignores the loan amount" }
+    ], "explain": "CLTV adds subordinate liens on top of the loan. With none, CLTV equals LTV." },
+    { "id": "proc-ignore", "unit": "processing", "difficulty": 1, "title": "Do not argue with the gauge", "brief": "LTV is over 80% and someone says to skip PMI because the payment feels fine.", "question": "Does ignoring the LTV gauge remove conventional PMI?", "options": [
+      { "text": "No", "correct": true },
+      { "text": "Yes, if the borrower asks" },
+      { "text": "Yes, after the appraisal is waived" }
+    ], "explain": "PMI follows the LTV. The gauge is the reading you use." },
+
+    { "id": "pl-d1-homeready", "unit": "product-lines", "difficulty": 1, "title": "Fannie affordable", "brief": "The borrower is income-limited and will live in the home. You are choosing a Fannie Mae line from this catalog.", "question": "Which product is Fannie Mae's affordable conventional option in this catalog?", "options": [
+      { "text": "HomeReady", "correct": true },
+      { "text": "Home Possible" },
+      { "text": "HomeStyle Renovation" }
+    ], "explain": "HomeReady is Fannie Mae. Home Possible is Freddie Mac's counterpart. HomeStyle is Fannie's renovation line." },
+    { "id": "pl-d1-homepossible", "unit": "product-lines", "difficulty": 1, "title": "Freddie affordable", "brief": "You want the Freddie Mac line that pairs with HomeReady.", "question": "Which product is Freddie Mac's affordable option in this catalog?", "options": [
+      { "text": "Home Possible", "correct": true },
+      { "text": "CHOICEHome" },
+      { "text": "HomeReady" }
+    ], "explain": "Home Possible is Freddie Mac. CHOICEHome is Freddie's renovation line. HomeReady is Fannie." },
+    { "id": "pl-d1-homestyle", "unit": "product-lines", "difficulty": 1, "title": "Fannie renovation", "brief": "The borrower will buy the house and renovate it on a Fannie delivery.", "question": "Which Fannie Mae line is the renovation product in this catalog?", "options": [
+      { "text": "HomeStyle Renovation", "correct": true },
+      { "text": "High-LTV refinance" },
+      { "text": "HomeReady" }
+    ], "explain": "HomeStyle Renovation is the Fannie renovation path. The high-LTV option is a refinance, and HomeReady is the affordable purchase and rate-term line." },
+    { "id": "pl-d1-choice", "unit": "product-lines", "difficulty": 1, "title": "Freddie renovation", "brief": "Same renovation idea, Freddie Mac delivery.", "question": "Which Freddie Mac line is the renovation product in this catalog?", "options": [
+      { "text": "CHOICEHome", "correct": true },
+      { "text": "Home Possible" },
+      { "text": "Relief refinance" }
+    ], "explain": "CHOICEHome is Freddie's renovation execution. Home Possible is affordable financing. Relief refinance is a rate-and-term path." },
+    { "id": "pl-d1-203b", "unit": "product-lines", "difficulty": 1, "title": "FHA forward", "brief": "The borrower wants a standard FHA-insured purchase and will occupy the home.", "question": "Which line is the standard FHA forward mortgage in this catalog?", "options": [
+      { "text": "FHA 203(b)", "correct": true },
+      { "text": "FHA streamline refinance" },
+      { "text": "FHA Limited 203(k)" }
+    ], "explain": "203(b) is the standard FHA forward loan. Streamline refinances an existing FHA loan. Limited 203(k) adds a capped rehab." },
+    { "id": "pl-d1-streamline", "unit": "product-lines", "difficulty": 1, "title": "Existing FHA loan", "brief": "The borrower already has an FHA loan and wants a rate-and-term refinance with a net tangible benefit.", "question": "Which FHA line fits that file?", "options": [
+      { "text": "FHA streamline refinance", "correct": true },
+      { "text": "FHA 203(b) as a new purchase" },
+      { "text": "Limited 203(k)" }
+    ], "explain": "Streamline is the FHA rate-and-term refinance of an existing FHA loan, with a net tangible benefit test. It is not a purchase and not the rehab line." },
+    { "id": "pl-d1-203k", "unit": "product-lines", "difficulty": 1, "title": "FHA rehab", "brief": "The owner-occupant needs a limited rehab scope, not a plain purchase.", "question": "Which FHA line is the capped rehab product in this catalog?", "options": [
+      { "text": "FHA Limited 203(k)", "correct": true },
+      { "text": "FHA streamline" },
+      { "text": "VA IRRRL" }
+    ], "explain": "Limited 203(k) is the FHA rehab path with a capped scope. Streamline does not add renovation. IRRRL is VA." },
+    { "id": "pl-d1-va-purchase", "unit": "product-lines", "difficulty": 1, "title": "Veteran purchase", "brief": "An eligible veteran will buy and occupy, and you still need the Certificate of Eligibility.", "question": "Which line is the VA purchase in this catalog?", "options": [
+      { "text": "VA-guaranteed purchase", "correct": true },
+      { "text": "VA IRRRL" },
+      { "text": "VA cash-out refinance" }
+    ], "explain": "The purchase line is for a new VA-guaranteed purchase. IRRRL refinances an existing VA loan without cash out. Cash-out is its own line." },
+    { "id": "pl-d1-irrrl", "unit": "product-lines", "difficulty": 1, "title": "Existing VA loan", "brief": "The borrower already has a VA loan and wants a lower rate, not cash out.", "question": "Which VA line is that rate-and-term refinance?", "options": [
+      { "text": "VA IRRRL", "correct": true },
+      { "text": "VA-guaranteed purchase" },
+      { "text": "VA cash-out refinance" }
+    ], "explain": "IRRRL is the VA interest-rate reduction refinance. Purchase is a new buy. Cash-out takes equity out and uses a lower LTV cap in this catalog." },
+    { "id": "pl-d1-usda", "unit": "product-lines", "difficulty": 1, "title": "Rural purchase", "brief": "The home has to sit in a USDA-eligible area, and household income has to fit the area limit.", "question": "Which line is the USDA purchase in this catalog?", "options": [
+      { "text": "USDA guaranteed purchase", "correct": true },
+      { "text": "USDA streamlined assist refinance" },
+      { "text": "FHA 203(b)" }
+    ], "explain": "Guaranteed purchase is the USDA buy. Streamlined assist refinances an existing USDA loan. 203(b) is FHA." },
+
+    { "id": "pl-d2-hr-ltv", "unit": "product-lines", "difficulty": 2, "title": "HomeReady LTV", "brief": "Primary-residence purchase on HomeReady. Read this catalog, not a live guide.", "question": "What is HomeReady's max LTV on a primary purchase in this catalog?", "options": [
+      { "text": "97%", "correct": true },
+      { "text": "80%" },
+      { "text": "96.5%" }
+    ], "explain": "This catalog sets HomeReady max LTV on a primary purchase at 97%. 96.5% is the FHA 203(b) figure." },
+    { "id": "pl-d2-hr-cltv", "unit": "product-lines", "difficulty": 2, "title": "HomeReady CLTV", "brief": "HomeReady can have assistance that sits above the first mortgage.", "question": "How do HomeReady's LTV and CLTV caps compare in this catalog?", "options": [
+      { "text": "LTV 97%, CLTV 105%", "correct": true },
+      { "text": "Both stop at 80%" },
+      { "text": "CLTV is lower than LTV" }
+    ], "explain": "HomeReady's catalog caps are 97% LTV and 105% CLTV. Home Possible uses the same pair." },
+    { "id": "pl-d2-hr-occ", "unit": "product-lines", "difficulty": 2, "title": "HomeReady occupancy", "brief": "The borrower wants HomeReady on a rental property.", "question": "Which occupancy does this catalog allow for HomeReady?", "options": [
+      { "text": "Primary residence only", "correct": true },
+      { "text": "Primary, second home, and investment" },
+      { "text": "Investment only" }
+    ], "explain": "HomeReady in this catalog is primary residence only. Standard conforming allows primary, second home, and investment." },
+    { "id": "pl-d2-ami", "unit": "product-lines", "difficulty": 2, "title": "Income limit", "brief": "You are checking HomeReady before anyone promises the product.", "question": "What income limit does this prototype use for HomeReady and Home Possible?", "options": [
+      { "text": "80% of area median income", "correct": true },
+      { "text": "No income cap" },
+      { "text": "50% of area median income" }
+    ], "explain": "The prototype uses 80% of AMI. Low-income census tract rules can differ, so the file still needs the agency AMI lookup for the address." },
+    { "id": "pl-d2-fico", "unit": "product-lines", "difficulty": 2, "title": "Affordable credit floors", "brief": "HomeReady and Home Possible are both on the board.", "question": "How do the catalog minimum credit scores compare?", "options": [
+      { "text": "Home Possible 660, HomeReady 620", "correct": true },
+      { "text": "Both 620" },
+      { "text": "Home Possible 580" }
+    ], "explain": "In this catalog HomeReady's minimum is 620 and Home Possible's minimum is 660. Investor overlays can be tighter than either." },
+    { "id": "pl-d2-standard-occ", "unit": "product-lines", "difficulty": 2, "title": "Standard conforming occupancy", "brief": "The loan is standard conventional conforming, not an affordable line.", "question": "Which occupancies does standard conforming allow in this catalog?", "options": [
+      { "text": "Primary, second home, and investment", "correct": true },
+      { "text": "Primary only" },
+      { "text": "Investment only" }
+    ], "explain": "Fannie and Freddie standard conforming in this catalog allow primary, second home, and investment. Affordable lines do not." },
+    { "id": "pl-d2-fha-ltv", "unit": "product-lines", "difficulty": 2, "title": "FHA 203(b) LTV", "brief": "Primary purchase, FHA 203(b).", "question": "What is the max LTV for FHA 203(b) primary purchase in this catalog?", "options": [
+      { "text": "96.5%", "correct": true },
+      { "text": "100%" },
+      { "text": "97%" }
+    ], "explain": "FHA 203(b) is 96.5% LTV in this catalog. 97% is the conventional affordable cap. 100% is VA purchase and USDA purchase." },
+    { "id": "pl-d2-fha-fico", "unit": "product-lines", "difficulty": 2, "title": "FHA 203(b) credit", "brief": "You are comparing agency floors in the catalog, before overlays.", "question": "What minimum credit score does this catalog list for FHA 203(b)?", "options": [
+      { "text": "580", "correct": true },
+      { "text": "620" },
+      { "text": "640" }
+    ], "explain": "FHA 203(b) and FHA streamline list 580. Limited 203(k) lists 620. USDA lists 640. Lenders often overlay higher floors." },
+    { "id": "pl-d2-va-ltv", "unit": "product-lines", "difficulty": 2, "title": "VA purchase LTV", "brief": "VA-guaranteed purchase, primary residence.", "question": "What max LTV does this catalog give a VA purchase?", "options": [
+      { "text": "100%", "correct": true },
+      { "text": "96.5%" },
+      { "text": "90%" }
+    ], "explain": "VA purchase and VA IRRRL are 100% LTV here. VA cash-out is 90%." },
+    { "id": "pl-d2-va-cash", "unit": "product-lines", "difficulty": 2, "title": "VA cash-out LTV", "brief": "The veteran wants cash out, not an IRRRL.", "question": "What max LTV does this catalog give VA cash-out?", "options": [
+      { "text": "90%", "correct": true },
+      { "text": "100%" },
+      { "text": "80%" }
+    ], "explain": "VA cash-out stops at 90% LTV and 90% CLTV in this catalog. Do not reuse the purchase cap." },
+
+    { "id": "pl-d3-inv-a-fico", "unit": "product-lines", "difficulty": 3, "title": "Investor A credit floor", "brief": "Conventional primary occupancy. The score is 645. Investor A's overlay is a hard stop below 660.", "question": "What does that overlay mean for this file?", "options": [
+      { "text": "Investor A is a hard stop. Move investors or improve the score", "correct": true },
+      { "text": "It still fits because the agency floor is 620" },
+      { "text": "The overlay applies only to investment occupancy" }
+    ], "explain": "Investor A's conventional primary overlay is a hard stop under 660. The agency 620 floor does not override that investor." },
+    { "id": "pl-d3-inv-a-dti", "unit": "product-lines", "difficulty": 3, "title": "Investment DTI overlay", "brief": "Investment occupancy, conventional, back-end DTI 48%. Investor A caps investment DTI at 45% as a hard stop.", "question": "Which call matches the overlay?", "options": [
+      { "text": "Hard stop at Investor A. Change the program or get an exception path", "correct": true },
+      { "text": "The catalog's 50% DTI max always wins" },
+      { "text": "That cap is a USDA rule" }
+    ], "explain": "Investor A's investment DTI cap is 45% and a hard stop. The agency max in the catalog is not a substitute for the overlay." },
+    { "id": "pl-d3-reno-dti", "unit": "product-lines", "difficulty": 3, "title": "Renovation DTI", "brief": "HomeStyle or CHOICEHome, not standard conforming.", "question": "What max DTI does this catalog list for those renovation lines?", "options": [
+      { "text": "45%", "correct": true },
+      { "text": "50%" },
+      { "text": "60%" }
+    ], "explain": "HomeStyle and CHOICEHome list 45% max DTI. Standard conforming lists 50%. VA purchase lists 60%." },
+    { "id": "pl-d3-reno-ltv", "unit": "product-lines", "difficulty": 3, "title": "Renovation LTV", "brief": "Primary purchase on HomeStyle or CHOICEHome.", "question": "What max LTV does this catalog list for those renovation lines?", "options": [
+      { "text": "95%", "correct": true },
+      { "text": "97%" },
+      { "text": "100%" }
+    ], "explain": "Both renovation lines cap primary purchase LTV and CLTV at 95% in this catalog." },
+    { "id": "pl-d3-refi-purpose", "unit": "product-lines", "difficulty": 3, "title": "High-LTV and relief refis", "brief": "Fannie's high-LTV refinance option and Freddie's relief refinance are on the list.", "question": "Which purpose does this catalog allow for those two lines?", "options": [
+      { "text": "Rate-and-term refinance only", "correct": true },
+      { "text": "Purchase and cash-out" },
+      { "text": "Cash-out only" }
+    ], "explain": "Both are rate-and-term refinances. They are not purchase products and they are not cash-out." },
+    { "id": "pl-d3-usda-type", "unit": "product-lines", "difficulty": 3, "title": "USDA property types", "brief": "The collateral is a 3-unit property. The line would be USDA guaranteed.", "question": "Which property types does USDA allow in this catalog?", "options": [
+      { "text": "Single family, PUD, and condo. Not 2- to 4-unit", "correct": true },
+      { "text": "The same list as Fannie, including 2- to 4-unit" },
+      { "text": "Manufactured homes only" }
+    ], "explain": "USDA rows in this catalog allow single family, PUD, and condo. They do not list 2-unit, 3-unit, or 4-unit." },
+    { "id": "pl-d3-203k-cltv", "unit": "product-lines", "difficulty": 3, "title": "Limited 203(k) leverage", "brief": "FHA Limited 203(k), with rehab financing in the stack.", "question": "What LTV and CLTV caps does this catalog list for Limited 203(k)?", "options": [
+      { "text": "LTV 96.5%, CLTV 110%", "correct": true },
+      { "text": "Both 96.5%" },
+      { "text": "Both 100%" }
+    ], "explain": "Limited 203(k) keeps the 96.5% LTV and allows CLTV up to 110% in this catalog. Plain 203(b) keeps both at 96.5%." },
+    { "id": "pl-d3-manual", "unit": "product-lines", "difficulty": 3, "title": "FHA manual reserves", "brief": "Investor B, FHA, manual underwrite. The overlay wants reserves.", "question": "What reserve floor does Investor B put on an FHA manual underwrite?", "options": [
+      { "text": "At least 3 months, and a shortfall needs an exception", "correct": true },
+      { "text": "No reserves" },
+      { "text": "12 months" }
+    ], "explain": "Investor B's FHA manual overlay is 3 months of reserves and is marked requires-exception, not a silent pass." },
+    { "id": "pl-d3-va-dti", "unit": "product-lines", "difficulty": 3, "title": "VA DTI by purpose", "brief": "You are comparing VA purchase with VA cash-out in this catalog.", "question": "How do the catalog max DTI figures compare?", "options": [
+      { "text": "Purchase and IRRRL 60%, cash-out 50%", "correct": true },
+      { "text": "Both 43%" },
+      { "text": "Cash-out is the higher one" }
+    ], "explain": "VA purchase and IRRRL list 60% max DTI. VA cash-out lists 50%. Residual income is still a VA test this prototype does not score." },
+    { "id": "pl-d3-limits", "unit": "product-lines", "difficulty": 3, "title": "Sample conforming limits", "brief": "The tool's 2026 sample table has Dallas County and Orange County, California. Confirm the live year at FHFA before you rely on it.", "question": "Which sample row is the baseline 1-unit limit, and which is the high-cost 1-unit limit?", "options": [
+      { "text": "Dallas $806,500 baseline. Orange County $1,149,825 high-cost", "correct": true },
+      { "text": "Both counties use $806,500" },
+      { "text": "Dallas is the high-cost row at $1,149,825" }
+    ], "explain": "The bundled sample marks Dallas as not high-cost at $806,500 for 1 unit, and Orange County, California as high-cost at $1,149,825. Those rows are sample data for the analyzer." },
+
+    { "id": "uw-dti", "unit": "underwriting", "difficulty": 1, "bind": "dtiFix", "title": "Turbulence: DTI over the ceiling" },
+    { "id": "uw-back", "unit": "underwriting", "difficulty": 1, "title": "Back-end DTI", "brief": "The back-end gauge is the one with every debt on it.", "question": "What is back-end DTI?", "options": [
+      { "text": "Total monthly debt divided by gross monthly income", "correct": true },
+      { "text": "Housing payment divided by the loan amount" },
+      { "text": "Assets divided by the rate" }
+    ], "explain": "Back-end DTI puts principal, interest, taxes, insurance, and other monthly debts over gross monthly income." },
+    { "id": "uw-front", "unit": "underwriting", "difficulty": 1, "title": "Front-end DTI", "brief": "The housing gauge is on the panel.", "question": "What is front-end DTI?", "options": [
+      { "text": "Housing payment divided by gross monthly income", "correct": true },
+      { "text": "All debts, including the car, divided by income" },
+      { "text": "Down payment divided by price" }
+    ], "explain": "Front-end DTI is the housing payment over gross monthly income. The car and other debts sit in the back-end number." },
+    { "id": "uw-term", "unit": "underwriting", "difficulty": 1, "title": "Shorter term", "brief": "Someone offers a 15-year term to make the file look stronger.", "question": "What does a shorter term do to principal and interest, and then to DTI?", "options": [
+      { "text": "It raises the payment and can make DTI worse", "correct": true },
+      { "text": "It cuts the payment in half" },
+      { "text": "It does not change the payment" }
+    ], "explain": "A shorter amortization raises principal and interest. Higher payment, higher DTI." },
+    { "id": "uw-payoff", "unit": "underwriting", "difficulty": 1, "title": "Paying off a debt", "brief": "An installment payment is in the back-end ratio. Assets can cover the balance.", "question": "How can paying that debt off from assets help DTI?", "options": [
+      { "text": "The monthly payment comes off the debts", "correct": true },
+      { "text": "The rate drops automatically" },
+      { "text": "LTV disappears" }
+    ], "explain": "Removing the payment lowers total monthly debt. The assets used to pay it off also lower reserves, so read both gauges." },
+    { "id": "uw-income", "unit": "underwriting", "difficulty": 1, "title": "Adding income", "brief": "A co-borrower's income can be added if it qualifies.", "question": "How does qualifying co-borrower income change DTI?", "options": [
+      { "text": "It raises the income denominator and can lower the ratio", "correct": true },
+      { "text": "It only changes LTV" },
+      { "text": "It increases the debts" }
+    ], "explain": "DTI falls when qualifying income rises and the debts stay put." },
+    { "id": "uw-ceiling", "unit": "underwriting", "difficulty": 1, "title": "This sim's ceiling", "brief": "The underwriting checkpoint has its own target.", "question": "What back-end ceiling does this flight use as the practice target?", "options": [
+      { "text": "45%", "correct": true },
+      { "text": "50%, the standard conforming catalog max" },
+      { "text": "60%, the VA purchase catalog max" }
+    ], "explain": "This checkpoint wants the file at 45% or below. That is a training target. The product catalog's standard conforming max is 50%, and VA purchase lists 60%." },
+    { "id": "uw-catalog", "unit": "underwriting", "difficulty": 1, "title": "Do not mix the numbers", "brief": "A teammate quotes 50% because that is the standard conforming catalog max.", "question": "Is that 50% the same number as this sim's practice ceiling?", "options": [
+      { "text": "No. The practice ceiling on this checkpoint is 45%", "correct": true },
+      { "text": "Yes. They are the same rule" },
+      { "text": "Yes, but only for FHA" }
+    ], "explain": "Keep the two numbers apart. This flight practices to 45%. Standard conforming in the catalog lists 50%." },
+    { "id": "uw-reserves", "unit": "underwriting", "difficulty": 1, "title": "Reserve months", "brief": "The reserves gauge is in months.", "question": "How does this sim turn assets into reserve months?", "options": [
+      { "text": "Liquid assets divided by the housing payment", "correct": true },
+      { "text": "Credit score divided by 100" },
+      { "text": "Loan amount divided by income" }
+    ], "explain": "Reserve months are assets over the housing payment, from the calculation engine." },
+    { "id": "uw-qualifying", "unit": "underwriting", "difficulty": 1, "title": "Income that counts", "brief": "Someone wants to add income that is not documented as qualifying.", "question": "Which income lowers DTI on this file?", "options": [
+      { "text": "Qualifying income that is actually on the file", "correct": true },
+      { "text": "Any number the borrower mentions" },
+      { "text": "The purchase price" }
+    ], "explain": "Only income that qualifies and is entered on the file moves the ratio." },
+
+    { "id": "cond-deposit", "unit": "conditions", "difficulty": 1, "title": "Holding pattern: the deposit", "brief": "The bank statement shows a deposit that is not payroll.", "question": "How do you clear that condition?", "options": [
+      { "text": "A letter of explanation and source documents", "correct": true },
+      { "text": "Drop the bank account from the file" },
+      { "text": "Ignore it because an automated system already approved" }
+    ], "explain": "A large deposit that is not payroll has to be sourced and explained. Dropping an account you need, or skipping an open condition, does not clear the file." },
+    { "id": "cond-drop", "unit": "conditions", "difficulty": 1, "title": "Do not drop the account", "brief": "The unsourced deposit is in the account that holds the reserves.", "question": "Does removing that account from the file clear the condition?", "options": [
+      { "text": "No. You still need the funds, and the deposit still has to be sourced", "correct": true },
+      { "text": "Yes. If the account is gone, the condition is gone" },
+      { "text": "Yes, after funding" }
+    ], "explain": "Taking the account off the file hides the funds you are using. It does not explain the deposit." },
+    { "id": "cond-aus", "unit": "conditions", "difficulty": 1, "title": "Approval is not clearance", "brief": "An automated findings report says approve, and a deposit condition is still open.", "question": "Does that approval clear the condition?", "options": [
+      { "text": "No", "correct": true },
+      { "text": "Yes. Approve means the condition list is optional" },
+      { "text": "Yes, on conventional only" }
+    ], "explain": "Findings do not erase an open condition. Clearance is the sourced paper." },
+    { "id": "cond-gift", "unit": "conditions", "difficulty": 1, "title": "Gift funds", "brief": "Part of the funds to close is a gift.", "question": "What does a gift condition usually need?", "options": [
+      { "text": "Donor ability and a transfer trail", "correct": true },
+      { "text": "Only a text message from the donor" },
+      { "text": "Nothing, if the borrower is related to the donor" }
+    ], "explain": "Gift funds need evidence the donor could give the money and that it moved into the file." },
+    { "id": "cond-voe", "unit": "conditions", "difficulty": 1, "title": "Wrong document", "brief": "The open item is an unexplained deposit.", "question": "Which document answers a deposit condition?", "options": [
+      { "text": "Source documents for that deposit, not a verification of employment", "correct": true },
+      { "text": "A verification of employment by itself" },
+      { "text": "The appraisal invoice" }
+    ], "explain": "A verification of employment supports the job. The deposit needs its own source paper." },
+    { "id": "cond-appraisal", "unit": "conditions", "difficulty": 1, "title": "Collateral versus credit", "brief": "The appraisal asks for a repair.", "question": "What kind of condition is that?", "options": [
+      { "text": "A collateral condition", "correct": true },
+      { "text": "A large-deposit explanation" },
+      { "text": "A Loan Estimate timing cure" }
+    ], "explain": "Repair items from the appraisal are collateral conditions. They are not cleared with a deposit letter." },
+    { "id": "cond-open", "unit": "conditions", "difficulty": 1, "title": "Still open", "brief": "One condition has no document behind it.", "question": "Can the file go clear to close with that condition open?", "options": [
+      { "text": "No", "correct": true },
+      { "text": "Yes, if the score is high" },
+      { "text": "Yes, if closing is this week" }
+    ], "explain": "An open condition holds the file. Clear to close means the list is satisfied." },
+    { "id": "cond-verbal", "unit": "conditions", "difficulty": 1, "title": "Sourcing", "brief": "The borrower explains the deposit out loud and offers no paper.", "question": "Is that enough to source it?", "options": [
+      { "text": "No. Sourcing is a paper trail", "correct": true },
+      { "text": "Yes. A verbal explanation is the source" },
+      { "text": "Yes, after the CD is out" }
+    ], "explain": "The letter tells the story. The statements or transfer records show the money." },
+    { "id": "cond-unsourced", "unit": "conditions", "difficulty": 1, "title": "Paying a debt with unsourced cash", "brief": "The borrower wants to pay off the car with a deposit that is not sourced.", "question": "What can that do to the file?", "options": [
+      { "text": "Add a sourcing condition instead of quietly fixing DTI", "correct": true },
+      { "text": "Remove every condition" },
+      { "text": "Change the loan to VA" }
+    ], "explain": "A payoff only helps if the money is sourced. Unsourced cash becomes its own condition." },
+    { "id": "cond-list", "unit": "conditions", "difficulty": 1, "title": "The list is the work", "brief": "The underwriter published a condition list.", "question": "What is that list?", "options": [
+      { "text": "The clearance list, not optional commentary", "correct": true },
+      { "text": "Suggestions you can skip if the payment looks fine" },
+      { "text": "A copy of the Loan Estimate" }
+    ], "explain": "Each open item has to be satisfied before the file is clear to close." },
+
+    { "id": "ctc-cd", "unit": "ctc", "difficulty": 1, "bind": "cdDue", "title": "Final approach: Closing Disclosure timing" },
+    { "id": "ctc-three", "unit": "ctc", "difficulty": 1, "title": "How early the borrower has it", "brief": "Consummation is the closing date on this file.", "question": "When must the borrower receive the Closing Disclosure?", "options": [
+      { "text": "At least three business days before consummation", "correct": true },
+      { "text": "The morning of closing" },
+      { "text": "Any time in the application week" }
+    ], "explain": "Three business days before consummation is the rule this sim practices." },
+    { "id": "ctc-saturday", "unit": "ctc", "difficulty": 1, "title": "CD business days", "brief": "This clock is not the Loan Estimate clock.", "question": "Which days count as Closing Disclosure business days in this sim?", "options": [
+      { "text": "Saturday counts. Sunday does not", "correct": true },
+      { "text": "Only Monday through Friday, same as the LE" },
+      { "text": "Sunday counts and Saturday does not" }
+    ], "explain": "For the CD, this sim counts every day except Sunday. Saturday counts. The LE clock is lender-open days and skips both weekend days." },
+    { "id": "ctc-holiday", "unit": "ctc", "difficulty": 1, "title": "Holidays still unmodeled", "brief": "A weekday before closing is a federal holiday.", "question": "Does this sim remove federal holidays from the CD count?", "options": [
+      { "text": "No", "correct": true },
+      { "text": "Yes. All federal holidays are skipped" },
+      { "text": "Yes, but only when they fall on Saturday" }
+    ], "explain": "Holidays are not modeled. Outside this sim, the real calendar still has to be checked." },
+    { "id": "ctc-eve", "unit": "ctc", "difficulty": 1, "title": "The day before", "brief": "Closing is tomorrow. The borrower does not have the CD yet.", "question": "Is delivery the day before closing on time in this sim?", "options": [
+      { "text": "No. That is inside the three-business-day window", "correct": true },
+      { "text": "Yes. One day is enough" },
+      { "text": "Yes, if the LE was on time" }
+    ], "explain": "The latest day is three business days before consummation, not the day before." },
+    { "id": "ctc-date", "unit": "ctc", "difficulty": 1, "title": "Which date is consummation", "brief": "The file shows an application date and a closing date.", "question": "Which date is consummation for this CD question?", "options": [
+      { "text": "The closing date", "correct": true },
+      { "text": "The application date" },
+      { "text": "The day the LE was sent" }
+    ], "explain": "Count backward from the closing date on the file." },
+    { "id": "ctc-reset", "unit": "ctc", "difficulty": 1, "title": "A new wait", "brief": "The CD is already out, and a material change shows up.", "question": "Which change can start a new three-day wait?", "options": [
+      { "text": "An APR increase past tolerance, a product change, or adding a prepayment penalty", "correct": true },
+      { "text": "Any typo in the mailing address" },
+      { "text": "Sending the LE on time" }
+    ], "explain": "A new waiting period can apply when the APR increases beyond tolerance, the loan product changes, or a prepayment penalty is added." },
+    { "id": "ctc-not-le", "unit": "ctc", "difficulty": 1, "title": "Do not swap the forms", "brief": "The Loan Estimate went out at application.", "question": "Does that Loan Estimate satisfy the Closing Disclosure timing rule?", "options": [
+      { "text": "No", "correct": true },
+      { "text": "Yes. One disclosure covers both clocks" },
+      { "text": "Yes, on a refinance" }
+    ], "explain": "The LE and the CD are different disclosures with different clocks." },
+    { "id": "ctc-earlier", "unit": "ctc", "difficulty": 1, "title": "Earlier than the last day", "brief": "The CD can be sent more than three business days before closing.", "question": "Is earlier delivery allowed?", "options": [
+      { "text": "Yes. The rule is the latest day, not the only day", "correct": true },
+      { "text": "No. It must be exactly three days before" },
+      { "text": "Only on FHA" }
+    ], "explain": "Earlier receipt is fine. The question on this flight is the latest day that still works." },
+    { "id": "ctc-sunday", "unit": "ctc", "difficulty": 1, "title": "Sunday", "brief": "You are counting CD business days and you land on a Sunday.", "question": "Does Sunday count in this sim?", "options": [
+      { "text": "No", "correct": true },
+      { "text": "Yes" },
+      { "text": "Only if the lender is open" }
+    ], "explain": "Sunday is skipped on the CD count in this sim. Saturday is not." },
+
+    { "id": "fund-risk", "unit": "funding", "difficulty": 1, "bind": "riskTier", "title": "Touchdown: final instrument check" },
+    { "id": "fund-color", "unit": "funding", "difficulty": 1, "title": "What the tier is", "brief": "The risk gauge has a color and a word.", "question": "What is that risk tier?", "options": [
+      { "text": "A training color from DTI, reserves, and LTV, not an underwriting decision", "correct": true },
+      { "text": "A DU or LPA approval" },
+      { "text": "The GSE analyzer's best-fit product" }
+    ], "explain": "The tier is a coarse UI color. It does not approve the loan and it does not pick a product line." },
+    { "id": "fund-dti-pts", "unit": "funding", "difficulty": 1, "title": "DTI points", "brief": "Back-end DTI is 46%.", "question": "How many risk points does that add in this sim?", "options": [
+      { "text": "2", "correct": true },
+      { "text": "1" },
+      { "text": "0" }
+    ], "explain": "DTI at or above 45% adds 2 points. DTI at or above 40% and under 45% adds 1." },
+    { "id": "fund-res-pts", "unit": "funding", "difficulty": 1, "title": "Reserve points", "brief": "Reserves are 3 months.", "question": "How many risk points does that add?", "options": [
+      { "text": "1", "correct": true },
+      { "text": "2" },
+      { "text": "0" }
+    ], "explain": "Reserves under 2 months add 2 points. Reserves under 4 months add 1. Three months is 1 point." },
+    { "id": "fund-ltv-pts", "unit": "funding", "difficulty": 1, "title": "LTV points", "brief": "LTV is 92%.", "question": "How many risk points does that add?", "options": [
+      { "text": "1", "correct": true },
+      { "text": "2" },
+      { "text": "0" }
+    ], "explain": "LTV over 95% adds 2 points. LTV over 90% and up to 95% adds 1. 92% is 1 point." },
+    { "id": "fund-medium", "unit": "funding", "difficulty": 1, "title": "Two points", "brief": "The three gauges add up to 2 points.", "question": "Which tier is 2 points?", "options": [
+      { "text": "Medium", "correct": true },
+      { "text": "Low" },
+      { "text": "High" }
+    ], "explain": "Two or three points is medium. Four or more is high. Under two is low." },
+    { "id": "fund-high", "unit": "funding", "difficulty": 1, "title": "Four points", "brief": "The gauges add up to 4 points.", "question": "Which tier is 4 points?", "options": [
+      { "text": "High", "correct": true },
+      { "text": "Medium" },
+      { "text": "Low" }
+    ], "explain": "Four points is the high tier. Medium starts at 2." },
+    { "id": "fund-inputs", "unit": "funding", "difficulty": 1, "title": "What the tier reads", "brief": "Rate, term, and credit score are on the file.", "question": "Which inputs does the risk tier actually use?", "options": [
+      { "text": "Back-end DTI, reserve months, and LTV", "correct": true },
+      { "text": "Credit score and the note rate" },
+      { "text": "The application date" }
+    ], "explain": "The engine scores back-end DTI, reserves, and LTV only." },
+    { "id": "fund-aus", "unit": "funding", "difficulty": 1, "title": "Not a submission", "brief": "The flight reaches funding.", "question": "Does finishing this sim submit the file to DU or LPA?", "options": [
+      { "text": "No", "correct": true },
+      { "text": "Yes. Funding here is an AUS run" },
+      { "text": "Yes, but only at Captain difficulty" }
+    ], "explain": "This is a synthetic training flight. It does not run AUS and it does not fund a real loan." },
+    { "id": "fund-link", "unit": "funding", "difficulty": 1, "title": "Where the analyzer is", "brief": "You want the product-fit grid from the GSE analyzer.", "question": "How do you open that analyzer from this flight?", "options": [
+      { "text": "The pilot-report button links to it. This score does not fill that page", "correct": true },
+      { "text": "The flight result is written onto the analyzer automatically" },
+      { "text": "The risk tier is the analyzer's best-fit product" }
+    ], "explain": "The report has a button that opens the GSE analyzer as its own tool. The flight score stays here." }
+  ]
+}

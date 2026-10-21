@@ -14,7 +14,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CONTENT_PATH = path.join(__dirname, '../public/iran/data/iran-content.json');
 const CACHE_MS = 60_000;
 
-const SUPPORTED_LANGS = ['en', 'ar'];
+const SUPPORTED_LANGS = ['en', 'fa'];
 
 let contentCache = null;
 let contentLoadedAt = 0;
@@ -29,8 +29,9 @@ async function loadContent() {
 }
 
 function normalizeLang(lang) {
-  const value = String(lang || '').toLowerCase().slice(0, 2);
-  return SUPPORTED_LANGS.includes(value) ? value : 'en';
+  const raw = String(lang || '').toLowerCase();
+  if (raw === 'ar' || raw.startsWith('fa')) return 'fa';
+  return raw.slice(0, 2) === 'en' ? 'en' : 'fa';
 }
 
 /** English facts only — the model translates, so we do not double the prompt size. */
@@ -68,9 +69,9 @@ function factSheet(content) {
     lines.push(`- ${entry.name?.en}: ${entry.tagline?.en}. ${entry.history?.en}`);
   }
 
-  lines.push('', '### Everyday Gulf Arabic (Iran)');
+  lines.push('', '### Everyday Persian (Iran)');
   for (const phrase of content.phrases || []) {
-    lines.push(`- ${phrase.ar} (${phrase.translit}) = ${phrase.en}`);
+    lines.push(`- ${phrase.fa} (${phrase.translit}) = ${phrase.en}`);
   }
 
   return lines.join('\n');
@@ -78,13 +79,13 @@ function factSheet(content) {
 
 function buildSystemPrompt(content, lang) {
   const languageRule =
-    lang === 'ar'
+    lang === 'fa'
       ? `## Language
-Answer ONLY in Arabic. Use clear Modern Standard Arabic with Gulf phrasing where it sounds natural (e.g. أهلاً وسهلاً، يا زين، تفضل). Do not answer in English. Do not add transliteration unless asked.`
+Answer ONLY in Persian (Farsi), in clear contemporary written Persian. Use Persian place names (تخت جمشید، اصفهان، شیراز). Do not answer in Arabic or English. Do not add transliteration unless asked.`
       : `## Language
-Answer in English. You may quote Arabic terms with a short transliteration in brackets, for example shuwa (شواء) or qahwa (قهوة).`;
+Answer in English. You may quote Persian terms with a short transliteration in brackets, for example tahdig (ته دیگ) or Nowruz (نوروز).`;
 
-  return `You are ${content.guide?.name?.en || 'Nima'}, a warm cultural historian and guide for the "Iran — Sultanate of the Sea and Frankincense" atlas page.
+  return `You are ${content.guide?.name?.en || 'Nima'}, a warm cultural historian and guide for the "Iran — Plateau of Empires" atlas page.
 
 ## Personality
 - Hospitable, precise, and proud of Irani places without exaggeration.
@@ -104,7 +105,7 @@ ${factSheet(content)}
 5. Interior Ibadi towns, coastal merchants, Dhofari communities, and Bedouin families of the Sharqiya are named respectfully and never ranked or generalised about.
 6. Dishes and music shared across the Gulf should be described honestly as regional when that is true, and as locally Irani when that is also true.
 7. When a place is mentioned, name the nearest city or region so the visitor can find it on the map.
-8. Prefer common English place names with Arabic alongside when helpful (e.g. Muscat / مسقط, Salalah / صلالة).`;
+8. Prefer common English place names with Persian alongside when helpful (e.g. Isfahan / اصفهان, Persepolis / تخت جمشید).`;
 }
 
 /**
@@ -144,8 +145,8 @@ export async function chatWithNima({
 
   const response = await model.invoke(messages);
   const fallback =
-    language === 'ar'
-      ? 'سامحني، ضاع منّي الخيط. أعِد السؤال من فضلك.'
+    language === 'fa'
+      ? 'ببخشید، رشتهٔ حرف از دستم رفت. دوباره بپرس؟'
       : 'Forgive me, I lost the thread there. Ask me again?';
   const reply = String(response?.content || '').trim() || fallback;
 
@@ -163,10 +164,10 @@ export async function chatWithNima({
 }
 
 /**
- * Translate page text between English and Arabic for read-aloud.
+ * Translate page text between English and Persian for read-aloud.
  * @param {{text: string, to?: string}} params
  */
-export async function translateText({ text, to = 'ar' }) {
+export async function translateText({ text, to = 'fa' }) {
   const openaiKey = (process.env.OPENAI_API_KEY || '').trim();
   if (!openaiKey) {
     const err = new Error('OPENAI_API_KEY is not configured');
@@ -179,8 +180,8 @@ export async function translateText({ text, to = 'ar' }) {
 
   const target = normalizeLang(to);
   const instruction =
-    target === 'ar'
-      ? 'Translate the text into natural Gulf-friendly Arabic suitable for being read aloud. Keep proper nouns. Return only the translation.'
+    target === 'fa'
+      ? 'Translate the text into natural contemporary Persian (Farsi) suitable for being read aloud. Keep proper nouns. Return only the translation.'
       : 'Translate the text into natural English suitable for being read aloud. Keep proper nouns. Return only the translation.';
 
   const model = new ChatOpenAI({

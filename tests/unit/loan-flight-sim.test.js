@@ -112,10 +112,13 @@ describe('loan flight sim page', () => {
     }
   });
 
-  test('labels the loan as synthetic and sends no PII to the GSE check', () => {
+  test('labels the loan as synthetic and links to the GSE analyzer without posting the flight', () => {
     expect(html).toContain('Synthetic loan');
+    expect(html).toContain('href="/gse-analyzer.html"');
     expect(js).toContain('createLoanFlightSimConfig');
-    expect(js).toContain('/api/gse/analyze-scenario');
+    expect(js).not.toContain('/api/gse/analyze-scenario');
+    expect(js).toContain('/api/loan-flight/deck');
+    expect(js).toContain('Question');
     expect(js).toMatch(/addBusinessDays\(\[l\.appDate, 3, false\]\)/);
     expect(js).toMatch(/addBusinessDays\(\[l\.closingDate, -3, true\]\)/);
     expect(js).not.toMatch(/\b(ssn|taxId|email|phone|fullName)\s*:/);

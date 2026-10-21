@@ -42,7 +42,8 @@ Node.js (Port 3000)              Python/FastAPI (Port 8000)
 - **Sources**: Encompass docs + ICE knowledge (repos, Postman)
 - **Model**: GPT-4
 - **Context**: DevConnect Labs tech stack, calculation engine, Encompass Hub/ScreenBindings
-- **Endpoints**: `/api/encompass-assistant/search`, `/chat`, `/summary`
+- **Endpoints**: `/api/encompass/*` and alias `/api/encompass-assistant/*` (`search`, `chat`, `summary`, `health`, `graph`, `history`)
+- **Service**: `services/encompass-assistant.service.js` — curated fact sheet (`data/knowledge/encompass-dev-expert.json`) + hybrid RAG + LangChain memory
 - **Related (optional AI scoring)**: Processor assignment can use OpenAI for loan difficulty points (`services/loan-complexity-ai.service.js`); see `docs/PROCESSOR_ASSIGNMENT.md`.
 
 ### 2. Loan Pipeline AI

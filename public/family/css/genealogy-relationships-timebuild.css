@@ -1,0 +1,167 @@
+/**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
+/* Time Build year-clock stage on Lane Relationships */
+
+.timebuild-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid rgba(44, 40, 36, 0.14);
+  background: rgba(255, 252, 247, 0.92);
+}
+
+.timebuild-controls__label {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lane-heritage-muted, #5a5348);
+  margin-right: 0.25rem;
+}
+
+.timebuild-controls .form-range {
+  width: min(220px, 42vw);
+  margin: 0;
+}
+
+.timebuild-stage {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid rgba(44, 40, 36, 0.16);
+  min-height: 420px;
+  background: #0c0e12;
+}
+
+.timebuild-flags {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.timebuild-flag {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 1.1s ease;
+  filter: saturate(0.85) brightness(0.45);
+}
+
+.timebuild-flag.is-active {
+  opacity: 0.42;
+}
+
+.timebuild-flag--england {
+  background-image: url('/family/assets/flags/st-george-england.svg');
+}
+
+.timebuild-flag--colonial {
+  background-image: url('/family/assets/colonial-red-ensign-great-britain-1707-1800.svg');
+}
+
+.timebuild-flag--early-us {
+  background-image: url('/family/assets/flags/early-us-1777.svg');
+}
+
+.timebuild-flag--later-us {
+  background-image: url('/family/assets/flags/us-modern.svg');
+}
+
+.timebuild-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 45%, rgba(8, 10, 14, 0.15), rgba(8, 10, 14, 0.78) 70%, #060708 100%),
+    linear-gradient(180deg, rgba(6, 8, 12, 0.35), transparent 35%, rgba(6, 8, 12, 0.55));
+}
+
+.timebuild-year-hud {
+  position: absolute;
+  left: 1rem;
+  top: 0.85rem;
+  z-index: 3;
+  pointer-events: none;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.75);
+}
+
+.timebuild-year-hud__year {
+  display: block;
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: #f4efe6;
+  font-variant-numeric: tabular-nums;
+}
+
+.timebuild-year-hud__era {
+  display: block;
+  margin-top: 0.35rem;
+  max-width: min(22rem, 70vw);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: rgba(232, 220, 198, 0.88);
+}
+
+.timebuild-stage #d3-visualization.genealogy-graph {
+  position: relative;
+  z-index: 2;
+  min-height: 420px;
+  height: 520px;
+  border: none;
+  background: transparent;
+}
+
+body[data-time-build='on'] {
+  --ice-dark: #f3f1ec;
+}
+
+body[data-time-build='on'] .timebuild-controls {
+  border-color: rgba(243, 241, 236, 0.14);
+  background: rgba(24, 22, 20, 0.92);
+  color: #e8e2d8;
+}
+
+body[data-time-build='on'] .timebuild-controls__label,
+body[data-time-build='on'] .timebuild-controls .form-check-label {
+  color: #b8b0a4;
+}
+
+body[data-time-build='on'] .timebuild-stage {
+  border-color: rgba(243, 241, 236, 0.12);
+  box-shadow: 0 0 0 1px rgba(168, 139, 114, 0.12), 0 18px 48px rgba(0, 0, 0, 0.45);
+}
+
+body[data-time-build='on'] .genealogy-graph-label,
+body.dark-mode.lane-relationships-page .genealogy-graph-label {
+  fill: #f1efe8;
+  stroke: rgba(8, 10, 14, 0.85);
+}
+
+body[data-time-build='on'] .genealogy-graph-node:hover circle,
+body.dark-mode.lane-relationships-page .genealogy-graph-node:hover circle {
+  stroke: #f1efe8;
+}
+
+body[data-time-build='on'] .genealogy-graph-legend,
+body.dark-mode.lane-relationships-page .genealogy-graph-legend {
+  color: var(--lf-ink-soft, #d4cfc6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timebuild-flag {
+    transition: none;
+  }
+}

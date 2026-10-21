@@ -16,6 +16,8 @@ const LS_SHOW_HIDDEN = 'lanePdfGallery.showHidden';
 const LS_AUTO_GRID_FIX_ONCE = 'lanePdfGallery.blankGridRecoverOnce.v1';
 /** One-shot: older builds defaulted checkbox off → empty grid after denylist+hides */
 const SHOW_HIDDEN_LEGACY_ONCE = 'lanePdfGallery.defaultShowLegacy20260428';
+/** One-shot: hide blank denylist by default (too many blank pages were showing as images) */
+const HIDE_DENYLIST_DEFAULT_ONCE = 'lanePdfGallery.hideDenylistDefault.v20261017';
 /** Legacy localStorage presets — migrated once to Postgres via /lane-pdf/presets/import */
 const LS_FILTER_PRESETS = 'lanePdfGallery.filterPresets.v1';
 const LS_PRESETS_MIGRATED = 'lanePdfGallery.presetsMigratedToDb.v1';
@@ -514,9 +516,11 @@ async function initLanePdfGallery() {
     try {
       if (!localStorage.getItem(SHOW_HIDDEN_LEGACY_ONCE)) {
         localStorage.setItem(SHOW_HIDDEN_LEGACY_ONCE, '1');
-        if (localStorage.getItem(LS_SHOW_HIDDEN) === '0') {
-          localStorage.removeItem(LS_SHOW_HIDDEN);
-        }
+      }
+      /** Prefer hiding blank/denylist plates so empty paper pages do not flood the grid. */
+      if (!localStorage.getItem(HIDE_DENYLIST_DEFAULT_ONCE)) {
+        localStorage.setItem(HIDE_DENYLIST_DEFAULT_ONCE, '1');
+        localStorage.setItem(LS_SHOW_HIDDEN, '0');
       }
     } catch (_) {
       /* ignore */
@@ -524,12 +528,8 @@ async function initLanePdfGallery() {
 
     if (showHiddenInput) {
       const sv = localStorage.getItem(LS_SHOW_HIDDEN);
-      if (sv === '0') {
-        showHiddenInput.checked = false;
-      } else {
-        /** Default checked: show full grid (omit denylist hides only when unchecked) */
-        showHiddenInput.checked = true;
-      }
+      /** Default unchecked: hide server denylist (blank / near-blank scans). */
+      showHiddenInput.checked = sv === '1';
     }
 
     bindHideDelegation(grid, async (plateId) => {
@@ -588,7 +588,7 @@ async function initLanePdfGallery() {
     function filterSnapshot() {
       const pageVal = pageInput.value.trim();
       const idVal = idInput.value.trim();
-      const sh = showHiddenInput ? (showHiddenInput.checked ? '1' : '0') : '1';
+      const sh = showHiddenInput ? (showHiddenInput.checked ? '1' : '0') : '0';
       return `${pageVal}|${idVal}|${sh}`;
     }
 
@@ -868,7 +868,7 @@ async function initLanePdfGallery() {
       const cfg = {
         filterPage: sanitizeFilterPage(pageInput.value),
         filterCandidateIds: idInput.value.trim().slice(0, 500),
-        showServerDenied: showHiddenInput ? showHiddenInput.checked : true
+        showServerDenied: showHiddenInput ? showHiddenInput.checked : false
       };
       try {
         const r = await fetch('/api/genealogy/lane-pdf/presets', {

@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="/shared/styles.css"/>
   <link rel="stylesheet" href="/family/css/lane-shell.css"/>
   <link rel="stylesheet" href="/family/css/genealogy-tree-page.css"/>
+  <link rel="stylesheet" href="/family/css/genealogy-relationships-timebuild.css"/>
   <link rel="stylesheet" href="/family/css/lane-tts.css"/>
   <link rel="stylesheet" href="/family/css/lane-family-pill-nav.css"/>
   <script src="/shared/modern-navbar.js"></script>
@@ -70,7 +71,42 @@
       <button type="button" class="btn btn-sm btn-outline-primary" data-show-family="1" data-section="buxton" data-family-no="1">
         Buxton · No. 1
       </button>
+      <button type="button" class="btn btn-sm btn-outline-secondary" data-show-family="1" data-section="dorchester" data-family-no="1">
+        Vol. II · Dorchester No. 1
+      </button>
+      <button type="button" class="btn btn-sm btn-outline-secondary" data-show-family="1" data-section="joblane" data-family-no="1">
+        Vol. III · Job Lane No. 1
+      </button>
     </div>
+  </div>
+
+  <div id="relResearchPanel" class="family-tree-container mb-4 p-3" aria-labelledby="relResearchHeading">
+    <div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-2">
+      <h2 class="h5 mb-0" id="relResearchHeading"><i class="bi-journal-richtext"></i> Multi-volume research</h2>
+      <a class="small" href="https://archive.org/details/lanegenealogies01chap" target="_blank" rel="noopener noreferrer">Internet Archive · Vol. I</a>
+    </div>
+    <p class="small text-muted mb-2">
+      Decoded families from <em>Lane Genealogies</em> Vol. I (1891), Vol. II (1897), and Vol. III (1902).
+      Pick any numbered family below, or use the graph controls.
+    </p>
+    <div id="relResearchStats" class="small mb-3" aria-live="polite">Loading research totals…</div>
+    <form class="row g-2 align-items-end" id="registerDirectoryForm" onsubmit="return false;">
+      <div class="col-12 col-md-4">
+        <label class="form-label small mb-1" for="registerDirectorySection">Book part / volume</label>
+        <select class="form-select form-select-sm" id="registerDirectorySection">
+          <option value="">All parts</option>
+        </select>
+      </div>
+      <div class="col-12 col-md-5">
+        <label class="form-label small mb-1" for="registerDirectoryFamily">Numbered family</label>
+        <select class="form-select form-select-sm" id="registerDirectoryFamily" disabled>
+          <option value="">Loading register…</option>
+        </select>
+      </div>
+      <div class="col-12 col-md-3 d-grid">
+        <button type="button" class="btn btn-outline-primary btn-sm" id="registerDirectoryGo"><i class="bi-diagram-3"></i> Show family</button>
+      </div>
+    </form>
   </div>
 
   <div id="relStatsBar" class="rel-stats-bar small mb-4" aria-live="polite"></div>
@@ -97,10 +133,20 @@
             <label class="form-label small mb-1" for="graphSection">Book part</label>
             <select class="form-select form-select-sm" id="graphSection">
               <option value="">All parts</option>
-              <option value="boston" selected>Part I · William Lane of Boston</option>
-              <option value="buxton">Part II · Buxton</option>
-              <option value="fishersfield">Part III · Fishersfield</option>
-              <option value="additions">Additions</option>
+              <option value="boston" selected>Vol. I · William Lane of Boston</option>
+              <option value="buxton">Vol. I · Buxton</option>
+              <option value="fishersfield">Vol. I · Fishersfield</option>
+              <option value="additions">Vol. I · Additions</option>
+              <option value="dorchester">Vol. II · Dorchester</option>
+              <option value="stratford">Vol. II · Stratford</option>
+              <option value="milford">Vol. II · Milford</option>
+              <option value="merrifield">Vol. II · Merrifield</option>
+              <option value="newlondon">Vol. II · New London</option>
+              <option value="rye">Vol. II · Rye</option>
+              <option value="rickmansworth">Vol. III · Rickmansworth</option>
+              <option value="joblane">Vol. III · Job Lane</option>
+              <option value="casco">Vol. III · Casco Bay</option>
+              <option value="edwardlane">Vol. III · Edward Lane</option>
             </select>
           </div>
           <div class="col-4 col-md-2">
@@ -128,8 +174,40 @@
           </div>
         </form>
 
-        <div id="d3-visualization" class="genealogy-graph" aria-label="Relationship graph">
-          <p class="text-muted mb-0">Loading relationship graph…</p>
+        <div class="timebuild-controls" id="timeBuildControls" aria-label="Time Build year clock">
+          <span class="timebuild-controls__label">Time Build</span>
+          <button type="button" class="btn btn-dark btn-sm" id="timeBuildPlay" title="Play year clock (starts music)">
+            <i class="bi-play-fill" aria-hidden="true"></i> Play Time Build
+          </button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" id="timeBuildPause" disabled>
+            <i class="bi-pause-fill" aria-hidden="true"></i> Pause
+          </button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" id="timeBuildRestart" disabled>
+            <i class="bi-skip-start-fill" aria-hidden="true"></i> Restart
+          </button>
+          <label class="form-check-label small mb-0">
+            <input type="checkbox" class="form-check-input me-1" id="timeBuildMute" /> Mute
+          </label>
+          <label class="small mb-0 d-flex align-items-center gap-2" for="timeBuildScrub">
+            <span class="visually-hidden">Year scrubber</span>
+            <input type="range" class="form-range" id="timeBuildScrub" min="1500" max="1900" value="1500" disabled />
+          </label>
+        </div>
+
+        <div class="timebuild-stage" id="timeBuildStage">
+          <div class="timebuild-flags" aria-hidden="true">
+            <div class="timebuild-flag timebuild-flag--england" data-flag-era="england"></div>
+            <div class="timebuild-flag timebuild-flag--colonial" data-flag-era="colonial"></div>
+            <div class="timebuild-flag timebuild-flag--early-us" data-flag-era="early-us"></div>
+            <div class="timebuild-flag timebuild-flag--later-us" data-flag-era="later-us"></div>
+          </div>
+          <div class="timebuild-year-hud" aria-live="polite">
+            <span class="timebuild-year-hud__year" id="timeBuildYear">1500</span>
+            <span class="timebuild-year-hud__era" id="timeBuildEra">Press Play to watch the family graph build through time</span>
+          </div>
+          <div id="d3-visualization" class="genealogy-graph" aria-label="Relationship graph">
+            <p class="text-muted mb-0">Loading relationship graph…</p>
+          </div>
         </div>
         <div class="genealogy-graph-legend small mt-2" aria-hidden="true">
           <span><i class="legend-line legend-father"></i> father</span>
@@ -203,13 +281,14 @@
       <li><strong>No.&nbsp;N</strong> — a numbered family block in the book (head, wife, children).</li>
       <li><strong>(N)</strong> before a child’s roman numeral — that child heads family No.&nbsp;N later in the register.</li>
       <li><strong>Pedigree</strong> — abbreviated father → grandfather chain printed after the head’s name.</li>
-      <li>Unmatched names stay on a review list; this tool never invents new people.</li>
+      <li>Unmatched OCR crumbs stay on a review list. High-signal register heads/wives/children can be synthesized with book provenance via <code>--enrich</code>.</li>
     </ul>
     <p class="mt-2 mb-0">
       Deep link examples:
       <code>?familyNo=3&amp;section=boston</code>,
       <code>?q=Lane&amp;relation=father&amp;bookOnly=1</code>,
-      <code>?id=10</code>.
+      <code>?id=10</code>,
+      <code>?timebuild=1</code> (auto-start year clock).
     </p>
   </details>
 </div>

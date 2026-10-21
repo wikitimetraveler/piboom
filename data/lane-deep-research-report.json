@@ -1,0 +1,534 @@
+{
+  "generatedAt": "2026-10-17T02:32:06.515Z",
+  "title": "Lane Genealogies multi-volume deep research report",
+  "sources": [
+    {
+      "volume": 1,
+      "year": 1891,
+      "iaId": "lanegenealogies01chap",
+      "archiveUrl": "https://archive.org/details/lanegenealogies01chap",
+      "stats": {
+        "families": 180,
+        "familiesWithResolvedHead": 142,
+        "familiesLinkedToParentFamily": 121,
+        "children": 2021,
+        "childrenResolved": 832,
+        "proposedEdges": 1409,
+        "reviewItems": 558,
+        "added": {
+          "father": 301,
+          "mother": 441,
+          "spouse": 99
+        },
+        "confirmed": 8,
+        "conflicts": 35,
+        "codedPeople": 982,
+        "multiVolumeFamilies": 431,
+        "volumesDecoded": 3
+      }
+    },
+    {
+      "volume": 2,
+      "year": 1897,
+      "iaId": "lanegenealogies02chap",
+      "archiveUrl": "https://archive.org/details/lanegenealogies02chap",
+      "pageCount": 187,
+      "sections": [
+        "dorchester",
+        "milford"
+      ],
+      "stats": {
+        "families": 79,
+        "familiesWithResolvedHead": 36,
+        "familiesLinkedToParentFamily": 16,
+        "children": 516,
+        "childrenResolved": 247,
+        "proposedEdges": 132,
+        "reviewItems": 145,
+        "added": {
+          "father": 4,
+          "mother": 0,
+          "spouse": 0
+        },
+        "confirmed": 0,
+        "conflicts": 1,
+        "codedPeople": 271
+      },
+      "enrichment": {
+        "created": 37,
+        "nextId": 5323
+      }
+    },
+    {
+      "volume": 3,
+      "year": 1902,
+      "iaId": "lanegenealogies03chap",
+      "archiveUrl": "https://archive.org/details/lanegenealogies03chap",
+      "pageCount": 303,
+      "sections": [
+        "joblane",
+        "rickmansworth",
+        "casco"
+      ],
+      "stats": {
+        "families": 172,
+        "familiesWithResolvedHead": 78,
+        "familiesLinkedToParentFamily": 51,
+        "children": 874,
+        "childrenResolved": 463,
+        "proposedEdges": 199,
+        "reviewItems": 303,
+        "added": {
+          "father": 5,
+          "mother": 0,
+          "spouse": 0
+        },
+        "confirmed": 0,
+        "conflicts": 3,
+        "codedPeople": 518
+      },
+      "enrichment": {
+        "created": 88,
+        "nextId": 5411
+      }
+    }
+  ],
+  "totals": {
+    "volumes": 3,
+    "families": 431,
+    "children": 3411,
+    "reviewItems": 1006
+  },
+  "volumeResults": [
+    {
+      "volume": 2,
+      "year": 1897,
+      "iaId": "lanegenealogies02chap",
+      "archiveUrl": "https://archive.org/details/lanegenealogies02chap",
+      "source": "lanegenealogies02chap.pdf",
+      "pageCount": 187,
+      "sections": [
+        "dorchester",
+        "milford"
+      ],
+      "stats": {
+        "families": 79,
+        "familiesWithResolvedHead": 36,
+        "familiesLinkedToParentFamily": 16,
+        "children": 516,
+        "childrenResolved": 247,
+        "proposedEdges": 132,
+        "reviewItems": 145,
+        "added": {
+          "father": 4,
+          "mother": 0,
+          "spouse": 0
+        },
+        "confirmed": 0,
+        "conflicts": 1,
+        "codedPeople": 271
+      },
+      "enrichment": {
+        "created": 37,
+        "nextId": 5323
+      },
+      "highlights": [
+        {
+          "section": "dorchester",
+          "sectionLabel": "Vol. II · William Lane of Dorchester",
+          "familyNo": 1,
+          "familyKey": "1",
+          "head": "William Lane",
+          "wife": null,
+          "children": 8,
+          "pdfPage": 5,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "dorchester",
+          "sectionLabel": "Vol. II · William Lane of Dorchester",
+          "familyNo": 3,
+          "familyKey": "3",
+          "head": "Andrew Lane",
+          "wife": null,
+          "children": 4,
+          "pdfPage": 10,
+          "parentFamilyNo": 1
+        },
+        {
+          "section": "dorchester",
+          "sectionLabel": "Vol. II · William Lane of Dorchester",
+          "familyNo": 5,
+          "familyKey": "5",
+          "head": "John Lane",
+          "wife": null,
+          "children": 11,
+          "pdfPage": 14,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "dorchester",
+          "sectionLabel": "Vol. II · William Lane of Dorchester",
+          "familyNo": 8,
+          "familyKey": "8",
+          "head": "John Lane",
+          "wife": null,
+          "children": 1,
+          "pdfPage": 19,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "dorchester",
+          "sectionLabel": "Vol. II · William Lane of Dorchester",
+          "familyNo": 10,
+          "familyKey": "10",
+          "head": "Joshua Lane",
+          "wife": null,
+          "children": 2,
+          "pdfPage": 20,
+          "parentFamilyNo": 1
+        },
+        {
+          "section": "dorchester",
+          "sectionLabel": "Vol. II · William Lane of Dorchester",
+          "familyNo": 11,
+          "familyKey": "11",
+          "head": "Samuel Lane",
+          "wife": null,
+          "children": 0,
+          "pdfPage": 21,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "dorchester",
+          "sectionLabel": "Vol. II · William Lane of Dorchester",
+          "familyNo": 12,
+          "familyKey": "12",
+          "head": "Ephraim Lane",
+          "wife": null,
+          "children": 5,
+          "pdfPage": 21,
+          "parentFamilyNo": 5
+        },
+        {
+          "section": "dorchester",
+          "sectionLabel": "Vol. II · William Lane of Dorchester",
+          "familyNo": 13,
+          "familyKey": "13",
+          "head": "John Lane",
+          "wife": null,
+          "children": 0,
+          "pdfPage": 22,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "dorchester",
+          "sectionLabel": "Vol. II · William Lane of Dorchester",
+          "familyNo": 14,
+          "familyKey": "14",
+          "head": "Benjamin Lane",
+          "wife": null,
+          "children": 10,
+          "pdfPage": 22,
+          "parentFamilyNo": 5
+        },
+        {
+          "section": "dorchester",
+          "sectionLabel": "Vol. II · William Lane of Dorchester",
+          "familyNo": 16,
+          "familyKey": "16",
+          "head": "Ebenezer Lane",
+          "wife": null,
+          "children": 6,
+          "pdfPage": 24,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "dorchester",
+          "sectionLabel": "Vol. II · William Lane of Dorchester",
+          "familyNo": 17,
+          "familyKey": "17",
+          "head": "Peter Lane",
+          "wife": null,
+          "children": 4,
+          "pdfPage": 25,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "dorchester",
+          "sectionLabel": "Vol. II · William Lane of Dorchester",
+          "familyNo": 19,
+          "familyKey": "19",
+          "head": "Jonathan Lane",
+          "wife": null,
+          "children": 0,
+          "pdfPage": 26,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "dorchester",
+          "sectionLabel": "Vol. II · William Lane of Dorchester",
+          "familyNo": 20,
+          "familyKey": "20",
+          "head": "Jeremiah Lane",
+          "wife": null,
+          "children": 8,
+          "pdfPage": 27,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "dorchester",
+          "sectionLabel": "Vol. II · William Lane of Dorchester",
+          "familyNo": 24,
+          "familyKey": "24",
+          "head": "Amos Lane",
+          "wife": null,
+          "children": 7,
+          "pdfPage": 30,
+          "parentFamilyNo": 5
+        },
+        {
+          "section": "dorchester",
+          "sectionLabel": "Vol. II · William Lane of Dorchester",
+          "familyNo": 25,
+          "familyKey": "25",
+          "head": "Zephaxia Lane",
+          "wife": null,
+          "children": 9,
+          "pdfPage": 31,
+          "parentFamilyNo": 14
+        },
+        {
+          "section": "dorchester",
+          "sectionLabel": "Vol. II · William Lane of Dorchester",
+          "familyNo": 28,
+          "familyKey": "28",
+          "head": "Ebenezer Lane",
+          "wife": null,
+          "children": 7,
+          "pdfPage": 32,
+          "parentFamilyNo": null
+        }
+      ],
+      "registerOut": "data\\lane-genealogy-codes-vol2.json"
+    },
+    {
+      "volume": 3,
+      "year": 1902,
+      "iaId": "lanegenealogies03chap",
+      "archiveUrl": "https://archive.org/details/lanegenealogies03chap",
+      "source": "lanegenealogies03chap.pdf",
+      "pageCount": 303,
+      "sections": [
+        "joblane",
+        "rickmansworth",
+        "casco"
+      ],
+      "stats": {
+        "families": 172,
+        "familiesWithResolvedHead": 78,
+        "familiesLinkedToParentFamily": 51,
+        "children": 874,
+        "childrenResolved": 463,
+        "proposedEdges": 199,
+        "reviewItems": 303,
+        "added": {
+          "father": 5,
+          "mother": 0,
+          "spouse": 0
+        },
+        "confirmed": 0,
+        "conflicts": 3,
+        "codedPeople": 518
+      },
+      "enrichment": {
+        "created": 88,
+        "nextId": 5411
+      },
+      "highlights": [
+        {
+          "section": "joblane",
+          "sectionLabel": "Vol. III · Job Lane of Malden & Billerica",
+          "familyNo": 9,
+          "familyKey": "9",
+          "head": "John Lane",
+          "wife": null,
+          "children": 1,
+          "pdfPage": 51,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "joblane",
+          "sectionLabel": "Vol. III · Job Lane of Malden & Billerica",
+          "familyNo": 12,
+          "familyKey": "12",
+          "head": "John Lane",
+          "wife": null,
+          "children": 13,
+          "pdfPage": 57,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "joblane",
+          "sectionLabel": "Vol. III · Job Lane of Malden & Billerica",
+          "familyNo": 16,
+          "familyKey": "16",
+          "head": "John Lane",
+          "wife": null,
+          "children": 0,
+          "pdfPage": 62,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "joblane",
+          "sectionLabel": "Vol. III · Job Lane of Malden & Billerica",
+          "familyNo": 17,
+          "familyKey": "17",
+          "head": "Samuel Lane",
+          "wife": null,
+          "children": 0,
+          "pdfPage": 63,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "joblane",
+          "sectionLabel": "Vol. III · Job Lane of Malden & Billerica",
+          "familyNo": 18,
+          "familyKey": "18",
+          "head": "James Lane",
+          "wife": null,
+          "children": 7,
+          "pdfPage": 63,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "joblane",
+          "sectionLabel": "Vol. III · Job Lane of Malden & Billerica",
+          "familyNo": 20,
+          "familyKey": "20",
+          "head": "Luke Lane",
+          "wife": null,
+          "children": 3,
+          "pdfPage": 66,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "joblane",
+          "sectionLabel": "Vol. III · Job Lane of Malden & Billerica",
+          "familyNo": 21,
+          "familyKey": "21",
+          "head": "John Lane",
+          "wife": null,
+          "children": 10,
+          "pdfPage": 66,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "joblane",
+          "sectionLabel": "Vol. III · Job Lane of Malden & Billerica",
+          "familyNo": 25,
+          "familyKey": "25",
+          "head": "Jonathan Lane",
+          "wife": null,
+          "children": 1,
+          "pdfPage": 73,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "joblane",
+          "sectionLabel": "Vol. III · Job Lane of Malden & Billerica",
+          "familyNo": 26,
+          "familyKey": "26",
+          "head": "Stephen Lane",
+          "wife": null,
+          "children": 0,
+          "pdfPage": 75,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "joblane",
+          "sectionLabel": "Vol. III · Job Lane of Malden & Billerica",
+          "familyNo": 27,
+          "familyKey": "27",
+          "head": "Gershomflagg Lane",
+          "wife": null,
+          "children": 6,
+          "pdfPage": 76,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "joblane",
+          "sectionLabel": "Vol. III · Job Lane of Malden & Billerica",
+          "familyNo": 30,
+          "familyKey": "30",
+          "head": "Oliverwellington Lane",
+          "wife": null,
+          "children": 1,
+          "pdfPage": 79,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "joblane",
+          "sectionLabel": "Vol. III · Job Lane of Malden & Billerica",
+          "familyNo": 31,
+          "familyKey": "31",
+          "head": "Solomon Lane",
+          "wife": null,
+          "children": 1,
+          "pdfPage": 81,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "joblane",
+          "sectionLabel": "Vol. III · Job Lane of Malden & Billerica",
+          "familyNo": 33,
+          "familyKey": "33",
+          "head": "Jonas Lane",
+          "wife": null,
+          "children": 0,
+          "pdfPage": 83,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "joblane",
+          "sectionLabel": "Vol. III · Job Lane of Malden & Billerica",
+          "familyNo": 34,
+          "familyKey": "34",
+          "head": "Ephraim Lane",
+          "wife": null,
+          "children": 1,
+          "pdfPage": 85,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "joblane",
+          "sectionLabel": "Vol. III · Job Lane of Malden & Billerica",
+          "familyNo": 35,
+          "familyKey": "35",
+          "head": "Ebenezer Lane",
+          "wife": null,
+          "children": 0,
+          "pdfPage": 87,
+          "parentFamilyNo": null
+        },
+        {
+          "section": "joblane",
+          "sectionLabel": "Vol. III · Job Lane of Malden & Billerica",
+          "familyNo": 36,
+          "familyKey": "36",
+          "head": "Samuel Lane",
+          "wife": null,
+          "children": 8,
+          "pdfPage": 88,
+          "parentFamilyNo": null
+        }
+      ],
+      "registerOut": "data\\lane-genealogy-codes-vol3.json"
+    }
+  ],
+  "notes": [
+    "Vol. I decoded from local PDF lanegenealogies01chap.pdf via resolve:lane-genealogy-codes.",
+    "Vol. II / III harvested from Internet Archive djvu.txt OCR (Fitts 1897 / 1902).",
+    "Register people synthesized only when --enrich is set; OCR junk is filtered by isPlausibleRegisterPerson."
+  ]
+}

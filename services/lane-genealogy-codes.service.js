@@ -24,7 +24,88 @@ export const SECTION_LABELS = {
   boston: 'Part I · William Lane of Boston',
   buxton: 'Part II · Buxton Lane family',
   fishersfield: 'Part III · Fishersfield Lane family',
-  additions: 'Additions'
+  additions: 'Additions',
+  // Volume II (1897) — Fitts
+  dorchester: 'Vol. II · William Lane of Dorchester',
+  stratford: 'Vol. II · Robert Lane of Stratford',
+  milford: 'Vol. II · John Lane of Milford',
+  merrifield: 'Vol. II · John Merrifield Lane of Boston',
+  newlondon: 'Vol. II · Daniel Lane of New London',
+  rye: 'Vol. II · George Lane of Rye',
+  // Volume III (1902) — Fitts
+  rickmansworth: 'Vol. III · English family, Rickmansworth',
+  joblane: 'Vol. III · Job Lane of Malden & Billerica',
+  casco: 'Vol. III · James Lane of Casco Bay',
+  edwardlane: 'Vol. III · Edward Lane of Boston'
+};
+
+/** Nickname / diminutive groups — any two names in a group agree. */
+export const NICKNAME_GROUPS = [
+  ['abi', 'abigail', 'nabby', 'abby'],
+  ['betsey', 'betsy', 'eliza', 'elizabeth', 'betty', 'bessie', 'libby'],
+  ['polly', 'molly', 'mary', 'mae', 'mamie'],
+  ['sally', 'sarah'],
+  ['patty', 'martha'],
+  ['sukey', 'susanna', 'susan', 'susannah', 'sue'],
+  ['peggy', 'margaret', 'maggie', 'meg'],
+  ['hitty', 'mehitable', 'hetty'],
+  ['nelly', 'eleanor', 'ellen', 'nell', 'nellie'],
+  ['jenny', 'jane', 'janet', 'jean'],
+  ['katie', 'kate', 'catherine', 'catharine', 'katherine'],
+  ['william', 'will', 'wm', 'billy', 'bill'],
+  ['samuel', 'sam', 'saml'],
+  ['john', 'jon', 'jno', 'jack'],
+  ['joseph', 'joe', 'jo'],
+  ['joshua', 'josh'],
+  ['benjamin', 'ben', 'benj'],
+  ['jonathan', 'jonth', 'jona'],
+  ['ebenezer', 'eben'],
+  ['jeremiah', 'jere', 'jerry'],
+  ['daniel', 'dan', 'danl', 'dani'],
+  ['nathaniel', 'nath', 'nat'],
+  ['robert', 'robt', 'bob'],
+  ['richard', 'rich', 'dick'],
+  ['matthew', 'matt'],
+  ['nicholas', 'nich', 'nick'],
+  ['thomas', 'thos', 'tom'],
+  ['james', 'jas', 'jim'],
+  ['josiah', 'si'],
+  ['bathsheba', 'bathsheea', 'sheba']
+];
+
+const NICKNAME_CANONICAL = (() => {
+  const map = new Map();
+  for (const group of NICKNAME_GROUPS) {
+    const canon = group[0];
+    for (const n of group) map.set(n, canon);
+  }
+  return map;
+})();
+
+/** Known OCR given-name repairs (space-split or letter-swapped). */
+export const OCR_GIVEN_REPAIRS = {
+  'eliza beth': 'elizabeth',
+  elizabeth: 'elizabeth',
+  'sus anna': 'susanna',
+  susanna: 'susanna',
+  'jo siah': 'josiah',
+  josiah: 'josiah',
+  bathsheea: 'bathsheba',
+  'bath sheba': 'bathsheba',
+  'mehit able': 'mehitable',
+  mehitable: 'mehitable',
+  'abi gail': 'abigail',
+  'beth sheba': 'bathsheba',
+  'hepsi bah': 'hepsibah',
+  'me hitable': 'mehitable',
+  'bar bara': 'barbara',
+  'mar tha': 'martha',
+  'han nah': 'hannah',
+  'deb orah': 'deborah',
+  'eunice': 'eunice',
+  'prisc illa': 'priscilla',
+  'cath erine': 'catherine',
+  'kath erine': 'katherine'
 };
 
 const RELATION_COLORS = { father: '#39F', mother: '#F39', spouse: '#CC0' };
@@ -221,37 +302,82 @@ export function stripRunningHeader(pageText = '', expectedOddPage = null) {
   return { text, printedPage: null };
 }
 
-function detectPageMode(rawText, currentMode) {
-  const head = String(rawText || '').slice(0, 80).replace(/\s+/g, '');
-  if (/^PART\s*SECOND/i.test(head)) return 'buxton';
-  if (/^PART\s*THIRD/i.test(head)) return 'fishersfield';
-  if (/^ADDITIONS/.test(head)) return 'additions';
-  if (/^(?:APPENDIX|INDEX|CORRECTIONS|NAMESOFPERSONS|CHRISTIANNAMES)/.test(head)) return 'skip';
-  if (/LISTOFSUBSCRIBERS/.test(head)) return 'skip';
-  if (currentMode === 'front' && /No\.\s*[1Il]\.\s*WILLIAM\s*LANE/.test(rawText)) return 'boston';
+function detectPageMode(rawText, currentMode, options = {}) {
+  const head = String(rawText || '').slice(0, 160).replace(/\s+/g, '');
+  const volume = options.volume || 1;
+  if (volume === 1) {
+    if (/^PART\s*SECOND/i.test(head)) return 'buxton';
+    if (/^PART\s*THIRD/i.test(head)) return 'fishersfield';
+    if (/^ADDITIONS/.test(head)) return 'additions';
+    if (/^(?:APPENDIX|INDEX|CORRECTIONS|NAMESOFPERSONS|CHRISTIANNAMES)/.test(head)) return 'skip';
+    if (/LISTOFSUBSCRIBERS/.test(head)) return 'skip';
+    if (currentMode === 'front' && /No\.\s*[1Il]\.\s*WILLIAM\s*LANE/.test(rawText)) return 'boston';
+    return currentMode;
+  }
+  if (volume === 2) {
+    if (/DORCHESTER/i.test(head) || /WILLIAM\s*LANE.*DORCHESTER/i.test(head)) return 'dorchester';
+    if (/STRATFORD/i.test(head) || /ROBERT\s*LANE/i.test(head)) return 'stratford';
+    if (/MILFORD/i.test(head) && /LANE/i.test(head)) return 'milford';
+    if (/MERRIFIELD/i.test(head)) return 'merrifield';
+    if (/NEW\s*LONDON/i.test(head) || /DANIEL\s*LANE/i.test(head)) return 'newlondon';
+    if (/\bRYE\b/i.test(head) || /GEORGE\s*LANE/i.test(head)) return 'rye';
+    if (/^(?:APPENDIX|INDEX|CORRECTIONS|NAMESOFPERSONS|CHRISTIANNAMES)/.test(head)) return 'skip';
+    if (currentMode === 'front' && /No\.\s*[1Il]\./.test(rawText)) return options.defaultSection || 'dorchester';
+    return currentMode === 'front' ? options.defaultSection || 'dorchester' : currentMode;
+  }
+  if (volume === 3) {
+    if (/RICKMANSWORTH/i.test(head) || /ENGLISH\s*FAMILY/i.test(head)) return 'rickmansworth';
+    if (/JOB\s*LANE/i.test(head) || /MALDEN/i.test(head) || /BILLERICA/i.test(head)) return 'joblane';
+    if (/CASCO/i.test(head) || /NORTH\s*YARMOUTH/i.test(head) || /JAMES\s*LANE/i.test(head)) return 'casco';
+    if (/EDWARD\s*LANE/i.test(head)) return 'edwardlane';
+    if (/^(?:APPENDIX|INDEX|CORRECTIONS|NAMESOFPERSONS|CHRISTIANNAMES)/.test(head)) return 'skip';
+    if (currentMode === 'front' && /No\.\s*[1Il]\./.test(rawText)) return options.defaultSection || 'joblane';
+    return currentMode === 'front' ? options.defaultSection || 'joblane' : currentMode;
+  }
   return currentMode;
+}
+
+/**
+ * Internet Archive djvu OCR for Vol. II/III inserts spaces between nearly every token
+ * ("No.  5,  WILLIAM  LANE"). Collapse to the glued form the Vol. I PDF parsers expect.
+ */
+export function collapseSpacedOcr(text = '') {
+  return String(text || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\n/g, ' ')
+    .replace(/\s+/g, '')
+    // Common Fitts OCR swaps once spaces are gone
+    .replace(/LAXE/g, 'LANE')
+    .replace(/I\.ANE/g, 'LANE')
+    .replace(/LAME(?=[,(0-9])/g, 'LANE');
 }
 
 /**
  * pages: [{ pdfPage, text }] -> { sections: { boston: { text, pageStarts: [{offset, pdfPage}] }, ... } }
  */
-export function buildSectionStreams(pages = []) {
+export function buildSectionStreams(pages = [], options = {}) {
   const sections = {};
   let mode = 'front';
   let lastEvenPrinted = null;
+  const volume = options.volume || 1;
+  const collapse = volume > 1 || options.collapseSpaces === true;
   for (const page of pages) {
     const raw = String(page?.text || '');
     if (!raw.trim()) continue;
-    mode = detectPageMode(raw, mode);
+    mode = detectPageMode(raw, mode, options);
     const expectedOdd = lastEvenPrinted != null ? lastEvenPrinted + 1 : null;
-    const { text, printedPage } = stripRunningHeader(raw, expectedOdd);
+    // Running-header strip expects lightly spaced text; collapse after.
+    const stripped = stripRunningHeader(raw, expectedOdd);
+    let text = stripped.text;
+    const printedPage = stripped.printedPage;
     if (printedPage != null && EVEN_HEADER_RE.test(raw)) lastEvenPrinted = printedPage;
     else if (EVEN_HEADER_RE.test(raw) && lastEvenPrinted != null) lastEvenPrinted += 2;
     if (mode === 'front' || mode === 'skip') continue;
-    if (!sections[mode]) sections[mode] = { key: mode, text: '', pageStarts: [] };
+    if (!sections[mode]) sections[mode] = { key: mode, text: '', pageStarts: [], volume };
     const sec = sections[mode];
     sec.pageStarts.push({ offset: sec.text.length, pdfPage: page.pdfPage });
-    sec.text += text.replace(/\n/g, '') + ' ';
+    const body = collapse ? collapseSpacedOcr(text) : text.replace(/\n/g, '');
+    sec.text += body + (collapse ? '' : ' ');
   }
   return { sections };
 }
@@ -272,7 +398,24 @@ export function pdfPageAtOffset(section, offset) {
 const FAMILY_HEADER_RE =
   /No\s*\.?\s*([0-9IlOoSig|]{1,4}a?)\s*[.,]\s*(?=(?:\[[^\]]{0,60}\]\s*)?(?:BY\s*J\.?\s*H\.?\s*F(?:ITTS)?\.?\]?\s*)?[A-Z][A-Z.'\-^]{2})/g;
 
-/** Split a section stream into family blocks using monotonic "No. N." headers. */
+/**
+ * Vol. II / III (Fitts) family heads look like:
+ *   "6.EBENEZERLANE^(George--,William'),1650-1726"
+ *   "27.ABIALLANE,1735-1803"
+ * rather than Chapman/Fitts Vol. I "No. N. NAME".
+ */
+const FITTS_FAMILY_HEADER_RE =
+  /(?<![0-9A-Za-z])(\d{1,3})\.((?:DEACON|CAPT|LT|REV|DR|COL|MAJOR|CORNET|ENSIGN)?[A-Z][A-Z.'\-]{1,36}LANE)/g;
+
+function finalizeFamilyBlocks(section, blocks) {
+  for (let i = 0; i < blocks.length; i += 1) {
+    const end = i + 1 < blocks.length ? blocks[i + 1].start : (section?.text || '').length;
+    blocks[i].text = (section?.text || '').slice(blocks[i].bodyStart, end);
+  }
+  return blocks;
+}
+
+/** Split a section stream into family blocks using monotonic "No. N." headers (Vol. I). */
 export function splitFamilyBlocks(section) {
   const text = section?.text || '';
   const blocks = [];
@@ -299,11 +442,41 @@ export function splitFamilyBlocks(section) {
     });
     lastNo = parsed.no;
   }
-  for (let i = 0; i < blocks.length; i += 1) {
-    const end = i + 1 < blocks.length ? blocks[i + 1].start : text.length;
-    blocks[i].text = text.slice(blocks[i].bodyStart, end);
+  return finalizeFamilyBlocks(section, blocks);
+}
+
+/** Split Fitts Vol. II / III section streams on "N.NAMELANE" family heads. */
+export function splitFittsFamilyBlocks(section) {
+  const text = section?.text || '';
+  const blocks = [];
+  let lastNo = 0;
+  FITTS_FAMILY_HEADER_RE.lastIndex = 0;
+  let m;
+  while ((m = FITTS_FAMILY_HEADER_RE.exec(text)) !== null) {
+    const parsed = parseFamilyNumber(m[1]);
+    if (!parsed) continue;
+    // Skip tiny arabic list items that aren't family heads (1–3 without LANE pedigree/lifespan nearby).
+    const peek = text.slice(m.index, m.index + m[0].length + 80);
+    const looksLikeHead =
+      /\([A-Za-z]/.test(peek) ||
+      /1[5-9]\d{2}/.test(peek) ||
+      /(?:andhis|m\.|married|bap|bapt|born|d\.|died)/i.test(peek);
+    if (!looksLikeHead && parsed.no > 3) continue;
+    if (lastNo > 0 && (parsed.no <= lastNo || parsed.no > lastNo + 40)) continue;
+    if (lastNo === 0 && parsed.no > 20) continue;
+    blocks.push({
+      section: section.key,
+      familyNo: parsed.no,
+      familyKey: parsed.key,
+      start: m.index,
+      // Keep the NAME LANE token inside the block so parseFamilyHeader can read the head.
+      bodyStart: m.index + String(m[1]).length + 1,
+      pdfPage: pdfPageAtOffset(section, m.index),
+      style: 'fitts'
+    });
+    lastNo = parsed.no;
   }
-  return blocks;
+  return finalizeFamilyBlocks(section, blocks);
 }
 
 const WIFE_CLAUSE_RE =
@@ -341,6 +514,32 @@ function pickKnownGiven(candidates, givenSet) {
   return candidates[0];
 }
 
+/**
+ * Rejoin OCR-split given names ("Eliza Beth" → "Elizabeth") and fix known letter swaps
+ * ("Bathsheea" → "Bathsheba"). Safe no-op when the name is already clean.
+ */
+export function repairSplitGivenName(name = '', givenSet = new Set(DEFAULT_GIVEN_NAMES)) {
+  let s = String(name || '')
+    .replace(/[^A-Za-z\s.-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!s) return s;
+  const lower = s.toLowerCase();
+  if (OCR_GIVEN_REPAIRS[lower]) return titleCase(OCR_GIVEN_REPAIRS[lower]);
+  const joined = squash(s);
+  if (OCR_GIVEN_REPAIRS[joined]) return titleCase(OCR_GIVEN_REPAIRS[joined]);
+  if (givenSet.has(joined) || DEFAULT_GIVEN_NAMES.includes(joined)) return titleCase(joined);
+  if (NICKNAME_CANONICAL.has(joined)) return titleCase(joined);
+  const words = lower.split(/\s+/).filter(Boolean);
+  if (words.length >= 2) {
+    const mashed = words.join('');
+    if (OCR_GIVEN_REPAIRS[mashed] || givenSet.has(mashed) || DEFAULT_GIVEN_NAMES.includes(mashed) || NICKNAME_CANONICAL.has(mashed)) {
+      return titleCase(OCR_GIVEN_REPAIRS[mashed] || mashed);
+    }
+  }
+  return titleCase(s);
+}
+
 /** "SAMUELA." -> "Samuel A.", "DANIELWARD" -> "Daniel Ward" (when both parts are known given names). */
 export function formatGlued(upper = '', givenSet = new Set(DEFAULT_GIVEN_NAMES)) {
   const s = String(upper || '').replace(/[^A-Za-z.\s]/g, '').trim();
@@ -354,16 +553,17 @@ export function formatGlued(upper = '', givenSet = new Set(DEFAULT_GIVEN_NAMES))
     }
     out.push(titleCase(splitKnownGiven(part.replace(/\.$/, ''), givenSet)) + (part.endsWith('.') && part.length <= 2 ? '.' : ''));
   }
-  return out.join(' ').replace(/\s+/g, ' ').trim();
+  return repairSplitGivenName(out.join(' ').replace(/\s+/g, ' ').trim(), givenSet);
 }
 
 function splitKnownGiven(word, givenSet) {
   const lower = word.toLowerCase();
+  if (OCR_GIVEN_REPAIRS[lower]) return OCR_GIVEN_REPAIRS[lower];
   if (givenSet.has(lower)) return lower;
   for (let i = lower.length - 3; i >= 3; i -= 1) {
     const a = lower.slice(0, i);
     const b = lower.slice(i);
-    if (givenSet.has(a) && givenSet.has(b)) return `${a} ${b}`;
+    if ((givenSet.has(a) || NICKNAME_CANONICAL.has(a)) && (givenSet.has(b) || NICKNAME_CANONICAL.has(b))) return `${a} ${b}`;
   }
   return lower;
 }
@@ -545,13 +745,22 @@ const CHILD_MARKER_RE =
 function cleanChildName(raw = '') {
   let s = String(raw || '').replace(/^y(?=[aeiou])/, 'J');
   s = s.replace(/[^A-Za-z]/g, ' ').trim();
-  const first = s.split(/\s+/)[0] || '';
+  const tokens = s.split(/\s+/).filter(Boolean);
+  const first = tokens[0] || '';
   const words = first.split(/(?<=[a-z])(?=[A-Z][a-z])/);
-  const cleaned = words
+  let cleaned = words
     .map((w) => w.replace(/(?<=[a-z]{3})[A-Z]$/, ''))
     .map((w) => (w.length > 1 ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : w))
-    .filter((w) => w.length >= 2);
-  return cleaned.join(' ');
+    .filter((w) => w.length >= 2)
+    .join(' ');
+  // Keep a second OCR-split token when joining yields a known given ("Eliza Beth").
+  if (tokens.length >= 2 && tokens[1].length >= 3 && tokens[1].length <= 6) {
+    const trial = repairSplitGivenName(`${cleaned} ${tokens[1]}`);
+    if (squash(trial) !== squash(cleaned)) cleaned = trial;
+  } else {
+    cleaned = repairSplitGivenName(cleaned);
+  }
+  return cleaned;
 }
 
 /**
@@ -654,10 +863,20 @@ function givenKey(name = '') {
   return squash(String(name || '').split(/\s+/)[0]).slice(0, 3);
 }
 
-function namesAgree(a, b) {
+function nicknameKey(name = '') {
+  const first = squash(String(name || '').split(/\s+/)[0]);
+  if (!first) return '';
+  return NICKNAME_CANONICAL.get(first) || first;
+}
+
+/** True when two given names match by 3-letter prefix or known nickname/diminutive. */
+export function namesAgree(a, b) {
   const ka = givenKey(a);
   const kb = givenKey(b);
-  return ka.length >= 2 && ka === kb;
+  if (ka.length >= 2 && ka === kb) return true;
+  const na = nicknameKey(a);
+  const nb = nicknameKey(b);
+  return na.length >= 2 && na === nb;
 }
 
 function pedigreeAgrees(childPed = [], parentPed = []) {
@@ -673,10 +892,12 @@ function pedigreeAgrees(childPed = [], parentPed = []) {
  */
 export function decodeGenealogyRegister(pages = [], options = {}) {
   const givenSet = options.givenSet || new Set(DEFAULT_GIVEN_NAMES);
-  const { sections } = buildSectionStreams(pages);
+  const { sections } = buildSectionStreams(pages, options);
   const families = [];
+  const volume = options.volume || 1;
   for (const section of Object.values(sections)) {
-    for (const block of splitFamilyBlocks(section)) {
+    const blocks = volume > 1 ? splitFittsFamilyBlocks(section) : splitFamilyBlocks(section);
+    for (const block of blocks) {
       const header = parseFamilyHeader(block.text, givenSet);
       const body = block.text.slice(header.headerEnd);
       const children = extractChildren(body, header.wives);
@@ -691,6 +912,7 @@ export function decodeGenealogyRegister(pages = [], options = {}) {
       families.push({
         section: section.key,
         sectionLabel: SECTION_LABELS[section.key] || section.key,
+        volume: options.volume || section.volume || 1,
         familyNo: block.familyNo,
         familyKey: block.familyKey,
         pdfPage: block.pdfPage,
@@ -1028,6 +1250,57 @@ export function buildGenealogyCodePlan(register, laneData) {
   };
   families.forEach(resolveWives);
 
+  // Pass A2 — parent-family & carry-forward propagation: when the header omits lifespan,
+  // prefer children of a resolved parent family (and inherit the child's book birth year).
+  for (const f of families) {
+    if (!f.parentLink) continue;
+    const parent = byKey.get(`${f.section}|${f.parentLink.familyNo}`);
+    if (!parent?.resolved) continue;
+    const preferIds = new Set();
+    for (const pid of [parent.resolved.headId, ...(parent.resolved.wifeIds || [])]) {
+      if (pid == null) continue;
+      for (const cid of index.children.get(pid) || []) preferIds.add(cid);
+    }
+    let inheritedYear = null;
+    if (f.parentLink.childIndex != null && parent.children[f.parentLink.childIndex]) {
+      inheritedYear = parent.children[f.parentLink.childIndex].birthYear || null;
+    } else {
+      const cf = parent.children.find(
+        (c) => c.linkedFamilyNo === f.familyNo || c.carryForward === f.familyNo
+      );
+      if (cf?.birthYear) inheritedYear = cf.birthYear;
+    }
+    if (f.head && f.resolved.headId == null && preferIds.size) {
+      const q = linealQuery(f, f.head);
+      if (!q.birthYear && inheritedYear) q.birthYear = inheritedYear;
+      const head = resolvePerson(
+        index,
+        { ...q, gender: 'M' },
+        { preferIds, allowNoYear: !q.birthYear, minScore: q.birthYear ? 5 : 4 }
+      );
+      if (head && !usedHeads.has(head.id)) {
+        f.resolved.headId = head.id;
+        f.resolved.headScore = head.score;
+        f.resolved.headAlternates = head.alternates ?? 0;
+        f.resolved.headMethod = 'parent-family';
+        usedHeads.set(head.id, f);
+        resolveWives(f);
+      }
+    } else if (f.lineal === 'wife' && f.wives[0] && (f.resolved.wifeIds[0] == null) && preferIds.size) {
+      const q = linealQuery(f, f.wives[0]);
+      if (!q.birthYear && inheritedYear) q.birthYear = inheritedYear;
+      const wife = resolvePerson(
+        index,
+        { ...q, gender: 'F' },
+        { preferIds, allowNoYear: !q.birthYear, maidenGuard: true, minScore: q.birthYear ? 5 : 4 }
+      );
+      if (wife) {
+        f.resolved.wifeIds[0] = wife.id;
+        f.resolved.headMethod = f.resolved.headMethod || 'parent-family-wife';
+      }
+    }
+  }
+
   // Phase B1 — level-1 children by name + birth year; a laneData father/mother shared by >=2 of them
   // (and agreeing with the book's given name) replaces or fills the family head/wife.
   const resolveLevel1 = (f, childIds) => {
@@ -1282,6 +1555,188 @@ function dedupeEdges(edges) {
   return [...seen.values()];
 }
 
+const REGISTER_JUNK_GIVENS = new Set([
+  'in', 'of', 'and', 'the', 'his', 'her', 'was', 'had', 'son', 'dau', 'lane', 'by', 'to', 'or',
+  'from', 'with', 'who', 'whom', 'this', 'that', 'they', 'she', 'him', 'for', 'not', 'but',
+  'also', 'see', 'page', 'vol', 'same', 'above', 'below', 'note', 'item'
+]);
+
+/**
+ * Guard against OCR fragments ("2. In", "of", glued page crumbs) becoming people.
+ * Accepts known givens/nicknames, or alphabetic names with birth year / maiden / pedigree / Lane surname.
+ */
+export function isPlausibleRegisterPerson(person = {}) {
+  const givenRaw = person.given || person.name || '';
+  const given = squash(String(givenRaw).split(/\s+/)[0]);
+  if (given.length < 3 || REGISTER_JUNK_GIVENS.has(given)) return false;
+  if (!/^[a-z]+$/.test(given)) return false;
+  if (DEFAULT_GIVEN_NAMES.includes(given) || NICKNAME_CANONICAL.has(given)) return true;
+  if (person.birthYear || person.deathYear || person.maiden || (person.pedigree && person.pedigree.length)) return true;
+  if (person.surname && squash(person.surname) === 'lane' && given.length >= 4) return true;
+  return given.length >= 5;
+}
+
+function displayNameForRegisterPerson(person, role = 'person') {
+  if (person.displayName) return person.displayName;
+  const bits = [person.given || person.name];
+  if (person.maiden) bits.push(`(${person.maiden})`);
+  if (person.surname) bits.push(person.surname);
+  else if (role !== 'wife' && !person.maiden) bits.push('Lane');
+  return bits.filter(Boolean).join(' ');
+}
+
+/**
+ * Create provenance-stamped people for unresolved but plausible register heads, wives, and
+ * level-1 / carry-forward children. Does not invent OCR junk. Returns a deep-copied laneData
+ * plus creation stats — caller should rebuild the genealogy-code plan afterward.
+ */
+export function enrichLaneDataFromRegister(laneData, register, options = {}) {
+  const data = JSON.parse(JSON.stringify(laneData || { nodes: [], links: [] }));
+  const nodes = Array.isArray(data.nodes) ? data.nodes : (data.nodes = []);
+  if (!Array.isArray(data.links)) data.links = [];
+  let nextId = nodes.reduce((m, n) => Math.max(m, Number(n.id) || 0), 0) + 1;
+  const created = [];
+  const index = buildNodeIndex(data);
+  const plan = options.plan || buildGenealogyCodePlan(register, data);
+  const byKey = new Map((plan.families || []).map((f) => [`${f.section}|${f.familyNo}`, f]));
+
+  const createNode = (person, meta) => {
+    if (!isPlausibleRegisterPerson(person)) return null;
+    // Prefer an existing unresolved match with looser scoring before synthesizing.
+    const soft = resolvePerson(
+      index,
+      {
+        given: person.given || person.name,
+        surname: person.surname || (meta.role === 'wife' && person.maiden ? null : 'Lane'),
+        maiden: person.maiden,
+        birthYear: person.birthYear,
+        anySurname: meta.role === 'wife'
+      },
+      { allowNoYear: true, maidenGuard: meta.role === 'wife', minScore: 3 }
+    );
+    if (soft?.id != null) return soft.id;
+
+    const id = nextId++;
+    const gender = meta.gender || (meta.role === 'wife' ? 'F' : meta.role === 'head' ? 'M' : '');
+    const name = displayNameForRegisterPerson(person, meta.role);
+    const node = {
+      id,
+      name,
+      gender: gender || 'U',
+      birthYear: person.birthYear ?? null,
+      deathYear: person.deathYear ?? null,
+      generation: meta.generation ?? null,
+      lastName: person.surname || (person.maiden ? person.maiden : 'Lane'),
+      text: '',
+      provenance: {
+        source: options.source || GENEALOGY_CODE_SOURCE,
+        by: GENEALOGY_CODE_METHOD,
+        method: 'register-enrich',
+        section: meta.section,
+        familyNo: meta.familyNo,
+        pdfPage: meta.pdfPage,
+        role: meta.role,
+        volume: meta.volume || 1
+      }
+    };
+    nodes.push(node);
+    created.push({ id, name, ...meta });
+    // Keep index roughly current for subsequent soft matches in this pass.
+    index.entries.push({
+      id,
+      node,
+      sq: squash(name.replace(/\([^)]*\)/g, ' ')),
+      sqWithParens: squash(name),
+      parens: person.maiden ? [squash(person.maiden)] : [],
+      first: squash(person.given || person.name || ''),
+      birthYear: person.birthYear ?? null,
+      deathYear: person.deathYear ?? null,
+      gender: node.gender,
+      degree: 0,
+      spouseCount: 0
+    });
+    index.byId.set(id, index.entries[index.entries.length - 1]);
+    return id;
+  };
+
+  for (const f of plan.families || []) {
+    const volume = f.volume || register?.volume || 1;
+    if (f.head && f.resolved?.headId == null) {
+      const id = createNode(f.head, {
+        role: 'head',
+        gender: 'M',
+        section: f.section,
+        familyNo: f.familyNo,
+        pdfPage: f.pdfPage,
+        generation: f.generation,
+        volume
+      });
+      if (id != null) f.resolved.headId = id;
+    }
+    (f.wives || []).forEach((w, i) => {
+      if (!w || (f.resolved?.wifeIds && f.resolved.wifeIds[i] != null)) return;
+      const id = createNode(w, {
+        role: 'wife',
+        gender: 'F',
+        section: f.section,
+        familyNo: f.familyNo,
+        pdfPage: f.pdfPage,
+        generation: f.generation,
+        volume
+      });
+      if (id != null) {
+        if (!f.resolved.wifeIds) f.resolved.wifeIds = [];
+        f.resolved.wifeIds[i] = id;
+      }
+    });
+    (f.children || []).forEach((c, i) => {
+      if (!c || (f.resolved?.childIds && f.resolved.childIds[i] != null)) return;
+      // Only synthesize level-1 children with a birth year or carry-forward (high-signal book rows).
+      if (c.level !== 1) return;
+      if (!c.birthYear && !c.linkedFamilyNo && !c.carryForward) return;
+      // If this child heads another family that we already synthesized, reuse that head.
+      const linkedNo = c.linkedFamilyNo || c.carryForward;
+      if (linkedNo) {
+        const target = byKey.get(`${f.section}|${linkedNo}`);
+        const tid = target?.resolved?.headId ?? target?.resolved?.wifeIds?.[0];
+        if (tid != null) {
+          if (!f.resolved.childIds) f.resolved.childIds = new Array(f.children.length).fill(null);
+          f.resolved.childIds[i] = tid;
+          return;
+        }
+      }
+      const id = createNode(
+        {
+          given: c.name,
+          name: c.name,
+          surname: 'Lane',
+          birthYear: c.birthYear,
+          displayName: `${c.name} Lane`
+        },
+        {
+          role: 'child',
+          gender: '',
+          section: f.section,
+          familyNo: f.familyNo,
+          pdfPage: c.pdfPage || f.pdfPage,
+          generation: (f.generation || 0) + 1,
+          volume
+        }
+      );
+      if (id != null) {
+        if (!f.resolved.childIds) f.resolved.childIds = new Array(f.children.length).fill(null);
+        f.resolved.childIds[i] = id;
+      }
+    });
+  }
+
+  return {
+    laneData: data,
+    created,
+    stats: { created: created.length, nextId }
+  };
+}
+
 /**
  * Apply a plan to laneData (mutates a deep copy). Existing edges gain `provenance` when the book code
  * confirms them; a parent edge that contradicts an existing parent of the same role is not written.
@@ -1392,6 +1847,8 @@ export function summarizeRegister(plan, applyStats = null) {
 
 export default {
   repairOcrDigits,
+  repairSplitGivenName,
+  namesAgree,
   parseFamilyNumber,
   normalizeCarryForward,
   parseOcrYear,
@@ -1407,6 +1864,8 @@ export default {
   buildNodeIndex,
   resolvePerson,
   buildGenealogyCodePlan,
+  enrichLaneDataFromRegister,
+  isPlausibleRegisterPerson,
   applyGenealogyCodePlan,
   summarizeRegister
 };

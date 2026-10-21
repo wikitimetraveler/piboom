@@ -12,14 +12,14 @@ const WELCOME = {
   en: `<img src="${PORTRAIT}" alt="" style="width:64px;height:64px;border-radius:50%;margin-bottom:8px;border:2px solid #c9992f"/>
     <p>Salâm — I'm <strong>Nima</strong>. Ask me about Persepolis and Isfahan, Nowruz and tahdig, tar and the radif, taarof and bazaars, or the Achaemenid stairs that still face the plain.</p>
     <small class="text-muted">Try: "What is tahdig?" or "Why is Persepolis famous?"</small>`,
-  ar: `<img src="${PORTRAIT}" alt="" style="width:64px;height:64px;border-radius:50%;margin-bottom:8px;border:2px solid #c9992f"/>
-    <p>سلام — أنا <strong>نیما</strong>. اسألني عن برسبوليس وأصفهان، نوروز والتهديغ، التار والرديف، التعارف والأسواق، أو الأدراج الأخمينية التي ما زالت تواجه السهل.</p>
-    <small class="text-muted">جرّب: «ما هو التهديغ؟» أو «لماذا اشتهرت برسبوليس؟»</small>`
+  fa: `<img src="${PORTRAIT}" alt="" style="width:64px;height:64px;border-radius:50%;margin-bottom:8px;border:2px solid #c9992f"/>
+    <p>سلام — من <strong>نیما</strong> هستم. از تخت جمشید و اصفهان، نوروز و ته دیگ، تار و ردیف، تعارف و بازار، یا پلکان هخامنشی که هنوز رو به دشت است بپرس.</p>
+    <small class="text-muted">مثلاً: «ته دیگ چیست؟» یا «چرا تخت جمشید مشهور است؟»</small>`
 };
 
 const PLACEHOLDER = {
   en: 'Ask about Persepolis, tahdig, Nowruz, tar…',
-  ar: 'اسأل عن برسبوليس أو التهديغ أو نوروز أو التار…'
+  fa: 'از تخت جمشید، ته دیگ، نوروز یا تار بپرس…'
 };
 
 function forSpeech(text) {

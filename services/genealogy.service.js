@@ -226,9 +226,35 @@ export function getLanePdfGalleryData() {
       .map((img) => (img && img.imageId != null ? String(img.imageId).trim() : ''))
       .filter((id) => id.length > 0)
   );
+  /** Curated plates must stay visible even when the page has multiple tree candidates. */
+  const protectedPlateIds = new Set(LANE_PDF_ALWAYS_VISIBLE_IDS);
+  for (const p of Array.isArray(portraitsDoc?.portraits) ? portraitsDoc.portraits : []) {
+    if (p?.imageId) protectedPlateIds.add(String(p.imageId).trim());
+  }
+  const bookDoc = loadLanePdfBookIllustrations();
+  for (const ill of Array.isArray(bookDoc?.illustrations) ? bookDoc.illustrations : []) {
+    for (const rawId of ill?.plateImageIds || []) {
+      const id = String(rawId ?? '').trim();
+      if (id) protectedPlateIds.add(id);
+    }
+  }
+
+  /** Ambiguous multi-person page matches are bogus for the plate grid — suppress unless curated. */
+  const ambiguousPlateIds = candidateImages
+    .filter((img) => {
+      if (!img?.imageId) return false;
+      const id = String(img.imageId).trim();
+      if (!id || protectedPlateIds.has(id)) return false;
+      const n = Array.isArray(img.candidatePersonIds) ? img.candidatePersonIds.length : 0;
+      return img.ambiguous === true || n > 1;
+    })
+    .map((img) => String(img.imageId).trim());
+
   /** Only denylist ids that exist in the corpus (typos / stale entries dropped). */
-  const galleryHiddenIds = [...new Set((hiddenDoc.hiddenImageIds || []).map((id) => String(id)))]
-    .filter((id) => knownPlateImageIds.has(id) && !LANE_PDF_ALWAYS_VISIBLE_IDS.has(id))
+  const galleryHiddenIds = [
+    ...new Set([...(hiddenDoc.hiddenImageIds || []).map((id) => String(id)), ...ambiguousPlateIds])
+  ]
+    .filter((id) => knownPlateImageIds.has(id) && !protectedPlateIds.has(id))
     .sort();
 
   const summary = manifest
@@ -274,7 +300,6 @@ export function getLanePdfGalleryData() {
       };
     });
 
-  const bookDoc = loadLanePdfBookIllustrations();
   const illRows = Array.isArray(bookDoc.illustrations) ? bookDoc.illustrations : [];
   const illustrationRefsByPlate = new Map();
   for (const ill of illRows) {

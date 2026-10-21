@@ -76,7 +76,8 @@ body.lfs-page.dark-mode {
 }
 
 .lfs-flight-no,
-.lfs-score {
+.lfs-score,
+.lfs-difficulty {
   display: flex;
   flex-direction: column;
   padding: 0.4rem 0.9rem;
@@ -87,7 +88,8 @@ body.lfs-page.dark-mode {
 }
 
 .lfs-flight-no span,
-.lfs-score span {
+.lfs-score span,
+.lfs-difficulty span {
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -95,7 +97,8 @@ body.lfs-page.dark-mode {
 }
 
 .lfs-flight-no strong,
-.lfs-score strong {
+.lfs-score strong,
+.lfs-difficulty strong {
   font-family: 'JetBrains Mono', ui-monospace, Consolas, monospace;
   font-size: 1.25rem;
   color: var(--lfs-ink);
@@ -179,9 +182,107 @@ body.lfs-page.dark-mode {
 .lfs-path__stops li {
   flex: 1 1 0;
   text-align: center;
-  font-size: 0.78rem;
+  font-size: 0.68rem;
+  line-height: 1.15;
   color: var(--lfs-muted);
   position: relative;
+}
+
+.lfs-meter {
+  display: flex;
+  gap: 0.25rem;
+  margin-top: 0.35rem;
+}
+
+.lfs-meter span {
+  width: 1.15rem;
+  height: 0.35rem;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.15);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.lfs-meter[data-level='1'] span:nth-child(-n + 1),
+.lfs-meter[data-level='2'] span:nth-child(-n + 2),
+.lfs-meter[data-level='3'] span:nth-child(-n + 3) {
+  background: var(--lfs-cyan);
+}
+
+.lfs-progress {
+  margin: 0.15rem 0 0;
+  color: var(--lfs-cyan);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.lfs-captain__row {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+}
+
+.lfs-captain__face {
+  flex: 0 0 auto;
+  width: 3.4rem;
+  height: 3.4rem;
+  border-radius: 1rem;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: #04131f;
+  background: linear-gradient(145deg, #7dd3fc, #34d399);
+}
+
+.lfs-captain__role {
+  margin: 0;
+  color: var(--lfs-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lfs-captain__line {
+  margin: 0.25rem 0 0.55rem;
+  font-size: 0.92rem;
+}
+
+.lfs-chat {
+  display: grid;
+  gap: 0.4rem;
+  max-height: 12rem;
+  overflow: auto;
+  margin: 0.8rem 0 0.6rem;
+}
+
+.lfs-chat p {
+  margin: 0;
+  padding: 0.45rem 0.7rem;
+  border-radius: 0.7rem;
+  font-size: 0.88rem;
+}
+
+.lfs-chat .is-user {
+  background: rgba(56, 189, 248, 0.12);
+}
+
+.lfs-chat .is-captain {
+  background: rgba(52, 211, 153, 0.1);
+}
+
+.lfs-chat__form {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.lfs-chat__form input {
+  flex: 1;
+  border: 1px solid var(--lfs-line);
+  border-radius: 999px;
+  background: #0a1b2e;
+  color: var(--lfs-ink);
+  padding: 0.35rem 0.8rem;
 }
 
 .lfs-path__stops li::before {
@@ -448,15 +549,14 @@ body.lfs-page.dark-mode {
 
 .lfs-gse {
   margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.45rem;
 }
 
-.lfs-gse__out {
-  margin-top: 0.6rem;
-  padding: 0.6rem 0.85rem;
-  border-radius: 0.65rem;
-  border: 1px solid var(--lfs-line);
-  background: #0a1b2e;
-  font-size: 0.9rem;
+.lfs-gse .lfs-btn {
+  text-decoration: none;
 }
 
 .lfs-note {

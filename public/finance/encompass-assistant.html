@@ -1,1027 +1,222 @@
-
 <!DOCTYPE html>
 <!-- Development work by David Lane -->
 <!--
-  ==============================================================================
-  Encompass AI Assistant
-  ==============================================================================
-  
+  Encompass Developer AI Expert
   @file       encompass-assistant.html
   @author     David Lane
-  @version    1.0.0
-  @since      2024
-  
-  @description
-  Frontend chat interface for the Encompass AI Agent, featuring knowledge search,
-  contextual citations, and voice-enabled interaction for loan officers.
+  Hybrid RAG chat for Encompass Developer Connect + ICE knowledge.
 -->
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-Frame-Options" content="ALLOWALL">
-    <title>Encompass AI Assistant - DevConnect Labs</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
-    <link rel="stylesheet" href="/shared/design-tokens.css"/>
-    <link rel="stylesheet" href="/shared/styles.css"/>
-    <link rel="stylesheet" href="/shared/encompass-dark-mode.css"/>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-Frame-Options" content="ALLOWALL" />
+    <title>Encompass Developer AI Expert — DevConnect Labs</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="/shared/design-tokens.css" />
+    <link rel="stylesheet" href="/shared/styles.css" />
+    <link rel="stylesheet" href="/shared/encompass-dark-mode.css" />
+    <link rel="stylesheet" href="/finance/css/encompass-assistant.css" />
     <script src="/shared/modern-navbar.js"></script>
-    <style>
-        :root {
-            --ea-header-bg: linear-gradient(135deg, var(--zen-dark) 0%, color-mix(in srgb, var(--zen-primary) 38%, var(--zen-dark)) 100%);
-            --ea-btn-bg: linear-gradient(135deg, var(--zen-primary) 0%, var(--zen-primary-hover) 100%);
-            --ea-voice-bg: linear-gradient(135deg, var(--ice-secondary) 0%, var(--zen-primary) 100%);
-        }
-
-        body {
-            background: linear-gradient(
-                145deg,
-                color-mix(in srgb, #ffffff 78%, var(--zen-surface) 22%) 0%,
-                color-mix(in srgb, var(--zen-surface) 55%, var(--zen-primary) 8%) 42%,
-                color-mix(in srgb, #ffffff 52%, var(--zen-primary) 48%) 100%
-            );
-            min-height: 100vh;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            color: var(--text-dark);
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background:
-                radial-gradient(circle at 14% 18%, rgba(var(--zen-primary-rgb), 0.2) 0%, transparent 44%),
-                radial-gradient(circle at 88% 10%, rgba(91, 168, 138, 0.14) 0%, transparent 40%),
-                radial-gradient(circle at 72% 82%, rgba(var(--zen-primary-rgb), 0.12) 0%, transparent 46%);
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .chat-container {
-            background: var(--zen-card-bg);
-            border: 1px solid var(--zen-border);
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(var(--zen-primary-rgb), 0.12);
-            margin: 20px auto;
-            max-width: 1200px;
-            overflow: hidden;
-            min-height: 80vh;
-            backdrop-filter: blur(8px);
-        }
-
-        .chat-header {
-            background: var(--ea-header-bg);
-            color: white;
-            padding: 15px;
-            text-align: center;
-        }
-
-        .chat-header h1 {
-            font-size: 22px;
-            margin-bottom: 3px;
-            font-weight: 600;
-        }
-
-        .chat-header p {
-            opacity: 0.9;
-            font-size: 14px;
-            margin: 0;
-        }
-
-        .input-section {
-            background: color-mix(in srgb, var(--zen-surface) 80%, white 20%);
-            padding: 15px;
-            border-bottom: 1px solid var(--zen-border);
-        }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .message-input {
-            flex: 1;
-            padding: 15px 20px;
-            border: 2px solid #e9ecef;
-            border-radius: 25px;
-            font-size: 16px;
-            outline: none;
-            transition: all 0.3s;
-            background: white;
-        }
-
-        .message-input:focus {
-            border-color: var(--zen-primary);
-            box-shadow: 0 0 0 3px rgba(var(--zen-primary-rgb), 0.18);
-        }
-
-        .btn-send {
-            background: var(--ea-btn-bg);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(var(--zen-primary-rgb), 0.32);
-        }
-
-        .btn-send:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(var(--zen-primary-rgb), 0.4);
-        }
-
-        .btn-voice {
-            background: var(--ea-voice-bg);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(40,167,69,0.3);
-        }
-
-        .btn-voice:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(40,167,69,0.4);
-        }
-
-        .btn-voice.listening {
-            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 4px 15px rgba(220,53,69,0.3); }
-            50% { box-shadow: 0 4px 25px rgba(220,53,69,0.6); }
-            100% { box-shadow: 0 4px 15px rgba(220,53,69,0.3); }
-        }
-
-        .chat-body {
-            display: flex;
-            height: 60vh;
-        }
-
-        .sidebar {
-            width: 300px;
-            background: color-mix(in srgb, var(--zen-surface) 75%, white 25%);
-            border-right: 1px solid var(--zen-border);
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .chat-main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-        }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            background: color-mix(in srgb, var(--zen-surface) 70%, white 30%);
-            border-radius: 15px;
-            margin-bottom: 20px;
-            min-height: 400px;
-            border: 1px solid var(--zen-border);
-        }
-
-        .message {
-            margin-bottom: 15px;
-            padding: 15px;
-            border-radius: 15px;
-            max-width: 80%;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .user-message {
-            background: var(--ea-btn-bg);
-            color: white;
-            margin-left: auto;
-            text-align: right;
-        }
-
-        .ai-message {
-            background: white;
-            border: 1px solid var(--zen-border);
-            margin-right: auto;
-        }
-
-        .source-list {
-            padding-left: 18px;
-            margin-bottom: 0;
-        }
-
-        .source-list li {
-            margin-bottom: 6px;
-            line-height: 1.4;
-        }
-
-        .source-meta {
-            font-size: 12px;
-            color: var(--zen-primary);
-            margin-top: 2px;
-        }
-
-        .source-path {
-            font-size: 11px;
-            color: #6c757d;
-        }
-
-        .source-snippet {
-            margin-top: 4px;
-            font-size: 13px;
-            color: var(--zen-primary-hover);
-        }
-
-        .quick-action {
-            display: block;
-            width: 100%;
-            padding: 12px 15px;
-            margin-bottom: 10px;
-            background: white;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            text-decoration: none;
-            color: #495057;
-            transition: all 0.3s;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        .quick-action:hover {
-            background: var(--ea-btn-bg);
-            color: white;
-            border-color: var(--zen-primary);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(var(--zen-primary-rgb), 0.28);
-        }
-
-        .typing-indicator {
-            display: none;
-            padding: 15px;
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 15px;
-            margin-bottom: 15px;
-            margin-right: auto;
-            max-width: 80%;
-        }
-
-        .typing-dots {
-            display: flex;
-            gap: 4px;
-            justify-content: center;
-        }
-
-        .typing-dots span {
-            width: 8px;
-            height: 8px;
-            background: var(--zen-primary);
-            border-radius: 50%;
-            animation: typing 1.4s infinite;
-        }
-
-        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-10px); }
-        }
-
-        .section-title {
-            color: var(--zen-dark);
-            margin-bottom: 15px;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .welcome-accordion {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 15px;
-            overflow: hidden;
-        }
-
-        .accordion-header {
-            background: var(--ea-header-bg);
-            color: white;
-            padding: 15px 20px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-
-        .accordion-header:hover {
-            background: linear-gradient(135deg, color-mix(in srgb, var(--zen-primary) 25%, var(--zen-dark)) 0%, var(--zen-dark) 100%);
-        }
-
-        .accordion-icon {
-            transition: transform 0.3s;
-        }
-
-        .accordion-icon.rotated {
-            transform: rotate(180deg);
-        }
-
-        .accordion-content {
-            padding: 20px;
-            background: #f8f9fa;
-            border-top: 1px solid #e9ecef;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out;
-        }
-
-        .accordion-content.expanded {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .accordion-content ul {
-            margin: 10px 0;
-            padding-left: 20px;
-        }
-
-        .accordion-content li {
-            margin: 5px 0;
-            color: #495057;
-        }
-
-        /* Smooth scrolling for accordion content */
-        .accordion-content {
-            scroll-behavior: smooth;
-        }
-
-        /* Custom scrollbar for accordion content */
-        .accordion-content::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .accordion-content::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 3px;
-        }
-
-        .accordion-content::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 3px;
-        }
-
-        .accordion-content::-webkit-scrollbar-thumb:hover {
-            background: #a8a8a8;
-        }
-
-        /* Navigation Styles */
-        .modern-navbar {
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--zen-border);
-            padding: 1rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 20px rgba(var(--zen-primary-rgb), 0.08);
-        }
-        
-        .navbar-brand-modern {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--zen-dark);
-        }
-        
-        .nav-user-btn {
-            background: rgba(var(--zen-primary-rgb), 0.08);
-            border: 2px solid var(--zen-border);
-            border-radius: 25px;
-            padding: 8px 20px;
-            transition: all 0.3s ease;
-        }
-        
-        .nav-user-btn:hover {
-            background: rgba(var(--zen-primary-rgb), 0.14);
-            border-color: var(--zen-primary);
-            transform: translateY(-2px);
-        }
-
-        /* Footer Styles */
-        .footer {
-            background: var(--ea-header-bg);
-            color: white;
-            padding: 20px 0;
-            margin-top: 40px;
-        }
-
-        .footer-content {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        .footer-quote {
-            font-size: 12px;
-            opacity: 0.7;
-            margin-top: 10px;
-        }
-    </style>
-</head>
-<body>
-    <!-- Modern Navbar Web Component -->
+    <script src="/shared/menu-config.js"></script>
+  </head>
+  <body class="ea-page">
     <modern-navbar></modern-navbar>
-    
-    <!-- Navigation Header -->
-    <nav class="navbar navbar-expand-lg navbar-light modern-navbar" style="display: none;">
-        <div class="container">
-            <a class="navbar-brand navbar-brand-modern" href="/"><i class="bi-bank me-2"></i>Encompass AI Assistant</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
-                <span class="navbar-toggler-icon"></span>
+
+    <main class="container">
+      <section class="ea-hero">
+        <p class="ea-kicker"><i class="bi bi-robot"></i> Lane AI Labs · Encompass</p>
+        <h1>Encompass Developer AI Expert</h1>
+        <p class="lead">
+          Hybrid RAG over Developer Connect docs, ICE sample repos, and Postman collections — plus a curated
+          DevConnect Labs fact sheet. Ask about OAuth, Pipeline, Field Reader/Writer, Enhanced Conditions, TPO
+          Connect, and webhooks. Retrieval only; live Hub calls stay on the Hub and Conditions pages.
+        </p>
+
+        <div class="ea-status-bar" aria-live="polite">
+          <span class="ea-badge"><span class="dot" id="eaHealthDot"></span> <span id="eaHealthLabel">checking…</span></span>
+          <span class="ea-badge" id="eaDocsBadge">Docs…</span>
+          <span class="ea-badge" id="eaIceBadge">ICE…</span>
+          <span class="ea-badge" id="eaRagBadge">hybrid RAG</span>
+          <span class="ea-badge" id="eaModelBadge">OpenAI…</span>
+        </div>
+
+        <div class="ea-quick-links">
+          <a class="btn btn-sm btn-primary" href="/finance/encompass-hub.html"><i class="bi bi-columns-gap"></i> Hub</a>
+          <a class="btn btn-sm btn-outline-secondary" href="/finance/enhanced-conditions.html"><i class="bi bi-ui-checks-grid"></i> Enhanced Conditions</a>
+          <a class="btn btn-sm btn-outline-secondary" href="/finance/enhanced-conditions-expert.html"><i class="bi bi-journal-richtext"></i> EC Expert</a>
+          <a class="btn btn-sm btn-outline-secondary" href="/finance/tpo-connect.html"><i class="bi bi-people"></i> TPO Connect</a>
+          <a class="btn btn-sm btn-outline-secondary" href="/finance/unit-tests.html"><i class="bi bi-check2-circle"></i> Unit Tests</a>
+          <a class="btn btn-sm btn-outline-secondary" href="/finance/tool9.html"><i class="bi bi-camera-reels"></i> Screen Test</a>
+          <a class="btn btn-sm btn-outline-secondary" href="/gse-analyzer.html"><i class="bi bi-graph-up-arrow"></i> GSE Analyzer</a>
+        </div>
+      </section>
+
+      <div class="ea-shell">
+        <aside class="ea-panel">
+          <h2>Quick prompts</h2>
+          <div id="eaQuickPrompts">
+            <button type="button" class="ea-chip" data-ea-q="How do I authenticate with Encompass Developer Connect OAuth 2.0? Cover client credentials vs authorization code, Bearer tokens, and how DevConnect Labs uses ensureEncompassToken / clearEncompassTokenCache.">
+              <i class="bi bi-shield-lock"></i> OAuth &amp; tokens
             </button>
-            <div id="nav" class="collapse navbar-collapse">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link nav-user-btn" href="#" id="navUserBtn" onclick="showLoginPopup(); return false;">
-                            <i class="bi-person-circle"></i> <span id="navUserName">Login</span>
-                        </a>
-                    </li>
-                </ul>
-                
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="/"><i class="bi-house"></i> Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/assistant.html"><i class="bi-chat-dots"></i> Levi Assistant</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/voice-dj.html"><i class="bi-mic"></i> Wolfman Dave</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+            <button type="button" class="ea-chip" data-ea-q="How does the Loan Pipeline API work with cursor pagination and canonical field names (Loan.* / Fields.*)? Mention RDB refresh lag.">
+              <i class="bi bi-funnel"></i> Pipeline cursor
+            </button>
+            <button type="button" class="ea-chip" data-ea-q="Show me how to use V3 Field Reader and Field Writer to read and update loan fields by ID, including custom CX.* fields. Include a short JSON body example.">
+              <i class="bi bi-input-cursor-text"></i> Field Reader/Writer
+            </button>
+            <button type="button" class="ea-chip" data-ea-q="Explain Enhanced Conditions types vs templates vs loan conditions, role-based access, and which DevConnect Labs pages to use (CRUD vs Condition Manager dry-run vs EC Expert).">
+              <i class="bi bi-clipboard-check"></i> Enhanced Conditions
+            </button>
+            <button type="button" class="ea-chip" data-ea-q="What is TPO Connect? Summarize guest iframe apps, ICE Secure Scripting Framework (elli.script), LoanContractTPO, and point me to /finance/tpo-connect.html.">
+              <i class="bi bi-people"></i> TPO Connect &amp; SSF
+            </button>
+            <button type="button" class="ea-chip" data-ea-q="How do I set up Encompass webhooks and Enhanced Field Change (EFC) events? Cover subscriptions, signing, allow-list domains, and reconciliation.">
+              <i class="bi bi-link-45deg"></i> EFC Webhooks
+            </button>
+            <button type="button" class="ea-chip" data-ea-q="How do I wire CalculationsEngine factory configs (DTI, FHA, Asset Qualifier) to Encompass field IDs via customIds in DevConnect Labs?">
+              <i class="bi bi-calculator"></i> CalculationsEngine
+            </button>
+            <button type="button" class="ea-chip" data-ea-q="What do the ICE GitHub repositories in our knowledge base contain? Enumerate each cloned repo and Postman collection and summarize what each provides.">
+              <i class="bi bi-github"></i> ICE repos inventory
+            </button>
+            <button type="button" class="ea-chip" data-ea-q="Explain how you use hybrid RAG and graph databases — two currents, one dock. Cover ICE knowledge, encompass docs, pgvector, keyword fallback, and how GraphRAG on graph_nodes differs from live /near.">
+              <i class="bi bi-diagram-3"></i> RAG &amp; graph DBs
+            </button>
+          </div>
 
-    <div class="container-fluid">
-        <div class="chat-container">
-            <div class="chat-header">
-                <h1><i class="bi-bank"></i> Encompass AI Assistant</h1>
-                <p>Your expert guide to Encompass Developer Connect APIs</p>
-            </div>
-            
-            <!-- Input Section -->
-            <div class="input-section">
-                <div class="input-group">
-                    <input type="text" class="message-input" id="messageInput" placeholder="Ask about Encompass APIs, authentication, workflows..." onkeypress="handleKeyPress(event)">
-                    <button class="btn-voice" id="voiceButton" onclick="toggleVoiceRecognition()" title="Voice Input">
-                        <i class="bi-mic" id="voiceIcon"></i>
-                    </button>
-                    <button id="tapToHearBtn" class="btn btn-sm btn-outline-light ms-2" style="display: none;" onclick="tapToHearResponse()" title="Tap to hear">
-                        <i class="bi-volume-up-fill"></i> Tap to hear
-                    </button>
-                    <button class="btn-send" id="sendButton" onclick="sendMessage()">
-                        <i class="bi-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="chat-body">
-                <div class="sidebar">
-                    <h4 class="section-title">🚀 Quick Actions</h4>
-                    <button class="quick-action" data-question="How do I authenticate with the Encompass API?">
-                        <i class="bi-shield-lock"></i> Authentication Help
-                    </button>
-                    <button class="quick-action" data-question="What are the main loan manufacturing workflows?">
-                        <i class="bi-gear"></i> Loan Manufacturing
-                    </button>
-                    <button class="quick-action" data-question="How do I set up webhooks?">
-                        <i class="bi-link-45deg"></i> Webhooks Setup
-                    </button>
-                    <button class="quick-action" data-question="What is TPO Connect? Summarize guest apps, SSF objects, and point me to /finance/tpo-connect.html.">
-                        <i class="bi-people"></i> TPO Connect
-                    </button>
-                    <a class="quick-action" href="/finance/tpo-connect.html" style="text-decoration: none;">
-                        <i class="bi-journal-richtext"></i> TPO knowledge page
-                    </a>
-                    <button class="quick-action" data-question="How do I handle compliance requirements?">
-                        <i class="bi-check-circle"></i> Compliance
-                    </button>
-                    <button class="quick-action" data-question="Explain how you use hybrid RAG and graph databases — two currents, one dock. Cover ICE knowledge, encompass docs, pgvector, keyword fallback, and how GraphRAG on graph_nodes differs from live /near.">
-                        <i class="bi-diagram-3"></i> RAG &amp; graph DBs
-                    </button>
-                    <button class="quick-action" data-question="What are the best practices for API usage?">
-                        <i class="bi-lightbulb"></i> Best Practices
-                    </button>
-                </div>
+          <h2>ICE repos</h2>
+          <div id="eaRepoList" class="small text-muted">Loading…</div>
 
-                <div class="chat-main">
-                    <div class="chat-messages" id="chatMessages">
-                        <div class="welcome-accordion">
-                            <div class="accordion-header" onclick="toggleWelcomeAccordion()">
-                                <i class="bi-bank"></i> Welcome to Encompass AI Assistant
-                                <i class="bi-chevron-down accordion-icon rotated" id="welcomeIcon"></i>
-                            </div>
-                            <div class="accordion-content expanded" id="welcomeContent">
-                                <p>Hello! I'm your AI assistant for Encompass Developer Connect documentation. I can help you with:</p>
-                                <ul>
-                                    <li>API authentication and setup</li>
-                                    <li>Loan manufacturing workflows</li>
-                                    <li>Webhook configuration</li>
-                                    <li>Compliance requirements</li>
-                                    <li>Best practices and troubleshooting</li>
-                                </ul>
-                                <p><strong>What would you like to know about Encompass development?</strong></p>
-                            </div>
-                        </div>
-                    </div>
+          <h2>DevConnect surfaces</h2>
+          <div id="eaSurfaceList" class="small text-muted">Loading…</div>
+        </aside>
 
-                    <div class="typing-indicator" id="typingIndicator">
-                        <div class="typing-dots">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Full Encompass app launcher (visible once logged in — same catalog as Hub) -->
-    <div class="container mt-4 mb-4" id="encompassAppsSection">
-        <div class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-3">
+        <section class="ea-chat" aria-label="Encompass developer chat">
+          <div class="ea-chat-header">
             <div>
-                <h2 class="h4 mb-1"><i class="bi-grid-3x3-gap"></i> Encompass apps</h2>
-                <p class="text-muted mb-0 small">Every mortgage app in this session — Hub, AI, tools, and calculators.</p>
+              <strong>Chat</strong>
+              <span class="small text-muted ms-1" id="eaStatus" role="status"></span>
             </div>
-            <a class="btn btn-sm btn-outline-primary" href="/finance/encompass-hub.html">
-                <i class="bi-columns-gap"></i> Open Hub
-            </a>
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+              <div class="form-check form-switch m-0">
+                <input class="form-check-input" type="checkbox" id="eaSpeakToggle" checked />
+                <label class="form-check-label small" for="eaSpeakToggle">Auto-speak</label>
+              </div>
+              <button type="button" class="btn btn-sm btn-outline-secondary" id="eaReplayBtn" title="Replay last answer">
+                <i class="bi bi-volume-up"></i>
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" id="eaStopBtn" title="Stop speech">
+                <i class="bi bi-stop-fill"></i>
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" id="eaClearBtn">Clear</button>
+            </div>
+          </div>
+
+          <div class="ea-messages" id="eaMessages" aria-live="polite"></div>
+          <div class="ea-typing" id="eaTyping" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+
+          <form class="ea-composer" id="eaChatForm" onsubmit="return false;">
+            <div class="ea-voice-bar">
+              <button type="button" class="btn btn-sm btn-outline-secondary" id="eaVoiceBtn" title="Voice input">
+                <i class="bi bi-mic" id="eaVoiceIcon"></i> Mic
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" id="eaTapHear" style="display: none;" title="Tap to hear">
+                <i class="bi bi-volume-up-fill"></i> Tap to hear
+              </button>
+              <span class="text-muted small">Google TTS via /shared/tts.js · Shift+Enter for newline</span>
+            </div>
+            <div class="ea-composer-row">
+              <textarea
+                id="eaInput"
+                rows="2"
+                placeholder="Ask about Encompass APIs, OAuth, Pipeline, Postman, ICE repos…"
+                aria-label="Message for Encompass Developer AI Expert"
+              ></textarea>
+              <button type="button" class="btn btn-primary" id="eaSendBtn" title="Send">
+                <i class="bi bi-send"></i>
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
+
+      <section class="ea-knowledge" id="eaKnowledgeBank" aria-label="Knowledge bank explorer">
+        <div class="ea-knowledge-head">
+          <div>
+            <h2 class="h5 mb-1"><i class="bi bi-diagram-3"></i> Knowledge bank explorer</h2>
+            <p class="small text-muted mb-0">
+              SVG category map + WebGPU constellation of RAG neighbors. Search docs, Postman, or ICE code without chatting.
+              Rebuild: <code>npm run refresh:encompass-knowledge</code>
+            </p>
+          </div>
+        </div>
+        <div class="row g-3">
+          <div class="col-lg-7">
+            <div class="ea-knowledge-canvas-wrap">
+              <svg id="eaKnowledgeGraph" class="ea-knowledge-graph" viewBox="0 0 640 280" role="img" aria-label="Encompass knowledge graph"></svg>
+              <canvas id="eaKnowledgeConstellation" class="ea-knowledge-constellation" role="img" aria-label="RAG neighbor constellation"></canvas>
+            </div>
+            <p class="small text-muted mb-0 mt-1" id="eaKnowledgeGraphCaption">Category map of Dev Connect docs and ICE records.</p>
+            <p class="small text-muted mb-0" id="eaConstellationCaption">Constellation paints server-returned RAG neighbors (not client embeddings).</p>
+          </div>
+          <div class="col-lg-5">
+            <div class="ea-filter-pills">
+              <button type="button" class="btn btn-sm btn-outline-secondary active" data-ea-source="all">All</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-ea-source="docs">Dev Connect</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-ea-source="postman">Postman</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-ea-source="repos">ICE repos</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" data-ea-source="curated">Curated</button>
+            </div>
+            <label class="form-label small text-muted mb-1" for="eaKnowledgeSearch">Explore knowledge</label>
+            <div class="input-group input-group-sm mb-2">
+              <input type="search" class="form-control" id="eaKnowledgeSearch" placeholder="OAuth, pipeline cursor, field writer…" />
+              <button type="button" class="btn btn-outline-primary" id="btnEaKnowledgeSearch">Search</button>
+            </div>
+            <ul class="ea-hits" id="eaKnowledgeHits" aria-live="polite">
+              <li class="text-muted">Search the bank to preview slips before asking the expert.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <div class="mb-4" id="encompassAppsSection" hidden>
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-3">
+          <div>
+            <h2 class="h5 mb-1"><i class="bi bi-grid-3x3-gap"></i> Encompass apps</h2>
+            <p class="text-muted mb-0 small">Every mortgage app in this session — Hub, AI, tools, and calculators.</p>
+          </div>
+          <a class="btn btn-sm btn-outline-primary" href="/finance/encompass-hub.html">
+            <i class="bi bi-columns-gap"></i> Open Hub
+          </a>
         </div>
         <div class="domain-grid domain-grid-sm" id="encompassToolGrid"></div>
-    </div>
+      </div>
+    </main>
 
-    <!-- Instructions Accordion at Bottom -->
-    <div class="container mt-4">
-        <div class="welcome-accordion">
-            <div class="accordion-header" onclick="toggleInstructionsAccordion()">
-                <i class="bi-info-circle"></i> How to Use This Assistant
-                <i class="bi-chevron-down accordion-icon rotated" id="instructionsIcon"></i>
-            </div>
-            <div class="accordion-content expanded" id="instructionsContent">
-                <div style="padding: 20px;">
-                    <h6><i class="bi-chat-dots"></i> Getting Started</h6>
-                    <ul>
-                        <li><strong>Ask specific questions:</strong> "How do I authenticate with OAuth2?"</li>
-                        <li><strong>Request examples:</strong> "Show me a loan creation API call"</li>
-                        <li><strong>Get workflow help:</strong> "Walk me through the loan manufacturing process"</li>
-                    </ul>
-                    
-                    <h6><i class="bi-mic"></i> Voice Commands</h6>
-                    <ul>
-                        <li>Click the microphone button to speak your question</li>
-                        <li>Speak clearly and naturally</li>
-                        <li>Use phrases like "How do I..." or "Show me..."</li>
-                    </ul>
-
-                    <h6><i class="bi-lightning"></i> Quick Actions</h6>
-                    <ul>
-                        <li>Use the sidebar buttons for common topics</li>
-                        <li>Import Postman collection for hands-on testing</li>
-                        <li>Check documentation status for latest updates</li>
-                    </ul>
-
-                    <h6><i class="bi-database"></i> Available Data Sources</h6>
-                    <ul>
-                        <li><strong>Encompass Developer Connect</strong> - Official API documentation</li>
-                        <li><strong>Postman Collections</strong> - Ready-to-use API examples</li>
-                        <li><strong>Knowledge Articles</strong> - Community solutions</li>
-                        <li><strong>Use Case Matrix</strong> - Real-world scenarios</li>
-                        <li><strong>API Reference Guides</strong> - Complete endpoint docs</li>
-                    </ul>
-
-                    <h6><i class="bi-collection"></i> Available Collections</h6>
-                    <ul>
-                        <li>Authentication & OAuth 2.0</li>
-                        <li>Loan Manufacturing Workflows</li>
-                        <li>Loan Pipeline Management</li>
-                        <li>Product & Pricing APIs</li>
-                        <li>Compliance & Regulatory</li>
-                        <li>Document Management</li>
-                        <li>Webhooks & Events</li>
-                        <li>TPO Connect Integration</li>
-                        <li>Custom Forms & Tools</li>
-                        <li>Best Practices & Security</li>
-                    </ul>
-                </div>
-            </div>
+    <footer class="ea-footer">
+      <div class="container text-center">
+        <div>
+          <strong>David E Lane</strong> — Powered by Cursor AI — <span id="dt"></span> — All Rights Reserved
         </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container text-center">
-            <div class="footer-content">
-                <strong>David E Lane</strong> — Powered by Cursor AI — <span id="dt"></span> — All Rights Reserved
-            </div>
-            <div class="footer-quote mt-2" id="secretQuote" style="cursor: default; transition: all 0.3s ease;">
-                🍄 "Turn on, tune in, drop out" 🍄
-            </div>
+        <div class="small mt-1 opacity-75">
+          Hybrid RAG · ICE knowledge · Developer Connect docs ·
+          <a href="https://developer.icemortgagetechnology.com/developer-connect/docs" target="_blank" rel="noopener noreferrer">Official docs</a>
         </div>
+      </div>
     </footer>
 
-    <script>
-        let chatHistory = [];
-        let isListening = false;
-        let recognition = null;
-
-        const SOURCE_TYPE_LABELS = {
-            code_reference: 'Code Reference',
-            api_reference: 'API Reference',
-            official_doc: 'Developer Connect'
-        };
-
-        function formatSourceTypeLabel(type) {
-            if (!type) return '';
-            return SOURCE_TYPE_LABELS[type] || type;
-        }
-
-        function buildSourceMeta(source) {
-            if (!source) return '';
-            const parts = [];
-
-            if (source.repo) {
-                parts.push(source.repo);
-            }
-
-            const typeLabel = formatSourceTypeLabel(source.sourceType);
-            if (typeLabel && (!source.repo || typeLabel !== source.repo)) {
-                parts.push(typeLabel);
-            } else if (source.category) {
-                parts.push(source.category);
-            }
-
-            return parts.join(' • ');
-        }
-
-        function buildSourceSnippet(content) {
-            if (!content) return '';
-            const clean = content.replace(/\s+/g, ' ').trim();
-            return clean.length > 220 ? `${clean.slice(0, 220)}…` : clean;
-        }
-
-        // Initialize voice recognition
-        function initVoiceRecognition() {
-            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                recognition = new SpeechRecognition();
-                
-                recognition.continuous = false;
-                recognition.interimResults = false;
-                recognition.lang = 'en-US';
-
-                recognition.onstart = function() {
-                    console.log('🎤 Voice recognition started');
-                    isListening = true;
-                    updateVoiceButton();
-                };
-
-                recognition.onresult = function(event) {
-                    const transcript = event.results[0][0].transcript;
-                    console.log('🎤 Voice input:', transcript);
-                    document.getElementById('messageInput').value = transcript;
-                    sendMessage();
-                };
-
-                recognition.onerror = function(event) {
-                    console.error('🎤 Voice recognition error:', event.error);
-                    isListening = false;
-                    updateVoiceButton();
-                    
-                    if (event.error === 'not-allowed') {
-                        alert('Microphone access denied. Please allow microphone access to use voice input.');
-                    }
-                };
-
-                recognition.onend = function() {
-                    console.log('🎤 Voice recognition ended');
-                    isListening = false;
-                    updateVoiceButton();
-                };
-            } else {
-                console.log('🎤 Voice recognition not supported');
-                document.getElementById('voiceButton').style.display = 'none';
-            }
-        }
-
-        // Toggle voice recognition
-        function toggleVoiceRecognition() {
-            if (!recognition) {
-                alert('Voice recognition not supported in this browser.');
-                return;
-            }
-
-            if (isListening) {
-                recognition.stop();
-            } else {
-                recognition.start();
-            }
-        }
-
-        // Update voice button appearance
-        function updateVoiceButton() {
-            const voiceButton = document.getElementById('voiceButton');
-            const voiceIcon = document.getElementById('voiceIcon');
-            
-            if (isListening) {
-                voiceButton.classList.add('listening');
-                voiceIcon.className = 'bi-mic-fill';
-                voiceButton.title = 'Stop listening...';
-            } else {
-                voiceButton.classList.remove('listening');
-                voiceIcon.className = 'bi-mic';
-                voiceButton.title = 'Voice Input';
-            }
-        }
-
-        // Ask a question
-        function askQuestion(question) {
-            document.getElementById('messageInput').value = question;
-            sendMessage();
-        }
-
-        // Make askQuestion available globally
-        window.askQuestion = askQuestion;
-
-        // Handle key press
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        }
-
-        // Send message
-        async function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const message = input.value.trim();
-            
-            if (!message) return;
-
-            // Clear input
-            input.value = '';
-            
-            // Add user message to chat
-            addMessage(message, 'user');
-            
-            // Show typing indicator
-            showTypingIndicator();
-            const tapBtn = document.getElementById('tapToHearBtn');
-            if (tapBtn) tapBtn.style.display = 'none';
-            
-            // Disable send button
-            const sendButton = document.getElementById('sendButton');
-            sendButton.disabled = true;
-
-            try {
-                const response = await fetch('/api/encompass/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        message: message,
-                        context: chatHistory
-                    })
-                });
-
-                const data = await response.json();
-                
-                if (response.ok) {
-                    // Add AI response to chat
-                    addMessage(data.message, 'ai', data.context);
-                    lastAiResponse = data.message || '';
-                    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 768);
-                    const tapBtn = document.getElementById('tapToHearBtn');
-                    if (tapBtn) tapBtn.style.display = isMobile && lastAiResponse ? 'inline-block' : 'none';
-                    speakAiResponse(lastAiResponse);
-                    
-                    // Update chat history
-                    chatHistory.push(message);
-                    chatHistory.push(data.message);
-                    
-                    // Keep only last 10 messages in context
-                    if (chatHistory.length > 20) {
-                        chatHistory = chatHistory.slice(-20);
-                    }
-                } else {
-                    addMessage(`Error: ${data.error}`, 'ai');
-                }
-            } catch (error) {
-                console.error('Error sending message:', error);
-                addMessage('Sorry, I encountered an error. Please try again.', 'ai');
-            } finally {
-                // Hide typing indicator and re-enable send button
-                hideTypingIndicator();
-                sendButton.disabled = false;
-            }
-        }
-
-        // Add message to chat
-        function addMessage(content, sender, context = null) {
-            const chatMessages = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}-message`;
-            
-            let messageContent = `<strong>${sender === 'user' ? 'You' : '🏦 Encompass AI'}:</strong><br>${content}`;
-            
-            if (context && context.length > 0) {
-                messageContent += '<div style="background: #e3f2fd; border: 1px solid #90caf9; border-radius: 10px; padding: 12px; margin-top: 10px; font-size: 13px; color: #1565c0;">';
-                messageContent += '<h5>📚 Sources:</h5><ul class="source-list">';
-                context.forEach((source) => {
-                    const title = source.url
-                        ? `<a href="${source.url}" target="_blank" rel="noopener noreferrer">${source.title}</a>`
-                        : source.title;
-                    const meta = buildSourceMeta(source);
-                    const pathInfo = source.path ? `<div class="source-path">${source.path}</div>` : '';
-                    const snippet = buildSourceSnippet(source.content);
-                    const snippetHtml = snippet ? `<div class="source-snippet">${snippet}</div>` : '';
-                    const metaHtml = meta ? `<div class="source-meta">${meta}</div>` : '';
-
-                    messageContent += `<li>${title}${metaHtml}${pathInfo}${snippetHtml}</li>`;
-                });
-                messageContent += '</ul></div>';
-            }
-            
-            messageDiv.innerHTML = messageContent;
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        // Show typing indicator
-        function showTypingIndicator() {
-            document.getElementById('typingIndicator').style.display = 'block';
-        }
-
-        // Hide typing indicator
-        function hideTypingIndicator() {
-            document.getElementById('typingIndicator').style.display = 'none';
-        }
-
-        // Toggle welcome accordion
-        function toggleWelcomeAccordion() {
-            const content = document.getElementById('welcomeContent');
-            const icon = document.getElementById('welcomeIcon');
-            
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                icon.classList.remove('rotated');
-            } else {
-                content.classList.add('expanded');
-                icon.classList.add('rotated');
-            }
-        }
-
-        // Toggle instructions accordion
-        function toggleInstructionsAccordion() {
-            const content = document.getElementById('instructionsContent');
-            const icon = document.getElementById('instructionsIcon');
-            
-            if (content.classList.contains('expanded')) {
-                content.classList.remove('expanded');
-                icon.classList.remove('rotated');
-            } else {
-                content.classList.add('expanded');
-                icon.classList.add('rotated');
-            }
-        }
-
-        // Make functions globally available
-        window.toggleWelcomeAccordion = toggleWelcomeAccordion;
-        window.toggleInstructionsAccordion = toggleInstructionsAccordion;
-
-        // Mobile TTS: tap-to-hear and priming
-        let lastAiResponse = '';
-        function tapToHearResponse() {
-            if (!lastAiResponse) return;
-            if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
-            if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
-            speakAiResponse(lastAiResponse);
-        }
-        function speakAiResponse(text) {
-            const clean = (text || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-            if (!clean) return;
-            if (typeof window.speakWithGoogle === 'function') {
-                window.speakWithGoogle(clean.substring(0, 500), 'en-US-Standard-D', { speakingRate: 0.9 })
-                    .catch(() => {});
-            } else if ('speechSynthesis' in window) {
-                const u = new SpeechSynthesisUtterance(clean.substring(0, 500));
-                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 768);
-                u.rate = isMobile ? 1 : 0.9;
-                u.pitch = isMobile ? 1 : 1;
-                window.speechSynthesis.cancel();
-                window.speechSynthesis.speak(u);
-            }
-        }
-        window.tapToHearResponse = tapToHearResponse;
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            initVoiceRecognition();
-            const vb = document.getElementById('voiceButton');
-            if (vb) vb.addEventListener('touchstart', function() {
-                if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
-                if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
-            }, { passive: true, capture: true });
-            
-            // Update date
-            document.getElementById('dt').textContent = new Date().toLocaleDateString();
-            
-            // Focus at top of page
-            window.scrollTo(0, 0);
-            document.body.scrollTop = 0;
-            document.documentElement.scrollTop = 0;
-            
-            // Sticky navbar scroll effect
-            const navbar = document.querySelector('.modern-navbar');
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 50) {
-                    navbar.classList.add('scrolled');
-                } else {
-                    navbar.classList.remove('scrolled');
-                }
-            });
-            
-            // Add event listeners to quick action buttons
-            document.querySelectorAll('.quick-action').forEach(button => {
-                button.addEventListener('click', function() {
-                    const question = this.getAttribute('data-question');
-                    if (question) {
-                        askQuestion(question);
-                    }
-                });
-            });
-        });
-
-        // Ensure page is at top when fully loaded
-        window.addEventListener('load', function() {
-            window.scrollTo(0, 0);
-            document.body.scrollTop = 0;
-            document.documentElement.scrollTop = 0;
-        });
-    </script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/shared/tts.js"></script>
     <script src="/shared/demo-users.js"></script>
     <script src="/shared/user-login.js"></script>
-    <script src="/shared/menu-config.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="/shared/finance-auth-guard.js"></script>
-  <script src="/shared/encompass-dark-mode.js"></script>
-  <script>
-    (function () {
-      function renderEncompassTools() {
-        var grid = document.getElementById('encompassToolGrid');
-        var section = document.getElementById('encompassAppsSection');
-        if (!grid || !window.MENU_CONFIG) return;
-        var loggedIn = typeof window.isLoggedIn === 'function' && window.isLoggedIn();
-        var tools = typeof window.MENU_CONFIG.getMortgageTools === 'function'
-          ? window.MENU_CONFIG.getMortgageTools(loggedIn)
-          : (window.MENU_CONFIG.ENCOMPASS_TOOLS || []);
-        grid.innerHTML = window.MENU_CONFIG.renderDomainGridItems(tools, {
-          loggedIn: loggedIn,
-          category: 'Mortgage',
-        });
-        if (section) section.hidden = !loggedIn || !grid.innerHTML;
-        var current = (location.pathname || '').toLowerCase();
-        grid.querySelectorAll('.domain-tile').forEach(function (tile) {
-          var href = (tile.getAttribute('href') || '').toLowerCase();
-          tile.classList.toggle('active', href && (current === href || current.endsWith(href)));
-        });
-      }
-      renderEncompassTools();
-      window.addEventListener('user-logged-in', renderEncompassTools);
-      window.addEventListener('storage', renderEncompassTools);
-    })();
-  </script>
+    <script src="/shared/js/webgpu-runtime.js"></script>
+    <script src="/shared/js/webgpu-knowledge-constellation.js"></script>
+    <script src="/shared/encompass-dark-mode.js"></script>
+    <script src="/shared/finance-auth-guard.js"></script>
+    <script src="/finance/js/encompass-assistant.js"></script>
   </body>
 </html>

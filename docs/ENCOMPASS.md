@@ -22,14 +22,16 @@ REST API integration with Encompass:
 
 Key fields: `Loan.LoanGuid`, `Loan.LoanNumber`, `Loan.LoanStatus`, `Loan.CurrentMilestoneName`, `Fields.11`–`Fields.15` (address), etc.
 
-### 2. Encompass Assistant (`controllers/encompass-assistant.controller.js`)
+### 2. Encompass Developer AI Expert (`services/encompass-assistant.service.js`)
 
-AI assistant for Encompass Developer Connect:
+AI assistant for Encompass Developer Connect (UI: `public/finance/encompass-assistant.html`):
 
 - Uses **encompass-docs.service.js** – Search official Developer Connect docs (`data/encompass-docs.json`; refresh with `npm run scrape:encompass-docs`)
 - Uses **ice-knowledge.service.js** – Search ICE repos, Postman, sample code (`data/knowledge/ice-sources.json`; build with `npm run build:ice-knowledge`)
-- System prompt includes DevConnect Labs tech stack, calculations class, Encompass context
-- Endpoints: `/search`, `/chat`, `/summary`, `/scrape` (admin, token-gated)
+- Curated fact sheet: `data/knowledge/encompass-dev-expert.json` (always injected)
+- LangChain PostgreSQL memory via `langchain-memory.service.js`; model via `ENCOMPASS_ASSISTANT_MODEL` / `OPENAI_AGENT_MODEL`
+- Thin controller: `controllers/encompass-assistant.controller.js`
+- Endpoints (also aliased at `/api/encompass-assistant/*`): `/search`, `/chat`, `/summary`, `/health`, `/graph`, `/history`, `/scrape` (admin, token-gated)
 - Refresh both stores together: `npm run refresh:encompass-knowledge`
 
 ### 3. Knowledge Sources (`knowledge-sources/ice/`)

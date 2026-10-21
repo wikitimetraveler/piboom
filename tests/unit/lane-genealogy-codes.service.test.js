@@ -18,7 +18,11 @@ import {
   resolvePerson,
   buildGenealogyCodePlan,
   applyGenealogyCodePlan,
-  summarizeRegister
+  summarizeRegister,
+  repairSplitGivenName,
+  namesAgree,
+  isPlausibleRegisterPerson,
+  enrichLaneDataFromRegister
 } from '../../services/lane-genealogy-codes.service.js';
 import { validateLaneData } from '../../services/genealogy-import.service.js';
 
@@ -246,5 +250,48 @@ describe('lane genealogy codes — resolve, plan, apply', () => {
     expect(doc.legend.carryForwardNo).toMatch(/heads family No\. N/);
     expect(doc.stats).toMatchObject({ families: 3, familiesWithResolvedHead: 3, familiesLinkedToParentFamily: 2, conflicts: 1 });
     expect(doc.families[1].children[1]).toMatchObject({ order: 'II', name: 'John', personId: 30 });
+  });
+});
+
+describe('lane genealogy codes — OCR repair, nicknames, enrich', () => {
+  test('repairSplitGivenName rejoins OCR-split and typo givens', () => {
+    expect(repairSplitGivenName('Eliza Beth')).toBe('Elizabeth');
+    expect(repairSplitGivenName('Sus Anna')).toBe('Susanna');
+    expect(repairSplitGivenName('Jo Siah')).toBe('Josiah');
+    expect(repairSplitGivenName('Bathsheea')).toBe('Bathsheba');
+    expect(repairSplitGivenName('Samuel')).toBe('Samuel');
+  });
+
+  test('namesAgree matches nicknames and diminutives', () => {
+    expect(namesAgree('Abi', 'Abigail')).toBe(true);
+    expect(namesAgree('Polly', 'Mary')).toBe(true);
+    expect(namesAgree('Nabby', 'Abigail')).toBe(true);
+    expect(namesAgree('Sally', 'Sarah')).toBe(true);
+    expect(namesAgree('William', 'Thomas')).toBe(false);
+  });
+
+  test('isPlausibleRegisterPerson rejects OCR junk', () => {
+    expect(isPlausibleRegisterPerson({ given: 'In' })).toBe(false);
+    expect(isPlausibleRegisterPerson({ given: 'of' })).toBe(false);
+    expect(isPlausibleRegisterPerson({ given: 'Samuel', birthYear: 1651 })).toBe(true);
+    expect(isPlausibleRegisterPerson({ given: 'Abi', maiden: 'Hovey' })).toBe(true);
+  });
+
+  test('enrichLaneDataFromRegister synthesizes missing plausible people then re-plans', () => {
+    const laneData = makeLaneData();
+    const register = decodeGenealogyRegister(PAGES, { givenSet: buildNodeIndex(laneData).givenSet });
+    // Drop Abigail Hovey-style wife for family 2 is already present; remove Sarah Dickinson to force enrich.
+    laneData.nodes = laneData.nodes.filter((n) => n.id !== 13);
+    laneData.links = laneData.links.filter((l) => l.source !== 13 && l.target !== 13);
+    const before = laneData.nodes.length;
+    const plan = buildGenealogyCodePlan(register, laneData);
+    expect(plan.families.find((f) => f.familyNo === 2).resolved.wifeIds[0]).toBeNull();
+    const { laneData: enriched, stats } = enrichLaneDataFromRegister(laneData, register, { plan });
+    expect(stats.created).toBeGreaterThan(0);
+    expect(enriched.nodes.length).toBeGreaterThan(before);
+    expect(enriched.nodes.every((n) => n.provenance?.method === 'register-enrich' || !n.provenance)).toBe(true);
+    const replan = buildGenealogyCodePlan(register, enriched);
+    expect(replan.families.find((f) => f.familyNo === 2).resolved.wifeIds[0]).not.toBeNull();
+    expect(validateLaneData(enriched).valid).toBe(true);
   });
 });

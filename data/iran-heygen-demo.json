@@ -2,28 +2,28 @@
   "id": "iran-nima-intro",
   "title": {
     "en": "Iran — Meet Nima",
-    "ar": "عُمان — تعرّف على نیما"
+    "fa": "ایران — آشنایی با نیما"
   },
   "ctaLabel": {
     "en": "Start the tour",
-    "ar": "ابدأ الجولة"
+    "fa": "شروع تور"
   },
   "ctaHref": "/iran/?reel=1",
   "qrLandingPath": "/iran/?demo=heygen",
   "brand": {
     "attribution": {
       "en": "Avatar narration powered by HeyGen",
-      "ar": "سرد الأفاتار بتقنية HeyGen"
+      "fa": "روایت آواتار با هیجن"
     },
     "developmentBy": "David E Lane"
   },
   "heygenScriptShort": {
-    "en": "Ahlan wa sahlan — I'm Nima. This atlas walks Iran: Persepolis and Isfahan, Nowruz and tahdig, tar and radif. Press play on the HyperFrame tour, or ask me anything on the page.",
-    "ar": "أهلاً وسهلاً — أنا نیما. هذا الأطلس يمشي إيران: برسبوليس وأصفهان، نوروز والتهديغ، الطار والرديف. شغّل جولة HyperFrame، أو اسألني عن أي شيء في الصفحة."
+    "en": "Salâm — I'm Nima. This atlas walks Iran: Persepolis and Isfahan, Nowruz and tahdig, tar and radif. Press play on the HyperFrame tour, or ask me anything on the page.",
+    "fa": "سلام — من نیما هستم. این اطلس ایران را قدم می‌زند: تخت جمشید و اصفهان، نوروز و ته دیگ، تار و ردیف. تور تصویری را پخش کن، یا هر چه روی صفحه است از من بپرس."
   },
   "heygenVoiceLanguage": {
     "en": "English",
-    "ar": "Arabic"
+    "fa": "فارسی"
   },
   "heygenMotionPrompt": "calm nod, warm local guide speaking to camera",
   "heygenExpressiveness": "low",
@@ -31,27 +31,27 @@
   "heygenAvatarGroupId": null,
   "heygenVoiceId": {
     "en": null,
-    "ar": null
+    "fa": null
   },
   "heygenVoiceName": {
     "en": null,
-    "ar": null
+    "fa": null
   },
   "heygenVideoIdShort": {
     "en": null,
-    "ar": null
+    "fa": null
   },
   "heygenVideoUrlShort": {
     "en": null,
-    "ar": null
+    "fa": null
   },
   "heygenVideoLocalShort": {
     "en": null,
-    "ar": null
+    "fa": null
   },
   "generatedAt": {
     "en": null,
-    "ar": null
+    "fa": null
   },
   "avatar": {
     "name": "Nima",
