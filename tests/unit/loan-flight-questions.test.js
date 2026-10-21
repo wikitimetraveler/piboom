@@ -23,6 +23,12 @@ describe('loan flight question bank', () => {
       expect(deck[id]).toHaveLength(10);
       expect(new Set(deck[id].map((q) => q.id)).size).toBe(10);
       expect(deck[id].every((q) => q.recycled === false)).toBe(true);
+      expect(drawDeck({
+        bank: bank.questions,
+        unitIds: [id],
+        difficulty: 1,
+        count: 3
+      })[id]).toHaveLength(3);
     }
   });
 
@@ -57,6 +63,33 @@ describe('loan flight question bank', () => {
     })['product-lines'];
     expect(officer.every((q) => q.difficulty === 2 && q.recycled === false)).toBe(true);
     expect(officer.map((q) => q.id).some((id) => seen.includes(id))).toBe(false);
+  });
+
+  test('first officer and captain each have a fresh set on every stage', () => {
+    for (const level of [2, 3]) {
+      const deck = drawDeck({
+        bank: bank.questions,
+        unitIds,
+        difficulty: level,
+        count: 10
+      });
+      for (const id of unitIds) {
+        expect(deck[id]).toHaveLength(10);
+        expect(deck[id].every((q) => q.difficulty === level && q.recycled === false)).toBe(true);
+      }
+    }
+    const officer = drawDeck({
+      bank: bank.questions,
+      unitIds: ['application', 'funding'],
+      difficulty: 2,
+      count: 10
+    });
+    const blob = ['application', 'funding']
+      .flatMap((id) => officer[id])
+      .map((q) => `${q.question} ${q.explain}`)
+      .join(' ');
+    expect(blob).toMatch(/Investor A|660|45%/);
+    expect(blob).toMatch(/medium|high|reserves/);
   });
 
   test('80% advances difficulty and a miss keeps the pilot on the same rung', () => {

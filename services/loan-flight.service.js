@@ -130,23 +130,36 @@ async function questionsFromPool(pool, bank) {
   return rows.map((row) => (typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload));
 }
 
-function shapeDeck(bank, questions, pilot, seenIds, source) {
+function chosenFlight(options, maxLevel, defaultCount) {
+  const level = Number(options?.difficulty);
+  const rawCount = Number(options?.count);
+  return {
+    difficulty: Number.isFinite(level) && level >= 1 ? Math.min(maxLevel, Math.round(level)) : null,
+    count: Number.isFinite(rawCount) && rawCount >= 1
+      ? Math.min(defaultCount, Math.max(1, Math.round(rawCount)))
+      : defaultCount
+  };
+}
+
+function shapeDeck(bank, questions, pilot, seenIds, source, options = {}) {
   const maxLevel = Math.max(...bank.difficulties.map((d) => Number(d.level)));
-  const difficulty = Math.min(maxLevel, Math.max(1, Number(pilot.difficulty) || 1));
+  const chosen = chosenFlight(options, maxLevel, bank.perUnit);
+  const difficulty = chosen.difficulty
+    || Math.min(maxLevel, Math.max(1, Number(pilot.difficulty) || 1));
   const unitIds = bank.units.map((u) => u.id);
   const drawn = drawDeck({
     bank: questions,
     unitIds,
     difficulty,
     seenIds,
-    count: bank.perUnit
+    count: chosen.count
   });
   return {
     source,
     difficulty,
     maxLevel,
     passRatio: PASS_RATIO,
-    perUnit: bank.perUnit,
+    perUnit: chosen.count,
     difficulties: bank.difficulties,
     label: difficultyLabel(difficulty, bank.difficulties),
     pilot: {
@@ -163,7 +176,7 @@ function shapeDeck(bank, questions, pilot, seenIds, source) {
   };
 }
 
-async function deckFromPool(pool, bank, clientId) {
+async function deckFromPool(pool, bank, clientId, options) {
   await ensureSchema(pool);
   const questions = await questionsFromPool(pool, bank);
   const { rows } = await pool.query(
@@ -179,25 +192,25 @@ async function deckFromPool(pool, bank, clientId) {
     'SELECT question_id FROM loan_flight_seen WHERE client_id = $1 ORDER BY seen_at ASC, question_id ASC',
     [clientId]
   );
-  return shapeDeck(bank, questions, pilot, seen.rows.map((r) => r.question_id), 'postgres');
+  return shapeDeck(bank, questions, pilot, seen.rows.map((r) => r.question_id), 'postgres', options);
 }
 
-function deckFromMemory(bank, clientId) {
+function deckFromMemory(bank, clientId, options) {
   const pilot = memoryPilots.get(clientId) || { difficulty: 1, flights: 0, bestRatio: 0 };
   const seenIds = memorySeen.get(clientId) || [];
-  return shapeDeck(bank, bank.questions, pilot, seenIds, 'file');
+  return shapeDeck(bank, bank.questions, pilot, seenIds, 'file', options);
 }
 
-export async function getDeck(clientId) {
+export async function getDeck(clientId, options = {}) {
   const id = cleanClientId(clientId);
   const bank = await loadBank();
   const pool = getPool();
-  if (!pool) return deckFromMemory(bank, id);
+  if (!pool) return deckFromMemory(bank, id, options);
   try {
-    return await deckFromPool(pool, bank, id);
+    return await deckFromPool(pool, bank, id, options);
   } catch (err) {
     console.warn(`loan flight deck fell back to the file bank: ${err.message}`);
-    return deckFromMemory(bank, id);
+    return deckFromMemory(bank, id, options);
   }
 }
 

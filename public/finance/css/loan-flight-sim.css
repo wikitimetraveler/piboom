@@ -135,6 +135,43 @@ body.lfs-page.dark-mode {
   color: #04131f;
 }
 
+.lfs-setup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin: 0 0 1.15rem;
+}
+
+.lfs-setup label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lfs-muted);
+}
+
+.lfs-setup select {
+  min-width: 12rem;
+  border-radius: 999px;
+  border: 1px solid var(--lfs-line);
+  background: var(--lfs-panel);
+  color: var(--lfs-ink);
+  padding: 0.45rem 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.lfs-setup select:focus-visible {
+  outline: 2px solid var(--lfs-cyan);
+  outline-offset: 2px;
+}
+
 .lfs-path {
   position: relative;
   margin: 0 0 1.5rem;
@@ -162,12 +199,21 @@ body.lfs-page.dark-mode {
 .lfs-path__plane {
   position: absolute;
   top: 0.85rem;
-  left: 0;
+  left: 0.5rem;
   font-size: 1.3rem;
   color: var(--lfs-ink);
-  transform: rotate(45deg);
-  transition: left 0.6s ease;
+  transform: translateX(var(--lfs-x, 0px)) rotate(-45deg);
+  transition: transform 0.6s ease;
   filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.8));
+}
+
+.lfs-path__plane::before {
+  animation: lfs-plane-bob 2.8s ease-in-out infinite;
+}
+
+@keyframes lfs-plane-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
 }
 
 .lfs-path__stops {
@@ -536,6 +582,46 @@ body.lfs-page.dark-mode {
   color: var(--lfs-muted);
 }
 
+.lfs-misses {
+  margin: 0.9rem 0 1rem;
+}
+
+.lfs-misses__title {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lfs-muted);
+  margin: 0 0 0.4rem;
+}
+
+.lfs-misses__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.lfs-misses__list li {
+  border-left: 3px solid var(--lfs-red);
+  padding: 0.1rem 0 0.1rem 0.7rem;
+}
+
+.lfs-misses__list li.is-clear {
+  border-left-color: var(--lfs-green);
+  color: var(--lfs-muted);
+}
+
+.lfs-misses__q {
+  margin: 0.15rem 0 0;
+}
+
+.lfs-misses__explain {
+  margin: 0.15rem 0 0;
+  color: var(--lfs-muted);
+  font-size: 0.88rem;
+}
+
 .lfs-log {
   list-style: none;
   padding: 0;
@@ -587,5 +673,9 @@ body.lfs-page.dark-mode {
   .lfs-path__fill,
   .lfs-path__plane {
     transition: none;
+  }
+
+  .lfs-path__plane::before {
+    animation: none;
   }
 }

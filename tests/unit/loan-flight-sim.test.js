@@ -117,7 +117,13 @@ describe('loan flight sim page', () => {
     expect(html).toContain('href="/gse-analyzer.html"');
     expect(js).toContain('createLoanFlightSimConfig');
     expect(js).not.toContain('/api/gse/analyze-scenario');
-    expect(js).toContain('/api/loan-flight/deck');
+    expect(html).toContain('id="lfsPerStage"');
+    expect(html).toContain('id="lfsDifficultyPick"');
+    expect(js).toContain('difficulty: String(selectedDifficulty())');
+    expect(js).toContain('count: String(selectedCount())');
+    expect(html).toContain('id="lfsMisses"');
+    expect(js).toContain('state.misses');
+    expect(js).toContain('--lfs-x');
     expect(js).toContain('Question');
     expect(js).toMatch(/addBusinessDays\(\[l\.appDate, 3, false\]\)/);
     expect(js).toMatch(/addBusinessDays\(\[l\.closingDate, -3, true\]\)/);

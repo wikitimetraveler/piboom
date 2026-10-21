@@ -93,11 +93,11 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 
 ## Loan file flight simulator
 
-Question bank: `data/loan-flight-question-bank.json`. Seen question ids and the pilot's difficulty are stored in Postgres (`loan_flight_question`, `loan_flight_seen`, `loan_flight_pilot`). The pilot report links to `/gse-analyzer.html` and does not post the flight into that form.
+Question bank: `data/loan-flight-question-bank.json`. Each of the eight stages has 10 questions at Trainee, First officer, and Captain. Seen question ids and the pilot's difficulty are stored in Postgres (`loan_flight_question`, `loan_flight_seen`, `loan_flight_pilot`). The pilot report links to `/gse-analyzer.html` and does not post the flight into that form.
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/api/loan-flight/deck?clientId=` | 10 unseen questions per stage at the pilot's difficulty. Product-line questions step up at First officer and Captain. |
+| GET | `/api/loan-flight/deck?clientId=&difficulty=&count=` | Unseen questions per stage. `count` is 1–10 (default 10). `difficulty` is 1 Trainee, 2 First officer, or 3 Captain. |
 | POST | `/api/loan-flight/complete` | Body: `clientId`, `difficulty`, `results[{id,correct}]`. Records seen ids. 80% or better unlocks the next difficulty. |
 | POST | `/api/loan-flight/assistant/chat` | Captain Mara Voss. Does not name the correct choice until `revealed` is true. Falls back to a short coach line when OpenAI is not configured. |
 

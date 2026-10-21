@@ -1,5 +1,5 @@
 /**
- * Loan-flight question draw: 10 per unit, unseen first, harder product lines as difficulty rises.
+ * Loan-flight question draw: 10 per unit at each difficulty, unseen first.
  * Development work by David Lane
  */
 
@@ -17,14 +17,13 @@ export function validateBank(bank) {
     if (q.bind) continue;
     const correct = (q.options || []).filter((o) => o.correct);
     if (!q.question || correct.length !== 1) errors.push(`options ${q.id}`);
+    if (!q.explain) errors.push(`explain ${q.id}`);
   }
   for (const unit of bank?.units || []) {
-    const n = questions.filter((q) => q.unit === unit.id && Number(q.difficulty) === 1).length;
-    if (n < perUnit) errors.push(`${unit.id} has ${n} difficulty-1 questions`);
-  }
-  for (const level of [2, 3]) {
-    const n = questions.filter((q) => q.unit === 'product-lines' && Number(q.difficulty) === level).length;
-    if (n < perUnit) errors.push(`product-lines difficulty ${level} has ${n}`);
+    for (const level of [1, 2, 3]) {
+      const n = questions.filter((q) => q.unit === unit.id && Number(q.difficulty) === level).length;
+      if (n < perUnit) errors.push(`${unit.id} difficulty ${level} has ${n}`);
+    }
   }
   return errors;
 }

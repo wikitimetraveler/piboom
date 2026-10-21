@@ -9,7 +9,10 @@ const router = Router();
 
 router.get('/deck', async (req, res) => {
   try {
-    const deck = await getDeck(req.query.clientId);
+    const deck = await getDeck(req.query.clientId, {
+      difficulty: req.query.difficulty,
+      count: req.query.count
+    });
     res.json({ success: true, ...deck });
   } catch (err) {
     res.status(err.status || 500).json({ success: false, error: err.message });

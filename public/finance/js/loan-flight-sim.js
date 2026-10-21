@@ -30,6 +30,8 @@
     score: $('lfsScore'),
     difficultyLabel: $('lfsDifficultyLabel'),
     meter: $('lfsMeter'),
+    perStage: $('lfsPerStage'),
+    difficultyPick: $('lfsDifficultyPick'),
     newFlight: $('lfsNewFlight'),
     pathFill: $('lfsPathFill'),
     plane: $('lfsPlane'),
@@ -47,6 +49,7 @@
     reportTitle: $('lfsReportTitle'),
     reportSummary: $('lfsReportSummary'),
     advance: $('lfsAdvance'),
+    misses: $('lfsMisses'),
     reportLog: $('lfsReportLog'),
     flyAgain: $('lfsFlyAgain'),
     fileMeta: $('lfsFileMeta'),
@@ -76,6 +79,7 @@
     qIndex: 0,
     score: 0,
     log: [],
+    misses: [],
     answered: false,
     difficulty: 1,
     maxLevel: 3,
@@ -84,7 +88,8 @@
     results: [],
     unitCorrect: 0,
     clientId: '',
-    source: 'file'
+    source: 'file',
+    syncingSetup: false
   };
 
   function clientId() {
@@ -105,6 +110,34 @@
 
   function writeSeen(ids) {
     try { localStorage.setItem('lfsSeenIds', JSON.stringify(ids.slice(-500))); } catch { /* ignore */ }
+  }
+
+  function selectedCount() {
+    const n = Number(els.perStage?.value);
+    return Number.isFinite(n) && n >= 1 ? Math.min(10, Math.round(n)) : 10;
+  }
+
+  function selectedDifficulty() {
+    const n = Number(els.difficultyPick?.value);
+    return Number.isFinite(n) && n >= 1 ? Math.min(3, Math.round(n)) : 1;
+  }
+
+  function rememberSetup() {
+    try {
+      localStorage.setItem('lfsPerStage', String(selectedCount()));
+      localStorage.setItem('lfsDifficulty', String(selectedDifficulty()));
+    } catch { /* ignore */ }
+  }
+
+  function restoreSetup() {
+    state.syncingSetup = true;
+    try {
+      const count = localStorage.getItem('lfsPerStage');
+      const level = localStorage.getItem('lfsDifficulty');
+      if (count && els.perStage?.querySelector(`option[value="${count}"]`)) els.perStage.value = count;
+      if (level && els.difficultyPick?.querySelector(`option[value="${level}"]`)) els.difficultyPick.value = level;
+    } catch { /* ignore */ }
+    state.syncingSetup = false;
   }
 
   /** Mirrors services/loan-flight-questions.js drawDeck for when Postgres is offline. */
@@ -131,10 +164,9 @@
   }
 
   function localDeck(bank) {
-    let difficulty = 1;
-    try { difficulty = Number(localStorage.getItem('lfsDifficulty')) || 1; } catch { /* ignore */ }
+    const difficulty = selectedDifficulty();
     const seenIds = readSeen();
-    const count = bank.perUnit || 10;
+    const count = selectedCount();
     return {
       source: 'file',
       difficulty,
@@ -150,8 +182,13 @@
   }
 
   async function loadDeck(id) {
+    const params = new URLSearchParams({
+      clientId: id,
+      difficulty: String(selectedDifficulty()),
+      count: String(selectedCount())
+    });
     try {
-      const res = await fetch(`/api/loan-flight/deck?clientId=${encodeURIComponent(id)}`);
+      const res = await fetch(`/api/loan-flight/deck?${params}`);
       if (res.ok) {
         const data = await res.json();
         if (data.success && data.source === 'postgres' && Array.isArray(data.units)) return data;
@@ -458,9 +495,14 @@
         return li;
       })
     );
-    const done = Math.min(state.stage, Math.max(list.length - 1, 1)) / Math.max(list.length - 1, 1);
+    const total = list.reduce((sum, unit) => sum + (unit.questions?.length || 1), 0) || 1;
+    const done = Math.min(1, state.results.length / total);
     els.pathFill.style.width = `${done * 100}%`;
-    els.plane.style.left = `calc(${done * 100}% - ${done * 1.1}rem)`;
+    const track = els.pathFill?.parentElement;
+    const width = track?.getBoundingClientRect().width || 0;
+    const planeWidth = els.plane?.offsetWidth || 0;
+    const x = done * Math.max(width - planeWidth, 0);
+    els.plane.style.setProperty('--lfs-x', `${x}px`);
   }
 
   let current = null;
@@ -517,6 +559,13 @@
       state.unitCorrect += 1;
     }
     state.results.push({ id: current.id, correct: passed });
+    if (!passed) {
+      state.misses.push({
+        stage: state.units[state.stage]?.label || '',
+        question: current.question || '',
+        explain: current.explain || ''
+      });
+    }
     const unit = state.units[state.stage];
     if (state.qIndex === unit.questions.length - 1) {
       state.log[state.stage] = {
@@ -553,6 +602,32 @@
     return 'Trainee';
   }
 
+  function renderMisses() {
+    if (!els.misses) return;
+    if (!state.misses.length) {
+      const li = document.createElement('li');
+      li.className = 'is-clear';
+      li.textContent = 'No misses on this flight.';
+      els.misses.replaceChildren(li);
+      return;
+    }
+    els.misses.replaceChildren(
+      ...state.misses.map((row) => {
+        const li = document.createElement('li');
+        const stage = document.createElement('strong');
+        stage.textContent = row.stage;
+        const question = document.createElement('p');
+        question.className = 'lfs-misses__q';
+        question.textContent = row.question;
+        const explain = document.createElement('p');
+        explain.className = 'lfs-misses__explain';
+        explain.textContent = row.explain;
+        li.append(stage, question, explain);
+        return li;
+      })
+    );
+  }
+
   async function showReport() {
     els.challenge.hidden = true;
     els.report.hidden = false;
@@ -562,6 +637,7 @@
     els.reportTitle.textContent = `${rank(state.score, max)} · ${state.score} / ${state.results.length * POINTS}`;
     els.reportSummary.textContent = `Flight LF-${state.seed} · ${correct} of ${state.results.length} on ${labelFor(state.difficulty)}. Funded at ${ins.ltv}% LTV, ${ins.backDti}% back DTI and ${ins.reserves} months of reserves (${ins.risk} risk tier).`;
     if (els.advance) els.advance.textContent = '';
+    renderMisses();
     els.reportLog.replaceChildren(
       ...state.log.map((row) => {
         const li = document.createElement('li');
@@ -592,6 +668,11 @@
       });
       const data = await res.json();
       if (res.ok && data.success) {
+        paintDifficulty(data.difficulty);
+        state.syncingSetup = true;
+        if (els.difficultyPick) els.difficultyPick.value = String(data.difficulty);
+        state.syncingSetup = false;
+        try { localStorage.setItem('lfsDifficulty', String(data.difficulty)); } catch { /* ignore */ }
         if (els.advance) {
           els.advance.textContent = data.advanced
             ? `Next flight: ${data.label}. Product-line questions you have not seen are waiting.`
@@ -602,6 +683,9 @@
       const ratio = correct / Math.max(state.results.length, 1);
       if (ratio >= PASS_RATIO && state.difficulty < state.maxLevel) {
         paintDifficulty(state.difficulty + 1);
+        state.syncingSetup = true;
+        if (els.difficultyPick) els.difficultyPick.value = String(state.difficulty);
+        state.syncingSetup = false;
         try { localStorage.setItem('lfsDifficulty', String(state.difficulty)); } catch { /* ignore */ }
       }
       if (els.advance) els.advance.textContent = 'Progress is saved in this browser until the database is back.';
@@ -680,6 +764,7 @@
     state.qIndex = 0;
     state.score = 0;
     state.log = [];
+    state.misses = [];
     state.results = [];
     state.unitCorrect = 0;
     els.brief.textContent = 'Loading the question bank…';
@@ -737,6 +822,15 @@
     }
     engine = new window.CalculationsEngine(window.createLoanFlightSimConfig());
     state.clientId = clientId();
+    restoreSetup();
+    const restartFromSetup = () => {
+      if (state.syncingSetup) return;
+      rememberSetup();
+      startFlight(state.seed || randomSeed());
+    };
+    window.addEventListener('resize', () => renderPath());
+    els.perStage?.addEventListener('change', restartFromSetup);
+    els.difficultyPick?.addEventListener('change', restartFromSetup);
     els.cont.addEventListener('click', next);
     els.newFlight.addEventListener('click', () => startFlight(randomSeed()));
     els.flyAgain.addEventListener('click', () => startFlight(randomSeed()));
