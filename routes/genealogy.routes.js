@@ -11,6 +11,7 @@ import {
   getPeople,
   getPerson,
   search,
+  getKinshipPath,
   getGeneration,
   getPeopleAliveInYear,
   getMusicalEraInfo,
@@ -58,8 +59,11 @@ router.get('/data', getFamilyData);
 // Get all people
 router.get('/people', getPeople);
 
-// Search people
+// Search people (name, place, year, work, register code)
 router.get('/search', search);
+
+// Shortest path between two people — register before /:id
+router.get('/path', getKinshipPath);
 
 // Get family tree statistics
 router.get('/stats', getStats);

@@ -187,6 +187,8 @@ Question bank: `data/loan-flight-question-bank.json`. Each of the eight stages h
 | DELETE | `/api/critter-collection/:id` | Delete critter |
 | POST | `/api/nature-collection/share` | Share nature collection |
 | GET | `/api/nature-collection/share/:id` | Get shared nature collection |
+| GET | `/api/genealogy/search` | Ranked Lane search (`q`, optional `limit`, `offset`). Words are AND. Prefixes: `name:`, `place:`, `born:`, `died:`, `year:`, `work:`, `code:`, `gen:`, `id:`, `notes:`. Years and `1650-1700` match birth or death. `no 3` / `gen 2` are shortcuts. |
+| GET | `/api/genealogy/path` | Shortest path between two people (`from`, `to`, optional `via=kin\|blood\|all`). Steps are forward (child), back (parent), or across (spouse). |
 | GET | `/api/genealogy/relationships` | Lane relationship edges from Postgres (memory fallback); query: q, relation, personId, bookOnly, section, familyNo, pdfPage, limit, offset |
 | GET | `/api/genealogy/relationships/stats` | Edge totals per relation (all / from 1891 book / confirmed) + coded people |
 | GET | `/api/genealogy/genealogy-codes` | 1891 Lane Genealogies register index (`?section=boston\|buxton\|fishersfield\|additions`) |

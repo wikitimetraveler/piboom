@@ -23,6 +23,39 @@
       "source": "seed"
     },
     {
+      "id": "jackson-lake",
+      "name": "Jackson Lake",
+      "route": "wrightwood",
+      "kind": "lake",
+      "town": "Big Pines",
+      "note": "Lake on Big Pines Highway, west of the village. Winter walk and picnic.",
+      "lat": 34.3917,
+      "lng": -117.725,
+      "source": "seed"
+    },
+    {
+      "id": "grassy-hollow",
+      "name": "Grassy Hollow Visitor Center",
+      "route": "wrightwood",
+      "kind": "viewpoint",
+      "town": "Wrightwood",
+      "note": "Lookout and short walks on CA-2, just west of Mountain High.",
+      "lat": 34.3758,
+      "lng": -117.7222,
+      "source": "seed"
+    },
+    {
+      "id": "devils-punchbowl",
+      "name": "Devil's Punchbowl",
+      "route": "wrightwood",
+      "kind": "hike",
+      "town": "Valyermo",
+      "note": "Sandstone amphitheater and short trails near Valyermo, a short hop off CA-138.",
+      "lat": 34.4139,
+      "lng": -117.8583,
+      "source": "seed"
+    },
+    {
       "id": "claremont-village",
       "name": "Claremont Village",
       "route": "mt-baldy",
@@ -42,6 +75,39 @@
       "note": "Canyon hamlet under the peaks on Mt Baldy Rd — last stop before Manker Flats.",
       "lat": 34.2367,
       "lng": -117.6584,
+      "source": "seed"
+    },
+    {
+      "id": "san-antonio-falls",
+      "name": "San Antonio Falls",
+      "route": "mt-baldy",
+      "kind": "hike",
+      "town": "Mt Baldy",
+      "note": "Short hike from Manker Flats to the waterfall under the ski hill.",
+      "lat": 34.2662,
+      "lng": -117.6268,
+      "source": "seed"
+    },
+    {
+      "id": "icehouse-canyon",
+      "name": "Icehouse Canyon",
+      "route": "mt-baldy",
+      "kind": "hike",
+      "town": "Mt Baldy",
+      "note": "Canyon trailhead below the village. Winter walk with traction.",
+      "lat": 34.2502,
+      "lng": -117.6362,
+      "source": "seed"
+    },
+    {
+      "id": "baldy-lodge",
+      "name": "Baldy Lodge",
+      "route": "mt-baldy",
+      "kind": "food",
+      "town": "Mt Baldy",
+      "note": "Food in the village on the way up Mt Baldy Road.",
+      "lat": 34.2379,
+      "lng": -117.6578,
       "source": "seed"
     },
     {
@@ -75,6 +141,72 @@
       "note": "Apple-country detour if you take 38 instead of 330.",
       "lat": 34.0458,
       "lng": -116.947,
+      "source": "seed"
+    },
+    {
+      "id": "heaps-peak",
+      "name": "Heaps Peak Arboretum",
+      "route": "big-bear",
+      "kind": "hike",
+      "town": "Skyforest",
+      "note": "Short paved trail on CA-18 between Running Springs and the lake.",
+      "lat": 34.2339,
+      "lng": -117.1589,
+      "source": "seed"
+    },
+    {
+      "id": "lake-arrowhead-village",
+      "name": "Lake Arrowhead Village",
+      "route": "big-bear",
+      "kind": "town",
+      "town": "Lake Arrowhead",
+      "note": "Lakeside town detour on CA-18 before Big Bear.",
+      "lat": 34.2518,
+      "lng": -117.1895,
+      "source": "seed"
+    },
+    {
+      "id": "castle-rock",
+      "name": "Castle Rock",
+      "route": "big-bear",
+      "kind": "hike",
+      "town": "Big Bear Lake",
+      "note": "Short scramble above the lake, trailhead just east of the dam.",
+      "lat": 34.2368,
+      "lng": -116.9616,
+      "source": "seed"
+    },
+    {
+      "id": "big-bear-alpine-zoo",
+      "name": "Big Bear Alpine Zoo",
+      "route": "big-bear",
+      "kind": "history",
+      "town": "Big Bear Lake",
+      "note": "Moonridge rescue zoo, open in winter.",
+      "lat": 34.2393,
+      "lng": -116.8688,
+      "source": "seed"
+    },
+    {
+      "id": "holcomb-valley",
+      "name": "Holcomb Valley",
+      "route": "big-bear",
+      "kind": "history",
+      "town": "Fawnskin",
+      "note": "Gold-rush valley north of the lake. Dirt roads — better when dry.",
+      "lat": 34.3019,
+      "lng": -116.8944,
+      "source": "seed"
+    },
+    {
+      "id": "alpine-slide",
+      "name": "Alpine Slide at Magic Mountain",
+      "route": "big-bear",
+      "kind": "town",
+      "town": "Big Bear Lake",
+      "note": "Snow play in the village in winter.",
+      "lat": 34.2383,
+      "lng": -116.9211,
       "source": "seed"
     },
     {
@@ -119,6 +251,83 @@
       "note": "Quiet loop town on CA-158 at the foot of June Mountain.",
       "lat": 37.7799,
       "lng": -119.0743,
+      "source": "seed"
+    },
+    {
+      "id": "manzanar",
+      "name": "Manzanar",
+      "route": "eastern-sierra",
+      "kind": "history",
+      "town": "Independence",
+      "note": "Year-round historic site at Independence, on the drive north.",
+      "lat": 36.7275,
+      "lng": -118.1482,
+      "source": "seed"
+    },
+    {
+      "id": "laws-railroad",
+      "name": "Laws Railroad Museum",
+      "route": "eastern-sierra",
+      "kind": "history",
+      "town": "Bishop",
+      "note": "Railroad museum a few minutes off 395.",
+      "lat": 37.4005,
+      "lng": -118.3463,
+      "source": "seed"
+    },
+    {
+      "id": "earthquake-fault",
+      "name": "Earthquake Fault",
+      "route": "eastern-sierra",
+      "kind": "hike",
+      "town": "Mammoth Lakes",
+      "note": "Short walk in town at Mammoth. Usually open in winter.",
+      "lat": 37.6539,
+      "lng": -118.9998,
+      "source": "seed"
+    },
+    {
+      "id": "minaret-vista",
+      "name": "Minaret Vista",
+      "route": "eastern-sierra",
+      "kind": "viewpoint",
+      "town": "Mammoth Lakes",
+      "note": "Ritter and Banner view above the Mammoth turnoff. The last stretch of road often closes in winter.",
+      "lat": 37.6567,
+      "lng": -119.0614,
+      "source": "seed"
+    },
+    {
+      "id": "gull-lake",
+      "name": "Gull Lake",
+      "route": "eastern-sierra",
+      "kind": "lake",
+      "town": "June Lake",
+      "note": "First lake on the June Lake Loop, a minute from the village.",
+      "lat": 37.7725,
+      "lng": -119.0835,
+      "source": "seed"
+    },
+    {
+      "id": "mono-lake-south-tufa",
+      "name": "Mono Lake South Tufa",
+      "route": "eastern-sierra",
+      "kind": "viewpoint",
+      "town": "Lee Vining",
+      "note": "Tufa towers east of Lee Vining — year-round, just north of June.",
+      "lat": 37.9386,
+      "lng": -119.0272,
+      "source": "seed"
+    },
+    {
+      "id": "devils-postpile",
+      "name": "Devils Postpile",
+      "route": "eastern-sierra",
+      "kind": "hike",
+      "town": "Mammoth Lakes",
+      "note": "Basalt columns and Rainbow Falls. Summer shuttle only.",
+      "lat": 37.6244,
+      "lng": -119.0844,
       "source": "seed"
     }
   ]

@@ -10,6 +10,7 @@ import {
   getAllPeople,
   getPersonById,
   searchPeople,
+  findKinshipPath,
   getRelationships,
   getChildren,
   getParents,
@@ -173,29 +174,81 @@ export async function getPerson(req, res) {
 }
 
 /**
- * Search for people by name
+ * Search people by name, place, year, occupation, notes, or register code.
+ * Query: q, optional limit, offset.
+ * Prefixes: name: place: born: died: year: work: code: gen: id: notes:
  */
 export async function search(req, res) {
   try {
-    const { q } = req.query;
-    
+    const q = String(req.query.q || '').trim();
+
     if (!q) {
       return res.status(400).json({
         success: false,
         error: 'Search query required'
       });
     }
-    
-    const results = searchPeople(q);
-    
+
+    const out = searchPeople(q, {
+      detailed: true,
+      limit: req.query.limit,
+      offset: req.query.offset
+    });
+
     res.json({
       success: true,
-      query: q,
-      count: results.length,
-      results: results
+      query: out.query,
+      count: out.count,
+      total: out.total,
+      limit: out.limit,
+      offset: out.offset,
+      notice: out.notice,
+      results: out.results
     });
   } catch (error) {
     console.error('Error searching people:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+/**
+ * Shortest path between two people.
+ * Query: from, to, optional via=kin|blood|all.
+ */
+export async function getKinshipPath(req, res) {
+  try {
+    const from = req.query.from;
+    const to = req.query.to;
+    if (from == null || to == null || String(from).trim() === '' || String(to).trim() === '') {
+      return res.status(400).json({
+        success: false,
+        error: 'Query from and to person ids are required'
+      });
+    }
+    const via = String(req.query.via || 'kin').toLowerCase();
+    if (!['kin', 'blood', 'all'].includes(via)) {
+      return res.status(400).json({
+        success: false,
+        error: 'via must be kin, blood, or all'
+      });
+    }
+    const path = findKinshipPath(from, to, { via });
+    if (path.reason === 'person-not-found') {
+      return res.status(404).json({
+        success: false,
+        error: 'One or both people were not found',
+        missing: path.missing || []
+      });
+    }
+    res.json({
+      success: true,
+      ...path
+    });
+  } catch (error) {
+    console.error('Error finding kinship path:', error);
     res.status(500).json({
       success: false,
       error: error.message

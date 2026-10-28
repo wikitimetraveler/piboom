@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<!--
+  Genealogy source file.
+  Author: Levi Lane.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Path between two people — Lane Family</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="/shared/styles.css" />
+  <link rel="stylesheet" href="/family/css/lane-shell.css" />
+  <link rel="stylesheet" href="/family/css/genealogy-tree-page.css" />
+  <link rel="stylesheet" href="/family/css/lane-path.css" />
+  <link rel="stylesheet" href="/family/css/lane-tts.css" />
+  <link rel="stylesheet" href="/family/css/lane-family-pill-nav.css" />
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/family/js/lane-family-pill-nav.js" defer></script>
+</head>
+<body class="lane-path-page genealogy-tree-page">
+  <div class="particles" id="particles"></div>
+  <modern-navbar></modern-navbar>
+
+  <main class="container mt-4 mb-5 lane-tools-page" data-lane-tts-main>
+    <nav class="lane-family-crumb mb-2" aria-label="Breadcrumb">
+      <a href="/family/lane-family.html">Lane Family hub</a>
+      <span aria-hidden="true"> · </span>
+      <a href="/family/genealogy.html">Family tree</a>
+      <span aria-hidden="true"> · </span>
+      <span>Path between two people</span>
+    </nav>
+
+    <header class="lane-page-head mb-3">
+      <h1 class="lane-page-title">
+        <i class="bi bi-signpost-split" aria-hidden="true"></i>
+        <span class="lane-page-title__text">Path between two people</span>
+      </h1>
+      <p class="lane-page-lead text-muted mb-2">
+        Search the Lane graph by name, place, year, work, or an 1891 register code.
+        Pick a start and an end, then step forward and back along the links that join them.
+      </p>
+      <p class="small border-start border-2 ps-3 mb-0 history-context-evidence-note">
+        <strong>Context:</strong> a shortest path through father, mother, and spouse links.
+        <strong>Evidence:</strong> the same <code>laneData</code> graph as the family tree. Blood only drops marriages. Include associations adds non-parent ties.
+      </p>
+    </header>
+
+    <div class="d-flex flex-wrap gap-2 mb-3">
+      <a class="btn btn-outline-secondary btn-sm" href="/family/lane-family.html"><i class="bi-house-heart"></i> Hub</a>
+      <a class="btn btn-outline-secondary btn-sm" href="/family/lane-relationships.html"><i class="bi-link-45deg"></i> Relationships</a>
+      <a class="btn btn-outline-secondary btn-sm" href="/family/genealogy.html"><i class="bi-diagram-3"></i> Full tree</a>
+      <a class="btn btn-outline-secondary btn-sm" href="/family/lane-direct-ancestor-story.html"><i class="bi-signpost-2"></i> Direct line</a>
+    </div>
+
+    <section class="family-tree-container mb-4" aria-labelledby="lanePathSearchHeading">
+      <h2 class="h4" id="lanePathSearchHeading"><i class="bi-search"></i> Search the Lane database</h2>
+      <form id="lanePathSearchForm" class="row g-2 align-items-end" role="search">
+        <div class="col-12 col-lg-9">
+          <label class="form-label small mb-1" for="lanePathQuery">Name, place, year, work, or book code</label>
+          <input
+            type="search"
+            class="form-control"
+            id="lanePathQuery"
+            placeholder="e.g. William Lane, place:Hampton, 1650-1700, work:tanner, no 3"
+            autocomplete="off"
+          />
+        </div>
+        <div class="col-12 col-lg-3 d-grid">
+          <button type="submit" class="btn btn-primary" id="lanePathSearchBtn"><i class="bi-search"></i> Search</button>
+        </div>
+      </form>
+      <p class="lane-path-hint small text-muted mt-2 mb-2">
+        Every word must match. Try <code>place:Boston</code>, <code>born:1659</code>, <code>work:selectman</code>,
+        <code>code:boston</code>, <code>gen 2</code>, <code>id:4</code>, or a quoted place such as <code>"Hampton Falls"</code>.
+      </p>
+      <p id="lanePathSearchStatus" class="small mb-2" role="status" aria-live="polite"></p>
+      <div id="lanePathResults" class="lane-path-results" aria-live="polite"></div>
+      <div class="mt-2">
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="lanePathMore" hidden>More results</button>
+      </div>
+    </section>
+
+    <section class="family-tree-container mb-4" aria-labelledby="lanePathPairHeading">
+      <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+        <h2 class="h4 mb-0" id="lanePathPairHeading">The two people</h2>
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+          <label class="small mb-0" for="lanePathVia">Links</label>
+          <select class="form-select form-select-sm" id="lanePathVia" style="width: auto;">
+            <option value="kin">Parents, children, spouses</option>
+            <option value="blood">Blood only</option>
+            <option value="all">Include associations</option>
+          </select>
+          <button type="button" class="btn btn-outline-secondary btn-sm" id="lanePathSwap"><i class="bi-arrow-left-right"></i> Swap</button>
+        </div>
+      </div>
+      <div class="lane-path-slots">
+        <article class="lane-path-slot" id="lanePathStartSlot">
+          <h2>Start</h2>
+          <p class="lane-path-slot-name" id="lanePathStartName">Choose a person</p>
+          <p class="small text-muted mb-2" id="lanePathStartMeta">Use Start on a search result.</p>
+          <button type="button" class="btn btn-outline-secondary btn-sm" id="lanePathClearStart" hidden>Clear start</button>
+        </article>
+        <div class="d-flex align-items-center justify-content-center text-muted small">to</div>
+        <article class="lane-path-slot" id="lanePathEndSlot">
+          <h2>End</h2>
+          <p class="lane-path-slot-name" id="lanePathEndName">Choose a person</p>
+          <p class="small text-muted mb-2" id="lanePathEndMeta">Use End on a search result.</p>
+          <button type="button" class="btn btn-outline-secondary btn-sm" id="lanePathClearEnd" hidden>Clear end</button>
+        </article>
+      </div>
+    </section>
+
+    <section class="family-tree-container" aria-labelledby="lanePathTrackHeading">
+      <div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-2">
+        <h2 class="h4 mb-0" id="lanePathTrackHeading"><i class="bi-arrow-left-right"></i> Track the path</h2>
+        <p class="small text-muted mb-0 lane-path-step-count" id="lanePathStepCount"></p>
+      </div>
+      <p id="lanePathHeadline" class="lead mb-2">Pick two people to see how the graph joins them.</p>
+      <p id="lanePathSummary" class="small text-muted"></p>
+      <p id="lanePathHinge" class="small mb-3"></p>
+      <div id="lanePathRail" class="lane-path-rail mb-3" role="group" aria-label="People along the path"></div>
+      <div class="lane-path-stage">
+        <button type="button" class="btn btn-outline-primary" id="lanePathBack" disabled>
+          <i class="bi-arrow-left"></i> Back
+        </button>
+        <article class="lane-path-card" id="lanePathCard" aria-live="polite">
+          <p class="small text-muted mb-0">The current person on the path will appear here.</p>
+        </article>
+        <button type="button" class="btn btn-outline-primary" id="lanePathForward" disabled>
+          Forward <i class="bi-arrow-right"></i>
+        </button>
+      </div>
+      <div class="d-flex flex-wrap gap-2 mt-3 align-items-center">
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="lanePathPlay" disabled>
+          <i class="bi-play-fill"></i> Play forward
+        </button>
+        <p class="small text-muted mb-0" id="lanePathHopCaption"></p>
+      </div>
+      <p class="small text-muted mt-3 mb-0">Left and right arrow keys move along the path when the search box is not focused.</p>
+    </section>
+
+    <div class="text-center mt-4" data-lane-site-credit></div>
+  </main>
+
+  <script src="/family/js/lane-path.js"></script>
+  <script src="/family/js/lane-site-credit.js"></script>
+  <script src="/shared/tts.js"></script>
+  <script src="/family/js/lane-tts.js"></script>
+  <script src="/shared/dark-mode.js"></script>
+</body>
+</html>

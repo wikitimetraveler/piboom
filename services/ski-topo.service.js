@@ -12,7 +12,7 @@ const DATA_DIR = path.join(__dirname, '../data/ski');
 const NWS_UA = 'DevConnectLabs-SkiTopo/1.0 (ski-desk)';
 export const CHAIN_ELEV_FT = 4500;
 
-const SCENIC_KINDS = new Set(['viewpoint', 'town', 'food', 'lake']);
+const SCENIC_KINDS = new Set(['viewpoint', 'town', 'food', 'lake', 'hike', 'history']);
 
 let catalogCache = null;
 

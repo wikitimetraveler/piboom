@@ -8,7 +8,7 @@ const CHIPS = [
   { id: 'scenic', label: 'Scenic' },
 ];
 
-const SCENIC = new Set(['viewpoint', 'town', 'food', 'lake']);
+const SCENIC = new Set(['viewpoint', 'town', 'food', 'lake', 'hike', 'history']);
 const HIDDEN = new Set(['smoke', 'dispensary']);
 
 interface Props {

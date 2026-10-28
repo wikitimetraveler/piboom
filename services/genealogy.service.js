@@ -1936,17 +1936,652 @@ export function getPersonById(id) {
   return people.find(person => person.id === parseInt(id));
 }
 
+const LANE_SEARCH_FIELDS = {
+  name: 'name',
+  last: 'name',
+  title: 'title',
+  place: 'place',
+  born: 'born',
+  birthplace: 'born',
+  died: 'died',
+  death: 'died',
+  burial: 'burial',
+  year: 'year',
+  work: 'work',
+  occ: 'work',
+  occupation: 'work',
+  job: 'work',
+  code: 'code',
+  no: 'code',
+  register: 'code',
+  gen: 'generation',
+  generation: 'generation',
+  id: 'id',
+  notes: 'text',
+  text: 'text'
+};
+
+const KINSHIP_RELATIONS = {
+  kin: new Set(['father', 'mother', 'spouse']),
+  blood: new Set(['father', 'mother']),
+  all: new Set(['father', 'mother', 'spouse', 'associated'])
+};
+
+function yearNumbersFrom(value) {
+  const found = String(value ?? '').match(/\d{3,4}/g);
+  if (!found) return [];
+  return found
+    .map((year) => parseInt(year, 10))
+    .filter((year) => year >= 1000 && year <= 2100);
+}
+
+function occupationSearchText(person) {
+  const occ = Array.isArray(person?.occupation) ? person.occupation : [];
+  const bits = [];
+  for (const entry of occ) {
+    if (!entry || typeof entry !== 'object') {
+      if (typeof entry === 'string') bits.push(entry);
+      continue;
+    }
+    for (const key of ['job', 'government', 'text', 'role', 'title']) {
+      if (typeof entry[key] === 'string') bits.push(entry[key]);
+    }
+    if (Array.isArray(entry.service)) {
+      for (const svc of entry.service) {
+        if (!svc || typeof svc !== 'object') continue;
+        if (typeof svc.war === 'string') bits.push(svc.war);
+        if (typeof svc.text === 'string') bits.push(svc.text);
+      }
+    }
+  }
+  return bits.join(' ');
+}
+
+function codeSearchText(person) {
+  const code = person?.genealogyCode;
+  if (!code || typeof code !== 'object') return '';
+  return [code.label, code.section, code.sectionLabel, code.familyKey, code.familyNo, code.childOrder]
+    .filter((value) => value != null && String(value).trim() !== '')
+    .join(' ');
+}
+
+function buildLaneSearchDoc(person) {
+  const born = String(person?.born || '').toLowerCase();
+  const deathPlace = String(person?.deathPlace || '').toLowerCase();
+  const burial = String(person?.burial || '').toLowerCase();
+  return {
+    name: String(person?.name || '').toLowerCase(),
+    lastName: String(person?.lastName || '').toLowerCase(),
+    title: String(person?.title || '').toLowerCase(),
+    born,
+    deathPlace,
+    burial,
+    place: [born, deathPlace, burial].filter(Boolean).join(' · '),
+    text: String(person?.text || '').toLowerCase(),
+    work: occupationSearchText(person).toLowerCase(),
+    code: codeSearchText(person).toLowerCase(),
+    birthYears: [...new Set(yearNumbersFrom(person?.birthYear).concat(yearNumbersFrom(person?.birthDate)))],
+    deathYears: [...new Set(yearNumbersFrom(person?.deathYear).concat(yearNumbersFrom(person?.deathDate)))],
+    id: person?.id == null ? '' : String(person.id),
+    generation: person?.generation == null || person.generation === '' ? '' : String(person.generation)
+  };
+}
+
+function parseLaneSearchQuery(raw) {
+  const input = String(raw || '').trim().replace(/[–—]/g, '-');
+  if (!input) return [];
+  const clauses = [];
+  const pending = [];
+  const re = /"([^"]+)"|(\S+)/g;
+  let match;
+  while ((match = re.exec(input))) {
+    if (match[1]) {
+      const phrase = match[1].trim().toLowerCase();
+      if (phrase) clauses.push({ type: 'phrase', value: phrase });
+      continue;
+    }
+    const token = match[2];
+    const fieldMatch = /^([A-Za-z][\w]*):(.*)$/.exec(token);
+    if (fieldMatch) {
+      const field = LANE_SEARCH_FIELDS[fieldMatch[1].toLowerCase()];
+      const value = fieldMatch[2].trim().toLowerCase();
+      if (field && value) {
+        clauses.push({ type: 'field', field, value });
+        continue;
+      }
+    }
+    pending.push(token);
+  }
+
+  let index = 0;
+  while (index < pending.length) {
+    const token = pending[index].toLowerCase().replace(/\.$/, '');
+    const next = pending[index + 1];
+    if ((token === 'gen' || token === 'generation') && next && /^\d+$/.test(next)) {
+      clauses.push({ type: 'field', field: 'generation', value: String(parseInt(next, 10)) });
+      index += 2;
+      continue;
+    }
+    if ((token === 'no' || token === 'number') && next && /^\d+$/.test(next)) {
+      clauses.push({ type: 'field', field: 'code', value: String(parseInt(next, 10)) });
+      index += 2;
+      continue;
+    }
+    const range = /^(\d{3,4})-(\d{3,4})$/.exec(token);
+    if (range) {
+      const start = parseInt(range[1], 10);
+      const end = parseInt(range[2], 10);
+      clauses.push({ type: 'year-range', from: Math.min(start, end), to: Math.max(start, end) });
+      index += 1;
+      continue;
+    }
+    if (/^\d{3,4}$/.test(token)) {
+      clauses.push({ type: 'year', value: parseInt(token, 10) });
+      index += 1;
+      continue;
+    }
+    if (token.length < 2) {
+      clauses.push({ type: 'too-short', value: token });
+      index += 1;
+      continue;
+    }
+    clauses.push({ type: 'token', value: token });
+    index += 1;
+  }
+  return clauses;
+}
+
+function includesScore(hay, needle, base) {
+  if (!hay || !needle) return 0;
+  if (hay === needle) return base + 28;
+  if (hay.startsWith(needle)) return base + 14;
+  const at = hay.indexOf(needle);
+  if (at < 0) return 0;
+  const prev = at === 0 ? ' ' : hay.charAt(at - 1);
+  if (/[^a-z0-9]/i.test(prev)) return base + 8;
+  return base;
+}
+
+function codeScore(hay, value) {
+  if (!hay || !value) return 0;
+  const escaped = value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(`(^|[^0-9])${escaped}([^0-9]|$)`);
+  if (!re.test(hay)) return 0;
+  if (hay.includes(`no. ${value}`) || hay.includes(`no ${value}`)) return 44;
+  return 30;
+}
+
+function collectFieldHits(candidates) {
+  const positive = candidates.filter((candidate) => candidate.score > 0);
+  if (!positive.length) return { score: 0, fields: [] };
+  positive.sort((a, b) => b.score - a.score);
+  const strong = positive.filter((candidate) => candidate.field !== 'notes');
+  const chosen = strong.length ? strong : positive;
+  const fields = [];
+  for (const candidate of chosen) {
+    if (!fields.includes(candidate.field)) fields.push(candidate.field);
+  }
+  return { score: chosen[0].score, fields };
+}
+
+function scoreTextFields(doc, value) {
+  return collectFieldHits([
+    { score: Math.max(includesScore(doc.name, value, 42), includesScore(doc.lastName, value, 36)), field: 'name' },
+    { score: includesScore(doc.title, value, 24), field: 'title' },
+    { score: includesScore(doc.place, value, 34), field: 'place' },
+    { score: includesScore(doc.work, value, 34), field: 'work' },
+    { score: codeScore(doc.code, value), field: 'register code' },
+    { score: doc.id === value ? 96 : 0, field: 'id' },
+    { score: doc.generation && doc.generation === value ? 26 : 0, field: 'generation' },
+    { score: includesScore(doc.text, value, 12), field: 'notes' }
+  ]);
+}
+
+function scoreYear(doc, year) {
+  const birth = doc.birthYears.includes(year);
+  const death = doc.deathYears.includes(year);
+  if (birth && death) return { score: 56, fields: ['birth year', 'death year'] };
+  if (birth) return { score: 50, fields: ['birth year'] };
+  if (death) return { score: 42, fields: ['death year'] };
+  return { score: 0, fields: [] };
+}
+
+function scoreYearRange(doc, from, to) {
+  const birth = doc.birthYears.some((year) => year >= from && year <= to);
+  const death = doc.deathYears.some((year) => year >= from && year <= to);
+  if (birth) return { score: 40, fields: ['birth year'] };
+  if (death) return { score: 28, fields: ['death year'] };
+  return { score: 0, fields: [] };
+}
+
+function scoreFieldClause(doc, field, value) {
+  if (field === 'name') {
+    return collectFieldHits([
+      { score: Math.max(includesScore(doc.name, value, 42), includesScore(doc.lastName, value, 36)), field: 'name' },
+      { score: includesScore(doc.title, value, 24), field: 'title' }
+    ]);
+  }
+  if (field === 'title') return collectFieldHits([{ score: includesScore(doc.title, value, 30), field: 'title' }]);
+  if (field === 'place') return collectFieldHits([{ score: includesScore(doc.place, value, 36), field: 'place' }]);
+  if (field === 'born') {
+    if (/^\d{3,4}$/.test(value)) return scoreYear({ ...doc, deathYears: [] }, parseInt(value, 10));
+    return collectFieldHits([{ score: includesScore(doc.born, value, 36), field: 'place' }]);
+  }
+  if (field === 'died') {
+    if (/^\d{3,4}$/.test(value)) return scoreYear({ ...doc, birthYears: [] }, parseInt(value, 10));
+    return collectFieldHits([{ score: includesScore(doc.deathPlace, value, 36), field: 'place' }]);
+  }
+  if (field === 'burial') return collectFieldHits([{ score: includesScore(doc.burial, value, 36), field: 'place' }]);
+  if (field === 'year') {
+    if (/^\d{3,4}$/.test(value)) return scoreYear(doc, parseInt(value, 10));
+    const range = /^(\d{3,4})-(\d{3,4})$/.exec(value);
+    if (range) return scoreYearRange(doc, parseInt(range[1], 10), parseInt(range[2], 10));
+    return { score: 0, fields: [] };
+  }
+  if (field === 'work') return collectFieldHits([{ score: includesScore(doc.work, value, 36), field: 'work' }]);
+  if (field === 'code') return collectFieldHits([{ score: codeScore(doc.code, value), field: 'register code' }]);
+  if (field === 'generation') {
+    return collectFieldHits([{ score: doc.generation === String(parseInt(value, 10)) ? 40 : 0, field: 'generation' }]);
+  }
+  if (field === 'id') return collectFieldHits([{ score: doc.id === String(parseInt(value, 10)) ? 100 : 0, field: 'id' }]);
+  if (field === 'text') return collectFieldHits([{ score: includesScore(doc.text, value, 16), field: 'notes' }]);
+  return { score: 0, fields: [] };
+}
+
+function scoreLanePerson(doc, clauses) {
+  let score = 0;
+  const fields = [];
+  let textClauses = 0;
+  let textOnName = 0;
+  for (const clause of clauses) {
+    let hit = { score: 0, fields: [] };
+    if (clause.type === 'token' || clause.type === 'phrase') {
+      hit = scoreTextFields(doc, clause.value);
+      textClauses += 1;
+      if (hit.fields.includes('name')) textOnName += 1;
+    } else if (clause.type === 'year') {
+      hit = scoreYear(doc, clause.value);
+    } else if (clause.type === 'year-range') {
+      hit = scoreYearRange(doc, clause.from, clause.to);
+    } else if (clause.type === 'field') {
+      hit = scoreFieldClause(doc, clause.field, clause.value);
+    }
+    if (hit.score <= 0) return null;
+    score += hit.score;
+    for (const field of hit.fields) {
+      if (!fields.includes(field)) fields.push(field);
+    }
+  }
+  if (textClauses > 0 && textOnName === textClauses) score += 18;
+  return { score, fields, why: fields.join(' · ') };
+}
+
+function parseSearchWindow(options = {}) {
+  const limitRaw = options.limit;
+  let limit = null;
+  if (limitRaw != null && limitRaw !== '') {
+    const parsed = parseInt(limitRaw, 10);
+    if (Number.isFinite(parsed)) limit = Math.min(200, Math.max(1, parsed));
+  }
+  const offsetRaw = parseInt(options.offset, 10);
+  const offset = Number.isFinite(offsetRaw) && offsetRaw > 0 ? offsetRaw : 0;
+  return { limit, offset };
+}
+
+function birthSortKey(person) {
+  const years = yearNumbersFrom(person?.birthYear);
+  return years.length ? years[0] : 9999;
+}
+
 /**
- * Search people by name
+ * Rank people against a Lane search query.
+ * Every word must match. Field prefixes: name, place, born, died, year, work, code, gen, id, notes.
+ * Years and ranges (1659, 1650-1700) match birth or death. "no 3" and "gen 2" are register shortcuts.
  */
-export function searchPeople(query) {
-  const people = getAllPeople();
-  const lowerQuery = query.toLowerCase();
-  return people.filter((person) => {
-    const nm = (person.name || '').toLowerCase();
-    const tt = (person.title || '').toLowerCase();
-    return nm.includes(lowerQuery) || tt.includes(lowerQuery);
+export function searchLanePeople(people, query, options = {}) {
+  const q = String(query || '').trim();
+  const { limit, offset } = parseSearchWindow(options);
+  const empty = {
+    query: q,
+    total: 0,
+    count: 0,
+    limit,
+    offset,
+    notice: null,
+    results: []
+  };
+  if (!q) {
+    empty.notice = 'Enter a name, place, year, occupation, or register code.';
+    return empty;
+  }
+  const clauses = parseLaneSearchQuery(q);
+  const usable = clauses.filter((clause) => clause.type !== 'too-short');
+  if (!usable.length) {
+    empty.notice = 'Type at least two letters, a year, or a field such as place:Hampton.';
+    return empty;
+  }
+
+  const ranked = [];
+  for (const person of people || []) {
+    if (!person) continue;
+    const hit = scoreLanePerson(buildLaneSearchDoc(person), usable);
+    if (!hit) continue;
+    ranked.push({ person, hit });
+  }
+  ranked.sort((a, b) => {
+    if (b.hit.score !== a.hit.score) return b.hit.score - a.hit.score;
+    const yearDiff = birthSortKey(a.person) - birthSortKey(b.person);
+    if (yearDiff !== 0) return yearDiff;
+    const nameDiff = String(a.person.name || '').localeCompare(String(b.person.name || ''));
+    if (nameDiff !== 0) return nameDiff;
+    return Number(a.person.id) - Number(b.person.id);
   });
+
+  const windowed = ranked.slice(offset, limit == null ? undefined : offset + limit);
+  return {
+    query: q,
+    total: ranked.length,
+    count: windowed.length,
+    limit,
+    offset,
+    notice: null,
+    results: windowed.map(({ person, hit }) => ({
+      ...person,
+      match: { score: hit.score, fields: hit.fields, why: hit.why }
+    }))
+  };
+}
+
+/**
+ * Search people by name, place, year, occupation, notes, or 1891 register code.
+ * Returns an array unless options.detailed is set.
+ */
+export function searchPeople(query, options = {}) {
+  const out = searchLanePeople(getAllPeople(), query, options);
+  if (options && options.detailed) return out;
+  return out.results;
+}
+
+function pathPersonSummary(person, id) {
+  if (!person) {
+    return { id, name: `Person ${id}`, gender: '', birthYear: '', deathYear: '', born: '', deathPlace: '', generation: null, genealogyCode: null };
+  }
+  const code = person.genealogyCode;
+  return {
+    id: person.id,
+    name: person.name || 'Unknown',
+    gender: person.gender || '',
+    birthYear: person.birthYear ?? '',
+    deathYear: person.deathYear ?? '',
+    born: person.born || '',
+    deathPlace: person.deathPlace || '',
+    generation: person.generation ?? null,
+    title: person.title || '',
+    genealogyCode: code && (code.label || code.familyKey)
+      ? {
+          label: code.label || '',
+          section: code.section || '',
+          familyKey: code.familyKey != null ? String(code.familyKey) : ''
+        }
+      : null
+  };
+}
+
+function greatPrefix(extra) {
+  if (extra <= 0) return '';
+  if (extra > 4) return `${extra}× great-`;
+  return 'great-'.repeat(extra);
+}
+
+function gendered(person, female, male, unknown) {
+  if (person?.gender === 'F') return female;
+  if (person?.gender === 'M') return male;
+  return unknown;
+}
+
+function directKinshipLabel(hops, direction, person) {
+  const extra = hops - 2;
+  if (direction === 'back') {
+    if (hops === 1) return gendered(person, 'mother', 'father', 'parent');
+    if (hops === 2) return gendered(person, 'grandmother', 'grandfather', 'grandparent');
+    return `${greatPrefix(extra)}${gendered(person, 'grandmother', 'grandfather', 'grandparent')}`;
+  }
+  if (hops === 1) return gendered(person, 'daughter', 'son', 'child');
+  if (hops === 2) return gendered(person, 'granddaughter', 'grandson', 'grandchild');
+  return `${greatPrefix(extra)}${gendered(person, 'granddaughter', 'grandson', 'grandchild')}`;
+}
+
+function cousinWord(degree) {
+  if (degree === 1) return 'first cousin';
+  if (degree === 2) return 'second cousin';
+  if (degree === 3) return 'third cousin';
+  return `${degree}th cousin`;
+}
+
+function removedWord(removed) {
+  if (removed === 1) return ' once removed';
+  if (removed === 2) return ' twice removed';
+  if (removed > 2) return ` ${removed} times removed`;
+  return '';
+}
+
+function collateralKinshipLabel(ups, downs, person) {
+  if (ups === 1 && downs === 1) return gendered(person, 'sister', 'brother', 'sibling');
+  if (ups === 1 && downs > 1) {
+    const extra = greatPrefix(downs - 2);
+    return gendered(person, `${extra}niece`, `${extra}nephew`, `${extra}niece or ${extra}nephew`);
+  }
+  if (downs === 1 && ups > 1) {
+    const extra = greatPrefix(ups - 2);
+    return gendered(person, `${extra}aunt`, `${extra}uncle`, `${extra}aunt or ${extra}uncle`);
+  }
+  const degree = Math.min(ups, downs) - 1;
+  if (degree < 1) return null;
+  return `${cousinWord(degree)}${removedWord(Math.abs(ups - downs))}`;
+}
+
+function classifyKinshipPath(steps) {
+  const dirs = steps.slice(1).map((step) => step.step?.direction).filter(Boolean);
+  if (!dirs.length) return { shape: 'same', kinship: null, ups: 0, downs: 0 };
+  if (dirs.length === 1 && dirs[0] === 'across') {
+    return { shape: 'by-marriage', kinship: 'spouse', ups: 0, downs: 0 };
+  }
+  if (dirs.some((direction) => direction === 'across' || direction === 'linked')) {
+    return { shape: 'by-marriage', kinship: null, ups: 0, downs: 0 };
+  }
+  let ups = 0;
+  while (ups < dirs.length && dirs[ups] === 'back') ups += 1;
+  let cursor = ups;
+  while (cursor < dirs.length && dirs[cursor] === 'forward') cursor += 1;
+  if (cursor !== dirs.length) return { shape: 'connected', kinship: null, ups: 0, downs: 0 };
+  const downs = dirs.length - ups;
+  const end = steps[steps.length - 1].person;
+  if (downs === 0) return { shape: 'ancestor', kinship: directKinshipLabel(ups, 'back', end), ups, downs };
+  if (ups === 0) return { shape: 'descendant', kinship: directKinshipLabel(downs, 'forward', end), ups, downs };
+  return { shape: 'collateral', kinship: collateralKinshipLabel(ups, downs, end), ups, downs };
+}
+
+function describeKinshipHop(edge, destPerson) {
+  if (edge.relation === 'spouse') {
+    return { direction: 'across', relation: 'spouse', label: 'Spouse', phrase: 'spouse' };
+  }
+  if (edge.relation === 'associated') {
+    return { direction: 'linked', relation: 'associated', label: 'Associated', phrase: 'associate' };
+  }
+  if (edge.to === edge.parentId) {
+    const phrase = edge.relation === 'mother' ? 'mother' : 'father';
+    const label = phrase.charAt(0).toUpperCase() + phrase.slice(1);
+    return { direction: 'back', relation: phrase, label, phrase };
+  }
+  const phrase = gendered(destPerson, 'daughter', 'son', 'child');
+  return {
+    direction: 'forward',
+    relation: phrase,
+    label: phrase.charAt(0).toUpperCase() + phrase.slice(1),
+    phrase,
+    viaParent: edge.relation
+  };
+}
+
+function kinshipSummary(steps) {
+  if (steps.length < 2) return '';
+  const sentences = [];
+  for (let index = 1; index < steps.length; index += 1) {
+    const prev = steps[index - 1].person;
+    const current = steps[index].person;
+    const step = steps[index].step;
+    if (step.relation === 'spouse') sentences.push(`${current.name} is the spouse of ${prev.name}`);
+    else if (step.relation === 'associated') sentences.push(`${current.name} is associated with ${prev.name}`);
+    else sentences.push(`${current.name} is the ${step.phrase} of ${prev.name}`);
+  }
+  return `${sentences.join('. ')}.`;
+}
+
+/**
+ * Shortest path between two people through father, mother, and optional spouse links.
+ * `via`: kin (default) | blood | all.
+ */
+export function findKinshipPathInGraph(graph, fromId, toId, options = {}) {
+  const via = KINSHIP_RELATIONS[options.via] ? options.via : 'kin';
+  const allowed = KINSHIP_RELATIONS[via];
+  const nodes = Array.isArray(graph?.nodes) ? graph.nodes : [];
+  const links = Array.isArray(graph?.links) ? graph.links : [];
+  const byId = new Map(nodes.map((person) => [Number(person.id), person]));
+  const from = parseInt(fromId, 10);
+  const to = parseInt(toId, 10);
+  const fromPerson = byId.get(from);
+  const toPerson = byId.get(to);
+  if (!Number.isFinite(from) || !Number.isFinite(to) || !fromPerson || !toPerson) {
+    const missing = [];
+    if (!fromPerson) missing.push(from);
+    if (!toPerson) missing.push(to);
+    return { found: false, reason: 'person-not-found', via, missing, from: pathPersonSummary(fromPerson, from), to: pathPersonSummary(toPerson, to) };
+  }
+
+  const base = {
+    via,
+    from: pathPersonSummary(fromPerson, from),
+    to: pathPersonSummary(toPerson, to)
+  };
+
+  if (from === to) {
+    const steps = [{ index: 0, person: base.from, step: null }];
+    return {
+      ...base,
+      found: true,
+      reason: null,
+      shape: 'same',
+      kinship: null,
+      headline: `${base.from.name} is the same person in the graph.`,
+      summary: `${base.from.name} is the same person in the graph.`,
+      ups: 0,
+      downs: 0,
+      hinge: null,
+      hops: 0,
+      steps
+    };
+  }
+
+  const adjacent = new Map();
+  const addEdge = (origin, edge) => {
+    if (!adjacent.has(origin)) adjacent.set(origin, []);
+    adjacent.get(origin).push(edge);
+  };
+  for (const link of links) {
+    const relation = String(link?.relation || '');
+    if (!allowed.has(relation)) continue;
+    const source = parseInt(link.source, 10);
+    const target = parseInt(link.target, 10);
+    if (!Number.isFinite(source) || !Number.isFinite(target) || source === target) continue;
+    if (relation === 'father' || relation === 'mother') {
+      addEdge(source, { to: target, relation, childId: source, parentId: target });
+      addEdge(target, { to: source, relation, childId: source, parentId: target });
+    } else {
+      addEdge(source, { to: target, relation, childId: null, parentId: null });
+      addEdge(target, { to: source, relation, childId: null, parentId: null });
+    }
+  }
+
+  const previous = new Map();
+  const seen = new Set([from]);
+  const queue = [from];
+  let found = false;
+  let cursor = 0;
+  while (cursor < queue.length && !found) {
+    const current = queue[cursor];
+    cursor += 1;
+    for (const edge of adjacent.get(current) || []) {
+      if (seen.has(edge.to)) continue;
+      seen.add(edge.to);
+      previous.set(edge.to, { via: current, edge });
+      if (edge.to === to) {
+        found = true;
+        break;
+      }
+      queue.push(edge.to);
+    }
+  }
+
+  if (!found) {
+    return {
+      ...base,
+      found: false,
+      reason: 'no-path',
+      shape: 'unconnected',
+      kinship: null,
+      headline: null,
+      summary: 'No path joins these two people through the selected links.',
+      ups: 0,
+      downs: 0,
+      hinge: null,
+      hops: null,
+      searched: seen.size,
+      steps: []
+    };
+  }
+
+  const chain = [to];
+  let walk = to;
+  while (walk !== from) {
+    walk = previous.get(walk).via;
+    chain.push(walk);
+  }
+  chain.reverse();
+
+  const steps = chain.map((id, index) => {
+    const person = pathPersonSummary(byId.get(id), id);
+    if (index === 0) return { index, person, step: null };
+    const hop = previous.get(id);
+    const described = describeKinshipHop(hop.edge, byId.get(id));
+    return {
+      index,
+      person,
+      step: { ...described, fromId: hop.via, toId: id }
+    };
+  });
+  const classified = classifyKinshipPath(steps);
+  const headline = classified.kinship
+    ? `${base.to.name} is the ${classified.kinship} of ${base.from.name}.`
+    : null;
+  return {
+    ...base,
+    found: true,
+    reason: null,
+    shape: classified.shape,
+    kinship: classified.kinship,
+    headline,
+    summary: kinshipSummary(steps),
+    ups: classified.ups,
+    downs: classified.downs,
+    hinge: classified.ups > 0 && classified.downs > 0 ? steps[classified.ups].person : null,
+    hops: steps.length - 1,
+    steps
+  };
+}
+
+export function findKinshipPath(fromId, toId, options = {}) {
+  if (!genealogyData) loadGenealogyData();
+  return findKinshipPathInGraph(genealogyData, fromId, toId, options);
 }
 
 /**
@@ -2319,6 +2954,9 @@ export default {
   getAllPeople,
   getPersonById,
   searchPeople,
+  searchLanePeople,
+  findKinshipPath,
+  findKinshipPathInGraph,
   getRelationships,
   getChildren,
   getParents,

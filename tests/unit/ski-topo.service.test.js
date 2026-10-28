@@ -92,7 +92,9 @@ describe('ski-topo.service', () => {
     expect(thrift[0].kind).toBe('thrift');
 
     const scenic = filterStops(seed, { route: 'big-bear', kind: 'scenic' });
-    expect(scenic.every((s) => ['viewpoint', 'town', 'food', 'lake'].includes(s.kind))).toBe(true);
+    expect(scenic.every((s) => ['viewpoint', 'town', 'food', 'lake', 'hike', 'history'].includes(s.kind))).toBe(true);
+    expect(scenic.some((s) => s.id === 'heaps-peak' && s.kind === 'hike')).toBe(true);
+    expect(scenic.some((s) => s.id === 'big-bear-alpine-zoo' && s.kind === 'history')).toBe(true);
   });
 
   test('mergeStops prefers seed then live and dedupes by name', () => {

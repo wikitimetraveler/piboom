@@ -1,0 +1,167 @@
+/**
+ * Development work by David Lane
+ */
+/**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
+
+.lane-path-page .family-tree-container {
+  min-height: 0;
+}
+
+.lane-path-hint code {
+  font-size: 0.85em;
+}
+
+.lane-path-slots {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+.lane-path-slot {
+  border: 1px solid var(--lf-line, rgba(44, 40, 36, 0.14));
+  border-radius: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: var(--lf-bg-elevated, rgba(255, 255, 255, 0.72));
+  min-height: 6.5rem;
+}
+
+.lane-path-slot.is-filled {
+  border-color: rgba(107, 83, 68, 0.45);
+}
+
+.lane-path-slot h2 {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lane-heritage-muted, #6b645c);
+  margin: 0 0 0.35rem;
+}
+
+.lane-path-slot .lane-path-slot-name {
+  font-size: 1.15rem;
+  margin: 0;
+  color: var(--lane-heritage-ink, inherit);
+}
+
+.lane-path-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 28rem;
+  overflow: auto;
+}
+
+.lane-path-hit {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--lf-line, rgba(44, 40, 36, 0.12));
+  border-radius: 0.65rem;
+  background: var(--lf-bg-elevated, rgba(255, 255, 255, 0.72));
+}
+
+.lane-path-hit-main {
+  min-width: 0;
+}
+
+.lane-path-hit-name {
+  font-weight: 600;
+  color: var(--lane-heritage-ink, inherit);
+}
+
+.lane-path-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  justify-content: flex-end;
+}
+
+.lane-path-rail {
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding: 0.15rem 0.1rem 0.55rem;
+  scroll-snap-type: x proximity;
+}
+
+.lane-path-stop {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+  min-width: 9.5rem;
+  max-width: 15rem;
+  text-align: left;
+  border-radius: 0.75rem;
+  border: 1px solid var(--lf-line, rgba(44, 40, 36, 0.16));
+  background: var(--lf-bg-elevated, #fff);
+  color: var(--lane-heritage-ink, inherit);
+  padding: 0.55rem 0.7rem;
+}
+
+.lane-path-stop .lane-path-stop-rel {
+  display: block;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lane-heritage-accent, #6b5344);
+  margin-bottom: 0.15rem;
+}
+
+.lane-path-stop.is-current {
+  border-color: var(--lane-heritage-accent, #6b5344);
+  box-shadow: 0 0 0 2px rgba(107, 83, 68, 0.28);
+}
+
+.lane-path-stage {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.lane-path-card {
+  border: 1px solid var(--lf-line, rgba(44, 40, 36, 0.14));
+  border-radius: 0.85rem;
+  padding: 1rem 1.1rem;
+  background: var(--lf-bg-elevated, rgba(255, 255, 255, 0.8));
+  min-height: 8.5rem;
+}
+
+.lane-path-card h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.45rem;
+  color: var(--lane-heritage-ink, inherit);
+}
+
+.lane-path-step-count {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 720px) {
+  .lane-path-slots {
+    grid-template-columns: 1fr;
+  }
+
+  .lane-path-hit {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .lane-path-actions {
+    justify-content: flex-start;
+  }
+
+  .lane-path-stage {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .lane-path-card {
+    grid-column: 1 / -1;
+    order: -1;
+  }
+}

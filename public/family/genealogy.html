@@ -233,8 +233,13 @@
     <div class="tab-pane fade" id="search" role="tabpanel">
       <div class="family-tree-container">
         <h3><i class="bi-search"></i> Search Family Members</h3>
+        <p class="small text-muted">
+          Names, places, years, occupations, and 1891 register codes.
+          Try <code>place:Hampton</code>, <code>1650-1700</code>, or <code>work:tanner</code>.
+          To step along the links between two people, open <a href="/family/lane-path.html">Path between two people</a>.
+        </p>
         <div class="input-group input-group-lg mb-4">
-          <input type="text" id="searchInput" class="form-control" placeholder="Search by name...">
+          <input type="text" id="searchInput" class="form-control" placeholder="Name, place, year, work, or book code">
           <div class="input-group-append">
             <button class="btn btn-primary" onclick="searchFamily()">
               <i class="bi-search"></i> Search
@@ -769,22 +774,30 @@ async function searchFamily() {
     resultsDiv.innerHTML = '';
     
     if (data.success && data.results.length > 0) {
+      if (data.total > data.results.length) {
+        resultsDiv.innerHTML = `<p class="small text-muted">Showing ${data.results.length} of ${data.total}, best matches first.</p>`;
+      }
       data.results.forEach(person => {
         const card = document.createElement('div');
         card.className = 'person-card';
         card.onclick = () => viewPerson(person.id);
+        const why = person.match && person.match.why
+          ? `<br><span class="small">Matched ${esc(person.match.why)}</span>`
+          : '';
         card.innerHTML = `
           <div class="person-name">${esc(formatPersonDisplayName(person))}</div>
           <div class="person-details">
-            ${person.birthYear} - ${person.deathYear || 'Present'}<br>
-            ${person.born || 'Unknown location'}<br>
-            Generation ${person.generation}
+            ${esc(person.birthYear)} - ${esc(person.deathYear || 'Present')}<br>
+            ${esc(person.born || 'Unknown location')}<br>
+            Generation ${esc(person.generation)}
+            ${why}<br>
+            <a href="/family/lane-path.html?from=${encodeURIComponent(person.id)}" onclick="event.stopPropagation()">Trace a path from here</a>
           </div>
         `;
         resultsDiv.appendChild(card);
       });
     } else {
-      resultsDiv.innerHTML = '<p class="text-muted text-center">No results found</p>';
+      resultsDiv.innerHTML = `<p class="text-muted text-center">${esc((data && data.notice) || 'No results found')}</p>`;
     }
   } catch (error) {
     console.error('Error searching:', error);

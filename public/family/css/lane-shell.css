@@ -23,6 +23,7 @@ body.lane-trading-cards-page,
 body.whai-page,
 body.genealogy-import-page,
 body.genealogy-tree-page,
+body.lane-path-page,
 body.lane-cinema-page {
   --ice-dark: var(--lane-heritage-ink, var(--lf-ink));
 }

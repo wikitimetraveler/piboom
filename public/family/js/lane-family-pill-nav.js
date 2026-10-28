@@ -24,6 +24,7 @@
     { href: '/family/lane-occupations.html', label: 'Work' },
     { href: '/family/lane-pdf-gallery.html', label: 'Plates' },
     { href: '/family/lane-relationships.html', label: 'Relationships' },
+    { href: '/family/lane-path.html', label: 'Path' },
     { href: '/family/lane-cinema.html', label: 'Cinema' },
     { href: '/family/lane-direct-ancestor-story.html', label: 'Line' },
     { href: '/family/genealogy-import.html', label: 'Import' }
