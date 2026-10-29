@@ -115,3 +115,7 @@ data/encompass-conditions/
 # Planetarium catalog build cache
 data/planetarium/.cache/
 
+# USGS lidar full-resolution clouds and the boundaries cache. LOD0 is committed.
+data/ski/lidar/*-lod1.bin
+data/ski/lidar/.cache/
+

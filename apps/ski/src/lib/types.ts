@@ -10,6 +10,26 @@ export interface WeatherSnap {
   freezeLevelFt?: number | null;
 }
 
+export interface GoogleWeatherSnap {
+  tempF: number | null;
+  snowIn: number | null;
+  precipProb: number | null;
+  windMph: number | null;
+  gustMph: number | null;
+  visibilityMi: number | null;
+  condition: string;
+  time?: string | null;
+}
+
+export interface GoogleWeatherBrief {
+  source?: 'google' | 'open-meteo';
+  base: GoogleWeatherSnap | null;
+  summit: GoogleWeatherSnap | null;
+  hours: GoogleWeatherSnap[];
+  windHold: boolean;
+  summitGustMph: number | null;
+}
+
 export interface AlertSnap {
   event: string;
   severity?: string;
@@ -24,6 +44,8 @@ export interface DestinationBrief {
   dem: 'mt-baldy' | 'wrightwood' | 'big-bear' | 'snow-valley' | 'mammoth' | 'june';
   lat: number;
   lng: number;
+  summitLat?: number;
+  summitLng?: number;
   baseFt: number;
   summitFt: number;
   verticalFt: number;
@@ -36,6 +58,7 @@ export interface DestinationBrief {
   weather: WeatherSnap;
   forecast?: { shortForecast?: string; name?: string } | null;
   alerts: AlertSnap[];
+  googleWeather?: GoogleWeatherBrief | null;
   score: GoScore;
   chainsLikely: boolean;
 }
@@ -78,6 +101,8 @@ export interface SkiRun {
   aspectDeg?: number;
   aspect?: string;
   profile?: [number, number][];
+  treeCoverPct?: number | null;
+  coverLabel?: 'tree' | 'glade' | 'open' | string | null;
 }
 
 export interface SkiLift {

@@ -250,7 +250,7 @@ if (config.autoIngestDisasters) {
   console.log('⏸️ Skipping automatic disaster refresh scheduler');
 }
 
-app.get(['/ski', '/ski/', '/ski/areas', '/ski/areas/', '/ski/log', '/ski/log/'], (req, res, next) => {
+app.get(['/ski', '/ski/', '/ski/areas', '/ski/areas/', '/ski/cams', '/ski/cams/', '/ski/cams/:resort', '/ski/log', '/ski/log/'], (req, res, next) => {
   if (path.extname(req.path)) return next();
   res.sendFile(path.join(__dirname, 'public', 'ski', 'index.html'), (err) => {
     if (err) next();

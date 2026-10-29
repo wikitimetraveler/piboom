@@ -1,10 +1,11 @@
-import { useEffect, useRef, type MutableRefObject } from 'react';
+import { useEffect, useRef, useState, type MutableRefObject } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { Line2 } from 'three/examples/jsm/lines/Line2.js';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+import type { LidarCloud } from '../lib/lidar';
 import type { DemGrid, DestinationBrief, LatLng, SkiLift, SkiRun, TrailsPayload } from '../lib/types';
 import { fmtDeg, fmtFt, liftTitle, runTitle, TIER_META, tierOf } from '../lib/trails';
 
@@ -48,6 +49,8 @@ interface Props {
   pins?: OverlayPin[];
   controlsRef?: MutableRefObject<SceneControls | null>;
   compact?: boolean;
+  lidar?: LidarCloud | null;
+  lidarNote?: string;
 }
 
 interface Overlay {
@@ -91,6 +94,7 @@ const terrainFragment = /* glsl */ `
   uniform vec3 uLight;
   uniform float uSnowFt;
   uniform float uInterval;
+  uniform float uAlpha;
   varying float vElev;
   varying vec3 vNormal;
   varying vec3 vWorld;
@@ -121,9 +125,78 @@ const terrainFragment = /* glsl */ `
     float line = 1.0 - smoothstep(0.0, w * 1.25, abs(fract(e - 0.5) - 0.5));
     float major = step(abs(mod(floor(e + 0.5), 5.0)), 0.5);
     col = mix(col, col * 0.5, line * (0.28 + 0.32 * major));
-    gl_FragColor = vec4(col, 1.0);
+    gl_FragColor = vec4(col, uAlpha);
   }
 `;
+
+const lidarVertex = /* glsl */ `
+  attribute float aCls;
+  attribute float aHag;
+  attribute float aElev;
+  uniform float uMode;
+  uniform float uSize;
+  uniform float uDpr;
+  uniform float uZMin;
+  uniform float uZMax;
+  uniform float uFreeze;
+  varying vec3 vColor;
+  vec3 classColor(float c) {
+    if (c < 2.5) return vec3(0.62, 0.55, 0.46);
+    if (c < 3.5) return vec3(0.45, 0.58, 0.28);
+    if (c < 4.5) return vec3(0.22, 0.48, 0.24);
+    if (c < 5.5) return vec3(0.08, 0.32, 0.16);
+    if (c < 6.5) return vec3(0.72, 0.45, 0.32);
+    if (c > 8.5 && c < 10.5) return vec3(0.25, 0.48, 0.72);
+    return vec3(0.62, 0.64, 0.66);
+  }
+  void main() {
+    float relief = clamp((aElev - uZMin) / max(1.0, uZMax - uZMin), 0.0, 1.0);
+    vec3 col = classColor(aCls);
+    if (uMode > 0.5 && uMode < 1.5) {
+      float t = clamp(aHag / 28.0, 0.0, 1.0);
+      col = mix(vec3(0.42, 0.38, 0.32), vec3(0.12, 0.55, 0.22), t);
+    } else if (uMode > 1.5 && uMode < 2.5) {
+      col = mix(vec3(0.28, 0.36, 0.24), vec3(0.92, 0.95, 0.97), relief);
+    } else if (uMode > 2.5) {
+      float above = smoothstep(uFreeze - 150.0, uFreeze + 150.0, aElev);
+      vec3 snow = vec3(0.94, 0.97, 1.0);
+      float cover = aCls < 3.5 ? 1.0 : 0.35;
+      col = mix(col * 0.75, snow, above * cover);
+    }
+    // Canopy tops and high ground read a little lighter so ridges and trees look 3D.
+    col *= 0.82 + 0.12 * relief + 0.1 * clamp(aHag / 25.0, 0.0, 1.0);
+    vec4 mv = modelViewMatrix * vec4(position, 1.0);
+    float dist = max(0.05, -mv.z);
+    col *= mix(1.0, 0.62, clamp((dist - 1.5) / 6.0, 0.0, 1.0));
+    vColor = col;
+    gl_Position = projectionMatrix * mv;
+    gl_PointSize = uSize * uDpr * clamp(2.8 / dist, 0.35, 4.0);
+  }
+`;
+
+const lidarFragment = /* glsl */ `
+  varying vec3 vColor;
+  void main() {
+    vec2 d = gl_PointCoord - 0.5;
+    float r = length(d);
+    if (r > 0.5) discard;
+    gl_FragColor = vec4(vColor * (1.0 - 0.35 * r * r), 1.0);
+  }
+`;
+
+type LidarColor = 'class' | 'canopy' | 'elev' | 'snow';
+
+const LIDAR_MODES: Record<LidarColor, number> = { class: 0, canopy: 1, elev: 2, snow: 3 };
+
+const LIDAR_CLASS_KEYS = [
+  ['Ground', '#9e8c75'],
+  ['Low veg', '#739447'],
+  ['Mid veg', '#387a3d'],
+  ['Trees', '#145229'],
+  ['Building', '#b87352'],
+  ['Water', '#407ab8'],
+  ['Other', '#9ea3a8'],
+] as const;
 
 function makeFrame(dem: DemGrid) {
   const { south, north, west, east, rows, cols, heights } = dem;
@@ -223,7 +296,7 @@ interface LiftHandle {
 
 export default function TerrainScene(props: Props) {
   const { dem, trails, destinations, resortId, selectedRunId, previewRunId, matchIds, onSelectRun } = props;
-  const { tracks, pins, controlsRef, compact } = props;
+  const { tracks, pins, controlsRef, compact, lidar, lidarNote } = props;
   const host = useRef<HTMLDivElement>(null);
   const compass = useRef<HTMLDivElement>(null);
   const api = useRef<SceneApi | null>(null);
@@ -235,10 +308,22 @@ export default function TerrainScene(props: Props) {
   overlayRef.current = { tracks: tracks || [], pins: pins || [] };
   const controlsOut = useRef(controlsRef);
   controlsOut.current = controlsRef;
+  const worldRef = useRef<{
+    scene: THREE.Scene;
+    frame: Frame;
+    terrainMat: THREE.ShaderMaterial;
+    lidarMat?: THREE.ShaderMaterial;
+  } | null>(null);
+  const [sceneEpoch, setSceneEpoch] = useState(0);
+  const [lidarColor, setLidarColor] = useState<LidarColor>('class');
+  const freezeLevelFt = destinations.find((d) => d.id === resortId)?.weather?.freezeLevelFt ?? null;
+  const [pointSize, setPointSize] = useState(4);
+  const [meshOpacity, setMeshOpacity] = useState(0);
 
   useEffect(() => {
     const el = host.current;
     if (!el || !dem) return;
+    let live = true;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const frame = makeFrame(dem);
     const activeTrails = trails && trails.id === dem.id ? trails : null;
@@ -290,6 +375,7 @@ export default function TerrainScene(props: Props) {
         uLight: { value: new THREE.Vector3(-0.55, 0.75, -0.45) },
         uSnowFt: { value: 6900 },
         uInterval: { value: 100 },
+        uAlpha: { value: 1 },
       },
       polygonOffset: true,
       polygonOffsetFactor: 2,
@@ -641,6 +727,8 @@ export default function TerrainScene(props: Props) {
     document.addEventListener('visibilitychange', vis);
 
     api.current = { applyStyles, frameResort, frameRun, setOverlay };
+    worldRef.current = { scene, frame, terrainMat };
+    if (live) setSceneEpoch((n) => n + 1);
     if (controlsOut.current) {
       controlsOut.current.current = { frameTracks, frameRun, frameResort, setProgress, orbit };
     }
@@ -656,6 +744,7 @@ export default function TerrainScene(props: Props) {
     tick();
 
     return () => {
+      live = false;
       cancelAnimationFrame(raf);
       ro.disconnect();
       document.removeEventListener('visibilitychange', vis);
@@ -665,6 +754,7 @@ export default function TerrainScene(props: Props) {
       canvas.removeEventListener('pointerup', onUp);
       controls.dispose();
       api.current = null;
+      worldRef.current = null;
       if (controlsOut.current) controlsOut.current.current = null;
       for (const m of overlayMats) m.dispose();
       scene.traverse((obj) => {
@@ -697,6 +787,80 @@ export default function TerrainScene(props: Props) {
     if (selectedRunId) api.current?.frameRun(selectedRunId);
   }, [selectedRunId]);
 
+  useEffect(() => {
+    const world = worldRef.current;
+    if (!world || !lidar?.count || !dem) return;
+    const { scene, frame } = world;
+    const { count, south, north, west, east, zMinFt, zMaxFt, x, y, z, cls, hag } = lidar;
+    const positions = new Float32Array(count * 3);
+    const elev = new Float32Array(count);
+    const aCls = new Float32Array(count);
+    const aHag = new Float32Array(count);
+    const spanY = north - south || 1;
+    const spanX = east - west || 1;
+    const spanZ = zMaxFt - zMinFt || 1;
+    const demX = dem.east - dem.west || 1;
+    const demY = dem.north - dem.south || 1;
+    for (let i = 0; i < count; i++) {
+      const lat = south + (y[i] / 65535) * spanY;
+      const lng = west + (x[i] / 65535) * spanX;
+      const ft = zMinFt + (z[i] / 65535) * spanZ;
+      positions[i * 3] = ((lng - dem.west) / demX - 0.5) * WIDTH;
+      positions[i * 3 + 1] = (ft - frame.minFt) * frame.vScale + 0.002;
+      positions[i * 3 + 2] = ((dem.north - lat) / demY - 0.5) * frame.depth;
+      elev[i] = ft;
+      aCls[i] = cls[i];
+      aHag[i] = hag[i];
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('aCls', new THREE.BufferAttribute(aCls, 1));
+    geo.setAttribute('aHag', new THREE.BufferAttribute(aHag, 1));
+    geo.setAttribute('aElev', new THREE.BufferAttribute(elev, 1));
+    const mat = new THREE.ShaderMaterial({
+      vertexShader: lidarVertex,
+      fragmentShader: lidarFragment,
+      uniforms: {
+        uMode: { value: LIDAR_MODES[lidarColor] },
+        uSize: { value: pointSize },
+        uDpr: { value: Math.min(window.devicePixelRatio || 1, 2) },
+        uZMin: { value: zMinFt },
+        uZMax: { value: zMaxFt },
+        uFreeze: { value: freezeLevelFt ?? 1e6 },
+      },
+    });
+    const points = new THREE.Points(geo, mat);
+    points.frustumCulled = false;
+    scene.add(points);
+    world.lidarMat = mat;
+    return () => {
+      scene.remove(points);
+      geo.dispose();
+      mat.dispose();
+      if (world.lidarMat === mat) world.lidarMat = undefined;
+    };
+    // Color and size update through uniforms so the cloud is not rebuilt on every slider tick.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lidar, dem, sceneEpoch]);
+
+  useEffect(() => {
+    const mat = worldRef.current?.lidarMat;
+    if (!mat) return;
+    mat.uniforms.uMode.value = LIDAR_MODES[lidarColor];
+    mat.uniforms.uSize.value = pointSize;
+    mat.uniforms.uFreeze.value = freezeLevelFt ?? 1e6;
+  }, [lidarColor, pointSize, freezeLevelFt, lidar, sceneEpoch]);
+
+  useEffect(() => {
+    const mat = worldRef.current?.terrainMat;
+    if (!mat) return;
+    const alpha = lidar ? meshOpacity : 1;
+    mat.uniforms.uAlpha.value = alpha;
+    mat.transparent = alpha < 0.99;
+    mat.depthWrite = alpha >= 0.99;
+    mat.needsUpdate = true;
+  }, [lidar, meshOpacity, sceneEpoch]);
+
   if (!dem) {
     return (
       <div className="ski-trail-map ski-trail-map--empty" aria-label="Ski area trail map">
@@ -715,6 +879,11 @@ export default function TerrainScene(props: Props) {
             <span>N</span>
           </div>
         </div>
+        {lidar ? (
+          <p className="ski-lidar-note">{lidar.attribution}. Snow-free flight — ground and trees, not the snowpack.</p>
+        ) : lidarNote ? (
+          <p className="ski-lidar-note">{lidarNote}</p>
+        ) : null}
       </div>
     );
   }
@@ -746,7 +915,80 @@ export default function TerrainScene(props: Props) {
           Runs © OpenStreetMap contributors · Elevation{' '}
           {dem.source === 'terrarium-3dep' ? 'USGS 3DEP (AWS Terrain Tiles)' : dem.source || 'DEM'} · {EXAG}× vertical
         </p>
+        {lidar ? (
+          <p>
+            {lidar.attribution} · {lidar.count.toLocaleString()} points · snow-free flight, so this is ground and trees,
+            not the snowpack
+          </p>
+        ) : lidarNote ? (
+          <p>{lidarNote}</p>
+        ) : null}
       </div>
+      {lidar ? (
+        <div className="ski-lidar-controls" role="group" aria-label="Lidar display">
+          {(
+            [
+              ['class', 'Class'],
+              ['canopy', 'Canopy'],
+              ['elev', 'Elevation'],
+              ['snow', 'Snow line'],
+            ] as const
+          ).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              className={lidarColor === id ? 'is-on' : ''}
+              aria-pressed={lidarColor === id}
+              disabled={id === 'snow' && freezeLevelFt == null}
+              title={id === 'snow' && freezeLevelFt == null ? 'No freeze level in today’s forecast' : undefined}
+              onClick={() => setLidarColor(id)}
+            >
+              {label}
+            </button>
+          ))}
+          <label>
+            Points
+            <input
+              type="range"
+              min={1}
+              max={8}
+              step={0.2}
+              value={pointSize}
+              aria-label="Point size"
+              onChange={(e) => setPointSize(Number(e.target.value))}
+            />
+          </label>
+          <label>
+            Terrain
+            <input
+              type="range"
+              min={0}
+              max={1}
+              step={0.05}
+              value={meshOpacity}
+              aria-label="Terrain opacity"
+              onChange={(e) => setMeshOpacity(Number(e.target.value))}
+            />
+          </label>
+          {lidarColor === 'class' ? (
+            <div className="ski-lidar-legend">
+              {LIDAR_CLASS_KEYS.map(([label, color]) => (
+                <span key={label}>
+                  <i style={{ background: color }} />
+                  {label}
+                </span>
+              ))}
+            </div>
+          ) : lidarColor === 'snow' && freezeLevelFt != null ? (
+            <div className="ski-lidar-legend">
+              <span>
+                <i style={{ background: '#f0f7ff' }} />
+                Above today’s freeze level, {freezeLevelFt.toLocaleString()} ft
+              </span>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }

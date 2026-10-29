@@ -544,17 +544,28 @@ function removeEmptyValues() {
     }
 }
 
+// Boolean expression inside an Encompass If/Then block (drops the Fail/End If body).
+function encompassConditionExpression(conditionValue) {
+    if (conditionValue == null) return '';
+    let text = String(conditionValue).replace(/\r\n/g, '\n').replace(/_\s*\n/g, ' ').trim();
+    text = text.replace(/^\s*If\b/i, '').trim();
+    const thenAt = text.search(/\bThen\b/i);
+    if (thenAt !== -1) text = text.slice(0, thenAt).trim();
+    return text.replace(/\bEnd\s+If\b/gi, '').trim();
+}
+
 // Function to convert Encompass VB condition to JavaScript
 function convertEncompassConditionToJS(conditionValue) {
-    return conditionValue
-        .trim()
+    const expression = encompassConditionExpression(conditionValue);
+    if (!expression) return '';
+    return expression
         .replace(/\bAndAlso\b/gi, '&&')
         .replace(/\bOrElse\b/gi, '||')
         .replace(/\bNot\b/gi, '!')
         .replace(/<>/g, '!=')
         .replace(/(?<![<>=!])=(?!=)/g, '==') // careful: only = not part of == or !=
         .replace(/#(\d{1,2}\/\d{1,2}\/\d{4})#/g, 'new Date("$1")') // #date# → new Date("date")
-        .replace(/\bIsDate\((.*?)\)/gi, 'isNaN(Date.parse($1))') // IsDate(x) → isNaN(Date.parse(x))
+        .replace(/\bIsDate\((.*?)\)/gi, '!isNaN(Date.parse($1))') // IsDate(x) is true when x is a date
         .replace(/\[(.*?)\]/g, 'fields["$1"]') // [Field.Name] → fields["Field.Name"]
         .replace(/\.Contains\(/gi, '.includes(') // .Contains → .includes
         .replace(/(fields\["[^"]+"\])\s*([<>=!]+)\s*([^&|]+)/g, function(match, field, operator, value) {
@@ -567,17 +578,18 @@ function convertEncompassConditionToJS(conditionValue) {
 }
 
 // Function to evaluate Encompass conditions
+function looksLikeDateString(value) {
+    if (typeof value !== 'string') return false;
+    const text = value.trim();
+    return /^\d{4}-\d{2}-\d{2}(?:[T\s].*)?$/.test(text) || /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(text);
+}
+
 function evaluateEncompassCondition(conditionValue, fieldValues) {
     const jsExpr = convertEncompassConditionToJS(conditionValue);
     try {
-        // Create a fields object that converts date strings to Date objects
         const fields = {};
         for (const [key, value] of Object.entries(fieldValues)) {
-            fields[key] = value;
-            // If the value looks like a date, also create a Date object version
-            if (typeof value === 'string' && !isNaN(Date.parse(value))) {
-                fields[key] = new Date(value);
-            }
+            fields[key] = looksLikeDateString(value) ? new Date(value) : value;
         }
         return eval(jsExpr);
     } catch (err) {
@@ -595,7 +607,7 @@ function getTestValueForField(fieldId) {
     }
     
     // Pattern matching
-    if (fieldId.includes("DATE")) {
+    if (fieldId.toUpperCase().includes("DATE")) {
         return encompassFieldTestValues["DEFAULT_DATE"];
     }
     if (fieldId.includes("AMOUNT") || fieldId.includes("RATE") || fieldId.includes("SCORE")) {
@@ -618,6 +630,110 @@ function escapeHtmlTool8(str) {
         .replace(/"/g, '&quot;');
 }
 
+function conditionFieldIds(condition) {
+    const ids = [];
+    const add = (id) => {
+        const text = id == null ? '' : String(id).trim();
+        if (!text || ids.indexOf(text) !== -1) return;
+        ids.push(text);
+    };
+    (condition.affectedFields || []).forEach((field) => add(field.id));
+    const re = /\[([^\]]+)\]/g;
+    let match;
+    const source = condition.value || '';
+    while ((match = re.exec(source))) add(match[1]);
+    return ids;
+}
+
+function sampleValuesForCondition(condition) {
+    const loanData = {};
+    conditionFieldIds(condition).forEach((fieldId) => {
+        loanData[fieldId] = getTestValueForField(fieldId);
+        if (fieldId.toUpperCase().includes('DATE')) {
+            loanData['@' + fieldId] = getTestValueForField(fieldId);
+        }
+    });
+    return loanData;
+}
+
+function splitAndAlsoParts(expression) {
+    const parts = [];
+    let currentPart = '';
+    let parenthesesCount = 0;
+    for (let i = 0; i < expression.length; i++) {
+        const char = expression[i];
+        if (char === '(') parenthesesCount++;
+        if (char === ')') parenthesesCount--;
+        if (char === 'A' && expression.substring(i, i + 7) === 'AndAlso' && parenthesesCount === 0) {
+            if (currentPart.trim()) parts.push(currentPart.trim());
+            currentPart = '';
+            i += 6;
+        } else {
+            currentPart += char;
+        }
+    }
+    if (currentPart.trim()) parts.push(currentPart.trim());
+    return parts;
+}
+
+function renderEvaluatorCard(condition) {
+    const expression = encompassConditionExpression(condition.value);
+    const loanData = sampleValuesForCondition(condition);
+    const fields = {};
+    Object.entries(loanData).forEach(([key, value]) => {
+        fields[key] = looksLikeDateString(value) ? new Date(value) : value;
+    });
+
+    const vbParts = splitAndAlsoParts(expression);
+    const jsParts = vbParts.map((part) => convertEncompassConditionToJS(part));
+    const jsExpr = convertEncompassConditionToJS(condition.value);
+    const result = evaluateEncompassCondition(condition.value, loanData);
+
+    const stepsText = vbParts.map((vbPart, index) => {
+        let stepResult;
+        try {
+            stepResult = eval(jsParts[index]);
+        } catch (e) {
+            stepResult = '(error: ' + (e && e.message ? e.message : e) + ')';
+        }
+        return `${index + 1}. VB Part: ${vbPart}\n   JS Part: ${jsParts[index]}\n   → ${stepResult}`;
+    }).join('\n\n');
+
+    const processed = {};
+    Object.entries(fields).forEach(([key, value]) => {
+        processed[key] = value instanceof Date ? value.toISOString() : value;
+    });
+
+    return `
+        <div class="card mb-3 border">
+            <div class="card-header bg-light border-bottom">
+                <h5 class="mb-0">Condition Evaluator Test Results</h5>
+            </div>
+            <div class="card-body">
+                <h6>Original VB Condition</h6>
+                <pre class="evaluator-pre p-3 rounded">${escapeHtmlTool8(condition.value)}</pre>
+
+                <h6>Converted JavaScript</h6>
+                <pre class="evaluator-pre p-3 rounded">${escapeHtmlTool8(jsExpr)}</pre>
+
+                <h6>Test Data (Original)</h6>
+                <pre class="evaluator-pre p-3 rounded">${escapeHtmlTool8(JSON.stringify(loanData, null, 2))}</pre>
+
+                <h6>Test Data (Processed)</h6>
+                <pre class="evaluator-pre p-3 rounded">${escapeHtmlTool8(JSON.stringify(processed, null, 2))}</pre>
+
+                <h6>Evaluation Steps</h6>
+                <pre class="evaluator-pre p-3 rounded">${escapeHtmlTool8(stepsText)}</pre>
+
+                <h6>Final Result</h6>
+                <div class="alert mb-0 ${result ? 'alert-success' : 'alert-danger'}">
+                    Condition evaluated to: <strong>${escapeHtmlTool8(String(result))}</strong>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
 // Function to test the condition evaluator
 function testConditionEvaluator() {
     const xmlInput = document.getElementById('xmlInput').value;
@@ -627,163 +743,95 @@ function testConditionEvaluator() {
     }
 
     try {
-        // Parse the XML to get the condition
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xmlInput, "text/xml");
-        const conditionElement = xmlDoc.getElementsByTagName("Condition")[0];
-        
-        if (!conditionElement) {
+        const conditions = extractConditionsFromXML(xmlInput);
+        if (conditions.length === 0) {
+            document.getElementById('result').innerHTML = '';
             showToast('No condition found in XML', 'warning');
             return;
         }
 
-        const condition = conditionElement.getAttribute("conditionValue");
-        if (!condition) {
-            showToast('No condition value found in XML', 'warning');
-            return;
-        }
-
-        // Extract field values from the XML
-        const loanData = {};
-        const affectedFields = xmlDoc.getElementsByTagName("AffectedField");
-        for (let field of affectedFields) {
-            const xref = field.getElementsByTagName("XRef")[0];
-            if (xref) {
-                const fieldId = xref.getAttribute("EntityID");
-                // Get test value from our dictionary
-                loanData[fieldId] = getTestValueForField(fieldId);
-                // Add @ version for date fields
-                if (fieldId.includes("DATE")) {
-                    loanData["@" + fieldId] = getTestValueForField(fieldId);
-                }
-            }
-        }
-
-        // Create a fields object that converts date strings to Date objects
-        const fields = {};
-        for (const [key, value] of Object.entries(loanData)) {
-            fields[key] = value;
-            // If the value looks like a date, also create a Date object version
-            if (typeof value === 'string' && !isNaN(Date.parse(value))) {
-                fields[key] = new Date(value);
-            }
-        }
-
-        // Parse the VB condition into parts
-        const vbParts = [];
-        let currentPart = '';
-        let parenthesesCount = 0;
-        
-        // Split the VB condition into logical parts while respecting parentheses
-        for (let i = 0; i < condition.length; i++) {
-            const char = condition[i];
-            if (char === '(') parenthesesCount++;
-            if (char === ')') parenthesesCount--;
-            
-            if (char === 'A' && condition.substring(i, i + 7) === 'AndAlso' && parenthesesCount === 0) {
-                if (currentPart.trim()) {
-                    vbParts.push(currentPart.trim());
-                    currentPart = '';
-                }
-                i += 6; // Skip the rest of "AndAlso"
-            } else {
-                currentPart += char;
-            }
-        }
-        if (currentPart.trim()) {
-            vbParts.push(currentPart.trim());
-        }
-
-        // Convert each part to JavaScript
-        const jsParts = vbParts.map(part => convertEncompassConditionToJS(part));
-        
-        // Get the full converted JavaScript
-        const jsExpr = convertEncompassConditionToJS(condition);
-
-        // Evaluate the condition
-        const result = evaluateEncompassCondition(condition, loanData);
-        
-        // Display the results (use .evaluator-pre + light theme so text is never dark-on-dark)
-        const stepsText = vbParts.map((vbPart, index) => {
-            let stepResult;
-            try {
-                stepResult = eval(jsParts[index]);
-            } catch (e) {
-                stepResult = '(error: ' + (e && e.message ? e.message : e) + ')';
-            }
-            return `${index + 1}. VB Part: ${vbPart}\n   JS Part: ${jsParts[index]}\n   → ${stepResult}`;
-        }).join('\n\n');
-
-        const resultDiv = document.getElementById('result');
-        resultDiv.innerHTML = `
-            <div class="card mb-3 border">
-                <div class="card-header bg-light border-bottom">
-                    <h5 class="mb-0">Condition Evaluator Test Results</h5>
-                </div>
-                <div class="card-body">
-                    <h6>Original VB Condition</h6>
-                    <pre class="evaluator-pre p-3 rounded">${escapeHtmlTool8(condition)}</pre>
-
-                    <h6>Converted JavaScript</h6>
-                    <pre class="evaluator-pre p-3 rounded">${escapeHtmlTool8(jsExpr)}</pre>
-
-                    <h6>Test Data (Original)</h6>
-                    <pre class="evaluator-pre p-3 rounded">${escapeHtmlTool8(JSON.stringify(loanData, null, 2))}</pre>
-
-                    <h6>Test Data (Processed)</h6>
-                    <pre class="evaluator-pre p-3 rounded">${escapeHtmlTool8(JSON.stringify(fields, null, 2))}</pre>
-
-                    <h6>Evaluation Steps</h6>
-                    <pre class="evaluator-pre p-3 rounded">${escapeHtmlTool8(stepsText)}</pre>
-
-                    <h6>Final Result</h6>
-                    <div class="alert mb-0 ${result ? 'alert-success' : 'alert-danger'}">
-                        Condition evaluated to: <strong>${escapeHtmlTool8(String(result))}</strong>
-                    </div>
-                </div>
-            </div>
-        `;
+        document.getElementById('result').innerHTML = conditions.map(renderEvaluatorCard).join('');
     } catch (error) {
         showToast('Error processing XML: ' + error.message, 'error');
         console.error('Error:', error);
     }
 }
 
+function fieldsFromConditionNode(node) {
+    const fields = [];
+    const affectedFields = node.getElementsByTagName('AffectedField');
+    for (let field of affectedFields) {
+        const xref = field.getElementsByTagName('XRef')[0];
+        if (!xref) continue;
+        fields.push({
+            id: xref.getAttribute('EntityID') || '',
+            type: xref.getAttribute('EntityType') || '',
+            description: xref.getAttribute('EntityUID') || ''
+        });
+    }
+    return fields;
+}
+
+function looksLikeVbCondition(text) {
+    return /\[|\bIf\b|\bAndAlso\b|\bOrElse\b|\bThen\b/i.test(text || '');
+}
+
+function rememberCondition(conditions, seen, type, value, fields) {
+    const text = value == null ? '' : String(value).trim();
+    if (!text || !looksLikeVbCondition(text)) return;
+    const key = text.replace(/\s+/g, ' ');
+    if (seen.has(key)) return;
+    seen.add(key);
+    conditions.push({
+        type: type || 'Condition',
+        value: text,
+        affectedFields: fields || [],
+        jsCondition: convertEncompassConditionToJS(text)
+    });
+}
+
 // Function to extract conditions from XML
 function extractConditionsFromXML(xmlContent) {
     const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(xmlContent, "text/xml");
+    const xmlDoc = parser.parseFromString(xmlContent, 'text/xml');
+    if (xmlDoc.querySelector('parsererror')) {
+        throw new Error('That XML could not be parsed');
+    }
+
     const conditions = [];
-    
-    // Find all Condition elements
-    const conditionElements = xmlDoc.getElementsByTagName("Condition");
-    
+    const seen = new Set();
+
+    const conditionElements = xmlDoc.getElementsByTagName('Condition');
     for (let condition of conditionElements) {
-        const conditionObj = {
-            type: condition.getAttribute("conditionType"),
-            value: condition.getAttribute("conditionValue"),
-            affectedFields: []
-        };
-        
-        // Extract affected fields
-        const affectedFields = condition.getElementsByTagName("AffectedField");
-        for (let field of affectedFields) {
-            const xref = field.getElementsByTagName("XRef")[0];
-            if (xref) {
-                conditionObj.affectedFields.push({
-                    id: xref.getAttribute("EntityID"),
-                    type: xref.getAttribute("EntityType"),
-                    description: xref.getAttribute("EntityUID")
-                });
+        const value = condition.getAttribute('conditionValue') || condition.getAttribute('conditionValueId') || '';
+        rememberCondition(
+            conditions,
+            seen,
+            condition.getAttribute('conditionType') || 'Condition',
+            value,
+            fieldsFromConditionNode(condition)
+        );
+    }
+
+    const advancedConditions = xmlDoc.getElementsByTagName('AdvancedCondition');
+    for (let advanced of advancedConditions) {
+        const valueNodes = advanced.getElementsByTagName('Value');
+        let value = '';
+        for (let node of valueNodes) {
+            const text = (node.textContent || '').trim();
+            if (looksLikeVbCondition(text)) {
+                value = text;
+                break;
             }
         }
-        
-        // Convert VB condition to JavaScript
-        conditionObj.jsCondition = convertEncompassConditionToJS(conditionObj.value);
-        
-        conditions.push(conditionObj);
+        rememberCondition(conditions, seen, 'Advanced Condition', value, fieldsFromConditionNode(advanced));
     }
-    
+
+    const advancedCodeXmls = xmlDoc.getElementsByTagName('AdvancedCodeXml');
+    for (let node of advancedCodeXmls) {
+        rememberCondition(conditions, seen, 'Advanced Code', node.textContent || '', []);
+    }
+
     return conditions;
 }
 
@@ -812,13 +860,13 @@ function displayConditions(conditions) {
     conditions.forEach(condition => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${condition.type}</td>
-            <td>${condition.value}</td>
-            <td>${condition.jsCondition}</td>
+            <td>${escapeHtmlTool8(condition.type)}</td>
+            <td>${escapeHtmlTool8(condition.value)}</td>
+            <td>${escapeHtmlTool8(condition.jsCondition)}</td>
             <td>
                 <ul class="list-unstyled">
-                    ${condition.affectedFields.map(field => 
-                        `<li><strong>${field.id}</strong>: ${field.description}</li>`
+                    ${condition.affectedFields.map(field =>
+                        `<li><strong>${escapeHtmlTool8(field.id)}</strong>: ${escapeHtmlTool8(field.description)}</li>`
                     ).join('')}
                 </ul>
             </td>
@@ -831,7 +879,7 @@ function displayConditions(conditions) {
     // Add copy button for JavaScript conditions
     const copyButton = document.createElement('button');
     copyButton.className = 'btn btn-custom mt-3';
-    copyButton.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Copy JavaScript Conditions';
+    copyButton.innerHTML = '<i class="bi-clipboard me-2"></i> Copy JavaScript Conditions';
     copyButton.onclick = () => {
         const jsConditions = conditions.map(c => c.jsCondition).join('\n');
         navigator.clipboard.writeText(jsConditions).then(() => {
@@ -852,6 +900,7 @@ function extractVBConditions() {
     try {
         const conditions = extractConditionsFromXML(xmlInput);
         if (conditions.length === 0) {
+            document.getElementById('result').innerHTML = '';
             showToast('No conditions found in the XML', 'info');
             return;
         }

@@ -1,0 +1,34 @@
+{
+  "id": "big-bear",
+  "name": "Big Bear ski basin",
+  "south": 34.2,
+  "north": 34.248,
+  "west": -116.93,
+  "east": -116.84,
+  "zMinFt": 6280.019886,
+  "zMaxFt": 8824.5737732,
+  "pointStride": 8,
+  "headerBytes": 40,
+  "lods": {
+    "0": {
+      "file": "big-bear-lod0.bin",
+      "count": 200000,
+      "bytes": 1600040
+    },
+    "1": {
+      "file": "big-bear-lod1.bin",
+      "count": 250000,
+      "bytes": 2000040
+    }
+  },
+  "sources": [
+    {
+      "name": "USGS_LPC_CA_SoCal_Wildfires_B1_2018_LAS_2019",
+      "year": 2018,
+      "url": "https://s3-us-west-2.amazonaws.com/usgs-lidar-public/USGS_LPC_CA_SoCal_Wildfires_B1_2018_LAS_2019/ept.json"
+    }
+  ],
+  "attribution": "USGS 3DEP lidar",
+  "snowFree": true,
+  "note": "3DEP lidar flights are mostly snow-free, so this cloud is the ground and trees, not the snowpack."
+}

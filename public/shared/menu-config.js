@@ -151,6 +151,7 @@
     { href: '/ai/assistant.html', icon: 'bi-chat-dots', label: 'Levi Assistant' },
     { href: '/ai/voice-guide.html', icon: 'bi-book', label: 'Voice Guide' },
     { href: '/family/lane-family.html', icon: 'bi-house-heart', label: 'Lane Family' },
+    { href: '/local/local-spots.html#fvThrift', icon: 'bi-shop', label: 'Thrift near home', title: 'Thrift stores within 30 miles of Fountain Valley or Hesperia' },
     { href: '/local/local-spots.html', icon: 'bi-geo-alt-fill', label: 'Local Spots' },
     { href: '/finds/index.html', icon: 'bi-search-heart', label: 'Finds' },
     { divider: true },
@@ -258,7 +259,7 @@
 
   /** Nature hub tool grid */
   const NATURE_TOOLS = [
-    { href: '/local/local-spots.html#fvThrift', icon: 'bi-shop', label: 'Thrift near Fountain Valley', title: 'Thrift stores within 30 miles of Fountain Valley, with a map and directions' },
+    { href: '/local/local-spots.html#fvThrift', icon: 'bi-shop', label: 'Thrift near home', title: 'Thrift stores within 30 miles of Fountain Valley or Hesperia, with a map and directions' },
     { href: '/ski/', icon: 'bi-signpost-2', label: 'Ski Drive', title: 'Fountain Valley drive desk — weather, chains, on-the-way stops' },
     { href: '/ski/areas', icon: 'bi-snow2', label: 'Ski Areas', title: 'Wrightwood and Big Bear ski-area topography — DEM, slope, aspect' },
     { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Bud Master, embedded origins map' },

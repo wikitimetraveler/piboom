@@ -1,0 +1,44 @@
+{
+  "id": "wrightwood",
+  "name": "Mountain High",
+  "south": 34.35,
+  "north": 34.395,
+  "west": -117.71,
+  "east": -117.645,
+  "zMinFt": 5800.000185600001,
+  "zMaxFt": 8756.233876,
+  "pointStride": 8,
+  "headerBytes": 40,
+  "lods": {
+    "0": {
+      "file": "wrightwood-lod0.bin",
+      "count": 200000,
+      "bytes": 1600040
+    },
+    "1": {
+      "file": "wrightwood-lod1.bin",
+      "count": 250000,
+      "bytes": 2000040
+    }
+  },
+  "sources": [
+    {
+      "name": "CA_LosAngeles_1_B23",
+      "year": null,
+      "url": "https://s3-us-west-2.amazonaws.com/usgs-lidar-public/CA_LosAngeles_1_B23/ept.json"
+    },
+    {
+      "name": "USGS_LPC_CA_LosAngeles_2016_LAS_2018",
+      "year": 2016,
+      "url": "https://s3-us-west-2.amazonaws.com/usgs-lidar-public/USGS_LPC_CA_LosAngeles_2016_LAS_2018/ept.json"
+    },
+    {
+      "name": "USGS_LPC_CA_SoCal_Wildfires_B2_2018_LAS_2019",
+      "year": 2018,
+      "url": "https://s3-us-west-2.amazonaws.com/usgs-lidar-public/USGS_LPC_CA_SoCal_Wildfires_B2_2018_LAS_2019/ept.json"
+    }
+  ],
+  "attribution": "USGS 3DEP lidar",
+  "snowFree": true,
+  "note": "3DEP lidar flights are mostly snow-free, so this cloud is the ground and trees, not the snowpack."
+}

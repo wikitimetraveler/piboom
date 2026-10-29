@@ -11,6 +11,22 @@ export const FOUNTAIN_VALLEY = {
   lng: -117.9537,
 };
 
+export const HESPERIA = {
+  id: 'hesperia',
+  name: 'Hesperia',
+  lat: 34.4264,
+  lng: -117.3009,
+};
+
+export const THRIFT_HOMES = {
+  'fountain-valley': FOUNTAIN_VALLEY,
+  hesperia: HESPERIA,
+};
+
+export function thriftHomeById(id) {
+  return THRIFT_HOMES[String(id || '').toLowerCase()] || FOUNTAIN_VALLEY;
+}
+
 export const RADIUS_MILES = 30;
 export const RADIUS_M = Math.round(RADIUS_MILES * 1609.344);
 
@@ -21,7 +37,7 @@ const OVERPASS_ENDPOINTS = [
   'https://overpass.kumi.systems/api/interpreter',
 ];
 
-let memoryCache = null;
+const memoryCache = new Map();
 
 export function milesBetween(aLat, aLng, bLat, bLng) {
   const toRad = (deg) => (deg * Math.PI) / 180;
@@ -33,9 +49,9 @@ export function milesBetween(aLat, aLng, bLat, bLng) {
   return 2 * EARTH_MILES * Math.asin(Math.min(1, Math.sqrt(h)));
 }
 
-export function withinThriftRadius(lat, lng, radiusMiles = RADIUS_MILES) {
+export function withinThriftRadius(lat, lng, radiusMiles = RADIUS_MILES, home = FOUNTAIN_VALLEY) {
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return false;
-  return milesBetween(FOUNTAIN_VALLEY.lat, FOUNTAIN_VALLEY.lng, lat, lng) <= radiusMiles + 0.25;
+  return milesBetween(home.lat, home.lng, lat, lng) <= radiusMiles + 0.25;
 }
 
 export function overpassThriftQuery(lat = FOUNTAIN_VALLEY.lat, lng = FOUNTAIN_VALLEY.lng, radiusM = RADIUS_M) {
@@ -65,11 +81,11 @@ function formatAddress(tags) {
   return [street, city].filter(Boolean).join(', ');
 }
 
-export function normalizeOverpassElement(el) {
+export function normalizeOverpassElement(el, home = FOUNTAIN_VALLEY) {
   const name = String(el?.tags?.name || '').trim();
   const loc = elementLatLng(el);
-  if (!name || !loc || !withinThriftRadius(loc.lat, loc.lng)) return null;
-  const miles = milesBetween(FOUNTAIN_VALLEY.lat, FOUNTAIN_VALLEY.lng, loc.lat, loc.lng);
+  if (!name || !loc || !withinThriftRadius(loc.lat, loc.lng, RADIUS_MILES, home)) return null;
+  const miles = milesBetween(home.lat, home.lng, loc.lat, loc.lng);
   return {
     id: `osm-${el.type || 'n'}-${el.id}`,
     name,
@@ -98,10 +114,10 @@ export function isSameStore(a, b) {
   return na === nb || na.includes(nb) || nb.includes(na);
 }
 
-export function dedupeStores(stores) {
+export function dedupeStores(stores, home = FOUNTAIN_VALLEY) {
   const out = [];
   for (const store of stores || []) {
-    if (!store?.name || !withinThriftRadius(store.lat, store.lng)) continue;
+    if (!store?.name || !withinThriftRadius(store.lat, store.lng, RADIUS_MILES, home)) continue;
     if (out.some((existing) => isSameStore(existing, store))) continue;
     out.push(store);
   }
@@ -109,11 +125,11 @@ export function dedupeStores(stores) {
 }
 
 export function clearThriftCache() {
-  memoryCache = null;
+  memoryCache.clear();
 }
 
-async function fetchOverpassElements(fetchFn) {
-  const body = overpassThriftQuery();
+async function fetchOverpassElements(fetchFn, home) {
+  const body = overpassThriftQuery(home.lat, home.lng);
   let lastErr = null;
   for (const endpoint of OVERPASS_ENDPOINTS) {
     try {
@@ -136,32 +152,44 @@ async function fetchOverpassElements(fetchFn) {
   throw lastErr || new Error('Overpass failed');
 }
 
-export async function getThriftNearFountainValley(fetchFn = fetch) {
-  if (memoryCache && Date.now() - memoryCache.at < CACHE_MS) return memoryCache.value;
+export async function getThriftNear(homeId, fetchFn = fetch) {
+  const home = thriftHomeById(homeId);
+  const cached = memoryCache.get(home.id);
+  if (cached && Date.now() - cached.at < CACHE_MS) return cached.value;
 
   let elements = [];
   let error = '';
   try {
-    elements = await fetchOverpassElements(fetchFn);
+    elements = await fetchOverpassElements(fetchFn, home);
   } catch (err) {
     error = err.message || 'Overpass failed';
   }
 
-  const stores = dedupeStores(elements.map(normalizeOverpassElement).filter(Boolean));
+  const stores = dedupeStores(
+    elements.map((el) => normalizeOverpassElement(el, home)).filter(Boolean),
+    home
+  );
   const value = {
-    home: FOUNTAIN_VALLEY,
+    home,
     radiusMiles: RADIUS_MILES,
     stores,
     fetchedAt: new Date().toISOString(),
     source: 'osm',
     error: error || undefined,
   };
-  if (!error) memoryCache = { at: Date.now(), value };
+  if (!error) memoryCache.set(home.id, { at: Date.now(), value });
   return value;
+}
+
+export async function getThriftNearFountainValley(fetchFn = fetch) {
+  return getThriftNear('fountain-valley', fetchFn);
 }
 
 export default {
   FOUNTAIN_VALLEY,
+  HESPERIA,
+  THRIFT_HOMES,
+  thriftHomeById,
   RADIUS_MILES,
   RADIUS_M,
   milesBetween,
@@ -170,6 +198,7 @@ export default {
   normalizeOverpassElement,
   isSameStore,
   dedupeStores,
+  getThriftNear,
   getThriftNearFountainValley,
   clearThriftCache,
 };

@@ -16,11 +16,16 @@ function destSnippet(destinations = []) {
   return destinations
     .map((d) => {
       const wx = d.weather || {};
+      const summit = d.googleWeather?.summit;
+      const windBit = summit
+        ? ` summit wind ${summit.windMph ?? '?'} mph, gusts ${summit.gustMph ?? '?'} mph, snow ${summit.snowIn ?? '?'} in;`
+        : '';
+      const hold = d.googleWeather?.windHold ? ' lift wind holds possible;' : '';
       const alertBits = (d.alerts || []).map((a) => a.event).filter(Boolean).join(', ');
       return (
         `- ${d.name} (${d.area}): ${d.score || 'unknown'}; base ${d.baseFt} ft / summit ${d.summitFt} ft;` +
         ` drive ~${d.driveMin ?? d.typicalDriveMin} min from Fountain Valley via ${(d.highways || []).join(', ')};` +
-        ` temp ${wx.tempF ?? '?'} F; freeze ${wx.freezeLevelFt ?? '?'} ft;` +
+        ` temp ${wx.tempF ?? '?'} F; freeze ${wx.freezeLevelFt ?? '?'} ft;${windBit}${hold}` +
         ` chains ${d.chainsLikely ? 'likely' : 'not flagged'}; alerts: ${alertBits || 'none'}.`
       );
     })
@@ -80,7 +85,8 @@ ${runTable || 'No trail data loaded — say the trail map is unavailable.'}
 4. Do not scrape or cite unofficial resort snow reports as official.
 5. If weather is missing, say caution — do not guess a green light.
 6. Mountain High here is the Wrightwood ski resort, not Mountain High Medicinals.
-7. For run questions (pitch, facing, difficulty), only recommend runs from the run table and quote its numbers. Run open/closed status and grooming today are unknown — tell guests to check the resort.`;
+7. For run questions (pitch, facing, difficulty), only recommend runs from the run table and quote its numbers. Run open/closed status and grooming today are unknown — tell guests to check the resort.
+8. If a destination says lift wind holds possible, mention it — summit gusts are 45 mph or higher. Summit wind and snow come from Google Weather when those numbers are in the list; otherwise say the hourly summit forecast is unavailable. Do not invent either.`;
 }
 
 export async function chatWithRidge({

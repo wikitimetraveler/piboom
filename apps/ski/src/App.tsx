@@ -8,6 +8,7 @@ import { runTitle } from './lib/trails';
 import CrewLog from './pages/CrewLog';
 import DriveDesk from './pages/DriveDesk';
 import SkiAreas from './pages/SkiAreas';
+import SkiCams from './pages/SkiCams';
 
 interface TerrainInfo {
   avgSlopeDeg?: number;
@@ -196,6 +197,8 @@ export default function App() {
       {status && page !== 'log' ? <p className="ski-disclaimer">{status}</p> : null}
       {page === 'log' ? (
         <CrewLog destinations={brief.destinations} />
+      ) : page === 'cams' ? (
+        <SkiCams destinations={brief.destinations} selectedId={dest?.id || selectedId} onSelect={setSelectedId} />
       ) : page === 'drive' ? (
         <DriveDesk
           brief={brief}

@@ -1,12 +1,14 @@
 import { useMemo, useState } from 'react';
 import CaliforniaTable from '../components/CaliforniaTable';
 import ResortProfile from '../components/ResortProfile';
+import SummitForecast from '../components/SummitForecast';
 import RunDetail from '../components/RunDetail';
 import RunFinder from '../components/RunFinder';
 import TerrainScene from '../components/TerrainScene';
 import GoogleEarthView from '../components/GoogleEarthView';
 import GoogleMapView from '../components/GoogleMapView';
 import MapModeSwitch, { useMapMode } from '../components/MapModeSwitch';
+import { useLidarCloud } from '../lib/lidar';
 import { boundsOf } from '../lib/googleMaps';
 import { demHeightFt, resortBaseView } from '../lib/terrainData';
 import type { BriefPayload, DemGrid, DestinationBrief, TrailsPayload } from '../lib/types';
@@ -32,7 +34,7 @@ interface Props {
 
 type View = 'state' | 'resort';
 
-const EMPTY_FILTER: RunFilter = { tiers: new Set(), facing: '', maxPitch: null, namedOnly: false };
+const EMPTY_FILTER: RunFilter = { tiers: new Set(), facing: '', maxPitch: null, namedOnly: false, treeOnly: false };
 
 export default function SkiAreas(props: Props) {
   const { brief, dest, selectedId, onSelect, dem, terrain, trails, selectedRunId, onSelectRun } = props;
@@ -55,6 +57,7 @@ export default function SkiAreas(props: Props) {
   );
   const selectedRun = resortRuns.find((r) => r.id === selectedRunId) || null;
   const [mapMode, setMapMode] = useMapMode();
+  const { cloud: lidar, note: lidarNote } = useLidarCloud(dest?.dem, mapMode === 'lidar' && view === 'resort');
   const resortLifts = useMemo(
     () => (trails && dem && trails.id === dem.id ? trails.lifts.filter((l) => l.resort === dest?.id) : []),
     [trails, dem, dest]
@@ -93,7 +96,8 @@ export default function SkiAreas(props: Props) {
         <p>
           Start on the California table, then fly onto the mountain. Mt. Baldy, Mountain High, Snow Valley, Snow Summit, Bear
           Mountain, Mammoth, and June carry real OpenStreetMap runs and lifts draped on a USGS 3DEP elevation model,
-          with pitch and facing measured run by run.
+          with pitch and facing measured run by run. Lidar 3D adds the USGS point cloud — ground and trees from a
+          snow-free flight, not the snowpack.
         </p>
       </header>
       <div className="ski-chips" role="tablist" aria-label="Ski area">
@@ -143,18 +147,7 @@ export default function SkiAreas(props: Props) {
             />
           ) : (
             <>
-              {mapMode === 'topo' || !dem ? (
-                <TerrainScene
-                  dem={dem}
-                  trails={trails}
-                  destinations={brief.destinations}
-                  resortId={dest?.id}
-                  selectedRunId={selectedRunId}
-                  previewRunId={previewRunId}
-                  matchIds={matchIds}
-                  onSelectRun={onSelectRun}
-                />
-              ) : mapMode === 'maps' ? (
+              {mapMode === 'maps' && dem ? (
                 <GoogleMapView
                   frame={resortBox || dem}
                   trails={trails && trails.id === dem.id ? trails : null}
@@ -164,7 +157,7 @@ export default function SkiAreas(props: Props) {
                   focus={baseView}
                   fitKey={`${dest?.id}:${dem.id}:${resortBox ? 1 : 0}:${baseView ? 1 : 0}`}
                 />
-              ) : (
+              ) : mapMode === 'earth' && dem ? (
                 <GoogleEarthView
                   frame={resortBox || dem}
                   groundFt={(lat, lng) => demHeightFt(dem, lat, lng)}
@@ -172,6 +165,19 @@ export default function SkiAreas(props: Props) {
                   resortId={dest?.id}
                   focus={baseView}
                   fitKey={`${dest?.id}:${dem.id}:${resortBox ? 1 : 0}:${baseView ? 1 : 0}`}
+                />
+              ) : (
+                <TerrainScene
+                  dem={dem}
+                  trails={trails}
+                  destinations={brief.destinations}
+                  resortId={dest?.id}
+                  selectedRunId={selectedRunId}
+                  previewRunId={previewRunId}
+                  matchIds={matchIds}
+                  onSelectRun={onSelectRun}
+                  lidar={mapMode === 'lidar' ? lidar : null}
+                  lidarNote={mapMode === 'lidar' ? lidarNote : ''}
                 />
               )}
               <MapModeSwitch mode={mapMode} onMode={setMapMode} />
@@ -217,6 +223,7 @@ export default function SkiAreas(props: Props) {
         <section className="ski-detail-row">
           <RunDetail run={selectedRun} onClear={() => onSelectRun(null)} />
           <div className="ski-side-stack">
+            <SummitForecast weather={dest?.googleWeather} />
             <ResortProfile dest={dest} />
             {terrain ? (
               <div className="ski-profile">

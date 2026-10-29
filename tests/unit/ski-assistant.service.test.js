@@ -39,6 +39,33 @@ describe('ski-assistant.service', () => {
     expect(prompt).toMatch(/Drive desk/i);
   });
 
+  test('Ridge hears summit gusts and a wind-hold flag', () => {
+    const prompt = buildSystemPrompt({
+      destinations: [
+        {
+          name: 'Mammoth Mountain',
+          area: 'Mammoth Lakes',
+          score: 'caution',
+          baseFt: 7953,
+          summitFt: 11053,
+          driveMin: 300,
+          highways: ['US-395'],
+          weather: {},
+          alerts: [],
+          chainsLikely: true,
+          googleWeather: {
+            windHold: true,
+            summit: { windMph: 30, gustMph: 52, snowIn: 0.4 },
+          },
+        },
+      ],
+    });
+    expect(prompt).toContain('gusts 52 mph');
+    expect(prompt).toContain('snow 0.4 in');
+    expect(prompt).toContain('lift wind holds possible');
+    expect(prompt).toMatch(/45 mph/);
+  });
+
   test('Ridge gets the selected resort run table and the selected run', () => {
     const prompt = buildSystemPrompt({
       destinations: [

@@ -95,6 +95,130 @@ body {
   margin: 0 0 1.25rem;
 }
 
+.ski-cam-resorts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 1.25rem;
+}
+
+.ski-cam-resorts button {
+  border: 1px solid var(--ski-line);
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  background: transparent;
+  color: var(--ski-ink);
+  cursor: pointer;
+}
+
+.ski-cam-resorts button.is-on {
+  background: var(--ski-ice);
+  color: #071018;
+}
+
+.ski-cam-group {
+  margin: 0 0 1.75rem;
+}
+
+.ski-cam-group h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.15rem;
+}
+
+.ski-cam-group h2 small {
+  color: var(--ski-muted);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.ski-cam-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ski-cam-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--ski-line);
+  border-radius: 10px;
+  background: var(--ski-panel);
+  color: var(--ski-ice);
+  text-decoration: none;
+}
+
+.ski-cam-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.6rem;
+}
+
+.ski-cam {
+  margin: 0;
+  border: 1px solid var(--ski-line);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--ski-panel);
+}
+
+.ski-cam a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ski-cam img,
+.ski-cam__missing {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #0b141d;
+}
+
+.ski-cam__missing {
+  display: grid;
+  place-items: center;
+  color: var(--ski-muted);
+  font-size: 0.8rem;
+}
+
+.ski-cam figcaption {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.5rem 0.65rem 0.6rem;
+  font-size: 0.8rem;
+}
+
+.ski-cam figcaption span {
+  color: var(--ski-muted);
+  font-size: 0.72rem;
+}
+
+.ski-cam figcaption b {
+  margin-right: 0.4rem;
+  padding: 0 0.35rem;
+  border-radius: 4px;
+  background: rgba(126, 200, 227, 0.14);
+  color: var(--ski-ink);
+  font-weight: 600;
+}
+
+.ski-cam figcaption b.is-chain {
+  background: var(--ski-caution);
+  color: #071018;
+}
+
+.ski-cam-empty {
+  color: var(--ski-muted);
+  font-size: 0.85rem;
+}
+
 .ski-hero h1 {
   margin: 0 0 0.35rem;
   font-size: clamp(1.6rem, 3vw, 2.2rem);
@@ -931,6 +1055,88 @@ body {
 .ski-mode-switch button.is-on {
   background: var(--ski-ice);
   color: #071018;
+}
+
+.ski-lidar-controls {
+  position: absolute;
+  left: 0.7rem;
+  bottom: 4.4rem;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.6rem;
+  max-width: calc(100% - 1.4rem);
+  padding: 0.4rem 0.55rem;
+  border-radius: 10px;
+  background: rgba(7, 16, 24, 0.82);
+  border: 1px solid var(--ski-line);
+  touch-action: auto;
+}
+
+.ski-lidar-controls button,
+.ski-lidar-controls label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 28px;
+  color: var(--ski-muted);
+  font-size: 0.72rem;
+}
+
+.ski-lidar-controls button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0 0.6rem;
+  background: transparent;
+  cursor: pointer;
+}
+
+.ski-lidar-controls button.is-on {
+  background: var(--ski-ice);
+  color: #071018;
+}
+
+.ski-lidar-controls button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ski-lidar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.6rem;
+  flex-basis: 100%;
+  font-size: 0.68rem;
+  color: var(--ski-muted);
+}
+
+.ski-lidar-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.ski-lidar-legend i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.ski-lidar-controls input[type='range'] {
+  width: 72px;
+  accent-color: var(--ski-ice);
+}
+
+.ski-lidar-note {
+  position: absolute;
+  left: 0.6rem;
+  right: 0.6rem;
+  bottom: 0.45rem;
+  margin: 0;
+  font-size: 0.68rem;
+  color: var(--ski-muted);
+  pointer-events: none;
 }
 
 .ski-gmap,

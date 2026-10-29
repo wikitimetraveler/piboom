@@ -1,0 +1,34 @@
+{
+  "id": "june",
+  "name": "June Mountain",
+  "south": 37.73,
+  "north": 37.78,
+  "west": -119.105,
+  "east": -119.045,
+  "zMinFt": 7398.228583199939,
+  "zMaxFt": 10889.993786800062,
+  "pointStride": 8,
+  "headerBytes": 40,
+  "lods": {
+    "0": {
+      "file": "june-lod0.bin",
+      "count": 200000,
+      "bytes": 1600040
+    },
+    "1": {
+      "file": "june-lod1.bin",
+      "count": 250000,
+      "bytes": 2000040
+    }
+  },
+  "sources": [
+    {
+      "name": "CA_SierraNevada_13_B22",
+      "year": null,
+      "url": "https://s3-us-west-2.amazonaws.com/usgs-lidar-public/CA_SierraNevada_13_B22/ept.json"
+    }
+  ],
+  "attribution": "USGS 3DEP lidar",
+  "snowFree": true,
+  "note": "3DEP lidar flights are mostly snow-free, so this cloud is the ground and trees, not the snowpack."
+}

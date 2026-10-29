@@ -21,29 +21,31 @@
     let fieldCalendars = {};
     let lastMethod = null;
 
-    // Load reference files
+    async function loadFieldIdSet(url) {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`${url} returned ${response.status}`);
+        }
+        const contentType = response.headers.get('content-type') || '';
+        const text = await response.text();
+        if (contentType.includes('text/html') || /^\s*</.test(text)) {
+            throw new Error(`${url} did not return a field list`);
+        }
+        return new Set(
+            text.split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0)
+                .map(line => line.replace(/[\[\]]/g, ''))
+        );
+    }
+
+    // Load reference files next to this page (/finance/data), not /data (the site catch-all).
     async function loadReferenceFiles() {
         try {
-            // Load dropdown fields
-            const dropdownResponse = await fetch('../data/dropdownFields.txt');
-            const dropdownText = await dropdownResponse.text();
-            dropdownFields = new Set(
-                dropdownText.split('\n')
-                    .map(line => line.trim())
-                    .filter(line => line.length > 0)
-                    .map(line => line.replace(/[\[\]]/g, ''))
-            );
+            dropdownFields = await loadFieldIdSet('data/dropdownFields.txt');
             console.log(`Loaded ${dropdownFields.size} dropdown fields`);
 
-            // Load borrower specific fields
-            const borrResponse = await fetch('../data/borrSpecificFields.txt');
-            const borrText = await borrResponse.text();
-            borrSpecificFields = new Set(
-                borrText.split('\n')
-                    .map(line => line.trim())
-                    .filter(line => line.length > 0)
-                    .map(line => line.replace(/[\[\]]/g, ''))
-            );
+            borrSpecificFields = await loadFieldIdSet('data/borrSpecificFields.txt');
             console.log(`Loaded ${borrSpecificFields.size} borrower specific fields`);
 
             // Initialize broker specific fields
@@ -62,6 +64,9 @@
 
         } catch (error) {
             console.error('Error loading reference files:', error);
+            if (typeof showToast === 'function') {
+                showToast('Field reference lists failed to load. Dropdown and borrower tags may be missing.', 'error');
+            }
         }
     }
 
@@ -98,6 +103,10 @@
         try {
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(xmlInput, "text/xml");
+            if (xmlDoc.querySelector('parsererror')) {
+                showToast('That XML could not be parsed. Check the file and try again.', 'error');
+                return;
+            }
             const affectedFields = xmlDoc.getElementsByTagName('AffectedField');
             const fields = new Set();
             const excludedFields = new Set();
@@ -480,9 +489,15 @@
             document.getElementById('fieldCount').textContent = `Fields: ${cleanedData.length}`;
 
             showToast('Empty values removed successfully!', 'success');
+            if (window.voiceController && typeof window.voiceController.speak === 'function') {
+                window.voiceController.speak('Empty values removed successfully');
+            }
         } catch (error) {
             console.error('Remove Empty Error:', error);
             showToast('Error removing empty values: ' + error.message, 'error');
+            if (window.voiceController && typeof window.voiceController.speak === 'function') {
+                window.voiceController.speak('Error removing empty values');
+            }
         }
     }
 

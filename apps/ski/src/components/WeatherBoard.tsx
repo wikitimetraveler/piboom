@@ -31,7 +31,21 @@ export default function WeatherBoard({ destinations, selectedId, onSelect }: Pro
             <dd>~{dest.driveMin} min</dd>
             <dt>Chains</dt>
             <dd>{dest.chainsLikely ? 'Likely' : 'Not flagged'}</dd>
+            {dest.googleWeather?.summit ? (
+              <>
+                <dt>Summit wind</dt>
+                <dd>{dest.googleWeather.summit.windMph ?? '—'} mph</dd>
+                <dt>Gusts</dt>
+                <dd>
+                  {dest.googleWeather.summit.gustMph ?? '—'} mph
+                  {dest.googleWeather.windHold ? ' · holds' : ''}
+                </dd>
+                <dt>Summit snow</dt>
+                <dd>{dest.googleWeather.summit.snowIn ?? '—'} in</dd>
+              </>
+            ) : null}
           </dl>
+          {dest.googleWeather?.windHold ? <p className="ski-alert">Lift wind holds possible</p> : null}
           {dest.alerts[0] ? <p className="ski-alert">{dest.alerts[0].event}</p> : null}
           {dest.forecast?.shortForecast ? (
             <p className="ski-alert" style={{ color: 'var(--ski-muted)' }}>

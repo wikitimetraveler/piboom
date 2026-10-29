@@ -6,7 +6,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { randomUUID } from 'crypto';
 import { getGoogleBrowserApiKey } from '../lib/google-api-key.js';
-import { getThriftNearFountainValley } from '../services/local-thrift.service.js';
+import { getThriftNear } from '../services/local-thrift.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -76,7 +76,7 @@ export async function listSpots(req, res) {
 
 export async function listThriftNear(req, res) {
   try {
-    const payload = await getThriftNearFountainValley();
+    const payload = await getThriftNear(req.query.near || req.query.home);
     res.json({ success: true, ...payload });
   } catch (error) {
     console.error('Local thrift radius error:', error);

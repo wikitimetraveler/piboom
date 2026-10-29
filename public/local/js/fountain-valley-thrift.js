@@ -5,7 +5,11 @@
 (function (global) {
   'use strict';
 
-  var HOME = { name: 'Fountain Valley', lat: 33.7095, lng: -117.9537 };
+  var PLACES = {
+    'fountain-valley': { id: 'fountain-valley', name: 'Fountain Valley', lat: 33.7095, lng: -117.9537, label: 'FV' },
+    hesperia: { id: 'hesperia', name: 'Hesperia', lat: 34.4264, lng: -117.3009, label: 'HS' },
+  };
+  var home = initialHome();
   var RADIUS_MILES = 30;
   var RADIUS_M = 48280;
   var EARTH_MILES = 3958.7613;
@@ -45,6 +49,17 @@
   var listBound = false;
   var attributions = [];
   var drawToken = 0;
+  var sweepGen = 0;
+  var radiusCircle = null;
+  var placeCache = {};
+
+  function initialHome() {
+    var id = '';
+    try {
+      id = (new URLSearchParams(global.location.search).get('near') || '').toLowerCase();
+    } catch (_) { /* no location */ }
+    return PLACES[id] || PLACES['fountain-valley'];
+  }
 
   function milesBetween(aLat, aLng, bLat, bLng) {
     var toRad = function (deg) { return (deg * Math.PI) / 180; };
@@ -58,8 +73,8 @@
 
   function offset(northMi, eastMi) {
     return {
-      lat: HOME.lat + northMi / 69,
-      lng: HOME.lng + eastMi / (69 * Math.cos(HOME.lat * Math.PI / 180)),
+      lat: home.lat + northMi / 69,
+      lng: home.lng + eastMi / (69 * Math.cos(home.lat * Math.PI / 180)),
     };
   }
 
@@ -93,10 +108,10 @@
   function statusLine() {
     var n = stores.length;
     var noun = n === 1 ? 'thrift store' : 'thrift stores';
-    var base = n + ' ' + noun + ' within 30 miles of Fountain Valley';
+    var base = n + ' ' + noun + ' within 30 miles of ' + home.name;
     if (searching) return 'Searching… ' + base + '.';
     if (limited) return base + '. Google Places paused early — this is the list so far.';
-    if (!n) return 'No thrift stores found within 30 miles of Fountain Valley.';
+    if (!n) return 'No thrift stores found within 30 miles of ' + home.name + '.';
     return base + '.';
   }
 
@@ -110,7 +125,7 @@
   }
 
   function dirUrl(store) {
-    return 'https://www.google.com/maps/dir/?api=1&origin=' + HOME.lat + ',' + HOME.lng +
+    return 'https://www.google.com/maps/dir/?api=1&origin=' + home.lat + ',' + home.lng +
       '&destination=' + store.lat + ',' + store.lng;
   }
 
@@ -149,7 +164,7 @@
     var helpers = markerHelpers();
     var marker = markers.get(store.id);
     var html = '<div style="max-width:240px"><strong>' + esc(store.name) + '</strong><br>' +
-      esc(store.miles.toFixed(1)) + ' mi from Fountain Valley' +
+      esc(store.miles.toFixed(1)) + ' mi from ' + esc(home.name) +
       (store.address ? '<br>' + esc(store.address) : '') +
       '<br><a href="' + esc(dirUrl(store)) + '" target="_blank" rel="noreferrer">Directions</a></div>';
     if (!infoWindow) infoWindow = new google.maps.InfoWindow();
@@ -176,7 +191,7 @@
   function fitAll() {
     if (!map) return;
     var bounds = new google.maps.LatLngBounds();
-    bounds.extend(HOME);
+    bounds.extend(home);
     stores.forEach(function (store) { bounds.extend({ lat: store.lat, lng: store.lng }); });
     map.fitBounds(bounds, 48);
   }
@@ -205,9 +220,9 @@
     if (helpers) {
       homeMarker = helpers.createMapMarker({
         map: map,
-        position: HOME,
-        title: 'Fountain Valley',
-        content: helpers.createPinContent({ color: '#4a90a4', label: 'FV' }),
+        position: home,
+        title: home.name,
+        content: helpers.createPinContent({ color: '#4a90a4', label: home.label }),
         zIndex: 10,
       });
     }
@@ -244,7 +259,7 @@
       var blocked = ['church', 'place_of_worship', 'shopping_mall', 'lodging', 'school', 'hospital'];
       if (types.some(function (type) { return blocked.indexOf(type) !== -1; })) return null;
     }
-    var miles = milesBetween(HOME.lat, HOME.lng, lat, lng);
+    var miles = milesBetween(home.lat, home.lng, lat, lng);
     if (miles > RADIUS_MILES + 0.25) return null;
     return {
       id: place.place_id || nameKey(name) + '@' + lat.toFixed(4),
@@ -257,7 +272,8 @@
     };
   }
 
-  function absorbGoogle(results) {
+  function absorbGoogle(results, gen) {
+    if (gen !== sweepGen) return;
     (results || []).forEach(function (place) {
       (place.html_attributions || []).forEach(function (html) {
         if (attributions.indexOf(html) === -1) attributions.push(html);
@@ -305,10 +321,13 @@
   }
 
   async function runSweeps() {
+    var gen = ++sweepGen;
+    var placeId = home.id;
     searching = true;
     setStatus(statusLine());
     var service = new google.maps.places.PlacesService(map);
     for (var i = 0; i < SWEEPS.length; i++) {
+      if (gen !== sweepGen) return;
       var sweep = SWEEPS[i];
       var center = offset(sweep.northMi, sweep.eastMi);
       var batch;
@@ -321,13 +340,16 @@
       } catch (_) {
         batch = { results: [], limited: false };
       }
-      absorbGoogle(batch.results);
+      if (gen !== sweepGen) return;
+      absorbGoogle(batch.results, gen);
       if (batch.limited) {
         limited = true;
         break;
       }
     }
+    if (gen !== sweepGen) return;
     searching = false;
+    placeCache[placeId] = snapshotPlace(true);
     render();
   }
 
@@ -337,16 +359,16 @@
     if (!el) return;
     var helpers = markerHelpers();
     map = new google.maps.Map(el, {
-      center: HOME,
+      center: home,
       zoom: 10,
       mapId: helpers ? helpers.DEFAULT_MAP_ID : 'DEMO_MAP_ID',
       streetViewControl: false,
       mapTypeControl: false,
       fullscreenControl: true,
     });
-    new google.maps.Circle({
+    radiusCircle = new google.maps.Circle({
       map: map,
-      center: HOME,
+      center: home,
       radius: RADIUS_M,
       strokeColor: '#4a90a4',
       strokeOpacity: 0.8,
@@ -370,6 +392,14 @@
     });
     var fit = document.getElementById('fvThriftFit');
     if (fit) fit.addEventListener('click', fitAll);
+    var toggle = document.getElementById('fvThriftToggle');
+    if (toggle) {
+      toggle.addEventListener('click', function (event) {
+        var button = event.target.closest('[data-home]');
+        if (!button) return;
+        selectHome(button.getAttribute('data-home'));
+      });
+    }
     window.addEventListener('resize', function () {
       if (!map || !global.google?.maps?.event) return;
       google.maps.event.trigger(map, 'resize');
@@ -377,16 +407,98 @@
     });
   }
 
-  function boot() {
-    bindList();
-    setStatus('Loading thrift stores within 30 miles of Fountain Valley…');
-    fetch('/api/local-spots/thrift-near')
+  function snapshotPlace(searched) {
+    return {
+      googleStores: googleStores.slice(),
+      osmStores: osmStores.slice(),
+      attributions: attributions.slice(),
+      limited: limited,
+      searched: !!searched,
+    };
+  }
+
+  function updateHeading() {
+    var title = document.getElementById('fvThriftTitle');
+    if (title) title.textContent = 'Thrift within 30 miles of ' + home.name;
+    var section = document.getElementById('fvThrift');
+    if (section) section.setAttribute('aria-label', 'Thrift stores near ' + home.name);
+    var mapEl = document.getElementById('fvThriftMap');
+    if (mapEl) mapEl.setAttribute('aria-label', 'Map of thrift stores near ' + home.name);
+    document.querySelectorAll('#fvThriftToggle [data-home]').forEach(function (button) {
+      var on = button.getAttribute('data-home') === home.id;
+      button.classList.toggle('is-on', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  }
+
+  function placeCircle() {
+    if (!radiusCircle) return;
+    radiusCircle.setCenter(home);
+  }
+
+  function rememberCurrent() {
+    placeCache[home.id] = snapshotPlace(!searching && googleStores.length > 0);
+  }
+
+  function applyCached(saved) {
+    googleStores = saved.googleStores.slice();
+    osmStores = saved.osmStores.slice();
+    attributions = saved.attributions.slice();
+    limited = !!saved.limited;
+  }
+
+  function loadOsm() {
+    var placeId = home.id;
+    fetch('/api/local-spots/thrift-near?near=' + encodeURIComponent(placeId))
       .then(function (res) { return res.ok ? res.json() : null; })
       .then(function (data) {
-        osmStores = (data && data.stores) || [];
+        if (home.id !== placeId) return;
+        var list = (data && data.stores) || [];
+        osmStores = list.map(function (store) {
+          var miles = milesBetween(home.lat, home.lng, Number(store.lat), Number(store.lng));
+          if (miles > RADIUS_MILES + 0.25) return null;
+          return Object.assign({}, store, { miles: Math.round(miles * 10) / 10 });
+        }).filter(Boolean);
         render();
       })
-      .catch(function () { render(); });
+      .catch(function () {
+        if (home.id === placeId) render();
+      });
+  }
+
+  function selectHome(id) {
+    var next = PLACES[id];
+    if (!next || next.id === home.id) return;
+    rememberCurrent();
+    sweepGen += 1;
+    home = next;
+    activeId = '';
+    searching = false;
+    var saved = placeCache[home.id];
+    if (saved) applyCached(saved);
+    else {
+      googleStores = [];
+      osmStores = [];
+      attributions = [];
+      limited = false;
+    }
+    updateHeading();
+    placeCircle();
+    if (map) {
+      map.panTo(home);
+      render();
+    } else {
+      renderList();
+    }
+    if (!saved) loadOsm();
+    if (map && !(saved && saved.searched)) runSweeps();
+  }
+
+  function boot() {
+    bindList();
+    updateHeading();
+    setStatus('Loading thrift stores within 30 miles of ' + home.name + '…');
+    loadOsm();
   }
 
   function onMapsReady() {
@@ -396,8 +508,11 @@
       setStatus('Map library did not load. The list still fills in when Places is available.');
       return;
     }
+    updateHeading();
+    placeCircle();
     render();
-    runSweeps();
+    var saved = placeCache[home.id];
+    if (!(saved && saved.searched)) runSweeps();
   }
 
   global.FountainValleyThrift = { boot: boot, onMapsReady: onMapsReady };

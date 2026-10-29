@@ -1,10 +1,11 @@
 import { useState } from 'react';
 
-export type MapMode = 'topo' | 'maps' | 'earth';
+export type MapMode = 'topo' | 'maps' | 'earth' | 'lidar';
 
 const KEY = 'ski.mapMode';
 const MODES: { id: MapMode; label: string; icon: string }[] = [
   { id: 'topo', label: 'Topo 3D', icon: 'bi-triangle' },
+  { id: 'lidar', label: 'Lidar 3D', icon: 'bi-boxes' },
   { id: 'maps', label: 'Google Maps', icon: 'bi-map' },
   { id: 'earth', label: 'Google Earth', icon: 'bi-globe-americas' },
 ];
@@ -12,7 +13,7 @@ const MODES: { id: MapMode; label: string; icon: string }[] = [
 export function useMapMode(): [MapMode, (m: MapMode) => void] {
   const [mode, setMode] = useState<MapMode>(() => {
     const saved = localStorage.getItem(KEY);
-    return saved === 'maps' || saved === 'earth' ? saved : 'topo';
+    return saved === 'maps' || saved === 'earth' || saved === 'lidar' ? saved : 'topo';
   });
   return [
     mode,

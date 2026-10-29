@@ -727,6 +727,9 @@
                     <button onclick="updateJSONFromTable()" class="btn-custom">
                         <i class="bi-clipboard me-2"></i>Update JSON from Table
                     </button>
+                    <button onclick="updateTableFromJSON()" class="btn-custom">
+                        <i class="bi-table me-2"></i>Update Table from JSON
+                    </button>
                     <button onclick="removeRowFromJSON()" class="btn-custom">
                         <i class="bi-trash me-2"></i>Remove Row from JSON
                     </button>
@@ -883,13 +886,19 @@
                 });
                 
                 document.addEventListener('keydown', (e) => {
-                    if (e.ctrlKey && e.key === 'v') {
-                        e.preventDefault();
-                        if (this.isListening) {
-                            this.stopListening();
-                        } else {
-                            this.startListening();
-                        }
+                    if (!(e.ctrlKey && e.key === 'v')) return;
+                    const target = e.target;
+                    const typing = target && (
+                        target.tagName === 'TEXTAREA' ||
+                        target.tagName === 'INPUT' ||
+                        target.isContentEditable
+                    );
+                    if (typing) return;
+                    e.preventDefault();
+                    if (this.isListening) {
+                        this.stopListening();
+                    } else {
+                        this.startListening();
                     }
                 });
             }
@@ -1040,35 +1049,6 @@
         function scrollToGuide() {
             document.getElementById('guideSection').scrollIntoView({behavior: 'smooth'});
             $('#guideCollapse').collapse('show');
-        }
-
-        function removeEmptyValues() {
-            try {
-                const jsonTextarea = $('#result textarea.form-control');
-                if (!jsonTextarea.length || !jsonTextarea.val()) {
-                    showToast('No JSON data found! Please transform XML first.', 'error');
-                    return;
-                }
-
-                const jsonData = JSON.parse(jsonTextarea.val());
-                const cleanedData = jsonData.map(item => {
-                    const cleanedItem = {};
-                    Object.keys(item).forEach(key => {
-                        if (item[key] !== "" && item[key] !== null && item[key] !== undefined) {
-                            cleanedItem[key] = item[key];
-                        }
-                    });
-                    return cleanedItem;
-                });
-
-                jsonTextarea.val(JSON.stringify(cleanedData, null, 2));
-                showToast('Empty values removed successfully!', 'success');
-                voiceController.speak('Empty values removed successfully');
-            } catch (error) {
-                console.error('Remove Empty Error:', error);
-                showToast('Error removing empty values: ' + error.message, 'error');
-                voiceController.speak('Error removing empty values');
-            }
         }
 
         // Make voice controller globally accessible for debugging

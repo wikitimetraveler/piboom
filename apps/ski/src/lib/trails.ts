@@ -91,10 +91,23 @@ export interface RunFilter {
   facing: string;
   maxPitch: number | null;
   namedOnly: boolean;
+  treeOnly: boolean;
+}
+
+export function isTreeRun(run: Pick<SkiRun, 'coverLabel' | 'treeCoverPct'>): boolean {
+  if (run.coverLabel === 'tree' || run.coverLabel === 'glade') return true;
+  return (run.treeCoverPct ?? 0) >= 25;
+}
+
+export function coverPhrase(label: string | null | undefined): string {
+  if (label === 'tree') return 'In the trees';
+  if (label === 'glade') return 'Glade';
+  if (label === 'open') return 'Open';
+  return '';
 }
 
 export function filterActive(f: RunFilter): boolean {
-  return f.tiers.size > 0 || Boolean(f.facing) || f.maxPitch != null || f.namedOnly;
+  return f.tiers.size > 0 || Boolean(f.facing) || f.maxPitch != null || f.namedOnly || f.treeOnly;
 }
 
 export function filterRuns(runs: SkiRun[], f: RunFilter): SkiRun[] {
@@ -104,6 +117,7 @@ export function filterRuns(runs: SkiRun[], f: RunFilter): SkiRun[] {
     if (faces && (!r.aspect || !faces.includes(r.aspect))) return false;
     if (f.maxPitch != null && (r.avgPitchDeg == null || r.avgPitchDeg > f.maxPitch)) return false;
     if (f.namedOnly && !r.name) return false;
+    if (f.treeOnly && !isTreeRun(r)) return false;
     return true;
   });
 }

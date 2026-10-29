@@ -154,12 +154,21 @@ describe('ski-trails.service', () => {
     const hits = findRuns(runs, { difficulty: 'intermediate', maxPitch: 25, facing: 'north' });
     expect(hits.map((r) => r.id)).toEqual(['e', 'a']);
     expect(findRuns(runs, { minVerticalFt: 1250 }).map((r) => r.id)).toEqual(['c', 'd']);
+    expect(
+      findRuns(
+        [
+          { id: 'open', coverLabel: 'open', treeCoverPct: 4, verticalFt: 800, difficulty: 'easy', avgPitchDeg: 8, aspect: 'S' },
+          { id: 'glade', coverLabel: 'glade', treeCoverPct: 22, verticalFt: 900, difficulty: 'intermediate', avgPitchDeg: 14, aspect: 'N' },
+        ],
+        { treeOnly: true }
+      ).map((r) => r.id)
+    ).toEqual(['glade']);
   });
 
   test('runCatalogSnippet gives Ridge names, rating, pitch, and facing', () => {
     const text = runCatalogSnippet(
       [
-        { name: 'Goldrush', resort: 'mountain-high', label: 'More difficult', verticalFt: 1573, lengthFt: 6240, avgPitchDeg: 14.1, maxPitchDeg: 24.7, aspect: 'N', topFt: 8139, bottomFt: 6566 },
+        { name: 'Goldrush', resort: 'mountain-high', label: 'More difficult', verticalFt: 1573, lengthFt: 6240, avgPitchDeg: 14.1, maxPitchDeg: 24.7, aspect: 'N', topFt: 8139, bottomFt: 6566, treeCoverPct: 42, coverLabel: 'tree' },
         { name: null, resort: 'mountain-high', label: 'Easier', verticalFt: 50 },
       ],
       { 'mountain-high': 'Mountain High' }
@@ -167,6 +176,7 @@ describe('ski-trails.service', () => {
     expect(text).toContain('Goldrush (Mountain High; More difficult)');
     expect(text).toContain('avg 14.1°');
     expect(text).toContain('faces N');
+    expect(text).toContain('tree cover 42% (tree)');
     expect(text.split('\n')).toHaveLength(1);
   });
 

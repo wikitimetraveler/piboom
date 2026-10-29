@@ -1,0 +1,33 @@
+{
+  "note": "Official resort webcam pages, checked October 2026. Live fire, summit, and road cams come from the hazard webcam catalog (/api/disasters/cameras).",
+  "regional": [
+    { "label": "Caltrans QuickMap (all road cams and chain control)", "url": "https://quickmap.dot.ca.gov/" }
+  ],
+  "resorts": {
+    "mountain-high": [
+      { "label": "Mountain High live cams", "url": "https://www.mthigh.com/site/cams" }
+    ],
+    "mt-baldy": [
+      { "label": "Mt Baldy Resort cam (7,800 ft)", "url": "https://mtbaldyresort.com/web-cam" },
+      { "label": "San Bernardino County snow webcams", "url": "https://snowinfo.sbcounty.gov/weather-webcams-map/" }
+    ],
+    "snow-valley": [
+      { "label": "Snow Valley live cams", "url": "https://www.bigbearmountainresort.com/webcams/snow-valley" },
+      { "label": "San Bernardino County snow webcams", "url": "https://snowinfo.sbcounty.gov/weather-webcams-map/" }
+    ],
+    "snow-summit": [
+      { "label": "Big Bear Mountain Resort live cams", "url": "https://www.bigbearmountainresort.com/webcams" },
+      { "label": "San Bernardino County snow webcams", "url": "https://snowinfo.sbcounty.gov/weather-webcams-map/" }
+    ],
+    "bear-mountain": [
+      { "label": "Big Bear Mountain Resort live cams", "url": "https://www.bigbearmountainresort.com/webcams" },
+      { "label": "San Bernardino County snow webcams", "url": "https://snowinfo.sbcounty.gov/weather-webcams-map/" }
+    ],
+    "mammoth": [
+      { "label": "Mammoth Mountain webcams", "url": "https://www.mammothmountain.com/on-the-mountain/mammoth-webcam" }
+    ],
+    "june": [
+      { "label": "June Mountain live cams", "url": "https://www.junemountain.com/mountain-information/live-cams" }
+    ]
+  }
+}

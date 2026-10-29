@@ -842,13 +842,19 @@
                 });
                 
                 document.addEventListener('keydown', (e) => {
-                    if (e.ctrlKey && e.key === 'v') {
-                        e.preventDefault();
-                        if (this.isListening) {
-                            this.stopListening();
-                        } else {
-                            this.startListening();
-                        }
+                    if (!(e.ctrlKey && e.key === 'v')) return;
+                    const target = e.target;
+                    const typing = target && (
+                        target.tagName === 'TEXTAREA' ||
+                        target.tagName === 'INPUT' ||
+                        target.isContentEditable
+                    );
+                    if (typing) return;
+                    e.preventDefault();
+                    if (this.isListening) {
+                        this.stopListening();
+                    } else {
+                        this.startListening();
                     }
                 });
             }

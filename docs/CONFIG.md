@@ -35,8 +35,11 @@ Hybrid vector RAG + GraphRAG details: `docs/VECTOR_RAG.md`.
 | Variable | Purpose |
 |----------|---------|
 | `GOOGLE_API_KEY` | General Google APIs; also fallback for browser Maps if `GOOGLE_BROWSER_API_KEY` is unset |
+| `GOOGLE_SERVER_API_KEY` | Server key for Distance Matrix and the **Google Weather API**. Ski Topo uses it for the hourly summit and base forecast. Enable the Weather API on the Cloud project. If the key is missing or the API is off, Ski Topo falls back to Open-Meteo and NWS. |
 | `GOOGLE_BROWSER_API_KEY` | Referrer-restricted key for **Google Maps JavaScript API** on public pages (recommended for `/family/` Lane maps) |
 | `MAPBOX_ACCESS_TOKEN` / `MAPBOX_API_KEY` / `MAP_KEY` | **Server-side** geocoding in `free-geocoding.service.js` (not required for drawing Google Maps if you only need the map canvas) |
+
+Ski Topo lidar is baked offline from public USGS 3DEP Entwine tiles: `npm run build:ski-lidar` (optional `--only wrightwood`). LOD0 files `data/ski/lidar/*-lod0.bin` are committed. LOD1 (`*-lod1.bin`) and the boundaries cache stay local. The 3D view is Lidar 3D on `/ski/`. 3DEP flights are mostly snow-free, so the cloud is ground and trees, not the snowpack. Tree cover along each run is written back onto `data/ski/*-trails.json` when a bake keeps at least 20,000 points.
 
 ## Disaster & Risk
 

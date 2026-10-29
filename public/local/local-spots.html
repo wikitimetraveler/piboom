@@ -73,6 +73,9 @@
     .fv-thrift-focus strong { display: block; }
     .fv-thrift-focus small { display: block; color: #5c6b73; }
     .fv-thrift-row a { flex: 0 0 auto; margin-right: 0.75rem; font-size: 0.85rem; }
+    .fv-thrift-toggle { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .fv-thrift-toggle button { border: 1px solid #4a90a4; background: #fff; color: #1c2833; border-radius: 999px; padding: 0.28rem 0.85rem; cursor: pointer; }
+    .fv-thrift-toggle button.is-on { background: #4a90a4; color: #fff; }
   </style>
 </head>
 <body>
@@ -93,14 +96,18 @@
   <div class="container-fluid">
     <div class="hero">
       <h1><i class="bi-map"></i> My Local Spots</h1>
-      <p>Thrift stores within 30 miles of Fountain Valley, plus the spots you save yourself.</p>
+      <p>Thrift stores within 30 miles of Fountain Valley or Hesperia, plus the spots you save yourself.</p>
     </div>
 
     <section class="card sidebar-card mb-4" id="fvThrift" aria-label="Thrift stores near Fountain Valley">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-start flex-wrap">
           <div>
-            <h2 class="h5 mb-1"><i class="bi-shop"></i> Thrift within 30 miles of Fountain Valley</h2>
+            <h2 class="h5 mb-2"><i class="bi-shop"></i> <span id="fvThriftTitle">Thrift within 30 miles of Fountain Valley</span></h2>
+            <div class="fv-thrift-toggle mb-2" id="fvThriftToggle" role="group" aria-label="Choose a town">
+              <button type="button" data-home="fountain-valley" class="is-on" aria-pressed="true">Fountain Valley</button>
+              <button type="button" data-home="hesperia" aria-pressed="false">Hesperia</button>
+            </div>
             <p class="text-muted small mb-2" id="fvThriftStatus" aria-live="polite">Loading thrift stores…</p>
           </div>
           <button type="button" class="btn btn-sm btn-outline-secondary mb-2" id="fvThriftFit">Show all on map</button>

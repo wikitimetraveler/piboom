@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import GoogleEarthView from '../GoogleEarthView';
 import GoogleMapView from '../GoogleMapView';
 import MapModeSwitch, { useMapMode } from '../MapModeSwitch';
+import { useLidarCloud } from '../../lib/lidar';
 import TerrainScene, { type OverlayPin, type OverlayTrack } from '../TerrainScene';
 import { exportKml, photoUrl } from '../../lib/logApi';
 import type { CrewPosition, LogPhoto, TripDay, TripPass } from '../../lib/logTypes';
@@ -30,6 +31,7 @@ export default function MapPanel({ pass, day, date, focus, onFocus, destinations
   const [area, setArea] = useState<string | null>(null);
   const { areas, demId } = useTripAreas(day, resort, area);
   const { dem, trails } = useMountain(demId);
+  const { cloud: lidar, note: lidarNote } = useLidarCloud(demId || undefined, mode === 'lidar');
   const [open, setOpen] = useState<LogPhoto | null>(null);
   const [kmlNote, setKmlNote] = useState('');
   const [busy, setBusy] = useState(false);
@@ -143,7 +145,7 @@ export default function MapPanel({ pass, day, date, focus, onFocus, destinations
       <div className="log-map__stage">
         {!demId ? (
           <p className="log-note">Pick a resort for this trip to see the mountain.</p>
-        ) : mode === 'topo' ? (
+        ) : mode === 'topo' || mode === 'lidar' ? (
           <TerrainScene
             dem={dem}
             trails={trails}
@@ -156,6 +158,8 @@ export default function MapPanel({ pass, day, date, focus, onFocus, destinations
             tracks={tracks}
             pins={pins}
             compact
+            lidar={mode === 'lidar' ? lidar : null}
+            lidarNote={mode === 'lidar' ? lidarNote : ''}
           />
         ) : !frame ? (
           <p className="log-note">Loading the mountain…</p>

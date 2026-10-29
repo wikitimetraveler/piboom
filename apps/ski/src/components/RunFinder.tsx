@@ -104,6 +104,14 @@ export default function RunFinder(props: Props) {
         />
         Named runs only
       </label>
+      <label className="ski-finder__check">
+        <input
+          type="checkbox"
+          checked={filter.treeOnly}
+          onChange={(e) => onFilter({ ...filter, treeOnly: e.target.checked })}
+        />
+        Tree runs
+      </label>
 
       <ol className="ski-finder__list" onMouseLeave={() => onPreview(null)}>
         {runs.map((r) => (

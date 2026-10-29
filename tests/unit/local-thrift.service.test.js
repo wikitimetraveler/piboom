@@ -4,9 +4,11 @@
 import { jest } from '@jest/globals';
 import {
   FOUNTAIN_VALLEY,
+  HESPERIA,
   RADIUS_MILES,
   clearThriftCache,
   dedupeStores,
+  getThriftNear,
   getThriftNearFountainValley,
   milesBetween,
   normalizeOverpassElement,
@@ -58,6 +60,29 @@ describe('local-thrift.service', () => {
     expect(near.miles).toBeLessThan(10);
     expect(withinThriftRadius(near.lat, near.lng)).toBe(true);
     expect(far).toBeNull();
+  });
+
+  test('Hesperia keeps a High Desert thrift shop and drops an Orange County one', () => {
+    const victorville = {
+      type: 'node',
+      id: 40,
+      lat: 34.536,
+      lon: -117.293,
+      tags: { name: 'Victorville Thrift', shop: 'second_hand' },
+    };
+    const santaAna = {
+      type: 'node',
+      id: 41,
+      lat: 33.748,
+      lon: -117.906,
+      tags: { name: 'Santa Ana Thrift', shop: 'charity' },
+    };
+    const nearHesperia = normalizeOverpassElement(victorville, HESPERIA);
+    expect(HESPERIA.name).toBe('Hesperia');
+    expect(nearHesperia.name).toBe('Victorville Thrift');
+    expect(nearHesperia.miles).toBeLessThan(15);
+    expect(normalizeOverpassElement(santaAna, HESPERIA)).toBeNull();
+    expect(normalizeOverpassElement(victorville, FOUNTAIN_VALLEY)).toBeNull();
   });
 
   test('dedupes the same shop reported twice', () => {

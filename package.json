@@ -97,6 +97,7 @@
     "fetch:iss-interiors": "node scripts/tools/fetch-iss-interiors.mjs",
     "build:ski-dem": "node scripts/tools/build-ski-dem.mjs",
     "build:ski-trails": "node scripts/tools/build-ski-trails.mjs",
+    "build:ski-lidar": "node scripts/tools/build-ski-lidar.mjs",
     "dev:ski": "npm run dev --prefix apps/ski",
     "build:ski": "npm run build --prefix apps/ski"
   },
@@ -136,6 +137,7 @@
     "@types/socket.io": "^3.0.2",
     "cross-env": "^10.1.0",
     "jest": "^30.2.0",
+    "laz-perf": "^0.0.7",
     "sharp": "^0.34.5",
     "topojson-client": "^3.1.0",
     "tsx": "^4.7.0",

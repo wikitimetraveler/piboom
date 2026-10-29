@@ -357,7 +357,7 @@ const ASPECT_ALIASES = {
 };
 
 /** Run finder: difficulty, pitch band, facing, minimum vertical. Sorted by vertical. */
-export function findRuns(runs = [], { resort, difficulty, minPitch, maxPitch, facing, minVerticalFt } = {}) {
+export function findRuns(runs = [], { resort, difficulty, minPitch, maxPitch, facing, minVerticalFt, treeOnly } = {}) {
   const diffs = [].concat(difficulty || []).filter(Boolean);
   const faces = facing ? ASPECT_ALIASES[String(facing).toLowerCase()] || [String(facing).toUpperCase()] : null;
   return runs
@@ -367,6 +367,7 @@ export function findRuns(runs = [], { resort, difficulty, minPitch, maxPitch, fa
     .filter((r) => maxPitch == null || r.avgPitchDeg <= maxPitch)
     .filter((r) => !faces || faces.includes(r.aspect))
     .filter((r) => minVerticalFt == null || r.verticalFt >= minVerticalFt)
+    .filter((r) => !treeOnly || r.coverLabel === 'tree' || r.coverLabel === 'glade' || (r.treeCoverPct ?? 0) >= 25)
     .sort((a, b) => b.verticalFt - a.verticalFt);
 }
 
@@ -380,7 +381,8 @@ export function runCatalogSnippet(runs = [], resortNames = {}, limit = 120) {
       (r) =>
         `- ${r.name} (${resortNames[r.resort] || r.resort}; ${r.label}): ${r.verticalFt} ft vertical, ` +
         `${r.lengthFt} ft long, avg ${r.avgPitchDeg}°, max ${r.maxPitchDeg}°, faces ${r.aspect}, ` +
-        `${r.topFt}→${r.bottomFt} ft`
+        `${r.topFt}→${r.bottomFt} ft` +
+        (r.treeCoverPct == null ? '' : `, tree cover ${r.treeCoverPct}% (${r.coverLabel || 'unknown'})`)
     )
     .join('\n');
 }

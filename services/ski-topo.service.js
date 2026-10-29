@@ -14,6 +14,8 @@ export const CHAIN_ELEV_FT = 4500;
 
 const SCENIC_KINDS = new Set(['viewpoint', 'town', 'food', 'lake', 'hike', 'history']);
 
+export const WIND_HOLD_MPH = 45;
+
 let catalogCache = null;
 
 export async function loadDestinations() {
@@ -76,6 +78,7 @@ export function scoreGoNoGo({
   resortBaseFt = null,
   alerts = [],
   precipIn = 0,
+  summitGustMph = null,
 } = {}) {
   const events = (alerts || []).map((a) =>
     `${a.event || ''} ${a.severity || ''} ${a.headline || ''}`.toLowerCase()
@@ -96,6 +99,7 @@ export function scoreGoNoGo({
   if (hasAdvisory) return 'caution';
   if (freeze != null && base != null && freeze <= base && wet) return 'caution';
   if (freeze != null && freeze <= CHAIN_ELEV_FT && wet) return 'caution';
+  if (Number(summitGustMph) >= WIND_HOLD_MPH) return 'caution';
   return 'go';
 }
 
@@ -196,6 +200,139 @@ export async function fetchDriveMinutes(origin, dest, fetchFn = fetch) {
   }
 }
 
+function finiteOrNull(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+function hourStamp(hour) {
+  if (hour?.interval?.startTime) return hour.interval.startTime;
+  const stamp = hour?.displayDateTime;
+  if (!stamp || stamp.year == null) return null;
+  const pad = (n) => String(n ?? 0).padStart(2, '0');
+  return `${stamp.year}-${pad(stamp.month)}-${pad(stamp.day)}T${pad(stamp.hours)}:${pad(stamp.minutes)}:00Z`;
+}
+
+/** One Google Weather current or hourly record, in imperial units. */
+export function parseGoogleConditions(data) {
+  if (!data || typeof data !== 'object') return null;
+  const precip = data.precipitation || {};
+  const wind = data.wind || {};
+  const snow = precip.snowQpf?.quantity;
+  return {
+    tempF: finiteOrNull(data.temperature?.degrees),
+    snowIn: snow == null ? 0 : finiteOrNull(snow) ?? 0,
+    precipProb: finiteOrNull(precip.probability?.percent),
+    windMph: finiteOrNull(wind.speed?.value),
+    gustMph: finiteOrNull(wind.gust?.value),
+    visibilityMi: finiteOrNull(data.visibility?.distance),
+    condition: data.weatherCondition?.description?.text || data.weatherCondition?.type || '',
+    time: hourStamp(data),
+  };
+}
+
+export function parseGoogleHours(data) {
+  const list = data?.forecastHours || data?.hours || [];
+  return list.map((hour) => parseGoogleConditions(hour)).filter(Boolean);
+}
+
+export function buildGoogleWeather(basePack, summitPack) {
+  if (!basePack && !summitPack) return null;
+  const hours = (summitPack || basePack)?.hours || [];
+  const summit = (summitPack || basePack)?.current || null;
+  const gusts = [summit?.gustMph, ...hours.map((hour) => hour.gustMph)].filter((n) => n != null);
+  const summitGustMph = gusts.length ? Math.max(...gusts) : null;
+  return {
+    source: (summitPack || basePack)?.source || 'google',
+    base: basePack?.current || null,
+    summit,
+    hours,
+    windHold: summitGustMph != null && summitGustMph >= WIND_HOLD_MPH,
+    summitGustMph,
+  };
+}
+
+const WMO_CONDITIONS = [
+  [0, 'Clear'],
+  [3, 'Cloudy'],
+  [48, 'Fog'],
+  [57, 'Drizzle'],
+  [67, 'Rain'],
+  [77, 'Snow'],
+  [82, 'Rain showers'],
+  [86, 'Snow showers'],
+  [99, 'Thunderstorm'],
+];
+
+export function wmoCondition(code) {
+  const n = finiteOrNull(code);
+  if (n == null) return '';
+  if (n >= 1 && n <= 2) return 'Partly cloudy';
+  return (WMO_CONDITIONS.find(([max]) => n <= max) || [])[1] || '';
+}
+
+function openMeteoRecord(src, i) {
+  const at = (key) => finiteOrNull(i == null ? src[key] : src[key]?.[i]);
+  const time = i == null ? src.time : src.time?.[i];
+  return {
+    tempF: at('temperature_2m'),
+    snowIn: at('snowfall') ?? 0,
+    precipProb: at('precipitation_probability'),
+    windMph: at('wind_speed_10m'),
+    gustMph: at('wind_gusts_10m'),
+    visibilityMi: null,
+    condition: wmoCondition(i == null ? src.weather_code : src.weather_code?.[i]),
+    time: time ? `${time}:00Z` : null,
+  };
+}
+
+/** Parse an Open-Meteo forecast into the same { current, hours } pack as Google Weather. */
+export function parseOpenMeteoHourly(data) {
+  if (!data || typeof data !== 'object') return null;
+  const hourly = data.hourly || {};
+  const count = Array.isArray(hourly.time) ? hourly.time.length : 0;
+  const hours = Array.from({ length: count }, (_, i) => openMeteoRecord(hourly, i));
+  const current = data.current ? openMeteoRecord(data.current) : null;
+  if (!current && !hours.length) return null;
+  return { source: 'open-meteo', current, hours };
+}
+
+/** Keyless hourly summit forecast used when Google Weather has no data. */
+export async function fetchOpenMeteoHourly(lat, lng, fetchFn = fetch) {
+  const fields = 'temperature_2m,snowfall,precipitation_probability,wind_speed_10m,wind_gusts_10m,weather_code';
+  const url =
+    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}` +
+    `&current=${fields.replace(',precipitation_probability', '')}&hourly=${fields}` +
+    `&temperature_unit=fahrenheit&precipitation_unit=inch&wind_speed_unit=mph` +
+    `&timezone=UTC&forecast_hours=24`;
+  try {
+    return parseOpenMeteoHourly(await fetchJson(url, { 'User-Agent': NWS_UA }, fetchFn));
+  } catch (_) {
+    return null;
+  }
+}
+
+export async function fetchGoogleWeather(lat, lng, fetchFn = fetch, apiKey) {
+  const key = apiKey === undefined ? getGoogleServerApiKey() : apiKey;
+  if (!key) return null;
+  const q =
+    `location.latitude=${encodeURIComponent(lat)}&location.longitude=${encodeURIComponent(lng)}` +
+    `&unitsSystem=IMPERIAL&key=${encodeURIComponent(key)}`;
+  try {
+    const [currentRes, hoursRes] = await Promise.all([
+      fetchFn(`https://weather.googleapis.com/v1/currentConditions:lookup?${q}`),
+      fetchFn(`https://weather.googleapis.com/v1/forecast/hours:lookup?${q}&hours=24`),
+    ]);
+    if (!currentRes?.ok && !hoursRes?.ok) return null;
+    const current = currentRes?.ok ? parseGoogleConditions(await currentRes.json()) : null;
+    const hours = hoursRes?.ok ? parseGoogleHours(await hoursRes.json()) : [];
+    if (!current && !hours.length) return null;
+    return { source: 'google', current, hours };
+  } catch (_) {
+    return null;
+  }
+}
+
 export async function buildDestinationBrief(dest, home, fetchFn = fetch) {
   let weather = {};
   let alerts = [];
@@ -203,24 +340,43 @@ export async function buildDestinationBrief(dest, home, fetchFn = fetch) {
   let driveMin = dest.typicalDriveMin;
   let driveSource = 'typical';
 
-  try {
-    weather = await fetchOpenMeteo(dest.lat, dest.lng, fetchFn);
-  } catch (_) {
-    weather = {};
-  }
-  alerts = await fetchNwsAlerts(dest.lat, dest.lng, fetchFn);
-  forecast = await fetchNwsForecast(dest.lat, dest.lng, fetchFn);
-  const liveDrive = await fetchDriveMinutes(home, dest, fetchFn);
+  const summitLat = dest.summitLat ?? dest.lat;
+  const summitLng = dest.summitLng ?? dest.lng;
+  const samePoint = summitLat === dest.lat && summitLng === dest.lng;
+
+  const [openMeteo, nwsAlerts, nwsForecast, liveDrive, googleBase, googleSummit] = await Promise.all([
+    fetchOpenMeteo(dest.lat, dest.lng, fetchFn).catch(() => ({})),
+    fetchNwsAlerts(dest.lat, dest.lng, fetchFn),
+    fetchNwsForecast(dest.lat, dest.lng, fetchFn),
+    fetchDriveMinutes(home, dest, fetchFn),
+    fetchGoogleWeather(dest.lat, dest.lng, fetchFn),
+    samePoint ? Promise.resolve(null) : fetchGoogleWeather(summitLat, summitLng, fetchFn),
+  ]);
+  weather = openMeteo || {};
+  alerts = nwsAlerts;
+  forecast = nwsForecast;
   if (liveDrive != null) {
     driveMin = liveDrive;
     driveSource = 'distance-matrix';
   }
+  let basePack = googleBase;
+  let summitPack = samePoint ? googleBase : googleSummit;
+  if (!basePack && !summitPack) {
+    const [omBase, omSummit] = await Promise.all([
+      fetchOpenMeteoHourly(dest.lat, dest.lng, fetchFn),
+      samePoint ? Promise.resolve(null) : fetchOpenMeteoHourly(summitLat, summitLng, fetchFn),
+    ]);
+    basePack = omBase;
+    summitPack = samePoint ? omBase : omSummit;
+  }
+  const googleWeather = buildGoogleWeather(basePack, summitPack);
 
   const score = scoreGoNoGo({
     freezeLevelFt: weather.freezeLevelFt,
     resortBaseFt: dest.baseFt,
     alerts,
     precipIn: weather.precipIn,
+    summitGustMph: googleWeather?.summitGustMph ?? null,
   });
   const chains = chainsLikely({ freezeLevelFt: weather.freezeLevelFt, alerts });
 
@@ -232,6 +388,8 @@ export async function buildDestinationBrief(dest, home, fetchFn = fetch) {
     dem: dest.dem,
     lat: dest.lat,
     lng: dest.lng,
+    summitLat,
+    summitLng,
     baseFt: dest.baseFt,
     summitFt: dest.summitFt,
     verticalFt: dest.summitFt - dest.baseFt,
@@ -244,6 +402,7 @@ export async function buildDestinationBrief(dest, home, fetchFn = fetch) {
     weather,
     forecast,
     alerts,
+    googleWeather,
     score,
     chainsLikely: chains,
   };
@@ -273,6 +432,10 @@ export default {
   stopKey,
   scoreGoNoGo,
   chainsLikely,
+  fetchGoogleWeather,
+  buildGoogleWeather,
+  fetchOpenMeteoHourly,
+  parseOpenMeteoHourly,
   getBrief,
   buildDestinationBrief,
   CHAIN_ELEV_FT,

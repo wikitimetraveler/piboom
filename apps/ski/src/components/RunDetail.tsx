@@ -1,5 +1,5 @@
 import type { SkiRun } from '../lib/types';
-import { fmtDeg, fmtFt, pitchColor, runTitle, TIER_META, tierOf } from '../lib/trails';
+import { coverPhrase, fmtDeg, fmtFt, pitchColor, runTitle, TIER_META, tierOf } from '../lib/trails';
 import RunSymbol from './RunSymbol';
 
 interface Props {
@@ -93,6 +93,12 @@ export default function RunDetail({ run, onClear }: Props) {
         <dd>{fmtDeg(run.maxPitchDeg)}</dd>
         <dt>Faces</dt>
         <dd>{run.aspect ? `${run.aspect} (${run.aspectDeg}°)` : '—'}</dd>
+        <dt>Tree cover</dt>
+        <dd>
+          {run.treeCoverPct == null
+            ? '—'
+            : `${run.treeCoverPct}%${coverPhrase(run.coverLabel) ? ` · ${coverPhrase(run.coverLabel)}` : ''}`}
+        </dd>
         <dt>Top → bottom</dt>
         <dd>
           {fmtFt(run.topFt)} → {fmtFt(run.bottomFt)}
