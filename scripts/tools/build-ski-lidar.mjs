@@ -4,7 +4,7 @@
  *   npm run build:ski-lidar
  *   npm run build:ski-lidar -- --only wrightwood
  *   npm run build:ski-lidar -- --only wrightwood --max-points 20000 --lod0 5000 --skip-trails
- * LOD0 (200k points, ~1.6 MB) is meant to be committed. LOD1 is gitignored.
+ * LOD0 (200k points, ~1.6 MB) and LOD1 (250k points, ~2 MB) are committed, along with the USGS boundaries cache.
  * Development work by David Lane
  */
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
