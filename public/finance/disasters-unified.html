@@ -37,6 +37,7 @@
     <script type="module" src="../shared/ai-insights-card.js"></script>
     <link rel="stylesheet" href="/finance/css/disaster-ai-scan-card.css" />
     <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
+    <script src="/shared/js/open-suite-bar.js" defer></script>
   </head>
   <body class="du-page">
     <script src="/finance/js/disaster-heygen-popup.js"></script>
@@ -72,25 +73,25 @@
       <div class="du-hero-inner">
         <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
           <div class="du-hero-brand">
-            <p class="du-hero-kicker mb-1">90-day window · Multi-source hazard intelligence</p>
+            <p class="du-hero-kicker mb-1">90-day live window · Hazard monitoring</p>
             <h1 class="mb-1"><i class="bi-shield-exclamation me-2"></i>Unified Disasters</h1>
-            <p class="du-hero-lead small text-white-50 mb-0">Pick a place, review events, then triage nearby loans — live map proximity plus a persisted impact graph in Postgres (not a loss probability).</p>
-            <nav class="du-workflow-strip" id="workflowStripDesktop" aria-label="Workflow: Place, Events, Loans, Tools">
-              <button type="button" class="du-workflow-strip-btn" data-du-section-target="duGeoStage" data-du-section-step="1"><span class="step-num">1</span> Place</button>
-              <button type="button" class="du-workflow-strip-btn du-workflow-strip-active" data-du-section-target="collapseDisasters" data-du-section-step="2" aria-current="step"><span class="step-num">2</span> Events</button>
-              <button type="button" class="du-workflow-strip-btn" data-du-section-target="collapseLoans" data-du-section-step="3"><span class="step-num">3</span> Loans</button>
-              <button type="button" class="du-workflow-strip-btn" data-du-section-target="duBottomDock" data-du-section-step="4"><span class="step-num">4</span> Tools</button>
+            <p class="du-hero-lead small text-white-50 mb-0">FEMA, NASA FIRMS, USGS, NOAA/NWS, and NHC on one map. Review county hotspots, then open a property list for a portfolio check.</p>
+            <nav class="du-workflow-strip" id="workflowStripDesktop" aria-label="Workflow: Place, Hotspots, Spreadsheet, Loans, Tools">
+              <button type="button" class="du-workflow-strip-btn" data-du-section-target="duGeoStage" data-du-section-step="1"><span class="step-num">1</span> Map &amp; Place</button>
+              <button type="button" class="du-workflow-strip-btn du-workflow-strip-active" data-du-section-target="collapseRiskIntel" data-du-section-step="2" aria-current="step"><span class="step-num">2</span> Hotspots</button>
+              <button type="button" class="du-workflow-strip-btn" data-du-section-target="collapseSpreadsheet" data-du-section-step="3"><span class="step-num">3</span> Spreadsheet Risk Analyzer</button>
+              <button type="button" class="du-workflow-strip-btn" data-du-section-target="collapseLoans" data-du-section-step="3"><span class="step-num">4</span> Sample loans</button>
             </nav>
-            <!-- Mobile mirror of the same 4-step path (desktop strip is authoritative on lg+) -->
+            <!-- Mobile mirror of the same path (desktop strip is authoritative on lg+) -->
             <ul class="du-workflow-pills" id="workflowHint" aria-label="Workflow steps">
               <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="duGeoStage" data-du-section-step="1"><span class="step-num">1</span> Place</button></li>
-              <li class="du-workflow-pill-active"><button type="button" class="du-workflow-pill-btn" data-du-section-target="collapseDisasters" data-du-section-step="2"><span class="step-num">2</span> Events</button></li>
-              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="collapseLoans" data-du-section-step="3"><span class="step-num">3</span> Loans</button></li>
-              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="duBottomDock" data-du-section-step="4"><span class="step-num">4</span> Tools</button></li>
+              <li class="du-workflow-pill-active"><button type="button" class="du-workflow-pill-btn" data-du-section-target="collapseRiskIntel" data-du-section-step="2"><span class="step-num">2</span> Hotspots</button></li>
+              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="collapseSpreadsheet" data-du-section-step="3"><span class="step-num">3</span> Spreadsheet</button></li>
+              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="collapseLoans" data-du-section-step="4"><span class="step-num">4</span> Loans</button></li>
             </ul>
           </div>
           <div class="du-hero-actions d-flex flex-wrap gap-2 align-items-center">
-            <a class="btn btn-outline-light btn-sm" href="/finance/index.html"><i class="bi-arrow-left"></i> Hub</a>
+            <a class="btn btn-outline-light btn-sm" href="/open/"><i class="bi-collection"></i> Open suite</a>
             <a class="btn btn-outline-light btn-sm" href="disasters-webcams.html"><i class="bi-camera-video"></i> Webcams</a>
             <a class="btn btn-outline-light btn-sm" href="disasters-encompass-map.html" title="Optional fullscreen Google map · live proximity loan pins"><i class="bi-fullscreen"></i> Fullscreen map</a>
             <button type="button" class="btn btn-warning btn-sm" id="refreshBtnHero" title="Fetch FEMA, FIRMS, USGS, NWS, NHC live APIs and upsert into Postgres (1–3 min)">
@@ -182,14 +183,15 @@
           <div class="section-sidebar-title">Workflow</div>
           <ul class="section-sidebar-nav" id="duSectionSidebarNav">
             <li><a href="#" data-du-section-target="duGeoStage" data-du-section-step="1"><i class="bi bi-binoculars"></i> Place</a></li>
+            <li><a href="#" data-bs-target="#collapseRiskIntel" data-heading="headingRiskIntel" data-du-section-step="2"><i class="bi bi-fire"></i> All Hotspots</a></li>
+            <li><a href="#" data-bs-target="#collapseSpreadsheet" data-heading="headingSpreadsheet" data-du-section-step="3"><i class="bi bi-file-earmark-spreadsheet"></i> Spreadsheet Risk</a></li>
             <li><a href="#" class="active-section" data-bs-target="#collapseDisasters" data-heading="headingDisasters" data-du-section-step="2"><i class="bi bi-shield-exclamation"></i> Events</a></li>
             <li><a href="#" data-bs-target="#collapseCommandDeck" data-heading="headingCommandDeck" data-du-section-step="2"><i class="bi bi-sliders"></i> Sources</a></li>
             <li><a href="#" data-bs-target="#collapseFilters" data-heading="headingFilters" data-du-section-step="2"><i class="bi bi-funnel"></i> Filters</a></li>
-            <li><a href="#" data-bs-target="#collapseRiskIntel" data-heading="headingRiskIntel" data-du-section-step="2"><i class="bi bi-speedometer2"></i> Risk intel</a></li>
             <li><a href="#" data-bs-target="#collapseMapYouTube" data-heading="headingMapYouTube" data-du-section-step="2"><i class="bi bi-youtube"></i> Disaster videos</a></li>
             <li>
-              <a href="#" data-bs-target="#collapseEncompassMap" data-heading="headingEncompassMap" data-du-section-step="3" data-du-scroll-target="duEncompassLoansMapCard" title="Google Encompass map · live proximity — not graph NEAR">
-                <i class="bi bi-geo-alt"></i> Encompass map
+              <a href="#" data-bs-target="#collapseEncompassMap" data-heading="headingEncompassMap" data-du-section-step="3" data-du-scroll-target="duEncompassLoansMapCard" title="Proximity map for events near a place">
+                <i class="bi bi-geo-alt"></i> Proximity map
               </a>
             </li>
             <li><a href="#" data-bs-target="#collapseLoans" data-heading="headingLoans" data-du-section-step="3"><i class="bi bi-bank"></i> Loans</a></li>
@@ -205,6 +207,67 @@
         </nav>
 
         <div class="section-content-area">
+      <!-- Showcase Overview Banner: explains the page clearly & gives 1-click actions -->
+      <section class="card du-showcase-banner mb-4" id="duShowcaseOverview" aria-label="Hazard desk overview">
+        <div class="card-body py-3 px-3">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3 pb-2 border-bottom">
+            <div>
+              <span class="badge text-bg-primary me-2"><i class="bi bi-stars me-1"></i>Hazard desk</span>
+              <strong class="du-showcase-title">Hazards on one map</strong>
+              <span class="text-muted small ms-1">— From national hazard monitoring to property-level underwriting conditions in seconds.</span>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+              <button type="button" class="btn btn-sm btn-primary" id="duShowcaseSampleTapeBtn">
+                <i class="bi bi-file-earmark-spreadsheet me-1"></i>Analyze Sample Property Spreadsheet (12 Loans)
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-danger" id="duShowcaseHotspotsBtn">
+                <i class="bi bi-fire me-1"></i>View all hotspots
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" id="duShowcaseDemoLoadBtn" title="Populate showcase hazards and run portfolio analysis">
+                <i class="bi bi-play-circle me-1"></i>Run Full Showcase Demo
+              </button>
+            </div>
+          </div>
+          <div class="row g-3">
+            <div class="col-xl-3 col-md-6">
+              <div class="du-showcase-step-card h-100">
+                <div class="du-showcase-step-head">
+                  <span class="du-showcase-step-num">1</span>
+                  <strong>Multi-Source Hazard Map</strong>
+                </div>
+                <p class="small text-muted mb-0">Live 90-day feed fusing <strong>FEMA</strong> declarations, <strong>NASA FIRMS</strong> wildfires, <strong>USGS</strong> earthquakes, <strong>NOAA/NWS</strong> alerts, and <strong>NHC</strong> hurricanes by state &amp; county.</p>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+              <div class="du-showcase-step-card h-100">
+                <div class="du-showcase-step-head">
+                  <span class="du-showcase-step-num">2</span>
+                  <strong>County hotspots</strong>
+                </div>
+                <p class="small text-muted mb-0">Complete county-by-county hotspot ranking with exact <strong>GSE/FHA requirements</strong>: Form 1004D re-inspections, HOI binding moratoriums, and closing holds.</p>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+              <div class="du-showcase-step-card h-100">
+                <div class="du-showcase-step-head">
+                  <span class="du-showcase-step-num">3</span>
+                  <strong>Spreadsheet Risk Analyzer</strong>
+                </div>
+                <p class="small text-muted mb-0">Upload an <code>.xlsx</code> or <code>.csv</code> property tape (or paste from Excel) to score every property against active disasters and export an underwriting checklist.</p>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+              <div class="du-showcase-step-card h-100">
+                <div class="du-showcase-step-head">
+                  <span class="du-showcase-step-num">4</span>
+                  <strong>Cameras, 3D KML &amp; AI Expert</strong>
+                </div>
+                <p class="small text-muted mb-0">Inspect 1,000+ live fire/flood webcams, export a cinematic <strong>Google Earth KML</strong> flyover tour, or ask the <strong>Processor AI Expert</strong> for loan triage steps.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
       <!-- Hazard lens: Leaflet state/county picker (Engine A) -->
       <section class="card du-geo-stage mb-4" id="duGeoStage" aria-label="State and county hazard lens">
         <div class="card-header du-geo-stage-header d-flex flex-wrap justify-content-between align-items-center gap-2">
@@ -232,7 +295,7 @@
             </select>
           </div>
           <div class="du-overlay-chips mb-2" role="group" aria-label="Map overlays">
-            <button type="button" class="du-overlay-chip du-overlay-chip--active" data-du-overlay="live" aria-pressed="true" title="Live GET /api/disasters/near radius — operational truth">
+            <button type="button" class="du-overlay-chip du-overlay-chip--active" data-du-overlay="live" aria-pressed="true" title="Live events inside the selected radius">
               <span class="du-overlay-swatch du-overlay-swatch--live"></span> Live /near ring
             </button>
             <button type="button" class="du-overlay-chip du-overlay-chip--active" data-du-overlay="graphNear" aria-pressed="true" title="Persisted graph NEAR edges — as-of last reseed (seeded_at)">
@@ -481,42 +544,92 @@
         </div>
       </div>
 
-      <div class="du-section-card du-risk-intel du-section-card-hidden" id="duRiskIntelCard" data-du-collapse-target="collapseRiskIntel">
-        <div class="du-section-card-header collapsed" tabindex="0" id="headingRiskIntel" role="button" data-bs-toggle="collapse" data-bs-target="#collapseRiskIntel" aria-expanded="false" aria-controls="collapseRiskIntel">
+      <div class="du-section-card du-risk-intel" id="duRiskIntelCard" data-du-collapse-target="collapseRiskIntel">
+        <div class="du-section-card-header" tabindex="0" id="headingRiskIntel" role="button" data-bs-toggle="collapse" data-bs-target="#collapseRiskIntel" aria-expanded="true" aria-controls="collapseRiskIntel">
           <span class="du-section-title">
-            <i class="bi bi-speedometer2" aria-hidden="true"></i>
-            <h2 class="du-section-heading mb-0">Risk intelligence</h2>
-            <span class="badge rounded-pill text-bg-secondary">Events</span>
+            <span class="du-section-step-pill" aria-hidden="true">2</span>
+            <i class="bi bi-fire" aria-hidden="true"></i>
+            <h2 class="du-section-heading mb-0">County hotspots</h2>
+            <span class="badge rounded-pill text-bg-danger" id="duHotspotTotalCountBadge">All Hotspots</span>
             <span class="badge rounded-pill text-bg-primary du-hotspot-filter-badge" id="duHotspotFilterBadge" hidden></span>
           </span>
           <i class="bi bi-chevron-down du-section-chevron" aria-hidden="true"></i>
         </div>
-        <div id="collapseRiskIntel" class="collapse du-section-card-body" aria-labelledby="headingRiskIntel">
+        <div id="collapseRiskIntel" class="collapse show du-section-card-body" aria-labelledby="headingRiskIntel">
           <p class="small text-muted mb-3">
-            Hotspots and top events from the loaded grid. Click a hotspot to filter the disasters table and load county loans; click an event to drill down.
+            Complete list of active disaster hotspots ranked by severity, paired with concrete <strong>mortgage lender underwriting, inspection, insurance, and closing requirements</strong>. Click any hotspot to filter the events table and load affected county loans.
           </p>
+
+          <!-- What a Lender Needs — 4 Pillar Policy Reference -->
+          <div class="row g-2 mb-3" aria-label="What a lender needs by hazard tier">
+            <div class="col-xl-3 col-md-6">
+              <div class="p-2 rounded border bg-danger-subtle border-danger-subtle h-100 small">
+                <div class="fw-bold text-danger-emphasis mb-1"><i class="bi bi-house-exclamation me-1"></i>1. FEMA Declared Counties (DR#)</div>
+                <div class="text-body-secondary">Require <strong>Post-Disaster Inspection (Form 1004D / exterior + interior photos)</strong>, borrower no-damage attestation, and active HOI verification before closing or funding.</div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+              <div class="p-2 rounded border bg-warning-subtle border-warning-subtle h-100 small">
+                <div class="fw-bold text-warning-emphasis mb-1"><i class="bi bi-fire me-1"></i>2. Active Wildfire &amp; Hurricane (&lt;25 mi)</div>
+                <div class="text-body-secondary">Check <strong>insurance carrier ZIP binding moratoriums</strong>; require exterior photo certification confirming the subject property is outside active fire/surge perimeters.</div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+              <div class="p-2 rounded border bg-info-subtle border-info-subtle h-100 small">
+                <div class="fw-bold text-info-emphasis mb-1"><i class="bi bi-droplet-half me-1"></i>3. SFHA Flood Zones (A / AE / V / VE)</div>
+                <div class="text-body-secondary">Verify <strong>Life-of-Loan Flood Determination</strong>, mandatory NFIP or qualifying private flood insurance binder, and escrow setup per GSE/FHA coverage minimums.</div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+              <div class="p-2 rounded border bg-secondary-subtle border-secondary-subtle h-100 small">
+                <div class="fw-bold text-secondary-emphasis mb-1"><i class="bi bi-bank me-1"></i>4. Closing Gate &amp; Servicing Triage</div>
+                <div class="text-body-secondary">Place <strong>Clear-to-Close / Funding Hold</strong> on unverified loans in impact zones; flag closed/serviced loans in FEMA Individual Assistance (IA) counties for forbearance outreach.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hotspots Filter & Export Toolbar -->
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+            <div class="btn-group btn-group-sm" role="group" aria-label="Filter hotspots by lender urgency">
+              <button type="button" class="btn btn-outline-secondary active" data-du-hotspot-filter="all">All Hotspots</button>
+              <button type="button" class="btn btn-outline-danger" data-du-hotspot-filter="critical_high">Critical &amp; High (6+)</button>
+              <button type="button" class="btn btn-outline-warning" data-du-hotspot-filter="fema">FEMA Declared</button>
+              <button type="button" class="btn btn-outline-primary" data-du-hotspot-filter="hold">Closing Hold / Re-Inspect</button>
+            </div>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+              <input type="search" id="duHotspotSearchInput" class="form-control form-control-sm" style="min-width: 220px;" placeholder="Search county, state, hazard, requirement…" aria-label="Search hotspots">
+              <button type="button" class="btn btn-sm btn-outline-secondary" id="duHotspotToggleAllBtn" title="Toggle between Top 15 and All Hotspots">Showing All</button>
+              <button type="button" class="btn btn-sm btn-outline-success" id="duHotspotExportCsvBtn" title="Download all hotspots and lender requirements as CSV">
+                <i class="bi bi-download me-1"></i>Export Hotspots CSV
+              </button>
+            </div>
+          </div>
+
           <div class="row g-3">
-            <div class="col-lg-7">
-              <h3 class="du-risk-intel-kicker">Risk hotspots</h3>
-              <div class="table-responsive">
-                <table class="table table-sm table-hover du-hotspot-table mb-0" id="duHotspotTable" aria-label="Risk hotspots by county">
-                  <thead>
+            <div class="col-lg-8">
+              <h3 class="du-risk-intel-kicker">Active hotspots</h3>
+              <div class="table-responsive" style="max-height: 460px; overflow-y: auto;">
+                <table class="table table-sm table-hover align-middle du-hotspot-table mb-0" id="duHotspotTable" aria-label="Risk hotspots and lender requirements by county">
+                  <thead class="table-light sticky-top">
                     <tr>
-                      <th>Location</th>
+                      <th>Rank &amp; Location</th>
                       <th class="text-end">Events</th>
-                      <th class="text-end" title="Peak event intensity in this area — not loan ops triage">Peak intensity</th>
-                      <th>Dominant type</th>
+                      <th class="text-end" title="Peak event intensity in this area">Peak Intensity</th>
+                      <th>Dominant Hazard</th>
+                      <th>FEMA Status</th>
+                      <th>Inspection, insurance, and gate</th>
+                      <th class="text-end">Action</th>
                     </tr>
                   </thead>
                   <tbody id="duHotspotTableBody">
-                    <tr><td colspan="4" class="text-muted small">Loading…</td></tr>
+                    <tr><td colspan="7" class="text-muted small">Loading hotspots…</td></tr>
                   </tbody>
                 </table>
               </div>
             </div>
-            <div class="col-lg-5">
-              <h3 class="du-risk-intel-kicker">Top events</h3>
-              <div id="duTopEventsList" class="du-top-events-list" aria-label="Highest risk events">
+            <div class="col-lg-4">
+              <h3 class="du-risk-intel-kicker">Top High-Severity Events</h3>
+              <div id="duTopEventsList" class="du-top-events-list" aria-label="Highest risk events" style="max-height: 460px; overflow-y: auto;">
                 <p class="text-muted small mb-0">Loading…</p>
               </div>
             </div>
@@ -528,6 +641,162 @@
             <span class="du-risk-legend-dot du-risk-legend--low"></span> Low (&lt;3)
             <span class="du-risk-legend-dot du-risk-legend--none"></span> Minimal
           </p>
+        </div>
+      </div>
+
+      <!-- NEW: Property Spreadsheet Risk Analyzer Section -->
+      <div class="du-section-card du-spreadsheet-card mt-3" id="duSpreadsheetSection" data-du-collapse-target="collapseSpreadsheet">
+        <div class="du-section-card-header" tabindex="0" id="headingSpreadsheet" role="button" data-bs-toggle="collapse" data-bs-target="#collapseSpreadsheet" aria-expanded="true" aria-controls="collapseSpreadsheet">
+          <span class="du-section-title">
+            <span class="du-section-step-pill" aria-hidden="true">3</span>
+            <i class="bi bi-file-earmark-spreadsheet" aria-hidden="true"></i>
+            <h2 class="du-section-heading mb-0">Property Spreadsheet Risk Analyzer</h2>
+            <span class="badge rounded-pill text-bg-primary">Portfolio Upload · CSV / XLSX / Paste</span>
+          </span>
+          <i class="bi bi-chevron-down du-section-chevron" aria-hidden="true"></i>
+        </div>
+        <div id="collapseSpreadsheet" class="collapse show du-section-card-body" aria-labelledby="headingSpreadsheet">
+          <p class="small text-muted mb-3">
+            Upload a spreadsheet of properties (<code>.xlsx</code>, <code>.xls</code>, or <code>.csv</code>), paste rows from a sheet, or click <strong>Load sample properties</strong> to run a multi-hazard check with inspection, insurance, and closing-hold notes.
+          </p>
+
+          <div class="row g-3 align-items-stretch mb-3">
+            <div class="col-lg-6">
+              <div class="du-sp-dropzone p-3 rounded border text-center h-100 d-flex flex-column justify-content-center" id="duSpreadsheetDropZone" role="region" aria-label="Upload property spreadsheet">
+                <input type="file" id="duSpreadsheetFileInput" accept=".xlsx,.xls,.csv,.tsv,.txt" class="d-none" />
+                <div class="mb-2">
+                  <i class="bi bi-cloud-arrow-up fs-2 text-primary"></i>
+                </div>
+                <div class="fw-semibold mb-1">Drop a Property Spreadsheet (<code>.xlsx</code> or <code>.csv</code>) here or click to browse</div>
+                <p class="small text-muted mb-2">
+                  Recognizes columns: <code>Loan Number</code>, <code>Borrower</code>, <code>Address</code>, <code>City</code>, <code>County</code>, <code>State</code>, <code>ZIP</code>, <code>Loan Amount</code>, <code>Milestone</code>, <code>Flood Zone</code>, <code>Latitude</code>, <code>Longitude</code>
+                </p>
+                <div class="d-flex flex-wrap justify-content-center gap-2 mt-1">
+                  <button type="button" class="btn btn-sm btn-primary" id="duSpreadsheetSampleBtn">
+                    <i class="bi bi-lightning-charge-fill me-1"></i>Load sample properties (12)
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline-secondary" id="duSpreadsheetPasteToggleBtn">
+                    <i class="bi bi-clipboard-plus me-1"></i>Paste Spreadsheet Rows
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline-secondary" id="duSpreadsheetTemplateBtn">
+                    <i class="bi bi-download me-1"></i>Download Template CSV
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-6">
+              <div class="p-3 rounded border bg-light-subtle h-100 d-flex flex-column justify-content-between">
+                <div>
+                  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                    <strong class="small text-uppercase text-muted"><i class="bi bi-sliders me-1"></i>Portfolio Risk Engine Settings</strong>
+                    <div class="d-flex align-items-center gap-2">
+                      <label class="small fw-semibold mb-0" for="duSpreadsheetRadiusSelect">Proximity Radius:</label>
+                      <select id="duSpreadsheetRadiusSelect" class="form-select form-select-sm w-auto" aria-label="Hazard proximity radius in miles">
+                        <option value="10">10 miles</option>
+                        <option value="25" selected>25 miles</option>
+                        <option value="50">50 miles (Regional)</option>
+                        <option value="100">100 miles (Wide)</option>
+                      </select>
+                    </div>
+                  </div>
+                  <ul class="small text-muted mb-2 ps-3">
+                    <li><strong>Coordinate + County Matching:</strong> Checks exact distance to active wildfires (FIRMS), hurricanes (NHC), quakes (USGS), and weather alerts (NWS), plus county-wide FEMA Disaster Declarations (DR#).</li>
+                    <li><strong>Decision notes:</strong> Flags properties that need a re-inspection, an insurance-binder check, or flood insurance.</li>
+                  </ul>
+                </div>
+                <div id="duSpreadsheetStatus" class="small text-muted fw-medium" role="status" aria-live="polite">
+                  Ready — upload a spreadsheet or click &ldquo;Load sample properties (12)&rdquo; to see a portfolio check.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Optional Paste Area -->
+          <div id="duSpreadsheetPasteWrap" class="mb-3 p-3 rounded border bg-light-subtle" hidden>
+            <label class="form-label small fw-semibold" for="duSpreadsheetPasteInput">Paste CSV or Tab-Separated Rows from Excel / Google Sheets (include header row):</label>
+            <textarea id="duSpreadsheetPasteInput" class="form-control form-control-sm font-monospace mb-2" rows="5" placeholder="Loan Number,Borrower Name,Property Address,City,County,State,ZIP,Loan Amount,Milestone,Flood Zone,Latitude,Longitude&#10;LN-1001,Jane Doe,16420 Sunset Blvd,Pacific Palisades,Los Angeles,CA,90272,950000,Clear to Close,X,34.0481,-118.5262"></textarea>
+            <div class="d-flex justify-content-end gap-2">
+              <button type="button" class="btn btn-sm btn-primary" id="duSpreadsheetPasteRunBtn">
+                <i class="bi bi-play-fill me-1"></i>Analyze Pasted Properties
+              </button>
+            </div>
+          </div>
+
+          <!-- Spreadsheet Analysis Results -->
+          <div id="duSpreadsheetResultsWrap" hidden>
+            <!-- Portfolio KPI Summary Row -->
+            <div class="row g-2 mb-3" aria-label="Spreadsheet portfolio risk summary">
+              <div class="col-md-3 col-6">
+                <div class="p-2 rounded border bg-white h-100">
+                  <div class="small text-muted">Portfolio Analyzed</div>
+                  <div class="fw-bold fs-6" id="duSpKpiTotalCount">0 Properties</div>
+                  <div class="small text-secondary" id="duSpKpiTotalUpb">$0 Total UPB</div>
+                </div>
+              </div>
+              <div class="col-md-3 col-6">
+                <div class="p-2 rounded border bg-danger-subtle border-danger-subtle h-100">
+                  <div class="small text-danger-emphasis">High / Critical Risk</div>
+                  <div class="fw-bold fs-6 text-danger" id="duSpKpiHighRiskCount">0 High / Critical</div>
+                  <div class="small text-danger-emphasis" id="duSpKpiHighRiskUpb">$0 At-Risk UPB</div>
+                </div>
+              </div>
+              <div class="col-md-3 col-6">
+                <div class="p-2 rounded border bg-warning-subtle border-warning-subtle h-100">
+                  <div class="small text-warning-emphasis">Closing Hold / Re-Inspect</div>
+                  <div class="fw-bold fs-6 text-dark" id="duSpKpiHoldCount">0 Hold / Re-Inspect</div>
+                  <div class="small text-warning-emphasis" id="duSpKpiHoldUpb">$0 Hold UPB</div>
+                </div>
+              </div>
+              <div class="col-md-3 col-6">
+                <div class="p-2 rounded border bg-info-subtle border-info-subtle h-100">
+                  <div class="small text-info-emphasis">Flood &amp; FEMA Declarations</div>
+                  <div class="fw-bold fs-6 text-primary" id="duSpKpiFloodCount">0 SFHA Flood Action</div>
+                  <div class="small text-info-emphasis" id="duSpKpiFemaCount">0 in FEMA DR Counties</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Results Toolbar -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+              <div class="btn-group btn-group-sm" role="group" aria-label="Filter analyzed spreadsheet properties">
+                <button type="button" class="btn btn-outline-secondary active" data-du-sp-filter="all">All Properties</button>
+                <button type="button" class="btn btn-outline-danger" data-du-sp-filter="hold">Closing Hold / Re-Inspect</button>
+                <button type="button" class="btn btn-outline-warning" data-du-sp-filter="high">Critical &amp; High Risk</button>
+                <button type="button" class="btn btn-outline-primary" data-du-sp-filter="flood">Mandatory Flood (SFHA)</button>
+                <button type="button" class="btn btn-outline-success" data-du-sp-filter="clear">Clear to Proceed</button>
+              </div>
+              <div class="d-flex flex-wrap align-items-center gap-2">
+                <span class="small text-muted" id="duSpreadsheetRowCountBadge"></span>
+                <input type="search" id="duSpreadsheetSearchInput" class="form-control form-control-sm" style="min-width: 200px;" placeholder="Filter loan #, address, county…" aria-label="Search analyzed properties">
+                <button type="button" class="btn btn-sm btn-outline-primary" id="duSpreadsheetPlotMapBtn">
+                  <i class="bi bi-pin-map me-1"></i>Plot Portfolio on Map
+                </button>
+                <button type="button" class="btn btn-sm btn-success" id="duSpreadsheetExportBtn">
+                  <i class="bi bi-file-earmark-arrow-down me-1"></i>Export Risk Analysis CSV
+                </button>
+              </div>
+            </div>
+
+            <!-- Results Table -->
+            <div class="table-responsive" style="max-height: 520px; overflow-y: auto;">
+              <table class="table table-sm table-hover align-middle mb-0" id="duSpreadsheetTable" aria-label="Analyzed spreadsheet properties">
+                <thead class="table-light sticky-top">
+                  <tr>
+                    <th>Loan &amp; Borrower</th>
+                    <th>Property Address</th>
+                    <th class="text-end">Amount &amp; Stage</th>
+                    <th class="text-center">Flood Zone</th>
+                    <th>Risk Score</th>
+                    <th>Matched Hazards &amp; Closest</th>
+                    <th>Status</th>
+                    <th>Inspection, insurance, and gate</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="duSpreadsheetTableBody"></tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
       </div>
@@ -664,7 +933,7 @@
               <div class="alert alert-light border py-2 small mb-3" role="note">
                 <i class="bi bi-geo-alt me-1"></i>
                 Hazard + loan pins render on the
-                <a href="#" data-bs-target="#collapseEncompassMap" data-heading="headingEncompassMap" data-du-section-step="3" data-du-scroll-target="duEncompassLoansMapCard">Encompass map</a>
+                <a href="#" data-bs-target="#collapseEncompassMap" data-heading="headingEncompassMap" data-du-section-step="3" data-du-scroll-target="duEncompassLoansMapCard">Proximity map</a>
                 between Disasters and Loans (live proximity · ops triage — not graph NEAR). Optional
                 <a href="disasters-encompass-map.html" id="duVideosEncompassMapLink">fullscreen map</a>.
                 Leaflet place lens stays above.
@@ -707,7 +976,7 @@
             <span class="du-section-title">
               <span class="du-section-step-pill" aria-hidden="true">3</span>
               <i class="bi bi-geo-alt" aria-hidden="true"></i>
-              <h2 class="du-section-heading mb-0">Encompass map · live proximity</h2>
+              <h2 class="du-section-heading mb-0">Proximity map</h2>
             </span>
             <i class="bi bi-chevron-down du-section-chevron" aria-hidden="true"></i>
           </div>
@@ -715,7 +984,7 @@
             <div class="card du-data-panel du-map-panel mb-0" id="duEncompassLoansMapCard">
               <div class="card-header d-flex flex-wrap justify-content-between align-items-start gap-2">
                 <div>
-                  <strong><i class="bi-geo-alt"></i> Encompass map · live proximity (not graph NEAR)</strong>
+                  <strong><i class="bi-geo-alt"></i> Proximity map</strong>
                   <small class="text-muted d-block">Selected event + nearby mocked loan pins · ops triage rank — not a loss probability</small>
                 </div>
                 <div class="d-flex flex-wrap align-items-center gap-2">
@@ -726,7 +995,7 @@
                 </div>
               </div>
               <div class="card-body">
-                <div id="map" role="application" aria-label="Encompass hazard and loan map"></div>
+                <div id="map" role="application" aria-label="Hazard and place map"></div>
               </div>
             </div>
           </div>
@@ -820,7 +1089,7 @@
                 </div>
                 <div id="duLoanPanelLoans" class="du-loan-panel" role="tabpanel" aria-labelledby="duLoanPanelLoansTab">
                   <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
-                    <small class="text-muted mb-0">Sort and filter mocked loans like the disasters grid. Click a row for cameras; pins also appear on the Encompass map above.</small>
+                    <small class="text-muted mb-0">Sort and filter sample loans like the disasters grid. Click a row for cameras; pins also appear on the proximity map above.</small>
                     <input type="text" id="loansQuickFilter" class="form-control form-control-sm" style="max-width: 240px;" placeholder="Quick filter loans…" aria-label="Quick filter loans">
                   </div>
                   <div id="encompassLoansGrid" class="ag-theme-alpine"></div>
@@ -1038,13 +1307,13 @@
                 <tbody>
                   <tr>
                     <td><strong>Spatial (live)</strong></td>
-                    <td><code>GET /api/disasters/near</code> (PostGIS or Haversine)</td>
+                    <td>Radius search (PostGIS or Haversine)</td>
                     <td>Live selection, nearby loans &amp; cameras — operational truth</td>
                   </tr>
                 </tbody>
               </table>
               <p class="small mb-0">
-                Radius search powers the grid selection strip, Encompass map loan pins, and hazard webcam panel.
+                Radius search powers the grid selection strip, proximity-map pins, and hazard webcam panel.
                 Do <strong>not</strong> equate this with graph <code>NEAR</code> edges (those are as-of last reseed only).
               </p>
             </div>
@@ -1131,7 +1400,7 @@
                 Graph chain: county → disaster → zip → loan → milestone → processor, plus
                 <strong>NEAR</strong> edges from spatial seed (~50 mi, per-disaster cap).
                 Graph <code>NEAR</code> carries <code>seeded_at</code> in edge metadata — stale until reseed;
-                live proximity uses <code>GET /api/disasters/near</code> only.
+                live proximity uses the radius search only.
               </p>
             </div>
           </div>
@@ -1244,12 +1513,14 @@
     <script src="https://d3js.org/d3.v7.min.js" crossorigin="anonymous"></script>
     <script src="/shared/vendor/topojson-client.min.js"></script>
     <script src="/shared/js/webgpu-runtime.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous"></script>
     <script src="/finance/js/disasters-unified/webgpu-heat-overlay.js"></script>
     <script src="/finance/js/disasters-unified/core.js"></script>
     <script src="/finance/js/disasters-unified/geo-data.js"></script>
     <script src="/finance/js/disasters-unified/map-overlays.js"></script>
     <script src="/finance/js/disasters-unified/geo-picker.js"></script>
     <script src="/finance/js/disasters-unified/ingest.js"></script>
+    <script src="/finance/js/disasters-unified/spreadsheet-analyzer.js"></script>
     <script src="/finance/js/disasters-unified/grid.js"></script>
     <script src="/finance/js/disasters-unified/map.js"></script>
     <script src="/finance/js/disasters-unified/graph-panel.js"></script>

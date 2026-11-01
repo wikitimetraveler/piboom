@@ -506,7 +506,7 @@ function initEncompassLoansGrid() {
     {
       field: 'distanceKm',
       headerName: 'Live /near',
-      headerTooltip: 'Distance from live GET /api/disasters/near — not graph NEAR edges',
+      headerTooltip: 'Distance from the live radius search',
       width: 120,
       filter: 'agNumberColumnFilter',
       cellRenderer: (params) => htmlCellRenderer(params.data?.distanceHtml || '')
@@ -760,14 +760,29 @@ function hotspotKeyForRow(row) {
   return county ? `${county}|${state}` : `*|${state}`;
 }
 
-function aggregateRiskHotspots(gridRows) {
+var duHotspotShowAll = true;
+var duHotspotCategoryFilter = 'all';
+var duHotspotSearchQuery = '';
+var lastAggregatedHotspots = [];
+
+function aggregateRiskHotspots(gridRows, options = {}) {
   const map = new Map();
-  (gridRows || []).forEach((row) => {
+  let sourceRows = gridRows || [];
+  let usingReferenceFallback = false;
+
+  if (!sourceRows.length && typeof DuSpreadsheetAnalyzer !== 'undefined' && DuSpreadsheetAnalyzer.getShowcaseReferenceDisasters) {
+    const refDisasters = DuSpreadsheetAnalyzer.getShowcaseReferenceDisasters();
+    const lookup = buildRelatedDisasterCountLookup(refDisasters);
+    sourceRows = refDisasters.map((r, idx) => buildDisasterGridRow(r, refDisasters, idx, lookup));
+    usingReferenceFallback = true;
+  }
+
+  sourceRows.forEach((row) => {
     if (!row || row.isCamera) return;
-    const state = String(row.state || '').trim().toUpperCase();
+    const state = String(row.state || row.disasterObj?.state_abbr || '').trim().toUpperCase();
     if (!state) return;
-    const county = String(row.county || '').trim();
-    const key = hotspotKeyForRow(row);
+    const county = String(row.county || row.disasterObj?.county_name || '').trim();
+    const key = hotspotKeyForRow({ state, county });
     let agg = map.get(key);
     if (!agg) {
       agg = {
@@ -775,66 +790,211 @@ function aggregateRiskHotspots(gridRows) {
         state,
         county,
         eventCount: 0,
+        femaCount: 0,
         peakRisk: 0,
         dominantTypes: {},
-        topRow: null
+        sourcesSet: new Set(),
+        topRow: null,
+        usingReferenceFallback,
       };
       map.set(key, agg);
     }
     agg.eventCount += 1;
+    const src = String(row.source || row.disasterObj?.source || '').toLowerCase();
+    if (src) agg.sourcesSet.add(src);
+    if (src === 'fema') agg.femaCount += 1;
     const risk = Number(row.riskScore) || 0;
     agg.peakRisk = Math.max(agg.peakRisk, risk);
-    const et = String(row.eventType || 'other').toLowerCase();
+    const et = String(row.eventType || row.disasterObj?.event_type || 'other').toLowerCase();
     agg.dominantTypes[et] = (agg.dominantTypes[et] || 0) + 1;
     if (!agg.topRow || risk > (agg.topRow.riskScore || 0)) {
       agg.topRow = row;
     }
   });
-  return [...map.values()]
+
+  const allHotspots = [...map.values()]
     .map((agg) => {
       const dominantEntry = Object.entries(agg.dominantTypes).sort((a, b) => b[1] - a[1])[0];
-      return {
+      const item = {
         key: agg.key,
         state: agg.state,
         county: agg.county,
         eventCount: agg.eventCount,
+        femaCount: agg.femaCount,
+        sources: [...agg.sourcesSet],
         peakRisk: agg.peakRisk,
         dominantType: dominantEntry ? dominantEntry[0] : '',
-        topRow: agg.topRow
+        topRow: agg.topRow,
+        usingReferenceFallback: agg.usingReferenceFallback,
       };
+      if (typeof DuSpreadsheetAnalyzer !== 'undefined' && DuSpreadsheetAnalyzer.buildLenderGuidanceForHotspot) {
+        item.lenderGuidance = DuSpreadsheetAnalyzer.buildLenderGuidanceForHotspot(item);
+      }
+      return item;
     })
-    .sort((a, b) => b.peakRisk - a.peakRisk || b.eventCount - a.eventCount)
-    .slice(0, 10);
+    .sort((a, b) => b.peakRisk - a.peakRisk || b.eventCount - a.eventCount);
+
+  lastAggregatedHotspots = allHotspots;
+
+  const limit = options && typeof options.limit === 'number' ? options.limit : null;
+  return limit ? allHotspots.slice(0, limit) : allHotspots;
 }
 
 function getTopRiskEvents(gridRows, limit = 8) {
-  return (gridRows || [])
+  let sourceRows = gridRows || [];
+  if (!sourceRows.length && typeof DuSpreadsheetAnalyzer !== 'undefined' && DuSpreadsheetAnalyzer.getShowcaseReferenceDisasters) {
+    const refDisasters = DuSpreadsheetAnalyzer.getShowcaseReferenceDisasters();
+    const lookup = buildRelatedDisasterCountLookup(refDisasters);
+    sourceRows = refDisasters.map((r, idx) => buildDisasterGridRow(r, refDisasters, idx, lookup));
+  }
+  return sourceRows
     .filter((row) => row && !row.isCamera)
     .sort((a, b) => (b.riskScore || 0) - (a.riskScore || 0) || (b.startTime || 0) - (a.startTime || 0))
     .slice(0, limit);
 }
 
+function filterHotspotsForDisplay(hotspots) {
+  return (hotspots || []).filter((h) => {
+    if (duHotspotCategoryFilter === 'critical_high' && (Number(h.peakRisk) || 0) < 6) {
+      return false;
+    }
+    if (duHotspotCategoryFilter === 'fema' && !(h.femaCount > 0 || (h.sources || []).includes('fema'))) {
+      return false;
+    }
+    if (
+      duHotspotCategoryFilter === 'hold' &&
+      h.lenderGuidance?.filterCategory !== 'fema_hold' &&
+      h.lenderGuidance?.filterCategory !== 'perimeter_watch'
+    ) {
+      return false;
+    }
+    if (duHotspotSearchQuery) {
+      const hay = [
+        h.county,
+        h.state,
+        h.dominantType,
+        ...(h.sources || []),
+        h.lenderGuidance?.collateralNeed,
+        h.lenderGuidance?.insuranceNeed,
+        h.lenderGuidance?.closingGate,
+      ]
+        .join(' ')
+        .toLowerCase();
+      if (!hay.includes(duHotspotSearchQuery)) return false;
+    }
+    return true;
+  });
+}
+
+function exportHotspotsCsv() {
+  const rows = lastAggregatedHotspots || [];
+  if (!rows.length) return;
+  const headers = [
+    'Rank',
+    'County',
+    'State',
+    'Active Events',
+    'Sources',
+    'Peak Intensity',
+    'Dominant Hazard',
+    'FEMA Declarations',
+    'Collateral / Appraisal Requirement',
+    'Insurance Requirement',
+    'Closing / Funding Gate',
+  ];
+  const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const lines = [headers.map(esc).join(',')];
+  rows.forEach((h, idx) => {
+    const g = h.lenderGuidance || {};
+    lines.push(
+      [
+        idx + 1,
+        h.county || 'Statewide',
+        h.state,
+        h.eventCount,
+        (h.sources || []).map((s) => s.toUpperCase()).join(' | '),
+        h.peakRisk,
+        formatDominantEventType(h.dominantType),
+        h.femaCount || 0,
+        g.collateralNeed || 'Standard appraisal',
+        g.insuranceNeed || 'Standard hazard check',
+        g.closingGate || 'Standard closing',
+      ]
+        .map(esc)
+        .join(',')
+    );
+  });
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `us-disaster-hotspots-lender-guide-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
 function renderRiskIntelligencePanel(gridRows) {
-  const hotspots = aggregateRiskHotspots(gridRows);
-  const topEvents = getTopRiskEvents(gridRows);
+  const allHotspots = aggregateRiskHotspots(gridRows);
+  const filteredHotspots = filterHotspotsForDisplay(allHotspots);
+  const hotspots = duHotspotShowAll ? filteredHotspots : filteredHotspots.slice(0, 15);
+  const topEvents = getTopRiskEvents(gridRows, 10);
   const tbody = document.getElementById('duHotspotTableBody');
   const topList = document.getElementById('duTopEventsList');
   const legend = document.getElementById('duRiskMapLegend');
+  const countEl = document.getElementById('duHotspotTotalCountBadge');
+  const toggleBtn = document.getElementById('duHotspotToggleAllBtn');
+
+  if (countEl) {
+    countEl.textContent = `${filteredHotspots.length} of ${allHotspots.length} hotspot${allHotspots.length === 1 ? '' : 's'}`;
+  }
+  if (toggleBtn) {
+    toggleBtn.textContent = duHotspotShowAll
+      ? `Showing All (${filteredHotspots.length})`
+      : `Show All (${filteredHotspots.length})`;
+  }
 
   if (tbody) {
     if (!hotspots.length) {
-      tbody.innerHTML = '<tr><td colspan="4" class="text-muted small">No geocoded events in the current load — widen sources or filters.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" class="text-muted small py-3 text-center">No hotspots match the current filter — clear search or broaden sources.</td></tr>';
     } else {
-      tbody.innerHTML = hotspots.map((h) => {
+      tbody.innerHTML = hotspots.map((h, idx) => {
         const location = h.county
           ? `${h.county}, ${h.state}`
           : `${h.state} (statewide)`;
         const active = activeHotspotKey === h.key ? ' du-hotspot-row--active' : '';
+        const sourcePills = (h.sources || [])
+          .map((s) => createSourceBadgeHtml(s))
+          .join(' ');
+        const g = h.lenderGuidance || (typeof DuSpreadsheetAnalyzer !== 'undefined' && DuSpreadsheetAnalyzer.buildLenderGuidanceForHotspot
+          ? DuSpreadsheetAnalyzer.buildLenderGuidanceForHotspot(h)
+          : {});
         return `<tr class="du-hotspot-row${active}" data-hotspot-key="${h.key}" tabindex="0" role="button" aria-label="Filter to ${location}">
-          <td><strong>${location}</strong></td>
-          <td class="text-end">${h.eventCount}</td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge rounded-pill text-bg-light border text-muted">#${idx + 1}</span>
+              <div>
+                <strong>${duEscapeHtml(location)}</strong>
+                <div class="d-flex flex-wrap gap-1 mt-1">${sourcePills}</div>
+              </div>
+            </div>
+          </td>
+          <td class="text-end fw-semibold">${h.eventCount}</td>
           <td class="text-end">${getRiskBadge(h.peakRisk)}</td>
-          <td>${formatDominantEventType(h.dominantType)}</td>
+          <td><span class="fw-medium">${formatDominantEventType(h.dominantType)}</span></td>
+          <td>${g.femaBadge || '<span class="badge text-bg-light text-dark border">Live Watch</span>'}</td>
+          <td class="small">
+            <div class="mb-1">${g.actionBadge || ''}</div>
+            <div><strong>Inspection:</strong> ${duEscapeHtml(g.collateralNeed || 'Standard appraisal')}</div>
+            <div class="text-muted"><strong>Insurance:</strong> ${duEscapeHtml(g.insuranceNeed || 'Verify binder')}</div>
+            <div class="text-danger-emphasis"><strong>Closing:</strong> ${duEscapeHtml(g.closingGate || 'Monitor')}</div>
+          </td>
+          <td class="text-end">
+            <button type="button" class="btn btn-sm btn-outline-primary du-hotspot-drill-btn" data-hotspot-key="${h.key}">
+              <i class="bi bi-funnel"></i> Triage
+            </button>
+          </td>
         </tr>`;
       }).join('');
     }
@@ -862,13 +1022,13 @@ function renderRiskIntelligencePanel(gridRows) {
   }
 
   if (legend) {
-    legend.hidden = !gridRows || gridRows.length === 0;
+    legend.hidden = !allHotspots.length;
   }
 
   document.querySelectorAll('.du-hotspot-row').forEach((tr) => {
     tr.addEventListener('click', () => {
       const key = tr.getAttribute('data-hotspot-key');
-      const hotspot = hotspots.find((h) => h.key === key);
+      const hotspot = allHotspots.find((h) => h.key === key);
       if (hotspot) applyHotspotSelection(hotspot);
     });
     tr.addEventListener('keydown', (e) => {
@@ -876,6 +1036,45 @@ function renderRiskIntelligencePanel(gridRows) {
         e.preventDefault();
         tr.click();
       }
+    });
+  });
+}
+
+function initHotspotControls() {
+  const searchInput = document.getElementById('duHotspotSearchInput');
+  const toggleBtn = document.getElementById('duHotspotToggleAllBtn');
+  const exportBtn = document.getElementById('duHotspotExportCsvBtn');
+
+  if (searchInput && !searchInput.dataset.bound) {
+    searchInput.dataset.bound = '1';
+    searchInput.addEventListener('input', () => {
+      duHotspotSearchQuery = String(searchInput.value || '').trim().toLowerCase();
+      renderRiskIntelligencePanel(getActiveViewGridRows());
+    });
+  }
+
+  if (toggleBtn && !toggleBtn.dataset.bound) {
+    toggleBtn.dataset.bound = '1';
+    toggleBtn.addEventListener('click', () => {
+      duHotspotShowAll = !duHotspotShowAll;
+      renderRiskIntelligencePanel(getActiveViewGridRows());
+    });
+  }
+
+  if (exportBtn && !exportBtn.dataset.bound) {
+    exportBtn.dataset.bound = '1';
+    exportBtn.addEventListener('click', exportHotspotsCsv);
+  }
+
+  document.querySelectorAll('[data-du-hotspot-filter]').forEach((btn) => {
+    if (btn.dataset.bound) return;
+    btn.dataset.bound = '1';
+    btn.addEventListener('click', () => {
+      duHotspotCategoryFilter = btn.getAttribute('data-du-hotspot-filter') || 'all';
+      document.querySelectorAll('[data-du-hotspot-filter]').forEach((b) => {
+        b.classList.toggle('active', b === btn);
+      });
+      renderRiskIntelligencePanel(getActiveViewGridRows());
     });
   });
 }

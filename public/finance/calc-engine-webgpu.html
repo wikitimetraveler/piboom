@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="/finance/css/worksheets-shell.css" />
+    <script src="/shared/js/open-suite-bar.js" defer></script>
     <style>
       :root {
         --primary: #4A90A4;
@@ -99,76 +100,73 @@
         <span class="navbar-brand mb-0 fs-5">Calc Engine · WebGPU</span>
         <div class="navbar-collapse">
           <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><a class="nav-link" href="/finance/index.html"><i class="bi bi-grid-3x3-gap-fill me-1"></i>Worksheets Hub</a></li>
-            <li class="nav-item"><a class="nav-link" href="/finance/fha-streamline-loan-amount-calculator.html"><i class="bi bi-cash-coin me-1"></i>FHA Loan Amount</a></li>
-            <li class="nav-item"><a class="nav-link" href="/index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="/open/"><i class="bi bi-collection me-1"></i>Open suite</a></li>
           </ul>
         </div>
       </div>
     </nav>
     <div class="main-content">
     <div class="container worksheets-calculator-stack">
-      <h1 class="mb-2">FHA Streamline DAG on WebGPU</h1>
+      <h1 class="mb-2">Loan amount graph</h1>
       <p class="text-muted mb-3">
         CPU <code>calcMath</code> + <code>CalculationsEngine</code> still compute the live numbers (already microseconds).
-        WebGPU paints the cascade and runs an <strong>integer-cent</strong> kernel as a verifier — not a speed-up, and not HUD-certified.
-        Default GPU <code>f32</code> dollar floats cannot safely round FHA-scale cents.
+        WebGPU paints the cascade and runs an <strong>integer-cent</strong> kernel as a verifier — not a speed-up.
+        Default GPU <code>f32</code> dollar floats cannot safely round loan-sized cents.
       </p>
       <p class="small mb-4">
         <span class="badge text-bg-light border" id="ceBackendBadge">GPU: detecting…</span>
-        <a class="ms-2" href="/finance/fha-streamline-loan-amount-calculator.html">Open the live FHA Loan Amount worksheet</a>
       </p>
 
       <div class="ce-dag-wrap mb-3" id="ceDagWrap">
-        <canvas id="ceDagCanvas" role="img" aria-label="FHA Streamline calculation DAG"></canvas>
+        <canvas id="ceDagCanvas" role="img" aria-label="Loan amount calculation graph"></canvas>
       </div>
       <p class="small text-muted mb-4">Teal nodes are results; cooler nodes are inputs. Heat pulses when DAG-lite recomputes a cell.</p>
 
       <div class="row g-3 mb-4">
         <div class="col-md-4 col-lg-3">
-          <label class="form-label" for="fs_g7">Base G7</label>
+          <label class="form-label" for="fs_g7">Base amount</label>
           <div class="input-group input-group-sm">
             <span class="input-group-text">$</span>
             <input type="number" class="form-control" id="fs_g7" value="400000" min="0" step="0.01">
           </div>
         </div>
         <div class="col-md-4 col-lg-3">
-          <label class="form-label" for="fs_g8">Max loan G8</label>
+          <label class="form-label" for="fs_g8">Max loan</label>
           <div class="input-group input-group-sm">
             <span class="input-group-text">$</span>
             <input type="number" class="form-control" id="fs_g8" value="360000" min="0" step="0.01">
           </div>
         </div>
         <div class="col-md-4 col-lg-3">
-          <label class="form-label" for="fs_g9">Balance G9</label>
+          <label class="form-label" for="fs_g9">Current balance</label>
           <div class="input-group input-group-sm">
             <span class="input-group-text">$</span>
             <input type="number" class="form-control" id="fs_g9" value="222000" min="0" step="0.01">
           </div>
         </div>
         <div class="col-md-4 col-lg-3">
-          <label class="form-label" for="fs_d29">UFMIP D29</label>
+          <label class="form-label" for="fs_d29">Fee percent</label>
           <div class="input-group input-group-sm">
             <span class="input-group-text">%</span>
             <input type="number" class="form-control" id="fs_d29" value="1.75" min="0" step="0.01">
           </div>
         </div>
         <div class="col-md-4 col-lg-3">
-          <label class="form-label" for="fs_g12">Additional G12</label>
+          <label class="form-label" for="fs_g12">Add-on A</label>
           <div class="input-group input-group-sm">
             <span class="input-group-text">$</span>
             <input type="number" class="form-control" id="fs_g12" value="180000" min="0" step="0.01">
           </div>
         </div>
         <div class="col-md-4 col-lg-3">
-          <label class="form-label" for="fs_g13">Additional G13</label>
+          <label class="form-label" for="fs_g13">Add-on B</label>
           <div class="input-group input-group-sm">
             <span class="input-group-text">$</span>
             <input type="number" class="form-control" id="fs_g13" value="40000" min="0" step="0.01">
           </div>
         </div>
         <div class="col-md-4 col-lg-3">
-          <label class="form-label" for="fs_g14">Additional G14</label>
+          <label class="form-label" for="fs_g14">Add-on C</label>
           <div class="input-group input-group-sm">
             <span class="input-group-text">$</span>
             <input type="number" class="form-control" id="fs_g14" value="24000" min="0" step="0.01">
@@ -208,17 +206,17 @@
         </table>
       </div>
 
-      <h2 class="h5">f32 drift exhibit (canned, not the live G24)</h2>
+      <h2 class="h5">Float drift exhibit</h2>
       <p class="small text-muted mb-2">
-        G24 = <code>300000.27</code> × 1.75% UFMIP. Integer cents round to $5,250.00; f32 rounded cents miss by 1¢.
-        The live DAG floors G24 to whole dollars, so this row is a separate counterexample.
+        A base of <code>300000.27</code> times a 1.75% fee. Integer cents round to $5,250.00; 32-bit floats miss by 1¢.
+        The live graph floors that base to whole dollars, so this row is a separate example.
       </p>
       <div class="table-responsive mb-2">
         <table class="table table-sm" id="ceF32Table">
           <thead>
             <tr>
-              <th>G24 dollars</th>
-              <th>D29</th>
+              <th>Base dollars</th>
+              <th>Fee %</th>
               <th>Integer ¢</th>
               <th>f32 rounded ¢</th>
               <th>Delta</th>
@@ -231,7 +229,7 @@
       <section class="ce-analysis" aria-labelledby="ceAnalysisHeading">
         <h2 id="ceAnalysisHeading">Prototype analysis — what this proves (and what it does not)</h2>
         <p class="ce-claim mb-2">
-          This page is a <strong>prototype</strong>: WebGPU visualizes the FHA Streamline DAG and verifies an integer-cent chain.
+          This page is a <strong>prototype</strong>: WebGPU visualizes a loan-amount graph and verifies an integer-cent chain.
           The live product worksheet still runs on CPU <code>calcMath</code> + <code>CalculationsEngine</code>.
         </p>
 
@@ -252,22 +250,22 @@
 
         <h3>Precision (formal claims)</h3>
         <ul>
-          <li><code>f32</code> dollar floats cannot safely round FHA-scale cents (see the drift exhibit above).</li>
+          <li><code>f32</code> dollar floats cannot safely round loan-sized cents (see the drift exhibit above).</li>
           <li><strong>Integer cents (<code>i32</code>)</strong> make add / subtract / min / floor-to-dollar exact for typical loan sizes (~$21M max in cents).</li>
-          <li>GPU does <em>not</em> add precision — the <strong>integer representation</strong> does. Same rules run on CPU via <code>fhaLoanAmountIntegerCents</code>.</li>
-          <li>UFMIP uses a named half-up bps rule — research/demo only, <strong>not HUD-certified</strong>.</li>
+          <li>GPU does <em>not</em> add precision — the <strong>integer representation</strong> does. The same integer-cent rules run on the CPU.</li>
+          <li>The fee uses a named half-up rule — research/demo only.</li>
         </ul>
 
         <h3>Where this could matter theoretically</h3>
         <ul>
           <li><strong>Batch / stress grids</strong> — thousands of independent scenarios in one dispatch (rate × balance × factor), not one keystroke chain.</li>
-          <li><strong>Teach / audit / demos</strong> — pulse the DAG so processors see why G15 → G30 cascade; Unit Test / training reels.</li>
-          <li><strong>Second-opinion verifier</strong> — CI or pre-write check: GPU cents ≡ CPU integer cents, while Encompass UI stays on float <code>calcMath</code>.</li>
+          <li><strong>Teach / audit / demos</strong> — pulse the graph so the add-on total through the final amount is easy to follow.</li>
+          <li><strong>Second-opinion verifier</strong> — GPU cents match CPU integer cents, while the worksheet stays on decimal <code>calcMath</code>.</li>
         </ul>
 
         <h3>Where not to use it</h3>
         <ul>
-          <li>Replacing the live FHA Loan Amount worksheet recalculation.</li>
+          <li>Replacing the live worksheet recalculation.</li>
           <li>Trusting default GPU <code>f32</code> dollars for money.</li>
           <li>Expecting a speed-up on an 11-node sequential DAG.</li>
         </ul>
@@ -295,12 +293,33 @@
         const tbody = document.querySelector('#ceCompareTable tbody');
         const f32Body = document.querySelector('#ceF32Table tbody');
 
+        const displayName = {
+          fs_g7: 'Base',
+          fs_g8: 'Max',
+          fs_g9: 'Balance',
+          fs_g12: 'Add A',
+          fs_g13: 'Add B',
+          fs_g14: 'Add C',
+          fs_d29: 'Fee %',
+          fs_g15: 'Add-ons',
+          fs_g18: 'Add-ons',
+          fs_g19: 'Balance',
+          fs_g20: 'Gap',
+          fs_g22: 'Cap',
+          fs_g24: 'Base result',
+          fs_g28: 'Base result',
+          fs_e29: 'Fee',
+          fs_g29: 'Fee rounded',
+          fs_g30: 'Total',
+          fs_g33: 'Ratio'
+        };
+
         function placeLabels() {
           wrap.querySelectorAll('.ce-dag-label').forEach(function (el) { el.remove(); });
           layout.nodes.forEach(function (n) {
             const el = document.createElement('span');
             el.className = 'ce-dag-label';
-            el.textContent = n.label;
+            el.textContent = displayName[n.id] || n.label;
             el.style.left = (n.x * 100) + '%';
             el.style.top = (n.y * 100) + '%';
             wrap.appendChild(el);
@@ -347,13 +366,13 @@
         });
 
         const compareRows = [
-          { id: 'fs_g15', key: 'g15', label: 'G15', kind: 'money' },
-          { id: 'fs_g20', key: 'g20', label: 'G20', kind: 'money' },
-          { id: 'fs_g24', key: 'g24', label: 'G24', kind: 'money' },
-          { id: 'fs_e29', key: 'e29', label: 'E29', kind: 'money' },
-          { id: 'fs_g29', key: 'g29', label: 'G29', kind: 'money' },
-          { id: 'fs_g30', key: 'g30', label: 'G30', kind: 'money' },
-          { id: 'fs_g33', key: 'g33Hundredths', label: 'G33', kind: 'ratio' }
+          { id: 'fs_g15', key: 'g15', label: 'Add-ons', kind: 'money' },
+          { id: 'fs_g20', key: 'g20', label: 'Gap', kind: 'money' },
+          { id: 'fs_g24', key: 'g24', label: 'Base result', kind: 'money' },
+          { id: 'fs_e29', key: 'e29', label: 'Fee', kind: 'money' },
+          { id: 'fs_g29', key: 'g29', label: 'Fee rounded', kind: 'money' },
+          { id: 'fs_g30', key: 'g30', label: 'Total', kind: 'money' },
+          { id: 'fs_g33', key: 'g33Hundredths', label: 'Ratio', kind: 'ratio' }
         ];
 
         let kernelPending = false;

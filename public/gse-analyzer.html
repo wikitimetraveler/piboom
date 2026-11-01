@@ -13,41 +13,28 @@
     <link rel="stylesheet" href="/css/gse-analyzer.css" />
     <script src="/shared/menu-config.js"></script>
     <script src="/shared/modern-navbar.js" defer></script>
+    <script src="/shared/js/open-suite-bar.js" defer></script>
   </head>
   <body class="ag-theme-alpine">
     <div class="container py-4">
-      <div class="gse-hero">
-        <h1><i class="bi bi-diagram-3 me-2"></i>GSE product intelligence</h1>
-        <p class="gse-disclaimer mb-0">
-          Decision-support only. Uses bundled public-rule summaries and sample FHFA limits—not DU/LPA, not pricing, not
-          approval. <span id="gseServerDisclaimer"></span>
-        </p>
-      </div>
-
-      <div class="card shadow-sm mb-3 gse-pipeline-card">
-        <div class="card-body py-3">
-          <div class="row g-2 align-items-end">
-            <div class="col-md-3">
-              <label class="form-label small text-muted mb-0" for="gsePipelineLoanId">Pipeline loan id</label>
-              <input type="number" class="form-control form-control-sm" id="gsePipelineLoanId" min="1" placeholder="e.g. 42" />
-            </div>
-            <div class="col-md-auto">
-              <button type="button" class="btn btn-sm btn-outline-primary" id="btnLoadPipeline">
-                <i class="bi bi-cloud-download me-1" aria-hidden="true"></i>Load from Encompass (pipeline)
-              </button>
-            </div>
-            <div class="col-md">
-              <p class="small text-muted mb-0" id="gsePipelineStatus" role="status" aria-live="polite" aria-atomic="true">
-                Requires a pipeline row with <code>encompass_loan_guid</code>. Calls <code>GET /api/loan-pipeline/loans/:id</code> then
-                <code>POST /api/encompass-hub/loans/…/field-reader</code>.
-              </p>
-            </div>
-          </div>
+      <header class="gse-desk-head">
+        <div>
+          <p class="gse-kicker">Scenario desk</p>
+          <h1>GSE product intelligence</h1>
+          <p class="gse-disclaimer mb-0">
+            Decision-support only. Public-rule summaries and sample FHFA limits — not DU/LPA, not pricing, not approval.
+            <span id="gseServerDisclaimer"></span>
+          </p>
         </div>
-      </div>
+        <nav class="gse-jumps" aria-label="On this page">
+          <a href="#gseScenario">Scenario</a>
+          <a href="#gseExhibitSection">Program fit</a>
+          <a href="#gseKnowledgeBank" data-gse-open="gseRefKnowledge">Ask</a>
+        </nav>
+      </header>
 
-      <div class="row g-3 mb-3">
-        <div class="col-md-4">
+      <div class="row g-3 mb-4 gse-desk">
+        <div class="col-lg-4 order-1 order-lg-2 gse-desk__rail">
           <div class="card gse-summary-card shadow-sm h-100">
             <div class="card-body">
               <h2 class="h6 text-muted d-flex align-items-center gap-2">
@@ -72,17 +59,17 @@
                 <dd class="col-7" id="gseOverlayIssues">—</dd>
               </dl>
               <p class="small text-warning mt-2 mb-0 d-none" id="gseInputWarnings"></p>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-8">
-          <div class="card shadow-sm gse-scenario-card">
-            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-              <span>Scenario (no PII)</span>
-              <div class="btn-group btn-group-sm">
+              <div class="d-grid gap-2 mt-3">
                 <button type="button" class="btn btn-primary" id="btnAnalyze">Analyze</button>
                 <button type="button" class="btn btn-outline-secondary" id="btnLoanLimits">Loan limit lookup</button>
               </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-8 order-2 order-lg-1 gse-desk__work">
+          <div class="card shadow-sm gse-scenario-card" id="gseScenario">
+            <div class="card-header">
+              <span>Scenario (no PII)</span>
             </div>
             <div class="card-body">
               <p class="small text-muted gse-section-subtitle mb-3">
@@ -93,18 +80,18 @@
                 <legend class="gse-form-group__legend">Borrower profile</legend>
                 <div class="row g-2 small">
                 <div class="col-md-2">
-                  <label class="form-label">Credit score</label>
+                  <label class="form-label" for="creditScore">Credit score</label>
                   <input type="number" class="form-control" id="creditScore" value="720" />
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label">First-time buyer</label>
+                  <label class="form-label" for="firstTimeHomebuyer">First-time buyer</label>
                   <select class="form-select" id="firstTimeHomebuyer">
                     <option value="true" selected>Yes</option>
                     <option value="false">No</option>
                   </select>
                 </div>
                 <div class="col-md-3">
-                  <label class="form-label">Income (annual)</label>
+                  <label class="form-label" for="income">Income (annual)</label>
                   <input type="number" class="form-control" id="income" value="85000" />
                 </div>
                 <div class="col-md-3">
@@ -146,7 +133,7 @@
                 <legend class="gse-form-group__legend">Property and loan structure</legend>
                 <div class="row g-2 small">
                 <div class="col-md-3">
-                  <label class="form-label">Loan amount</label>
+                  <label class="form-label" for="loanAmount">Loan amount</label>
                   <input type="number" class="form-control" id="loanAmount" value="725000" />
                 </div>
                 <div class="col-md-2">
@@ -154,7 +141,7 @@
                   <input type="number" class="form-control" id="subordinateFinancing" value="12200" min="0" title="Second mortgages, HELOC draws, or down-payment assistance liens behind the first" />
                 </div>
                 <div class="col-md-3">
-                  <label class="form-label">Purchase price</label>
+                  <label class="form-label" for="purchasePrice">Purchase price</label>
                   <input type="number" class="form-control" id="purchasePrice" value="760000" />
                 </div>
                 <div class="col-md-2">
@@ -166,19 +153,19 @@
                   <input type="number" class="form-control bg-body-tertiary" id="cltv" value="97" readonly tabindex="-1" title="(Loan amount + subordinate liens) ÷ purchase price (calcMath.gseCltvPercent)" />
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label">Units</label>
+                  <label class="form-label" for="units">Units</label>
                   <input type="number" class="form-control" id="units" value="1" min="1" max="4" />
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label">State</label>
+                  <label class="form-label" for="state">State</label>
                   <input type="text" class="form-control" id="state" value="CA" maxlength="2" />
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label">County</label>
+                  <label class="form-label" for="county">County</label>
                   <input type="text" class="form-control" id="county" value="Orange" />
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label">Occupancy</label>
+                  <label class="form-label" for="occupancy">Occupancy</label>
                   <select class="form-select" id="occupancy">
                     <option value="primary" selected>Primary</option>
                     <option value="secondHome">Second home</option>
@@ -186,7 +173,7 @@
                   </select>
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label">Purpose</label>
+                  <label class="form-label" for="purpose">Purpose</label>
                   <select class="form-select" id="purpose">
                     <option value="purchase" selected>Purchase</option>
                     <option value="rateTermRefi">Rate/term refi</option>
@@ -194,7 +181,7 @@
                   </select>
                 </div>
                 <div class="col-md-2">
-                  <label class="form-label">Property type</label>
+                  <label class="form-label" for="propertyType">Property type</label>
                   <select class="form-select" id="propertyType">
                     <option value="singleFamily" selected>Single-family</option>
                     <option value="condo">Condo</option>
@@ -211,22 +198,22 @@
                 <legend class="gse-form-group__legend">Risk and underwriting signals</legend>
                 <div class="row g-2 small">
                 <div class="col-md-3">
-                  <label class="form-label">DTI %</label>
+                  <label class="form-label" for="dti">DTI %</label>
                   <input type="number" class="form-control" id="dti" value="43" />
                 </div>
                 <div class="col-md-3">
-                  <label class="form-label">Reserves (months)</label>
+                  <label class="form-label" for="reservesMonths">Reserves (months)</label>
                   <input type="number" class="form-control" id="reservesMonths" value="2" />
                 </div>
                 <div class="col-md-3">
-                  <label class="form-label">Manual underwrite</label>
+                  <label class="form-label" for="manualUnderwrite">Manual underwrite</label>
                   <select class="form-select" id="manualUnderwrite">
                     <option value="false" selected>No</option>
                     <option value="true">Yes</option>
                   </select>
                 </div>
                 <div class="col-md-3">
-                  <label class="form-label">USDA eligible area</label>
+                  <label class="form-label" for="usdaEligibleArea">USDA eligible area</label>
                   <select class="form-select" id="usdaEligibleArea">
                     <option value="">Unknown</option>
                     <option value="true">Yes</option>
@@ -236,11 +223,36 @@
                 </div>
               </fieldset>
 
-              <label class="form-label mt-3" for="jsonPaste">Or paste full scenario JSON (overrides form)</label>
-              <textarea class="form-control font-monospace small" id="jsonPaste" rows="5" aria-describedby="gseJsonHelp" placeholder='{"borrower":{...},"loan":{...},"risk":{...}}'></textarea>
-              <p class="small text-muted mt-2 mb-0" id="gseJsonHelp">
-                Use this for exact scenario replay from other systems. Form values are ignored when JSON is present.
-              </p>
+              <details class="gse-import mt-3">
+                <summary>Paste scenario JSON</summary>
+                <div class="gse-import__body">
+                  <label class="form-label" for="jsonPaste">Full scenario JSON (overrides the form)</label>
+                  <textarea class="form-control font-monospace small" id="jsonPaste" rows="5" aria-describedby="gseJsonHelp" placeholder='{"borrower":{...},"loan":{...},"risk":{...}}'></textarea>
+                  <p class="small text-muted mt-2 mb-0" id="gseJsonHelp">
+                    Use this for exact scenario replay from other systems. Form values are ignored when JSON is present.
+                  </p>
+                </div>
+              </details>
+
+              <details id="gsePipelineCard" class="gse-import gse-pipeline-card d-none mt-2" hidden>
+                <summary>Load a saved scenario</summary>
+                <div class="gse-import__body">
+                  <div class="row g-2 align-items-end">
+                    <div class="col-md-4">
+                      <label class="form-label" for="gsePipelineLoanId">Pipeline loan id</label>
+                      <input type="number" class="form-control form-control-sm" id="gsePipelineLoanId" min="1" placeholder="e.g. 42" />
+                    </div>
+                    <div class="col-md-auto">
+                      <button type="button" class="btn btn-sm btn-outline-primary" id="btnLoadPipeline">
+                        <i class="bi bi-cloud-download me-1" aria-hidden="true"></i>Load saved scenario
+                      </button>
+                    </div>
+                  </div>
+                  <p class="small text-muted mt-2 mb-0" id="gsePipelineStatus" role="status" aria-live="polite" aria-atomic="true">
+                    Optional. Enter a pipeline loan id to fill this scenario.
+                  </p>
+                </div>
+              </details>
             </div>
           </div>
         </div>
@@ -261,17 +273,20 @@
                 Conforming conventional and specialty products (e.g.
                 <a href="https://singlefamily.fanniemae.com/our-lending-solutions/single-family-home-ready" target="_blank" rel="noopener noreferrer">HomeReady</a>).
               </p>
-              <p class="small text-muted mb-1 gse-exhibit-links-label">Official references</p>
-              <ul class="list-unstyled small mb-2 gse-exhibit-links" id="gseExhibitFannieLinks" aria-label="Fannie Mae official references">
-                <li class="text-muted">References loading…</li>
-              </ul>
-              <p class="small text-muted mb-1 gse-exhibit-verify-label"><strong>Verify:</strong></p>
-              <p class="small gse-exhibit-verify mb-2" id="gseExhibitFannieVerify">
-                Confirm current Fannie Mae Selling Guide and SPC eligibility for this scenario. Do not rely on this tool for DU findings or approval.
-              </p>
               <p class="small text-muted mb-1 gse-exhibit-evidence-label"><strong>Evidence:</strong></p>
               <p class="small text-muted mb-2" id="gseExhibitFannieRun">Run Analyze to populate counts.</p>
-              <dl class="small row mb-0 gse-exhibit-counts" id="gseExhibitFannieCounts"></dl>
+              <dl class="small row mb-2 gse-exhibit-counts" id="gseExhibitFannieCounts"></dl>
+              <details class="gse-exhibit-more">
+                <summary>References and verify</summary>
+                <p class="small text-muted mb-1 gse-exhibit-links-label">Official references</p>
+                <ul class="list-unstyled small mb-2 gse-exhibit-links" id="gseExhibitFannieLinks" aria-label="Fannie Mae official references">
+                  <li class="text-muted">References loading…</li>
+                </ul>
+                <p class="small text-muted mb-1 gse-exhibit-verify-label"><strong>Verify:</strong></p>
+                <p class="small gse-exhibit-verify mb-0" id="gseExhibitFannieVerify">
+                  Confirm current Fannie Mae Selling Guide and SPC eligibility for this scenario. Do not rely on this tool for DU findings or approval.
+                </p>
+              </details>
             </article>
           </div>
           <div class="col-lg-3 col-md-6">
@@ -282,17 +297,20 @@
                 Conforming conventional paths (e.g.
                 <a href="https://sf.freddiemac.com/working-with-us/origination-underwriting/mortgage-products/home-possible" target="_blank" rel="noopener noreferrer">Home Possible</a>).
               </p>
-              <p class="small text-muted mb-1 gse-exhibit-links-label">Official references</p>
-              <ul class="list-unstyled small mb-2 gse-exhibit-links" id="gseExhibitFreddieLinks" aria-label="Freddie Mac official references">
-                <li class="text-muted">References loading…</li>
-              </ul>
-              <p class="small text-muted mb-1 gse-exhibit-verify-label"><strong>Verify:</strong></p>
-              <p class="small gse-exhibit-verify mb-2" id="gseExhibitFreddieVerify">
-                Confirm current Freddie Mac Seller/Servicer Guide and bulletin eligibility for this scenario. Do not rely on this tool for LPA findings or approval.
-              </p>
               <p class="small text-muted mb-1 gse-exhibit-evidence-label"><strong>Evidence:</strong></p>
               <p class="small text-muted mb-2" id="gseExhibitFreddieRun">Run Analyze to populate counts.</p>
-              <dl class="small row mb-0 gse-exhibit-counts" id="gseExhibitFreddieCounts"></dl>
+              <dl class="small row mb-2 gse-exhibit-counts" id="gseExhibitFreddieCounts"></dl>
+              <details class="gse-exhibit-more">
+                <summary>References and verify</summary>
+                <p class="small text-muted mb-1 gse-exhibit-links-label">Official references</p>
+                <ul class="list-unstyled small mb-2 gse-exhibit-links" id="gseExhibitFreddieLinks" aria-label="Freddie Mac official references">
+                  <li class="text-muted">References loading…</li>
+                </ul>
+                <p class="small text-muted mb-1 gse-exhibit-verify-label"><strong>Verify:</strong></p>
+                <p class="small gse-exhibit-verify mb-0" id="gseExhibitFreddieVerify">
+                  Confirm current Freddie Mac Seller/Servicer Guide and bulletin eligibility for this scenario. Do not rely on this tool for LPA findings or approval.
+                </p>
+              </details>
             </article>
           </div>
           <div class="col-lg-3 col-md-6">
@@ -303,17 +321,20 @@
                 Government-insured forward and streamline paths (
                 <a href="https://www.hud.gov/program_offices/housing/sfh/handbook_4000-1" target="_blank" rel="noopener noreferrer">Handbook 4000.1</a>).
               </p>
-              <p class="small text-muted mb-1 gse-exhibit-links-label">Official references</p>
-              <ul class="list-unstyled small mb-2 gse-exhibit-links" id="gseExhibitFhaLinks" aria-label="FHA official references">
-                <li class="text-muted">References loading…</li>
-              </ul>
-              <p class="small text-muted mb-1 gse-exhibit-verify-label"><strong>Verify:</strong></p>
-              <p class="small gse-exhibit-verify mb-2" id="gseExhibitFhaVerify">
-                Confirm current HUD FHA Handbook 4000.1 and applicable Mortgagee Letters. Do not rely on this tool for FHA TOTAL Scorecard or approval.
-              </p>
               <p class="small text-muted mb-1 gse-exhibit-evidence-label"><strong>Evidence:</strong></p>
               <p class="small text-muted mb-2" id="gseExhibitFhaRun">Run Analyze to populate counts.</p>
-              <dl class="small row mb-0 gse-exhibit-counts" id="gseExhibitFhaCounts"></dl>
+              <dl class="small row mb-2 gse-exhibit-counts" id="gseExhibitFhaCounts"></dl>
+              <details class="gse-exhibit-more">
+                <summary>References and verify</summary>
+                <p class="small text-muted mb-1 gse-exhibit-links-label">Official references</p>
+                <ul class="list-unstyled small mb-2 gse-exhibit-links" id="gseExhibitFhaLinks" aria-label="FHA official references">
+                  <li class="text-muted">References loading…</li>
+                </ul>
+                <p class="small text-muted mb-1 gse-exhibit-verify-label"><strong>Verify:</strong></p>
+                <p class="small gse-exhibit-verify mb-0" id="gseExhibitFhaVerify">
+                  Confirm current HUD FHA Handbook 4000.1 and applicable Mortgagee Letters. Do not rely on this tool for FHA TOTAL Scorecard or approval.
+                </p>
+              </details>
             </article>
           </div>
           <div class="col-lg-3 col-md-6">
@@ -324,17 +345,20 @@
                 VA-guaranteed programs (
                 <a href="https://www.benefits.va.gov/WARMS/docs/admin26/m26-7/ah_26-7.pdf" target="_blank" rel="noopener noreferrer">Pamphlet 26-7</a>).
               </p>
-              <p class="small text-muted mb-1 gse-exhibit-links-label">Official references</p>
-              <ul class="list-unstyled small mb-2 gse-exhibit-links" id="gseExhibitVaLinks" aria-label="VA official references">
-                <li class="text-muted">References loading…</li>
-              </ul>
-              <p class="small text-muted mb-1 gse-exhibit-verify-label"><strong>Verify:</strong></p>
-              <p class="small gse-exhibit-verify mb-2" id="gseExhibitVaVerify">
-                Confirm current VA Lenders Handbook (VA Pamphlet 26-7) and VA circulars for this scenario. VA residual income, COE, and funding fee rules are not modeled in this prototype.
-              </p>
               <p class="small text-muted mb-1 gse-exhibit-evidence-label"><strong>Evidence:</strong></p>
               <p class="small text-muted mb-2" id="gseExhibitVaRun">Run Analyze to populate counts.</p>
-              <dl class="small row mb-0 gse-exhibit-counts" id="gseExhibitVaCounts"></dl>
+              <dl class="small row mb-2 gse-exhibit-counts" id="gseExhibitVaCounts"></dl>
+              <details class="gse-exhibit-more">
+                <summary>References and verify</summary>
+                <p class="small text-muted mb-1 gse-exhibit-links-label">Official references</p>
+                <ul class="list-unstyled small mb-2 gse-exhibit-links" id="gseExhibitVaLinks" aria-label="VA official references">
+                  <li class="text-muted">References loading…</li>
+                </ul>
+                <p class="small text-muted mb-1 gse-exhibit-verify-label"><strong>Verify:</strong></p>
+                <p class="small gse-exhibit-verify mb-0" id="gseExhibitVaVerify">
+                  Confirm current VA Lenders Handbook (VA Pamphlet 26-7) and VA circulars for this scenario. VA residual income, COE, and funding fee rules are not modeled in this prototype.
+                </p>
+              </details>
             </article>
           </div>
           <div class="col-lg-3 col-md-6">
@@ -345,17 +369,20 @@
                 USDA rural housing guaranteed programs (
                 <a href="https://www.rd.usda.gov/resources/regulations/handbooks" target="_blank" rel="noopener noreferrer">HB-1-3555</a>).
               </p>
-              <p class="small text-muted mb-1 gse-exhibit-links-label">Official references</p>
-              <ul class="list-unstyled small mb-2 gse-exhibit-links" id="gseExhibitUsdaLinks" aria-label="USDA official references">
-                <li class="text-muted">References loading…</li>
-              </ul>
-              <p class="small text-muted mb-1 gse-exhibit-verify-label"><strong>Verify:</strong></p>
-              <p class="small gse-exhibit-verify mb-2" id="gseExhibitUsdaVerify">
-                Confirm current USDA handbook (HB-1-3555), eligible-area map, and household income limits before recommendation. Do not rely on this tool for GUS findings or final USDA approval.
-              </p>
               <p class="small text-muted mb-1 gse-exhibit-evidence-label"><strong>Evidence:</strong></p>
               <p class="small text-muted mb-2" id="gseExhibitUsdaRun">Run Analyze to populate counts.</p>
-              <dl class="small row mb-0 gse-exhibit-counts" id="gseExhibitUsdaCounts"></dl>
+              <dl class="small row mb-2 gse-exhibit-counts" id="gseExhibitUsdaCounts"></dl>
+              <details class="gse-exhibit-more">
+                <summary>References and verify</summary>
+                <p class="small text-muted mb-1 gse-exhibit-links-label">Official references</p>
+                <ul class="list-unstyled small mb-2 gse-exhibit-links" id="gseExhibitUsdaLinks" aria-label="USDA official references">
+                  <li class="text-muted">References loading…</li>
+                </ul>
+                <p class="small text-muted mb-1 gse-exhibit-verify-label"><strong>Verify:</strong></p>
+                <p class="small gse-exhibit-verify mb-0" id="gseExhibitUsdaVerify">
+                  Confirm current USDA handbook (HB-1-3555), eligible-area map, and household income limits before recommendation. Do not rely on this tool for GUS findings or final USDA approval.
+                </p>
+              </details>
             </article>
           </div>
         </div>
@@ -374,7 +401,7 @@
       <p class="small text-muted gse-section-subtitle mb-2">Status and score are directional. Review reasons/warnings and overlay findings before lock.</p>
       <div class="card shadow-sm gse-grid-card mb-4">
         <div class="card-body p-2 p-md-3">
-          <div id="gseProductsGrid" class="ag-theme-alpine" style="height: 320px; width: 100%"></div>
+          <div id="gseProductsGrid" class="ag-theme-alpine" style="height: 420px; width: 100%"></div>
         </div>
       </div>
 
@@ -385,7 +412,16 @@
         </div>
       </div>
 
-      <section class="gse-pooling-section mb-4" id="gsePoolingSection" aria-label="Mortgage pooling and MBS primer">
+      <div class="accordion gse-reference mb-4" id="gseReference">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="gseRefPoolingHead">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#gseRefPooling" aria-expanded="false" aria-controls="gseRefPooling">
+              Mortgage pooling and MBS
+            </button>
+          </h2>
+          <div id="gseRefPooling" class="accordion-collapse collapse" aria-labelledby="gseRefPoolingHead" data-bs-parent="#gseReference">
+            <div class="accordion-body">
+      <section class="gse-pooling-section mb-0" id="gsePoolingSection" aria-label="Mortgage pooling and MBS primer">
         <article class="gse-pooling-card">
           <div class="gse-exhibit-kicker">Secondary market · education</div>
           <h2 class="h5 mb-2">Mortgage pooling &amp; MBS</h2>
@@ -591,7 +627,7 @@
                   </table>
                 </div>
                 <p class="small text-muted mb-0">
-                  The 10th/11th only chooses <em>which</em> cycle the bank books; inside that cycle, note math (rate month, then payment month) still applies.
+                  The 10th/11th only chooses <em>which</em> cycle the servicer books; inside that cycle, note math (rate month, then payment month) still applies.
                   Confirm your investor/servicer matrix—cutoffs are not universal agency guide text.
                 </p>
               </div>
@@ -604,7 +640,7 @@
               <p class="small gse-exhibit-verify mb-0">
                 Pool eligibility, prefixes, commitment windows, custodian certification, remittance type, and TBA good-delivery rules change.
                 Always confirm the current Fannie Mae Selling Guide (Part C3), Freddie Mac Seller/Servicer Guide / capital markets docs, Ginnie Mae MBS Guide, SIFMA TBA guidelines, and your investor/issuer overlays.
-                ARM first rate / payment change dates and any bank cycle cutoffs (e.g. March 10 → April vs March 11 → July) must be confirmed on the note and your servicer calendar.
+                ARM first rate / payment change dates and any servicer cycle cutoffs (e.g. March 10 → April vs March 11 → July) must be confirmed on the note and your servicer calendar.
                 This analyzer does <em>not</em> score pool eligibility, ULDD readiness, issuer status, MBS pricing, or ARM reset calendars.
               </p>
             </div>
@@ -618,7 +654,18 @@
         </article>
       </section>
 
-      <section class="gse-delivery-section mb-4" id="gseGinnieSection" aria-label="Ginnie Mae MBS delivery">
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="gseRefGinnieHead">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#gseRefGinnie" aria-expanded="false" aria-controls="gseRefGinnie">
+              Ginnie Mae delivery
+            </button>
+          </h2>
+          <div id="gseRefGinnie" class="accordion-collapse collapse" aria-labelledby="gseRefGinnieHead" data-bs-parent="#gseReference">
+            <div class="accordion-body">
+      <section class="gse-delivery-section mb-0" id="gseGinnieSection" aria-label="Ginnie Mae MBS delivery">
         <article class="gse-delivery-card" data-delivery="ginnie">
           <div class="row g-3 align-items-start">
             <div class="col-lg-7">
@@ -648,7 +695,18 @@
         </article>
       </section>
 
-      <section class="card shadow-sm mt-4 gse-ai-card" id="gseKnowledgeBank">
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="gseRefKnowledgeHead">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#gseRefKnowledge" aria-expanded="false" aria-controls="gseRefKnowledge">
+              Ask the knowledge bank
+            </button>
+          </h2>
+          <div id="gseRefKnowledge" class="accordion-collapse collapse" aria-labelledby="gseRefKnowledgeHead" data-bs-parent="#gseReference">
+            <div class="accordion-body">
+      <section class="card shadow-sm gse-ai-card" id="gseKnowledgeBank">
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
           <span><i class="bi bi-diagram-3 me-1"></i>GSE knowledge bank + AI expert</span>
           <div class="d-flex flex-wrap align-items-center gap-2">
@@ -698,12 +756,12 @@
             <button type="button" class="btn btn-sm btn-outline-primary gse-ai-chip" data-prompt="If this loan is denied by overlays, what should operations do next?">Ops next steps</button>
             <button type="button" class="btn btn-sm btn-outline-primary gse-ai-chip" data-prompt="What documents do we need upfront for the best-fit programs?">Required docs upfront</button>
             <button type="button" class="btn btn-sm btn-outline-primary gse-ai-chip" data-prompt="Explain mortgage pooling and MBS delivery paths for this scenario: Fannie/Freddie UMBS vs Ginnie Mae, and what ops must verify before pooling.">Pooling &amp; MBS paths</button>
-            <button type="button" class="btn btn-sm btn-outline-primary gse-ai-chip" data-prompt="Explain ARM first rate change date vs first payment change date, and a bank cutoff where March 10 allows April but March 11 rolls to July.">ARM rate change dates</button>
+            <button type="button" class="btn btn-sm btn-outline-primary gse-ai-chip" data-prompt="Explain ARM first rate change date vs first payment change date, and a servicer cutoff where March 10 allows April but March 11 rolls to July.">ARM rate change dates</button>
             <button type="button" class="btn btn-sm btn-outline-primary gse-ai-chip" data-prompt="What appraisal / collateral path fits this scenario? Cover value acceptance or ACE waiver, desktop or hybrid, traditional full appraisal, UCDP submission, and UAD 3.6 / redesigned URAR timing.">Appraisal path</button>
           </div>
           <div class="row g-2">
             <div class="col-md-9">
-              <label class="form-label">Ask the expert</label>
+              <label class="form-label" for="gseAiQuestion">Ask the expert</label>
               <textarea class="form-control" id="gseAiQuestion" rows="3" aria-describedby="gseAiHelp" placeholder="Ask about product fit, overlays, pooling/MBS, ARM rate-change dates, or how the GSE knowledge RAG works."></textarea>
               <p class="small text-muted mt-2 mb-0" id="gseAiHelp">
                 RAG mode searches the Postgres knowledge bank (keyword + vectors when available), merges scenario rule cues, then answers with citations.
@@ -716,7 +774,7 @@
             <div class="col-md-3 d-flex flex-column justify-content-end gap-2">
               <button type="button" class="btn btn-primary" id="btnAskLoanExpert">Ask AI Expert</button>
               <button type="button" class="btn btn-outline-secondary btn-sm" id="btnClearGseChat">Clear chat memory</button>
-              <small class="text-muted" id="gseAiStatus" role="status" aria-live="polite" aria-atomic="true">Uses /api/gse-assistant/chat (RAG) with rules fallback.</small>
+              <small class="text-muted" id="gseAiStatus" role="status" aria-live="polite" aria-atomic="true">Knowledge mode answers from the indexed research notes, with a rules fallback.</small>
             </div>
           </div>
 
@@ -755,7 +813,18 @@
         </div>
       </section>
 
-      <section class="gse-pooling-section mt-4 mb-4" id="gseAppraisalSection" aria-label="Appraisal products and collateral delivery">
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="gseRefAppraisalHead">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#gseRefAppraisal" aria-expanded="false" aria-controls="gseRefAppraisal">
+              Appraisal products and collateral
+            </button>
+          </h2>
+          <div id="gseRefAppraisal" class="accordion-collapse collapse" aria-labelledby="gseRefAppraisalHead" data-bs-parent="#gseReference">
+            <div class="accordion-body">
+      <section class="gse-pooling-section mb-0" id="gseAppraisalSection" aria-label="Appraisal products and collateral delivery">
         <article class="gse-pooling-card">
           <div class="gse-exhibit-kicker">Collateral · education</div>
           <h2 class="h5 mb-2">Appraisal products &amp; collateral delivery</h2>
@@ -922,6 +991,10 @@
           </dl>
         </article>
       </section>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
@@ -934,6 +1007,8 @@
     <script src="/shared/js/webgpu-knowledge-constellation.js"></script>
     <script src="/shared/calcEngineLibrary.js"></script>
     <script src="/shared/calculationEngine.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/shared/dark-mode.js"></script>
     <script src="/js/gse-analyzer.js" defer></script>
   </body>
 </html>

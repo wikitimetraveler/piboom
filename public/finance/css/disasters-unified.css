@@ -2474,3 +2474,59 @@ body.du-pull-sheet-open .du-bottom-dock {
   }
 }
 
+/* ── Lender Showcase Banner & Spreadsheet Risk Analyzer ── */
+.du-showcase-banner {
+  border: 1px solid rgba(59, 130, 246, 0.28);
+  background: linear-gradient(180deg, rgba(239, 246, 255, 0.72) 0%, #ffffff 100%);
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+}
+
+.du-showcase-step-card {
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(255, 255, 255, 0.92);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.du-showcase-step-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.07);
+}
+
+.du-showcase-step-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.9rem;
+}
+
+.du-showcase-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.45rem;
+  height: 1.45rem;
+  border-radius: 999px;
+  background: #1d4ed8;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.du-sp-dropzone {
+  border: 2px dashed rgba(59, 130, 246, 0.45) !important;
+  background: rgba(239, 246, 255, 0.45);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.du-sp-dropzone:hover,
+.du-sp-dropzone--drag {
+  border-color: #1d4ed8 !important;
+  background: rgba(219, 234, 254, 0.65);
+}
+
+

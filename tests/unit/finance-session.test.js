@@ -43,6 +43,10 @@ describe('finance-session', () => {
     expect(financePathNeedsSession('/finance/disasters-unified.html')).toBe(false);
     expect(financePathNeedsSession('/finance/disasters-webcams.html')).toBe(false);
     expect(financePathNeedsSession('/finance/disasters-encompass-map.html')).toBe(false);
+    expect(financePathNeedsSession('/finance/encompass-assistant.html')).toBe(true);
+    expect(financePathNeedsSession('/finance/calc-engine-webgpu.html')).toBe(false);
+    expect(financePathNeedsSession('/gse-analyzer.html')).toBe(false);
+    expect(financePathNeedsSession('/finance/encompass-assistant.html')).toBe(true);
     expect(financePathNeedsSession('/finance/assets/geo/us-states.geojson')).toBe(false);
     expect(financePathNeedsSession('/finance/assets/geo/us-states.topojson')).toBe(false);
     expect(financePathNeedsSession('/finance/assets/geo/counties/CA.geojson')).toBe(false);

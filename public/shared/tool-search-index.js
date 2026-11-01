@@ -8,11 +8,12 @@
 (function (global) {
   'use strict';
 
-  /** Keep in sync with lib/finance-session.js FINANCE_PUBLIC_PAGES (disaster suite only). */
+  /** Keep in sync with lib/finance-session.js FINANCE_PUBLIC_PAGES (open suite). */
   const FINANCE_PUBLIC_PATHS = {
     '/finance/disasters-unified.html': true,
     '/finance/disasters-webcams.html': true,
     '/finance/disasters-encompass-map.html': true,
+    '/finance/calc-engine-webgpu.html': true,
   };
 
   function pathRequiresAuth(url) {
@@ -25,7 +26,9 @@
   const TOOL_INDEX = [
     // Worksheets (calculators & disasters; paths remain /finance/)
     { name: 'Worksheets Hub', url: '/finance/index.html', category: 'Worksheets', keywords: 'calculator hub worksheets', requiresAuth: true },
-    { name: 'Encompass Assistant', url: '/finance/encompass-assistant.html', category: 'Encompass', keywords: 'AI robot mortgage API', requiresAuth: true },
+    { name: 'Open suite', url: '/open/', category: 'Worksheets', keywords: 'linkedin showcase disasters GSE analyzer graph calculation public' },
+    { name: 'Encompass Assistant', url: '/finance/encompass-assistant.html', category: 'Encompass', keywords: 'AI robot mortgage API expert', requiresAuth: true },
+    { name: 'GSE scenario analyzer', url: '/gse-analyzer.html', category: 'Worksheets', keywords: 'GSE Fannie Freddie FHA VA USDA analyzer admin', requiresAuth: false },
     { name: 'Encompass Hub', url: '/finance/encompass-hub.html', category: 'Encompass', keywords: 'pipeline loans API', requiresAuth: true },
     { name: 'Loan batch update', url: '/finance/loan-batch-update.html', category: 'Encompass', keywords: 'batch update loanBatch custom fields filter', requiresAuth: true },
     { name: 'Processor assignment', url: '/finance/processor-assignment-mock.html', category: 'Encompass', keywords: 'processor assign complexity capacity associates mock demo synthetic offline', requiresAuth: true },
@@ -45,7 +48,7 @@
     { name: 'TPO Connect', url: '/finance/tpo-connect.html', category: 'Encompass', keywords: 'TPO third party originator correspondent wholesale SSF guest LoanContractTPO iframe token exchange postman externalOrganizations tpoFees externalUsers', requiresAuth: true },
     { name: 'FHA Streamline', url: '/finance/fha-streamline-calculator.html', category: 'Worksheets', keywords: 'FHA refinance', requiresAuth: true },
     { name: 'FHA Loan Amount', url: '/finance/fha-streamline-loan-amount-calculator.html', category: 'Worksheets', keywords: 'FHA streamline loan amount', requiresAuth: true },
-    { name: 'Calc Engine WebGPU', url: '/finance/calc-engine-webgpu.html', category: 'Worksheets', keywords: 'FHA streamline DAG webgpu calcMath integer cents', requiresAuth: true },
+    { name: 'Calc Engine WebGPU', url: '/finance/calc-engine-webgpu.html', category: 'Worksheets', keywords: 'FHA streamline DAG webgpu calcMath integer cents graph calculation comparison open suite', requiresAuth: false },
     { name: 'FHA NTB', url: '/finance/fha-streamline-ntb-calculator.html', category: 'Worksheets', keywords: 'FHA streamline net tangible benefit', requiresAuth: true },
     { name: 'Asset Qualifier', url: '/finance/asset-qualifier-calculator.html', category: 'Worksheets', keywords: 'asset retirement', requiresAuth: true },
     { name: 'DTI Calculator', url: '/finance/dti-calculator.html', category: 'Worksheets', keywords: 'debt income ratio', requiresAuth: true },

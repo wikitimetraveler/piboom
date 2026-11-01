@@ -103,7 +103,7 @@
     <div class="footer-content">
       <strong>DevConnect Labs</strong> — Entertainment hub and gallery tools — <span id="dt"></span> — All Rights Reserved
     </div>
-    <p class="mhm-return-link mt-2 mb-0">
+    <p class="mhm-return-link mt-2 mb-0" hidden aria-hidden="true">
       <a href="/mountain-high/">← Mountain High Medicinals</a> · 21+ prototype
     </p>
   </div>
@@ -117,9 +117,13 @@
 <script>
 window.addEventListener('DOMContentLoaded', () => {
   const grid = document.getElementById('entertainmentToolGrid');
-  if (grid && window.MENU_CONFIG && window.MENU_CONFIG.ENTERTAINMENT_TOOLS) {
-    grid.innerHTML = window.MENU_CONFIG.renderDomainGridItems(window.MENU_CONFIG.ENTERTAINMENT_TOOLS);
+  function renderEntertainmentTools() {
+    if (grid && window.MENU_CONFIG && window.MENU_CONFIG.ENTERTAINMENT_TOOLS) {
+      grid.innerHTML = window.MENU_CONFIG.renderDomainGridItems(window.MENU_CONFIG.ENTERTAINMENT_TOOLS);
+    }
   }
+  renderEntertainmentTools();
+  window.addEventListener('user-logged-in', renderEntertainmentTools);
 
   if (typeof initVoiceWidget === 'function') {
     initVoiceWidget({

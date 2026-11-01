@@ -95,6 +95,56 @@ body {
   margin: 0 0 1.25rem;
 }
 
+.ski-apex {
+  margin: 0 0 1.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--ski-line);
+  border-radius: 14px;
+  background: #0c151d;
+}
+
+.ski-apex__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.ski-apex h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.ski-apex p {
+  margin: 0.2rem 0 0;
+  color: var(--ski-muted);
+}
+
+.ski-apex button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  background: var(--ski-ice);
+  color: #071018;
+  cursor: pointer;
+}
+
+.ski-apex__media {
+  margin-top: 0.75rem;
+}
+
+.ski-apex__media[hidden] {
+  display: none;
+}
+
+.ski-apex__video {
+  display: block;
+  width: min(100%, 420px);
+  border-radius: 12px;
+  background: #071018;
+}
+
 .ski-cam-resorts {
   display: flex;
   flex-wrap: wrap;
@@ -1115,6 +1165,10 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
+}
+
+.ski-lidar-legend__line {
+  flex-basis: 100%;
 }
 
 .ski-lidar-legend i {

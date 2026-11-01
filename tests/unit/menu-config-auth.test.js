@@ -25,19 +25,21 @@ describe('menu-config auth filtering', () => {
     expect(MENU_CONFIG.pathRequiresAuth('/finance/disasters-unified.html')).toBe(false);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/disasters-webcams.html')).toBe(false);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/disasters-encompass-map.html')).toBe(false);
+    expect(MENU_CONFIG.pathRequiresAuth('/finance/encompass-assistant.html')).toBe(true);
+    expect(MENU_CONFIG.pathRequiresAuth('/finance/calc-engine-webgpu.html')).toBe(false);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/encompass-hub.html')).toBe(true);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/unit-tests.html')).toBe(true);
     expect(MENU_CONFIG.pathRequiresAuth('/gse-analyzer.html')).toBe(false);
   });
 
-  test('filterToolsByAuth logged-out visible set is disaster suite + GSE only', () => {
+  test('filterToolsByAuth logged-out visible set is the open suite + GSE', () => {
     const visible = MENU_CONFIG.filterToolsByAuth(MENU_CONFIG.ENCOMPASS_TOOLS, false);
     const hrefs = visible.map((t) => t.href);
     expect(hrefs).toContain('/finance/disasters-unified.html');
     expect(hrefs).toContain('/finance/disasters-encompass-map.html');
+    expect(hrefs).not.toContain('/finance/encompass-assistant.html');
     expect(hrefs).toContain('/gse-analyzer.html');
     expect(hrefs).not.toContain('/finance/index.html');
-    expect(hrefs).not.toContain('/finance/encompass-assistant.html');
     expect(hrefs).not.toContain('/finance/unit-tests.html');
     expect(hrefs).not.toContain('/finance/loan-batch-update.html');
     expect(hrefs).not.toContain('/finance/fha-streamline-calculator.html');
@@ -58,7 +60,10 @@ describe('menu-config auth filtering', () => {
     const loggedIn = MENU_CONFIG.getFinanceNavItems(true);
     expect(loggedOut).not.toEqual(MENU_CONFIG.NAV_FINANCE);
     const outHrefs = loggedOut.filter((t) => t.href).map((t) => t.href);
+    expect(outHrefs).toContain('/open/');
     expect(outHrefs).toContain('/finance/disasters-unified.html');
+    expect(outHrefs).not.toContain('/finance/encompass-assistant.html');
+    expect(outHrefs).toContain('/gse-analyzer.html');
     expect(outHrefs).not.toContain('/finance/encompass-hub.html');
     expect(outHrefs).not.toContain('/finance/unit-tests.html');
     expect(outHrefs).not.toContain('/finance/index.html');
@@ -83,12 +88,15 @@ describe('menu-config auth filtering', () => {
     );
   });
 
-  test('getMortgageTools returns disasters only when logged out; full set when logged in', () => {
+  test('getMortgageTools returns the open suite when logged out; full set when logged in', () => {
     const loggedOut = MENU_CONFIG.getMortgageTools(false);
     const loggedIn = MENU_CONFIG.getMortgageTools(true);
     const outHrefs = loggedOut.map((t) => t.href);
+    expect(outHrefs).toContain('/open/');
     expect(outHrefs).toContain('/finance/disasters-unified.html');
     expect(outHrefs).not.toContain('/finance/encompass-assistant.html');
+    expect(outHrefs).toContain('/gse-analyzer.html');
+    expect(outHrefs).toContain('/finance/calc-engine-webgpu.html');
     expect(outHrefs).not.toContain('/finance/dti-calculator.html');
     expect(loggedIn.map((t) => t.href)).toEqual(
       expect.arrayContaining([
@@ -118,6 +126,86 @@ describe('menu-config auth filtering', () => {
     expect(moreHrefs).toContain('/nature/nature-hub.html');
     expect(moreHrefs).not.toContain('/nature/tree-discovery.html');
     expect(moreHrefs).not.toContain('/ski/');
+  });
+
+  test('cannabis pages require login and drop out of logged-out menus', () => {
+    expect(MENU_CONFIG.pathRequiresAuth('/mountain-high/')).toBe(true);
+    expect(MENU_CONFIG.pathRequiresAuth('/mountain-high')).toBe(true);
+    expect(MENU_CONFIG.pathRequiresAuth('/nature/cannabis-origins.html')).toBe(true);
+    expect(MENU_CONFIG.isCannabisPath('/ski/')).toBe(false);
+    expect(MENU_CONFIG.pathRequiresAuth('/ski/')).toBe(false);
+
+    const lists = [
+      MENU_CONFIG.NAV_MUSIC,
+      MENU_CONFIG.NAV_ENTERTAINMENT,
+      MENU_CONFIG.NAV_NATURE,
+      MENU_CONFIG.ENTERTAINMENT_TOOLS,
+      MENU_CONFIG.NATURE_TOOLS,
+      MENU_CONFIG.MUSIC_TOOLS,
+    ];
+    lists.forEach((list) => {
+      const visible = MENU_CONFIG.filterToolsByAuth(list, false)
+        .filter((t) => t.href)
+        .map((t) => t.href);
+      expect(visible).not.toContain('/mountain-high/');
+      expect(visible).not.toContain('/nature/cannabis-origins.html');
+      const authed = MENU_CONFIG.filterToolsByAuth(list, true)
+        .filter((t) => t.href)
+        .map((t) => t.href);
+      list.filter((t) => t.href === '/mountain-high/' || t.href === '/nature/cannabis-origins.html')
+        .forEach((t) => expect(authed).toContain(t.href));
+    });
+
+    expect(readFileSync(join(process.cwd(), 'public/mountain-high/index.html'), 'utf8'))
+      .toContain('/shared/cannabis-page-guard.js');
+  });
+
+  test('mortgage tools carry a launch date and a hub category', () => {
+    const categories = ['encompass', 'ai', 'calculators', 'risk', 'devtools'];
+    const today = new Date();
+    const todayIso = [
+      today.getFullYear(),
+      String(today.getMonth() + 1).padStart(2, '0'),
+      String(today.getDate()).padStart(2, '0'),
+    ].join('-');
+
+    function assertTool(tool) {
+      expect(tool.since).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      const [y, m, d] = tool.since.split('-').map(Number);
+      const dt = new Date(Date.UTC(y, m - 1, d));
+      expect(dt.getUTCFullYear()).toBe(y);
+      expect(dt.getUTCMonth()).toBe(m - 1);
+      expect(dt.getUTCDate()).toBe(d);
+      expect(tool.since <= todayIso).toBe(true);
+      expect(categories).toContain(tool.category);
+    }
+
+    MENU_CONFIG.getMortgageTools(true).forEach(assertTool);
+    const byHref = new Map();
+    [...MENU_CONFIG.FINANCE_TOOLS, ...MENU_CONFIG.ENCOMPASS_TOOLS].forEach((tool) => {
+      assertTool(tool);
+      const prev = byHref.get(tool.href);
+      if (prev) {
+        expect(tool.since).toBe(prev.since);
+        expect(tool.category).toBe(prev.category);
+      } else {
+        byHref.set(tool.href, tool);
+      }
+    });
+    expect(byHref.get('/finance/fha-streamline-calculator.html')).toMatchObject({
+      since: '2025-10-28',
+      category: 'calculators',
+    });
+    expect(byHref.get('/finance/loan-flight-sim.html')).toMatchObject({
+      since: '2026-10-04',
+      category: 'encompass',
+    });
+  });
+
+  test('getAllTools keeps catalog group labels when hub categories are set', () => {
+    const tools = MENU_CONFIG.getAllTools(false, { loggedIn: true });
+    expect(tools.find((t) => t.href === '/finance/dti-calculator.html').category).toBe('Worksheets');
+    expect(tools.find((t) => t.href === '/finance/encompass-assistant.html').category).toBe('Encompass');
   });
 
   test('Entertainment menu includes Mountain High with a mountain icon', () => {

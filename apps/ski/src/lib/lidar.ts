@@ -106,14 +106,14 @@ async function fetchBin(demId: string, lod: 0 | 1): Promise<ArrayBuffer | null> 
   const api = await fetch(`/api/ski/lidar/${demId}/${lod}`);
   const type = api.headers.get('content-type') || '';
   if (api.ok && !type.includes('json') && !type.includes('html')) return api.arrayBuffer();
-  if (lod !== 0) return null;
-  const file = await fetch(`/data/ski/lidar/${demId}-lod0.bin`);
+  const file = await fetch(`/data/ski/lidar/${demId}-lod${lod}.bin`);
   if (!file.ok) return null;
   return file.arrayBuffer();
 }
 
 export function useLidarCloud(demId: string | undefined, enabled: boolean) {
   const [cloud, setCloud] = useState<LidarCloud | null>(null);
+  const [dense, setDense] = useState<LidarCloud | null>(null);
   const [note, setNote] = useState('');
 
   useEffect(() => {
@@ -124,6 +124,7 @@ export function useLidarCloud(demId: string | undefined, enabled: boolean) {
     }
     let live = true;
     setCloud(null);
+    setDense(null);
     setNote('Loading USGS lidar…');
     (async () => {
       try {
@@ -148,7 +149,7 @@ export function useLidarCloud(demId: string | undefined, enabled: boolean) {
         const dense = decodeLidarBin(lod1, 1);
         if (!dense || !live) return;
         dense.attribution = decoded.attribution;
-        setCloud(dense);
+        setDense(dense);
       } catch {
         if (live) setNote('Lidar could not be loaded.');
       }
@@ -158,5 +159,9 @@ export function useLidarCloud(demId: string | undefined, enabled: boolean) {
     };
   }, [demId, enabled]);
 
-  return { cloud: enabled ? cloud : null, note: enabled ? note : '' };
+  return {
+    cloud: enabled ? cloud : null,
+    dense: enabled ? dense : null,
+    note: enabled ? note : '',
+  };
 }

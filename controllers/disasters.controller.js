@@ -33,6 +33,7 @@ import {
 } from '../services/disaster-spatial.service.js';
 import { buildDailyBriefing } from '../services/disaster-daily-briefing.service.js';
 import { crawlDisasterWeb } from '../services/disaster-web-crawler.service.js';
+import { analyzePropertySpreadsheet } from '../services/disaster-spreadsheet.service.js';
 import {
   buildDisasterLiveCacheKey,
   checkDisasterLiveRateLimit,
@@ -732,6 +733,29 @@ export async function geocodeAddress(req, res) {
   }
 }
 
+export async function analyzeSpreadsheet(req, res) {
+  try {
+    const properties = req.body?.properties || req.body?.rows;
+    if (!Array.isArray(properties) || properties.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Request body must include a non-empty properties array',
+      });
+    }
+    const radiusMiles = req.body?.radiusMiles;
+    const disasters = Array.isArray(req.body?.disasters) ? req.body.disasters : undefined;
+    const data = await analyzePropertySpreadsheet(properties, { radiusMiles, disasters });
+    res.json({ success: true, data });
+  } catch (e) {
+    console.error('❌ Spreadsheet risk analysis error:', e);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to analyze property spreadsheet',
+      details: e.message,
+    });
+  }
+}
+
 export default {
   listDisasters,
   refreshDisasters,
@@ -747,6 +771,7 @@ export default {
   cameraCountySummaryByState,
   exportCsv,
   geocodeAddress,
+  analyzeSpreadsheet,
 };
 
 

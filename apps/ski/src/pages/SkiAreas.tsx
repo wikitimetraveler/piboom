@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import CaliforniaTable from '../components/CaliforniaTable';
 import ResortProfile from '../components/ResortProfile';
+import ApexLive from '../components/ApexLive';
 import SummitForecast from '../components/SummitForecast';
 import RunDetail from '../components/RunDetail';
 import RunFinder from '../components/RunFinder';
@@ -57,7 +58,10 @@ export default function SkiAreas(props: Props) {
   );
   const selectedRun = resortRuns.find((r) => r.id === selectedRunId) || null;
   const [mapMode, setMapMode] = useMapMode();
-  const { cloud: lidar, note: lidarNote } = useLidarCloud(dest?.dem, mapMode === 'lidar' && view === 'resort');
+  const { cloud: lidar, dense: lidarDense, note: lidarNote } = useLidarCloud(
+    dest?.dem,
+    mapMode === 'lidar' && view === 'resort'
+  );
   const resortLifts = useMemo(
     () => (trails && dem && trails.id === dem.id ? trails.lifts.filter((l) => l.resort === dest?.id) : []),
     [trails, dem, dest]
@@ -100,6 +104,7 @@ export default function SkiAreas(props: Props) {
           snow-free flight, not the snowpack.
         </p>
       </header>
+      <ApexLive />
       <div className="ski-chips" role="tablist" aria-label="Ski area">
         <button
           type="button"
@@ -177,6 +182,7 @@ export default function SkiAreas(props: Props) {
                   matchIds={matchIds}
                   onSelectRun={onSelectRun}
                   lidar={mapMode === 'lidar' ? lidar : null}
+                  lidarDense={mapMode === 'lidar' ? lidarDense : null}
                   lidarNote={mapMode === 'lidar' ? lidarNote : ''}
                 />
               )}

@@ -91,7 +91,7 @@
     }
     badge.hidden = false;
     badge.textContent = `Graph as-of ${formatSeededAt(seededAtMax)}`;
-    badge.title = 'Persisted NEAR / impact edges — not live GET /api/disasters/near';
+    badge.title = 'Saved impact links, separate from the live radius search';
   }
 
   function setStats(ego) {

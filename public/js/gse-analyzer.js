@@ -501,6 +501,24 @@
     card.addEventListener('change', onEdit);
   }
 
+  function isGseSessionActive() {
+    if (typeof window.isLoggedIn === 'function') return !!window.isLoggedIn();
+    try {
+      return localStorage.getItem('loggedInUserId') !== null;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /** Pipeline load talks to Encompass. The analyzer itself stays public. */
+  function syncPipelineCardVisibility() {
+    const card = $('gsePipelineCard');
+    if (!card) return;
+    const show = isGseSessionActive();
+    card.classList.toggle('d-none', !show);
+    card.hidden = !show;
+  }
+
   function setPipelineStatus(html, isError) {
     const el = $('gsePipelineStatus');
     if (!el) return;
@@ -583,13 +601,14 @@
     }
 
     const pipelineMatch = command.match(/load (?:pipeline )?(?:loan )?#?(\d{1,8})/);
-    if (pipelineMatch) {
-      if (pipelineInput) pipelineInput.value = pipelineMatch[1];
-      speak(`Loading pipeline loan ${pipelineMatch[1]}.`);
-      loadFromPipeline({ voiceFeedback: true });
-      return;
-    }
-    if (command.includes('load pipeline')) {
+    if (pipelineMatch || command.includes('load pipeline')) {
+      if (!isGseSessionActive()) return;
+      if (pipelineMatch) {
+        if (pipelineInput) pipelineInput.value = pipelineMatch[1];
+        speak(`Loading pipeline loan ${pipelineMatch[1]}.`);
+        loadFromPipeline({ voiceFeedback: true });
+        return;
+      }
       speak('Say load pipeline loan and then a number.');
       return;
     }
@@ -647,6 +666,7 @@
   }
 
   async function loadFromPipeline(options = {}) {
+    if (!isGseSessionActive()) return;
     const loadBtn = $('btnLoadPipeline');
     const idRaw = $('gsePipelineLoanId').value.trim();
     const loanId = parseInt(idRaw, 10);
@@ -678,16 +698,16 @@
       const guid = loan && loan.encompass_loan_guid ? String(loan.encompass_loan_guid).trim() : '';
       if (!guid) {
         setPipelineStatus(
-          'This pipeline row has no <code>encompass_loan_guid</code>. Load is only enabled when the loan is linked to Encompass.',
+          'This saved loan is not linked, so the scenario cannot be filled.',
           true
         );
-        if (options.voiceFeedback) speak('This pipeline loan is not linked to Encompass.');
+        if (options.voiceFeedback) speak('This saved loan is not linked.');
         return;
       }
 
       const loanNo = loan.loan_number != null ? String(loan.loan_number) : '';
       setPipelineStatus(
-        `Reading Encompass fields for loan #${loanNo || loanId} <span class="text-muted">(${guid.slice(0, 8)}…)</span>…`,
+        `Reading fields for loan #${loanNo || loanId}…`,
         false
       );
 
@@ -702,7 +722,7 @@
         const msg =
           (ehJson && (ehJson.details || ehJson.error || ehJson.message)) ||
           (typeof ehJson === 'string' ? ehJson : '') ||
-          `Encompass field-reader failed (${ehRes.status}).`;
+          `Field read failed (${ehRes.status}).`;
         setPipelineStatus(String(msg), true);
         if (options.voiceFeedback) speak(msg);
         return;
@@ -1295,13 +1315,15 @@
     });
     setAiStatus(
       gseAiMode === 'rules'
-        ? 'Quick rules mode → /api/gse/loan-program-expert'
-        : 'Knowledge RAG mode → /api/gse-assistant/chat (+ Postgres bank)',
+        ? 'Quick rules mode uses the agency guides summarized on this page.'
+        : 'Knowledge mode answers from the indexed research notes on this page.',
       false
     );
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    syncPipelineCardVisibility();
+    window.addEventListener('user-logged-in', syncPipelineCardVisibility);
     initProductsGrid();
     initSuggestionsGrid();
     loadMeta();
@@ -1365,6 +1387,20 @@
     }
     const clearBtn = $('btnClearGseChat');
     if (clearBtn) clearBtn.addEventListener('click', clearGseChat);
+
+    document.querySelectorAll('[data-gse-open]').forEach((link) => {
+      link.addEventListener('click', () => {
+        const pane = document.getElementById(link.getAttribute('data-gse-open'));
+        if (!pane || !window.bootstrap || !window.bootstrap.Collapse) return;
+        window.bootstrap.Collapse.getOrCreateInstance(pane, { toggle: false }).show();
+      });
+    });
+    const knowledgePane = $('gseRefKnowledge');
+    if (knowledgePane) {
+      knowledgePane.addEventListener('shown.bs.collapse', () => {
+        window.dispatchEvent(new Event('resize'));
+      });
+    }
     setAiMode('rag');
   });
 })();

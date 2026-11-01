@@ -41,6 +41,9 @@ router.get('/county-summary', disastersController.countySummaryByState);
 // CSV Export
 router.get('/export.csv', disastersController.exportCsv);
 
+// Spreadsheet property portfolio risk analysis
+router.post('/analyze-spreadsheet', disastersController.analyzeSpreadsheet);
+
 export default router;
 
 

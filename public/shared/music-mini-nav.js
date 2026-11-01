@@ -23,8 +23,28 @@
     { href: '/mountain-high/', label: 'Mountain High', icon: 'bi-mountain', title: 'Mountain High Medicinals — 21+ type cards, Bud Master' },
   ];
 
+  function isLoggedInNow() {
+    if (typeof window.isLoggedIn === 'function') return !!window.isLoggedIn();
+    try {
+      return !!localStorage.getItem('loggedInUserId');
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function isCannabisHref(href) {
+    if (window.MENU_CONFIG && typeof window.MENU_CONFIG.isCannabisPath === 'function') {
+      return window.MENU_CONFIG.isCannabisPath(href);
+    }
+    const path = String(href || '').split('?')[0].split('#')[0].toLowerCase();
+    return path === '/mountain-high' || path.indexOf('/mountain-high/') === 0
+      || path === '/nature/cannabis-origins.html';
+  }
+
   function getNavItems() {
-    return (window.MENU_CONFIG && window.MENU_CONFIG.MUSIC_TOOLS) || FALLBACK_ITEMS;
+    const items = (window.MENU_CONFIG && window.MENU_CONFIG.MUSIC_TOOLS) || FALLBACK_ITEMS;
+    if (isLoggedInNow()) return items;
+    return items.filter(function (item) { return !isCannabisHref(item.href); });
   }
 
   function renderMiniNav(container) {
@@ -73,5 +93,10 @@
   } else {
     init();
   }
+
+  window.addEventListener('user-logged-in', init);
+  window.addEventListener('storage', function (event) {
+    if (!event.key || event.key === 'loggedInUserId' || event.key === 'currentUserId') init();
+  });
 })();
 

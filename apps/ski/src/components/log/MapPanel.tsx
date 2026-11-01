@@ -31,7 +31,7 @@ export default function MapPanel({ pass, day, date, focus, onFocus, destinations
   const [area, setArea] = useState<string | null>(null);
   const { areas, demId } = useTripAreas(day, resort, area);
   const { dem, trails } = useMountain(demId);
-  const { cloud: lidar, note: lidarNote } = useLidarCloud(demId || undefined, mode === 'lidar');
+  const { cloud: lidar, dense: lidarDense, note: lidarNote } = useLidarCloud(demId || undefined, mode === 'lidar');
   const [open, setOpen] = useState<LogPhoto | null>(null);
   const [kmlNote, setKmlNote] = useState('');
   const [busy, setBusy] = useState(false);
@@ -159,6 +159,7 @@ export default function MapPanel({ pass, day, date, focus, onFocus, destinations
             pins={pins}
             compact
             lidar={mode === 'lidar' ? lidar : null}
+            lidarDense={mode === 'lidar' ? lidarDense : null}
             lidarNote={mode === 'lidar' ? lidarNote : ''}
           />
         ) : !frame ? (

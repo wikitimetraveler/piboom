@@ -11,6 +11,7 @@ import { getStops } from './ski-places.service.js';
 import { getTrails, runCatalogSnippet } from './ski-trails.service.js';
 
 export const GUIDE_NAME = 'Ridge';
+export const APEX_NAME = 'Apex';
 
 function destSnippet(destinations = []) {
   return destinations
@@ -54,11 +55,20 @@ function runsForContext(destinations = [], pageContext = {}) {
 export function buildSystemPrompt({ destinations = [], stops = [], pageContext = {}, runs } = {}) {
   const selected = pageContext.selectedDestination || 'none selected';
   const runTable = runs ?? runsForContext(destinations, pageContext);
-  return `You are ${GUIDE_NAME}, the SoCal ski-road desk for Ski Topo — a go/no-go board for Fountain Valley drives to Mt. Baldy (Mt. Baldy Resort, up Mt Baldy Rd from Claremont), Wrightwood (Mountain High Resort), Running Springs (Snow Valley), Big Bear (Snow Summit and Bear Mountain), and the Eastern Sierra up US-395 (Mammoth Mountain and June Mountain).
+  const onMountain = pageContext.page === 'areas';
+  const who = onMountain
+    ? `You are ${APEX_NAME}, a ski racer who super-cruises, on the Ski Areas page. Fast, smooth carved turns on groomers. Talk the race line from apex to apex: where to stand on an edge, when a run is too steep or too narrow for that speed, and which run on the selected mountain is a cruiser. You are not a snowboarder. Ridge handles the drive, the chains, and the shops.`
+    : `You are ${GUIDE_NAME}, the SoCal ski-road desk for Ski Topo — a go/no-go board for Fountain Valley drives to Mt. Baldy (Mt. Baldy Resort, up Mt Baldy Rd from Claremont), Wrightwood (Mountain High Resort), Running Springs (Snow Valley), Big Bear (Snow Summit and Bear Mountain), and the Eastern Sierra up US-395 (Mammoth Mountain and June Mountain).`;
+  const personality = onMountain
+    ? `- Direct ski-coach voice. Short sentences. No hype.
+- Two or three short paragraphs. No markdown bullets, hashes, or raw URLs.
+- For a line, only use runs from the run table. Quote pitch and facing. Say when it is a cruiser and when speed is a bad idea.`
+    : `- Calm mountain-road voice. Short sentences. No hype.
+- Two or three short paragraphs. No markdown bullets, hashes, or raw URLs.`;
+  return `${who}
 
 ## Personality
-- Calm mountain-road voice. Short sentences. No hype.
-- Two or three short paragraphs. No markdown bullets, hashes, or raw URLs.
+${personality}
 
 ## Ground truth
 Home: Fountain Valley, California.
@@ -135,12 +145,13 @@ export async function chatWithRidge({
     'Radio crackle — ask me that one more time?';
 
   try {
-    await persistConversationTurn(userId, sessionId, String(message), reply, 'ridge');
+    const guide = context.page === 'areas' ? APEX_NAME : GUIDE_NAME;
+    await persistConversationTurn(userId, sessionId, String(message), reply, guide.toLowerCase());
   } catch (_) {
     /* memory optional */
   }
 
-  return { reply, guideName: GUIDE_NAME };
+  return { reply, guideName: context.page === 'areas' ? APEX_NAME : GUIDE_NAME };
 }
 
 export async function getRidgeSummary() {
@@ -154,6 +165,7 @@ export async function getRidgeSummary() {
 
 export default {
   GUIDE_NAME,
+  APEX_NAME,
   buildSystemPrompt,
   chatWithRidge,
   getRidgeSummary,

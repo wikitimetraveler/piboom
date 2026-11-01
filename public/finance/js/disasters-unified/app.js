@@ -178,10 +178,10 @@ function initDuSectionCards() {
     });
   });
 
-  ['collapseCommandDeck', 'collapseRiskIntel', 'collapseEncompassMap', 'collapseLoans'].forEach((sectionId) => {
+  ['collapseCommandDeck', 'collapseRiskIntel', 'collapseSpreadsheet', 'collapseEncompassMap', 'collapseLoans'].forEach((sectionId) => {
     const el = document.getElementById(sectionId);
     if (!el) return;
-    const step = (sectionId === 'collapseLoans' || sectionId === 'collapseEncompassMap') ? 3 : 2;
+    const step = (sectionId === 'collapseLoans' || sectionId === 'collapseEncompassMap' || sectionId === 'collapseSpreadsheet') ? 3 : 2;
     updateDuSectionHeaderState(sectionId, el.classList.contains('show'));
     el.addEventListener('shown.bs.collapse', () => {
       updateDuSectionHeaderState(sectionId, true);
@@ -234,6 +234,7 @@ function getDuNavSectionForCollapse(sectionId) {
   if (id === 'collapseEncompassMap') return document.getElementById('duEncompassMapSection');
   if (id === 'collapseGraphDb') return document.getElementById('duGraphDbSection');
   if (id === 'collapseRiskIntel') return document.getElementById('duRiskIntelCard');
+  if (id === 'collapseSpreadsheet') return document.getElementById('duSpreadsheetSection');
   const navSection = el.closest('.du-nav-section');
   if (navSection) return navSection;
   return el.closest('.du-section-card');
@@ -380,6 +381,8 @@ function revealDuIntelShell({ scope, state, county, statusMsg, keepGeoExpanded =
   statsRow?.classList.remove('du-stats-row--hidden');
   if (statusMsg) setDashboardStatus(statusMsg, 'info');
 
+  showDuDashboardSectionCard('collapseRiskIntel');
+  showDuDashboardSectionCard('collapseSpreadsheet');
   showDuDashboardSectionCard('collapseCommandDeck');
   showDuDashboardSectionCard('collapseFilters');
   showDuDashboardSectionCard('collapseDisasters');
@@ -550,10 +553,11 @@ function syncDuSelectionOverlays() {
 function openDuDashboardSection(targetId, stepNum) {
   if (!targetId) return;
   const accordionIds = ['collapseFilters', 'collapseDisasters', 'collapseMapYouTube'];
-  const sectionCardIds = ['collapseCommandDeck', 'collapseRiskIntel', 'collapseEncompassMap', 'collapseLoans', 'collapseGraphDb'];
+  const sectionCardIds = ['collapseCommandDeck', 'collapseRiskIntel', 'collapseSpreadsheet', 'collapseEncompassMap', 'collapseLoans', 'collapseGraphDb'];
   const sectionHeadingIds = {
     collapseCommandDeck: 'headingCommandDeck',
     collapseRiskIntel: 'headingRiskIntel',
+    collapseSpreadsheet: 'headingSpreadsheet',
     collapseEncompassMap: 'headingEncompassMap',
     collapseLoans: 'headingLoans',
     collapseGraphDb: 'headingGraphDb',
@@ -649,6 +653,8 @@ function initDuSectionSidebar() {
     el.addEventListener('hidden.bs.collapse', () => updateDuSectionSidebarActiveState(id, false));
   });
 
+  showDuDashboardSectionCard('collapseRiskIntel');
+  showDuDashboardSectionCard('collapseSpreadsheet');
   const defaultOpenId = 'collapseDisasters';
   showDuDashboardSectionCard(defaultOpenId);
   updateDuSectionSidebarActiveState(defaultOpenId, true);
@@ -1138,7 +1144,7 @@ function updateSelectionContextStrip() {
   const summary = document.createElement('div');
   summary.className = 'du-selection-strip-summary';
   summary.innerHTML = `<strong class="du-selection-strip-title">${duEscapeHtml(title)}</strong>
-    <span class="badge text-bg-light border du-live-near-chip me-1" title="Live GET /api/disasters/near — not graph NEAR">Live /near</span>
+    <span class="badge text-bg-light border du-live-near-chip me-1" title="Live events inside the selected radius">Live radius</span>
     <span class="du-selection-strip-meta text-muted">${duEscapeHtml(location)} · ${duEscapeHtml(loanLine)} · ${duEscapeHtml(camLine)} · ${duEscapeHtml(nwsLine)}</span>`;
 
   const actions = document.createElement('div');
@@ -1147,7 +1153,7 @@ function updateSelectionContextStrip() {
   actions.setAttribute('aria-label', 'Selection actions');
 
   const primaryActions = [
-    { label: 'Show Encompass map', icon: 'bi-geo-alt', className: 'btn-outline-primary', onclick: 'openDuEncompassLoansMapSection()' },
+    { label: 'Show proximity map', icon: 'bi-geo-alt', className: 'btn-outline-primary', onclick: 'openDuEncompassLoansMapSection()' },
     { label: 'AI video briefing', icon: 'bi-camera-reels', className: 'btn-info text-white', onclick: 'openDisasterHeygenBriefing()' },
     { label: 'Google Earth KML', icon: 'bi-globe-americas', className: 'btn-warning', onclick: 'exportCinematicDisasterKml()' },
     { label: 'Processor expert', icon: 'bi-robot', className: 'btn-light', onclick: 'openProcessorExpert()' },
@@ -1628,6 +1634,10 @@ $(function init() {
   }
   initDuSectionCards();
   initHotspotFilterBadge();
+  if (typeof initHotspotControls === 'function') initHotspotControls();
+  if (window.DuSpreadsheetAnalyzer?.initSpreadsheetAnalyzerUi) {
+    window.DuSpreadsheetAnalyzer.initSpreadsheetAnalyzerUi();
+  }
   initDuSectionSidebar();
   if (typeof initSectionSidebarShell === 'function') {
     initSectionSidebarShell({ storageKey: 'duSectionSidebarOpen' });

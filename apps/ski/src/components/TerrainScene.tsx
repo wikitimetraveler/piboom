@@ -50,6 +50,7 @@ interface Props {
   controlsRef?: MutableRefObject<SceneControls | null>;
   compact?: boolean;
   lidar?: LidarCloud | null;
+  lidarDense?: LidarCloud | null;
   lidarNote?: string;
 }
 
@@ -73,6 +74,9 @@ interface SceneApi {
 }
 
 const WIDTH = 3;
+/** Camera distance to the look-at point. Inside the near band the denser cloud is shown. */
+const LIDAR_NEAR = 1.7;
+const LIDAR_FAR = 2.3;
 const EXAG = 1.5;
 const FT_PER_M = 3.28084;
 
@@ -190,12 +194,11 @@ const LIDAR_MODES: Record<LidarColor, number> = { class: 0, canopy: 1, elev: 2, 
 
 const LIDAR_CLASS_KEYS = [
   ['Ground', '#9e8c75'],
-  ['Low veg', '#739447'],
-  ['Mid veg', '#387a3d'],
-  ['Trees', '#145229'],
+  ['Brush', '#739447'],
+  ['Taller brush', '#387a3d'],
+  ['Trees, darker when the canopy is taller', '#145229'],
   ['Building', '#b87352'],
   ['Water', '#407ab8'],
-  ['Other', '#9ea3a8'],
 ] as const;
 
 function makeFrame(dem: DemGrid) {
@@ -240,6 +243,36 @@ function makeFrame(dem: DemGrid) {
 }
 
 type Frame = ReturnType<typeof makeFrame>;
+
+function lidarGeometry(cloud: LidarCloud, frame: Frame, dem: DemGrid) {
+  const { count, south, north, west, east, zMinFt, zMaxFt, x, y, z, cls, hag } = cloud;
+  const positions = new Float32Array(count * 3);
+  const elev = new Float32Array(count);
+  const aCls = new Float32Array(count);
+  const aHag = new Float32Array(count);
+  const spanY = north - south || 1;
+  const spanX = east - west || 1;
+  const spanZ = zMaxFt - zMinFt || 1;
+  const demX = dem.east - dem.west || 1;
+  const demY = dem.north - dem.south || 1;
+  for (let i = 0; i < count; i++) {
+    const lat = south + (y[i] / 65535) * spanY;
+    const lng = west + (x[i] / 65535) * spanX;
+    const ft = zMinFt + (z[i] / 65535) * spanZ;
+    positions[i * 3] = ((lng - dem.west) / demX - 0.5) * WIDTH;
+    positions[i * 3 + 1] = (ft - frame.minFt) * frame.vScale + 0.002;
+    positions[i * 3 + 2] = ((dem.north - lat) / demY - 0.5) * frame.depth;
+    elev[i] = ft;
+    aCls[i] = cls[i];
+    aHag[i] = hag[i];
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geo.setAttribute('aCls', new THREE.BufferAttribute(aCls, 1));
+  geo.setAttribute('aHag', new THREE.BufferAttribute(aHag, 1));
+  geo.setAttribute('aElev', new THREE.BufferAttribute(elev, 1));
+  return geo;
+}
 
 function haversineM(a: LatLng, b: LatLng): number {
   const toRad = (d: number) => (d * Math.PI) / 180;
@@ -296,7 +329,7 @@ interface LiftHandle {
 
 export default function TerrainScene(props: Props) {
   const { dem, trails, destinations, resortId, selectedRunId, previewRunId, matchIds, onSelectRun } = props;
-  const { tracks, pins, controlsRef, compact, lidar, lidarNote } = props;
+  const { tracks, pins, controlsRef, compact, lidar, lidarDense, lidarNote } = props;
   const host = useRef<HTMLDivElement>(null);
   const compass = useRef<HTMLDivElement>(null);
   const api = useRef<SceneApi | null>(null);
@@ -312,13 +345,19 @@ export default function TerrainScene(props: Props) {
     scene: THREE.Scene;
     frame: Frame;
     terrainMat: THREE.ShaderMaterial;
-    lidarMat?: THREE.ShaderMaterial;
+    lidarMats?: THREE.ShaderMaterial[];
   } | null>(null);
+  const lidarLive = useRef<{ far: THREE.Points | null; near: THREE.Points | null; dense: boolean }>({
+    far: null,
+    near: null,
+    dense: false,
+  });
   const [sceneEpoch, setSceneEpoch] = useState(0);
   const [lidarColor, setLidarColor] = useState<LidarColor>('class');
   const freezeLevelFt = destinations.find((d) => d.id === resortId)?.weather?.freezeLevelFt ?? null;
   const [pointSize, setPointSize] = useState(4);
   const [meshOpacity, setMeshOpacity] = useState(0);
+  const [lidarClose, setLidarClose] = useState(false);
 
   useEffect(() => {
     const el = host.current;
@@ -688,6 +727,17 @@ export default function TerrainScene(props: Props) {
         if (camera.position.distanceTo(goal.position) < 0.004) goal.active = false;
       }
       controls.update();
+      const liveCloud = lidarLive.current;
+      if (liveCloud.near && liveCloud.far) {
+        const dist = camera.position.distanceTo(controls.target);
+        const close = liveCloud.dense ? dist < LIDAR_FAR : dist < LIDAR_NEAR;
+        if (close !== liveCloud.dense) {
+          liveCloud.dense = close;
+          liveCloud.near.visible = close;
+          liveCloud.far.visible = !close;
+          setLidarClose(close);
+        }
+      }
       if (needsPick) {
         needsPick = false;
         const hit = pick();
@@ -789,67 +839,60 @@ export default function TerrainScene(props: Props) {
 
   useEffect(() => {
     const world = worldRef.current;
-    if (!world || !lidar?.count || !dem) return;
-    const { scene, frame } = world;
-    const { count, south, north, west, east, zMinFt, zMaxFt, x, y, z, cls, hag } = lidar;
-    const positions = new Float32Array(count * 3);
-    const elev = new Float32Array(count);
-    const aCls = new Float32Array(count);
-    const aHag = new Float32Array(count);
-    const spanY = north - south || 1;
-    const spanX = east - west || 1;
-    const spanZ = zMaxFt - zMinFt || 1;
-    const demX = dem.east - dem.west || 1;
-    const demY = dem.north - dem.south || 1;
-    for (let i = 0; i < count; i++) {
-      const lat = south + (y[i] / 65535) * spanY;
-      const lng = west + (x[i] / 65535) * spanX;
-      const ft = zMinFt + (z[i] / 65535) * spanZ;
-      positions[i * 3] = ((lng - dem.west) / demX - 0.5) * WIDTH;
-      positions[i * 3 + 1] = (ft - frame.minFt) * frame.vScale + 0.002;
-      positions[i * 3 + 2] = ((dem.north - lat) / demY - 0.5) * frame.depth;
-      elev[i] = ft;
-      aCls[i] = cls[i];
-      aHag[i] = hag[i];
+    if (!world || !lidar?.count || !dem) {
+      lidarLive.current = { far: null, near: null, dense: false };
+      return;
     }
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geo.setAttribute('aCls', new THREE.BufferAttribute(aCls, 1));
-    geo.setAttribute('aHag', new THREE.BufferAttribute(aHag, 1));
-    geo.setAttribute('aElev', new THREE.BufferAttribute(elev, 1));
-    const mat = new THREE.ShaderMaterial({
-      vertexShader: lidarVertex,
-      fragmentShader: lidarFragment,
-      uniforms: {
-        uMode: { value: LIDAR_MODES[lidarColor] },
-        uSize: { value: pointSize },
-        uDpr: { value: Math.min(window.devicePixelRatio || 1, 2) },
-        uZMin: { value: zMinFt },
-        uZMax: { value: zMaxFt },
-        uFreeze: { value: freezeLevelFt ?? 1e6 },
-      },
-    });
-    const points = new THREE.Points(geo, mat);
-    points.frustumCulled = false;
-    scene.add(points);
-    world.lidarMat = mat;
+    const { scene, frame } = world;
+    const make = (cloud: LidarCloud, visible: boolean) => {
+      const geo = lidarGeometry(cloud, frame, dem);
+      const mat = new THREE.ShaderMaterial({
+        vertexShader: lidarVertex,
+        fragmentShader: lidarFragment,
+        uniforms: {
+          uMode: { value: LIDAR_MODES[lidarColor] },
+          uSize: { value: pointSize },
+          uDpr: { value: Math.min(window.devicePixelRatio || 1, 2) },
+          uZMin: { value: cloud.zMinFt },
+          uZMax: { value: cloud.zMaxFt },
+          uFreeze: { value: freezeLevelFt ?? 1e6 },
+        },
+      });
+      const points = new THREE.Points(geo, mat);
+      points.frustumCulled = false;
+      points.visible = visible;
+      scene.add(points);
+      return { geo, mat, points };
+    };
+    const far = make(lidar, true);
+    const near = lidarDense?.count ? make(lidarDense, false) : null;
+    const mats = near ? [far.mat, near.mat] : [far.mat];
+    world.lidarMats = mats;
+    lidarLive.current = { far: far.points, near: near?.points ?? null, dense: false };
+    setLidarClose(false);
     return () => {
-      scene.remove(points);
-      geo.dispose();
-      mat.dispose();
-      if (world.lidarMat === mat) world.lidarMat = undefined;
+      for (const part of [far, near]) {
+        if (!part) continue;
+        scene.remove(part.points);
+        part.geo.dispose();
+        part.mat.dispose();
+      }
+      if (world.lidarMats === mats) world.lidarMats = undefined;
+      lidarLive.current = { far: null, near: null, dense: false };
     };
     // Color and size update through uniforms so the cloud is not rebuilt on every slider tick.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lidar, dem, sceneEpoch]);
+  }, [lidar, lidarDense, dem, sceneEpoch]);
 
   useEffect(() => {
-    const mat = worldRef.current?.lidarMat;
-    if (!mat) return;
-    mat.uniforms.uMode.value = LIDAR_MODES[lidarColor];
-    mat.uniforms.uSize.value = pointSize;
-    mat.uniforms.uFreeze.value = freezeLevelFt ?? 1e6;
-  }, [lidarColor, pointSize, freezeLevelFt, lidar, sceneEpoch]);
+    const mats = worldRef.current?.lidarMats;
+    if (!mats?.length) return;
+    for (const mat of mats) {
+      mat.uniforms.uMode.value = LIDAR_MODES[lidarColor];
+      mat.uniforms.uSize.value = pointSize;
+      mat.uniforms.uFreeze.value = freezeLevelFt ?? 1e6;
+    }
+  }, [lidarColor, pointSize, freezeLevelFt, lidar, lidarDense, sceneEpoch]);
 
   useEffect(() => {
     const mat = worldRef.current?.terrainMat;
@@ -917,8 +960,9 @@ export default function TerrainScene(props: Props) {
         </p>
         {lidar ? (
           <p>
-            {lidar.attribution} · {lidar.count.toLocaleString()} points · snow-free flight, so this is ground and trees,
-            not the snowpack
+            {lidar.attribution} · {(lidarClose && lidarDense ? lidarDense : lidar).count.toLocaleString()} points
+            {lidarDense ? (lidarClose ? ' · denser cloud while zoomed in' : ' · zoom in for the denser cloud') : ''} ·
+            snow-free flight, so this is ground and trees, not the snowpack
           </p>
         ) : lidarNote ? (
           <p>{lidarNote}</p>
@@ -978,6 +1022,18 @@ export default function TerrainScene(props: Props) {
                   {label}
                 </span>
               ))}
+              <span className="ski-lidar-legend__line">Brown is the ground. Greens are brush and trees. Orange is a building. Blue is water.</span>
+            </div>
+          ) : lidarColor === 'canopy' ? (
+            <div className="ski-lidar-legend">
+              <span>
+                <i style={{ background: '#6b6152' }} />
+                Pale is open ground
+              </span>
+              <span>
+                <i style={{ background: '#1f8c38' }} />
+                Darker green is a taller canopy
+              </span>
             </div>
           ) : lidarColor === 'snow' && freezeLevelFt != null ? (
             <div className="ski-lidar-legend">

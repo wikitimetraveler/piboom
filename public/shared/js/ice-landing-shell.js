@@ -267,11 +267,12 @@
         });
     };
 
-    /** Keep in sync with lib/finance-session.js FINANCE_PUBLIC_PAGES (disaster suite only). */
+    /** Keep in sync with lib/finance-session.js FINANCE_PUBLIC_PAGES (open suite). */
     const PUBLIC_FINANCE_PATHS = {
       '/finance/disasters-unified.html': true,
       '/finance/disasters-webcams.html': true,
       '/finance/disasters-encompass-map.html': true,
+      '/finance/calc-engine-webgpu.html': true,
     };
 
     const isPublicFinancePath = (pathOnly) => {

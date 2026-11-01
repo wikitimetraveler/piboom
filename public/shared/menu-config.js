@@ -18,6 +18,7 @@
 
   /** Navbar Worksheets dropdown items (URLs under /finance/) */
   const NAV_FINANCE = [
+    { href: '/open/', icon: 'bi-collection', label: 'Open suite', title: 'Public showcase — Disasters, GSE analyzer, graph calculation' },
     { href: '/finance/index.html', icon: 'bi-calculator', label: 'Worksheets Hub' },
     { href: '/finance/encompass-hub.html', icon: 'bi-columns-gap', label: 'Encompass Hub' },
     { href: '/finance/disasters-unified.html', icon: 'bi-globe', label: 'Unified Disasters' },
@@ -158,55 +159,56 @@
     { href: '/', icon: 'bi-house', label: 'Home' },
   ];
 
-  /** Worksheets hub tool grid (calculators + disasters only) */
+  /** Worksheets hub tool grid (calculators + disasters only). `since` is the page's first commit. */
   const FINANCE_TOOLS = [
-    { href: '/finance/encompass-hub.html', icon: 'bi-columns-gap', label: 'Encompass Hub', title: 'Encompass Hub, pipeline, loan APIs' },
-    { href: '/finance/fha-streamline-calculator.html', icon: 'bi-calculator', label: 'FHA Streamline', title: 'FHA Streamline refinance calculator' },
-    { href: '/finance/asset-qualifier-calculator.html', icon: 'bi-wallet2', label: 'Asset Qualifier', title: 'Asset Qualifier Calculator' },
-    { href: '/finance/fha-streamline-loan-amount-calculator.html', icon: 'bi-cash-coin', label: 'FHA Loan Amount', title: 'FHA Streamline Loan Amount' },
-    { href: '/finance/calc-engine-webgpu.html', icon: 'bi-diagram-3', label: 'Calc Engine WebGPU', title: 'FHA Streamline DAG on WebGPU — integer cents verifier' },
-    { href: '/finance/fha-streamline-ntb-calculator.html', icon: 'bi-graph-up', label: 'FHA NTB', title: 'FHA Streamline NTB' },
-    { href: '/finance/dti-calculator.html', icon: 'bi-percent', label: 'DTI Calculator', title: 'Debt-to-Income Calculator' },
-    { href: '/finance/cashout-refinance-calculator.html', icon: 'bi-cash-coin', label: 'Cash-Out', title: 'Cash-Out Refinance' },
-    { href: '/finance/amortization-schedule-calculator.html', icon: 'bi-calendar', label: 'Amortization', title: 'Amortization Schedule' },
-    { href: '/finance/closing-cost-calculator.html', icon: 'bi-receipt', label: 'Closing Cost', title: 'Closing Cost Calculator' },
-    { href: '/finance/ltv-calculator.html', icon: 'bi-house-door', label: 'LTV', title: 'Loan-to-Value Calculator' },
-    { href: '/finance/va-irrrl-calculator.html', icon: 'bi-calculator', label: 'VA IRRRL', title: 'VA IRRRL Calculator' },
-    { href: '/finance/disasters-unified.html', icon: 'bi-globe', label: 'Unified Disasters', title: 'Unified Disasters (90-day)' },
-    { href: '/finance/disasters-encompass-map.html', icon: 'bi-geo-alt', label: 'Encompass map', title: 'Encompass map — live proximity loan pins' },
+    { href: '/finance/encompass-hub.html', icon: 'bi-columns-gap', label: 'Encompass Hub', title: 'Encompass Hub, pipeline, loan APIs', since: '2025-12-05', category: 'encompass' },
+    { href: '/finance/fha-streamline-calculator.html', icon: 'bi-calculator', label: 'FHA Streamline', title: 'FHA Streamline refinance calculator', since: '2025-10-28', category: 'calculators' },
+    { href: '/finance/asset-qualifier-calculator.html', icon: 'bi-wallet2', label: 'Asset Qualifier', title: 'Asset Qualifier Calculator', since: '2025-10-29', category: 'calculators' },
+    { href: '/finance/fha-streamline-loan-amount-calculator.html', icon: 'bi-cash-coin', label: 'FHA Loan Amount', title: 'FHA Streamline Loan Amount', since: '2025-10-30', category: 'calculators' },
+    { href: '/finance/calc-engine-webgpu.html', icon: 'bi-diagram-3', label: 'Calc Engine WebGPU', title: 'FHA Streamline DAG on WebGPU — integer cents verifier', since: '2026-09-14', category: 'calculators' },
+    { href: '/finance/fha-streamline-ntb-calculator.html', icon: 'bi-graph-up', label: 'FHA NTB', title: 'FHA Streamline NTB', since: '2025-10-30', category: 'calculators' },
+    { href: '/finance/dti-calculator.html', icon: 'bi-percent', label: 'DTI Calculator', title: 'Debt-to-Income Calculator', since: '2025-10-30', category: 'calculators' },
+    { href: '/finance/cashout-refinance-calculator.html', icon: 'bi-cash-coin', label: 'Cash-Out', title: 'Cash-Out Refinance', since: '2025-10-30', category: 'calculators' },
+    { href: '/finance/amortization-schedule-calculator.html', icon: 'bi-calendar', label: 'Amortization', title: 'Amortization Schedule', since: '2025-10-30', category: 'calculators' },
+    { href: '/finance/closing-cost-calculator.html', icon: 'bi-receipt', label: 'Closing Cost', title: 'Closing Cost Calculator', since: '2025-10-30', category: 'calculators' },
+    { href: '/finance/ltv-calculator.html', icon: 'bi-house-door', label: 'LTV', title: 'Loan-to-Value Calculator', since: '2025-10-30', category: 'calculators' },
+    { href: '/finance/va-irrrl-calculator.html', icon: 'bi-calculator', label: 'VA IRRRL', title: 'VA IRRRL Calculator', since: '2025-11-02', category: 'calculators' },
+    { href: '/open/', icon: 'bi-collection', label: 'Open suite', title: 'Public showcase — Disasters, GSE analyzer, graph calculation', since: '2026-10-31', category: 'risk' },
+    { href: '/finance/disasters-unified.html', icon: 'bi-globe', label: 'Unified Disasters', title: 'Unified Disasters (90-day)', since: '2025-10-30', category: 'risk' },
+    { href: '/finance/disasters-encompass-map.html', icon: 'bi-geo-alt', label: 'Encompass map', title: 'Encompass map — live proximity loan pins', since: '2026-08-12', category: 'risk' },
   ];
 
-  /** Encompass hub / AI Assistant tool grid — full catalog when logged in. */
+  /** Encompass hub / AI Assistant tool grid — full catalog when logged in. `since` is the page's first commit. */
   const ENCOMPASS_TOOLS = [
-    { href: '/finance/index.html', icon: 'bi-calculator', label: 'Worksheets Hub', title: 'Worksheets Hub, calculators, disasters' },
-    { href: '/gse-analyzer.html', icon: 'bi-graph-up-arrow', label: 'GSE scenario analyzer', title: 'Fannie / Freddie / FHFA public rules — research only' },
-    { href: '/finance/encompass-hub.html', icon: 'bi-cloud-arrow-down', label: 'Encompass Hub', title: 'Encompass Hub' },
-    { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant', title: 'Encompass AI Assistant' },
-    { href: '/finance/encompass-analytics.html', icon: 'bi-bar-chart-line', label: 'Analytics', title: 'Encompass Analytics' },
-    { href: '/finance/disasters-unified.html', icon: 'bi-globe', label: 'Unified Disasters', title: 'Unified Disasters (90-day)' },
-    { href: '/finance/disasters-encompass-map.html', icon: 'bi-geo-alt', label: 'Encompass map', title: 'Encompass map — live proximity loan pins' },
-    { href: '/finance/loan-batch-update.html', icon: 'bi-layers-half', label: 'Loan batch update', title: 'Encompass loanBatch/updateRequests' },
-    { href: '/finance/processor-assignment.html', icon: 'bi-people-fill', label: 'Processor assignment', title: 'Live processor assignment against Encompass pipeline' },
-    { href: '/finance/processor-assignment-mock.html', icon: 'bi-people', label: 'Processor assignment (demo)', title: 'Processor assignment demo with synthetic loans' },
-    { href: '/finance/loan-flight-sim.html', icon: 'bi-airplane', label: 'Loan flight simulator', title: 'Fly a synthetic loan file from application to funding — TRID timing, LTV, DTI fixes' },
-    { href: '/finance/pipeline-risk-dashboard.html', icon: 'bi-shield-check', label: 'Pipeline Risk', title: 'Pipeline Risk Dashboard' },
-    { href: '/finance/risk-analysis-dashboard.html', icon: 'bi-graph-up', label: 'Risk Analysis', title: 'Risk Analysis Dashboard' },
-    { href: '/finance/unit-tests.html', icon: 'bi-check2-circle', label: 'Unit Tests', title: 'Unit Test Runner' },
-    { href: '/finance/tool9.html', icon: 'bi-camera-reels', label: 'Screen Test', title: 'The Screen Test' },
-    { href: '/finance/encompass-users.html', icon: 'bi-people', label: 'Users', title: 'Encompass Users' },
-    { href: '/finance/encompass-native-fields.html', icon: 'bi-list-columns', label: 'Native Fields', title: 'Native Loan Fields' },
-    { href: '/finance/encompass-custom-fields.html', icon: 'bi-sliders', label: 'Custom Fields', title: 'Custom Loan Fields' },
-    { href: '/finance/condition-manager.html', icon: 'bi-clipboard-check', label: 'Condition Manager', title: 'Convert the legacy Conditions CDO into Enhanced Conditions' },
-    { href: '/finance/enhanced-conditions.html', icon: 'bi-ui-checks-grid', label: 'Enhanced Conditions', title: 'Live Enhanced Conditions CRUD — types, templates, loan conditions' },
-    { href: '/finance/enhanced-conditions-expert.html', icon: 'bi-journal-richtext', label: 'EC Expert', title: 'Enhanced Conditions AI expert — APIs, roles, handoff pack' },
-    { href: '/finance/tpo-connect.html', icon: 'bi-people', label: 'TPO Connect', title: 'TPO Connect — guest apps, SSF objects, LoanContractTPO fields' },
-    { href: '/finance/encompass-hub-test.html', icon: 'bi-plug', label: 'Test Endpoints', title: 'Test API endpoints' },
-    { href: '/finance/tool2.html', icon: 'bi-code-slash', label: 'Parser', title: 'The Parser' },
-    { href: '/finance/tool3.html', icon: 'bi-globe', label: 'Mashup', title: 'The Mashup' },
-    { href: '/finance/tool4.html', icon: 'bi-gear', label: 'Automator', title: 'The Automator' },
-    { href: '/finance/tool5.html', icon: 'bi-rulers', label: 'Ruler', title: 'The Ruler' },
-    { href: '/finance/tool6.html', icon: 'bi-arrow-repeat', label: 'Transformer', title: 'The Transformer' },
-    { href: '/finance/tool8.html', icon: 'bi-magic', label: 'Alchemist', title: 'The Alchemist' },
+    { href: '/finance/index.html', icon: 'bi-calculator', label: 'Worksheets Hub', title: 'Worksheets Hub, calculators, disasters', since: '2025-10-28', category: 'encompass' },
+    { href: '/gse-analyzer.html', icon: 'bi-graph-up-arrow', label: 'GSE scenario analyzer', title: 'Fannie / Freddie / FHFA public rules — research only', since: '2026-05-03', category: 'calculators' },
+    { href: '/finance/encompass-hub.html', icon: 'bi-cloud-arrow-down', label: 'Encompass Hub', title: 'Encompass Hub', since: '2025-12-05', category: 'encompass' },
+    { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant', title: 'Encompass AI Assistant', since: '2025-10-24', category: 'ai' },
+    { href: '/finance/encompass-analytics.html', icon: 'bi-bar-chart-line', label: 'Analytics', title: 'Encompass Analytics', since: '2025-12-07', category: 'encompass' },
+    { href: '/finance/disasters-unified.html', icon: 'bi-globe', label: 'Unified Disasters', title: 'Unified Disasters (90-day)', since: '2025-10-30', category: 'risk' },
+    { href: '/finance/disasters-encompass-map.html', icon: 'bi-geo-alt', label: 'Encompass map', title: 'Encompass map — live proximity loan pins', since: '2026-08-12', category: 'risk' },
+    { href: '/finance/loan-batch-update.html', icon: 'bi-layers-half', label: 'Loan batch update', title: 'Encompass loanBatch/updateRequests', since: '2026-03-25', category: 'encompass' },
+    { href: '/finance/processor-assignment.html', icon: 'bi-people-fill', label: 'Processor assignment', title: 'Live processor assignment against Encompass pipeline', since: '2026-04-03', category: 'encompass' },
+    { href: '/finance/processor-assignment-mock.html', icon: 'bi-people', label: 'Processor assignment (demo)', title: 'Processor assignment demo with synthetic loans', since: '2026-06-26', category: 'encompass' },
+    { href: '/finance/loan-flight-sim.html', icon: 'bi-airplane', label: 'Loan flight simulator', title: 'Fly a synthetic loan file from application to funding — TRID timing, LTV, DTI fixes', since: '2026-10-04', category: 'encompass' },
+    { href: '/finance/pipeline-risk-dashboard.html', icon: 'bi-shield-check', label: 'Pipeline Risk', title: 'Pipeline Risk Dashboard', since: '2025-10-29', category: 'risk' },
+    { href: '/finance/risk-analysis-dashboard.html', icon: 'bi-graph-up', label: 'Risk Analysis', title: 'Risk Analysis Dashboard', since: '2025-11-14', category: 'risk' },
+    { href: '/finance/unit-tests.html', icon: 'bi-check2-circle', label: 'Unit Tests', title: 'Unit Test Runner', since: '2026-02-04', category: 'devtools' },
+    { href: '/finance/tool9.html', icon: 'bi-camera-reels', label: 'Screen Test', title: 'The Screen Test', since: '2026-02-14', category: 'ai' },
+    { href: '/finance/encompass-users.html', icon: 'bi-people', label: 'Users', title: 'Encompass Users', since: '2025-12-12', category: 'encompass' },
+    { href: '/finance/encompass-native-fields.html', icon: 'bi-list-columns', label: 'Native Fields', title: 'Native Loan Fields', since: '2026-01-25', category: 'encompass' },
+    { href: '/finance/encompass-custom-fields.html', icon: 'bi-sliders', label: 'Custom Fields', title: 'Custom Loan Fields', since: '2026-01-25', category: 'encompass' },
+    { href: '/finance/condition-manager.html', icon: 'bi-clipboard-check', label: 'Condition Manager', title: 'Convert the legacy Conditions CDO into Enhanced Conditions', since: '2026-08-01', category: 'encompass' },
+    { href: '/finance/enhanced-conditions.html', icon: 'bi-ui-checks-grid', label: 'Enhanced Conditions', title: 'Live Enhanced Conditions CRUD — types, templates, loan conditions', since: '2026-08-18', category: 'encompass' },
+    { href: '/finance/enhanced-conditions-expert.html', icon: 'bi-journal-richtext', label: 'EC Expert', title: 'Enhanced Conditions AI expert — APIs, roles, handoff pack', since: '2026-08-02', category: 'ai' },
+    { href: '/finance/tpo-connect.html', icon: 'bi-people', label: 'TPO Connect', title: 'TPO Connect — guest apps, SSF objects, LoanContractTPO fields', since: '2026-08-08', category: 'encompass' },
+    { href: '/finance/encompass-hub-test.html', icon: 'bi-plug', label: 'Test Endpoints', title: 'Test API endpoints', since: '2026-02-04', category: 'devtools' },
+    { href: '/finance/tool2.html', icon: 'bi-code-slash', label: 'Parser', title: 'The Parser', since: '2025-10-28', category: 'devtools' },
+    { href: '/finance/tool3.html', icon: 'bi-globe', label: 'Mashup', title: 'The Mashup', since: '2025-10-28', category: 'devtools' },
+    { href: '/finance/tool4.html', icon: 'bi-gear', label: 'Automator', title: 'The Automator', since: '2025-10-28', category: 'devtools' },
+    { href: '/finance/tool5.html', icon: 'bi-rulers', label: 'Ruler', title: 'The Ruler', since: '2025-10-28', category: 'devtools' },
+    { href: '/finance/tool6.html', icon: 'bi-arrow-repeat', label: 'Transformer', title: 'The Transformer', since: '2025-10-28', category: 'devtools' },
+    { href: '/finance/tool8.html', icon: 'bi-magic', label: 'Alchemist', title: 'The Alchemist', since: '2025-10-28', category: 'devtools' },
   ];
 
   /** Drop duplicate hrefs; keep the first label/icon and tidy dividers. */
@@ -229,7 +231,7 @@
   }
 
   /**
-   * Worksheets navbar: disaster suite only when logged out; every mortgage app
+   * Worksheets navbar: open suite (disasters + Encompass AI Expert) when logged out; every mortgage app
    * (Encompass Hub, AI Assistant, tools, calculators) when logged in.
    */
   function getFinanceNavItems(loggedIn) {
@@ -252,7 +254,12 @@
    */
   function getMortgageTools(loggedIn) {
     const authed = typeof loggedIn === 'boolean' ? loggedIn : isUserLoggedIn();
-    if (!authed) return filterToolsByAuth(FINANCE_TOOLS, false);
+    if (!authed) {
+      return dedupeMenuItems([
+        ...filterToolsByAuth(FINANCE_TOOLS, false),
+        ...filterToolsByAuth(ENCOMPASS_TOOLS, false),
+      ]).filter(function (item) { return item && !item.divider; });
+    }
     return dedupeMenuItems([...ENCOMPASS_TOOLS, { divider: true }, ...FINANCE_TOOLS])
       .filter(function (item) { return item && !item.divider; });
   }
@@ -316,6 +323,7 @@
     '/finance/disasters-unified.html',
     '/finance/disasters-webcams.html',
     '/finance/disasters-encompass-map.html',
+    '/finance/calc-engine-webgpu.html',
   ];
 
   /** Get home domain tiles, optionally filtered for demo mode + login */
@@ -350,8 +358,53 @@
     }
   }
 
-  /** True when href is under /finance/ and not a public disaster page. */
+  /** Mountain High Medicinals and the cannabis origins map. */
+  function isCannabisPath(href) {
+    const path = normalizeHrefPath(href);
+    if (!path) return false;
+    if (path === '/mountain-high' || path.startsWith('/mountain-high/')) return true;
+    return path === '/nature/cannabis-origins.html';
+  }
+
+  function visitorIsLoggedIn() {
+    if (typeof global.isLoggedIn === 'function') return !!global.isLoggedIn();
+    try {
+      return !!localStorage.getItem('loggedInUserId');
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /** Hide cannabis page links until the visitor is logged in. */
+  function syncCannabisLinks(root) {
+    const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
+    const show = visitorIsLoggedIn();
+    scope.querySelectorAll('a[href]').forEach(function (anchor) {
+      if (!isCannabisPath(anchor.getAttribute('href'))) return;
+      const host = anchor.closest('.mhm-return-link, .co-return') || anchor;
+      host.hidden = !show;
+      if (show) host.removeAttribute('aria-hidden');
+      else host.setAttribute('aria-hidden', 'true');
+    });
+  }
+
+  function installCannabisLinkSync() {
+    if (typeof document === 'undefined' || !document || typeof document.addEventListener !== 'function') return;
+    const run = function () { syncCannabisLinks(document); };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', run);
+    } else {
+      run();
+    }
+    global.addEventListener('user-logged-in', run);
+    global.addEventListener('storage', function (event) {
+      if (!event.key || event.key === 'loggedInUserId' || event.key === 'currentUserId') run();
+    });
+  }
+
+  /** True for login-gated finance pages and every cannabis page. */
   function pathRequiresAuth(href) {
+    if (isCannabisPath(href)) return true;
     const path = normalizeHrefPath(href);
     if (!path.startsWith('/finance/')) return false;
     return FINANCE_PUBLIC_PATHS.indexOf(path) === -1;
@@ -407,7 +460,8 @@
       icon: item.icon || 'bi-grid',
       label: item.label || 'Tool',
       title: item.title || item.label || 'Tool',
-      category: item.category || (options && options.category) || 'General',
+      // Group label from the caller wins over a hub category on the raw item.
+      category: (options && options.category) || item.category || 'General',
       domain: item.domain || '',
       requiresAuth: itemRequiresAuth(Object.assign({}, item, { href: href }))
     };
@@ -470,6 +524,8 @@
     makeToolId,
     normalizeToolItem,
     pathRequiresAuth,
+    isCannabisPath,
+    syncCannabisLinks,
     itemRequiresAuth,
     filterToolsByAuth,
     renderDomainGridItems,
@@ -488,4 +544,5 @@
   };
 
   global.MENU_CONFIG = MENU_CONFIG;
+  installCannabisLinkSync();
 })(typeof window !== 'undefined' ? window : globalThis);

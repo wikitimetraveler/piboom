@@ -596,33 +596,11 @@
     }
   }
 
-  function renderEncompassTools() {
-    const grid = $('encompassToolGrid');
-    const section = $('encompassAppsSection');
-    if (!grid || !window.MENU_CONFIG) return;
-    const loggedIn = typeof window.isLoggedIn === 'function' && window.isLoggedIn();
-    const tools =
-      typeof window.MENU_CONFIG.getMortgageTools === 'function'
-        ? window.MENU_CONFIG.getMortgageTools(loggedIn)
-        : window.MENU_CONFIG.ENCOMPASS_TOOLS || [];
-    grid.innerHTML = window.MENU_CONFIG.renderDomainGridItems(tools, {
-      loggedIn,
-      category: 'Mortgage'
-    });
-    if (section) section.hidden = !loggedIn || !grid.innerHTML;
-    const current = (location.pathname || '').toLowerCase();
-    grid.querySelectorAll('.domain-tile').forEach((tile) => {
-      const href = (tile.getAttribute('href') || '').toLowerCase();
-      tile.classList.toggle('active', href && (current === href || current.endsWith(href)));
-    });
-  }
-
   document.addEventListener('DOMContentLoaded', () => {
     ensureIds();
     initVoice();
     loadHealth();
     bootConstellation();
-    renderEncompassTools();
 
     appendMessage(
       'assistant',

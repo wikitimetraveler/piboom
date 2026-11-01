@@ -593,7 +593,3 @@ html[data-bs-theme="dark"] .ea-chip {
   border-color: color-mix(in srgb, var(--ea-teal) 40%, #1a2430);
   color: var(--ea-ink);
 }
-
-#encompassAppsSection {
-  margin-bottom: 1.5rem;
-}

@@ -28,12 +28,21 @@
 </header>
 
 <main class="portfolio-main">
-  <section class="portfolio-section">
-    <p class="portfolio-kicker">Worksheets</p>
-    <h1 class="portfolio-section__title">Mortgage calculators &amp; Encompass tools</h1>
-    <p class="portfolio-section__lead">FHA and VA worksheets, ICE-integrated hubs, disaster intelligence, and developer utilities. Some tools require finance login on this host.</p>
-    <div class="portfolio-finance-grid" id="financeToolGrid" aria-label="Finance tools"></div>
+  <section class="portfolio-hero" aria-labelledby="financeHubTitle">
+    <p class="portfolio-hero__role">Worksheets</p>
+    <h1 class="portfolio-hero__title" id="financeHubTitle">Mortgage calculators &amp; Encompass tools</h1>
+    <p class="portfolio-hero__lead">FHA and VA worksheets, ICE-integrated hubs, disaster intelligence, and developer utilities — cataloged in the order they shipped. Some tools require a finance login on this host.</p>
+    <dl class="pf-hub-stats" id="financeHubStats"></dl>
   </section>
+
+  <div class="pf-hub-toolbar">
+    <div class="pf-view-toggle" role="group" aria-label="How to browse tools">
+      <button type="button" data-view="category" aria-pressed="true">By category</button>
+      <button type="button" data-view="timeline" aria-pressed="false">Timeline</button>
+    </div>
+  </div>
+
+  <div id="financeToolGrid" aria-live="polite"></div>
 </main>
 
 <footer class="portfolio-footer">
@@ -48,27 +57,188 @@
 <script src="/shared/js/portfolio-shell.js"></script>
 <script>
 window.addEventListener('DOMContentLoaded', () => {
-  function renderFinanceTools() {
-    const grid = document.getElementById('financeToolGrid');
-    if (!grid || !window.MENU_CONFIG) return;
+  const VIEW_KEY = 'financeHubView';
+  const CATEGORIES = [
+    { id: 'encompass', label: 'Encompass' },
+    { id: 'ai', label: 'AI' },
+    { id: 'calculators', label: 'Calculators' },
+    { id: 'risk', label: 'Risk & disasters' },
+    { id: 'devtools', label: 'Developer tools' }
+  ];
+  const DATE_LONG = { month: 'short', day: 'numeric', year: 'numeric' };
+
+  function esc(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function parseIso(iso) {
+    const parts = String(iso || '').split('-').map(Number);
+    if (parts.length < 3 || parts.some(function (n) { return !n; })) return null;
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+  }
+
+  function formatDate(iso) {
+    const date = parseIso(iso);
+    if (!date) return '';
+    return date.toLocaleDateString('en-US', DATE_LONG);
+  }
+
+  function formatMonthYear(iso) {
+    const date = parseIso(iso);
+    if (!date) return '';
+    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  }
+
+  function formatMonthLong(iso) {
+    const date = parseIso(iso);
+    if (!date) return '';
+    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  }
+
+  function categoryLabel(id) {
+    const found = CATEGORIES.find(function (c) { return c.id === id; });
+    return found ? found.label : (id || '');
+  }
+
+  function resolveView() {
+    const query = new URLSearchParams(window.location.search).get('view');
+    if (query === 'timeline' || query === 'category') {
+      try { localStorage.setItem(VIEW_KEY, query); } catch (e) { /* private mode */ }
+      return query;
+    }
+    try {
+      const saved = localStorage.getItem(VIEW_KEY);
+      if (saved === 'timeline' || saved === 'category') return saved;
+    } catch (e) { /* private mode */ }
+    return 'category';
+  }
+
+  let view = resolveView();
+
+  function mortgageTools() {
     const loggedIn = typeof window.isLoggedIn === 'function' && window.isLoggedIn();
-    const tools = typeof window.MENU_CONFIG.getMortgageTools === 'function'
-      ? window.MENU_CONFIG.getMortgageTools(loggedIn)
-      : (window.MENU_CONFIG.filterToolsByAuth
-        ? window.MENU_CONFIG.filterToolsByAuth(window.MENU_CONFIG.FINANCE_TOOLS || [], loggedIn)
-        : (window.MENU_CONFIG.FINANCE_TOOLS || []));
-    grid.innerHTML = tools.map(function (item) {
-      const title = (item.title || item.label || '').replace(/"/g, '&quot;');
-      const label = (item.label || '').replace(/"/g, '&quot;');
-      const icon = item.icon || 'bi-box';
-      const href = item.href || '#';
+    if (!window.MENU_CONFIG) return [];
+    if (typeof window.MENU_CONFIG.getMortgageTools === 'function') {
+      return window.MENU_CONFIG.getMortgageTools(loggedIn);
+    }
+    if (window.MENU_CONFIG.filterToolsByAuth) {
+      return window.MENU_CONFIG.filterToolsByAuth(window.MENU_CONFIG.FINANCE_TOOLS || [], loggedIn);
+    }
+    return window.MENU_CONFIG.FINANCE_TOOLS || [];
+  }
+
+  function renderStats(tools) {
+    const stats = document.getElementById('financeHubStats');
+    if (!stats) return;
+    const encompass = tools.filter(function (item) { return item.category === 'encompass'; }).length;
+    const earliest = tools.reduce(function (min, item) {
+      if (!item.since) return min;
+      return !min || item.since < min ? item.since : min;
+    }, '');
+    const first = earliest ? formatDate(earliest) : '—';
+    stats.innerHTML =
+      '<div><dt>Tools</dt><dd>' + tools.length + '</dd></div>' +
+      '<div><dt>Encompass tools</dt><dd>' + encompass + '</dd></div>' +
+      '<div><dt>First shipped</dt><dd>' + esc(first) + '</dd></div>';
+  }
+
+  function toolCard(item, extra) {
+    const desc = item.title && item.title !== item.label ? item.title : '';
+    const since = formatMonthYear(item.since);
+    const badge = extra && extra.badge
+      ? '<span class="portfolio-badge portfolio-badge--cat">' + esc(categoryLabel(item.category)) + '</span>'
+      : '';
+    return (
+      '<a class="pf-tool-card' + (extra && extra.className ? ' ' + extra.className : '') + '" href="' + esc(item.href || '#') + '">' +
+      '<i class="bi ' + esc(item.icon || 'bi-box') + '" aria-hidden="true"></i>' +
+      '<span class="pf-tool-card__name">' + esc(item.label || '') + '</span>' +
+      (desc ? '<span class="pf-tool-card__desc">' + esc(desc) + '</span>' : '') +
+      badge +
+      (since && !(extra && extra.badge) ? '<span class="pf-tool-card__since">Since ' + esc(since) + '</span>' : '') +
+      '</a>'
+    );
+  }
+
+  function renderCategories(tools) {
+    return CATEGORIES.map(function (cat) {
+      const items = tools.filter(function (item) { return item.category === cat.id; });
+      if (!items.length) return '';
       return (
-        '<a class="portfolio-finance-tile" href="' + href + '" title="' + title + '">' +
-        '<i class="bi ' + icon + '" aria-hidden="true"></i>' +
-        '<span>' + label + '</span></a>'
+        '<section class="pf-cat" aria-labelledby="pf-cat-' + cat.id + '">' +
+        '<header class="pf-cat__head">' +
+        '<h2 id="pf-cat-' + cat.id + '">' + esc(cat.label) + '</h2>' +
+        '<span class="pf-cat__count">' + items.length + '</span>' +
+        '</header>' +
+        '<div class="pf-card-grid">' + items.map(function (item) { return toolCard(item); }).join('') + '</div>' +
+        '</section>'
       );
     }).join('');
   }
+
+  function renderTimeline(tools) {
+    const sorted = tools.slice().sort(function (a, b) {
+      const byDate = String(b.since || '').localeCompare(String(a.since || ''));
+      if (byDate) return byDate;
+      return String(a.label || '').localeCompare(String(b.label || ''));
+    });
+    let side = 0;
+    let lastMonth = '';
+    const parts = ['<div class="pf-timeline">'];
+    sorted.forEach(function (item) {
+      const month = String(item.since || '').slice(0, 7);
+      if (month && month !== lastMonth) {
+        parts.push('<h2 class="pf-timeline__month">' + esc(formatMonthLong(item.since)) + '</h2>');
+        lastMonth = month;
+      }
+      const sideClass = side % 2 === 0 ? 'pf-timeline__item--left' : 'pf-timeline__item--right';
+      side += 1;
+      parts.push(
+        '<article class="pf-timeline__item ' + sideClass + '">' +
+        '<time class="pf-date-chip" datetime="' + esc(item.since || '') + '">' + esc(formatDate(item.since) || 'Date unknown') + '</time>' +
+        toolCard(item, { className: 'pf-timeline__card', badge: true }) +
+        '</article>'
+      );
+    });
+    parts.push('</div>');
+    return parts.join('');
+  }
+
+  function syncViewToggle() {
+    document.querySelectorAll('.pf-view-toggle button').forEach(function (btn) {
+      btn.setAttribute('aria-pressed', btn.getAttribute('data-view') === view ? 'true' : 'false');
+    });
+  }
+
+  function renderFinanceTools() {
+    const grid = document.getElementById('financeToolGrid');
+    if (!grid || !window.MENU_CONFIG) return;
+    const tools = mortgageTools().filter(function (item) { return item && !item.divider; });
+    renderStats(tools);
+    syncViewToggle();
+    if (!tools.length) {
+      grid.innerHTML = '<p class="pf-hub-empty">No worksheets are available for this session.</p>';
+      return;
+    }
+    grid.innerHTML = view === 'timeline' ? renderTimeline(tools) : renderCategories(tools);
+  }
+
+  document.querySelectorAll('.pf-view-toggle button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const next = btn.getAttribute('data-view');
+      if (next !== 'category' && next !== 'timeline') return;
+      view = next;
+      try { localStorage.setItem(VIEW_KEY, view); } catch (e) { /* private mode */ }
+      const url = new URL(window.location.href);
+      url.searchParams.set('view', view);
+      history.replaceState(null, '', url);
+      renderFinanceTools();
+    });
+  });
+
   window.renderFinanceTools = renderFinanceTools;
   renderFinanceTools();
   window.addEventListener('user-logged-in', renderFinanceTools);

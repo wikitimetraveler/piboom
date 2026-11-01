@@ -47,6 +47,15 @@ describe('gse-analyzer.html layout', () => {
     expect(engine).toBeLessThan(page);
   });
 
+  test('Encompass pipeline load stays hidden until login; the page itself stays public', () => {
+    expect(html).toMatch(/id="gsePipelineCard"[^>]*hidden/);
+    expect(html).toMatch(/id="gsePipelineCard"[^>]*\bd-none\b/);
+    const js = readFileSync(join(__dirname, '../../public/js/gse-analyzer.js'), 'utf8');
+    expect(js).toMatch(/function isGseSessionActive/);
+    expect(js).toMatch(/syncPipelineCardVisibility/);
+    expect(js).toMatch(/loggedInUserId/);
+  });
+
   test('LTV, CLTV, and AMI % are read-only engine outputs with their source inputs present', () => {
     for (const id of ['ltv', 'cltv', 'amiPercent']) {
       expect(html).toMatch(new RegExp(`id="${id}"[^>]*readonly`));

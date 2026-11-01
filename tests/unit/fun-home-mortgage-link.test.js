@@ -82,9 +82,17 @@ describe('fun-home public project cards', () => {
     expect(body).not.toMatch(/>Unit Tests</);
   });
 
-  test('Entertainment card More menu includes Mountain High with a mountain icon', () => {
+  test('home hero links the public open suite without putting finance tools in the project grid', () => {
+    expect(indexHtml).toMatch(/href="\/open\/"/);
+    expect(indexHtml).toMatch(/Disasters, GSE, graph/);
+    expect(indexHtml).not.toMatch(/fun-featured-work--suite[^>]*\bhidden\b/);
+    const projectsSection = indexHtml.match(/<section class="fun-projects"[\s\S]*?<\/section>/);
+    expect(projectsSection[0]).not.toMatch(/href="\/open\/"/);
+  });
+
+  test('Entertainment card More menu keeps Mountain High behind login', () => {
     const card = cardSlice('entertainment');
-    expect(card).toMatch(/href="\/mountain-high\/"/);
+    expect(card).toMatch(/href="\/mountain-high\/"[^>]*data-gated-featured[^>]*\bhidden\b/);
     expect(card).toMatch(/bi-mountain/);
     expect(card).toMatch(/Mountain High/);
   });

@@ -169,10 +169,16 @@ class ModernNavbar extends HTMLElement {
     }).join('\n                  ');
   }
 
+  isOpenSuitePage() {
+    if (typeof document === 'undefined') return false;
+    return !!document.querySelector('script[src*="open-suite-bar.js"], .open-suite-bar');
+  }
+
   getFinanceNavItems() {
     const cfg = window.MENU_CONFIG || {};
+    const loggedIn = this.isOpenSuitePage() ? false : this.isUserLoggedIn();
     if (typeof cfg.getFinanceNavItems === 'function') {
-      return cfg.getFinanceNavItems(this.isUserLoggedIn());
+      return cfg.getFinanceNavItems(loggedIn);
     }
     return cfg.NAV_FINANCE || [];
   }

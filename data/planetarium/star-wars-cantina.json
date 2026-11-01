@@ -1,0 +1,122 @@
+{
+  "id": "star-wars-cantina",
+  "title": "Cantina",
+  "subtitle": "The bar, with the main figures.",
+  "disclaimer": "Stylized fan figures in an original bar set — not official likenesses and not an official film.",
+  "voices": {
+    "zigzag": {
+      "voice": "en-US-Neural2-I",
+      "pitch": 2.4,
+      "speakingRate": 0.96,
+      "label": "Zigzag"
+    }
+  },
+  "figures": [
+    { "id": "door", "name": "The room" },
+    { "id": "band", "name": "House band" },
+    { "id": "han", "name": "Han Solo" },
+    { "id": "chewbacca", "name": "Chewbacca" },
+    { "id": "luke", "name": "Luke Skywalker" },
+    { "id": "obi-wan", "name": "Obi-Wan Kenobi" },
+    { "id": "leia", "name": "Leia Organa" },
+    { "id": "lando", "name": "Lando Calrissian" },
+    { "id": "yoda", "name": "Yoda" },
+    { "id": "c3po", "name": "C-3PO" },
+    { "id": "r2d2", "name": "R2-D2" },
+    { "id": "boba", "name": "Boba Fett" },
+    { "id": "vader", "name": "Darth Vader" }
+  ],
+  "beats": [
+    {
+      "id": "door",
+      "who": "zigzag",
+      "figure": "door",
+      "label": "Door",
+      "text": "This is the bar. Low light, a band, a counter, and every main figure of the story in one room. None of these faces are the actors. The costumes are the tell."
+    },
+    {
+      "id": "band",
+      "who": "zigzag",
+      "figure": "band",
+      "label": "Band",
+      "text": "The house band is on the stage. Original players, not the film combo. They keep the room from going quiet."
+    },
+    {
+      "id": "han",
+      "who": "zigzag",
+      "figure": "han",
+      "label": "Han",
+      "text": "Han is at the bar. Vest, holster, one elbow on the counter. He looks like he already knows the tab."
+    },
+    {
+      "id": "chewbacca",
+      "who": "zigzag",
+      "figure": "chewbacca",
+      "label": "Chewbacca",
+      "text": "Chewbacca stands beside him. Taller than the room wants, bandolier across the chest, fur catching the bar light."
+    },
+    {
+      "id": "luke",
+      "who": "zigzag",
+      "figure": "luke",
+      "label": "Luke",
+      "text": "Luke is in the booth. Light tunic, farm-boy belt, still looking at the room like it is new."
+    },
+    {
+      "id": "obi-wan",
+      "who": "zigzag",
+      "figure": "obi-wan",
+      "label": "Obi-Wan",
+      "text": "Obi-Wan sits across from him. Brown robe, hood back, the quiet one in the booth."
+    },
+    {
+      "id": "leia",
+      "who": "zigzag",
+      "figure": "leia",
+      "label": "Leia",
+      "text": "Leia has the white gown and the side buns. She is at her own table, not waiting to be introduced."
+    },
+    {
+      "id": "lando",
+      "who": "zigzag",
+      "figure": "lando",
+      "label": "Lando",
+      "text": "Lando is cape and collar, a smile built into the posture. He looks like the room might be his."
+    },
+    {
+      "id": "yoda",
+      "who": "zigzag",
+      "figure": "yoda",
+      "label": "Yoda",
+      "text": "Yoda is on a stool at the end of the bar. Small, green, ears out. The glass in front of him is almost as tall as he is."
+    },
+    {
+      "id": "c3po",
+      "who": "zigzag",
+      "figure": "c3po",
+      "label": "C-3PO",
+      "text": "C-3PO is gold plates and a worried lean. He does not belong in a bar and he knows it."
+    },
+    {
+      "id": "r2d2",
+      "who": "zigzag",
+      "figure": "r2d2",
+      "label": "R2-D2",
+      "text": "R2-D2 is the dome at his feet. White barrel, blue bits, shorter than the tables and busier than anyone."
+    },
+    {
+      "id": "boba",
+      "who": "zigzag",
+      "figure": "boba",
+      "label": "Boba Fett",
+      "text": "Boba Fett keeps a corner booth. Helmet on, jetpack against the wall, visor toward the door."
+    },
+    {
+      "id": "vader",
+      "who": "zigzag",
+      "figure": "vader",
+      "label": "Vader",
+      "text": "Vader is in the doorway. Cape, helmet, chest lights. The bar gets quieter without anyone asking."
+    }
+  ]
+}

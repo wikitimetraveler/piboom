@@ -94,6 +94,7 @@ FIRMS NRT detections are clustered with **union-find single-linkage** (`clusterF
 | POST | `/refresh` | Refresh from all sources (FEMA, FIRMS, USGS, NWS, NHC) |
 | GET | `/stats` | Stats |
 | GET | `/export.csv` | CSV export |
+| POST | `/analyze-spreadsheet` | Analyze a spreadsheet/tape of properties (`properties[]`, `radiusMiles`, optional `disasters[]`) and return per-property risk triage, matched hazards, lender underwriting/closing checklists, and portfolio rollups (`services/disaster-spreadsheet.service.js`) |
 | GET | `/geocode-address` | Forward geocode for webcam address search (`q` query param) |
 | GET | `/near` | Nearby disasters, webcams, and loans — query: `lat`, `lng`, `radiusMiles` (1–500, default 50), `types` (comma: `disasters`, `cameras`, `loans`; default all), `limit` (max 500). PostGIS when available; Haversine fallback otherwise. Each row includes `distance_miles` when applicable. |
 | GET | `/cameras` | Hazard webcams (national catalog) — query: `state`, `county` (ILIKE), `source`, `hazard` (JSONB tag), `mediaType`, `limit`, `offset`; geo: `nearLat`, `nearLng`, `radiusMiles` (1–500, default 50 when geo set) — PostGIS `ST_DWithin`/KNN when available, else Haversine; nearest-first, each row includes `distance_miles` when geo is used |

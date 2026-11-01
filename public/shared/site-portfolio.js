@@ -94,6 +94,14 @@
       icon: 'bi-music-note-beamed',
     },
     {
+      id: 'open-suite',
+      label: 'Open suite',
+      tagline: 'Disasters, GSE analyzer, and graph calculation',
+      domain: PRIMARY_HOST,
+      path: '/open/',
+      icon: 'bi-collection',
+    },
+    {
       id: 'disasters',
       label: 'Unified Disasters',
       tagline: 'FEMA, NASA FIRMS, hazard webcams, pipeline risk',

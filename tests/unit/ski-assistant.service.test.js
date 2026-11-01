@@ -74,6 +74,9 @@ describe('ski-assistant.service', () => {
       ],
       pageContext: { selectedDestination: 'snow-summit', page: 'areas', selectedRun: 'Westridge' },
     });
+    expect(prompt).toContain('Apex');
+    expect(prompt).toMatch(/super-cruis|race line/i);
+    expect(prompt).not.toMatch(/^You are Ridge/);
     expect(prompt).toContain('Selected run on the trail map: Westridge');
     expect(prompt).toMatch(/\(Snow Summit; (Easier|Beginner|More difficult|Most difficult|Experts only|Unrated)\)/);
     expect(prompt).not.toContain('(Mountain High;');

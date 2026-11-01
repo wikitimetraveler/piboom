@@ -1,0 +1,261 @@
+{
+  "id": "star-wars-hangar",
+  "title": "Hangar OAV",
+  "subtitle": "Zigzag walks the ships, outside and in.",
+  "disclaimer": "Stylized fan mockup — not an official film.",
+  "ships": [
+    { "id": "lambda", "name": "Lambda shuttle" },
+    { "id": "x-wing", "name": "X-wing" },
+    { "id": "tie", "name": "TIE fighter" },
+    { "id": "y-wing", "name": "Y-wing" },
+    { "id": "falcon", "name": "Millennium Falcon" },
+    { "id": "star-destroyer", "name": "Star Destroyer" },
+    { "id": "death-star", "name": "Death Star" }
+  ],
+  "voices": {
+    "zigzag": {
+      "voice": "en-US-Neural2-I",
+      "pitch": 2.4,
+      "speakingRate": 0.96,
+      "label": "Zigzag"
+    }
+  },
+  "beats": [
+    {
+      "id": "lambda-out",
+      "who": "zigzag",
+      "ship": "lambda",
+      "camera": "approach",
+      "label": "Hull",
+      "text": "Start with the shuttle. Wings fold up in the bay, then they lock open and the hull becomes a dart."
+    },
+    {
+      "id": "lambda-ramp",
+      "who": "zigzag",
+      "ship": "lambda",
+      "camera": "walk",
+      "room": "ramp",
+      "label": "Ramp",
+      "text": "The ramp is down. Warm light from the hangar, cold light from the cabin. This is how you come aboard."
+    },
+    {
+      "id": "lambda-cabin",
+      "who": "zigzag",
+      "ship": "lambda",
+      "camera": "walk",
+      "room": "cabin",
+      "label": "Cabin",
+      "text": "Four seats, ribs in the ceiling, a short walk to the flight deck. The cabin is the whole passenger ship."
+    },
+    {
+      "id": "lambda-cockpit",
+      "who": "zigzag",
+      "ship": "lambda",
+      "camera": "walk",
+      "room": "cockpit",
+      "label": "Cockpit",
+      "text": "Two seats under the canopy. The board is lit. From here the wings are already locked."
+    },
+    {
+      "id": "x-wing-out",
+      "who": "zigzag",
+      "ship": "x-wing",
+      "camera": "approach",
+      "label": "Hull",
+      "text": "Four foils on a cross. They sit shut for the cruise, then snap into an X when the pilot commits."
+    },
+    {
+      "id": "x-wing-cockpit",
+      "who": "zigzag",
+      "ship": "x-wing",
+      "camera": "walk",
+      "room": "cockpit",
+      "label": "Cockpit",
+      "text": "One seat, a canopy, and a board you can reach without standing. The fighter is a cockpit with wings."
+    },
+    {
+      "id": "x-wing-socket",
+      "who": "zigzag",
+      "ship": "x-wing",
+      "camera": "walk",
+      "room": "socket",
+      "label": "Socket",
+      "text": "Behind the seat is the socket. A dome droid rides there and talks to the ship through the bulkhead."
+    },
+    {
+      "id": "tie-out",
+      "who": "zigzag",
+      "ship": "tie",
+      "camera": "orbit",
+      "label": "Hull",
+      "text": "A ball cockpit and two hex wings. No shields on this one. The pilot sits in the middle and trusts the frame."
+    },
+    {
+      "id": "tie-seat",
+      "who": "zigzag",
+      "ship": "tie",
+      "camera": "walk",
+      "room": "seat",
+      "label": "Seat",
+      "text": "Inside the ball there is a seat, a viewport, and not much else. The whole ship is this room."
+    },
+    {
+      "id": "tie-panels",
+      "who": "zigzag",
+      "ship": "tie",
+      "camera": "walk",
+      "room": "panels",
+      "label": "Panels",
+      "text": "Panels wrap the sphere. Life support, guns, and the wings are all an arm's length from the pilot."
+    },
+    {
+      "id": "y-wing-out",
+      "who": "zigzag",
+      "ship": "y-wing",
+      "camera": "orbit",
+      "label": "Hull",
+      "text": "The armor is gone. What is left is a cockpit, a neck, and two long engines. It looks stripped because it is."
+    },
+    {
+      "id": "y-wing-pilot",
+      "who": "zigzag",
+      "ship": "y-wing",
+      "camera": "walk",
+      "room": "pilot",
+      "label": "Pilot",
+      "text": "The pilot sits forward under a short canopy. The board is close. The engines are behind you and loud."
+    },
+    {
+      "id": "y-wing-gunner",
+      "who": "zigzag",
+      "ship": "y-wing",
+      "camera": "walk",
+      "room": "gunner",
+      "label": "Gunner",
+      "text": "Turn around. The second seat faces aft. That is the gunner's station, looking back down the neck."
+    },
+    {
+      "id": "falcon-out",
+      "who": "zigzag",
+      "ship": "falcon",
+      "camera": "approach",
+      "label": "Hull",
+      "text": "Saucer, split mandibles, cockpit off to the side. The dish on the spine is the tell. This freighter is faster than it looks."
+    },
+    {
+      "id": "falcon-ramp",
+      "who": "zigzag",
+      "ship": "falcon",
+      "camera": "walk",
+      "room": "ramp",
+      "label": "Ramp",
+      "text": "Boarding ramp under the nose. You come up into the saucer, not a corridor. The ship is one big room with pockets."
+    },
+    {
+      "id": "falcon-hold",
+      "who": "zigzag",
+      "ship": "falcon",
+      "camera": "walk",
+      "room": "hold",
+      "label": "Hold",
+      "text": "The hold is crates, scuffed deck, and enough height to stand. Freight lives here when it is not people."
+    },
+    {
+      "id": "falcon-lounge",
+      "who": "zigzag",
+      "ship": "falcon",
+      "camera": "walk",
+      "room": "lounge",
+      "label": "Lounge",
+      "text": "A round table and a few seats. This is the lounge. The ship does its talking here."
+    },
+    {
+      "id": "falcon-cockpit",
+      "who": "zigzag",
+      "ship": "falcon",
+      "camera": "walk",
+      "room": "cockpit",
+      "label": "Cockpit",
+      "text": "The cockpit is a tube off the starboard side. Two seats, a board, and windows that are not on the centerline."
+    },
+    {
+      "id": "falcon-engineering",
+      "who": "zigzag",
+      "ship": "falcon",
+      "camera": "walk",
+      "room": "engineering",
+      "label": "Engineering",
+      "text": "Aft is the engine bay. The glow is the drive. You can stand here and feel the whole saucer pointed forward."
+    },
+    {
+      "id": "destroyer-out",
+      "who": "zigzag",
+      "ship": "star-destroyer",
+      "camera": "pullback",
+      "label": "Hull",
+      "text": "Step back. The wedge only reads when you give it room. The tower sits aft, and the engines light the stern."
+    },
+    {
+      "id": "destroyer-bridge",
+      "who": "zigzag",
+      "ship": "star-destroyer",
+      "camera": "walk",
+      "room": "bridge",
+      "label": "Bridge",
+      "text": "The bridge is a wide room of consoles and a viewport. Crew pits face the glass. The wedge flies from here."
+    },
+    {
+      "id": "destroyer-corridor",
+      "who": "zigzag",
+      "ship": "star-destroyer",
+      "camera": "walk",
+      "room": "corridor",
+      "label": "Corridor",
+      "text": "A ribbed corridor runs aft of the bridge. The ship is mostly hallways like this, then a room that matters."
+    },
+    {
+      "id": "destroyer-bay",
+      "who": "zigzag",
+      "ship": "star-destroyer",
+      "camera": "walk",
+      "room": "bay",
+      "label": "Hangar bay",
+      "text": "The bay is the hollow in the belly. A shuttle can sit on the deck. The doors open onto black."
+    },
+    {
+      "id": "death-out",
+      "who": "zigzag",
+      "ship": "death-star",
+      "camera": "pullback",
+      "label": "Hull",
+      "text": "A sphere, a trench around the middle, and a dish on the face. Now we go inside the station."
+    },
+    {
+      "id": "death-corridor",
+      "who": "zigzag",
+      "ship": "death-star",
+      "camera": "walk",
+      "room": "corridor",
+      "label": "Corridor",
+      "text": "The inside is a corridor with a red line in the deck. The station is hallways until it is a weapon."
+    },
+    {
+      "id": "death-gallery",
+      "who": "zigzag",
+      "ship": "death-star",
+      "camera": "walk",
+      "room": "gallery",
+      "label": "Gallery",
+      "text": "The gallery looks into the dish. That orange well is the superlaser face, seen from the safe side of the glass."
+    },
+    {
+      "id": "death-dock",
+      "who": "zigzag",
+      "ship": "death-star",
+      "camera": "walk",
+      "room": "dock",
+      "label": "Dock",
+      "text": "A dock big enough for a shuttle. You can walk off a ship and into the station without ever seeing the hull."
+    }
+  ]
+}

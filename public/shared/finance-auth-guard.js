@@ -5,11 +5,12 @@
 (() => {
   const FINANCE_PATH_PREFIX = '/finance/';
   const CHECK_INTERVAL_MS = 600;
-  /** Keep in sync with lib/finance-session.js FINANCE_PUBLIC_PAGES (disaster suite only). */
+  /** Keep in sync with lib/finance-session.js FINANCE_PUBLIC_PAGES (open suite). */
   const PUBLIC_FINANCE_PAGES = new Set([
     '/finance/disasters-unified.html',
     '/finance/disasters-webcams.html',
     '/finance/disasters-encompass-map.html',
+    '/finance/calc-engine-webgpu.html',
   ]);
 
   const financePath = window.location.pathname.toLowerCase();

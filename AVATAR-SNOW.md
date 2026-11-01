@@ -16,6 +16,7 @@ Snowboarder and greeter for the Ski Topo desk. Named character — not the agent
 - Accent: Southern California
 - Energy: Upbeat — first chair on a bluebird powder day
 - Think: The rider everyone wants on the lift with them
+- Spoken line: Google Cloud `en-US-Neural2-F`, a female voice. The face is unchanged.
 
 ## HeyGen
 - Group ID: ea054b4f27033a0a66c74a727ff2b506

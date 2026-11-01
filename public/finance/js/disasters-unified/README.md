@@ -7,10 +7,11 @@ Load **in this order** from `disasters-unified.html`:
 3. `map-overlays.js` — Leaflet overlays: live `/near` ring, graph NEAR rays, source markers, FIRMS heat, flood halo
 4. `geo-picker.js` — Leaflet hazard lens (state → county, choropleth modes: events / ops triage / cameras)
 5. `ingest.js` — pull APIs, `loadDisasters`, source deck
-6. `grid.js` — AG Grid + risk intelligence
-7. `map.js` — Google Maps between Disasters and Loans (`#map`) + YouTube; Leaflet place lens stays in geo-picker / overlays
-8. `graph-panel.js` — D3 force ego-network (persisted impact graph)
-9. `app.js` — selection, AI, bootstrap
+6. `spreadsheet-analyzer.js` — Property Spreadsheet Risk Analyzer (`.xlsx`/`.csv`/paste + 12-loan Sample Lender Tape) + hotspot lender guidance
+7. `grid.js` — AG Grid + All Hotspots & Lender Action Guide + NWS filters
+8. `map.js` — Google Maps between Disasters and Loans (`#map`) + YouTube; Leaflet place lens stays in geo-picker / overlays
+9. `graph-panel.js` — D3 force ego-network (persisted impact graph)
+10. `app.js` — selection, AI, bootstrap
 
 Inline Encompass map (primary): `#map` in its own section card between the disasters grid and mocked loans grid.
 Optional fullscreen: `disasters-encompass-map.html` via handoff.

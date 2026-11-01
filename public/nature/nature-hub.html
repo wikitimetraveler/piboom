@@ -237,9 +237,13 @@ function copyShareLink() {
 
 document.addEventListener('DOMContentLoaded', async function() {
   const ng = document.getElementById('natureToolGrid');
-  if (ng && window.MENU_CONFIG && window.MENU_CONFIG.NATURE_TOOLS) {
-    ng.innerHTML = window.MENU_CONFIG.renderDomainGridItems(window.MENU_CONFIG.NATURE_TOOLS);
+  function renderNatureTools() {
+    if (ng && window.MENU_CONFIG && window.MENU_CONFIG.NATURE_TOOLS) {
+      ng.innerHTML = window.MENU_CONFIG.renderDomainGridItems(window.MENU_CONFIG.NATURE_TOOLS);
+    }
   }
+  renderNatureTools();
+  window.addEventListener('user-logged-in', renderNatureTools);
   createUserSelector('userSelectorContainer', { title: 'View collection:', showAllOption: true });
   await loadData();
   loadFieldGuide();

@@ -101,6 +101,7 @@ function setDuInlineLoading(active, targets) {
 var DU_SIDEBAR_SECTION_IDS = [
   'collapseCommandDeck',
   'collapseRiskIntel',
+  'collapseSpreadsheet',
   'collapseFilters',
   'collapseDisasters',
   'collapseMapYouTube',

@@ -1,0 +1,113 @@
+/**
+ * Public LinkedIn suite — Disasters, GSE analyzer, graph calc.
+ * Development work by David Lane
+ */
+.open-suite {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
+}
+
+.open-suite__kicker {
+  margin: 0 0 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #1f5f8b;
+}
+
+.open-suite__hero h1 {
+  margin: 0 0 0.6rem;
+  font-size: clamp(2rem, 4vw, 3rem);
+  letter-spacing: -0.03em;
+  color: #143044;
+}
+
+.open-suite__lead {
+  max-width: 42rem;
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: #3d5160;
+}
+
+.open-suite__url {
+  margin: 0.85rem 0 0;
+  font-size: 0.92rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  color: #1f5f8b;
+}
+
+.open-suite__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+.open-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-height: 16rem;
+  padding: 1.35rem 1.3rem 1.25rem;
+  border-radius: 1.1rem;
+  color: #f4f8fb;
+  box-shadow: 0 16px 36px rgba(15, 35, 48, 0.18);
+}
+
+.open-card h2 {
+  margin: 0;
+  font-size: 1.55rem;
+}
+
+.open-card p {
+  margin: 0;
+}
+
+.open-card .btn {
+  margin-top: auto;
+  font-weight: 650;
+}
+
+.open-card__kicker {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.open-card--disasters {
+  background:
+    radial-gradient(ellipse 80% 80% at 0% 0%, rgba(255, 255, 255, 0.18), transparent 55%),
+    linear-gradient(155deg, #1e4d6b 0%, #16324a 55%, #0f766e 100%);
+}
+
+.open-card--expert {
+  background:
+    radial-gradient(ellipse 80% 80% at 100% 0%, rgba(255, 255, 255, 0.16), transparent 50%),
+    linear-gradient(155deg, #3d4f78 0%, #243556 48%, #1a3a4a 100%);
+}
+
+.open-card--gse {
+  background:
+    radial-gradient(ellipse 80% 80% at 0% 100%, rgba(255, 255, 255, 0.14), transparent 50%),
+    linear-gradient(155deg, #0f172a 0%, #1e3a5f 46%, #0d9488 100%);
+}
+
+.open-card--graph {
+  background:
+    radial-gradient(ellipse 80% 80% at 100% 100%, rgba(255, 255, 255, 0.16), transparent 52%),
+    linear-gradient(155deg, #134e4a 0%, #1e3a5f 50%, #4a90a4 100%);
+}
+
+@media (max-width: 980px) {
+  .open-suite__grid {
+    grid-template-columns: 1fr;
+  }
+}
