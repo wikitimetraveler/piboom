@@ -5,6 +5,8 @@ import type { DestinationBrief } from '../../lib/types';
 
 interface Props {
   destinations: DestinationBrief[];
+  selectedId: string;
+  onSelect: (id: string) => void;
   onReady: (pass: TripPass) => void;
 }
 
@@ -14,13 +16,13 @@ function todayLocal() {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Los_Angeles' }).format(new Date());
 }
 
-export default function TripGate({ destinations, onReady }: Props) {
+export default function TripGate({ destinations, selectedId, onSelect, onReady }: Props) {
   const invite = new URLSearchParams(window.location.search).get('trip') || '';
   const [mode, setMode] = useState<'join' | 'start'>(invite ? 'join' : 'start');
   const [displayName, setDisplayName] = useState(() => localStorage.getItem(NAME_KEY) || '');
   const [code, setCode] = useState(invite.toUpperCase());
   const [tripName, setTripName] = useState('');
-  const [resortId, setResortId] = useState('');
+  const [resortId, setResortId] = useState(selectedId);
   const [date, setDate] = useState(todayLocal);
   const [preview, setPreview] = useState<{ name: string; resortId: string; riders: number } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -28,8 +30,12 @@ export default function TripGate({ destinations, onReady }: Props) {
   const saved = listPasses();
 
   useEffect(() => {
+    if (selectedId && (!destinations.length || destinations.some((d) => d.id === selectedId))) {
+      setResortId(selectedId);
+      return;
+    }
     if (!resortId && destinations.length) setResortId(destinations[0].id);
-  }, [destinations, resortId]);
+  }, [destinations, selectedId, resortId]);
 
   useEffect(() => {
     const clean = code.replace(/[^A-Za-z0-9]/g, '');
@@ -124,7 +130,13 @@ export default function TripGate({ destinations, onReady }: Props) {
             </label>
             <label>
               Resort
-              <select value={resortId} onChange={(e) => setResortId(e.target.value)}>
+              <select
+                value={resortId}
+                onChange={(e) => {
+                  setResortId(e.target.value);
+                  onSelect(e.target.value);
+                }}
+              >
                 {destinations.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.name}

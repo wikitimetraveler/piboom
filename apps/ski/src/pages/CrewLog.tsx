@@ -28,6 +28,8 @@ const IDLE: TrackerState = { tracking: false, lastFix: null, queued: 0, uploaded
 
 interface Props {
   destinations: DestinationBrief[];
+  selectedId: string;
+  onSelect: (id: string) => void;
 }
 
 /** An invite link for another trip opens that trip (or its join screen), not the last one used. */
@@ -39,7 +41,7 @@ function startingPass(): TripPass | null {
   return saved || null;
 }
 
-export default function CrewLog({ destinations: briefed }: Props) {
+export default function CrewLog({ destinations: briefed, selectedId, onSelect }: Props) {
   const [pass, setPass] = useState<TripPass | null>(startingPass);
   const [catalog, setCatalog] = useState<DestinationBrief[]>([]);
   useEffect(() => {
@@ -54,7 +56,19 @@ export default function CrewLog({ destinations: briefed }: Props) {
     };
   }, [briefed.length]);
   const destinations = briefed.length ? briefed : catalog;
-  if (!pass) return <TripGate destinations={destinations} onReady={setPass} />;
+  if (!pass) {
+    return (
+      <TripGate
+        destinations={destinations}
+        selectedId={selectedId}
+        onSelect={onSelect}
+        onReady={(p) => {
+          onSelect(p.resortId);
+          setPass(p);
+        }}
+      />
+    );
+  }
   return (
     <TripView
       key={pass.code}

@@ -111,8 +111,9 @@ describe('ski-topo.service', () => {
       [...seed, { id: 'x', name: 'Test Thrift', route: 'wrightwood', kind: 'thrift' }],
       { route: 'wrightwood', kind: 'thrift' }
     );
-    expect(thrift).toHaveLength(1);
-    expect(thrift[0].kind).toBe('thrift');
+    expect(thrift.length).toBeGreaterThanOrEqual(2);
+    expect(thrift.every((s) => s.kind === 'thrift')).toBe(true);
+    expect(thrift.some((s) => s.id === 'x')).toBe(true);
 
     const scenic = filterStops(seed, { route: 'big-bear', kind: 'scenic' });
     expect(scenic.every((s) => ['viewpoint', 'town', 'food', 'lake', 'hike', 'history'].includes(s.kind))).toBe(true);
@@ -303,9 +304,17 @@ describe('ski-topo.service', () => {
     expect(googleFirst.source).toBe('google');
   });
 
-  test('seed file exists and is scenic-only', async () => {
+  test('seed file exists and includes thrift, pizza, and A&W stops on every drive route', async () => {
     const raw = JSON.parse(await readFile(path.join(process.cwd(), 'data/ski/on-the-way.json'), 'utf8'));
     expect(raw.stops.length).toBeGreaterThanOrEqual(4);
     expect(raw.stops.every((s) => s.source === 'seed')).toBe(true);
+    for (const route of ['wrightwood', 'mt-baldy', 'big-bear', 'eastern-sierra']) {
+      const routeThrifts = filterStops(raw.stops, { route, kind: 'thrift' });
+      const routePizza = filterStops(raw.stops, { route, kind: 'pizza' });
+      const routeAw = filterStops(raw.stops, { route, kind: 'aw' });
+      expect(routeThrifts.length).toBeGreaterThanOrEqual(2);
+      expect(routePizza.length).toBeGreaterThanOrEqual(2);
+      expect(routeAw.length).toBeGreaterThanOrEqual(2);
+    }
   });
 });

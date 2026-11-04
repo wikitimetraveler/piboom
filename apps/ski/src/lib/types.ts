@@ -1,6 +1,6 @@
 export type GoScore = 'go' | 'caution' | 'no-go';
 
-export type StopKind = 'thrift' | 'viewpoint' | 'town' | 'food' | 'lake' | 'hike' | 'history';
+export type StopKind = 'thrift' | 'pizza' | 'aw' | 'viewpoint' | 'town' | 'food' | 'lake' | 'hike' | 'history';
 
 export interface WeatherSnap {
   tempF?: number | null;

@@ -1,18 +1,48 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Greeter from './components/Greeter';
 import GuideChat from './components/GuideChat';
 import SkiSwitch from './components/SkiSwitch';
-import { pageFromPath, type SkiPage } from './lib/page';
+import { camsResortFromPath, pageFromPath, type SkiPage } from './lib/page';
 import type { BriefPayload, DemGrid, OnTheWayStop, TrailsPayload } from './lib/types';
 import { runTitle } from './lib/trails';
 import CrewLog from './pages/CrewLog';
 import DriveDesk from './pages/DriveDesk';
-import SkiAreas from './pages/SkiAreas';
+import SkiAreas, { type AreaView } from './pages/SkiAreas';
 import SkiCams from './pages/SkiCams';
 
 interface TerrainInfo {
   avgSlopeDeg?: number;
   maxSlopeDeg?: number;
+}
+
+const SELECTED_RESORT_KEY = 'ski.selectedId';
+const AREA_VIEW_KEY = 'ski.areaView';
+
+function initialSelectedId(): string {
+  const fromQuery = new URLSearchParams(window.location.search).get('resort') || '';
+  if (fromQuery) return fromQuery;
+  const fromCams = camsResortFromPath();
+  if (fromCams) return fromCams;
+  try {
+    const saved = localStorage.getItem(SELECTED_RESORT_KEY);
+    if (saved) return saved;
+  } catch {
+    /* ignore storage errors */
+  }
+  return 'mountain-high';
+}
+
+function initialAreaView(initialPage: SkiPage): AreaView {
+  const fromQuery = new URLSearchParams(window.location.search).get('resort') || '';
+  if (fromQuery || camsResortFromPath() || initialPage !== 'areas') return 'resort';
+  try {
+    const savedView = localStorage.getItem(AREA_VIEW_KEY);
+    if (savedView === 'resort' || savedView === 'state') return savedView;
+    if (localStorage.getItem(SELECTED_RESORT_KEY)) return 'resort';
+  } catch {
+    /* ignore storage errors */
+  }
+  return 'state';
 }
 
 const EMPTY_BRIEF: BriefPayload = {
@@ -25,7 +55,8 @@ const EMPTY_BRIEF: BriefPayload = {
 export default function App() {
   const [page, setPage] = useState<SkiPage>(() => pageFromPath());
   const [brief, setBrief] = useState<BriefPayload>(EMPTY_BRIEF);
-  const [selectedId, setSelectedId] = useState('mountain-high');
+  const [selectedId, setSelectedId] = useState<string>(initialSelectedId);
+  const [areaView, setAreaView] = useState<AreaView>(() => initialAreaView(pageFromPath()));
   const [stops, setStops] = useState<OnTheWayStop[]>([]);
   const [dem, setDem] = useState<DemGrid | null>(null);
   const [terrain, setTerrain] = useState<TerrainInfo | null>(null);
@@ -33,22 +64,61 @@ export default function App() {
   const [selectedRunId, setSelectedRunId] = useState<string | null>(null);
   const [status, setStatus] = useState('Loading weather…');
 
+  const updateAreaView = useCallback((nextView: AreaView) => {
+    setAreaView(nextView);
+    try {
+      localStorage.setItem(AREA_VIEW_KEY, nextView);
+    } catch {
+      /* ignore storage errors */
+    }
+  }, []);
+
+  const selectResort = useCallback((id: string) => {
+    if (!id) return;
+    setSelectedId(id);
+    setAreaView('resort');
+    try {
+      localStorage.setItem(SELECTED_RESORT_KEY, id);
+      localStorage.setItem(AREA_VIEW_KEY, 'resort');
+    } catch {
+      /* ignore storage errors */
+    }
+  }, []);
+
   const dest = useMemo(
     () => brief.destinations.find((d) => d.id === selectedId) || brief.destinations[0],
     [brief, selectedId]
   );
   const demId = dest?.dem;
-  const selectedRun = trails?.runs.find((r) => r.id === selectedRunId);
+  const activeDem = dem && dem.id === demId ? dem : null;
+  const activeTerrain = dem && dem.id === demId ? terrain : null;
+  const activeTrails = trails && trails.id === demId ? trails : null;
+  const selectedRun = activeTrails?.runs.find((r) => r.id === selectedRunId);
 
   useEffect(() => {
     setSelectedRunId(null);
   }, [selectedId]);
 
   useEffect(() => {
-    const onPop = () => setPage(pageFromPath());
+    if (page === 'drive' || page === 'cams') {
+      updateAreaView('resort');
+      try {
+        if (selectedId) localStorage.setItem(SELECTED_RESORT_KEY, selectedId);
+      } catch {
+        /* ignore storage errors */
+      }
+    }
+  }, [page, selectedId, updateAreaView]);
+
+  useEffect(() => {
+    const onPop = () => {
+      setPage(pageFromPath());
+      const camResort = camsResortFromPath();
+      if (camResort) selectResort(camResort);
+    };
     window.addEventListener('popstate', onPop);
     return () => window.removeEventListener('popstate', onPop);
-  }, []);
+  }, [selectResort]);
 
   useEffect(() => {
     let live = true;
@@ -60,9 +130,11 @@ export default function App() {
         if (!Array.isArray(data.destinations)) throw new Error('brief-shape');
         if (!live) return;
         setBrief(data);
-        if (data.destinations.length && !data.destinations.some((d) => d.id === selectedId)) {
-          setSelectedId(data.destinations[0].id);
-        }
+        setSelectedId((prev) =>
+          data.destinations.length && !data.destinations.some((d) => d.id === prev)
+            ? data.destinations[0].id
+            : prev
+        );
         setStatus('');
       } catch {
         try {
@@ -192,19 +264,23 @@ export default function App() {
 
   return (
     <main className="ski-app">
-      <SkiSwitch page={page} />
+      <SkiSwitch page={page} selectedId={dest?.id || selectedId} />
       {page === 'log' ? null : <Greeter />}
       {status && page !== 'log' ? <p className="ski-disclaimer">{status}</p> : null}
       {page === 'log' ? (
-        <CrewLog destinations={brief.destinations} />
+        <CrewLog
+          destinations={brief.destinations}
+          selectedId={dest?.id || selectedId}
+          onSelect={selectResort}
+        />
       ) : page === 'cams' ? (
-        <SkiCams destinations={brief.destinations} selectedId={dest?.id || selectedId} onSelect={setSelectedId} />
+        <SkiCams destinations={brief.destinations} selectedId={dest?.id || selectedId} onSelect={selectResort} />
       ) : page === 'drive' ? (
         <DriveDesk
           brief={brief}
           dest={dest}
           selectedId={dest?.id || selectedId}
-          onSelect={setSelectedId}
+          onSelect={selectResort}
           stops={stops}
         />
       ) : (
@@ -212,10 +288,12 @@ export default function App() {
           brief={brief}
           dest={dest}
           selectedId={dest?.id || selectedId}
-          onSelect={setSelectedId}
-          dem={dem}
-          terrain={terrain}
-          trails={trails}
+          onSelect={selectResort}
+          view={areaView}
+          onViewChange={updateAreaView}
+          dem={activeDem}
+          terrain={activeTerrain}
+          trails={activeTrails}
           selectedRunId={selectedRunId}
           onSelectRun={setSelectedRunId}
         />

@@ -7,7 +7,7 @@ import TerrainScene, { type OverlayPin, type OverlayTrack } from '../TerrainScen
 import { exportKml, photoUrl } from '../../lib/logApi';
 import type { CrewPosition, LogPhoto, TripDay, TripPass } from '../../lib/logTypes';
 import { fmtAgo, initials, todayLocal } from '../../lib/logFormat';
-import { areaName, demHeightFt } from '../../lib/terrainData';
+import { areaName, demHeightFt, resortBaseView } from '../../lib/terrainData';
 import type { DestinationBrief } from '../../lib/types';
 import { useMountain, useTripAreas } from '../../lib/useMountain';
 import PhotoLightbox from './PhotoLightbox';
@@ -87,7 +87,14 @@ export default function MapPanel({ pass, day, date, focus, onFocus, destinations
     return out;
   }, [day, focus, riders, live, isToday, pass.code]);
 
-  const fitKey = `${date}|${focus}|${demId}`;
+  const baseView = useMemo(() => {
+    if (!dem || !trails || trails.id !== dem.id) return null;
+    const activeResortId = resort?.dem === demId ? resort.id : undefined;
+    const lifts = activeResortId ? trails.lifts.filter((l) => l.resort === activeResortId) : trails.lifts;
+    const runs = activeResortId ? trails.runs.filter((r) => r.resort === activeResortId) : trails.runs;
+    return resortBaseView(dem, lifts, runs);
+  }, [dem, trails, resort, demId]);
+  const fitKey = `${date}|${focus}|${demId}|${baseView ? 1 : 0}`;
   const frame = dem || null;
   const groundFt = (lat: number, lng: number) => (dem ? demHeightFt(dem, lat, lng) : resort?.baseFt ?? 7000);
 
@@ -165,7 +172,16 @@ export default function MapPanel({ pass, day, date, focus, onFocus, destinations
         ) : !frame ? (
           <p className="log-note">Loading the mountain…</p>
         ) : mode === 'maps' ? (
-          <GoogleMapView frame={frame} trails={trails} tracks={tracks} pins={pins} onPin={onPin} fitKey={fitKey} />
+          <GoogleMapView
+            frame={frame}
+            trails={trails}
+            resortId={resort?.dem === demId ? resort.id : undefined}
+            tracks={tracks}
+            pins={pins}
+            onPin={onPin}
+            focus={baseView}
+            fitKey={fitKey}
+          />
         ) : (
           <GoogleEarthView
             frame={frame}
@@ -175,6 +191,7 @@ export default function MapPanel({ pass, day, date, focus, onFocus, destinations
             tracks={tracks}
             pins={pins}
             onPin={onPin}
+            focus={baseView}
             fitKey={fitKey}
           />
         )}

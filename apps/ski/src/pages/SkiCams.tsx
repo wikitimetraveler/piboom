@@ -98,14 +98,23 @@ const chainRoute = (hw: string) => hw.replace(/^CA-/, 'SR-');
 
 export default function SkiCams({ destinations, selectedId, onSelect }: Props) {
   const fromPath = camsResortFromPath();
-  const resortId = destinations.some((d) => d.id === fromPath) ? fromPath : selectedId;
+  const resortId =
+    fromPath && (!destinations.length || destinations.some((d) => d.id === fromPath)) ? fromPath : selectedId;
   const [data, setData] = useState<CamsPayload | null>(null);
   const [error, setError] = useState('');
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
-    if (fromPath && fromPath !== selectedId && destinations.some((d) => d.id === fromPath)) onSelect(fromPath);
+    if (fromPath && fromPath !== selectedId && (!destinations.length || destinations.some((d) => d.id === fromPath))) {
+      onSelect(fromPath);
+    }
   }, [fromPath, selectedId, destinations, onSelect]);
+
+  useEffect(() => {
+    if (resortId && fromPath !== resortId) {
+      window.history.replaceState({ page: 'cams' }, '', camsPath(resortId));
+    }
+  }, [resortId, fromPath]);
 
   useEffect(() => {
     if (!resortId) return;
@@ -130,8 +139,8 @@ export default function SkiCams({ destinations, selectedId, onSelect }: Props) {
   }, []);
 
   const pick = (id: string) => {
-    onSelect(id);
     window.history.replaceState({ page: 'cams' }, '', camsPath(id));
+    onSelect(id);
   };
 
   const current = data && data.resort.id === resortId ? data : null;

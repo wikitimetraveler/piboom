@@ -8,6 +8,7 @@ import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRe
 import type { LidarCloud } from '../lib/lidar';
 import type { DemGrid, DestinationBrief, LatLng, SkiLift, SkiRun, TrailsPayload } from '../lib/types';
 import { fmtDeg, fmtFt, liftTitle, runTitle, TIER_META, tierOf } from '../lib/trails';
+import FullscreenButton from './FullscreenButton';
 
 export interface OverlayTrack {
   id: string;
@@ -917,6 +918,7 @@ export default function TerrainScene(props: Props) {
   if (compact) {
     return (
       <div className="ski-trail-map ski-trail-map--compact" ref={host} role="application" aria-label={`${dem.name} 3D map`}>
+        <FullscreenButton targetRef={host} />
         <div className="ski-3d-compass" aria-hidden="true">
           <div ref={compass} className="ski-3d-compass__needle">
             <span>N</span>
@@ -933,6 +935,7 @@ export default function TerrainScene(props: Props) {
 
   return (
     <div className="ski-trail-map" ref={host} role="application" aria-label={`${dem.name} 3D trail map`}>
+      <FullscreenButton targetRef={host} />
       <div className="ski-3d-legend" aria-hidden="true">
         <span><i className="ski-key ski-key--green" />Easier</span>
         <span><i className="ski-key ski-key--blue" />More difficult</span>

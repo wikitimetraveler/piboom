@@ -56,6 +56,105 @@
       "source": "seed"
     },
     {
+      "id": "goodwill-corona-91",
+      "name": "Goodwill Southern California — Corona",
+      "route": "wrightwood",
+      "kind": "thrift",
+      "town": "Corona",
+      "note": "Quick stop off CA-91 at N Main St for extra fleece layers and wool socks on the drive out of OC.",
+      "lat": 33.8842,
+      "lng": -117.5653,
+      "source": "seed"
+    },
+    {
+      "id": "savers-rancho-cucamonga",
+      "name": "Savers — Rancho Cucamonga",
+      "route": "wrightwood",
+      "kind": "thrift",
+      "town": "Rancho Cucamonga",
+      "note": "Large Foothill Blvd thrift store just off I-15 before the Cajon Pass climb — good rack of ski jackets and snow pants.",
+      "lat": 34.1066,
+      "lng": -117.5754,
+      "source": "seed"
+    },
+    {
+      "id": "phelan-community-thrift",
+      "name": "High Desert Secondhand & Thrift",
+      "route": "wrightwood",
+      "kind": "thrift",
+      "town": "Phelan",
+      "note": "Along Phelan Rd on the CA-138 approach to Wrightwood — mountain coats, gloves, and cabin books.",
+      "lat": 34.4264,
+      "lng": -117.5712,
+      "source": "seed"
+    },
+    {
+      "id": "wrightwood-vintage-thrift",
+      "name": "Wrightwood Mountain Thrift & Vintage",
+      "route": "wrightwood",
+      "kind": "thrift",
+      "town": "Wrightwood",
+      "note": "Village consignment and thrift off Park Dr — retro wool sweaters, beanies, and local mountain gear.",
+      "lat": 34.3605,
+      "lng": -117.6292,
+      "source": "seed"
+    },
+    {
+      "id": "wrightwood-pizza-company",
+      "name": "Wrightwood Pizza Company",
+      "route": "wrightwood",
+      "kind": "pizza",
+      "town": "Wrightwood",
+      "note": "Hand-tossed mountain pies and garlic knots on Evergreen Rd in Wrightwood village — classic stop after the lifts.",
+      "lat": 34.3604,
+      "lng": -117.6301,
+      "source": "seed"
+    },
+    {
+      "id": "mile-high-pizza-wrightwood",
+      "name": "Mile High Pizza & Deli — Wrightwood Village",
+      "route": "wrightwood",
+      "kind": "pizza",
+      "town": "Wrightwood",
+      "note": "Hot slices, calzones, and subs right off Park Dr in the pines.",
+      "lat": 34.3612,
+      "lng": -117.6285,
+      "source": "seed"
+    },
+    {
+      "id": "oggis-pizza-sierra-lakes",
+      "name": "Oggi's Sports Brewhouse & Pizza — Fontana / I-15",
+      "route": "wrightwood",
+      "kind": "pizza",
+      "town": "Fontana",
+      "note": "Right off I-15 at Sierra Ave before the Cajon Pass climb.",
+      "lat": 34.1369,
+      "lng": -117.4352,
+      "source": "seed"
+    },
+    {
+      "id": "aw-ontario-i15",
+      "name": "A&W All American Food — Ontario / I-15 Corridor",
+      "route": "wrightwood",
+      "kind": "aw",
+      "town": "Ontario",
+      "note": "Root beer floats in frosty mugs, Papa Burgers, and cheese curds on the drive north toward I-15.",
+      "lat": 34.0483,
+      "lng": -117.6697,
+      "source": "seed"
+    },
+    {
+      "id": "aw-victorville-high-desert",
+      "name": "A&W All American Food — High Desert / I-15",
+      "route": "wrightwood",
+      "kind": "aw",
+      "town": "Victorville",
+      "note": "Quick drive-thru off the I-15 / CA-138 high-desert corridor for root beer floats and fries after the mountain.",
+      "lat": 34.4712,
+      "lng": -117.3418,
+      "source": "seed"
+    },
+    {
       "id": "claremont-village",
       "name": "Claremont Village",
       "route": "mt-baldy",
@@ -108,6 +207,94 @@
       "note": "Food in the village on the way up Mt Baldy Road.",
       "lat": 34.2379,
       "lng": -117.6578,
+      "source": "seed"
+    },
+    {
+      "id": "assistance-league-fullerton-brea",
+      "name": "Assistance League Thrift Shop — Brea / Fullerton",
+      "route": "mt-baldy",
+      "kind": "thrift",
+      "town": "Brea",
+      "note": "Easy stop right off the CA-57 corridor heading north out of Orange County.",
+      "lat": 33.9165,
+      "lng": -117.8952,
+      "source": "seed"
+    },
+    {
+      "id": "ACTS-thrift-pomona-claremont",
+      "name": "ACTS Thrift Store — Foothill Blvd",
+      "route": "mt-baldy",
+      "kind": "thrift",
+      "town": "Claremont",
+      "note": "Big community thrift on Foothill Blvd right before turning north onto Mountain Ave / Mt Baldy Rd.",
+      "lat": 34.1069,
+      "lng": -117.7345,
+      "source": "seed"
+    },
+    {
+      "id": "deja-vu-claremont-village",
+      "name": "The Grove Vintage & Thrift — Claremont Village",
+      "route": "mt-baldy",
+      "kind": "thrift",
+      "town": "Claremont",
+      "note": "Secondhand flannels, parkas, and vintage layers in Claremont Village at the foot of the canyon.",
+      "lat": 34.0958,
+      "lng": -117.7186,
+      "source": "seed"
+    },
+    {
+      "id": "inland-valley-humane-thrift",
+      "name": "Humane Society Thrift Shop — Upland / Foothill",
+      "route": "mt-baldy",
+      "kind": "thrift",
+      "town": "Upland",
+      "note": "Just east of Mountain Ave along the base of the San Gabriels before the switchbacks.",
+      "lat": 34.0977,
+      "lng": -117.6508,
+      "source": "seed"
+    },
+    {
+      "id": "pizza-n-such-claremont",
+      "name": "Pizza N' Such — Claremont Village",
+      "route": "mt-baldy",
+      "kind": "pizza",
+      "town": "Claremont",
+      "note": "Claremont Village staple on Yale Ave since 1977 — thick-crust pies and patio tables right below Mt. Baldy Rd.",
+      "lat": 34.0953,
+      "lng": -117.7189,
+      "source": "seed"
+    },
+    {
+      "id": "stuffd-pizza-upland-mountain",
+      "name": "Mountain Ave Pizzeria — Upland / Foothill",
+      "route": "mt-baldy",
+      "kind": "pizza",
+      "town": "Upland",
+      "note": "Right at Mountain Ave & Foothill Blvd — last pizza stop before heading up the canyon to Manker Flats.",
+      "lat": 34.1068,
+      "lng": -117.6695,
+      "source": "seed"
+    },
+    {
+      "id": "aw-ontario-mountain-ave",
+      "name": "A&W All American Food — Mountain Ave",
+      "route": "mt-baldy",
+      "kind": "aw",
+      "town": "Ontario",
+      "note": "Straight down Mountain Ave from the Mt. Baldy turnoff — classic A&W draft root beer, floats, and burgers.",
+      "lat": 34.0483,
+      "lng": -117.6697,
+      "source": "seed"
+    },
+    {
+      "id": "aw-ca57-orange-county",
+      "name": "A&W All American Food — CA-57 Corridor",
+      "route": "mt-baldy",
+      "kind": "aw",
+      "town": "Fullerton",
+      "note": "Easy stop along the CA-57 route out of Orange County for root beer floats and chicken tenders.",
+      "lat": 33.8704,
+      "lng": -117.8898,
       "source": "seed"
     },
     {
@@ -207,6 +394,116 @@
       "note": "Snow play in the village in winter.",
       "lat": 34.2383,
       "lng": -116.9211,
+      "source": "seed"
+    },
+    {
+      "id": "mchughs-thrift-riverside",
+      "name": "Goodwill & Magnolia Ave Thrift — Riverside",
+      "route": "big-bear",
+      "kind": "thrift",
+      "town": "Riverside",
+      "note": "Right off CA-91 in Riverside on the way toward the I-215 / CA-330 junction.",
+      "lat": 33.9461,
+      "lng": -117.4012,
+      "source": "seed"
+    },
+    {
+      "id": "assistance-league-redlands-38",
+      "name": "Assistance League Thrift Shop — Redlands / Highland",
+      "route": "big-bear",
+      "kind": "thrift",
+      "town": "Redlands",
+      "note": "At the foot of the San Bernardinos between the CA-330 and CA-38 climbs.",
+      "lat": 34.0556,
+      "lng": -117.1912,
+      "source": "seed"
+    },
+    {
+      "id": "hearts-and-lives-running-springs",
+      "name": "Mountain Top Thrift — Running Springs",
+      "route": "big-bear",
+      "kind": "thrift",
+      "town": "Running Springs",
+      "note": "Where CA-330 meets CA-18 just before Snow Valley — secondhand snow bibs, gloves, and mountain coats.",
+      "lat": 34.2072,
+      "lng": -117.1084,
+      "source": "seed"
+    },
+    {
+      "id": "doves-thrift-big-bear",
+      "name": "DOVES Repeat Boutique Thrift — Big Bear",
+      "route": "big-bear",
+      "kind": "thrift",
+      "town": "Big Bear Lake",
+      "note": "Local charity thrift on Big Bear Blvd between Snow Summit and Bear Mountain — winter boots, jackets, and cabin finds.",
+      "lat": 34.2442,
+      "lng": -116.8891,
+      "source": "seed"
+    },
+    {
+      "id": "bear-valley-hospice-thrift",
+      "name": "Bear Valley Community Thrift — Big Bear Blvd",
+      "route": "big-bear",
+      "kind": "thrift",
+      "town": "Big Bear Lake",
+      "note": "Secondhand ski clothes, fleece layers, and vintage lodge decor in town.",
+      "lat": 34.2426,
+      "lng": -116.9023,
+      "source": "seed"
+    },
+    {
+      "id": "saucy-mamas-pizzeria-big-bear",
+      "name": "Saucy Mama's Pizzeria — Big Bear Village",
+      "route": "big-bear",
+      "kind": "pizza",
+      "town": "Big Bear Lake",
+      "note": "Lively Pine Knot Ave pizzeria in Big Bear Village with loaded mountain pies and craft beer.",
+      "lat": 34.2429,
+      "lng": -116.9112,
+      "source": "seed"
+    },
+    {
+      "id": "maggios-pizza-big-bear",
+      "name": "Maggio's Pizza — Big Bear Blvd",
+      "route": "big-bear",
+      "kind": "pizza",
+      "town": "Big Bear Lake",
+      "note": "Family Big Bear pizza institution since 1978, right on Big Bear Blvd between Snow Summit and Bear Mountain.",
+      "lat": 34.2438,
+      "lng": -116.8856,
+      "source": "seed"
+    },
+    {
+      "id": "mountain-pizza-running-springs",
+      "name": "Rim of the World Pizza — Running Springs",
+      "route": "big-bear",
+      "kind": "pizza",
+      "town": "Running Springs",
+      "note": "Right at the CA-330 / CA-18 junction in Running Springs, five minutes west of Snow Valley.",
+      "lat": 34.2081,
+      "lng": -117.1088,
+      "source": "seed"
+    },
+    {
+      "id": "aw-mentone-big-bear-climb",
+      "name": "A&W All American Food — Mentone / Redlands (CA-38)",
+      "route": "big-bear",
+      "kind": "aw",
+      "town": "Mentone",
+      "note": "Iconic mountain-road A&W on Mentone Blvd at the foot of the CA-38 Big Bear climb — frosty mug root beer floats and Papa Burgers.",
+      "lat": 34.0697,
+      "lng": -117.1274,
+      "source": "seed"
+    },
+    {
+      "id": "aw-san-bernardino-mountain-gate",
+      "name": "A&W All American Food — San Bernardino / CA-330 Gate",
+      "route": "big-bear",
+      "kind": "aw",
+      "town": "San Bernardino",
+      "note": "Along the I-215 / CA-330 approach before climbing up to Running Springs and Snow Valley.",
+      "lat": 34.1083,
+      "lng": -117.2898,
       "source": "seed"
     },
     {
@@ -328,6 +625,116 @@
       "note": "Basalt columns and Rainbow Falls. Summer shuttle only.",
       "lat": 37.6244,
       "lng": -119.0844,
+      "source": "seed"
+    },
+    {
+      "id": "lone-pine-sierra-thrift",
+      "name": "Southern Inyo Hospital Auxiliary Thrift Shop",
+      "route": "eastern-sierra",
+      "kind": "thrift",
+      "town": "Lone Pine",
+      "note": "Right on Main St (US-395) in Lone Pine — wool flannels, Western hats, and trail layers under Mt. Whitney.",
+      "lat": 36.6058,
+      "lng": -118.0628,
+      "source": "seed"
+    },
+    {
+      "id": "hidden-treasures-bishop",
+      "name": "Hidden Treasures & New To You Thrift — Main St",
+      "route": "eastern-sierra",
+      "kind": "thrift",
+      "town": "Bishop",
+      "note": "Along US-395 in downtown Bishop near Schat's — down parkas, fleece pullovers, and secondhand Eastern Sierra gear.",
+      "lat": 37.3619,
+      "lng": -118.3953,
+      "source": "seed"
+    },
+    {
+      "id": "cast-off-mammoth-lakes",
+      "name": "The Cast Off Thrift Store",
+      "route": "eastern-sierra",
+      "kind": "thrift",
+      "town": "Mammoth Lakes",
+      "note": "Mammoth Hospital Auxiliary thrift on Old Mammoth Rd — famous local stop for lightly used ski jackets, goggles, and snow pants.",
+      "lat": 37.6416,
+      "lng": -118.9669,
+      "source": "seed"
+    },
+    {
+      "id": "second-chance-thrift-mammoth",
+      "name": "Second Chance Thrift — Mammoth Lakes",
+      "route": "eastern-sierra",
+      "kind": "thrift",
+      "town": "Mammoth Lakes",
+      "note": "Local charity thrift off Main St (CA-203) supporting Disabled Sports Eastern Sierra — winter shells, gloves, and mountain layers.",
+      "lat": 37.6483,
+      "lng": -118.9698,
+      "source": "seed"
+    },
+    {
+      "id": "giovannis-pizzeria-mammoth",
+      "name": "Giovanni's Pizzeria — Mammoth Lakes",
+      "route": "eastern-sierra",
+      "kind": "pizza",
+      "town": "Mammoth Lakes",
+      "note": "Mammoth's go-to apres-ski pizza and pitchers spot on Old Mammoth Rd since 1984.",
+      "lat": 37.6419,
+      "lng": -118.9662,
+      "source": "seed"
+    },
+    {
+      "id": "johns-pizza-works-mammoth",
+      "name": "John's Pizza Works — Mammoth Lakes",
+      "route": "eastern-sierra",
+      "kind": "pizza",
+      "town": "Mammoth Lakes",
+      "note": "Hot pies, wings, and arcade games right on Main St (CA-203) coming into Mammoth.",
+      "lat": 37.6488,
+      "lng": -118.9689,
+      "source": "seed"
+    },
+    {
+      "id": "upper-crust-pizza-bishop",
+      "name": "Upper Crust Pizza Co. — Bishop (US-395)",
+      "route": "eastern-sierra",
+      "kind": "pizza",
+      "town": "Bishop",
+      "note": "Handcrafted pizza on N Main St (US-395) in Bishop before the Sherwin Grade climb to Mammoth and June.",
+      "lat": 37.3728,
+      "lng": -118.3955,
+      "source": "seed"
+    },
+    {
+      "id": "pizza-factory-lone-pine",
+      "name": "Pizza Factory — Lone Pine (US-395)",
+      "route": "eastern-sierra",
+      "kind": "pizza",
+      "town": "Lone Pine",
+      "note": "Classic Owens Valley pizza stop right on Main St (US-395) under Mt. Whitney.",
+      "lat": 36.6039,
+      "lng": -118.0626,
+      "source": "seed"
+    },
+    {
+      "id": "aw-bishop-us395",
+      "name": "A&W All American Food — Bishop (US-395)",
+      "route": "eastern-sierra",
+      "kind": "aw",
+      "town": "Bishop",
+      "note": "Legendary US-395 Eastern Sierra stop at 1255 N Main St in Bishop — frosty root beer floats, Papa Burgers, and cheese curds on the Mammoth & June run.",
+      "lat": 37.3742,
+      "lng": -118.3956,
+      "source": "seed"
+    },
+    {
+      "id": "aw-mojave-395-corridor",
+      "name": "A&W All American Food — High Desert / US-395 Approach",
+      "route": "eastern-sierra",
+      "kind": "aw",
+      "town": "Adelanto / Victorville",
+      "note": "Desert highway stop where I-15 meets the US-395 north corridor toward Kramer Junction and Owens Valley.",
+      "lat": 34.4712,
+      "lng": -117.3418,
       "source": "seed"
     }
   ]

@@ -540,7 +540,7 @@ body {
 }
 
 .ski-stage-slot .ski-3d-legend {
-  max-width: calc(100% - 14rem);
+  max-width: calc(100% - 16rem);
 }
 
 @keyframes ski-stage-in {
@@ -552,10 +552,36 @@ body {
   }
 }
 
+.ski-fullscreen-btn {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(126, 200, 227, 0.45);
+  background: rgba(7, 16, 24, 0.82);
+  color: var(--ski-ink);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ski-fullscreen-btn:hover,
+.ski-fullscreen-btn:focus-visible,
+.ski-fullscreen-btn.is-on {
+  background: var(--ski-ice);
+  color: #071018;
+}
+
 .ski-to-state {
   position: absolute;
   top: 0.7rem;
-  right: 4.2rem;
+  right: 7.4rem;
+  z-index: 4;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -791,7 +817,7 @@ body {
 
 .ski-3d-compass {
   position: absolute;
-  top: 0.7rem;
+  top: 3.3rem;
   right: 0.7rem;
   width: 44px;
   height: 44px;
@@ -1300,6 +1326,65 @@ body {
   height: 100%;
   border-radius: inherit;
   border: 0;
+}
+
+.ski-body-fullscreen {
+  overflow: hidden;
+}
+
+.ski-stage-slot:fullscreen,
+.ski-stage-slot:-webkit-full-screen,
+.ski-stage-slot.is-fullscreen,
+.log-map__stage:fullscreen,
+.log-map__stage:-webkit-full-screen,
+.log-map__stage.is-fullscreen,
+.log-recap__stage:fullscreen,
+.log-recap__stage:-webkit-full-screen,
+.log-recap__stage.is-fullscreen,
+.ski-trail-map:fullscreen,
+.ski-trail-map:-webkit-full-screen,
+.ski-trail-map.is-fullscreen,
+.ski-gmap:fullscreen,
+.ski-gmap:-webkit-full-screen,
+.ski-gmap.is-fullscreen,
+.ski-earth:fullscreen,
+.ski-earth:-webkit-full-screen,
+.ski-earth.is-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  width: 100vw;
+  height: 100vh;
+  max-height: none;
+  border-radius: 0;
+  border: 0;
+  background: #081019;
+}
+
+.ski-stage-slot:fullscreen > .ski-trail-map,
+.ski-stage-slot:-webkit-full-screen > .ski-trail-map,
+.ski-stage-slot.is-fullscreen > .ski-trail-map,
+.ski-stage-slot:fullscreen > .ski-gmap,
+.ski-stage-slot:-webkit-full-screen > .ski-gmap,
+.ski-stage-slot.is-fullscreen > .ski-gmap,
+.ski-stage-slot:fullscreen > .ski-earth,
+.ski-stage-slot:-webkit-full-screen > .ski-earth,
+.ski-stage-slot.is-fullscreen > .ski-earth {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  border: 0;
+}
+
+.ski-stage-slot:fullscreen > .ski-mode-switch,
+.ski-stage-slot:-webkit-full-screen > .ski-mode-switch,
+.ski-stage-slot.is-fullscreen > .ski-mode-switch {
+  position: absolute;
+  bottom: 2.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  margin-top: 0;
 }
 
 @media (max-width: 1000px) {

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { boundsCenter, boundsOf, boundsSpanM, loadGoogleMaps, type GMaps } from '../lib/googleMaps';
 import { TIER_META, tierOf } from '../lib/trails';
 import type { TrailsPayload } from '../lib/types';
+import FullscreenButton from './FullscreenButton';
 import type { Box } from './GoogleMapView';
 import type { OverlayPin, OverlayTrack } from './TerrainScene';
 
@@ -202,6 +203,7 @@ export default function GoogleEarthView({ frame, groundFt, trails, resortId, tra
   return (
     <div className="ski-earth">
       <div ref={host} className="ski-earth__host" role="application" aria-label="Google Earth photorealistic 3D view" />
+      <FullscreenButton targetRef={host} />
       {!steady && !error ? (
         <p className="ski-gmap__status">
           {stalled

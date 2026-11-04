@@ -5,6 +5,8 @@ import { mapsDirUrl } from '../lib/goNoGo';
 const CHIPS = [
   { id: 'all', label: 'All' },
   { id: 'thrift', label: 'Thrift' },
+  { id: 'pizza', label: 'Pizza' },
+  { id: 'aw', label: 'A&W' },
   { id: 'scenic', label: 'Scenic' },
 ];
 

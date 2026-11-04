@@ -5,6 +5,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { CALIFORNIA_OUTLINE, FT_TO_KM, tableXZ } from '../lib/california';
 import type { BriefPayload, DemGrid, DestinationBrief } from '../lib/types';
+import FullscreenButton from './FullscreenButton';
 
 interface Props {
   destinations: DestinationBrief[];
@@ -652,11 +653,12 @@ export default function CaliforniaTable({ destinations, home, returnFrom, flyReq
   }, [data, layoutKey]);
 
   useEffect(() => {
-    if (flyRequest) flyRef.current?.(flyRequest);
-  }, [flyRequest]);
+    if (flyRequest && data) flyRef.current?.(flyRequest);
+  }, [flyRequest, data]);
 
   return (
     <div className="ski-trail-map ski-table" ref={host} role="application" aria-label="California ski table">
+      <FullscreenButton targetRef={host} />
       {!data ? <p className="ski-table__loading">Setting the table…</p> : null}
       <div className="ski-3d-foot">
         <p>Click a mountain or a resort name to fly in · drag to orbit · scroll to zoom</p>

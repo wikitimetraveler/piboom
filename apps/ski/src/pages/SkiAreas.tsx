@@ -21,11 +21,15 @@ interface TerrainInfo {
   maxSlopeDeg?: number;
 }
 
+export type AreaView = 'state' | 'resort';
+
 interface Props {
   brief: BriefPayload;
   dest: DestinationBrief | undefined;
   selectedId: string;
   onSelect: (id: string) => void;
+  view: AreaView;
+  onViewChange: (view: AreaView) => void;
   dem: DemGrid | null;
   terrain: TerrainInfo | null;
   trails: TrailsPayload | null;
@@ -33,19 +37,17 @@ interface Props {
   onSelectRun: (id: string | null) => void;
 }
 
-type View = 'state' | 'resort';
-
 const EMPTY_FILTER: RunFilter = { tiers: new Set(), facing: '', maxPitch: null, namedOnly: false, treeOnly: false };
 
 export default function SkiAreas(props: Props) {
-  const { brief, dest, selectedId, onSelect, dem, terrain, trails, selectedRunId, onSelectRun } = props;
+  const { brief, dest, selectedId, onSelect, view, onViewChange, dem, terrain, trails, selectedRunId, onSelectRun } = props;
   const [filter, setFilter] = useState<RunFilter>(EMPTY_FILTER);
   const [sort, setSort] = useState<SortKey>('vertical');
   const [previewRunId, setPreviewRunId] = useState<string | null>(null);
-  const [view, setView] = useState<View>('state');
   const [returnFrom, setReturnFrom] = useState<string | null>(null);
   const [flyRequest, setFlyRequest] = useState<string | null>(null);
   const [flying, setFlying] = useState(false);
+  const showTable = view === 'state' || flying;
 
   const resortRuns = useMemo(
     () => (trails && dem && trails.id === dem.id ? trails.runs.filter((r) => r.resort === dest?.id) : []),
@@ -60,7 +62,7 @@ export default function SkiAreas(props: Props) {
   const [mapMode, setMapMode] = useMapMode();
   const { cloud: lidar, dense: lidarDense, note: lidarNote } = useLidarCloud(
     dest?.dem,
-    mapMode === 'lidar' && view === 'resort'
+    mapMode === 'lidar' && !showTable
   );
   const resortLifts = useMemo(
     () => (trails && dem && trails.id === dem.id ? trails.lifts.filter((l) => l.resort === dest?.id) : []),
@@ -76,21 +78,23 @@ export default function SkiAreas(props: Props) {
   );
 
   const pickResort = (id: string) => {
-    if (view === 'resort') {
-      onSelect(id);
+    onSelect(id);
+    if (!showTable) {
       return;
     }
     if (flying) return;
+    setFlying(true);
     setFlyRequest(null);
     queueMicrotask(() => setFlyRequest(id));
   };
 
   const toCalifornia = () => {
-    if (view === 'state') return;
+    if (view === 'state' && !flying) return;
     onSelectRun(null);
     setReturnFrom(dest?.id || null);
     setFlyRequest(null);
-    setView('state');
+    setFlying(false);
+    onViewChange('state');
   };
 
   return (
@@ -134,7 +138,7 @@ export default function SkiAreas(props: Props) {
 
       <section className="ski-trail-stage">
         <div className="ski-stage-slot">
-          {view === 'state' ? (
+          {showTable ? (
             <CaliforniaTable
               destinations={brief.destinations}
               home={brief.home}
@@ -147,7 +151,7 @@ export default function SkiAreas(props: Props) {
               onArrive={() => {
                 setFlying(false);
                 setFlyRequest(null);
-                setView('resort');
+                onViewChange('resort');
               }}
             />
           ) : (
@@ -193,7 +197,7 @@ export default function SkiAreas(props: Props) {
             </>
           )}
         </div>
-        {view === 'state' ? (
+        {showTable ? (
           <aside className="ski-table-panel" aria-label="Mountains on the table">
             <h2>Pick a mountain</h2>
             <p>Drive times are from {brief.home.name}.</p>
@@ -225,7 +229,7 @@ export default function SkiAreas(props: Props) {
         )}
       </section>
 
-      {view === 'resort' ? (
+      {!showTable ? (
         <section className="ski-detail-row">
           <RunDetail run={selectedRun} onClear={() => onSelectRun(null)} />
           <div className="ski-side-stack">

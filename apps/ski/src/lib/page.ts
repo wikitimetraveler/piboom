@@ -19,7 +19,8 @@ export function camsPath(resortId: string) {
   return resortId ? `${PATHS.cams}/${resortId}` : PATHS.cams;
 }
 
-export function goPage(page: SkiPage) {
-  window.history.pushState({ page }, '', PATHS[page]);
+export function goPage(page: SkiPage, resortId?: string) {
+  const path = page === 'cams' && resortId ? camsPath(resortId) : PATHS[page];
+  window.history.pushState({ page }, '', path);
   window.dispatchEvent(new PopStateEvent('popstate'));
 }

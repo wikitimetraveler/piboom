@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { boundsOf, loadGoogleMaps, type GMaps } from '../lib/googleMaps';
 import { TIER_META, tierOf, runTitle, liftTitle } from '../lib/trails';
 import type { TrailsPayload } from '../lib/types';
+import FullscreenButton from './FullscreenButton';
 import type { OverlayPin, OverlayTrack } from './TerrainScene';
 
 export interface Box {
@@ -21,12 +22,13 @@ interface Props {
   onPin?: (id: string) => void;
   onSelectRun?: (id: string | null) => void;
   fitKey?: string;
-  /** Opens centered here (e.g. the base lodge) instead of fitting the whole frame, when there are no tracks or pins. */
-  focus?: { lat: number; lng: number } | null;
+  /** Opens centered here (e.g. the base lodge) looking up the mountain along `heading`, when there are no tracks or pins. */
+  focus?: { lat: number; lng: number; heading?: number; reachM?: number } | null;
 }
 
 const hex = (n: number) => `#${n.toString(16).padStart(6, '0')}`;
 const FOCUS_ZOOM = 16;
+const FOCUS_TILT = 55;
 
 export default function GoogleMapView({ frame, trails, resortId, selectedRunId, tracks, pins, onPin, onSelectRun, fitKey, focus }: Props) {
   const host = useRef<HTMLDivElement>(null);
@@ -49,12 +51,18 @@ export default function GoogleMapView({ frame, trails, resortId, selectedRunId, 
       if (!live || !host.current) return;
       const m = new Map(host.current, {
         mapId: 'DEMO_MAP_ID',
+        renderingType: maps.RenderingType?.VECTOR ?? 'VECTOR',
         mapTypeId: 'hybrid',
         center: focus ? { lat: focus.lat, lng: focus.lng } : { lat: (frame.south + frame.north) / 2, lng: (frame.west + frame.east) / 2 },
         zoom: focus ? FOCUS_ZOOM : 14,
+        heading: focus?.heading ?? 0,
+        tilt: focus ? FOCUS_TILT : 0,
+        headingInteractionEnabled: true,
+        tiltInteractionEnabled: true,
+        rotateControl: true,
         gestureHandling: 'greedy',
         streetViewControl: false,
-        fullscreenControl: true,
+        fullscreenControl: false,
         mapTypeControl: true,
         mapTypeControlOptions: { mapTypeIds: ['hybrid', 'terrain', 'roadmap'] },
         clickableIcons: false,
@@ -165,12 +173,19 @@ export default function GoogleMapView({ frame, trails, resortId, selectedRunId, 
       ...(pins || []).map((p) => ({ lat: p.lat, lng: p.lng })),
     ];
     if (!pts.length && focus) {
-      map.setCenter({ lat: focus.lat, lng: focus.lng });
-      map.setZoom(FOCUS_ZOOM);
+      map.moveCamera({
+        center: { lat: focus.lat, lng: focus.lng },
+        zoom: FOCUS_ZOOM,
+        heading: focus.heading ?? 0,
+        tilt: FOCUS_TILT,
+      });
       return;
     }
     const box = boundsOf(pts) || frame;
     map.fitBounds({ south: box.south, north: box.north, west: box.west, east: box.east }, 40);
+    if (focus?.heading != null) {
+      map.setHeading?.(focus.heading);
+    }
     // Refit only when the caller says the subject changed, not on every live update.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, lib, fitKey]);
@@ -178,6 +193,7 @@ export default function GoogleMapView({ frame, trails, resortId, selectedRunId, 
   return (
     <div className="ski-gmap">
       <div ref={host} className="ski-gmap__canvas" role="application" aria-label="Google map of the ski area" />
+      <FullscreenButton targetRef={host} />
       {!map && !error ? <p className="ski-gmap__status">Loading Google Maps…</p> : null}
       {error ? <p className="ski-gmap__status ski-gmap__status--error">{error}</p> : null}
     </div>
