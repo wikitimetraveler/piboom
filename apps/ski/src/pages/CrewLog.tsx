@@ -8,9 +8,11 @@ import RecapPanel from '../components/log/RecapPanel';
 import SkiPanel from '../components/log/SkiPanel';
 import TodayPanel from '../components/log/TodayPanel';
 import TripGate from '../components/log/TripGate';
+import { buildDemoCrewDay, createDemoPass, isDemoPass } from '../lib/demoCrewDay';
 import { currentPass, getDay, listPasses, switchPass } from '../lib/logApi';
 import type { TripDay, TripPass } from '../lib/logTypes';
 import { todayLocal } from '../lib/logFormat';
+import { loadDemGrid, loadTrailsFor } from '../lib/terrainData';
 import { Tracker, type TrackerState } from '../lib/tracker';
 import type { DestinationBrief } from '../lib/types';
 import '../log.css';
@@ -33,8 +35,12 @@ interface Props {
 }
 
 /** An invite link for another trip opens that trip (or its join screen), not the last one used. */
-function startingPass(): TripPass | null {
-  const invite = (new URLSearchParams(window.location.search).get('trip') || '').toUpperCase();
+function startingPass(selectedId: string): TripPass | null {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('demo') === '1') {
+    return createDemoPass(params.get('resort') || selectedId || 'mammoth');
+  }
+  const invite = (params.get('trip') || '').toUpperCase();
   if (!invite) return currentPass();
   const saved = listPasses().find((p) => p.code === invite);
   if (saved) switchPass(saved.code);
@@ -42,7 +48,7 @@ function startingPass(): TripPass | null {
 }
 
 export default function CrewLog({ destinations: briefed, selectedId, onSelect }: Props) {
-  const [pass, setPass] = useState<TripPass | null>(startingPass);
+  const [pass, setPass] = useState<TripPass | null>(() => startingPass(selectedId));
   const [catalog, setCatalog] = useState<DestinationBrief[]>([]);
   useEffect(() => {
     if (briefed.length) return;
@@ -71,9 +77,13 @@ export default function CrewLog({ destinations: briefed, selectedId, onSelect }:
   }
   return (
     <TripView
-      key={pass.code}
+      key={`${pass.code}:${pass.resortId}`}
       pass={pass}
       destinations={destinations}
+      onSwitchPass={(nextPass) => {
+        onSelect(nextPass.resortId);
+        setPass(nextPass);
+      }}
       onLeave={() => {
         switchPass(null);
         setPass(null);
@@ -82,11 +92,22 @@ export default function CrewLog({ destinations: briefed, selectedId, onSelect }:
   );
 }
 
-function TripView({ pass, destinations, onLeave }: { pass: TripPass; destinations: DestinationBrief[]; onLeave: () => void }) {
-  const [tab, setTab] = useState<Tab>('ski');
+function TripView({
+  pass,
+  destinations,
+  onSwitchPass,
+  onLeave,
+}: {
+  pass: TripPass;
+  destinations: DestinationBrief[];
+  onSwitchPass: (p: TripPass) => void;
+  onLeave: () => void;
+}) {
+  const demoMode = isDemoPass(pass);
+  const [tab, setTab] = useState<Tab>(() => (demoMode ? 'recap' : 'ski'));
   const [date, setDate] = useState(todayLocal);
   const [day, setDay] = useState<TripDay | null>(null);
-  const [focus, setFocus] = useState<number | 'crew'>(pass.memberId);
+  const [focus, setFocus] = useState<number | 'crew'>(() => (demoMode ? 'crew' : pass.memberId));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [tracker, setTracker] = useState<TrackerState>(IDLE);
@@ -97,6 +118,16 @@ function TripView({ pass, destinations, onLeave }: { pass: TripPass; destination
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
+      if (isDemoPass(pass)) {
+        const demId = resort?.dem || 'mammoth';
+        const [dem, trails] = await Promise.all([
+          loadDemGrid(demId).catch(() => null),
+          loadTrailsFor(demId).catch(() => null),
+        ]);
+        setDay(buildDemoCrewDay(pass.resortId, date, trails, dem, resort));
+        setError('');
+        return;
+      }
       await trackerRef.current?.flush();
       setDay(await getDay(pass, date));
       setError('');
@@ -106,9 +137,10 @@ function TripView({ pass, destinations, onLeave }: { pass: TripPass; destination
     } finally {
       setLoading(false);
     }
-  }, [pass, date]);
+  }, [pass, date, resort]);
 
   useEffect(() => {
+    if (isDemoPass(pass)) return;
     const t = new Tracker(pass, setTracker);
     trackerRef.current = t;
     setTracker(t.snapshot);
@@ -153,6 +185,32 @@ function TripView({ pass, destinations, onLeave }: { pass: TripPass; destination
           </p>
         </div>
         <div className="log-head__actions">
+          {!demoMode ? (
+            <button
+              type="button"
+              className="log-ghost"
+              onClick={() => onSwitchPass(createDemoPass(pass.resortId, resort?.name))}
+              title="Preview a 4-rider demo day on this mountain"
+            >
+              Demo Day
+            </button>
+          ) : (
+            <select
+              className="log-demo-resort"
+              value={pass.resortId}
+              aria-label="Demo mountain"
+              onChange={(e) => {
+                const nextResort = destinations.find((d) => d.id === e.target.value);
+                onSwitchPass(createDemoPass(e.target.value, nextResort?.name));
+              }}
+            >
+              {destinations.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+            </select>
+          )}
           <button
             type="button"
             className="log-code"
@@ -161,7 +219,7 @@ function TripView({ pass, destinations, onLeave }: { pass: TripPass; destination
             title="Invite riders with a QR code"
           >
             {pass.code}
-            <small>Invite</small>
+            <small>{demoMode ? 'Demo' : 'Invite'}</small>
           </button>
           <button type="button" className="log-ghost" onClick={onLeave}>
             Trips
@@ -236,6 +294,7 @@ function TripView({ pass, destinations, onLeave }: { pass: TripPass; destination
           loading={loading}
           onGoSki={() => setTab('ski')}
           onChanged={refresh}
+          onLoadDemo={() => onSwitchPass(createDemoPass(pass.resortId, resort?.name))}
         />
       ) : null}
     </section>

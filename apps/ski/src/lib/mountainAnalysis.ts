@@ -28,14 +28,13 @@ const ASPECT_DEG: Record<string, number> = {
 };
 
 function angleDiffDeg(a: number, b: number): number {
-  const d = Math.abs(((a - b + 540) % 360) - 180);
-  return d;
+  return Math.abs(((a - b + 540) % 360) - 180);
 }
 
 export function formatHourLabel(hour: number): string {
   const whole = Math.floor(hour);
   const mins = Math.round((hour - whole) * 60);
-  const h =mins === 60 ? whole + 1 : whole;
+  const h = mins === 60 ? whole + 1 : whole;
   const m = mins === 60 ? 0 : mins;
   const suffix = h >= 12 ? 'PM' : 'AM';
   const h12 = h % 12 === 0 ? 12 : h % 12;
@@ -49,7 +48,6 @@ export function formatHourLabel(hour: number): string {
 export function computeSunState(hour: number, latDeg = 35.5): SunState {
   const clamped = Math.max(6.5, Math.min(17.5, hour));
   const rad = Math.PI / 180;
-  // Mid-February solar declination (~ -11 deg) gives crisp winter mountain shadows.
   const decl = -11 * rad;
   const lat = latDeg * rad;
   const hourAngle = (clamped - 12) * 15 * rad;
@@ -59,7 +57,6 @@ export function computeSunState(hour: number, latDeg = 35.5): SunState {
   const altRad = Math.max(0.08, Math.asin(Math.max(-1, Math.min(1, sinAlt))));
   const altitudeDeg = Math.round((altRad / rad) * 10) / 10;
 
-  // Solar azimuth measured clockwise from North (morning = ESE, noon = S, afternoon = WSW)
   const cosAz =
     (Math.sin(decl) - Math.sin(altRad) * Math.sin(lat)) /
     Math.max(1e-5, Math.cos(altRad) * Math.cos(lat));
@@ -67,7 +64,6 @@ export function computeSunState(hour: number, latDeg = 35.5): SunState {
   if (hourAngle > 0) azRad = 2 * Math.PI - azRad;
   const azimuthDeg = Math.round(((azRad / rad) + 360) % 360);
 
-  // Convert compass azimuth (0 = N = -Z, 90 = E = +X, 180 = S = +Z) + altitude into unit 3D vector
   const horiz = Math.cos(altRad);
   const lx = Math.sin(azRad) * horiz;
   const ly = Math.sin(altRad);
@@ -128,10 +124,6 @@ function haversineFt(a: LatLng, b: LatLng): number {
   return 2 * 20_902_231 * Math.asin(Math.sqrt(h));
 }
 
-/**
- * Stitches a run's coordinate paths into a continuous top-to-bottom polyline and samples
- * position, elevation, pitch, and forward look-ahead point at normalized progress t in [0, 1].
- */
 export function sampleRunAtProgress(
   run: SkiRun,
   dem: DemGrid | null,
@@ -165,7 +157,6 @@ export function sampleRunAtProgress(
     return top - frac * (top - bot);
   };
 
-  // Ensure path is oriented top-to-bottom
   const firstElev = dem ? demHeightFt(dem, pts[0][0], pts[0][1]) : (run.topFt ?? 8000);
   const lastElev = dem
     ? demHeightFt(dem, pts[pts.length - 1][0], pts[pts.length - 1][1])
@@ -204,7 +195,6 @@ export function sampleRunAtProgress(
   const aheadFrac = Math.min(1, aheadDist / totalFt);
   const lookAtElevFt = elevAt(ahead.lat, ahead.lng, aheadFrac);
 
-  // Local pitch from window around targetDist
   const d0 = Math.max(0, targetDist - 45);
   const d1 = Math.min(totalFt, targetDist + 45);
   const p0 = coordAtDist(d0);
@@ -233,10 +223,6 @@ export function sampleRunAtProgress(
   };
 }
 
-/**
- * Finds the upper station of a lift and returns all runs in the resort that can be entered
- * from that lift's top station (or within a short ridge traverse).
- */
 export function findRunsOffLift(
   lift: SkiLift,
   runs: SkiRun[],
@@ -252,21 +238,16 @@ export function findRunsOffLift(
   const topCoord = eLast >= eFirst ? last : first;
   const topElevFt = Math.max(eFirst, eLast, lift.topFt ?? 0);
 
-  const REACH_FT = 1350; // ~410m unload & ridge traverse radius
+  const REACH_FT = 1350;
   const scored: { run: SkiRun; distFt: number }[] = [];
 
   for (const run of runs) {
     if (lift.resort && run.resort && lift.resort !== run.resort) continue;
     const pts = run.paths.flat();
     if (pts.length < 2) continue;
-    // Check distance from lift top to the highest points of the run
     const startA = pts[0];
     const startB = pts[pts.length - 1];
-    const dA = haversineFt(topCoord, startA);
-    const dB = haversineFt(topCoord, startB);
-    const minStartDist = Math.min(dA, dB);
-    // Also check if the run passes right by the unload station
-    let minAnyDist = minStartDist;
+    let minAnyDist = Math.min(haversineFt(topCoord, startA), haversineFt(topCoord, startB));
     for (let i = 0; i < pts.length; i += Math.max(1, Math.floor(pts.length / 8))) {
       const d = haversineFt(topCoord, pts[i]);
       if (d < minAnyDist) minAnyDist = d;

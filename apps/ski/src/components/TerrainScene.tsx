@@ -6,6 +6,7 @@ import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import type { LidarCloud } from '../lib/lidar';
+import { computeSunState, type TerrainOverlayMode } from '../lib/mountainAnalysis';
 import type { DemGrid, DestinationBrief, LatLng, SkiLift, SkiRun, TrailsPayload } from '../lib/types';
 import { fmtDeg, fmtFt, liftTitle, runTitle, TIER_META, tierOf } from '../lib/trails';
 import FullscreenButton from './FullscreenButton';
@@ -35,6 +36,14 @@ export interface SceneControls {
   frameResort: (resortId?: string) => void;
   setProgress: (t: number) => void;
   orbit: (on: boolean) => void;
+  setPovPose?: (pose: {
+    lat: number;
+    lng: number;
+    lookAtLat: number;
+    lookAtLng: number;
+    liftM?: number;
+    lookLiftM?: number;
+  } | null) => void;
 }
 
 interface Props {
@@ -46,6 +55,22 @@ interface Props {
   previewRunId: string | null;
   matchIds: Set<string> | null;
   onSelectRun: (id: string | null) => void;
+  selectedLiftId?: string | null;
+  onSelectLift?: (id: string | null) => void;
+  lapRunIds?: string[];
+  sunHour?: number | null;
+  onSunHourChange?: (h: number | null) => void;
+  terrainOverlay?: 'natural' | 'slope' | 'aspect';
+  onTerrainOverlayChange?: (mode: 'natural' | 'slope' | 'aspect') => void;
+  povSample?: {
+    lat: number;
+    lng: number;
+    lookAtLat: number;
+    lookAtLng: number;
+    pitchDeg?: number;
+    elevFt?: number;
+    followCam?: boolean;
+  } | null;
   tracks?: OverlayTrack[];
   pins?: OverlayPin[];
   controlsRef?: MutableRefObject<SceneControls | null>;
@@ -65,6 +90,8 @@ interface StyleState {
   selectedRunId: string | null;
   previewRunId: string | null;
   matchIds: Set<string> | null;
+  selectedLiftId?: string | null;
+  lapRunIds?: string[];
 }
 
 interface SceneApi {
@@ -72,6 +99,17 @@ interface SceneApi {
   frameResort: (resortId: string | undefined) => void;
   frameRun: (runId: string) => void;
   setOverlay: (o: Overlay) => void;
+  setPovMarker: (
+    sample: {
+      lat: number;
+      lng: number;
+      lookAtLat: number;
+      lookAtLng: number;
+      pitchDeg?: number;
+      elevFt?: number;
+      followCam?: boolean;
+    } | null
+  ) => void;
 }
 
 const WIDTH = 3;
@@ -100,6 +138,8 @@ const terrainFragment = /* glsl */ `
   uniform float uSnowFt;
   uniform float uInterval;
   uniform float uAlpha;
+  uniform float uOverlayMode;
+  uniform float uExag;
   varying float vElev;
   varying vec3 vNormal;
   varying vec3 vWorld;
@@ -115,10 +155,43 @@ const terrainFragment = /* glsl */ `
     float steep = 1.0 - n.y;
     float rocky = smoothstep(0.42, 0.7, steep) * 0.55;
     base = mix(base, rock, rocky);
+
+    // True terrain slope in degrees (correcting for vertical exaggeration uExag)
+    vec2 hGrad = n.xz / max(0.05, n.y * uExag);
+    float slopeDeg = degrees(atan(length(hGrad)));
+
+    if (uOverlayMode > 0.5 && uOverlayMode < 1.5) {
+      // Slope / Avalanche Pitch Heatmap
+      vec3 cGreen = vec3(0.22, 0.72, 0.45);
+      vec3 cBlue  = vec3(0.24, 0.56, 0.96);
+      vec3 cGold  = vec3(0.96, 0.76, 0.24);
+      vec3 cRed   = vec3(0.95, 0.32, 0.25);
+      vec3 cPurp  = vec3(0.76, 0.22, 0.78);
+      vec3 heat = mix(cGreen, cBlue, smoothstep(10.0, 18.0, slopeDeg));
+      heat = mix(heat, cGold, smoothstep(20.0, 27.0, slopeDeg));
+      heat = mix(heat, cRed, smoothstep(28.0, 35.0, slopeDeg));
+      heat = mix(heat, cPurp, smoothstep(37.0, 45.0, slopeDeg));
+      base = mix(base, heat, 0.76);
+    } else if (uOverlayMode > 1.5) {
+      // Aspect Compass Rose (N = ice cyan, E = morning gold, S = warm coral, W = twilight violet)
+      float az = atan(n.x, -n.z); // 0 = North (-Z), +pi/2 = East (+X), pi = South (+Z)
+      vec3 cN = vec3(0.32, 0.78, 0.96);
+      vec3 cE = vec3(0.96, 0.78, 0.30);
+      vec3 cS = vec3(0.95, 0.42, 0.34);
+      vec3 cW = vec3(0.64, 0.44, 0.92);
+      float wN = max(0.0, cos(az));
+      float wS = max(0.0, -cos(az));
+      float wE = max(0.0, sin(az));
+      float wW = max(0.0, -sin(az));
+      vec3 aspectCol = cN * wN + cS * wS + cE * wE + cW * wW;
+      float flatFade = smoothstep(3.0, 10.0, slopeDeg);
+      base = mix(base, aspectCol, 0.72 * flatFade);
+    }
+
     vec3 l = normalize(uLight);
     float diffuse = clamp(dot(n, l), 0.0, 1.0);
     float sky = 0.5 + 0.5 * n.y;
-    vec3 col = base * (0.30 + 0.78 * diffuse) + vec3(0.04, 0.07, 0.10) * sky;
+    vec3 col = base * (0.26 + 0.84 * diffuse) + vec3(0.04, 0.07, 0.11) * sky;
     vec3 v = normalize(cameraPosition - vWorld);
     vec3 h = normalize(l + v);
     float nh = max(dot(n, h), 0.0);
@@ -330,14 +403,39 @@ interface LiftHandle {
 
 export default function TerrainScene(props: Props) {
   const { dem, trails, destinations, resortId, selectedRunId, previewRunId, matchIds, onSelectRun } = props;
-  const { tracks, pins, controlsRef, compact, lidar, lidarDense, lidarNote } = props;
+  const {
+    selectedLiftId = null,
+    onSelectLift,
+    lapRunIds = [],
+    sunHour: propSunHour,
+    onSunHourChange,
+    terrainOverlay: propOverlay,
+    onTerrainOverlayChange,
+    povSample = null,
+    tracks,
+    pins,
+    controlsRef,
+    compact,
+    lidar,
+    lidarDense,
+    lidarNote,
+  } = props;
   const host = useRef<HTMLDivElement>(null);
   const compass = useRef<HTMLDivElement>(null);
   const api = useRef<SceneApi | null>(null);
-  const styleRef = useRef<StyleState>({ resortId, selectedRunId, previewRunId, matchIds });
-  styleRef.current = { resortId, selectedRunId, previewRunId, matchIds };
+  const styleRef = useRef<StyleState>({
+    resortId,
+    selectedRunId,
+    previewRunId,
+    matchIds,
+    selectedLiftId,
+    lapRunIds,
+  });
+  styleRef.current = { resortId, selectedRunId, previewRunId, matchIds, selectedLiftId, lapRunIds };
   const selectRef = useRef(onSelectRun);
   selectRef.current = onSelectRun;
+  const selectLiftRef = useRef(onSelectLift);
+  selectLiftRef.current = onSelectLift;
   const overlayRef = useRef<Overlay>({ tracks: [], pins: [] });
   overlayRef.current = { tracks: tracks || [], pins: pins || [] };
   const controlsOut = useRef(controlsRef);
@@ -359,6 +457,20 @@ export default function TerrainScene(props: Props) {
   const [pointSize, setPointSize] = useState(4);
   const [meshOpacity, setMeshOpacity] = useState(0);
   const [lidarClose, setLidarClose] = useState(false);
+  const [localSunHour, setLocalSunHour] = useState<number | null>(null);
+  const [localOverlay, setLocalOverlay] = useState<TerrainOverlayMode>('natural');
+
+  const activeSunHour = propSunHour !== undefined ? propSunHour : localSunHour;
+  const setSunHour = (val: number | null) => {
+    setLocalSunHour(val);
+    onSunHourChange?.(val);
+  };
+  const activeOverlay = propOverlay !== undefined ? propOverlay : localOverlay;
+  const setTerrainOverlay = (val: TerrainOverlayMode) => {
+    setLocalOverlay(val);
+    onTerrainOverlayChange?.(val);
+  };
+  const sunState = activeSunHour != null ? computeSunState(activeSunHour, dem ? (dem.south + dem.north) / 2 : 35.5) : null;
 
   useEffect(() => {
     const el = host.current;
@@ -390,9 +502,9 @@ export default function TerrainScene(props: Props) {
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
-    controls.minDistance = 0.35;
+    controls.minDistance = 0.22;
     controls.maxDistance = 6;
-    controls.maxPolarAngle = Math.PI * 0.46;
+    controls.maxPolarAngle = Math.PI * 0.47;
     controls.target.set(0, 0.15, 0);
     controls.update();
 
@@ -416,6 +528,8 @@ export default function TerrainScene(props: Props) {
         uSnowFt: { value: 6900 },
         uInterval: { value: 100 },
         uAlpha: { value: 1 },
+        uOverlayMode: { value: 0 },
+        uExag: { value: EXAG },
       },
       polygonOffset: true,
       polygonOffsetFactor: 2,
@@ -498,6 +612,12 @@ export default function TerrainScene(props: Props) {
     tip.visible = false;
     scene.add(tip);
 
+    const povEl = document.createElement('div');
+    povEl.className = 'ski-3d-pov-marker';
+    const povObj = new CSS2DObject(povEl);
+    povObj.visible = false;
+    scene.add(povObj);
+
     let hoverId: string | null = null;
     const runById = new Map(runs.map((h) => [h.run.id, h]));
     const liftById = new Map(lifts.map((h) => [h.lift.id, h]));
@@ -523,7 +643,7 @@ export default function TerrainScene(props: Props) {
         const b = document.createElement('strong');
         b.textContent = liftTitle(l.lift);
         const s = document.createElement('span');
-        s.textContent = `${fmtFt(l.lift.riseFt)} rise · ${fmtFt(l.lift.lengthFt)} long`;
+        s.textContent = `${fmtFt(l.lift.riseFt)} rise · ${fmtFt(l.lift.lengthFt)} long · click for reachable runs`;
         tipEl.append(b, s);
         tip.position.copy(point ?? l.box.getCenter(new THREE.Vector3()));
       }
@@ -534,38 +654,44 @@ export default function TerrainScene(props: Props) {
     // Fade by blending toward snow-gray at full opacity: translucent Line2 segments double up at joints.
     const fade = new THREE.Color(0xc4ced8);
     const applyStyles = (s: StyleState) => {
-      const anySel = Boolean(s.selectedRunId);
+      const lapSet = new Set(s.lapRunIds || []);
+      const anySel = Boolean(s.selectedRunId || lapSet.size > 0);
       for (const h of runs) {
         const id = h.run.id;
         const isSel = id === s.selectedRunId;
+        const isInLap = lapSet.has(id);
         const isHot = id === s.previewRunId || id === hoverId;
         const inResort = !s.resortId || h.run.resort === s.resortId;
         const matches = !s.matchIds || s.matchIds.has(id);
         let dim = inResort ? (matches ? 0 : 0.85) : 0.75;
-        if (anySel && !isSel && !isHot) dim = Math.max(dim, 0.5);
-        if (isSel || isHot) dim = 0;
+        if (anySel && !isSel && !isInLap && !isHot) dim = Math.max(dim, 0.5);
+        if (isSel || isInLap || isHot) dim = 0;
         const meta = TIER_META[tierOf(h.run.difficulty)];
-        h.core.linewidth = isSel ? 5.5 : isHot ? 4.5 : dim > 0.6 ? 1.8 : 2.6;
-        h.casing.linewidth = h.core.linewidth + (isSel ? 5 : 2.6);
+        h.core.linewidth = isSel ? 5.5 : isInLap ? 4.8 : isHot ? 4.5 : dim > 0.6 ? 1.8 : 2.6;
+        h.casing.linewidth = h.core.linewidth + (isSel || isInLap ? 5 : 2.6);
         h.core.color.setHex(meta.line).lerp(fade, dim);
-        h.casing.color.setHex(isSel ? 0x7ec8e3 : isHot ? 0xffffff : meta.casing).lerp(fade, dim);
+        h.casing.color
+          .setHex(isSel ? 0x7ec8e3 : isInLap ? 0x5dbe8a : isHot ? 0xffffff : meta.casing)
+          .lerp(fade, dim);
         for (const c of h.cores) {
-          c.renderOrder = isSel || isHot ? 6 : 2;
+          c.renderOrder = isSel || isInLap || isHot ? 6 : 2;
           c.userData.dim = dim;
         }
         for (const c of h.casings) {
-          c.renderOrder = isSel || isHot ? 5 : 1;
+          c.renderOrder = isSel || isInLap || isHot ? 5 : 1;
           c.visible = dim < 0.6;
         }
       }
       for (const l of lifts) {
         const inResort = !s.resortId || l.lift.resort === s.resortId;
-        const dim = l.lift.id === hoverId ? 0 : inResort ? (anySel ? 0.45 : 0) : 0.75;
-        l.mat.color.setHex(0xffd166).lerp(fade, dim);
-        l.mat.linewidth = l.lift.id === hoverId ? 3 : 1.6;
+        const isLiftSel = l.lift.id === s.selectedLiftId;
+        const isLiftHover = l.lift.id === hoverId;
+        const dim = isLiftSel || isLiftHover ? 0 : inResort ? (anySel ? 0.45 : 0) : 0.75;
+        l.mat.color.setHex(isLiftSel ? 0x5dbe8a : 0xffd166).lerp(fade, dim);
+        l.mat.linewidth = isLiftSel ? 3.8 : isLiftHover ? 3 : 1.6;
         l.line.userData.dim = dim;
       }
-      if (!hoverId) showTip(s.previewRunId || s.selectedRunId);
+      if (!hoverId) showTip(s.previewRunId || s.selectedRunId || s.selectedLiftId || null);
     };
 
     const goal = { target: new THREE.Vector3(), position: new THREE.Vector3(), active: false };
@@ -595,6 +721,73 @@ export default function TerrainScene(props: Props) {
       const h = runById.get(id);
       if (h) flyTo(h.box, 0.45);
     };
+
+    const setPovPose = (
+      pose: {
+        lat: number;
+        lng: number;
+        lookAtLat: number;
+        lookAtLng: number;
+        liftM?: number;
+        lookLiftM?: number;
+      } | null
+    ) => {
+      if (!pose) return;
+      const here = frame.toWorld(pose.lat, pose.lng, pose.liftM ?? 22);
+      const ahead = frame.toWorld(pose.lookAtLat, pose.lookAtLng, pose.lookLiftM ?? 4);
+      const forward = ahead.clone().sub(here);
+      if (forward.lengthSq() < 1e-6) forward.set(0, -0.2, 1);
+      forward.normalize();
+      const camPos = here.clone().addScaledVector(forward, -0.24).add(new THREE.Vector3(0, 0.14, 0));
+      goal.target.copy(ahead);
+      goal.position.copy(camPos);
+      if (reduced) {
+        controls.target.copy(goal.target);
+        camera.position.copy(goal.position);
+        goal.active = false;
+      } else {
+        goal.active = true;
+      }
+    };
+
+    const setPovMarker = (
+      sample: {
+        lat: number;
+        lng: number;
+        lookAtLat: number;
+        lookAtLng: number;
+        pitchDeg?: number;
+        elevFt?: number;
+        followCam?: boolean;
+      } | null
+    ) => {
+      if (!sample) {
+        povObj.visible = false;
+        return;
+      }
+      const pos = frame.toWorld(sample.lat, sample.lng, 10);
+      povObj.position.copy(pos);
+      povEl.innerHTML = '';
+      const dot = document.createElement('i');
+      dot.className = 'ski-3d-pov-marker__dot';
+      const badge = document.createElement('span');
+      const pitchTxt = sample.pitchDeg != null ? `${sample.pitchDeg.toFixed(1)}°` : '';
+      const elevTxt = sample.elevFt != null ? `${Math.round(sample.elevFt).toLocaleString()} ft` : '';
+      badge.textContent = [pitchTxt, elevTxt].filter(Boolean).join(' · ') || 'Skier POV';
+      povEl.append(dot, badge);
+      povObj.visible = true;
+      if (sample.followCam) {
+        setPovPose({
+          lat: sample.lat,
+          lng: sample.lng,
+          lookAtLat: sample.lookAtLat,
+          lookAtLng: sample.lookAtLng,
+          liftM: 18,
+          lookLiftM: 2,
+        });
+      }
+    };
+
     controls.addEventListener('start', () => {
       goal.active = false;
       controls.autoRotate = false;
@@ -711,8 +904,16 @@ export default function TerrainScene(props: Props) {
       if (moved > 5) return;
       setNdc(ev);
       const hit = pick();
-      if (!hit) selectRef.current(null);
-      else if (runById.has(hit.id)) selectRef.current(hit.id);
+      if (!hit) {
+        selectRef.current(null);
+        selectLiftRef.current?.(null);
+      } else if (runById.has(hit.id)) {
+        selectRef.current(hit.id);
+      } else if (liftById.has(hit.id)) {
+        selectLiftRef.current?.(hit.id === styleRef.current.selectedLiftId ? null : hit.id);
+        const lh = liftById.get(hit.id);
+        if (lh) flyTo(lh.box, 0.55);
+      }
     };
     const canvas = renderer.domElement;
     canvas.addEventListener('pointermove', onMove);
@@ -723,8 +924,8 @@ export default function TerrainScene(props: Props) {
     let raf = 0;
     const tick = () => {
       if (goal.active) {
-        controls.target.lerp(goal.target, 0.085);
-        camera.position.lerp(goal.position, 0.085);
+        controls.target.lerp(goal.target, 0.12);
+        camera.position.lerp(goal.position, 0.12);
         if (camera.position.distanceTo(goal.position) < 0.004) goal.active = false;
       }
       controls.update();
@@ -777,11 +978,11 @@ export default function TerrainScene(props: Props) {
     };
     document.addEventListener('visibilitychange', vis);
 
-    api.current = { applyStyles, frameResort, frameRun, setOverlay };
+    api.current = { applyStyles, frameResort, frameRun, setOverlay, setPovMarker };
     worldRef.current = { scene, frame, terrainMat };
     if (live) setSceneEpoch((n) => n + 1);
     if (controlsOut.current) {
-      controlsOut.current.current = { frameTracks, frameRun, frameResort, setProgress, orbit };
+      controlsOut.current.current = { frameTracks, frameRun, frameResort, setProgress, orbit, setPovPose };
     }
     applyStyles(styleRef.current);
     setOverlay(overlayRef.current);
@@ -823,8 +1024,31 @@ export default function TerrainScene(props: Props) {
   }, [dem, trails, destinations]);
 
   useEffect(() => {
-    api.current?.applyStyles({ resortId, selectedRunId, previewRunId, matchIds });
-  }, [resortId, selectedRunId, previewRunId, matchIds]);
+    api.current?.applyStyles({
+      resortId,
+      selectedRunId,
+      previewRunId,
+      matchIds,
+      selectedLiftId,
+      lapRunIds,
+    });
+  }, [resortId, selectedRunId, previewRunId, matchIds, selectedLiftId, lapRunIds]);
+
+  useEffect(() => {
+    api.current?.setPovMarker(povSample || null);
+  }, [povSample, sceneEpoch]);
+
+  useEffect(() => {
+    const mat = worldRef.current?.terrainMat;
+    if (!mat) return;
+    const modeVal = activeOverlay === 'slope' ? 1 : activeOverlay === 'aspect' ? 2 : 0;
+    mat.uniforms.uOverlayMode.value = modeVal;
+    if (sunState) {
+      mat.uniforms.uLight.value.set(sunState.lightVec[0], sunState.lightVec[1], sunState.lightVec[2]);
+    } else {
+      mat.uniforms.uLight.value.set(-0.55, 0.75, -0.45);
+    }
+  }, [activeOverlay, sunState, sceneEpoch]);
 
   useEffect(() => {
     api.current?.setOverlay(overlayRef.current);
@@ -948,9 +1172,75 @@ export default function TerrainScene(props: Props) {
           <span>N</span>
         </div>
       </div>
+      {!lidar ? (
+        <div className="ski-terrain-lab" role="group" aria-label="Terrain shader and sun angle">
+          <div className="ski-terrain-lab__modes">
+            {(
+              [
+                ['natural', 'Natural'],
+                ['slope', 'Pitch Heatmap'],
+                ['aspect', 'Aspect Rose'],
+              ] as const
+            ).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                className={activeOverlay === id ? 'is-on' : ''}
+                aria-pressed={activeOverlay === id}
+                onClick={() => setTerrainOverlay(id)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <div className="ski-terrain-lab__sun">
+            <button
+              type="button"
+              className={activeSunHour != null ? 'is-on' : ''}
+              onClick={() => setSunHour(activeSunHour == null ? 9.5 : null)}
+              title="Toggle live sun-angle and snow-softening scrubber"
+            >
+              <i className="bi bi-sun-fill" aria-hidden="true" />{' '}
+              {sunState ? sunState.timeLabel : 'Sun Angle'}
+            </button>
+            {activeSunHour != null ? (
+              <input
+                type="range"
+                min={7}
+                max={17}
+                step={0.25}
+                value={activeSunHour}
+                aria-label="Time of day sun angle"
+                onChange={(e) => setSunHour(Number(e.target.value))}
+              />
+            ) : null}
+          </div>
+          {activeOverlay === 'slope' ? (
+            <div className="ski-terrain-lab__legend">
+              <span><i style={{ background: '#38b873' }} />&lt;15° Cruise</span>
+              <span><i style={{ background: '#3d8ff5' }} />15–26° Blue</span>
+              <span><i style={{ background: '#f5c23d' }} />27–33° Steep</span>
+              <span><i style={{ background: '#f25240' }} />34–40° Avy / Chute</span>
+              <span><i style={{ background: '#c238c7' }} />40°+ Cliff</span>
+            </div>
+          ) : activeOverlay === 'aspect' ? (
+            <div className="ski-terrain-lab__legend">
+              <span><i style={{ background: '#52c7f5' }} />North (Cold chalk)</span>
+              <span><i style={{ background: '#f5c74d' }} />East (AM sun)</span>
+              <span><i style={{ background: '#f26b57' }} />South (Spring corn)</span>
+              <span><i style={{ background: '#a370eb' }} />West (PM sun)</span>
+            </div>
+          ) : null}
+          {sunState ? (
+            <p className="ski-terrain-lab__summary">
+              {sunState.summary} · Sun alt {sunState.altitudeDeg}°, az {sunState.azimuthDeg}°
+            </p>
+          ) : null}
+        </div>
+      ) : null}
       <div className="ski-3d-foot">
         <p>
-          Drag to orbit · scroll to zoom · right-drag to pan · click a run
+          Drag to orbit · scroll to zoom · right-drag to pan · click a run or lift
           {runCount
             ? ` · ${runCount} runs, ${liftCount} lifts`
             : trails && trails.id === dem.id

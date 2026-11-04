@@ -211,6 +211,39 @@ export function deletePhoto(pass: TripPass, id: string) {
 }
 
 export function photoUrl(code: string, id: string, thumb = false) {
+  if (id.startsWith('demo-photo-')) {
+    const parts = id.split('-');
+    const riderId = Number(parts[2] || 1);
+    const palette: Record<number, { name: string; color: string; label: string }> = {
+      1: { name: 'Maya', color: '#7ec8e3', label: 'Summit Cornice Drop' },
+      2: { name: 'Brooks', color: '#5dbe8a', label: 'Mid-Mountain Bowl' },
+      3: { name: 'Kai', color: '#ffd166', label: 'North Ridge Trees' },
+      4: { name: 'Elena', color: '#ff7a59', label: 'Chalk Chute' },
+    };
+    const meta = palette[riderId] || palette[1];
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 420" width="640" height="420">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#071320"/>
+          <stop offset="65%" stop-color="#142d42"/>
+          <stop offset="100%" stop-color="#1e3c52"/>
+        </linearGradient>
+        <linearGradient id="snow" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#f2f8fc"/>
+          <stop offset="100%" stop-color="#9ab8ce"/>
+        </linearGradient>
+      </defs>
+      <rect width="640" height="420" fill="url(#sky)"/>
+      <circle cx="510" cy="88" r="38" fill="#ffd166" opacity="0.88"/>
+      <polygon points="0,330 160,150 320,280 470,120 640,295 640,420 0,420" fill="#182b3a"/>
+      <polygon points="80,350 250,165 410,305 540,155 640,275 640,420 0,420" fill="url(#snow)" opacity="0.92"/>
+      <path d="M 250 165 Q 290 255 210 385" stroke="${meta.color}" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="10 8"/>
+      <rect x="24" y="316" width="592" height="80" rx="14" fill="#071018" opacity="0.84" stroke="${meta.color}" stroke-width="2"/>
+      <text x="44" y="350" fill="#ffffff" font-family="system-ui, sans-serif" font-size="22" font-weight="700">${meta.label}</text>
+      <text x="44" y="378" fill="#9eb4c7" font-family="system-ui, sans-serif" font-size="16">Shot by ${meta.name} · Powder Crew Demo</text>
+    </svg>`;
+    return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  }
   return `${BASE}/trips/${encodeURIComponent(code)}/photos/${id}.jpg${thumb ? '?v=thumb' : ''}`;
 }
 

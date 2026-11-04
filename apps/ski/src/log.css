@@ -760,3 +760,142 @@
 .log-recap__empty p {
   margin: 0;
 }
+
+.log-recap__empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.log-demo-callout {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0 0 1.2rem;
+  padding: 0.9rem 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(126, 200, 227, 0.45);
+  background: linear-gradient(135deg, rgba(16, 26, 36, 0.96), rgba(14, 38, 54, 0.88));
+}
+
+.log-demo-callout strong {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: #fff;
+  font-size: 0.98rem;
+}
+
+.log-demo-callout p {
+  margin: 0;
+  color: var(--ski-muted);
+  font-size: 0.84rem;
+  line-height: 1.4;
+}
+
+.log-demo-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  padding: 0 1rem;
+  border-radius: 999px;
+  border: 0;
+  background: var(--ski-ice);
+  color: #071018;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.log-demo-resort {
+  min-height: 40px;
+  padding: 0 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--ski-line);
+  background: #0b141d;
+  color: var(--ski-ink);
+  font-size: 0.85rem;
+}
+
+.log-chase-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--ski-muted);
+}
+
+.log-chase-bar button {
+  --chip: var(--ski-ice);
+  min-height: 32px;
+  padding: 0 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--chip);
+  background: transparent;
+  color: var(--ski-ink);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.log-chase-bar button.is-on {
+  background: var(--chip);
+  color: #071018;
+  font-weight: 700;
+}
+
+.log-telemetry-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.45rem;
+}
+
+.log-telemetry-card {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 12px;
+  border: 1px solid var(--ski-line);
+  background: var(--ski-panel);
+  color: var(--ski-ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.log-telemetry-card.is-chased {
+  border-color: var(--ski-ice);
+  box-shadow: 0 0 0 1px var(--ski-ice);
+}
+
+.log-telemetry-card__top {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+}
+
+.log-telemetry-card__top strong {
+  flex: 1;
+}
+
+.log-telemetry-card__speed {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--ski-ice);
+}
+
+.log-telemetry-card__sub {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.35rem;
+  font-size: 0.73rem;
+  color: var(--ski-muted);
+}
+
+.log-telemetry-card__sub span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+

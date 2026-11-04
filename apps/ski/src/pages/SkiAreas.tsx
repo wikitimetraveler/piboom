@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import CaliforniaTable from '../components/CaliforniaTable';
 import ResortProfile from '../components/ResortProfile';
 import ApexLive from '../components/ApexLive';
@@ -11,6 +11,7 @@ import GoogleMapView from '../components/GoogleMapView';
 import MapModeSwitch, { useMapMode } from '../components/MapModeSwitch';
 import { useLidarCloud } from '../lib/lidar';
 import { boundsOf } from '../lib/googleMaps';
+import { findRunsOffLift, type RunSamplePoint } from '../lib/mountainAnalysis';
 import { demHeightFt, resortBaseView } from '../lib/terrainData';
 import type { BriefPayload, DemGrid, DestinationBrief, TrailsPayload } from '../lib/types';
 import { formatFt } from '../lib/goNoGo';
@@ -44,29 +45,50 @@ export default function SkiAreas(props: Props) {
   const [filter, setFilter] = useState<RunFilter>(EMPTY_FILTER);
   const [sort, setSort] = useState<SortKey>('vertical');
   const [previewRunId, setPreviewRunId] = useState<string | null>(null);
+  const [selectedLiftId, setSelectedLiftId] = useState<string | null>(null);
+  const [lapRunIds, setLapRunIds] = useState<string[]>([]);
+  const [povSample, setPovSample] = useState<(RunSamplePoint & { followCam?: boolean }) | null>(null);
   const [returnFrom, setReturnFrom] = useState<string | null>(null);
   const [flyRequest, setFlyRequest] = useState<string | null>(null);
   const [flying, setFlying] = useState(false);
   const showTable = view === 'state' || flying;
 
+  useEffect(() => {
+    setSelectedLiftId(null);
+    setLapRunIds([]);
+    setPovSample(null);
+  }, [selectedId]);
+
   const resortRuns = useMemo(
     () => (trails && dem && trails.id === dem.id ? trails.runs.filter((r) => r.resort === dest?.id) : []),
     [trails, dem, dest]
   );
-  const shown = useMemo(() => sortRuns(filterRuns(resortRuns, filter), sort), [resortRuns, filter, sort]);
-  const matchIds = useMemo(
-    () => (filterActive(filter) ? new Set(shown.map((r) => r.id)) : null),
-    [filter, shown]
+  const resortLifts = useMemo(
+    () => (trails && dem && trails.id === dem.id ? trails.lifts.filter((l) => l.resort === dest?.id) : []),
+    [trails, dem, dest]
   );
+  const shown = useMemo(() => sortRuns(filterRuns(resortRuns, filter), sort), [resortRuns, filter, sort]);
+  const liftReachIds = useMemo(() => {
+    if (!selectedLiftId) return null;
+    const lift = resortLifts.find((l) => l.id === selectedLiftId);
+    if (!lift) return null;
+    const reach = findRunsOffLift(lift, resortRuns, dem);
+    return new Set(reach.reachableRuns.map((r) => r.id));
+  }, [selectedLiftId, resortLifts, resortRuns, dem]);
+
+  const matchIds = useMemo(() => {
+    const filterSet = filterActive(filter) ? new Set(shown.map((r) => r.id)) : null;
+    if (filterSet && liftReachIds) {
+      return new Set([...filterSet].filter((id) => liftReachIds.has(id)));
+    }
+    return liftReachIds || filterSet;
+  }, [filter, shown, liftReachIds]);
+
   const selectedRun = resortRuns.find((r) => r.id === selectedRunId) || null;
   const [mapMode, setMapMode] = useMapMode();
   const { cloud: lidar, dense: lidarDense, note: lidarNote } = useLidarCloud(
     dest?.dem,
     mapMode === 'lidar' && !showTable
-  );
-  const resortLifts = useMemo(
-    () => (trails && dem && trails.id === dem.id ? trails.lifts.filter((l) => l.resort === dest?.id) : []),
-    [trails, dem, dest]
   );
   const resortBox = useMemo(() => {
     const pts = [...resortRuns.flatMap((r) => r.paths.flat()), ...resortLifts.flatMap((l) => l.coords)];
@@ -185,6 +207,10 @@ export default function SkiAreas(props: Props) {
                   previewRunId={previewRunId}
                   matchIds={matchIds}
                   onSelectRun={onSelectRun}
+                  selectedLiftId={selectedLiftId}
+                  onSelectLift={setSelectedLiftId}
+                  lapRunIds={lapRunIds}
+                  povSample={povSample}
                   lidar={mapMode === 'lidar' ? lidar : null}
                   lidarDense={mapMode === 'lidar' ? lidarDense : null}
                   lidarNote={mapMode === 'lidar' ? lidarNote : ''}
@@ -231,7 +257,19 @@ export default function SkiAreas(props: Props) {
 
       {!showTable ? (
         <section className="ski-detail-row">
-          <RunDetail run={selectedRun} onClear={() => onSelectRun(null)} />
+          <RunDetail
+            run={selectedRun}
+            onClear={() => onSelectRun(null)}
+            dem={dem}
+            allRuns={resortRuns}
+            allLifts={resortLifts}
+            selectedLiftId={selectedLiftId}
+            onSelectLift={setSelectedLiftId}
+            onSelectRun={onSelectRun}
+            lapRunIds={lapRunIds}
+            onLapRunIdsChange={setLapRunIds}
+            onPovSampleChange={setPovSample}
+          />
           <div className="ski-side-stack">
             <SummitForecast weather={dest?.googleWeather} />
             <ResortProfile dest={dest} />

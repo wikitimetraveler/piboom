@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import TerrainScene, { type OverlayPin, type OverlayTrack, type SceneControls } from '../TerrainScene';
+import { sampleRidersAtTimestamp } from '../../lib/demoCrewDay';
 import { exportKml, photoUrl, shareUrl } from '../../lib/logApi';
 import type { TripDay, TripPass } from '../../lib/logTypes';
-import { fmtClock, fmtDay, todayLocal } from '../../lib/logFormat';
+import { fmtClock, fmtDay, initials, todayLocal } from '../../lib/logFormat';
 import { areaName } from '../../lib/terrainData';
 import { fmtFt } from '../../lib/trails';
 import type { DestinationBrief } from '../../lib/types';
@@ -19,6 +20,7 @@ interface Props {
   loading: boolean;
   onGoSki: () => void;
   onChanged: () => void;
+  onLoadDemo?: () => void;
 }
 
 const REEL_MS = 20_000;
@@ -27,7 +29,17 @@ function prefersReducedMotion() {
   return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-export default function RecapPanel({ pass, day, date, onDate, destinations, loading, onGoSki, onChanged }: Props) {
+export default function RecapPanel({
+  pass,
+  day,
+  date,
+  onDate,
+  destinations,
+  loading,
+  onGoSki,
+  onChanged,
+  onLoadDemo,
+}: Props) {
   const resort = destinations.find((d) => d.id === pass.resortId);
   const [area, setArea] = useState<string | null>(null);
   const { areas, demId } = useTripAreas(day, resort, area);
@@ -37,6 +49,7 @@ export default function RecapPanel({ pass, day, date, onDate, destinations, load
   const [reduced] = useState(prefersReducedMotion);
   const [playing, setPlaying] = useState(false);
   const [t, setT] = useState(1);
+  const [chaseMemberId, setChaseMemberId] = useState<number | null>(null);
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -48,7 +61,11 @@ export default function RecapPanel({ pass, day, date, onDate, destinations, load
     () =>
       (day?.members || [])
         .filter((m) => m.track.length > 1)
-        .map((m) => ({ id: `m${m.id}`, color: m.color, points: m.track.map(([lat, lng]) => [lat, lng] as [number, number]) })),
+        .map((m) => ({
+          id: `m${m.id}`,
+          color: m.color,
+          points: m.track.map(([lat, lng]) => [lat, lng] as [number, number]),
+        })),
     [day]
   );
 
@@ -60,12 +77,19 @@ export default function RecapPanel({ pass, day, date, onDate, destinations, load
   }, [day, crew]);
 
   const playheadTs = span ? span.from + t * (span.to - span.from) : Infinity;
+  const liveRiders = useMemo(
+    () => sampleRidersAtTimestamp(day, playheadTs, dem),
+    [day, playheadTs, dem]
+  );
   const shownPhotos = (day?.photos || []).filter((p) => p.lat != null && p.lng != null && p.ts <= playheadTs);
   const shownKey = shownPhotos.map((p) => p.id).join(',');
+  const riderPinKey = liveRiders
+    .map((r) => `${r.memberId}:${r.lat.toFixed(4)},${r.lng.toFixed(4)}`)
+    .join('|');
 
   const pins = useMemo<OverlayPin[]>(
-    () =>
-      shownPhotos.map((p) => {
+    () => {
+      const photoPins: OverlayPin[] = shownPhotos.map((p) => {
         const by = day?.members.find((m) => m.id === p.memberId);
         return {
           id: p.id,
@@ -76,11 +100,38 @@ export default function RecapPanel({ pass, day, date, onDate, destinations, load
           label: p.caption || `Photo by ${by?.name || 'the crew'}`,
           imageUrl: photoUrl(pass.code, p.id, true),
         };
-      }),
-    // shownKey captures which photos are visible; rebuilding on every frame would thrash the scene.
+      });
+      const crewPins: OverlayPin[] = liveRiders.map((r) => ({
+        id: `live-rider-${r.memberId}`,
+        kind: 'crew',
+        lat: r.lat,
+        lng: r.lng,
+        color: r.color,
+        label: initials(r.name),
+      }));
+      return [...photoPins, ...crewPins];
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [shownKey, day, pass.code]
+    [shownKey, riderPinKey, day, pass.code]
   );
+
+  const chasedRider = useMemo(
+    () => (chaseMemberId != null ? liveRiders.find((r) => r.memberId === chaseMemberId) || null : null),
+    [chaseMemberId, liveRiders]
+  );
+
+  useEffect(() => {
+    if (!chasedRider) return;
+    controls.current?. orbit(false);
+    controls.current?.setPovPose?.({
+      lat: chasedRider.lat,
+      lng: chasedRider.lng,
+      lookAtLat: chasedRider.lookLat,
+      lookAtLng: chasedRider.lookLng,
+      liftM: 28,
+      lookLiftM: 4,
+    });
+  }, [chasedRider]);
 
   const stop = () => {
     cancelAnimationFrame(raf.current);
@@ -102,8 +153,10 @@ export default function RecapPanel({ pass, day, date, onDate, destinations, load
     if (!c) return;
     const startAt = t >= 1 ? 0 : t;
     const began = performance.now() - startAt * REEL_MS;
-    c.frameTracks();
-    c.orbit(true);
+    if (chaseMemberId == null) {
+      c.frameTracks();
+      c.orbit(true);
+    }
     setPlaying(true);
     let lastPct = -1;
     const step = (now: number) => {
@@ -174,9 +227,16 @@ export default function RecapPanel({ pass, day, date, onDate, destinations, load
       {!loading && !hasDay ? (
         <div className="log-recap__empty">
           <p>No runs logged on this day yet.</p>
-          <button type="button" className="log-ghost" onClick={onGoSki}>
-            Go to Ski
-          </button>
+          <div className="log-recap__empty-actions">
+            <button type="button" className="log-ghost" onClick={onGoSki}>
+              Go to Ski
+            </button>
+            {onLoadDemo ? (
+              <button type="button" className="log-demo-btn" onClick={onLoadDemo}>
+                <i className="bi bi-play-circle-fill" aria-hidden="true" /> Load 4-Rider Demo Day
+              </button>
+            ) : null}
+          </div>
         </div>
       ) : null}
 
@@ -198,6 +258,33 @@ export default function RecapPanel({ pass, day, date, onDate, destinations, load
               {areas.map((a) => (
                 <button key={a} type="button" className={a === demId ? 'is-on' : ''} onClick={() => setArea(a)}>
                   {areaName(a)}
+                </button>
+              ))}
+            </div>
+          ) : null}
+
+          {liveRiders.length > 0 ? (
+            <div className="log-chase-bar" role="group" aria-label="3D Camera View">
+              <span>Camera:</span>
+              <button
+                type="button"
+                className={chaseMemberId == null ? 'is-on' : ''}
+                onClick={() => {
+                  setChaseMemberId(null);
+                  controls.current?.frameTracks();
+                }}
+              >
+                Mountain Orbit
+              </button>
+              {liveRiders.map((r) => (
+                <button
+                  key={r.memberId}
+                  type="button"
+                  className={chaseMemberId === r.memberId ? 'is-on' : ''}
+                  style={{ '--chip': r.color } as React.CSSProperties}
+                  onClick={() => setChaseMemberId(chaseMemberId === r.memberId ? null : r.memberId)}
+                >
+                  Chase {r.name}
                 </button>
               ))}
             </div>
@@ -230,7 +317,10 @@ export default function RecapPanel({ pass, day, date, onDate, destinations, load
                 <p className="log-note">Motion is reduced on this device, so the whole day is drawn at once.</p>
               ) : (
                 <button type="button" className="log-recap__play" onClick={playing ? stop : play} disabled={!dem}>
-                  <i className={`bi ${playing ? 'bi-pause-fill' : t >= 1 ? 'bi-arrow-counterclockwise' : 'bi-play-fill'}`} aria-hidden="true" />
+                  <i
+                    className={`bi ${playing ? 'bi-pause-fill' : t >= 1 ? 'bi-arrow-counterclockwise' : 'bi-play-fill'}`}
+                    aria-hidden="true"
+                  />
                   {playing ? 'Pause' : t >= 1 ? 'Replay the day' : 'Play'}
                 </button>
               )}
@@ -248,6 +338,30 @@ export default function RecapPanel({ pass, day, date, onDate, destinations, load
           ) : (
             <p className="log-note">Check-ins only today, so there are no GPS tracks to fly along.</p>
           )}
+
+          {liveRiders.length > 0 ? (
+            <div className="log-telemetry-strip" aria-label="Live rider telemetry">
+              {liveRiders.map((r) => (
+                <button
+                  key={r.memberId}
+                  type="button"
+                  className={`log-telemetry-card${chaseMemberId === r.memberId ? ' is-chased' : ''}`}
+                  onClick={() => setChaseMemberId(chaseMemberId === r.memberId ? null : r.memberId)}
+                  title="Click to lock 3D chase cam on this rider"
+                >
+                  <div className="log-telemetry-card__top">
+                    <span className="log-board__dot" style={{ background: r.color }} />
+                    <strong>{r.name}</strong>
+                    <span className="log-telemetry-card__speed">{r.speedMph} mph</span>
+                  </div>
+                  <div className="log-telemetry-card__sub">
+                    <span>{r.activityLabel}</span>
+                    <small>{r.elevFt.toLocaleString()} ft</small>
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : null}
 
           <StatGrid stats={crew} />
           {crew.longestRun ? (

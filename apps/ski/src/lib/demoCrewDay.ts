@@ -72,9 +72,6 @@ function densifyPath(coords: LatLng[], targetPoints = 24): LatLng[] {
   return out;
 }
 
-/**
- * Generates a rich, multi-rider synthetic powder day using real runs and lifts from the active mountain.
- */
 export function buildDemoCrewDay(
   resortId: string,
   date: string,
@@ -97,7 +94,6 @@ export function buildDemoCrewDay(
     { id: 4, name: 'Elena', color: '#ff7a59', speedBase: 39, runIndices: [0, 3, 1, 4, 2] },
   ];
 
-  // 9:00 AM Pacific on the chosen date
   const baseEpoch = Date.parse(`${date}T09:00:00-08:00`) || Date.now() - 4 * 3600_000;
   const demId = dem?.id || dest?.dem || 'mammoth';
 
@@ -131,7 +127,6 @@ export function buildDemoCrewDay(
       const runPts = densifyPath(orientTopToBottom(chosenRun, dem), 28);
       if (runPts.length < 2) continue;
 
-      // Optional lift ride up before the run
       if (lift && lift.coords.length >= 2) {
         const liftStart = cursorTs;
         const liftDurS = 380;
@@ -163,7 +158,6 @@ export function buildDemoCrewDay(
         cursorTs += (liftDurS + 45) * 1000;
       }
 
-      // Ski run descent
       const runStart = cursorTs;
       const runDurS = 240 + (lap % 3) * 45;
       for (let i = 0; i < runPts.length; i++) {
@@ -221,11 +215,9 @@ export function buildDemoCrewDay(
         resort: resortId,
       });
 
-      // Drop a scenic photo pin mid-run on select laps
       if (lap === 1 && rIdx < 3) {
         const midPt = runPts[Math.floor(runPts.length * 0.45)];
         const midTs = Math.round(runStart + runDurS * 450);
-        const elevFt = dem ? Math.round(demHeightFt(dem, midPt[0], midPt[1])) : Math.round(chosenRun.topFt ?? 8500);
         const photoId = `demo-photo-${rider.id}-${lap}`;
         photos.push({
           id: photoId,
@@ -237,7 +229,7 @@ export function buildDemoCrewDay(
           demId,
           runId: chosenRun.id,
           runName: rName,
-          caption: `${rider.name} dropping into ${rName} (${ makeSvgPhotoDataUri(rName, `Shot by ${rider.name}`, rider.color, `${elevFt.toLocaleString()} ft`) ? 'fresh chalk' : '' })`,
+          caption: `${rider.name} on ${rName}`,
           width: 640,
           height: 420,
         });
@@ -267,12 +259,6 @@ export function buildDemoCrewDay(
       track,
       lastFix: lastPt ? { ts: lastPt[2], lat: lastPt[0], lng: lastPt[1] } : null,
     });
-  }
-
-  // Fix photo captions cleanly and store SVG preview map
-  for (const p of photos) {
-    const m = members.find((x) => x.id === p.memberId);
-    p.caption = `${m?.name || 'Crew'} on ${p.runName || 'the ridge'}`;
   }
 
   const leaderboard = members
@@ -347,9 +333,6 @@ export interface RiderLiveState {
   activityLabel: string;
 }
 
-/**
- * Samples each rider's instantaneous GPS position, speed, and active run/lift at `playheadTs`.
- */
 export function sampleRidersAtTimestamp(
   day: TripDay | null,
   playheadTs: number,

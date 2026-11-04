@@ -1412,3 +1412,332 @@ body {
     top: 3rem;
   }
 }
+
+/* ---- Terrain Shader Lab (Pitch Heatmap, Aspect Rose & Sun Scrubber) ---- */
+
+.ski-terrain-lab {
+  position: absolute;
+  left: 0.7rem;
+  bottom: 4.3rem;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.65rem;
+  max-width: calc(100% - 1.4rem);
+  padding: 0.42rem 0.6rem;
+  border-radius: 12px;
+  background: rgba(7, 16, 24, 0.86);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--ski-line);
+  touch-action: auto;
+}
+
+.ski-terrain-lab__modes,
+.ski-terrain-lab__sun {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.ski-terrain-lab button {
+  min-height: 28px;
+  padding: 0 0.65rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ski-muted);
+  font-size: 0.73rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ski-terrain-lab button:hover,
+.ski-terrain-lab button:focus-visible {
+  color: var(--ski-ink);
+  border-color: var(--ski-line);
+}
+
+.ski-terrain-lab button.is-on {
+  background: var(--ski-ice);
+  color: #071018;
+}
+
+.ski-terrain-lab__sun input[type='range'] {
+  width: 96px;
+  accent-color: #ffd166;
+}
+
+.ski-terrain-lab__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.65rem;
+  flex-basis: 100%;
+  font-size: 0.69rem;
+  color: var(--ski-ink);
+}
+
+.ski-terrain-lab__legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.ski-terrain-lab__legend i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.ski-terrain-lab__summary {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 0.7rem;
+  color: #ffd166;
+}
+
+/* ---- 3D Skier POV Beacon & Run Fly-Through ---- */
+
+.ski-3d-pov-marker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transform: translateY(-0.9rem);
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(7, 16, 24, 0.92);
+  border: 1.5px solid #5dbe8a;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ski-3d-pov-marker__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #5dbe8a;
+  box-shadow: 0 0 8px #5dbe8a;
+}
+
+.ski-pov-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.4rem 0 0.5rem;
+}
+
+.ski-pov-btn,
+.ski-lap-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 34px;
+  padding: 0 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--ski-ice);
+  background: rgba(126, 200, 227, 0.14);
+  color: var(--ski-ink);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ski-pov-btn.is-on {
+  background: var(--ski-ice);
+  color: #071018;
+}
+
+.ski-lap-add {
+  border-color: rgba(93, 190, 138, 0.55);
+  background: rgba(93, 190, 138, 0.12);
+}
+
+.ski-lap-add.is-on {
+  background: var(--ski-go);
+  color: #071018;
+  border-color: var(--ski-go);
+}
+
+.ski-pov-cam-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: var(--ski-muted);
+  cursor: pointer;
+}
+
+.ski-pov-scrubber {
+  display: grid;
+  gap: 0.25rem;
+  margin-bottom: 0.65rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 10px;
+  background: rgba(7, 16, 24, 0.55);
+  border: 1px solid var(--ski-line);
+}
+
+.ski-pov-scrubber input[type='range'] {
+  width: 100%;
+  accent-color: var(--ski-ice);
+}
+
+.ski-pov-telemetry {
+  font-size: 0.74rem;
+  color: var(--ski-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.ski-pov-telemetry strong {
+  color: var(--ski-ink);
+}
+
+.ski-run-profile {
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.ski-run-profile__readout {
+  fill: #ffffff;
+  font-size: 8.5px;
+  font-weight: 700;
+}
+
+/* ---- Lift-to-Run Explorer & Custom Lap Builder ---- */
+
+.ski-lift-builder {
+  margin-top: 0.9rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--ski-line);
+  display: grid;
+  gap: 0.65rem;
+}
+
+.ski-lift-builder__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.45rem;
+}
+
+.ski-lift-builder__head h4 {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--ski-ink);
+}
+
+.ski-lift-builder__head select {
+  padding: 0.32rem 0.55rem;
+  border-radius: 8px;
+  border: 1px solid var(--ski-line);
+  background: #0b141c;
+  color: var(--ski-ink);
+  font-size: 0.78rem;
+}
+
+.ski-lift-reach__meta {
+  margin: 0 0 0.45rem;
+  font-size: 0.78rem;
+  color: var(--ski-muted);
+}
+
+.ski-lift-reach__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.ski-lift-reach__item {
+  display: inline-flex;
+  align-items: stretch;
+  border-radius: 8px;
+  border: 1px solid var(--ski-line);
+  background: #0b141c;
+  overflow: hidden;
+}
+
+.ski-lift-reach__item > button:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.28rem 0.55rem;
+  border: 0;
+  background: transparent;
+  color: var(--ski-ink);
+  font-size: 0.74rem;
+  cursor: pointer;
+}
+
+.ski-lift-reach__item > button:first-child.is-on {
+  background: rgba(126, 200, 227, 0.2);
+}
+
+.ski-lift-reach__item small {
+  color: var(--ski-muted);
+  font-size: 0.68rem;
+}
+
+.ski-lift-reach__add {
+  border: 0;
+  border-left: 1px solid var(--ski-line);
+  padding: 0 0.5rem;
+  background: transparent;
+  color: var(--ski-ice);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ski-lift-reach__add.is-on {
+  background: var(--ski-go);
+  color: #071018;
+}
+
+.ski-lap-card {
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid rgba(93, 190, 138, 0.45);
+  background: rgba(93, 190, 138, 0.08);
+  display: grid;
+  gap: 0.4rem;
+}
+
+.ski-lap-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+}
+
+.ski-lap-card__head button {
+  border: 0;
+  background: transparent;
+  color: var(--ski-muted);
+  font-size: 0.74rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.ski-lap-card__route {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--ski-ice);
+}
+
+.ski-lap-card__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.9rem;
+  font-size: 0.76rem;
+  color: var(--ski-muted);
+}
+
+.ski-lap-card__stats strong {
+  color: var(--ski-ink);
+}
+

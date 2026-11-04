@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createDemoPass } from '../../lib/demoCrewDay';
 import { createTrip, joinTrip, listPasses, previewTrip, switchPass } from '../../lib/logApi';
 import type { TripPass } from '../../lib/logTypes';
 import type { DestinationBrief } from '../../lib/types';
@@ -84,6 +85,26 @@ export default function TripGate({ destinations, selectedId, onSelect, onReady }
       <p className="log-lede">
         Log every run on the real trail map, see the crew on the mountain, and get a recap at the end of the day.
       </p>
+
+      <div className="log-demo-callout">
+        <div>
+          <strong>Want to see a full day in action?</strong>
+          <p>
+            Launch a 4-rider powder day at {resortName(resortId || selectedId || 'mammoth')} with GPS tracks, photo pins,
+            live speedometer, and 3D chase-cam replay.
+          </p>
+        </div>
+        <button
+          type="button"
+          className="log-demo-btn"
+          onClick={() => {
+            const targetResort = resortId || selectedId || 'mammoth';
+            onReady(createDemoPass(targetResort, resortName(targetResort)));
+          }}
+        >
+          <i className="bi bi-play-circle-fill" aria-hidden="true" /> Try Instant Demo Crew Day
+        </button>
+      </div>
 
       {saved.length ? (
         <div className="log-saved">
