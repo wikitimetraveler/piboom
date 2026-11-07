@@ -163,7 +163,9 @@ export default function SkiCams({ destinations, selectedId, onSelect }: Props) {
         ))}
       </nav>
       {error ? <p className="ski-disclaimer">{error}</p> : null}
-      {current ? (
+      {!resortId ? (
+        <p className="ski-empty">Select a ski area above to load its official, mountain, and highway webcams.</p>
+      ) : current ? (
         <>
           <section className="ski-cam-group" aria-label="Official resort cams">
             <h2>{current.resort.name} official cams</h2>

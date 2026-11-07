@@ -23,8 +23,16 @@ export default function DriveDesk({ brief, dest, selectedId, onSelect, stops }: 
         <p className="ski-disclaimer">{brief.disclaimer}</p>
       </header>
       <WeatherBoard destinations={brief.destinations} selectedId={selectedId} onSelect={onSelect} />
-      <DrivePanel dest={dest} homeName={brief.home.name} />
-      <OnTheWay stops={stops} />
+      {dest ? (
+        <>
+          <DrivePanel dest={dest} homeName={brief.home.name} />
+          <OnTheWay stops={stops} />
+        </>
+      ) : (
+        <p className="ski-empty">
+          Select a ski area above to load its drive route, chain-control highways, and stops along the way.
+        </p>
+      )}
     </>
   );
 }

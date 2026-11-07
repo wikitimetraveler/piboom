@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { CALIFORNIA_OUTLINE, FT_TO_KM, tableXZ } from '../lib/california';
-import type { BriefPayload, DemGrid, DestinationBrief } from '../lib/types';
+import type { BriefPayload, DestinationBrief } from '../lib/types';
 import FullscreenButton from './FullscreenButton';
 
 interface Props {
@@ -86,23 +86,46 @@ function elevColor(ft: number, out: THREE.Color) {
   out.copy(chaparral).lerp(forest, smooth(5500, 6400, ft)).lerp(snow, smooth(6650, 7350, ft));
 }
 
-function nearestFt(dem: DemGrid, lat: number, lng: number): number {
-  const r = Math.round(((lat - dem.south) / (dem.north - dem.south)) * (dem.rows - 1));
-  const c = Math.round(((lng - dem.west) / (dem.east - dem.west)) * (dem.cols - 1));
-  const rr = Math.min(dem.rows - 1, Math.max(0, r));
-  const cc = Math.min(dem.cols - 1, Math.max(0, c));
-  return dem.heights[rr * dem.cols + cc];
-}
-
-/** One terrain block cut from the DEM, with skirts down to the table, centred on its own footprint. */
-function buildModel(dem: DemGrid) {
-  const step = Math.max(1, Math.ceil(dem.cols / 64));
-  const cols = Math.floor((dem.cols - 1) / step) + 1;
-  const rows = Math.floor((dem.rows - 1) / step) + 1;
-  const center = tableXZ((dem.south + dem.north) / 2, (dem.west + dem.east) / 2);
+/**
+ * Lightweight 3D mountain block synthesized from the area's resort coordinates and elevations
+ * so the California overview renders immediately without downloading every area's full DEM grid.
+ */
+function buildAreaModel(demId: string, here: DestinationBrief[]) {
+  const lats = here.flatMap((d) => [d.lat, d.summitLat ?? d.lat]);
+  const lngs = here.flatMap((d) => [d.lng, d.summitLng ?? d.lng]);
+  const south = Math.min(...lats) - 0.032;
+  const north = Math.max(...lats) + 0.032;
+  const west = Math.min(...lngs) - 0.038;
+  const east = Math.max(...lngs) + 0.038;
+  const cols = 28;
+  const rows = 28;
+  const center = tableXZ((south + north) / 2, (west + east) / 2);
   const local = (lat: number, lng: number) => {
     const p = tableXZ(lat, lng);
     return { x: (p.x - center.x) * MODEL_SCALE, z: (p.z - center.z) * MODEL_SCALE };
+  };
+
+  const baseValleyFt = Math.max(DATUM_FT + 400, Math.min(...here.map((d) => d.baseFt)) - 900);
+  const peaks = here.map((d) => ({
+    sLat: d.summitLat ?? d.lat,
+    sLng: d.summitLng ?? d.lng,
+    bLat: d.lat,
+    bLng: d.lng,
+    summitFt: d.summitFt,
+    baseFt: d.baseFt,
+  }));
+
+  const heightAt = (lat: number, lng: number) => {
+    let ft = baseValleyFt;
+    for (const pk of peaks) {
+      const dSum = Math.hypot((lat - pk.sLat) * 111, (lng - pk.sLng) * 92);
+      const dBase = Math.hypot((lat - pk.bLat) * 111, (lng - pk.bLng) * 92);
+      const sumContrib = (pk.summitFt - baseValleyFt) * Math.exp(-(dSum * dSum) / 4.2);
+      const ridgeContrib = (pk.baseFt - baseValleyFt) * 0.65 * Math.exp(-(dBase * dBase) / 6.5);
+      const candidate = baseValleyFt + Math.max(sumContrib, ridgeContrib);
+      if (candidate > ft) ft = candidate;
+    }
+    return ft;
   };
 
   const positions: number[] = [];
@@ -110,12 +133,10 @@ function buildModel(dem: DemGrid) {
   const color = new THREE.Color();
   const top: THREE.Vector3[] = [];
   for (let r = 0; r < rows; r++) {
-    const sr = Math.min(r * step, dem.rows - 1);
-    const lat = dem.south + (sr / (dem.rows - 1)) * (dem.north - dem.south);
+    const lat = south + (r / (rows - 1)) * (north - south);
     for (let c = 0; c < cols; c++) {
-      const sc = Math.min(c * step, dem.cols - 1);
-      const lng = dem.west + (sc / (dem.cols - 1)) * (dem.east - dem.west);
-      const ft = dem.heights[sr * dem.cols + sc];
+      const lng = west + (c / (cols - 1)) * (east - west);
+      const ft = heightAt(lat, lng);
       const p = local(lat, lng);
       const v = new THREE.Vector3(p.x, modelY(ft), p.z);
       top.push(v);
@@ -155,7 +176,7 @@ function buildModel(dem: DemGrid) {
   skirt.setAttribute('position', new THREE.Float32BufferAttribute(wall, 3));
   skirt.computeVertexNormals();
 
-  return { surface, skirt, center, local };
+  return { id: demId, surface, skirt, center, local, heightAt };
 }
 
 function poseOf(camera: THREE.Camera, target: THREE.Vector3): Pose {
@@ -190,29 +211,18 @@ async function fetchJson<T>(url: string): Promise<T> {
 }
 
 interface TableData {
-  dems: DemGrid[];
   routes: Waypoint[][];
 }
 
-const tableData = new Map<string, Promise<TableData>>();
+let cachedRoutes: Promise<TableData> | null = null;
 
-function loadTable(demIds: string): Promise<TableData> {
-  if (!tableData.has(demIds)) {
-    const dems = Promise.all(
-      demIds.split(',').map((id) => fetchJson<DemGrid>(`/data/ski/${id}-dem.json`).catch(() => null))
-    );
-    const routes = fetchJson<Record<string, { waypoints: Waypoint[] }>>('/data/ski/routes.json')
-      .then((r) => Object.values(r).map((x) => x.waypoints || []))
-      .catch(() => [] as Waypoint[][]);
-    tableData.set(
-      demIds,
-      Promise.all([dems, routes]).then(([list, wps]) => ({
-        dems: list.filter((d): d is DemGrid => Boolean(d)),
-        routes: wps,
-      }))
-    );
+function loadTableRoutes(): Promise<TableData> {
+  if (!cachedRoutes) {
+    cachedRoutes = fetchJson<Record<string, { waypoints: Waypoint[] }>>('/data/ski/routes.json')
+      .then((r) => ({ routes: Object.values(r).map((x) => x.waypoints || []) }))
+      .catch(() => ({ routes: [] as Waypoint[][] }));
   }
-  return tableData.get(demIds)!;
+  return cachedRoutes;
 }
 
 export default function CaliforniaTable({ destinations, home, returnFrom, flyRequest, onFlyStart, onArrive }: Props) {
@@ -231,20 +241,19 @@ export default function CaliforniaTable({ destinations, home, returnFrom, flyReq
   ]);
 
   useEffect(() => {
-    if (!demIds) return;
     let live = true;
-    loadTable(demIds).then((d) => {
+    loadTableRoutes().then((d) => {
       if (live) setData(d);
     });
     return () => {
       live = false;
     };
-  }, [demIds]);
+  }, []);
 
   useEffect(() => {
     const el = host.current;
-    if (!el || !data) return;
-    const { dems, routes } = data;
+    if (!el || !data || !demIds) return;
+    const { routes } = data;
     const { destinations, home, returnFrom } = latest.current;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const width = Math.max(el.clientWidth, 280);
@@ -377,26 +386,26 @@ export default function CaliforniaTable({ destinations, home, returnFrom, flyReq
       tween(poseOf(camera, controls.target), to, FLY_S, () => cb.current.onArrive(id));
     };
 
-    for (const dem of dems) {
-      const model = buildModel(dem);
+    for (const demId of demIds.split(',').filter(Boolean)) {
+      const here = destinations.filter((d) => d.dem === demId);
+      if (!here.length) continue;
+      const model = buildAreaModel(demId, here);
       const group = new THREE.Group();
       group.position.set(model.center.x, 0, model.center.z);
       const surface = new THREE.Mesh(keep(model.surface), surfaceMat);
-      surface.userData.dem = dem.id;
+      surface.userData.dem = model.id;
       group.add(surface, new THREE.Mesh(keep(model.skirt), skirtMat));
       scene.add(group);
       pickables.push(surface);
 
-      const here = destinations.filter((d) => d.dem === dem.id);
       let topY = 0;
       for (const d of here) {
         const p = model.local(d.lat, d.lng);
-        const a = new THREE.Vector3(model.center.x + p.x, modelY(nearestFt(dem, d.lat, d.lng)), model.center.z + p.z);
+        const a = new THREE.Vector3(model.center.x + p.x, modelY(model.heightAt(d.lat, d.lng)), model.center.z + p.z);
         anchors.set(d.id, a);
         topY = Math.max(topY, a.y);
         bounds.expandByPoint(a);
       }
-      if (!here.length) continue;
 
       const tag = document.createElement('div');
       tag.className = 'ski-table-label';

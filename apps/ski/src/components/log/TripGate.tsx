@@ -33,10 +33,8 @@ export default function TripGate({ destinations, selectedId, onSelect, onReady }
   useEffect(() => {
     if (selectedId && (!destinations.length || destinations.some((d) => d.id === selectedId))) {
       setResortId(selectedId);
-      return;
     }
-    if (!resortId && destinations.length) setResortId(destinations[0].id);
-  }, [destinations, selectedId, resortId]);
+  }, [destinations, selectedId]);
 
   useEffect(() => {
     const clean = code.replace(/[^A-Za-z0-9]/g, '');
@@ -153,11 +151,13 @@ export default function TripGate({ destinations, selectedId, onSelect, onReady }
               Resort
               <select
                 value={resortId}
+                required
                 onChange={(e) => {
                   setResortId(e.target.value);
-                  onSelect(e.target.value);
+                  if (e.target.value) onSelect(e.target.value);
                 }}
               >
+                <option value="">Select a ski area…</option>
                 {destinations.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.name}
@@ -193,7 +193,11 @@ export default function TripGate({ destinations, selectedId, onSelect, onReady }
         )}
 
         {error ? <p className="log-error">{error}</p> : null}
-        <button type="submit" className="log-primary" disabled={busy || !displayName.trim() || (mode === 'join' && !preview)}>
+        <button
+          type="submit"
+          className="log-primary"
+          disabled={busy || !displayName.trim() || (mode === 'start' ? !resortId : !preview)}
+        >
           {busy ? 'One sec…' : mode === 'start' ? 'Start trip' : 'Join trip'}
         </button>
       </form>
