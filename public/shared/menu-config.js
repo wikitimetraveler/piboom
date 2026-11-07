@@ -145,6 +145,7 @@
     { href: '/egypt/', icon: 'bi-globe-central-south-asia', label: 'Egypt', title: 'Egypt — bilingual history, food, music, café and living culture atlas with Omar (no login)' },
     { href: '/silk-road/', icon: 'bi-signpost-split', label: 'Silk Road', title: 'Silk Road — bilingual caravan journey through all eight atlases, guide to guide (no login)' },
     { href: '/nature/nature-hub.html', icon: 'bi-tree-fill', label: 'Nature Hub', title: 'Trees, critters, fish, rocks, ski topo, The Valley, Dinosaur Hall' },
+    { href: '/corgi/', icon: 'bi-hearts', label: 'Crouton', title: 'Crouton — Cardigan Welsh Corgi × Aussie feeding tracker, treats, and fun facts' },
     { href: '/gse-analyzer.html', icon: 'bi-graph-up-arrow', label: 'GSE scenario analyzer' },
     { href: '/bike-store-home.html', icon: 'bi-bicycle', label: 'Bike Store' },
     { href: '/ai/voice-dj.html', icon: 'bi-mic', label: 'Wolfman Dave' },
@@ -266,6 +267,7 @@
 
   /** Nature hub tool grid */
   const NATURE_TOOLS = [
+    { href: '/corgi/', icon: 'bi-hearts', label: 'Crouton', title: 'Crouton — Cardigan Welsh Corgi × Aussie bucket feeder, treats, QR lid, and fun facts' },
     { href: '/local/local-spots.html#fvThrift', icon: 'bi-shop', label: 'Thrift near home', title: 'Thrift stores within 30 miles of Fountain Valley or Hesperia, with a map and directions' },
     { href: '/ski/', icon: 'bi-signpost-2', label: 'Ski Drive', title: 'Fountain Valley drive desk — weather, chains, on-the-way stops' },
     { href: '/ski/areas', icon: 'bi-snow2', label: 'Ski Areas', title: 'Wrightwood and Big Bear ski-area topography — DEM, slope, aspect' },

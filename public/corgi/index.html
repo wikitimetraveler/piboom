@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#7c3f18" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Crouton" />
+  <title>Crouton — Cardigan Welsh Corgi × Aussie Bucket Tracker & Fun Facts</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="/corgi/css/corgi.css" />
+</head>
+<body>
+  <!-- Sticky Phone App Header -->
+  <header class="crouton-appbar no-print">
+    <div class="container crouton-shell d-flex align-items-center justify-content-between py-2">
+      <div class="d-flex align-items-center gap-2">
+        <div class="crouton-avatar-badge" aria-hidden="true">🍞</div>
+        <div>
+          <div class="d-flex align-items-center gap-2">
+            <h1 class="crouton-title mb-0">Crouton</h1>
+            <span class="badge crouton-breed-pill">Brown Cardigan Corgi × Aussie</span>
+          </div>
+          <div class="crouton-subtitle">Bucket Lid Scanner • 8 AM &amp; 5 PM (1 Cup Each)</div>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <button id="btnJumpQr" type="button" class="btn btn-sm crouton-icon-btn" title="Food Bucket Lid QR Code">
+          <i class="bi bi-qr-code-scan"></i>
+          <span class="d-none d-sm-inline ms-1">Lid QR</span>
+        </button>
+        <button id="btnRefresh" type="button" class="btn btn-sm crouton-icon-btn" title="Refresh status">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container crouton-shell py-3 pb-5 no-print">
+    <!-- Scan Alert Toast / Banner -->
+    <div id="scanModeNotice" class="crouton-scan-pill d-none mb-3" role="status">
+      <i class="bi bi-qr-code me-1"></i>
+      <span><strong>Bucket Lid Scanned!</strong> Check Crouton's status below before scooping.</span>
+    </div>
+
+    <!-- #1 LIVE BUCKET LID STATUS BANNER (Hero Guardrail) -->
+    <section id="statusHeroCard" class="crouton-status-hero status-ready mb-3" aria-live="polite">
+      <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+        <span id="statusBadgePill" class="crouton-state-tag">
+          <i class="bi bi-shield-check me-1"></i> CHECKING BUCKET...
+        </span>
+        <span id="currentClockLabel" class="crouton-clock-pill">--:--</span>
+      </div>
+
+      <h2 id="statusHeadline" class="crouton-hero-headline mb-1">
+        Loading Crouton's feeding log...
+      </h2>
+      <p id="statusSubline" class="crouton-hero-subline mb-3">
+        Checking if David, Tina, or Hieu already scooped from the bucket.
+      </p>
+
+      <!-- Last Fed & Last Treat Readout Boxes -->
+      <div class="row g-2">
+        <div class="col-12 col-sm-7">
+          <div class="crouton-last-box">
+            <div class="crouton-last-label">
+              <i class="bi bi-cup-hot-fill me-1"></i> LAST MAIN MEAL SCOOP
+            </div>
+            <div id="lastMealMainText" class="crouton-last-main">No meals logged yet</div>
+            <div id="lastMealMetaText" class="crouton-last-meta">Target: 1 cup @ ~8 AM &amp; 1 cup @ ~5 PM</div>
+          </div>
+        </div>
+        <div class="col-12 col-sm-5">
+          <div class="crouton-last-box crouton-last-treat-box">
+            <div class="crouton-last-label">
+              <i class="bi bi-stars me-1"></i> LAST TREAT NOTE
+            </div>
+            <div id="lastTreatMainText" class="crouton-last-main">No treats today</div>
+            <div id="lastTreatMetaText" class="crouton-last-meta">Add a quick note when giving treats</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- #2 TODAY'S 2-CUP METER (8 AM + 5 PM SLOTS) -->
+    <section class="crouton-card mb-3">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <h3 class="crouton-section-title mb-0">
+          <i class="bi bi-speedometer2 me-1"></i> Today's Portion Meter
+        </h3>
+        <span id="dailyCupBadge" class="crouton-cup-counter">0 / 2 Cups</span>
+      </div>
+
+      <div class="progress crouton-progress mb-3" role="progressbar" aria-label="Daily cups fed">
+        <div id="dailyProgressBar" class="progress-bar" style="width: 0%"></div>
+      </div>
+
+      <div class="row g-2">
+        <!-- Morning 8 AM Slot -->
+        <div class="col-6">
+          <div id="slotMorningCard" class="crouton-slot-card">
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="crouton-slot-time"><i class="bi bi-sunrise-fill me-1"></i> ~8:00 AM</span>
+              <span id="slotMorningIcon" class="crouton-slot-status-icon">⏳</span>
+            </div>
+            <div class="crouton-slot-title">Breakfast (1 Cup)</div>
+            <div id="slotMorningDetail" class="crouton-slot-detail">Not fed yet</div>
+          </div>
+        </div>
+
+        <!-- Evening 5 PM Slot -->
+        <div class="col-6">
+          <div id="slotEveningCard" class="crouton-slot-card">
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="crouton-slot-time"><i class="bi bi-sunset-fill me-1"></i> ~5:00 PM</span>
+              <span id="slotEveningIcon" class="crouton-slot-status-icon">⏳</span>
+            </div>
+            <div class="crouton-slot-title">Dinner (1 Cup)</div>
+            <div id="slotEveningDetail" class="crouton-slot-detail">Not fed yet</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- #3 ONE-TAP PHONE LOGGER FOR DAVID, TINA & HIEU -->
+    <section class="crouton-card mb-3" id="loggerSection">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <h3 class="crouton-section-title mb-0">
+          <i class="bi bi-hand-index-thumb-fill me-1"></i> 1. Who Opened the Bucket?
+        </h3>
+        <span class="text-muted small">Tap your name</span>
+      </div>
+
+      <div class="crouton-feeder-grid mb-3" role="group" aria-label="Select feeder">
+        <button type="button" class="crouton-feeder-btn active" data-feeder="David">
+          <span class="feeder-avatar">D</span>
+          <span class="feeder-name">David</span>
+        </button>
+        <button type="button" class="crouton-feeder-btn" data-feeder="Tina">
+          <span class="feeder-avatar">T</span>
+          <span class="feeder-name">Tina</span>
+        </button>
+        <button type="button" class="crouton-feeder-btn" data-feeder="Hieu">
+          <span class="feeder-avatar">H</span>
+          <span class="feeder-name">Hieu</span>
+        </button>
+      </div>
+
+      <h3 class="crouton-section-title mb-2">
+        <i class="bi bi-bucket-fill me-1"></i> 2. Log Main Meal Scoop (1 Cup)
+      </h3>
+
+      <div class="row g-2 mb-3">
+        <div class="col-12 col-sm-6">
+          <button id="btnFeedMorning" type="button" class="btn crouton-feed-btn crouton-feed-morning w-100">
+            <div class="d-flex align-items-center justify-content-between">
+              <span><i class="bi bi-sunrise-fill me-2"></i><strong>Morning Scoop</strong></span>
+              <span class="badge bg-light text-dark">1 Cup • ~8 AM</span>
+            </div>
+            <div id="btnFeedMorningSub" class="crouton-btn-sub">Tap to log breakfast scoop</div>
+          </button>
+        </div>
+        <div class="col-12 col-sm-6">
+          <button id="btnFeedEvening" type="button" class="btn crouton-feed-btn crouton-feed-evening w-100">
+            <div class="d-flex align-items-center justify-content-between">
+              <span><i class="bi bi-sunset-fill me-2"></i><strong>Evening Scoop</strong></span>
+              <span class="badge bg-light text-dark">1 Cup • ~5 PM</span>
+            </div>
+            <div id="btnFeedEveningSub" class="crouton-btn-sub">Tap to log dinner scoop</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Treat Note Row -->
+      <div class="crouton-treat-strip pt-3 border-top">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <label for="treatNoteInput" class="crouton-section-title mb-0">
+            <i class="bi bi-chat-heart-fill me-1"></i> Treat Note (Optional)
+          </label>
+          <span id="treatsCountBadge" class="badge rounded-pill text-bg-warning">0 treats today</span>
+        </div>
+        <form id="treatForm" class="d-flex gap-2">
+          <input
+            id="treatNoteInput"
+            type="text"
+            class="form-control crouton-input"
+            placeholder="e.g. Greenie dental chew, cheese cube, bully stick..."
+            maxlength="140"
+          />
+          <button id="btnLogTreat" type="submit" class="btn crouton-treat-btn flex-shrink-0">
+            <i class="bi bi-plus-circle-fill me-1"></i> Log Note
+          </button>
+        </form>
+        <div class="d-flex flex-wrap gap-1 mt-2">
+          <button type="button" class="btn btn-sm crouton-chip-btn" data-quick-treat="Dental chew">🦷 Dental chew</button>
+          <button type="button" class="btn btn-sm crouton-chip-btn" data-quick-treat="Training biscuit">🦴 Training biscuit</button>
+          <button type="button" class="btn btn-sm crouton-chip-btn" data-quick-treat="Peanut butter snack">🥜 PB snack</button>
+          <button type="button" class="btn btn-sm crouton-chip-btn" data-quick-treat="Crunchy veggie / apple">🍎 Apple slice</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- #4 RECENT FEEDING & TREAT LOG -->
+    <section class="crouton-card mb-3">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <h3 class="crouton-section-title mb-0">
+          <i class="bi bi-clock-history me-1"></i> Bucket &amp; Treat History
+        </h3>
+        <span class="text-muted small">Tap <i class="bi bi-trash3"></i> to undo a mistake</span>
+      </div>
+      <div id="feedHistoryList" class="crouton-history-list">
+        <div class="text-muted small py-2">Loading history...</div>
+      </div>
+    </section>
+
+    <!-- #5 SUPER COOL BROWN CORGI + AUSSIE ("AUGGIE") FUN FACTS -->
+    <section class="crouton-card crouton-facts-section mb-3" id="factsSection">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+        <div>
+          <span class="crouton-kicker">THE TOASTED CARDI-AUGGIE ENCYCLOPEDIA</span>
+          <h3 class="crouton-section-title mb-0">
+            <i class="bi bi-lightning-charge-fill me-1"></i> Crouton's Brown Cardigan Corgi × Aussie Fun Facts
+          </h3>
+        </div>
+        <button id="btnSpinFact" type="button" class="btn btn-sm crouton-spin-btn">
+          <i class="bi bi-shuffle me-1"></i> Spin Fresh Fact
+        </button>
+      </div>
+
+      <!-- Featured Spotlight Fact Card -->
+      <div id="spotlightFactCard" class="crouton-spotlight-fact mb-3">
+        <div class="d-flex align-items-center justify-content-between mb-1">
+          <span id="spotlightFactCategory" class="badge crouton-fact-badge">Auggie Mix Magic</span>
+          <span id="spotlightFactCounter" class="small opacity-75">Fact 1 of 12</span>
+        </div>
+        <h4 id="spotlightFactTitle" class="crouton-spotlight-title mb-1">
+          Why Crouton Acts Like He Hasn't Eaten Since 1842
+        </h4>
+        <p id="spotlightFactBody" class="mb-0">
+          Both Welsh Corgis and Australian Shepherds were bred for high-burn cattle herding, giving them a relentless food drive—and award-winning "I'm starving" puppy eyes right after finishing a full cup!
+        </p>
+      </div>
+
+      <!-- Category Filter Pills -->
+      <div class="d-flex flex-wrap gap-1 mb-3" role="tablist" aria-label="Fact categories">
+        <button type="button" class="btn btn-sm crouton-filter-pill active" data-fact-cat="all">All Facts</button>
+        <button type="button" class="btn btn-sm crouton-filter-pill" data-fact-cat="auggie">🤎 Brown Auggie Mix</button>
+        <button type="button" class="btn btn-sm crouton-filter-pill" data-fact-cat="food">🥣 The Stomach Illusion</button>
+        <button type="button" class="btn btn-sm crouton-filter-pill" data-fact-cat="folklore">🧚 Fairy Lore &amp; Herding</button>
+        <button type="button" class="btn btn-sm crouton-filter-pill" data-fact-cat="quirks">🍑 Sploots, Loaf &amp; Zoomies</button>
+      </div>
+
+      <!-- Facts Grid -->
+      <div id="factsGrid" class="row g-2"></div>
+    </section>
+
+    <!-- #6 PRINTABLE FOOD STORAGE BUCKET LID QR CODE -->
+    <section class="crouton-card mb-4" id="qrSection">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+        <div>
+          <span class="crouton-kicker">STICK THIS ON THE FOOD STORAGE BUCKET LID</span>
+          <h3 class="crouton-section-title mb-0">
+            <i class="bi bi-qr-code-scan me-1"></i> Crouton's Food Bucket Lid QR Code
+          </h3>
+        </div>
+        <button id="btnPrintQrCard" type="button" class="btn btn-sm crouton-print-btn">
+          <i class="bi bi-printer-fill me-1"></i> Print Bucket Lid Sticker
+        </button>
+      </div>
+
+      <p class="small text-muted mb-3">
+        Print and tape this badge to the top of Crouton's food storage bucket. When <strong>David</strong>, <strong>Tina</strong>, or <strong>Hieu</strong> scans it with their phone camera, it opens right to the live feeding check!
+      </p>
+
+      <div class="row g-3 align-items-center">
+        <div class="col-12 col-md-5 text-center">
+          <div class="crouton-qr-preview-box mx-auto">
+            <div class="crouton-qr-header">STOP &amp; SCAN BEFORE SCOOPING</div>
+            <div id="qrSvgContainer" class="crouton-qr-svg-wrap my-2" aria-label="QR Code for Crouton Feeding Page"></div>
+            <div class="crouton-qr-dog-name">CROUTON'S BUCKET</div>
+            <div class="crouton-qr-rule">1 Cup @ 8:00 AM • 1 Cup @ 5:00 PM</div>
+            <div class="crouton-qr-crew">Crew: David • Tina • Hieu</div>
+          </div>
+        </div>
+        <div class="col-12 col-md-7">
+          <label for="qrUrlInput" class="form-label small fw-bold mb-1">
+            QR Code Target URL (customize if using home Wi-Fi LAN IP)
+          </label>
+          <div class="input-group input-group-sm mb-2">
+            <input id="qrUrlInput" type="url" class="form-control" />
+            <button id="btnCopyUrl" class="btn btn-outline-secondary" type="button">
+              <i class="bi bi-clipboard"></i> Copy
+            </button>
+          </div>
+          <div class="small text-muted mb-3">
+            <strong>Phone Tip:</strong> After scanning once on your iPhone or Android, tap <em>"Add to Home Screen"</em> so Crouton's app icon lives right on your phone!
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- PRINT-ONLY BUCKET LID STICKER SHEET -->
+  <section class="print-only-lid-sheet">
+    <div class="print-lid-badge">
+      <div class="print-lid-stop">⚠️ STOP &amp; SCAN BEFORE OPENING BUCKET ⚠️</div>
+      <h1 class="print-lid-title">🍞 CROUTON'S FOOD BUCKET</h1>
+      <div class="print-lid-sub">Brown Cardigan Welsh Corgi × Australian Shepherd</div>
+      <div id="printQrSvgContainer" class="print-qr-box"></div>
+      <div class="print-lid-rules">
+        <div><strong>MORNING MEAL:</strong> ~8:00 AM — <strong>1 LEVEL CUP</strong></div>
+        <div><strong>EVENING MEAL:</strong> ~5:00 PM — <strong>1 LEVEL CUP</strong></div>
+        <div class="mt-1"><strong>DAILY MAX:</strong> 2 CUPS TOTAL (Plus logged treat notes)</div>
+      </div>
+      <div class="print-lid-warning">
+        "Do NOT fall for Crouton's sad starving eyes! Scan with your phone so <strong>David, Tina &amp; Hieu</strong> don't double-feed him!"
+      </div>
+      <div id="printQrUrlCaption" class="print-lid-url"></div>
+    </div>
+  </section>
+
+  <!-- OVERFEED WARNING MODAL (When someone already scooped!) -->
+  <div id="overfeedModal" class="crouton-modal-backdrop d-none" role="dialog" aria-modal="true" aria-labelledby="overfeedModalTitle">
+    <div class="crouton-modal-card">
+      <div class="crouton-modal-icon">🚨</div>
+      <h3 id="overfeedModalTitle" class="crouton-modal-title">Put the Scoop Down!</h3>
+      <p id="overfeedModalMessage" class="crouton-modal-body">
+        Crouton was already fed for this meal window!
+      </p>
+      <div class="crouton-modal-quote">
+        "Crouton is a Corgi-Aussie mastermind. He is 100% pretending he hasn't eaten today."
+      </div>
+      <div class="d-grid gap-2 mt-3">
+        <button id="btnCancelOverfeed" type="button" class="btn btn-lg btn-success fw-bold">
+          <i class="bi bi-shield-check me-1"></i> Phew! Close Bucket Lid (Cancel)
+        </button>
+        <button id="btnForceOverfeed" type="button" class="btn btn-sm btn-outline-danger">
+          Override &amp; Log Extra Scoop Anyway
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <script src="/corgi/js/corgi.js"></script>
+</body>
+</html>

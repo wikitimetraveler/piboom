@@ -106,6 +106,7 @@
     { name: 'Lane Family', url: '/family/lane-family.html', category: 'Family', keywords: 'lane genealogy museum hub family exhibits' },
     { name: 'Scientific Lane', url: '/family/lane-scientific-lane.html', category: 'Family', keywords: 'jonathan homer lane astrophysicist crater homer cousin branch' },
     { name: 'Nature Hub', url: '/nature/nature-hub.html', category: 'Nature', keywords: 'map gallery field guide share trees critters' },
+    { name: 'Crouton', url: '/corgi/', category: 'Nature', keywords: 'crouton corgi cardigan welsh australian shepherd feed bucket treats qr david tina hieu dog' },
     { name: 'Ski Drive', url: '/ski/', category: 'Nature', keywords: 'ski drive fountain valley weather chains thrift dispensary wrightwood big bear mammoth june lake 395' },
     { name: 'Ski Areas', url: '/ski/areas', category: 'Nature', keywords: 'ski area topo dem slope aspect mountain high snow summit bear mountain mammoth june mountain' },
     { name: 'Tree Discovery', url: '/nature/tree-discovery.html', category: 'Nature', keywords: 'tree Smokey identify' },

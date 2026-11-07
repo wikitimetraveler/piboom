@@ -1,0 +1,646 @@
+/* Crouton — Toasted Brown Corgi × Australian Shepherd ("Auggie") Mobile App Theme */
+
+:root {
+  --crouton-crust: #5c2d0c;
+  --crouton-sable: #8b4513;
+  --crouton-toast: #c87a38;
+  --crouton-butter: #f7e6cf;
+  --crouton-cream: #fffaf3;
+  --crouton-card: #ffffff;
+  --crouton-ink: #2a180c;
+  --crouton-muted: #6e523d;
+  --crouton-ready-bg: #e7f6ec;
+  --crouton-ready-border: #2b8a44;
+  --crouton-ready-ink: #155226;
+  --crouton-warn-bg: #fff4db;
+  --crouton-warn-border: #d97706;
+  --crouton-warn-ink: #7c2d12;
+  --crouton-stop-bg: #fde8e8;
+  --crouton-stop-border: #dc2626;
+  --crouton-stop-ink: #7f1d1d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: radial-gradient(circle at top, #fdf3e3 0%, #f5e4ca 100%);
+  color: var(--crouton-ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.crouton-shell {
+  max-width: 640px;
+}
+
+/* Sticky Phone App Top Bar */
+.crouton-appbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: linear-gradient(135deg, #5c2d0c 0%, #8b4513 60%, #a45a21 100%);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(60, 26, 5, 0.25);
+}
+
+.crouton-avatar-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(255, 245, 230, 0.18);
+  border: 2px solid rgba(255, 224, 178, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+
+.crouton-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.crouton-breed-pill {
+  background: rgba(255, 232, 198, 0.22);
+  color: #ffe8c2;
+  border: 1px solid rgba(255, 232, 198, 0.4);
+  font-weight: 600;
+  font-size: 0.7rem;
+}
+
+.crouton-subtitle {
+  font-size: 0.75rem;
+  color: rgba(255, 243, 224, 0.85);
+}
+
+.crouton-icon-btn {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.crouton-icon-btn:hover,
+.crouton-icon-btn:focus {
+  background: rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
+
+.crouton-scan-pill {
+  background: #3b1d08;
+  color: #ffedd5;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  border: 1px solid #c87a38;
+  box-shadow: 0 4px 12px rgba(92, 45, 12, 0.15);
+}
+
+/* Status Hero Banner */
+.crouton-status-hero {
+  border-radius: 20px;
+  padding: 18px;
+  border: 3px solid var(--crouton-ready-border);
+  background: var(--crouton-ready-bg);
+  color: var(--crouton-ready-ink);
+  box-shadow: 0 10px 24px rgba(42, 24, 12, 0.1);
+  transition: all 0.2s ease;
+}
+
+.crouton-status-hero.status-ready {
+  background: var(--crouton-ready-bg);
+  border-color: var(--crouton-ready-border);
+  color: var(--crouton-ready-ink);
+}
+
+.crouton-status-hero.status-warn {
+  background: var(--crouton-warn-bg);
+  border-color: var(--crouton-warn-border);
+  color: var(--crouton-warn-ink);
+}
+
+.crouton-status-hero.status-stop {
+  background: var(--crouton-stop-bg);
+  border-color: var(--crouton-stop-border);
+  color: var(--crouton-stop-ink);
+}
+
+.crouton-state-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.crouton-clock-pill {
+  font-size: 0.78rem;
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+.crouton-hero-headline {
+  font-size: 1.32rem;
+  font-weight: 900;
+  line-height: 1.22;
+}
+
+.crouton-hero-subline {
+  font-size: 0.92rem;
+  opacity: 0.92;
+}
+
+.crouton-last-box {
+  background: rgba(255, 255, 255, 0.86);
+  border-radius: 14px;
+  padding: 10px 12px;
+  color: var(--crouton-ink);
+  border: 1px solid rgba(92, 45, 12, 0.12);
+  height: 100%;
+}
+
+.crouton-last-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--crouton-sable);
+  text-transform: uppercase;
+}
+
+.crouton-last-main {
+  font-size: 0.98rem;
+  font-weight: 800;
+  margin-top: 2px;
+}
+
+.crouton-last-meta {
+  font-size: 0.76rem;
+  color: var(--crouton-muted);
+}
+
+/* Cards */
+.crouton-card {
+  background: var(--crouton-card);
+  border-radius: 18px;
+  padding: 16px;
+  border: 1px solid rgba(139, 69, 19, 0.15);
+  box-shadow: 0 6px 18px rgba(60, 28, 8, 0.06);
+}
+
+.crouton-section-title {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: var(--crouton-crust);
+}
+
+.crouton-kicker {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--crouton-toast);
+  text-transform: uppercase;
+}
+
+/* Portion Progress & Slots */
+.crouton-cup-counter {
+  background: var(--crouton-butter);
+  color: var(--crouton-crust);
+  font-weight: 800;
+  font-size: 0.85rem;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(139, 69, 19, 0.25);
+}
+
+.crouton-progress {
+  height: 14px;
+  border-radius: 999px;
+  background: #f1e3d0;
+  overflow: hidden;
+}
+
+.crouton-progress .progress-bar {
+  background: linear-gradient(90deg, #c87a38, #8b4513);
+  transition: width 0.35s ease;
+}
+
+.crouton-slot-card {
+  border-radius: 14px;
+  padding: 12px;
+  border: 2px solid #ead8c0;
+  background: #fffcf7;
+  height: 100%;
+}
+
+.crouton-slot-card.slot-fed {
+  border-color: #2b8a44;
+  background: #eefaf2;
+}
+
+.crouton-slot-time {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--crouton-sable);
+}
+
+.crouton-slot-title {
+  font-weight: 800;
+  font-size: 0.92rem;
+  margin-top: 2px;
+}
+
+.crouton-slot-detail {
+  font-size: 0.78rem;
+  color: var(--crouton-muted);
+  margin-top: 2px;
+}
+
+/* Feeder Selector Grid (David, Tina, Hieu) */
+.crouton-feeder-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.crouton-feeder-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 12px 8px;
+  border-radius: 14px;
+  border: 2px solid #e5d0b5;
+  background: #fffaf3;
+  color: var(--crouton-ink);
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.crouton-feeder-btn .feeder-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #ebd5b7;
+  color: var(--crouton-crust);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  font-weight: 900;
+}
+
+.crouton-feeder-btn.active {
+  border-color: var(--crouton-crust);
+  background: linear-gradient(145deg, #7c3f18, #5c2d0c);
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(92, 45, 12, 0.25);
+  transform: translateY(-1px);
+}
+
+.crouton-feeder-btn.active .feeder-avatar {
+  background: #ffd89b;
+  color: #4a2106;
+}
+
+/* Big Main Meal Scoop Buttons */
+.crouton-feed-btn {
+  text-align: left;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 2px solid transparent;
+  color: #fff;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.crouton-feed-btn:active {
+  transform: scale(0.98);
+}
+
+.crouton-feed-morning {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+  box-shadow: 0 6px 16px rgba(180, 83, 9, 0.25);
+}
+
+.crouton-feed-evening {
+  background: linear-gradient(135deg, #6d3611 0%, #431f07 100%);
+  box-shadow: 0 6px 16px rgba(67, 31, 7, 0.25);
+}
+
+.crouton-feed-btn:hover,
+.crouton-feed-btn:focus {
+  color: #fff;
+  filter: brightness(1.05);
+}
+
+.crouton-feed-btn.slot-already-done {
+  background: #f3ece2;
+  color: #6e523d;
+  border: 2px dashed #c7b299;
+  box-shadow: none;
+}
+
+.crouton-btn-sub {
+  font-size: 0.78rem;
+  opacity: 0.9;
+  margin-top: 4px;
+}
+
+/* Treat Note Strip */
+.crouton-treat-btn {
+  background: var(--crouton-sable);
+  color: #fff;
+  font-weight: 700;
+  border-radius: 12px;
+  padding: 8px 14px;
+}
+
+.crouton-treat-btn:hover {
+  background: var(--crouton-crust);
+  color: #fff;
+}
+
+.crouton-chip-btn {
+  background: #fdf3e4;
+  border: 1px solid #e2c7a5;
+  color: var(--crouton-crust);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.crouton-chip-btn:hover {
+  background: #f4dec0;
+}
+
+/* History List */
+.crouton-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.crouton-log-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #fffaf3;
+  border: 1px solid #eee0cd;
+}
+
+.crouton-log-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  background: #f5e2c8;
+}
+
+.crouton-log-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.crouton-log-sub {
+  font-size: 0.75rem;
+  color: var(--crouton-muted);
+}
+
+/* Fun Facts Section */
+.crouton-spotlight-fact {
+  background: linear-gradient(135deg, #5c2d0c 0%, #8b4513 55%, #b56324 100%);
+  color: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 8px 20px rgba(92, 45, 12, 0.22);
+}
+
+.crouton-fact-badge {
+  background: rgba(255, 232, 198, 0.22);
+  color: #ffe8c2;
+  border: 1px solid rgba(255, 232, 198, 0.4);
+}
+
+.crouton-spotlight-title {
+  font-size: 1.08rem;
+  font-weight: 800;
+}
+
+.crouton-spin-btn,
+.crouton-print-btn {
+  background: var(--crouton-butter);
+  color: var(--crouton-crust);
+  border: 1px solid #d7b68d;
+  font-weight: 700;
+  border-radius: 10px;
+}
+
+.crouton-filter-pill {
+  border-radius: 999px;
+  border: 1px solid #dfC6a8;
+  background: #fffaf3;
+  color: var(--crouton-crust);
+  font-weight: 700;
+  font-size: 0.76rem;
+}
+
+.crouton-filter-pill.active {
+  background: var(--crouton-crust);
+  color: #fff;
+  border-color: var(--crouton-crust);
+}
+
+.crouton-fact-card {
+  background: #fffcf8;
+  border: 1px solid #ead7be;
+  border-radius: 14px;
+  padding: 12px;
+  height: 100%;
+}
+
+.crouton-fact-card-title {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--crouton-crust);
+}
+
+.crouton-fact-card-body {
+  font-size: 0.8rem;
+  color: var(--crouton-muted);
+  margin-bottom: 0;
+}
+
+/* QR Bucket Lid Card */
+.crouton-qr-preview-box {
+  max-width: 240px;
+  background: #fff;
+  border: 3px dashed var(--crouton-crust);
+  border-radius: 18px;
+  padding: 12px;
+}
+
+.crouton-qr-header {
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  color: #b91c1c;
+}
+
+.crouton-qr-svg-wrap svg {
+  width: 170px;
+  height: 170px;
+  display: block;
+  margin: 0 auto;
+}
+
+.crouton-qr-dog-name {
+  font-weight: 900;
+  font-size: 1rem;
+  color: var(--crouton-crust);
+}
+
+.crouton-qr-rule {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--crouton-sable);
+}
+
+.crouton-qr-crew {
+  font-size: 0.7rem;
+  color: var(--crouton-muted);
+}
+
+/* Overfeed Modal */
+.crouton-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(30, 12, 4, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.crouton-modal-card {
+  background: #fff;
+  border-radius: 22px;
+  max-width: 420px;
+  width: 100%;
+  padding: 22px;
+  text-align: center;
+  border: 3px solid #dc2626;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+}
+
+.crouton-modal-icon {
+  font-size: 2.6rem;
+  line-height: 1;
+}
+
+.crouton-modal-title {
+  font-weight: 900;
+  color: #991b1b;
+  margin-top: 8px;
+}
+
+.crouton-modal-body {
+  font-size: 0.96rem;
+  font-weight: 600;
+  color: var(--crouton-ink);
+}
+
+.crouton-modal-quote {
+  font-size: 0.82rem;
+  font-style: italic;
+  background: #fef3c7;
+  color: #78350f;
+  padding: 10px 12px;
+  border-radius: 12px;
+}
+
+/* Print Bucket Lid Sheet */
+.print-only-lid-sheet {
+  display: none;
+}
+
+@media print {
+  body {
+    background: #fff !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only-lid-sheet {
+    display: flex !important;
+    justify-content: center;
+    padding: 20px;
+  }
+  .print-lid-badge {
+    width: 4.5in;
+    border: 4px dashed #3b1d08;
+    border-radius: 24px;
+    padding: 24px;
+    text-align: center;
+  }
+  .print-lid-stop {
+    font-size: 0.9rem;
+    font-weight: 900;
+    color: #b91c1c;
+    letter-spacing: 0.04em;
+  }
+  .print-lid-title {
+    font-size: 1.7rem;
+    font-weight: 900;
+    margin: 6px 0 2px;
+    color: #3b1d08;
+  }
+  .print-lid-sub {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #6e523d;
+    margin-bottom: 12px;
+  }
+  .print-qr-box svg {
+    width: 240px;
+    height: 240px;
+  }
+  .print-lid-rules {
+    margin-top: 12px;
+    font-size: 0.95rem;
+    background: #fdf3e4;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid #d7b68d;
+  }
+  .print-lid-warning {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    font-style: italic;
+  }
+  .print-lid-url {
+    margin-top: 8px;
+    font-size: 0.72rem;
+    color: #666;
+  }
+}
