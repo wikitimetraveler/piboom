@@ -100,6 +100,7 @@
     pendingOverridePayload: null,
     selectedFactCategory: 'all',
     spotlightIndex: 0,
+    lastFetchedTodayKey: null,
   };
 
   function init() {
@@ -115,10 +116,41 @@
     checkScanQueryBanner();
     startClockTicker();
     bindEvents();
+    bindLiveRefresh();
     renderFactsGrid();
     renderSpotlightFact(0);
     setupQrCodeBox();
     fetchStatus();
+  }
+
+  /** Phone left open overnight / bfcache restore must re-check the Pacific day. */
+  function bindLiveRefresh() {
+    const refreshNow = () => fetchStatus();
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') refreshNow();
+    });
+    window.addEventListener('focus', refreshNow);
+    window.addEventListener('pageshow', refreshNow);
+    // Safety poll so a phone stuck on the kitchen counter still rolls over after midnight
+    setInterval(() => {
+      const localToday = getClientPacificDayKey();
+      if (state.lastFetchedTodayKey && state.lastFetchedTodayKey !== localToday) {
+        refreshNow();
+      }
+    }, 60000);
+  }
+
+  function getClientPacificDayKey(date = new Date()) {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Los_Angeles',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hourCycle: 'h23',
+    }).formatToParts(date);
+    const get = (type) => parts.find((p) => p.type === type)?.value || '00';
+    return `${get('year')}-${get('month')}-${get('day')}`;
   }
 
   function checkScanQueryBanner() {
@@ -306,10 +338,13 @@
 
   async function fetchStatus() {
     try {
-      const res = await fetch('/api/corgi/status');
+      const res = await fetch(`/api/corgi/status?t=${Date.now()}`, {
+        cache: 'no-store',
+      });
       const data = await res.json();
       if (data && data.success) {
         state.statusData = data;
+        state.lastFetchedTodayKey = data.todayKey || getClientPacificDayKey();
         renderStatus(data);
       }
     } catch (err) {
@@ -418,26 +453,30 @@
       } else if (data.statusCode === 'SLOT_ALREADY_FED') {
         badge.innerHTML = '<i class="bi bi-exclamation-triangle-fill me-1"></i> ALREADY FED THIS MEAL';
       } else {
-        badge.innerHTML = '<i class="bi bi-Octagon-fill me-1"></i> DO NOT FEED — 2 CUPS DONE';
+        badge.innerHTML = '<i class="bi bi-octagon-fill me-1"></i> DO NOT FEED — 2 CUPS DONE';
       }
     }
 
     if (headline) headline.textContent = data.statusHeadline || '';
     if (subline) subline.textContent = data.statusSubline || '';
 
-    // Last Meal Box
+    // Last Meal Box (may be yesterday — never treat it as today's scoop)
     const lastMealMain = document.getElementById('lastMealMainText');
     const lastMealMeta = document.getElementById('lastMealMetaText');
+    const todayKey = data.todayKey || getClientPacificDayKey();
     if (data.lastMeal) {
       const m = data.lastMeal;
+      const mealDay = getClientPacificDayKey(new Date(m.fedAt));
+      const isTodayMeal = mealDay === todayKey;
+      const dayTag = isTodayMeal ? 'Today' : formatShortDate(m.fedAt);
       const slotTag = m.mealSlot === 'morning' ? 'Morning (8 AM)' : 'Evening (5 PM)';
       if (lastMealMain) {
-        lastMealMain.textContent = `${m.fedBy} fed ${m.cups} cup • ${formatClockTime(m.fedAt)}`;
+        lastMealMain.textContent = `${m.fedBy} fed ${m.cups} cup • ${formatClockTime(m.fedAt)} (${dayTag})`;
       }
       if (lastMealMeta) {
-        lastMealMeta.textContent = `${slotTag} • ${formatRelativeTime(m.fedAt)} (${formatShortDate(
-          m.fedAt
-        )})`;
+        lastMealMeta.textContent = isTodayMeal
+          ? `${slotTag} • ${formatRelativeTime(m.fedAt)}`
+          : `Not today — last scoop was ${dayTag} ${slotTag}. Today's meter is fresh.`;
       }
     } else {
       if (lastMealMain) lastMealMain.textContent = 'No meals logged yet';
@@ -703,21 +742,28 @@
   function formatClockTime(iso) {
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return '';
-    return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    return d.toLocaleTimeString([], {
+      hour: 'numeric',
+      minute: '2-digit',
+      timeZone: 'America/Los_Angeles',
+    });
   }
 
   function formatShortDate(iso) {
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return '';
-    const now = new Date();
-    if (
-      d.getFullYear() === now.getFullYear() &&
-      d.getMonth() === now.getMonth() &&
-      d.getDate() === now.getDate()
-    ) {
-      return 'Today';
-    }
-    return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    const mealDay = getClientPacificDayKey(d);
+    const today = getClientPacificDayKey();
+    if (mealDay === today) return 'Today';
+
+    const yesterdayKey = getClientPacificDayKey(new Date(Date.now() - 24 * 3600000));
+    if (mealDay === yesterdayKey) return 'Yesterday';
+
+    return d.toLocaleDateString([], {
+      month: 'short',
+      day: 'numeric',
+      timeZone: 'America/Los_Angeles',
+    });
   }
 
   function formatRelativeTime(iso) {

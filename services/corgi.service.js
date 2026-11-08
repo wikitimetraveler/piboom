@@ -17,10 +17,14 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const FALLBACK_FILE = path.join(__dirname, '..', 'data', 'corgi-feed-log.json');
 
+/** Household day / meal windows always use Pacific, even if the Node host is UTC. */
+export const CROUTON_TIME_ZONE = 'America/Los_Angeles';
+
 export const CROUTON_PROFILE = {
   name: 'Crouton',
   breed: 'Brown Cardigan Welsh Corgi × Australian Shepherd Mix ("Cardi-Auggie")',
   feeders: ['David', 'Tina', 'Hieu'],
+  timeZone: CROUTON_TIME_ZONE,
   dailySchedule: {
     morning: {
       id: 'morning',
@@ -39,6 +43,40 @@ export const CROUTON_PROFILE = {
     dailyGoalCups: 2,
   },
 };
+
+/**
+ * Calendar / clock parts in the household timezone (Pacific).
+ * @param {Date|string|number} input
+ * @param {string} [timeZone]
+ * @returns {{ year: string, month: string, day: string, hour: number, minute: number, dayKey: string }}
+ */
+export function getZonedParts(input = new Date(), timeZone = CROUTON_TIME_ZONE) {
+  const d = input instanceof Date ? input : new Date(input);
+  if (Number.isNaN(d.getTime())) {
+    return getZonedParts(new Date(), timeZone);
+  }
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(d);
+  const get = (type) => parts.find((p) => p.type === type)?.value || '00';
+  const year = get('year');
+  const month = get('month');
+  const day = get('day');
+  return {
+    year,
+    month,
+    day,
+    hour: Number(get('hour')),
+    minute: Number(get('minute')),
+    dayKey: `${year}-${month}-${day}`,
+  };
+}
 
 let tableInitialized = false;
 let memoryLogsCache = null;
@@ -97,27 +135,24 @@ async function writeFallbackLogs(logs) {
 
 /**
  * Determine which meal slot ('morning' or 'evening') applies at a given timestamp.
- * Morning window: 3:00 AM – 1:59 PM (target ~8:00 AM)
- * Evening window: 2:00 PM – 2:59 AM (target ~5:00 PM)
+ * Morning window: 3:00 AM – 1:59 PM Pacific (target ~8:00 AM)
+ * Evening window: 2:00 PM – 2:59 AM Pacific (target ~5:00 PM)
  * @param {Date} [now]
  * @returns {'morning' | 'evening'}
  */
 export function inferMealSlot(now = new Date()) {
-  const hour = now.getHours();
+  const hour = getZonedParts(now).hour;
   return hour >= 3 && hour < 14 ? 'morning' : 'evening';
 }
 
 /**
- * Return local YYYY-MM-DD key for a Date object so daily limits match household local day.
+ * Return Pacific YYYY-MM-DD key so the daily 2-cup limit resets at Pacific midnight
+ * even when the Node host (or Postgres) is running in UTC.
  * @param {Date|string} input
  * @returns {string}
  */
 export function getLocalDayKey(input = new Date()) {
-  const d = input instanceof Date ? input : new Date(input);
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  return getZonedParts(input).dayKey;
 }
 
 function normalizeRow(row) {
@@ -445,6 +480,8 @@ export function __resetCorgiMemoryCacheForTests() {
 
 export default {
   CROUTON_PROFILE,
+  CROUTON_TIME_ZONE,
+  getZonedParts,
   inferMealSlot,
   getLocalDayKey,
   listFeedLogs,
