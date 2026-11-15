@@ -433,7 +433,8 @@ function revealDuStateIntelPanels(state) {
     url.searchParams.delete('scope');
     url.searchParams.set('load', '1');
     window.history.replaceState({}, '', url);
-    openDuDashboardSection('collapseDisasters', 2);
+    openDuDashboardSection('collapseDisasters', 2, { scroll: false });
+    scrollDuPageToTop();
   });
 }
 
@@ -460,7 +461,10 @@ function revealDuUsaIntelPanels() {
     url.searchParams.set('scope', 'usa');
     url.searchParams.set('load', '1');
     window.history.replaceState({}, '', url);
-    openDuDashboardSection('collapseDisasters', 2);
+    // Auto / deep-link USA load: expand Events but keep viewport on the hero + map.
+    openDuDashboardSection('collapseDisasters', 2, { scroll: false });
+    scrollDuPageToTop();
+    requestAnimationFrame(() => scrollDuPageToTop());
   });
 }
 
@@ -550,8 +554,9 @@ function syncDuSelectionOverlays() {
   }
 }
 
-function openDuDashboardSection(targetId, stepNum) {
+function openDuDashboardSection(targetId, stepNum, options) {
   if (!targetId) return;
+  const shouldScroll = options?.scroll !== false;
   const accordionIds = ['collapseFilters', 'collapseDisasters', 'collapseMapYouTube'];
   const sectionCardIds = ['collapseCommandDeck', 'collapseRiskIntel', 'collapseSpreadsheet', 'collapseEncompassMap', 'collapseLoans', 'collapseGraphDb'];
   const sectionHeadingIds = {
@@ -575,19 +580,30 @@ function openDuDashboardSection(targetId, stepNum) {
       });
       showDuDashboardSectionCard(targetId);
     }
-    document.getElementById(sectionHeadingIds[targetId])?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (shouldScroll) {
+      document.getElementById(sectionHeadingIds[targetId])?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   }
 
-  if (targetId === 'duBottomDock') {
+  if (shouldScroll && targetId === 'duBottomDock') {
     document.getElementById('duBottomDock')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
-  if (targetId === 'duGeoStage') {
+  if (shouldScroll && targetId === 'duGeoStage') {
     document.getElementById('duGeoStage')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   setDuSectionPillActive(targetId);
   if (stepNum) syncDuWorkflowPill(Number(stepNum));
+}
+
+/** Keep the hero / map lens in view after auto place loads. */
+function scrollDuPageToTop() {
+  try {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  } catch (_) {
+    window.scrollTo(0, 0);
+  }
 }
 
 function initDuWorkflowPills() {
@@ -1442,6 +1458,8 @@ window.openDisasterHeygenBriefing = openDisasterHeygenBriefing;
 
 
 $(function init() {
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  scrollDuPageToTop();
   import('/shared/disaster-refresh-client.js')
     .then(({ captureDisasterRefreshTokenFromUrl }) => captureDisasterRefreshTokenFromUrl())
     .catch((err) => console.warn('Disaster refresh client unavailable:', err));

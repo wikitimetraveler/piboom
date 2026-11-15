@@ -434,7 +434,7 @@
             <span class="source-chip-count" data-source-count="fema">0</span>
             <span class="source-chip-db-total" data-source-db="fema" hidden></span>
           </button>
-          <button type="button" class="source-chip freshness-off" data-source="firms" onclick="toggleUnifiedSourceChip(this, 'firms')">
+          <button type="button" class="source-chip source-chip-active freshness-ok" data-source="firms" onclick="toggleUnifiedSourceChip(this, 'firms')">
             <span class="freshness-dot" aria-hidden="true"></span>
             <i class="bi bi-fire"></i> NASA FIRMS
             <span class="source-chip-count" data-source-count="firms">0</span>
@@ -866,7 +866,7 @@
                   <label class="form-label" for="sourceInput">Source <span class="text-muted fw-normal">(Ctrl+click)</span></label>
                   <select id="sourceInput" class="form-control du-filter-multiselect" multiple size="6" aria-label="Filter by disaster source">
                     <option value="fema" selected>FEMA</option>
-                    <option value="firms">NASA FIRMS</option>
+                    <option value="firms" selected>NASA FIRMS</option>
                     <option value="usgs" selected>USGS</option>
                     <option value="nws" selected>NOAA/NWS</option>
                     <option value="nhc" selected>NHC</option>
@@ -910,7 +910,7 @@
               <div class="card du-data-panel">
                 <div class="card-header"><strong>Disasters</strong> <small class="text-muted">(Click a row to view related videos, loans, cameras, and weather alerts)</small></div>
                 <div class="card-body">
-                  <div id="firmsDeferredAlert" class="alert alert-info py-2 small d-flex align-items-center gap-2 mb-3" role="status">
+                  <div id="firmsDeferredAlert" class="alert alert-info py-2 small d-none d-flex align-items-center gap-2 mb-3" role="status">
                     <i class="bi bi-info-circle flex-shrink-0"></i>
                     <span><strong>NASA FIRMS</strong> (active fire hotspots) is not loaded. Turn on the <strong>NASA FIRMS</strong> chip above or in Filters — sources <strong>auto-reload</strong> the grid (or use <strong>Reload grid</strong>).</span>
                   </div>
