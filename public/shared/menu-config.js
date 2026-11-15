@@ -18,7 +18,7 @@
 
   /** Navbar Worksheets dropdown items (URLs under /finance/) */
   const NAV_FINANCE = [
-    { href: '/open/', icon: 'bi-collection', label: 'Open suite', title: 'Public showcase — Disasters, GSE analyzer, graph calculation' },
+    { href: '/open/', icon: 'bi-collection', label: 'Open Lender Suite', title: 'Public showcase — Disasters, GSE analyzer, graph calc, flight sim, Encompass Expert' },
     { href: '/finance/index.html', icon: 'bi-calculator', label: 'Worksheets Hub' },
     { href: '/finance/encompass-hub.html', icon: 'bi-columns-gap', label: 'Encompass Hub' },
     { href: '/finance/disasters-unified.html', icon: 'bi-globe', label: 'Unified Disasters' },
@@ -30,6 +30,7 @@
     { href: '/finance/pipeline-risk-dashboard.html', icon: 'bi-shield-check', label: 'Pipeline Risk' },
     { href: '/gse-analyzer.html', icon: 'bi-graph-up-arrow', label: 'GSE scenario analyzer' },
     { href: '/finance/loan-flight-sim.html', icon: 'bi-airplane', label: 'Loan flight simulator' },
+    { href: '/finance/calc-engine-webgpu.html', icon: 'bi-diagram-3', label: 'Calc Engine WebGPU' },
     { divider: true },
     { href: '/finance/index.html', icon: 'bi-grid-3x3-gap', label: 'All Worksheets Tools' },
   ];
@@ -145,7 +146,7 @@
     { href: '/egypt/', icon: 'bi-globe-central-south-asia', label: 'Egypt', title: 'Egypt — bilingual history, food, music, café and living culture atlas with Omar (no login)' },
     { href: '/silk-road/', icon: 'bi-signpost-split', label: 'Silk Road', title: 'Silk Road — bilingual caravan journey through all eight atlases, guide to guide (no login)' },
     { href: '/nature/nature-hub.html', icon: 'bi-tree-fill', label: 'Nature Hub', title: 'Trees, critters, fish, rocks, ski topo, The Valley, Dinosaur Hall' },
-    { href: '/corgi/', icon: 'bi-hearts', label: 'Crouton', title: 'Crouton — Cardigan Welsh Corgi × Aussie feeding tracker, treats, and fun facts' },
+    { href: '/corgi/', icon: 'bi-hearts', label: 'Crouton', title: 'Crouton — Cowboy Corgi feeding tracker, treats, and fun facts' },
     { href: '/gse-analyzer.html', icon: 'bi-graph-up-arrow', label: 'GSE scenario analyzer' },
     { href: '/bike-store-home.html', icon: 'bi-bicycle', label: 'Bike Store' },
     { href: '/ai/voice-dj.html', icon: 'bi-mic', label: 'Wolfman Dave' },
@@ -174,7 +175,7 @@
     { href: '/finance/closing-cost-calculator.html', icon: 'bi-receipt', label: 'Closing Cost', title: 'Closing Cost Calculator', since: '2025-10-30', category: 'calculators' },
     { href: '/finance/ltv-calculator.html', icon: 'bi-house-door', label: 'LTV', title: 'Loan-to-Value Calculator', since: '2025-10-30', category: 'calculators' },
     { href: '/finance/va-irrrl-calculator.html', icon: 'bi-calculator', label: 'VA IRRRL', title: 'VA IRRRL Calculator', since: '2025-11-02', category: 'calculators' },
-    { href: '/open/', icon: 'bi-collection', label: 'Open suite', title: 'Public showcase — Disasters, GSE analyzer, graph calculation', since: '2026-10-31', category: 'risk' },
+    { href: '/open/', icon: 'bi-collection', label: 'Open Lender Suite', title: 'Public showcase — Disasters, GSE analyzer, graph calc, flight sim, Encompass Expert', since: '2026-10-31', category: 'risk' },
     { href: '/finance/disasters-unified.html', icon: 'bi-globe', label: 'Unified Disasters', title: 'Unified Disasters (90-day)', since: '2025-10-30', category: 'risk' },
     { href: '/finance/disasters-encompass-map.html', icon: 'bi-geo-alt', label: 'Encompass map', title: 'Encompass map — live proximity loan pins', since: '2026-08-12', category: 'risk' },
   ];
@@ -232,7 +233,7 @@
   }
 
   /**
-   * Worksheets navbar: open suite (disasters + Encompass AI Expert) when logged out; every mortgage app
+   * Worksheets navbar: Open Lender Suite tools when logged out; every mortgage app
    * (Encompass Hub, AI Assistant, tools, calculators) when logged in.
    */
   function getFinanceNavItems(loggedIn) {
@@ -267,7 +268,7 @@
 
   /** Nature hub tool grid */
   const NATURE_TOOLS = [
-    { href: '/corgi/', icon: 'bi-hearts', label: 'Crouton', title: 'Crouton — Cardigan Welsh Corgi × Aussie bucket feeder, treats, QR lid, and fun facts' },
+    { href: '/corgi/', icon: 'bi-hearts', label: 'Crouton', title: 'Crouton — Cowboy Corgi bucket feeder, treats, QR lid, and fun facts' },
     { href: '/local/local-spots.html#fvThrift', icon: 'bi-shop', label: 'Thrift near home', title: 'Thrift stores within 30 miles of Fountain Valley or Hesperia, with a map and directions' },
     { href: '/ski/', icon: 'bi-signpost-2', label: 'Ski Drive', title: 'Fountain Valley drive desk — weather, chains, on-the-way stops' },
     { href: '/ski/areas', icon: 'bi-snow2', label: 'Ski Areas', title: 'Wrightwood and Big Bear ski-area topography — DEM, slope, aspect' },
@@ -326,6 +327,8 @@
     '/finance/disasters-webcams.html',
     '/finance/disasters-encompass-map.html',
     '/finance/calc-engine-webgpu.html',
+    '/finance/loan-flight-sim.html',
+    '/finance/encompass-assistant.html',
   ];
 
   /** Get home domain tiles, optionally filtered for demo mode + login */

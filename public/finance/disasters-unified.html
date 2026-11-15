@@ -339,10 +339,6 @@
             </div>
             <div class="col-lg-4">
               <div class="du-geo-rail">
-                <div class="du-webgpu-globe-wrap mb-3">
-                  <canvas id="duWebgpuPulseGlobe" class="du-webgpu-pulse-globe" role="img" aria-label="Hazard pulse globe"></canvas>
-                  <p class="small text-muted mb-0 mt-1">Pulse globe — FIRMS / USGS / alerts from the loaded grid (ops viz, not risk probability).</p>
-                </div>
                 <label class="form-label small fw-semibold" for="duGeoStateSelect">State</label>
                 <select id="duGeoStateSelect" class="form-select form-select-sm mb-3" aria-label="Select US state">
                   <option value="">— Select state —</option>
@@ -590,11 +586,11 @@
 
           <!-- Hotspots Filter & Export Toolbar -->
           <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
-            <div class="btn-group btn-group-sm" role="group" aria-label="Filter hotspots by lender urgency">
-              <button type="button" class="btn btn-outline-secondary active" data-du-hotspot-filter="all">All Hotspots</button>
-              <button type="button" class="btn btn-outline-danger" data-du-hotspot-filter="critical_high">Critical &amp; High (6+)</button>
-              <button type="button" class="btn btn-outline-warning" data-du-hotspot-filter="fema">FEMA Declared</button>
-              <button type="button" class="btn btn-outline-primary" data-du-hotspot-filter="hold">Closing Hold / Re-Inspect</button>
+            <div id="duHotspotFilterStrip" class="btn-group btn-group-sm" role="group" aria-label="Filter hotspots by lender urgency">
+              <button type="button" class="btn btn-outline-secondary active" data-du-hotspot-filter="all" aria-pressed="true">All Hotspots</button>
+              <button type="button" class="btn btn-outline-danger" data-du-hotspot-filter="critical_high" aria-pressed="false">Critical &amp; High (6+)</button>
+              <button type="button" class="btn btn-outline-warning" data-du-hotspot-filter="fema" aria-pressed="false">FEMA Declared</button>
+              <button type="button" class="btn btn-outline-primary" data-du-hotspot-filter="hold" aria-pressed="false">Closing Hold / Re-Inspect</button>
             </div>
             <div class="d-flex flex-wrap align-items-center gap-2">
               <input type="search" id="duHotspotSearchInput" class="form-control form-control-sm" style="min-width: 220px;" placeholder="Search county, state, hazard, requirement…" aria-label="Search hotspots">
@@ -658,6 +654,7 @@
         <div id="collapseSpreadsheet" class="collapse show du-section-card-body" aria-labelledby="headingSpreadsheet">
           <p class="small text-muted mb-3">
             Upload a spreadsheet of properties (<code>.xlsx</code>, <code>.xls</code>, or <code>.csv</code>), paste rows from a sheet, or click <strong>Load sample properties</strong> to run a multi-hazard check with inspection, insurance, and closing-hold notes.
+            <strong>Do not upload real borrower names or loan numbers</strong> — use hashed or tokenized IDs and synthetic labels only (a de-identified property table is enough).
           </p>
 
           <div class="row g-3 align-items-stretch mb-3">
@@ -668,6 +665,9 @@
                   <i class="bi bi-cloud-arrow-up fs-2 text-primary"></i>
                 </div>
                 <div class="fw-semibold mb-1">Drop a Property Spreadsheet (<code>.xlsx</code> or <code>.csv</code>) here or click to browse</div>
+                <p class="small text-warning-emphasis mb-1">
+                  Privacy: no real borrower names or loan numbers. Use hashed IDs / aliases in those columns.
+                </p>
                 <p class="small text-muted mb-2">
                   Recognizes columns: <code>Loan Number</code>, <code>Borrower</code>, <code>Address</code>, <code>City</code>, <code>County</code>, <code>State</code>, <code>ZIP</code>, <code>Loan Amount</code>, <code>Milestone</code>, <code>Flood Zone</code>, <code>Latitude</code>, <code>Longitude</code>
                 </p>
@@ -714,7 +714,7 @@
           <!-- Optional Paste Area -->
           <div id="duSpreadsheetPasteWrap" class="mb-3 p-3 rounded border bg-light-subtle" hidden>
             <label class="form-label small fw-semibold" for="duSpreadsheetPasteInput">Paste CSV or Tab-Separated Rows from Excel / Google Sheets (include header row):</label>
-            <textarea id="duSpreadsheetPasteInput" class="form-control form-control-sm font-monospace mb-2" rows="5" placeholder="Loan Number,Borrower Name,Property Address,City,County,State,ZIP,Loan Amount,Milestone,Flood Zone,Latitude,Longitude&#10;LN-1001,Jane Doe,16420 Sunset Blvd,Pacific Palisades,Los Angeles,CA,90272,950000,Clear to Close,X,34.0481,-118.5262"></textarea>
+            <textarea id="duSpreadsheetPasteInput" class="form-control form-control-sm font-monospace mb-2" rows="5" placeholder="Loan Number,Borrower Name,Property Address,City,County,State,ZIP,Loan Amount,Milestone,Flood Zone,Latitude,Longitude&#10;LN-HASH-9F2A,Borrower-A,16420 Sunset Blvd,Pacific Palisades,Los Angeles,CA,90272,950000,Clear to Close,X,34.0481,-118.5262"></textarea>
             <div class="d-flex justify-content-end gap-2">
               <button type="button" class="btn btn-sm btn-primary" id="duSpreadsheetPasteRunBtn">
                 <i class="bi bi-play-fill me-1"></i>Analyze Pasted Properties
@@ -838,6 +838,20 @@
                   <label class="btn btn-outline-secondary" for="duTime30d">Last 30d</label>
                 </div>
                 <p class="small text-muted mt-1 mb-0">Filter disasters by recency. For High &amp; Critical events only, use <strong>Major now</strong> on the source bar (last 2 or 3 days).</p>
+              </div>
+              <div class="mb-3" id="duFirmsConfidenceFilter">
+                <label class="form-label fw-semibold">FIRMS confidence</label>
+                <div class="btn-group btn-group-sm du-firms-confidence-pills" role="group" aria-label="FIRMS confidence filter">
+                  <input type="radio" class="btn-check" name="duFirmsConfidence" id="duFirmsConfHigh" value="high" autocomplete="off" checked>
+                  <label class="btn btn-outline-secondary" for="duFirmsConfHigh">High</label>
+
+                  <input type="radio" class="btn-check" name="duFirmsConfidence" id="duFirmsConfNominal" value="nominal" autocomplete="off">
+                  <label class="btn btn-outline-secondary" for="duFirmsConfNominal">Nominal+</label>
+
+                  <input type="radio" class="btn-check" name="duFirmsConfidence" id="duFirmsConfAll" value="all" autocomplete="off">
+                  <label class="btn btn-outline-secondary" for="duFirmsConfAll">All</label>
+                </div>
+                <p class="small text-muted mt-1 mb-0">Applies to NASA FIRMS only. Default <strong>High</strong> keeps the map clean; Nominal+ / All show more detections (more noise).</p>
               </div>
               <div class="row g-3 align-items-start">
                 <div class="col-md-3 col-sm-6">
@@ -1507,6 +1521,8 @@
     <script src="/finance/js/disaster-camera-filters.js"></script>
     <script src="/finance/js/disaster-weather-alert-filters.js"></script>
     <script src="/finance/js/disaster-major-now-filter.js"></script>
+    <script src="/finance/js/disaster-firms-confidence-filter.js"></script>
+    <script src="/finance/js/disaster-hotspot-filters.js"></script>
     <script src="/finance/js/hazard-webcam-viewer.js"></script>
     <script type="module" src="/shared/disaster-kml-export.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>

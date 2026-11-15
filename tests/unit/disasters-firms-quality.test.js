@@ -24,6 +24,21 @@ describe('FIRMS quality gate (combined pull)', () => {
     expect(normalizeFirmsConfidence('n')).toBe('nominal');
   });
 
+  test('default ingest confidence floor is nominal', () => {
+    const prev = process.env.FIRMS_MIN_CONFIDENCE;
+    delete process.env.FIRMS_MIN_CONFIDENCE;
+    try {
+      const t = getFirmsQualityThresholds();
+      expect(t.minConfidence).toBe('nominal');
+      expect(passesFirmsConfidenceGate('nominal', t)).toBe(true);
+      expect(passesFirmsConfidenceGate('high', t)).toBe(true);
+      expect(passesFirmsConfidenceGate('low', t)).toBe(false);
+    } finally {
+      if (prev !== undefined) process.env.FIRMS_MIN_CONFIDENCE = prev;
+      else delete process.env.FIRMS_MIN_CONFIDENCE;
+    }
+  });
+
   test('passesFirmsThermalGate accepts brightness or FRP', () => {
     expect(passesFirmsThermalGate({ brightness: 340, frp: null }, thresholds)).toBe(true);
     expect(passesFirmsThermalGate({ brightness: 200, frp: 5 }, thresholds)).toBe(true);
@@ -39,6 +54,9 @@ describe('FIRMS quality gate (combined pull)', () => {
 
     const clustered = parseFirmsDetectionProps({ confidence: 'high', bright_ti4: 335, frp: 5 });
     expect(isLikelyActualFirmsFire(clustered, 2, thresholds)).toBe(true);
+
+    const nominalClustered = parseFirmsDetectionProps({ confidence: 'nominal', bright_ti4: 335, frp: 5 });
+    expect(isLikelyActualFirmsFire(nominalClustered, 2, thresholds)).toBe(true);
   });
 
   test('low confidence detections fail gate', () => {

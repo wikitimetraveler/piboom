@@ -57,7 +57,7 @@ Impact graph seeding adds **`NEAR`** edges (`disaster_event → loan`) from a sp
 
 ### FIRMS clustering
 
-FIRMS NRT detections are clustered with **union-find single-linkage** (`clusterFirmsDetectionsByDistance`): membership is order-independent; elongated fronts can chain beyond diameter \(2r\). Quality gates (confidence / thermal / cluster-or-strong-solo) remain precision-oriented.
+FIRMS NRT detections are clustered with **union-find single-linkage** (`clusterFirmsDetectionsByDistance`): membership is order-independent; elongated fronts can chain beyond diameter \(2r\). Quality gates (confidence / thermal / cluster-or-strong-solo) remain precision-oriented. Ingest default confidence floor is **`nominal`** (`FIRMS_MIN_CONFIDENCE`); cluster rows store `raw.firms_confidence`. Unified Disasters UI filter: **High** (default) / **Nominal+** / **All** (`public/finance/js/disaster-firms-confidence-filter.js`).
 
 **Upsert shape:** `aggregateFirmsClusterEvents` writes **one `disasters` row per qualifying cluster** (centroid + max FRP/brightness), not one row per VIIRS pixel. Stable `source_id` looks like `firms-cluster:YYYY-MM-DD:lat:lng`. Coordinates use `hasFiniteCoords` (allows `0°`; never falsy `lat && lng`).
 
@@ -135,7 +135,7 @@ FIRMS NRT detections are clustered with **union-find single-linkage** (`clusterF
 ## Environment Variables
 
 - `NASA_API_KEY` – NASA FIRMS fire data
-- `FIRMS_MIN_CONFIDENCE` / `FIRMS_MIN_BRIGHTNESS` / `FIRMS_MIN_FRP` / `FIRMS_CLUSTER_RADIUS_KM` – FIRMS quality gates (defaults: high / 330 / 4 / 5)
+- `FIRMS_MIN_CONFIDENCE` / `FIRMS_MIN_BRIGHTNESS` / `FIRMS_MIN_FRP` / `FIRMS_CLUSTER_RADIUS_KM` – FIRMS quality gates (defaults: nominal / 330 / 4 / 5)
 - `USGS_MIN_MAG` – Minimum earthquake magnitude to ingest (default `2.5`)
 - `USGS_MIN_SIG` – Optional USGS significance floor; when set, keep quakes with `sig >=` this value even if mag is below `USGS_MIN_MAG`
 - `DATABASE_URL` – PostgreSQL (disasters table, `fire_cameras` hazard webcams)
@@ -220,6 +220,7 @@ Mute: music icon in the AI chat header, or `localStorage` key `dc_disaster_music
 | UI element | Meaning |
 |------------|---------|
 | **Major now** | Sticky source-bar filter: keep only **High** (intensity ≥ 6) and **Critical** (≥ 10) events from the last **2 or 3 days**. Applies to the grid, map pins, stats, and risk intel. Event intensity is a relative ranking — not loan ops triage and not a loss probability. Deep link: `?major=1` (3 days) or `?major=2` / `?major=3`. |
+| **Showcase demo** | `?showcase=1` (or `?showcase=demo`) auto-runs **Run Full Showcase Demo**: seeds reference hazards if the DB is empty, opens hotspots + spreadsheet, and analyzes the hashed 12-loan sample tape (`LN-HASH-*` / `Borrower-A`…`L`). |
 | **Freshness dot (green)** | Source is enabled and returned rows in the current grid load |
 | **Freshness dot (amber)** | Source is enabled but returned zero rows (check filters or run **Refresh data**) |
 | **Freshness dot (gray)** | Source is disabled |

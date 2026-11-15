@@ -123,6 +123,25 @@ describe('WebGpuGlobe', () => {
     expect(sync.sunDir.x).toBeGreaterThan(0);
   });
 
+  test('capHazardPoints maps multi-source disasters into GPU pulse weights', () => {
+    const pts = WebGpuGlobe.capHazardPoints(
+      [
+        { lat: 34.05, lng: -118.25, source: 'firms', frp: 80, brightness: 400 },
+        { latitude: 37.7, longitude: -122.4, source: 'usgs', mag: 6.2 },
+        { lat: 25.8, lon: -80.2, source: 'nhc' },
+        { lat: 40.7, lng: -74.0, source: 'fema', risk_score: 9 },
+        { lat: 1, lng: 1, isCamera: true, source: 'alertcalifornia' },
+        { lat: 999, lng: 0, source: 'nws' },
+      ],
+      50
+    );
+    expect(pts.length).toBe(4);
+    expect(pts[0].weight).toBeGreaterThan(1);
+    expect(pts.every((p) => Number.isFinite(p.lat) && Number.isFinite(p.lon) && p.weight > 0)).toBe(
+      true
+    );
+  });
+
   test('LANDMARKS include Moon, Mars, Jupiter, Earth, Saturn, and outer-body targets', () => {
     expect(WebGpuGlobe.LANDMARKS.moon.lat).toBeCloseTo(-9.5, 5);
     expect(WebGpuGlobe.LANDMARKS.moon.href).toMatch(/lane-museum/);
@@ -226,6 +245,46 @@ describe('WebGpuCalcEngineDag', () => {
     expect(typeof WebGpuCalcEngineDag.layoutFhaDag).toBe('function');
     expect(WebGpuCalcEngineDag.PAINT_WGSL).toMatch(/@compute/);
     expect(WebGpuCalcEngineDag.INTEGER_KERNEL_WGSL).toMatch(/round_half_up_mul_div/);
+  });
+
+  test('mount api exposes setPaused for private-agent GPU coexistence', async () => {
+    const prevRaf = globalThis.requestAnimationFrame;
+    const prevCancel = globalThis.cancelAnimationFrame;
+    const prevWindow = globalThis.window;
+    globalThis.requestAnimationFrame = (fn) => {
+      void fn;
+      return 1;
+    };
+    globalThis.cancelAnimationFrame = () => {};
+    globalThis.window = {
+      addEventListener() {},
+      removeEventListener() {},
+    };
+    try {
+      const canvas = {
+        getContext: () => null,
+        style: {},
+        parentElement: { clientWidth: 320, clientHeight: 240 },
+        width: 0,
+        height: 0,
+      };
+      const viz = await WebGpuCalcEngineDag.mount({
+        canvas,
+        layout: { nodes: [], edges: [] },
+      });
+      expect(viz).toBeTruthy();
+      expect(typeof viz.setPaused).toBe('function');
+      expect(typeof viz.isPaused).toBe('function');
+      viz.setPaused(true);
+      expect(viz.isPaused()).toBe(true);
+      viz.setPaused(false);
+      expect(viz.isPaused()).toBe(false);
+      viz.dispose();
+    } finally {
+      globalThis.requestAnimationFrame = prevRaf;
+      globalThis.cancelAnimationFrame = prevCancel;
+      globalThis.window = prevWindow;
+    }
   });
 
   test('layoutFhaDag from createFHACalculatorConfig has 11 results and expected edges', () => {

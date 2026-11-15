@@ -19,25 +19,27 @@ describe('menu-config auth filtering', () => {
     MENU_CONFIG = loadMenuConfig();
   });
 
-  test('pathRequiresAuth gates mortgage pages; disaster suite and GSE stay public', () => {
+  test('pathRequiresAuth gates mortgage pages; Open Lender Suite and GSE stay public', () => {
     expect(MENU_CONFIG.pathRequiresAuth('/finance/index.html')).toBe(true);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/fha-streamline-calculator.html')).toBe(true);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/disasters-unified.html')).toBe(false);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/disasters-webcams.html')).toBe(false);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/disasters-encompass-map.html')).toBe(false);
-    expect(MENU_CONFIG.pathRequiresAuth('/finance/encompass-assistant.html')).toBe(true);
+    expect(MENU_CONFIG.pathRequiresAuth('/finance/encompass-assistant.html')).toBe(false);
+    expect(MENU_CONFIG.pathRequiresAuth('/finance/loan-flight-sim.html')).toBe(false);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/calc-engine-webgpu.html')).toBe(false);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/encompass-hub.html')).toBe(true);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/unit-tests.html')).toBe(true);
     expect(MENU_CONFIG.pathRequiresAuth('/gse-analyzer.html')).toBe(false);
   });
 
-  test('filterToolsByAuth logged-out visible set is the open suite + GSE', () => {
+  test('filterToolsByAuth logged-out visible set is the Open Lender Suite + GSE', () => {
     const visible = MENU_CONFIG.filterToolsByAuth(MENU_CONFIG.ENCOMPASS_TOOLS, false);
     const hrefs = visible.map((t) => t.href);
     expect(hrefs).toContain('/finance/disasters-unified.html');
     expect(hrefs).toContain('/finance/disasters-encompass-map.html');
-    expect(hrefs).not.toContain('/finance/encompass-assistant.html');
+    expect(hrefs).toContain('/finance/encompass-assistant.html');
+    expect(hrefs).toContain('/finance/loan-flight-sim.html');
     expect(hrefs).toContain('/gse-analyzer.html');
     expect(hrefs).not.toContain('/finance/index.html');
     expect(hrefs).not.toContain('/finance/unit-tests.html');
@@ -62,7 +64,9 @@ describe('menu-config auth filtering', () => {
     const outHrefs = loggedOut.filter((t) => t.href).map((t) => t.href);
     expect(outHrefs).toContain('/open/');
     expect(outHrefs).toContain('/finance/disasters-unified.html');
-    expect(outHrefs).not.toContain('/finance/encompass-assistant.html');
+    expect(outHrefs).toContain('/finance/encompass-assistant.html');
+    expect(outHrefs).toContain('/finance/loan-flight-sim.html');
+    expect(outHrefs).toContain('/finance/calc-engine-webgpu.html');
     expect(outHrefs).toContain('/gse-analyzer.html');
     expect(outHrefs).not.toContain('/finance/encompass-hub.html');
     expect(outHrefs).not.toContain('/finance/unit-tests.html');
@@ -88,13 +92,14 @@ describe('menu-config auth filtering', () => {
     );
   });
 
-  test('getMortgageTools returns the open suite when logged out; full set when logged in', () => {
+  test('getMortgageTools returns the Open Lender Suite when logged out; full set when logged in', () => {
     const loggedOut = MENU_CONFIG.getMortgageTools(false);
     const loggedIn = MENU_CONFIG.getMortgageTools(true);
     const outHrefs = loggedOut.map((t) => t.href);
     expect(outHrefs).toContain('/open/');
     expect(outHrefs).toContain('/finance/disasters-unified.html');
-    expect(outHrefs).not.toContain('/finance/encompass-assistant.html');
+    expect(outHrefs).toContain('/finance/encompass-assistant.html');
+    expect(outHrefs).toContain('/finance/loan-flight-sim.html');
     expect(outHrefs).toContain('/gse-analyzer.html');
     expect(outHrefs).toContain('/finance/calc-engine-webgpu.html');
     expect(outHrefs).not.toContain('/finance/dti-calculator.html');

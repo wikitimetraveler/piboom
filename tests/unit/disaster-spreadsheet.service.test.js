@@ -179,4 +179,13 @@ describe('disaster-spreadsheet.service', () => {
     expect(guidance.filterCategory).toBe('fema_hold');
     expect(guidance.collateralNeed).toMatch(/Inspection/i);
   });
+
+  test('sample lender tape uses hashed loan IDs and borrower aliases only', () => {
+    const client = loadClientSpreadsheetAnalyzer();
+    expect(typeof client.runFullShowcaseDemo).toBe('function');
+    for (const row of client.SAMPLE_LENDER_TAPE) {
+      expect(row.loan_number).toMatch(/^LN-HASH-/);
+      expect(row.borrower_name).toMatch(/^Borrower-[A-L]$/);
+    }
+  });
 });

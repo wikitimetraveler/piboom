@@ -9,6 +9,7 @@ import {
   getZonedParts,
   inferMealSlot,
   computeFeedingStatus,
+  buildHistoryByDay,
   addFeedEntry,
   deleteFeedEntry,
   __resetCorgiMemoryCacheForTests,
@@ -24,15 +25,14 @@ function pacificIso(year, month, day, hour, minute = 0) {
   return new Date(`${year}-${mm}-${dd}T${hh}:${mi}:00-08:00`);
 }
 
-describe('corgi.service — Crouton Cardigan Welsh Corgi × Aussie Tracker', () => {
+describe('corgi.service — Crouton Cowboy Corgi Tracker', () => {
   beforeEach(() => {
     __resetCorgiMemoryCacheForTests();
   });
 
   test('exposes Crouton profile with David, Tina, and Hieu and 2-cup daily schedule', () => {
     expect(CROUTON_PROFILE.name).toBe('Crouton');
-    expect(CROUTON_PROFILE.breed).toMatch(/Cardigan Welsh Corgi/i);
-    expect(CROUTON_PROFILE.breed).toMatch(/Australian Shepherd/i);
+    expect(CROUTON_PROFILE.breed).toBe('Cowboy Corgi');
     expect(CROUTON_PROFILE.feeders).toEqual(['David', 'Tina', 'Hieu']);
     expect(CROUTON_PROFILE.timeZone).toBe(CROUTON_TIME_ZONE);
     expect(CROUTON_PROFILE.dailySchedule.dailyGoalCups).toBe(2);
@@ -59,6 +59,60 @@ describe('corgi.service — Crouton Cardigan Welsh Corgi × Aussie Tracker', () 
 
     expect(inferMealSlot(eightAm)).toBe('morning');
     expect(inferMealSlot(fivePm)).toBe('evening');
+  });
+
+  test('buildHistoryByDay / status history calendar keeps today separate from past days', () => {
+    const logs = [
+      {
+        id: 't1',
+        entryType: 'treat',
+        mealSlot: 'treat',
+        fedBy: 'Hieu',
+        cups: 0,
+        note: 'Dental chew',
+        fedAt: pacificIso(2026, 11, 8, 7, 0).toISOString(),
+      },
+      {
+        id: 'm-sun',
+        entryType: 'meal',
+        mealSlot: 'morning',
+        fedBy: 'David',
+        cups: 1,
+        note: 'Morning',
+        fedAt: pacificIso(2026, 11, 8, 8, 5).toISOString(),
+      },
+      {
+        id: 'm-sat-pm',
+        entryType: 'meal',
+        mealSlot: 'evening',
+        fedBy: 'Tina',
+        cups: 1,
+        note: 'Evening',
+        fedAt: pacificIso(2026, 11, 7, 17, 10).toISOString(),
+      },
+      {
+        id: 'm-sat-am',
+        entryType: 'meal',
+        mealSlot: 'morning',
+        fedBy: 'David',
+        cups: 1,
+        note: 'Morning',
+        fedAt: pacificIso(2026, 11, 7, 8, 5).toISOString(),
+      },
+    ];
+
+    const sundayMorning = pacificIso(2026, 11, 8, 9, 0);
+    const status = computeFeedingStatus(logs, sundayMorning);
+    expect(status.historyByDay.map((d) => d.dayKey)).toEqual(['2026-11-08', '2026-11-07']);
+    expect(status.historyByDay[0].isToday).toBe(true);
+    expect(status.historyByDay[0].mealCups).toBe(1);
+    expect(status.historyByDay[0].treatsCount).toBe(1);
+    expect(status.historyByDay[1].isToday).toBe(false);
+    expect(status.historyByDay[1].mealCups).toBe(2);
+    expect(status.historyByDay[1].entries).toHaveLength(2);
+
+    const grouped = buildHistoryByDay(logs, '2026-11-08');
+    expect(grouped).toHaveLength(2);
   });
 
   test('yesterday evening meal does NOT count toward today after Pacific midnight', () => {

@@ -27,6 +27,8 @@ var lastNearbyWeatherAlerts = [];
 var nwsGridFilterActive = false;
 var nwsGridFilterContext = null;
 var timeRangeFilterHours = null;
+/** FIRMS confidence view: high | nominal | all (default high — map stays clean) */
+var firmsConfidenceFilter = 'high';
 /** Major now: High/Critical event intensity + last 2–3 days */
 var majorNowFilterActive = false;
 var majorNowFilterHours = 72;

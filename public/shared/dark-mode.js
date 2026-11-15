@@ -641,17 +641,19 @@ function initDarkMode() {
   const isGlazedPage = document.body.classList.contains('gz-page');
   const isNightHub = document.body.classList.contains('music-menu-page')
     || document.body.classList.contains('nature-hub-page');
+  const isOpenSuite = document.body.classList.contains('open-suite-page');
   const isMeAtlas = isMiddleEastAtlasPage();
   const storedPref = localStorage.getItem(DARK_MODE_KEY);
   const meAtlasPref = localStorage.getItem(ME_ATLAS_DARK_MODE_KEY);
 
-  // Glazed, Music, Nature Hub, and Middle East atlas pages default to night mode.
-  // ME atlas uses its own key so a light/dark choice sticks without following sitewide.
-  // Other pages respect saved preference or stay light.
+  // Glazed, Music, Nature Hub, Open Lender Suite, and Middle East atlas pages
+  // default to night mode. ME atlas uses its own key so a light/dark choice
+  // sticks without following sitewide. Other pages respect saved preference
+  // or stay light.
   let shouldBeDark = false;
   if (isMeAtlas) {
     shouldBeDark = meAtlasPref === null ? true : meAtlasPref === 'true';
-  } else if (isGlazedPage || isNightHub) {
+  } else if (isGlazedPage || isNightHub || isOpenSuite) {
     shouldBeDark = storedPref === null ? true : storedPref === 'true';
   } else {
     shouldBeDark = storedPref === 'true';

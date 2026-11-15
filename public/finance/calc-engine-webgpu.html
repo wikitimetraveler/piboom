@@ -92,6 +92,24 @@
       .ce-timing-card strong { display: block; font-size: 0.8rem; letter-spacing: 0.03em; text-transform: uppercase; color: #6b7c8a; }
       .ce-timing-card .ce-scale { font-size: 1.35rem; font-weight: 700; color: var(--dark); line-height: 1.2; }
       .ce-timing-card p { margin: 0.35rem 0 0; font-size: 0.85rem; color: #5a6a78; }
+      .ce-private-agent {
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.1rem 1.25rem;
+        background: linear-gradient(165deg, #f4faf8 0%, #eef6f4 55%, #f8fafb 100%);
+        margin-top: 1.5rem;
+      }
+      .ce-private-agent__log {
+        min-height: 140px;
+        max-height: 280px;
+        overflow: auto;
+        background: #fff;
+        font-size: 0.875rem;
+      }
+      .ce-private-agent__msg { margin-bottom: 0.55rem; }
+      .ce-private-agent__msg--user strong { color: var(--dark); }
+      .ce-private-agent__msg--assistant strong { color: var(--primary); }
+      .ce-private-agent__msg--tool { color: #5a6a78; font-size: 0.8rem; }
     </style>
   </head>
   <body class="worksheets-shell" data-calculator="calc-engine-webgpu">
@@ -100,7 +118,7 @@
         <span class="navbar-brand mb-0 fs-5">Calc Engine · WebGPU</span>
         <div class="navbar-collapse">
           <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><a class="nav-link" href="/open/"><i class="bi bi-collection me-1"></i>Open suite</a></li>
+            <li class="nav-item"><a class="nav-link" href="/open/"><i class="bi bi-collection me-1"></i>Open Lender Suite</a></li>
           </ul>
         </div>
       </div>
@@ -261,6 +279,7 @@
           <li><strong>Batch / stress grids</strong> — thousands of independent scenarios in one dispatch (rate × balance × factor), not one keystroke chain.</li>
           <li><strong>Teach / audit / demos</strong> — pulse the graph so the add-on total through the final amount is easy to follow.</li>
           <li><strong>Second-opinion verifier</strong> — GPU cents match CPU integer cents, while the worksheet stays on decimal <code>calcMath</code>.</li>
+          <li><strong>Private on-device agent</strong> — WebLLM on WebGPU explains the DAG and runs what-ifs locally; loan inputs never hit our server assistants.</li>
         </ul>
 
         <h3>Where not to use it</h3>
@@ -275,6 +294,8 @@
           Product calculators stay on CPU. Scale the kernel only when the workload is many independent loans, not one form.
         </p>
       </section>
+
+      <div id="cePrivateAgentPanel" aria-label="Private GPU agent"></div>
     </div>
     </div>
 
@@ -283,6 +304,7 @@
     <script src="/shared/calculationEngine.js"></script>
     <script src="/shared/js/webgpu-runtime.js"></script>
     <script src="/shared/js/webgpu-calc-engine-dag.js"></script>
+    <script src="/shared/js/webgpu-private-agent.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', async function () {
         const config = createFHACalculatorConfig({ prefix: 'fs' });
@@ -434,6 +456,47 @@
             window.setTimeout(refreshCompare, 80);
           });
         });
+
+        const agentPanel = document.getElementById('cePrivateAgentPanel');
+        if (agentPanel && window.WebGpuPrivateAgent) {
+          WebGpuPrivateAgent.mount({
+            panelRoot: agentPanel,
+            getLiveInputs: readInputs,
+            getLayout: function () { return layout; },
+            getCompareSnapshot: async function () {
+              const live = readInputs();
+              const cpuInt = calcMath.fhaLoanAmountIntegerCents(live);
+              const gpuRun = viz
+                ? await viz.runIntegerKernel(live)
+                : { source: 'cpu', cents: cpuInt };
+              return {
+                inputs: live,
+                calcMathLive: {
+                  g15: num('fs_g15'),
+                  g20: num('fs_g20'),
+                  g24: num('fs_g24'),
+                  e29: num('fs_e29'),
+                  g29: num('fs_g29'),
+                  g30: num('fs_g30'),
+                  g33: num('fs_g33')
+                },
+                cpuIntegerCents: cpuInt,
+                kernel: { source: gpuRun.source || 'cpu', cents: gpuRun.cents || cpuInt }
+              };
+            },
+            runIntegerKernel: async function (input) {
+              if (!viz) {
+                return { source: 'cpu', cents: calcMath.fhaLoanAmountIntegerCents(input) };
+              }
+              return viz.runIntegerKernel(input);
+            },
+            onGpuBusy: function (busy) {
+              if (viz && typeof viz.setPaused === 'function') {
+                viz.setPaused(busy);
+              }
+            }
+          });
+        }
       });
     </script>
     <script src="/shared/finance-auth-guard.js"></script>

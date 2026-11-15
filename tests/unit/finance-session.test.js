@@ -39,14 +39,14 @@ describe('finance-session', () => {
     expect(financeSessionClearCookieHeader()).toMatch(/Max-Age=0/);
   });
 
-  test('financePathNeedsSession allows public disaster suite and hazard geo assets', () => {
+  test('financePathNeedsSession allows Open Lender Suite pages and hazard geo assets', () => {
     expect(financePathNeedsSession('/finance/disasters-unified.html')).toBe(false);
     expect(financePathNeedsSession('/finance/disasters-webcams.html')).toBe(false);
     expect(financePathNeedsSession('/finance/disasters-encompass-map.html')).toBe(false);
-    expect(financePathNeedsSession('/finance/encompass-assistant.html')).toBe(true);
+    expect(financePathNeedsSession('/finance/encompass-assistant.html')).toBe(false);
+    expect(financePathNeedsSession('/finance/loan-flight-sim.html')).toBe(false);
     expect(financePathNeedsSession('/finance/calc-engine-webgpu.html')).toBe(false);
     expect(financePathNeedsSession('/gse-analyzer.html')).toBe(false);
-    expect(financePathNeedsSession('/finance/encompass-assistant.html')).toBe(true);
     expect(financePathNeedsSession('/finance/assets/geo/us-states.geojson')).toBe(false);
     expect(financePathNeedsSession('/finance/assets/geo/us-states.topojson')).toBe(false);
     expect(financePathNeedsSession('/finance/assets/geo/counties/CA.geojson')).toBe(false);

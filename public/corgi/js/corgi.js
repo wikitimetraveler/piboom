@@ -1,5 +1,5 @@
 /**
- * Crouton — Brown Cardigan Welsh Corgi × Australian Shepherd ("Cardi-Auggie")
+ * Crouton — Cowboy Corgi (Cardigan Welsh × Aussie ranch mix)
  * Mobile Bucket Lid Scanner, Anti-Overfeeding Tracker & Fun Facts
  */
 
@@ -9,30 +9,37 @@
 
   const CROUTON_FACTS = [
     {
+      id: 'cowboy-corgi',
+      category: 'auggie',
+      categoryLabel: '🤠 Cowboy Corgi',
+      title: 'Crouton Is Officially a Cowboy Corgi',
+      body: 'Cardigan Welsh Corgis herded cattle for centuries in Wales, and Australian Shepherds ran American ranches. Put that together and you get Crouton: a short-legged cowboy with a brindle duster coat and white boot paws.',
+    },
+    {
       id: 'cardigan-oldest',
       category: 'auggie',
-      categoryLabel: '🤎 Brown Cardigan × Aussie',
+      categoryLabel: '🤠 Cowboy Corgi',
       title: 'Cardigan Welsh Corgis Are Over 3,000 Years Old',
       body: 'Unlike the younger Pembroke Corgi, the Cardigan Welsh Corgi is one of the oldest herding breeds in the British Isles—brought to Cardiganshire, Wales around 1200 BC by Celtic tribes!',
     },
     {
       id: 'brown-brindle-coat',
       category: 'auggie',
-      categoryLabel: '🤎 Brown Cardigan × Aussie',
-      title: 'Why Crouton Has That Gorgeous Toasted Brown Coat',
-      body: 'Both Cardigan Welsh Corgis (famous for brown, sable, and brindle coats) and Australian Shepherds (red/liver and copper-trimmed coats) carry rich brown pigment genes—making Crouton a literal toasted crouton!',
+      categoryLabel: '🤠 Cowboy Corgi',
+      title: 'That Brindle Coat Is Pure Cowboy Duster',
+      body: 'Crouton’s charcoal stripes over warm ginger and taupe are classic Cardigan brindle—like a tiny ranch hand wearing a weathered brown duster. His cream neck patch and white paws finish the look.',
     },
     {
       id: 'cardigan-tail-rudder',
       category: 'auggie',
-      categoryLabel: '🤎 Brown Cardigan × Aussie',
+      categoryLabel: '🤠 Cowboy Corgi',
       title: 'The Cardigan Brush Tail Is a High-Speed Rudder',
       body: 'Cardigan Welsh Corgis keep their long, low-set fox brush tail! Combined with Australian Shepherd agility, they use their tail and low center of gravity as a rudder for hairpin turns.',
     },
     {
       id: 'double-herder-brain',
       category: 'auggie',
-      categoryLabel: '🤎 Brown Cardigan × Aussie',
+      categoryLabel: '🤠 Cowboy Corgi',
       title: 'Double Cattle-Herding Genius ("The Cardi-Auggie")',
       body: 'Cardigans were bred to drive Welsh cattle by nipping heels and ducking kicks, while Aussies managed huge American ranches. Together, Crouton has two PhDs in bossing his humans around the kitchen.',
     },
@@ -74,21 +81,28 @@
     {
       id: 'sploot-science',
       category: 'quirks',
-      categoryLabel: '🍑 Sploots, Loaf & Zoomies',
+      categoryLabel: '🐾 Face, Ears & White Paws',
       title: 'Master of the Full Drumstick "Sploot"',
       body: 'When Crouton stretches both hind legs straight out behind him like furry drumsticks, that’s a "sploot"! Corgis have extra-flexible hip sockets and love pressing their bellies flat against cool floors.',
     },
     {
       id: 'cardigan-sonar-ears',
       category: 'quirks',
-      categoryLabel: '🍑 Sploots, Loaf & Zoomies',
-      title: 'Cardigan Radar Dishes Hear the Food Bucket From 3 Rooms Away',
-      body: 'Cardigan Welsh Corgis have larger, more rounded ears than Pembrokes. Those radar dishes were built to hear cattle in thick Welsh fog—and today they can detect the food storage bucket lid clicking open from anywhere in the house.',
+      categoryLabel: '🐾 Face, Ears & White Paws',
+      title: 'Those Big Cardigan Ears Are Ranch Radar',
+      body: 'Cardigan Welsh Corgis have larger, more rounded “bat” ears than Pembrokes. Crouton’s radar dishes can hear cattle in Welsh fog—or the food bucket lid clicking open from three rooms away.',
+    },
+    {
+      id: 'white-boot-paws',
+      category: 'quirks',
+      categoryLabel: '🐾 Face, Ears & White Paws',
+      title: 'White Boot Paws Complete the Cowboy Look',
+      body: 'Crouton’s bright white front paws look like tiny cowboy boots against his brindle coat. Cardigans often flash white feet and chest blazes—perfect ranch-hand footwear for kitchen patrol.',
     },
     {
       id: 'fraps-and-awoos',
       category: 'quirks',
-      categoryLabel: '🍑 Sploots, Loaf & Zoomies',
+      categoryLabel: '🐾 Face, Ears & White Paws',
       title: 'FRAPs (8 PM Zoomies) & The Aussie-Corgi "Barooo"',
       body: 'Between the Cardigan bark and the Australian Shepherd "woo-woo" grumble, Cardi-Auggies have an entire vocabulary of SASS—usually followed by FRAPs (Frenetic Random Activity Periods, aka hallway zoomies).',
     },
@@ -101,6 +115,8 @@
     selectedFactCategory: 'all',
     spotlightIndex: 0,
     lastFetchedTodayKey: null,
+    /** Pacific YYYY-MM-DD for the past-day calendar chip (never "today"). */
+    selectedHistoryDay: null,
   };
 
   function init() {
@@ -570,53 +586,200 @@
       treatsBadge.textContent = `${count} treat${count === 1 ? '' : 's'} today`;
     }
 
-    // History List
-    renderHistoryList(data.recentLogs || []);
+    // History: today block + past-day calendar (not one endless stack)
+    renderHistoryList(data);
   }
 
-  function renderHistoryList(logs) {
+  function buildClientHistoryByDay(logs, todayKey) {
+    const buckets = new Map();
+    for (const entry of logs || []) {
+      const dayKey = getClientPacificDayKey(new Date(entry.fedAt));
+      if (!buckets.has(dayKey)) {
+        buckets.set(dayKey, {
+          dayKey,
+          isToday: dayKey === todayKey,
+          mealCups: 0,
+          treatsCount: 0,
+          entries: [],
+        });
+      }
+      const bucket = buckets.get(dayKey);
+      bucket.entries.push(entry);
+      if (entry.entryType === 'treat') bucket.treatsCount += 1;
+      else bucket.mealCups = Number((bucket.mealCups + (Number(entry.cups) || 0)).toFixed(2));
+    }
+    return [...buckets.values()].sort((a, b) => b.dayKey.localeCompare(a.dayKey));
+  }
+
+  function formatHistoryDayLabel(dayKey, todayKey) {
+    if (dayKey === todayKey) return 'Today';
+    const yesterdayKey = getClientPacificDayKey(new Date(Date.now() - 24 * 3600000));
+    if (dayKey === yesterdayKey) return 'Yesterday';
+    const d = new Date(`${dayKey}T12:00:00-08:00`);
+    if (Number.isNaN(d.getTime())) return dayKey;
+    return d.toLocaleDateString([], {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      timeZone: 'America/Los_Angeles',
+    });
+  }
+
+  function formatHistoryChipLabel(dayKey, todayKey) {
+    if (dayKey === todayKey) return 'Today';
+    const yesterdayKey = getClientPacificDayKey(new Date(Date.now() - 24 * 3600000));
+    if (dayKey === yesterdayKey) return 'Yest';
+    const d = new Date(`${dayKey}T12:00:00-08:00`);
+    if (Number.isNaN(d.getTime())) return dayKey.slice(5);
+    return d.toLocaleDateString([], {
+      month: 'short',
+      day: 'numeric',
+      timeZone: 'America/Los_Angeles',
+    });
+  }
+
+  function renderLogEntry(item) {
+    const isTreat = item.entryType === 'treat';
+    const icon = isTreat ? '🦴' : item.mealSlot === 'morning' ? '🌅' : '🌇';
+    const title = isTreat
+      ? `Treat Note: ${escapeHtml(item.note || 'Treat')}`
+      : `${item.mealSlot === 'morning' ? 'Morning Meal (~8 AM)' : 'Evening Meal (~5 PM)'} — ${item.cups} Cup`;
+    const sub = `By <strong>${escapeHtml(item.fedBy)}</strong> • ${formatClockTime(
+      item.fedAt
+    )} (${formatRelativeTime(item.fedAt)})`;
+
+    return `
+      <div class="crouton-log-item">
+        <div class="d-flex align-items-center gap-2">
+          <div class="crouton-log-icon" aria-hidden="true">${icon}</div>
+          <div>
+            <div class="crouton-log-title">${title}</div>
+            <div class="crouton-log-sub">${sub}</div>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-secondary crouton-undo-btn"
+          data-delete-id="${escapeHtml(item.id)}"
+          title="Undo / delete this entry"
+        >
+          <i class="bi bi-trash3"></i>
+        </button>
+      </div>
+    `;
+  }
+
+  function daySummaryLine(bucket) {
+    const cups = Number(bucket.mealCups || 0);
+    const treats = Number(bucket.treatsCount || 0);
+    const cupBit = `${cups} cup${cups === 1 ? '' : 's'}`;
+    const treatBit = `${treats} treat${treats === 1 ? '' : 's'}`;
+    return `${cupBit} · ${treatBit}`;
+  }
+
+  function renderHistoryList(data) {
     const container = document.getElementById('feedHistoryList');
     if (!container) return;
 
-    if (!logs.length) {
+    const todayKey = data.todayKey || getClientPacificDayKey();
+    const historyByDay =
+      Array.isArray(data.historyByDay) && data.historyByDay.length
+        ? data.historyByDay
+        : buildClientHistoryByDay(data.recentLogs || [], todayKey);
+
+    if (!historyByDay.length) {
       container.innerHTML =
         '<div class="text-muted small py-2">No bucket scoops or treat notes yet. Tap your name above to log Crouton’s first meal!</div>';
       return;
     }
 
-    container.innerHTML = logs
-      .slice(0, 12)
-      .map((item) => {
-        const isTreat = item.entryType === 'treat';
-        const icon = isTreat ? '🦴' : item.mealSlot === 'morning' ? '🌅' : '🌇';
-        const title = isTreat
-          ? `Treat Note: ${escapeHtml(item.note || 'Treat')}`
-          : `${item.mealSlot === 'morning' ? 'Morning Meal (~8 AM)' : 'Evening Meal (~5 PM)'} — ${item.cups} Cup`;
-        const sub = `By <strong>${escapeHtml(item.fedBy)}</strong> • ${formatClockTime(
-          item.fedAt
-        )} (${formatRelativeTime(item.fedAt)})`;
+    const todayBucket = historyByDay.find((d) => d.dayKey === todayKey) || {
+      dayKey: todayKey,
+      isToday: true,
+      mealCups: 0,
+      treatsCount: 0,
+      entries: [],
+    };
+    const pastDays = historyByDay.filter((d) => d.dayKey !== todayKey);
 
-        return `
-          <div class="crouton-log-item">
-            <div class="d-flex align-items-center gap-2">
-              <div class="crouton-log-icon" aria-hidden="true">${icon}</div>
-              <div>
-                <div class="crouton-log-title">${title}</div>
-                <div class="crouton-log-sub">${sub}</div>
-              </div>
-            </div>
-            <button
-              type="button"
-              class="btn btn-sm btn-outline-secondary crouton-undo-btn"
-              data-delete-id="${escapeHtml(item.id)}"
-              title="Undo / delete this entry"
-            >
-              <i class="bi bi-trash3"></i>
-            </button>
+    if (
+      state.selectedHistoryDay &&
+      (state.selectedHistoryDay === todayKey || !pastDays.some((d) => d.dayKey === state.selectedHistoryDay))
+    ) {
+      state.selectedHistoryDay = pastDays[0]?.dayKey || null;
+    }
+    if (!state.selectedHistoryDay && pastDays.length) {
+      state.selectedHistoryDay = pastDays[0].dayKey;
+    }
+
+    const selectedPast = pastDays.find((d) => d.dayKey === state.selectedHistoryDay) || null;
+
+    const todayEntriesHtml = todayBucket.entries.length
+      ? todayBucket.entries.map(renderLogEntry).join('')
+      : '<div class="crouton-history-empty">Nothing logged yet today — meter is fresh.</div>';
+
+    const calendarHtml = pastDays.length
+      ? `
+        <div class="crouton-history-past">
+          <div class="crouton-history-past-label">
+            <i class="bi bi-calendar-week me-1" aria-hidden="true"></i>
+            Past days — tap a date
           </div>
-        `;
-      })
-      .join('');
+          <div class="crouton-day-calendar" role="tablist" aria-label="Past feeding days">
+            ${pastDays
+              .map((day) => {
+                const on = day.dayKey === state.selectedHistoryDay;
+                return `
+                  <button
+                    type="button"
+                    role="tab"
+                    class="crouton-day-chip${on ? ' is-on' : ''}"
+                    data-history-day="${escapeHtml(day.dayKey)}"
+                    aria-selected="${on ? 'true' : 'false'}"
+                  >
+                    <span class="crouton-day-chip__date">${escapeHtml(
+                      formatHistoryChipLabel(day.dayKey, todayKey)
+                    )}</span>
+                    <span class="crouton-day-chip__meta">${day.mealCups}c · ${day.treatsCount}t</span>
+                  </button>
+                `;
+              })
+              .join('')}
+          </div>
+          ${
+            selectedPast
+              ? `
+            <div class="crouton-history-day-panel" role="tabpanel">
+              <div class="crouton-history-day-head">
+                <strong>${escapeHtml(formatHistoryDayLabel(selectedPast.dayKey, todayKey))}</strong>
+                <span>${escapeHtml(daySummaryLine(selectedPast))}</span>
+              </div>
+              ${selectedPast.entries.map(renderLogEntry).join('')}
+            </div>
+          `
+              : ''
+          }
+        </div>
+      `
+      : '<div class="crouton-history-empty mt-2">No earlier days yet — history will stack here by date.</div>';
+
+    container.innerHTML = `
+      <div class="crouton-history-today">
+        <div class="crouton-history-day-head crouton-history-day-head--today">
+          <strong>Today · ${escapeHtml(formatHistoryDayLabel(todayKey, todayKey))}</strong>
+          <span>${escapeHtml(daySummaryLine(todayBucket))}</span>
+        </div>
+        ${todayEntriesHtml}
+      </div>
+      ${calendarHtml}
+    `;
+
+    container.querySelectorAll('[data-history-day]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.selectedHistoryDay = btn.getAttribute('data-history-day');
+        renderHistoryList(state.statusData || data);
+      });
+    });
 
     container.querySelectorAll('[data-delete-id]').forEach((btn) => {
       btn.addEventListener('click', () => {

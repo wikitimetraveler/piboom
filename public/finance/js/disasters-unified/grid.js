@@ -72,17 +72,58 @@ function getMajorNowFilterOptions() {
   };
 }
 
+function getFirmsConfidenceFilterOptions() {
+  const F = typeof DisasterFirmsConfidenceFilter !== 'undefined' ? DisasterFirmsConfidenceFilter : null;
+  return {
+    mode: F ? F.normalizeMode(firmsConfidenceFilter) : (firmsConfidenceFilter || 'high'),
+  };
+}
+
+function isFirmsConfidenceFilterActive() {
+  const F = typeof DisasterFirmsConfidenceFilter !== 'undefined' ? DisasterFirmsConfidenceFilter : null;
+  if (!F) return false;
+  return F.normalizeMode(firmsConfidenceFilter) !== F.MODE_ALL;
+}
+
+function applyFirmsConfidenceToGridRows(rows) {
+  const F = typeof DisasterFirmsConfidenceFilter !== 'undefined' ? DisasterFirmsConfidenceFilter : null;
+  if (!F || !isFirmsConfidenceFilterActive()) return rows || [];
+  return F.filterRows(rows || [], getFirmsConfidenceFilterOptions());
+}
+
+function applyFirmsConfidenceToDisasterRows(rows) {
+  const F = typeof DisasterFirmsConfidenceFilter !== 'undefined' ? DisasterFirmsConfidenceFilter : null;
+  if (!F || !isFirmsConfidenceFilterActive()) return rows || [];
+  return F.filterRows(rows || [], getFirmsConfidenceFilterOptions());
+}
+
 function getActiveViewGridRows() {
-  const rows = lastGridRows || [];
+  let rows = lastGridRows || [];
+  rows = applyFirmsConfidenceToGridRows(rows);
   if (!majorNowFilterActive || typeof DisasterMajorNowFilter === 'undefined') return rows;
   return DisasterMajorNowFilter.filterRows(rows, getMajorNowFilterOptions());
 }
 
 function getActiveViewDisasterRows() {
+  let rows;
   if (!majorNowFilterActive || typeof DisasterMajorNowFilter === 'undefined') {
-    return lastLoadedDisasterRows || [];
+    rows = lastLoadedDisasterRows || [];
+  } else {
+    rows = DisasterMajorNowFilter.disasterObjsFromPassingRows(lastGridRows, getMajorNowFilterOptions());
   }
-  return DisasterMajorNowFilter.disasterObjsFromPassingRows(lastGridRows, getMajorNowFilterOptions());
+  return applyFirmsConfidenceToDisasterRows(rows);
+}
+
+function syncFirmsConfidenceView(options) {
+  const remap = options?.remap !== false;
+  refreshNwsGridExternalFilter();
+  if (!lastLoadedDisasterRows.length && !(lastGridRows || []).length) return;
+  renderSourceDeckCounts(getActiveViewDisasterRows());
+  renderRiskIntelligencePanel(getActiveViewGridRows());
+  updateStats(getActiveViewDisasterRows());
+  if (remap && typeof renderMap === 'function') {
+    renderMap(getActiveViewDisasterRows());
+  }
 }
 
 function updateMajorNowFilterUi() {
@@ -178,7 +219,8 @@ function toggleMajorNowFilter() {
 function disastersGridExternalFilterPresent() {
   return (nwsGridFilterActive && !!nwsGridFilterContext)
     || timeRangeFilterHours !== null
-    || majorNowFilterActive;
+    || majorNowFilterActive
+    || isFirmsConfidenceFilterActive();
 }
 
 function disastersGridExternalFilterPass(node) {
@@ -199,6 +241,12 @@ function disastersGridExternalFilterPass(node) {
 
   if (majorNowFilterActive && typeof DisasterMajorNowFilter !== 'undefined') {
     if (!DisasterMajorNowFilter.rowPasses(node.data, getMajorNowFilterOptions())) return false;
+  }
+
+  if (typeof DisasterFirmsConfidenceFilter !== 'undefined' && isFirmsConfidenceFilterActive()) {
+    if (!DisasterFirmsConfidenceFilter.rowPasses(node.data, getFirmsConfidenceFilterOptions())) {
+      return false;
+    }
   }
   
   return true;
@@ -854,6 +902,14 @@ function getTopRiskEvents(gridRows, limit = 8) {
 }
 
 function filterHotspotsForDisplay(hotspots) {
+  const F = typeof DisasterHotspotFilters !== 'undefined' ? DisasterHotspotFilters : null;
+  if (F?.filterHotspots) {
+    return F.filterHotspots(hotspots, {
+      category: duHotspotCategoryFilter,
+      query: duHotspotSearchQuery,
+    });
+  }
+  // Fallback if the shared filter script did not load
   return (hotspots || []).filter((h) => {
     if (duHotspotCategoryFilter === 'critical_high' && (Number(h.peakRisk) || 0) < 6) {
       return false;
@@ -1070,12 +1126,24 @@ function initHotspotControls() {
     if (btn.dataset.bound) return;
     btn.dataset.bound = '1';
     btn.addEventListener('click', () => {
-      duHotspotCategoryFilter = btn.getAttribute('data-du-hotspot-filter') || 'all';
+      const next =
+        typeof DisasterHotspotFilters !== 'undefined' && DisasterHotspotFilters.normalizeCategory
+          ? DisasterHotspotFilters.normalizeCategory(btn.getAttribute('data-du-hotspot-filter'))
+          : btn.getAttribute('data-du-hotspot-filter') || 'all';
+      duHotspotCategoryFilter = next;
       document.querySelectorAll('[data-du-hotspot-filter]').forEach((b) => {
-        b.classList.toggle('active', b === btn);
+        const on = b === btn;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
       renderRiskIntelligencePanel(getActiveViewGridRows());
     });
+  });
+
+  document.querySelectorAll('[data-du-hotspot-filter]').forEach((btn) => {
+    const on = (btn.getAttribute('data-du-hotspot-filter') || 'all') === duHotspotCategoryFilter;
+    btn.classList.toggle('active', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
   });
 }
 
@@ -1226,7 +1294,8 @@ function updateStats(rows) {
   const quakes = rows.filter(r => r.event_type?.toLowerCase() === 'earthquake').length;
   const counties = new Set(rows.filter(r => r.county_name).map(r => `${r.county_name}, ${r.state_abbr}`)).size;
 
-  renderSourceDeckCounts(lastLoadedDisasterRows.length ? lastLoadedDisasterRows : rows);
+  // Chip counts follow the active view (FIRMS confidence / Major now), including empty []; DB totals stay on · N DB.
+  renderSourceDeckCounts(Array.isArray(rows) ? rows : (lastLoadedDisasterRows || []));
   void refreshSourceStatsFromApi();
 
   $('#totalDisasters').text(total).css('animation', 'none').offset().offset; // Trigger reflow

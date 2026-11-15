@@ -291,6 +291,11 @@ fn main() {
     let pulseImpl = () => {};
     let gpuKernel = null;
 
+    let paused = false;
+    let setPausedImpl = (flag) => {
+      paused = Boolean(flag);
+    };
+
     const api = {
       backend: 'none',
       pulse(resultId) {
@@ -300,9 +305,15 @@ fn main() {
         layout = next || { nodes: [], edges: [] };
         if (api._setLayout) api._setLayout(layout);
       },
+      setPaused(flag) {
+        setPausedImpl(flag);
+      },
+      isPaused() {
+        return paused;
+      },
       async runIntegerKernel(input) {
         const cpu = evalIntegerCents(input);
-        if (gpuKernel) {
+        if (gpuKernel && !paused) {
           try {
             const gpu = await gpuKernel(input);
             return { source: 'gpu', cents: gpu, cpu };
@@ -326,6 +337,10 @@ fn main() {
           disposeFn = live.dispose;
           pulseImpl = live.pulse;
           api._setLayout = live.setLayout;
+          setPausedImpl = (flag) => {
+            paused = Boolean(flag);
+            if (live.setPaused) live.setPaused(paused);
+          };
           gpuKernel = live.runIntegerKernel;
           api.backend = backend;
           return api;
@@ -339,6 +354,10 @@ fn main() {
     disposeFn = live.dispose;
     pulseImpl = live.pulse;
     api._setLayout = live.setLayout;
+    setPausedImpl = (flag) => {
+      paused = Boolean(flag);
+      if (live.setPaused) live.setPaused(paused);
+    };
     api.backend = 'webgl2';
     return api;
   }
@@ -356,6 +375,7 @@ fn main() {
     let layout = initialLayout || { nodes: [], edges: [] };
     let raf = 0;
     let dead = false;
+    let pausedLocal = false;
     let last = performance.now();
 
     function resize() {
@@ -372,7 +392,7 @@ fn main() {
     function frame(now) {
       if (dead) return;
       raf = requestAnimationFrame(frame);
-      if (Runtime && Runtime.shouldPause()) return;
+      if (pausedLocal || (Runtime && Runtime.shouldPause())) return;
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       const reduced = Runtime && Runtime.prefersReducedMotion();
@@ -389,6 +409,9 @@ fn main() {
       },
       setLayout(next) {
         layout = next || { nodes: [], edges: [] };
+      },
+      setPaused(flag) {
+        pausedLocal = Boolean(flag);
       },
       pulse(resultId) {
         const node = (layout.nodes || []).find((n) => n.id === resultId);
@@ -438,6 +461,7 @@ fn main() {
     let layout = initialLayout || { nodes: [], edges: [] };
     let raf = 0;
     let dead = false;
+    let pausedLocal = false;
     let last = performance.now();
     const wrap = canvas.parentElement || canvas;
     const uniformData = new Float32Array(8);
@@ -492,7 +516,7 @@ fn main() {
     function frame(now) {
       if (dead) return;
       raf = requestAnimationFrame(frame);
-      if (Runtime.shouldPause()) return;
+      if (pausedLocal || Runtime.shouldPause()) return;
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       const reduced = Runtime.prefersReducedMotion();
@@ -585,6 +609,9 @@ fn main() {
       setLayout(next) {
         layout = next || { nodes: [], edges: [] };
         writeGraph();
+      },
+      setPaused(flag) {
+        pausedLocal = Boolean(flag);
       },
       pulse(resultId) {
         const node = (layout.nodes || []).find((n) => n.id === resultId);

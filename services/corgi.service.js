@@ -22,7 +22,7 @@ export const CROUTON_TIME_ZONE = 'America/Los_Angeles';
 
 export const CROUTON_PROFILE = {
   name: 'Crouton',
-  breed: 'Brown Cardigan Welsh Corgi × Australian Shepherd Mix ("Cardi-Auggie")',
+  breed: 'Cowboy Corgi',
   feeders: ['David', 'Tina', 'Hieu'],
   timeZone: CROUTON_TIME_ZONE,
   dailySchedule: {
@@ -304,15 +304,43 @@ export function computeFeedingStatus(logs = [], now = new Date()) {
     },
     lastMeal,
     lastTreat,
-    recentLogs: normalized.slice(0, 25),
+    recentLogs: normalized.slice(0, 120),
+    /** Pacific-day buckets for the history calendar (newest day first). */
+    historyByDay: buildHistoryByDay(normalized, todayKey),
   };
+}
+
+/**
+ * Group feed + treat logs into Pacific calendar days for the history UI.
+ * @param {Array} logs newest-first normalized entries
+ * @param {string} todayKey Pacific YYYY-MM-DD
+ */
+export function buildHistoryByDay(logs = [], todayKey = getLocalDayKey()) {
+  const buckets = new Map();
+  for (const entry of logs) {
+    const dayKey = getLocalDayKey(entry.fedAt);
+    if (!buckets.has(dayKey)) {
+      buckets.set(dayKey, {
+        dayKey,
+        isToday: dayKey === todayKey,
+        mealCups: 0,
+        treatsCount: 0,
+        entries: [],
+      });
+    }
+    const bucket = buckets.get(dayKey);
+    bucket.entries.push(entry);
+    if (entry.entryType === 'treat') bucket.treatsCount += 1;
+    else bucket.mealCups = Number((bucket.mealCups + (Number(entry.cups) || 0)).toFixed(2));
+  }
+  return [...buckets.values()].sort((a, b) => b.dayKey.localeCompare(a.dayKey));
 }
 
 /**
  * Get current status summary for Crouton.
  */
 export async function getFeedingStatus() {
-  const logs = await listFeedLogs(60);
+  const logs = await listFeedLogs(150);
   return computeFeedingStatus(logs, new Date());
 }
 
@@ -484,6 +512,7 @@ export default {
   getZonedParts,
   inferMealSlot,
   getLocalDayKey,
+  buildHistoryByDay,
   listFeedLogs,
   computeFeedingStatus,
   getFeedingStatus,

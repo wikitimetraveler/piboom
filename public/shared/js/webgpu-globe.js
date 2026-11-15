@@ -643,6 +643,45 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
     return out;
   }
 
+  /**
+   * Multi-hazard rows → GPU pulse points (FIRMS / USGS / NWS / NHC / FEMA).
+   * Uses FRP when present; otherwise intensity / magnitude / risk score.
+   */
+  function capHazardPoints(rows, maxCount) {
+    const cap = Math.max(1, Math.min(MAX_FIRMS, Math.floor(maxCount || MAX_FIRMS)));
+    const list = Array.isArray(rows) ? rows : [];
+    const out = [];
+    for (let i = 0; i < list.length && out.length < cap; i += 1) {
+      const r = list[i] || {};
+      if (r.isCamera) continue;
+      const lat = Number(r.lat ?? r.latitude ?? r.avg_latitude);
+      const lon = Number(r.lng ?? r.lon ?? r.longitude ?? r.avg_longitude);
+      if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
+      if (Math.abs(lat) > 90 || Math.abs(lon) > 180) continue;
+      const raw = r.raw || {};
+      const frp = Number(raw.frp ?? r.frp) || 0;
+      const bright = Number(raw.brightness ?? r.brightness) || 0;
+      const mag = Number(raw.mag ?? raw.magnitude ?? r.magnitude ?? r.mag) || 0;
+      const risk = Number(r.riskScore ?? r.risk_score) || 0;
+      let weight = 0.45;
+      if (frp > 0 || bright > 0) {
+        weight = Math.min(3, 0.35 + frp / 40 + bright / 400);
+      } else if (mag > 0) {
+        weight = Math.min(3, 0.4 + mag / 3.2);
+      } else if (risk > 0) {
+        weight = Math.min(3, 0.35 + risk / 5);
+      } else {
+        const src = String(r.source || '').toLowerCase();
+        if (src === 'nhc') weight = 1.8;
+        else if (src === 'fema') weight = 1.4;
+        else if (src === 'usgs') weight = 1.2;
+        else if (src === 'nws') weight = 0.9;
+      }
+      out.push({ lat, lon, weight });
+    }
+    return out;
+  }
+
   function createPlaceholderTex(device) {
     const tex = device.createTexture({
       size: { width: 1, height: 1 },
@@ -783,8 +822,16 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
     const body = spec.id;
     const rings = spec.rings || null;
     const tiltRad = ((Number(spec.tiltDeg) || 0) * Math.PI) / 180;
-    const bodySpin = Number.isFinite(spec.spinRate) ? spec.spinRate : 0.11;
+    const bodySpin =
+      opts && Number.isFinite(opts.spinRate)
+        ? Number(opts.spinRate)
+        : Number.isFinite(spec.spinRate)
+          ? spec.spinRate
+          : 0.11;
     const camPull = rings ? Math.max(0.9, (rings.outer - 1) * 1.35) : 0;
+    const autoFirms = !(opts && opts.autoFirms === false);
+    const markBodyClass = !(opts && opts.markBodyClass === false);
+    const seedWithLava = !(opts && opts.includeLavaSeeds === false);
     let destroyed = false;
     let raf = 0;
     let inView = true;
@@ -824,9 +871,24 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
     const earth = await loadBodyTextures(device, body);
     const sampler = device.createSampler({ magFilter: 'linear', minFilter: 'linear' });
 
+    function applyHazardPoints(points, withLava) {
+      const base = Array.isArray(points) ? points : [];
+      const seeded = withLava ? base.concat(LAVA_SEEDS) : base;
+      fireCount = writeFires(device, fireBuf, seeded);
+      return fireCount;
+    }
+
     if (body === 'earth') {
-      const firms = await fetchFirmsPoints();
-      fireCount = writeFires(device, fireBuf, firms.concat(LAVA_SEEDS));
+      if (opts && Array.isArray(opts.initialPoints) && opts.initialPoints.length) {
+        applyHazardPoints(opts.initialPoints, seedWithLava);
+      } else if (autoFirms) {
+        const firms = await fetchFirmsPoints();
+        applyHazardPoints(firms, seedWithLava);
+      } else if (seedWithLava) {
+        applyHazardPoints([], true);
+      } else {
+        fireCount = 0;
+      }
     } else if (body === 'moon') {
       fireCount = writeFires(device, fireBuf, [
         { lat: LANE_CRATER.lat, lon: LANE_CRATER.lon, weight: 2.8 },
@@ -835,10 +897,10 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
       fireCount = 0;
     }
     const firmsTimer =
-      body === 'earth' && typeof setInterval === 'function'
+      body === 'earth' && autoFirms && typeof setInterval === 'function'
         ? setInterval(() => {
             fetchFirmsPoints().then((pts) => {
-              if (!destroyed) fireCount = writeFires(device, fireBuf, pts.concat(LAVA_SEEDS));
+              if (!destroyed) applyHazardPoints(pts, seedWithLava);
             });
           }, 120000)
         : null;
@@ -1015,11 +1077,11 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
       if (earth.night) earth.night.destroy();
       uniformBuf.destroy();
       fireBuf.destroy();
-      document.body.classList.remove('fun-home--webgpu');
+      if (markBodyClass) document.body.classList.remove('fun-home--webgpu');
     }
 
     window.addEventListener('pagehide', dispose, { once: true });
-    document.body.classList.add('fun-home--webgpu');
+    if (markBodyClass) document.body.classList.add('fun-home--webgpu');
     raf = requestAnimationFrame(frame);
 
     return {
@@ -1027,6 +1089,13 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
       resize: sizeCanvas,
       hasTex: earth.hasTex,
       setNight: () => {},
+      setHazardPoints(points, options) {
+        if (destroyed || body !== 'earth') return 0;
+        const withLava = options && Object.prototype.hasOwnProperty.call(options, 'includeLavaSeeds')
+          ? Boolean(options.includeLavaSeeds)
+          : seedWithLava;
+        return applyHazardPoints(points, withLava);
+      },
       lookAt(lat, lon, nextZoom) {
         pinLat = Number(lat);
         pinLon = Number(lon);
@@ -1044,6 +1113,7 @@ fn main(@builtin(global_invocation_id) id: vec3u) {
     mount,
     latLonToUv,
     capFirmsPoints,
+    capHazardPoints,
     ensureHeroSync,
     applySunFromDate,
     resolveBody,

@@ -1570,6 +1570,29 @@ $(function init() {
     }
   });
 
+  // FIRMS confidence filter (High default / Nominal+ / All)
+  document.querySelectorAll('input[name="duFirmsConfidence"]').forEach((radio) => {
+    radio.addEventListener('change', (e) => {
+      const F = typeof DisasterFirmsConfidenceFilter !== 'undefined' ? DisasterFirmsConfidenceFilter : null;
+      firmsConfidenceFilter = F ? F.normalizeMode(e.target.value) : (e.target.value || 'high');
+      if (typeof syncFirmsConfidenceView === 'function') {
+        syncFirmsConfidenceView({ remap: true });
+      } else {
+        refreshNwsGridExternalFilter();
+      }
+      const firmsRows = (lastLoadedDisasterRows || []).filter((r) => String(r.source || '').toLowerCase() === 'firms');
+      const visibleFirms = typeof DisasterFirmsConfidenceFilter !== 'undefined'
+        ? DisasterFirmsConfidenceFilter.filterRows(firmsRows, { mode: firmsConfidenceFilter }).length
+        : firmsRows.length;
+      setDashboardStatus(
+        F
+          ? F.statusMessage(firmsConfidenceFilter, visibleFirms, firmsRows.length)
+          : `FIRMS confidence: ${firmsConfidenceFilter}`,
+        'info'
+      );
+    });
+  });
+
   // Time range filter (shared state: timeRangeFilterHours in core.js)
   document.querySelectorAll('input[name="duTimeRange"]').forEach((radio) => {
     radio.addEventListener('change', (e) => {
@@ -1644,6 +1667,16 @@ $(function init() {
   }
   initDuWorkflowPills();
   initDuLoanPillsMenu();
+
+  const showcaseParam = new URLSearchParams(window.location.search).get('showcase');
+  if (
+    (showcaseParam === '1' || showcaseParam === 'demo') &&
+    window.DuSpreadsheetAnalyzer?.runFullShowcaseDemo
+  ) {
+    window.setTimeout(() => {
+      void window.DuSpreadsheetAnalyzer.runFullShowcaseDemo();
+    }, 400);
+  }
 
   refreshSourceStatsFromApi().then((dbTotal) => {
     const params = new URLSearchParams(window.location.search);

@@ -733,18 +733,54 @@
   background: #38bdf8;
   color: #0f172a;
 }
-.encompass-dark-mode #duHotspotFilterStrip {
-  background: #1e3a5f;
-  border-color: #2563eb;
-  color: #dbeafe;
-}
 .encompass-dark-mode #duHotspotFilterStrip .btn-outline-secondary {
-  color: #dbeafe;
-  border-color: #60a5fa;
+  color: #e2e8f0;
+  border-color: #64748b;
+  background: transparent;
 }
 .encompass-dark-mode #duHotspotFilterStrip .btn-outline-secondary:hover {
-  background: #2563eb;
+  background: #334155;
   color: #fff;
+  border-color: #94a3b8;
+}
+.encompass-dark-mode #duHotspotFilterStrip .btn-outline-secondary.active,
+.encompass-dark-mode #duHotspotFilterStrip .btn-outline-secondary[aria-pressed="true"] {
+  background: #334155;
+  border-color: #94a3b8;
+  color: #f8fafc;
+}
+.encompass-dark-mode #duHotspotFilterStrip .btn-outline-danger {
+  color: #fca5a5;
+  border-color: #f87171;
+  background: transparent;
+}
+.encompass-dark-mode #duHotspotFilterStrip .btn-outline-danger.active,
+.encompass-dark-mode #duHotspotFilterStrip .btn-outline-danger[aria-pressed="true"] {
+  background: #7f1d1d;
+  border-color: #f87171;
+  color: #fee2e2;
+}
+.encompass-dark-mode #duHotspotFilterStrip .btn-outline-warning {
+  color: #fcd34d;
+  border-color: #fbbf24;
+  background: transparent;
+}
+.encompass-dark-mode #duHotspotFilterStrip .btn-outline-warning.active,
+.encompass-dark-mode #duHotspotFilterStrip .btn-outline-warning[aria-pressed="true"] {
+  background: #78350f;
+  border-color: #fbbf24;
+  color: #fef3c7;
+}
+.encompass-dark-mode #duHotspotFilterStrip .btn-outline-primary {
+  color: #93c5fd;
+  border-color: #60a5fa;
+  background: transparent;
+}
+.encompass-dark-mode #duHotspotFilterStrip .btn-outline-primary.active,
+.encompass-dark-mode #duHotspotFilterStrip .btn-outline-primary[aria-pressed="true"] {
+  background: #1e3a8a;
+  border-color: #60a5fa;
+  color: #dbeafe;
 }
 .encompass-dark-mode .du-hotspot-filter-badge {
   background: #2563eb !important;

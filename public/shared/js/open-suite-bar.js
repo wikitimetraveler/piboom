@@ -1,15 +1,17 @@
 /**
- * Shared switcher for the public LinkedIn suite.
+ * Shared switcher for the public Open Lender Suite.
  * Development work by David Lane
  */
 (function () {
   'use strict';
 
   var ITEMS = [
-    { href: '/open/', label: 'Open suite', test: function (path) { return path === '/open' || path === '/open/'; } },
+    { href: '/open/', label: 'Lender Suite', test: function (path) { return path === '/open' || path === '/open/'; } },
     { href: '/finance/disasters-unified.html', label: 'Disasters', test: function (path) { return path.indexOf('/finance/disasters-') === 0; } },
     { href: '/gse-analyzer.html', label: 'GSE analyzer', test: function (path) { return path === '/gse-analyzer.html'; } },
-    { href: '/finance/calc-engine-webgpu.html', label: 'Graph calc', test: function (path) { return path === '/finance/calc-engine-webgpu.html'; } }
+    { href: '/finance/calc-engine-webgpu.html', label: 'Graph calc', test: function (path) { return path === '/finance/calc-engine-webgpu.html'; } },
+    { href: '/finance/loan-flight-sim.html', label: 'Flight sim', test: function (path) { return path === '/finance/loan-flight-sim.html'; } },
+    { href: '/finance/encompass-assistant.html', label: 'Encompass Expert', test: function (path) { return path === '/finance/encompass-assistant.html'; } }
   ];
 
   function ensureCss() {
@@ -26,7 +28,7 @@
     var path = (location.pathname || '').toLowerCase();
     var bar = document.createElement('nav');
     bar.className = 'open-suite-bar';
-    bar.setAttribute('aria-label', 'Open suite');
+    bar.setAttribute('aria-label', 'Open Lender Suite');
     ITEMS.forEach(function (item) {
       var link = document.createElement('a');
       link.href = item.href;

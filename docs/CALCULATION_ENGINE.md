@@ -35,6 +35,8 @@ Live worksheet: **`/finance/fha-streamline-loan-amount-calculator.html`** (uses 
 
 WebGPU research demo (integer-cent verifier + f32 drift exhibit): **`/finance/calc-engine-webgpu.html`**. Default GPU `f32` cannot safely round FHA-scale cents; this is **not** a speed-up (11 sequential cells vs dispatch + readback). Helpers: `dollarsToCents`, `centsToDollars`, `fhaLoanAmountIntegerCents`, `multiplyPercentageF32`. Optional engine hook: `onCellComputed`.
 
+**Private on-device agent (same page only):** [`public/shared/js/webgpu-private-agent.js`](../public/shared/js/webgpu-private-agent.js) loads WebLLM in the browser on WebGPU. It explains the DAG / f32 drift and runs local what-if / small batch tools through the integer-cent path. Loan inputs and chat stay in the browser — no Node/LangChain assistant routes. Other site assistants are unchanged. While the model is busy, the DAG viz pauses and tools prefer CPU integer cents so WebLLM can hold the GPU.
+
 ```javascript
 const config = createFHACalculatorConfig({
   prefix: 'fs',

@@ -9,10 +9,11 @@
 (function (global) {
   'use strict';
 
+  /** Synthetic demo tape — hashed loan IDs + aliases only (no real borrower PII). */
   const SAMPLE_LENDER_TAPE = [
     {
-      loan_number: 'LN-2026-1041',
-      borrower_name: 'Elena & Marcus Vance',
+      loan_number: 'LN-HASH-A1',
+      borrower_name: 'Borrower-A',
       property_address: '16420 Sunset Blvd',
       city: 'Pacific Palisades',
       state: 'CA',
@@ -26,8 +27,8 @@
       longitude: -118.5262,
     },
     {
-      loan_number: 'LN-2026-1042',
-      borrower_name: 'David & Sarah Chen',
+      loan_number: 'LN-HASH-A2',
+      borrower_name: 'Borrower-B',
       property_address: '412 Bayshore Blvd',
       city: 'Tampa',
       state: 'FL',
@@ -41,8 +42,8 @@
       longitude: -82.4609,
     },
     {
-      loan_number: 'LN-2026-1043',
-      borrower_name: 'Robert & Maria Alvarez',
+      loan_number: 'LN-HASH-A3',
+      borrower_name: 'Borrower-C',
       property_address: '8910 Memorial Dr',
       city: 'Houston',
       state: 'TX',
@@ -56,8 +57,8 @@
       longitude: -95.4561,
     },
     {
-      loan_number: 'LN-2026-1044',
-      borrower_name: 'Hannah & Thomas Reynolds',
+      loan_number: 'LN-HASH-B1',
+      borrower_name: 'Borrower-D',
       property_address: '215 Biltmore Ave',
       city: 'Asheville',
       state: 'NC',
@@ -71,8 +72,8 @@
       longitude: -82.5515,
     },
     {
-      loan_number: 'LN-2026-1045',
-      borrower_name: 'Kai & Noelani Morales',
+      loan_number: 'LN-HASH-B2',
+      borrower_name: 'Borrower-E',
       property_address: '740 Front St',
       city: 'Lahaina',
       state: 'HI',
@@ -86,8 +87,8 @@
       longitude: -156.6825,
     },
     {
-      loan_number: 'LN-2026-1046',
-      borrower_name: 'Antoine & Claire Broussard',
+      loan_number: 'LN-HASH-B3',
+      borrower_name: 'Borrower-F',
       property_address: '5210 Magazine St',
       city: 'New Orleans',
       state: 'LA',
@@ -101,8 +102,8 @@
       longitude: -90.1112,
     },
     {
-      loan_number: 'LN-2026-1047',
-      borrower_name: 'Jason & Priya Patel',
+      loan_number: 'LN-HASH-C1',
+      borrower_name: 'Borrower-G',
       property_address: '1422 Skyway Rd',
       city: 'Chico',
       state: 'CA',
@@ -116,8 +117,8 @@
       longitude: -121.8375,
     },
     {
-      loan_number: 'LN-2026-1048',
-      borrower_name: 'Liam & Olivia McGregor',
+      loan_number: 'LN-HASH-C2',
+      borrower_name: 'Borrower-H',
       property_address: '1850 Estero Blvd',
       city: 'Fort Myers Beach',
       state: 'FL',
@@ -131,8 +132,8 @@
       longitude: -81.9481,
     },
     {
-      loan_number: 'LN-2026-1049',
-      borrower_name: 'Caleb &Megan Walker',
+      loan_number: 'LN-HASH-C3',
+      borrower_name: 'Borrower-I',
       property_address: '1104 SW 19th St',
       city: 'Moore',
       state: 'OK',
@@ -146,8 +147,8 @@
       longitude: -97.5031,
     },
     {
-      loan_number: 'LN-2026-1050',
-      borrower_name: 'Noah & Sophia Lindqvist',
+      loan_number: 'LN-HASH-D1',
+      borrower_name: 'Borrower-J',
       property_address: '2401 Ballard Way',
       city: 'Seattle',
       state: 'WA',
@@ -161,8 +162,8 @@
       longitude: -122.3842,
     },
     {
-      loan_number: 'LN-2026-1051',
-      borrower_name: 'Grace & Benjamin Carter',
+      loan_number: 'LN-HASH-D2',
+      borrower_name: 'Borrower-K',
       property_address: '98 Broad St',
       city: 'Charleston',
       state: 'SC',
@@ -176,8 +177,8 @@
       longitude: -79.9311,
     },
     {
-      loan_number: 'LN-2026-1052',
-      borrower_name: 'Daniel & Rebecca Hoffman',
+      loan_number: 'LN-HASH-D3',
+      borrower_name: 'Borrower-L',
       property_address: '4510 E Camelback Rd',
       city: 'Phoenix',
       state: 'AZ',
@@ -1224,22 +1225,27 @@
     });
 
     document.getElementById('duShowcaseDemoLoadBtn')?.addEventListener('click', () => {
-      const refRows = getShowcaseReferenceDisasters();
-      const merged = (global.lastLoadedDisasterRows || []).length
-        ? global.lastLoadedDisasterRows
-        : refRows;
-      if (!(global.lastLoadedDisasterRows || []).length && typeof global.finishDisastersLoad === 'function') {
-        global.duCountyIntelLoaded = true;
-        global.duMultiPanelMode = true;
-        global.duGeoLoadScope = 'usa';
-        global.finishDisastersLoad(merged);
-      }
-      if (typeof global.showDuDashboardSectionCard === 'function') {
-        global.showDuDashboardSectionCard('collapseRiskIntel');
-        global.showDuDashboardSectionCard('collapseSpreadsheet');
-      }
-      void loadSampleLenderTapeAndAnalyze();
+      void runFullShowcaseDemo();
     });
+  }
+
+  /** One-click EVP / LinkedIn showcase: seed hazards if empty, open hotspots + tape. */
+  async function runFullShowcaseDemo() {
+    const refRows = getShowcaseReferenceDisasters();
+    const merged = (global.lastLoadedDisasterRows || []).length
+      ? global.lastLoadedDisasterRows
+      : refRows;
+    if (!(global.lastLoadedDisasterRows || []).length && typeof global.finishDisastersLoad === 'function') {
+      global.duCountyIntelLoaded = true;
+      global.duMultiPanelMode = true;
+      global.duGeoLoadScope = 'usa';
+      global.finishDisastersLoad(merged);
+    }
+    if (typeof global.showDuDashboardSectionCard === 'function') {
+      global.showDuDashboardSectionCard('collapseRiskIntel');
+      global.showDuDashboardSectionCard('collapseSpreadsheet');
+    }
+    await loadSampleLenderTapeAndAnalyze();
   }
 
   const api = {
@@ -1249,6 +1255,7 @@
     buildLenderGuidanceForHotspot,
     runSpreadsheetAnalysis,
     loadSampleLenderTapeAndAnalyze,
+    runFullShowcaseDemo,
     exportAnalyzedSpreadsheetCsv,
     downloadTemplateCsv,
     initSpreadsheetAnalyzerUi,

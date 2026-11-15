@@ -3,25 +3,194 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#7c3f18" />
+  <meta name="theme-color" content="#2b2622" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Crouton" />
-  <title>Crouton — Cardigan Welsh Corgi × Aussie Bucket Tracker & Fun Facts</title>
+  <title>Crouton — Cowboy Corgi Bucket Tracker</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="/corgi/css/corgi.css" />
 </head>
 <body>
+  <!-- Floating cowboy Corgi faces + white paws (like ♪ notes on music pages) -->
+  <div class="floating-corgi-notes no-print" aria-hidden="true">
+    <div class="floating-corgi-bit face">
+      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="18" cy="30" rx="11" ry="16" fill="#2b2622"/>
+        <ellipse cx="46" cy="30" rx="11" ry="16" fill="#2b2622"/>
+        <ellipse cx="18" cy="32" rx="7" ry="11" fill="#c47a3a"/>
+        <ellipse cx="46" cy="32" rx="7" ry="11" fill="#c47a3a"/>
+        <path d="M12 18 L32 8 L52 18 L48 14 L32 4 L16 14 Z" fill="#3d2a1c"/>
+        <ellipse cx="32" cy="10" rx="7" ry="3.5" fill="#f0d9a8"/>
+        <ellipse cx="32" cy="38" rx="20" ry="18" fill="#8c6e4a"/>
+        <ellipse cx="32" cy="42" rx="14" ry="12" fill="#b86d29"/>
+        <circle cx="24" cy="36" r="3.2" fill="#1a1714"/>
+        <circle cx="40" cy="36" r="3.2" fill="#1a1714"/>
+        <ellipse cx="32" cy="44" rx="4" ry="3" fill="#1a1714"/>
+        <path d="M28 48 Q32 52 36 48" stroke="#1a1714" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+        <ellipse cx="22" cy="48" rx="3" ry="2" fill="#f5f5f0" opacity=".85"/>
+        <ellipse cx="42" cy="48" rx="3" ry="2" fill="#f5f5f0" opacity=".85"/>
+      </svg>
+    </div>
+    <div class="floating-corgi-bit paws">
+      <svg viewBox="0 0 64 48" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="20" cy="28" rx="12" ry="10" fill="#f7f4ee"/>
+        <ellipse cx="44" cy="28" rx="12" ry="10" fill="#f7f4ee"/>
+        <circle cx="14" cy="20" r="4" fill="#f7f4ee"/>
+        <circle cx="20" cy="16" r="4" fill="#f7f4ee"/>
+        <circle cx="26" cy="20" r="4" fill="#f7f4ee"/>
+        <circle cx="38" cy="20" r="4" fill="#f7f4ee"/>
+        <circle cx="44" cy="16" r="4" fill="#f7f4ee"/>
+        <circle cx="50" cy="20" r="4" fill="#f7f4ee"/>
+        <ellipse cx="20" cy="30" rx="5" ry="4" fill="#e8d4b8"/>
+        <ellipse cx="44" cy="30" rx="5" ry="4" fill="#e8d4b8"/>
+      </svg>
+    </div>
+    <div class="floating-corgi-bit face">
+      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="18" cy="30" rx="11" ry="16" fill="#1a1714"/>
+        <ellipse cx="46" cy="30" rx="11" ry="16" fill="#1a1714"/>
+        <ellipse cx="18" cy="32" rx="7" ry="11" fill="#b86d29"/>
+        <ellipse cx="46" cy="32" rx="7" ry="11" fill="#b86d29"/>
+        <path d="M12 18 L32 8 L52 18 L48 14 L32 4 L16 14 Z" fill="#2b2622"/>
+        <ellipse cx="32" cy="10" rx="7" ry="3.5" fill="#f0d9a8"/>
+        <ellipse cx="32" cy="38" rx="20" ry="18" fill="#8c6e4a"/>
+        <ellipse cx="32" cy="42" rx="14" ry="12" fill="#c47a3a"/>
+        <circle cx="24" cy="36" r="3.2" fill="#1a1714"/>
+        <circle cx="40" cy="36" r="3.2" fill="#1a1714"/>
+        <ellipse cx="32" cy="44" rx="4" ry="3" fill="#1a1714"/>
+        <path d="M28 48 Q32 52 36 48" stroke="#1a1714" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="floating-corgi-bit paws">
+      <svg viewBox="0 0 64 48" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="20" cy="28" rx="12" ry="10" fill="#f5f5f0"/>
+        <ellipse cx="44" cy="28" rx="12" ry="10" fill="#f5f5f0"/>
+        <circle cx="14" cy="20" r="4" fill="#f5f5f0"/>
+        <circle cx="20" cy="16" r="4" fill="#f5f5f0"/>
+        <circle cx="26" cy="20" r="4" fill="#f5f5f0"/>
+        <circle cx="38" cy="20" r="4" fill="#f5f5f0"/>
+        <circle cx="44" cy="16" r="4" fill="#f5f5f0"/>
+        <circle cx="50" cy="20" r="4" fill="#f5f5f0"/>
+      </svg>
+    </div>
+    <div class="floating-corgi-bit face">
+      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="18" cy="30" rx="11" ry="16" fill="#2b2622"/>
+        <ellipse cx="46" cy="30" rx="11" ry="16" fill="#2b2622"/>
+        <ellipse cx="18" cy="32" rx="7" ry="11" fill="#c47a3a"/>
+        <ellipse cx="46" cy="32" rx="7" ry="11" fill="#c47a3a"/>
+        <path d="M12 18 L32 8 L52 18 L48 14 L32 4 L16 14 Z" fill="#3d2a1c"/>
+        <ellipse cx="32" cy="10" rx="7" ry="3.5" fill="#f0d9a8"/>
+        <ellipse cx="32" cy="38" rx="20" ry="18" fill="#8c6e4a"/>
+        <ellipse cx="32" cy="42" rx="14" ry="12" fill="#b86d29"/>
+        <circle cx="24" cy="36" r="3.2" fill="#1a1714"/>
+        <circle cx="40" cy="36" r="3.2" fill="#1a1714"/>
+        <ellipse cx="32" cy="44" rx="4" ry="3" fill="#1a1714"/>
+      </svg>
+    </div>
+    <div class="floating-corgi-bit paws">
+      <svg viewBox="0 0 64 48" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="20" cy="28" rx="12" ry="10" fill="#f7f4ee"/>
+        <ellipse cx="44" cy="28" rx="12" ry="10" fill="#f7f4ee"/>
+        <circle cx="14" cy="20" r="4" fill="#f7f4ee"/>
+        <circle cx="20" cy="16" r="4" fill="#f7f4ee"/>
+        <circle cx="26" cy="20" r="4" fill="#f7f4ee"/>
+        <circle cx="38" cy="20" r="4" fill="#f7f4ee"/>
+        <circle cx="44" cy="16" r="4" fill="#f7f4ee"/>
+        <circle cx="50" cy="20" r="4" fill="#f7f4ee"/>
+      </svg>
+    </div>
+    <div class="floating-corgi-bit face">
+      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="18" cy="30" rx="11" ry="16" fill="#1a1714"/>
+        <ellipse cx="46" cy="30" rx="11" ry="16" fill="#1a1714"/>
+        <path d="M12 18 L32 8 L52 18 L48 14 L32 4 L16 14 Z" fill="#2b2622"/>
+        <ellipse cx="32" cy="10" rx="7" ry="3.5" fill="#f0d9a8"/>
+        <ellipse cx="32" cy="38" rx="20" ry="18" fill="#8c6e4a"/>
+        <ellipse cx="32" cy="42" rx="14" ry="12" fill="#b86d29"/>
+        <circle cx="24" cy="36" r="3.2" fill="#1a1714"/>
+        <circle cx="40" cy="36" r="3.2" fill="#1a1714"/>
+        <ellipse cx="32" cy="44" rx="4" ry="3" fill="#1a1714"/>
+      </svg>
+    </div>
+    <div class="floating-corgi-bit paws">
+      <svg viewBox="0 0 64 48" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="20" cy="28" rx="12" ry="10" fill="#f5f5f0"/>
+        <ellipse cx="44" cy="28" rx="12" ry="10" fill="#f5f5f0"/>
+        <circle cx="14" cy="20" r="4" fill="#f5f5f0"/>
+        <circle cx="20" cy="16" r="4" fill="#f5f5f0"/>
+        <circle cx="26" cy="20" r="4" fill="#f5f5f0"/>
+        <circle cx="38" cy="20" r="4" fill="#f5f5f0"/>
+        <circle cx="44" cy="16" r="4" fill="#f5f5f0"/>
+        <circle cx="50" cy="20" r="4" fill="#f5f5f0"/>
+      </svg>
+    </div>
+    <div class="floating-corgi-bit face">
+      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="18" cy="30" rx="11" ry="16" fill="#2b2622"/>
+        <ellipse cx="46" cy="30" rx="11" ry="16" fill="#2b2622"/>
+        <path d="M12 18 L32 8 L52 18 L48 14 L32 4 L16 14 Z" fill="#3d2a1c"/>
+        <ellipse cx="32" cy="10" rx="7" ry="3.5" fill="#f0d9a8"/>
+        <ellipse cx="32" cy="38" rx="20" ry="18" fill="#8c6e4a"/>
+        <circle cx="24" cy="36" r="3.2" fill="#1a1714"/>
+        <circle cx="40" cy="36" r="3.2" fill="#1a1714"/>
+        <ellipse cx="32" cy="44" rx="4" ry="3" fill="#1a1714"/>
+      </svg>
+    </div>
+    <div class="floating-corgi-bit paws">
+      <svg viewBox="0 0 64 48" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="20" cy="28" rx="12" ry="10" fill="#f7f4ee"/>
+        <ellipse cx="44" cy="28" rx="12" ry="10" fill="#f7f4ee"/>
+        <circle cx="14" cy="20" r="4" fill="#f7f4ee"/>
+        <circle cx="20" cy="16" r="4" fill="#f7f4ee"/>
+        <circle cx="26" cy="20" r="4" fill="#f7f4ee"/>
+        <circle cx="38" cy="20" r="4" fill="#f7f4ee"/>
+        <circle cx="44" cy="16" r="4" fill="#f7f4ee"/>
+        <circle cx="50" cy="20" r="4" fill="#f7f4ee"/>
+      </svg>
+    </div>
+    <div class="floating-corgi-bit face">
+      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="18" cy="30" rx="11" ry="16" fill="#1a1714"/>
+        <ellipse cx="46" cy="30" rx="11" ry="16" fill="#1a1714"/>
+        <path d="M12 18 L32 8 L52 18 L48 14 L32 4 L16 14 Z" fill="#2b2622"/>
+        <ellipse cx="32" cy="10" rx="7" ry="3.5" fill="#f0d9a8"/>
+        <ellipse cx="32" cy="38" rx="20" ry="18" fill="#b86d29"/>
+        <circle cx="24" cy="36" r="3.2" fill="#1a1714"/>
+        <circle cx="40" cy="36" r="3.2" fill="#1a1714"/>
+        <ellipse cx="32" cy="44" rx="4" ry="3" fill="#1a1714"/>
+      </svg>
+    </div>
+    <div class="floating-corgi-bit paws">
+      <svg viewBox="0 0 64 48" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="20" cy="28" rx="12" ry="10" fill="#f5f5f0"/>
+        <ellipse cx="44" cy="28" rx="12" ry="10" fill="#f5f5f0"/>
+        <circle cx="14" cy="20" r="4" fill="#f5f5f0"/>
+        <circle cx="20" cy="16" r="4" fill="#f5f5f0"/>
+        <circle cx="26" cy="20" r="4" fill="#f5f5f0"/>
+        <circle cx="38" cy="20" r="4" fill="#f5f5f0"/>
+        <circle cx="44" cy="16" r="4" fill="#f5f5f0"/>
+        <circle cx="50" cy="20" r="4" fill="#f5f5f0"/>
+      </svg>
+    </div>
+  </div>
+
   <!-- Sticky Phone App Header -->
   <header class="crouton-appbar no-print">
     <div class="container crouton-shell d-flex align-items-center justify-content-between py-2">
       <div class="d-flex align-items-center gap-2">
-        <div class="crouton-avatar-badge" aria-hidden="true">🍞</div>
+        <div class="crouton-avatar-badge" aria-hidden="true" title="Brindle coat colors">
+          <span class="crouton-swatch crouton-swatch--brindle"></span>
+          <span class="crouton-swatch crouton-swatch--sable"></span>
+          <span class="crouton-swatch crouton-swatch--toast"></span>
+          <span class="crouton-swatch crouton-swatch--paw"></span>
+        </div>
         <div>
-          <div class="d-flex align-items-center gap-2">
+          <div class="d-flex align-items-center gap-2 flex-wrap">
             <h1 class="crouton-title mb-0">Crouton</h1>
-            <span class="badge crouton-breed-pill">Brown Cardigan Corgi × Aussie</span>
+            <span class="badge crouton-breed-pill">🤠 Cowboy Corgi</span>
           </div>
           <div class="crouton-subtitle">Bucket Lid Scanner • 8 AM &amp; 5 PM (1 Cup Each)</div>
         </div>
@@ -44,6 +213,22 @@
       <i class="bi bi-qr-code me-1"></i>
       <span><strong>Bucket Lid Scanned!</strong> Check Crouton's status below before scooping.</span>
     </div>
+
+    <!-- Coat-color theme ribbon (no photo — colors only until a better shot is added) -->
+    <section class="crouton-theme-ribbon mb-3" aria-label="Crouton coat color theme">
+      <div class="crouton-theme-ribbon__stripes" aria-hidden="true"></div>
+      <div class="crouton-theme-ribbon__copy">
+        <span class="cowboy-tag">🤠 Ranch Hand of the Kitchen</span>
+        <p class="cowboy-line">Crouton — Cowboy Corgi</p>
+        <p class="cowboy-sub">Theme from his brindle coat · charcoal · sable · toast · cream paw</p>
+      </div>
+      <div class="crouton-palette" aria-hidden="true">
+        <span class="crouton-swatch crouton-swatch--brindle" title="Brindle charcoal"></span>
+        <span class="crouton-swatch crouton-swatch--sable" title="Sable"></span>
+        <span class="crouton-swatch crouton-swatch--toast" title="Toast ginger"></span>
+        <span class="crouton-swatch crouton-swatch--paw" title="Cream paw"></span>
+      </div>
+    </section>
 
     <!-- #1 LIVE BUCKET LID STATUS BANNER (Hero Guardrail) -->
     <section id="statusHeroCard" class="crouton-status-hero status-ready mb-3" aria-live="polite">
@@ -202,13 +387,13 @@
       </div>
     </section>
 
-    <!-- #4 RECENT FEEDING & TREAT LOG -->
+    <!-- #4 FEEDING & TREAT HISTORY — today + past-day calendar -->
     <section class="crouton-card mb-3">
-      <div class="d-flex align-items-center justify-content-between mb-2">
+      <div class="d-flex align-items-center justify-content-between mb-2 gap-2 flex-wrap">
         <h3 class="crouton-section-title mb-0">
-          <i class="bi bi-clock-history me-1"></i> Bucket &amp; Treat History
+          <i class="bi bi-calendar3 me-1"></i> Bucket &amp; Treat History
         </h3>
-        <span class="text-muted small">Tap <i class="bi bi-trash3"></i> to undo a mistake</span>
+        <span class="text-muted small">Today on top · tap a past day · <i class="bi bi-trash3"></i> undoes</span>
       </div>
       <div id="feedHistoryList" class="crouton-history-list">
         <div class="text-muted small py-2">Loading history...</div>
@@ -219,9 +404,9 @@
     <section class="crouton-card crouton-facts-section mb-3" id="factsSection">
       <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
         <div>
-          <span class="crouton-kicker">THE TOASTED CARDI-AUGGIE ENCYCLOPEDIA</span>
+          <span class="crouton-kicker">🤠 THE COWBOY CORGI ENCYCLOPEDIA</span>
           <h3 class="crouton-section-title mb-0">
-            <i class="bi bi-lightning-charge-fill me-1"></i> Crouton's Brown Cardigan Corgi × Aussie Fun Facts
+            <i class="bi bi-lightning-charge-fill me-1"></i> Crouton's Cowboy Corgi Fun Facts
           </h3>
         </div>
         <button id="btnSpinFact" type="button" class="btn btn-sm crouton-spin-btn">
@@ -232,7 +417,7 @@
       <!-- Featured Spotlight Fact Card -->
       <div id="spotlightFactCard" class="crouton-spotlight-fact mb-3">
         <div class="d-flex align-items-center justify-content-between mb-1">
-          <span id="spotlightFactCategory" class="badge crouton-fact-badge">Auggie Mix Magic</span>
+          <span id="spotlightFactCategory" class="badge crouton-fact-badge">Cowboy Corgi</span>
           <span id="spotlightFactCounter" class="small opacity-75">Fact 1 of 12</span>
         </div>
         <h4 id="spotlightFactTitle" class="crouton-spotlight-title mb-1">
@@ -246,10 +431,10 @@
       <!-- Category Filter Pills -->
       <div class="d-flex flex-wrap gap-1 mb-3" role="tablist" aria-label="Fact categories">
         <button type="button" class="btn btn-sm crouton-filter-pill active" data-fact-cat="all">All Facts</button>
-        <button type="button" class="btn btn-sm crouton-filter-pill" data-fact-cat="auggie">🤎 Brown Auggie Mix</button>
+        <button type="button" class="btn btn-sm crouton-filter-pill" data-fact-cat="auggie">🤠 Cowboy Corgi</button>
         <button type="button" class="btn btn-sm crouton-filter-pill" data-fact-cat="food">🥣 The Stomach Illusion</button>
         <button type="button" class="btn btn-sm crouton-filter-pill" data-fact-cat="folklore">🧚 Fairy Lore &amp; Herding</button>
-        <button type="button" class="btn btn-sm crouton-filter-pill" data-fact-cat="quirks">🍑 Sploots, Loaf &amp; Zoomies</button>
+        <button type="button" class="btn btn-sm crouton-filter-pill" data-fact-cat="quirks">🐾 Face, Ears &amp; White Paws</button>
       </div>
 
       <!-- Facts Grid -->
@@ -306,8 +491,8 @@
   <section class="print-only-lid-sheet">
     <div class="print-lid-badge">
       <div class="print-lid-stop">⚠️ STOP &amp; SCAN BEFORE OPENING BUCKET ⚠️</div>
-      <h1 class="print-lid-title">🍞 CROUTON'S FOOD BUCKET</h1>
-      <div class="print-lid-sub">Brown Cardigan Welsh Corgi × Australian Shepherd</div>
+      <h1 class="print-lid-title">🤠 CROUTON'S FOOD BUCKET</h1>
+      <div class="print-lid-sub">🤠 Cowboy Corgi</div>
       <div id="printQrSvgContainer" class="print-qr-box"></div>
       <div class="print-lid-rules">
         <div><strong>MORNING MEAL:</strong> ~8:00 AM — <strong>1 LEVEL CUP</strong></div>
@@ -330,7 +515,7 @@
         Crouton was already fed for this meal window!
       </p>
       <div class="crouton-modal-quote">
-        "Crouton is a Corgi-Aussie mastermind. He is 100% pretending he hasn't eaten today."
+        "This Cowboy Corgi is a mastermind. He is 100% pretending he hasn't eaten today."
       </div>
       <div class="d-grid gap-2 mt-3">
         <button id="btnCancelOverfeed" type="button" class="btn btn-lg btn-success fw-bold">

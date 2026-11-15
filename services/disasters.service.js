@@ -731,10 +731,11 @@ const FIRMS_CONFIDENCE_RANK = { low: 0, nominal: 1, high: 2 };
 
 /** Read FIRMS quality thresholds from env (combined pulls use these). */
 export function getFirmsQualityThresholds() {
-  const minConfidence = String(process.env.FIRMS_MIN_CONFIDENCE || 'high').toLowerCase().trim();
+  // Default nominal so UI can filter High / Nominal+ / All; thermal + cluster gates still cut noise.
+  const minConfidence = String(process.env.FIRMS_MIN_CONFIDENCE || 'nominal').toLowerCase().trim();
   return {
     minConfidence,
-    minConfidenceRank: FIRMS_CONFIDENCE_RANK[minConfidence] ?? FIRMS_CONFIDENCE_RANK.high,
+    minConfidenceRank: FIRMS_CONFIDENCE_RANK[minConfidence] ?? FIRMS_CONFIDENCE_RANK.nominal,
     minBrightness: parseInt(process.env.FIRMS_MIN_BRIGHTNESS || '330', 10) || 330,
     minFrp: parseFloat(process.env.FIRMS_MIN_FRP || '4') || 4,
     clusterRadiusKm: parseFloat(process.env.FIRMS_CLUSTER_RADIUS_KM || '5') || 5,
@@ -759,10 +760,16 @@ export function parseFirmsDetectionProps(props = {}) {
   };
 }
 
-/** Stage 1: confidence must meet threshold (default high). */
+/** Stage 1: confidence must meet threshold (default nominal). */
 export function passesFirmsConfidenceGate(confidence, thresholds = getFirmsQualityThresholds()) {
   const rank = FIRMS_CONFIDENCE_RANK[confidence] ?? -1;
   return rank >= thresholds.minConfidenceRank;
+}
+
+/** Rank for UI/API filters — unknown values sort below low. */
+export function firmsConfidenceRank(confidence) {
+  const key = normalizeFirmsConfidence(confidence);
+  return FIRMS_CONFIDENCE_RANK[key] ?? -1;
 }
 
 /** Stage 2: thermal signal — brightness or fire radiative power. */
@@ -1188,6 +1195,7 @@ export async function ingestFirmsNrt() {
     }
     
     const n = memberCount || 1;
+    const firmsConfidence = normalizeFirmsConfidence(confidence) || 'nominal';
     const rec = {
       source: 'firms',
       event_type: 'wildfire',
@@ -1196,13 +1204,20 @@ export async function ingestFirmsNrt() {
       state_abbr: state,
       start_time: start,
       end_time: null,
-      severity: `${confidence}${brightness != null ? ` (${brightness}K)` : ''}${frp != null ? ` FRP ${frp}MW` : ''}${n > 1 ? ` · ${n} px` : ''}`.trim(),
+      severity: `${firmsConfidence}${brightness != null ? ` (${brightness}K)` : ''}${frp != null ? ` FRP ${frp}MW` : ''}${n > 1 ? ` · ${n} px` : ''}`.trim(),
       title: n > 1
         ? `Wildfire cluster (${n} detections${frp != null ? `, FRP ${frp}MW` : brightness != null ? `, ${brightness}K` : ''})`
         : `Wildfire${brightness != null ? ` (${brightness}K)` : frp != null ? ` (FRP ${frp}MW)` : ''}`.trim(),
       lat, lng,
       source_id: String(props.id || `${lat},${lng},${start}`),
-      raw: props
+      raw: {
+        ...(props && typeof props === 'object' ? props : {}),
+        firms_confidence: firmsConfidence,
+        confidence: firmsConfidence,
+        brightness: brightness ?? props?.brightness ?? props?.bright_ti4 ?? null,
+        frp: frp ?? props?.frp ?? null,
+        cluster_size: n,
+      },
     };
     
     if (shouldIncludeDisasterRecord(rec)) {

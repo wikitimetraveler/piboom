@@ -8,12 +8,14 @@
 (function (global) {
   'use strict';
 
-  /** Keep in sync with lib/finance-session.js FINANCE_PUBLIC_PAGES (open suite). */
+  /** Keep in sync with lib/finance-session.js FINANCE_PUBLIC_PAGES (Open Lender Suite). */
   const FINANCE_PUBLIC_PATHS = {
     '/finance/disasters-unified.html': true,
     '/finance/disasters-webcams.html': true,
     '/finance/disasters-encompass-map.html': true,
     '/finance/calc-engine-webgpu.html': true,
+    '/finance/loan-flight-sim.html': true,
+    '/finance/encompass-assistant.html': true,
   };
 
   function pathRequiresAuth(url) {
@@ -26,8 +28,9 @@
   const TOOL_INDEX = [
     // Worksheets (calculators & disasters; paths remain /finance/)
     { name: 'Worksheets Hub', url: '/finance/index.html', category: 'Worksheets', keywords: 'calculator hub worksheets', requiresAuth: true },
-    { name: 'Open suite', url: '/open/', category: 'Worksheets', keywords: 'linkedin showcase disasters GSE analyzer graph calculation public' },
-    { name: 'Encompass Assistant', url: '/finance/encompass-assistant.html', category: 'Encompass', keywords: 'AI robot mortgage API expert', requiresAuth: true },
+    { name: 'Open Lender Suite', url: '/open/', category: 'Worksheets', keywords: 'linkedin showcase disasters GSE analyzer graph calculation flight sim Encompass Expert public' },
+    { name: 'Encompass Assistant', url: '/finance/encompass-assistant.html', category: 'Encompass', keywords: 'AI robot mortgage API expert open suite', requiresAuth: false },
+    { name: 'Loan flight simulator', url: '/finance/loan-flight-sim.html', category: 'Encompass', keywords: 'training sim TRID LTV DTI synthetic loan open suite', requiresAuth: false },
     { name: 'GSE scenario analyzer', url: '/gse-analyzer.html', category: 'Worksheets', keywords: 'GSE Fannie Freddie FHA VA USDA analyzer admin', requiresAuth: false },
     { name: 'Encompass Hub', url: '/finance/encompass-hub.html', category: 'Encompass', keywords: 'pipeline loans API', requiresAuth: true },
     { name: 'Loan batch update', url: '/finance/loan-batch-update.html', category: 'Encompass', keywords: 'batch update loanBatch custom fields filter', requiresAuth: true },
@@ -106,7 +109,7 @@
     { name: 'Lane Family', url: '/family/lane-family.html', category: 'Family', keywords: 'lane genealogy museum hub family exhibits' },
     { name: 'Scientific Lane', url: '/family/lane-scientific-lane.html', category: 'Family', keywords: 'jonathan homer lane astrophysicist crater homer cousin branch' },
     { name: 'Nature Hub', url: '/nature/nature-hub.html', category: 'Nature', keywords: 'map gallery field guide share trees critters' },
-    { name: 'Crouton', url: '/corgi/', category: 'Nature', keywords: 'crouton corgi cardigan welsh australian shepherd feed bucket treats qr david tina hieu dog' },
+    { name: 'Crouton', url: '/corgi/', category: 'Nature', keywords: 'crouton cowboy corgi feed bucket treats qr david tina hieu dog' },
     { name: 'Ski Drive', url: '/ski/', category: 'Nature', keywords: 'ski drive fountain valley weather chains thrift dispensary wrightwood big bear mammoth june lake 395' },
     { name: 'Ski Areas', url: '/ski/areas', category: 'Nature', keywords: 'ski area topo dem slope aspect mountain high snow summit bear mountain mammoth june mountain' },
     { name: 'Tree Discovery', url: '/nature/tree-discovery.html', category: 'Nature', keywords: 'tree Smokey identify' },
