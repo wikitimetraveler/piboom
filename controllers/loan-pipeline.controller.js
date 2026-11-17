@@ -317,8 +317,8 @@ export async function getRiskSummary(req, res) {
     const riskDistribution = await pool.query(`
       SELECT 
         CASE 
-          WHEN disaster_risk_score BETWEEN 0 AND 2 THEN 'Low Risk'
-          WHEN disaster_risk_score BETWEEN 3 AND 5 THEN 'Medium Risk'
+          WHEN disaster_risk_score >= 0 AND disaster_risk_score < 3 THEN 'Low Risk'
+          WHEN disaster_risk_score >= 3 AND disaster_risk_score < 6 THEN 'Medium Risk'
           WHEN disaster_risk_score >= 6 THEN 'High Risk'
           ELSE 'Not Analyzed'
         END as risk_level,
@@ -327,8 +327,8 @@ export async function getRiskSummary(req, res) {
       FROM loans 
       GROUP BY 
         CASE 
-          WHEN disaster_risk_score BETWEEN 0 AND 2 THEN 'Low Risk'
-          WHEN disaster_risk_score BETWEEN 3 AND 5 THEN 'Medium Risk'
+          WHEN disaster_risk_score >= 0 AND disaster_risk_score < 3 THEN 'Low Risk'
+          WHEN disaster_risk_score >= 3 AND disaster_risk_score < 6 THEN 'Medium Risk'
           WHEN disaster_risk_score >= 6 THEN 'High Risk'
           ELSE 'Not Analyzed'
         END
@@ -484,13 +484,13 @@ export async function queryFEMADirect(req, res) {
     const ninetyDaysAgoStr = ninetyDaysAgo.toISOString().split('T')[0]; // Format: YYYY-MM-DD
 
     // Use FEMA API v2 (like tool3) for better compatibility
-    // Filter for last 90 days
+    // Filter for last 90 days (by declarationDate or incidentBeginDate)
     const femaDisasterDeclUrl = 'https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries';
     const filters = [];
-    if (state) filters.push(`state eq '${state}'`);
-    if (county) filters.push(`designatedArea eq '${county} (County)'`);
-    filters.push(`incidentBeginDate ge ${ninetyDaysAgoStr}`);
-    const filterParams = `$count=true&$top=1000&$filter=${filters.join(' and ')}`;
+    if (state) filters.push(`state eq '${String(state).replace(/'/g, "''")}'`);
+    if (county) filters.push(`designatedArea eq '${String(county).replace(/\s*\(County\)$/i, '').replace(/'/g, "''")} (County)'`);
+    filters.push(`(declarationDate ge ${ninetyDaysAgoStr} or incidentBeginDate ge ${ninetyDaysAgoStr})`);
+    const filterParams = `$count=true&$top=1000&$filter=${encodeURIComponent(filters.join(' and '))}`;
     
     console.log(`🌐 Querying FEMA API: state=${state || 'ALL'}, county=${county || 'ALL'}, since=${ninetyDaysAgoStr}`);
     
@@ -517,14 +517,17 @@ export async function queryFEMADirect(req, res) {
       
       console.log(`📋 Processing ${disasters.length} disaster records`);
       
-      // Additional filter to ensure we only get last 90 days
+      // Additional filter to ensure we only get last 90 days (and deduplicate per county+disasterNumber)
       const ninetyDaysDate = new Date(ninetyDaysAgoStr);
+      const seenKeys = new Set();
       disasters = disasters.filter(item => {
-        if (item.incidentBeginDate) {
-          const disasterDate = new Date(item.incidentBeginDate);
-          return disasterDate >= ninetyDaysDate;
-        }
-        return false;
+        const beginOk = item.incidentBeginDate && new Date(item.incidentBeginDate) >= ninetyDaysDate;
+        const declOk = item.declarationDate && new Date(item.declarationDate) >= ninetyDaysDate;
+        if (!beginOk && !declOk) return false;
+        const dedupeKey = `${item.disasterNumber || ''}|${item.state || ''}|${item.designatedArea || ''}`;
+        if (seenKeys.has(dedupeKey)) return false;
+        seenKeys.add(dedupeKey);
+        return true;
       });
       
       console.log(`✅ After date filter: ${disasters.length} disasters`);
@@ -622,54 +625,73 @@ export async function getFEMADisasters(req, res) {
     const oneYearAgoStr = oneYearAgo.toISOString().split('T')[0]; // Format: YYYY-MM-DD
 
     // Get unique FEMA disasters from stored loan data (last year only)
-    // Handle both 'title' (v1 API) and 'declarationTitle' (v2 API) field names
+    // Supports both nested fema_data->'disasters' arrays and legacy flat fema_data objects
     const result = await pool.query(`
-      SELECT DISTINCT 
-        fema_data->>'disasterNumber' as disaster_number,
-        fema_data->>'incidentType' as incident_type,
-        COALESCE(
-          fema_data->>'title',
-          fema_data->>'declarationTitle'
-        ) as declaration_title,
-        fema_data->>'state' as state,
-        fema_data->>'county' as county,
-        fema_data->>'declarationDate' as declaration_date,
-        fema_data->>'incidentBeginDate' as incident_begin_date,
-        fema_data->>'incidentEndDate' as incident_end_date,
-        CASE 
-          WHEN fema_data->>'ihProgramDeclared' = 'true' OR fema_data->>'ihProgramDeclared'::boolean = true THEN true
-          ELSE false
-        END as ih_program_declared,
-        CASE 
-          WHEN fema_data->>'iaProgramDeclared' = 'true' OR fema_data->>'iaProgramDeclared'::boolean = true THEN true
-          ELSE false
-        END as ia_program_declared,
-        CASE 
-          WHEN fema_data->>'paProgramDeclared' = 'true' OR fema_data->>'paProgramDeclared'::boolean = true THEN true
-          ELSE false
-        END as pa_program_declared,
-        CASE 
-          WHEN fema_data->>'hmProgramDeclared' = 'true' OR fema_data->>'hmProgramDeclared'::boolean = true THEN true
-          ELSE false
-        END as hm_program_declared,
-        latitude,
-        longitude
-      FROM loans 
-      WHERE fema_data IS NOT NULL 
-        AND fema_data != 'null'::jsonb
-        AND fema_data != '{}'::jsonb
-        AND (
-          (fema_data->>'incidentBeginDate' IS NOT NULL AND fema_data->>'incidentBeginDate' >= $1)
-          OR (fema_data->>'declarationDate' IS NOT NULL AND fema_data->>'declarationDate' >= $1)
+      SELECT *
+      FROM (
+        SELECT DISTINCT ON (
+          COALESCE(d->>'disasterNumber', d->>'declarationTitle', d->>'title'),
+          COALESCE(d->>'state', l.state),
+          COALESCE(d->>'county', l.county)
         )
+          d->>'disasterNumber' as disaster_number,
+          d->>'declarationType' as declaration_type,
+          d->>'incidentType' as incident_type,
+          COALESCE(
+            d->>'title',
+            d->>'declarationTitle'
+          ) as declaration_title,
+          COALESCE(d->>'state', l.state) as state,
+          COALESCE(d->>'county', l.county) as county,
+          d->>'declarationDate' as declaration_date,
+          d->>'incidentBeginDate' as incident_begin_date,
+          d->>'incidentEndDate' as incident_end_date,
+          CASE 
+            WHEN d->>'ihProgramDeclared' = 'true' THEN true
+            ELSE false
+          END as ih_program_declared,
+          CASE 
+            WHEN d->>'iaProgramDeclared' = 'true' THEN true
+            ELSE false
+          END as ia_program_declared,
+          CASE 
+            WHEN d->>'paProgramDeclared' = 'true' THEN true
+            ELSE false
+          END as pa_program_declared,
+          CASE 
+            WHEN d->>'hmProgramDeclared' = 'true' THEN true
+            ELSE false
+          END as hm_program_declared,
+          COALESCE(NULLIF(d->>'latitude', '')::double precision, l.latitude) as latitude,
+          COALESCE(NULLIF(d->>'longitude', '')::double precision, l.longitude) as longitude
+        FROM loans l
+        CROSS JOIN LATERAL (
+          SELECT elem AS d
+          FROM jsonb_array_elements(
+            CASE
+              WHEN jsonb_typeof(l.fema_data->'disasters') = 'array' THEN l.fema_data->'disasters'
+              WHEN jsonb_typeof(l.fema_data) = 'object' AND (l.fema_data ? 'disasterNumber' OR l.fema_data ? 'incidentType') THEN jsonb_build_array(l.fema_data)
+              ELSE '[]'::jsonb
+            END
+          ) AS elem
+        ) sub
+        WHERE l.fema_data IS NOT NULL 
+          AND l.fema_data != 'null'::jsonb
+          AND l.fema_data != '{}'::jsonb
+          AND (
+            (d->>'incidentBeginDate' IS NOT NULL AND d->>'incidentBeginDate' >= $1)
+            OR (d->>'declarationDate' IS NOT NULL AND d->>'declarationDate' >= $1)
+          )
+      ) uniq
       ORDER BY COALESCE(
-        fema_data->>'declarationDate',
-        fema_data->>'incidentBeginDate'
+        uniq.declaration_date,
+        uniq.incident_begin_date
       ) DESC
     `, [oneYearAgoStr]);
     
     const disasters = result.rows.map(row => ({
-      declarationType: row.disaster_number ? row.disaster_number.substring(0, 2) : 'DR',
+      declarationType: row.declaration_type || (row.disaster_number && /^[A-Za-z]{2}/.test(row.disaster_number) ? row.disaster_number.substring(0, 2) : 'DR'),
+      disasterNumber: row.disaster_number || null,
       incidentType: row.incident_type || 'Unknown',
       declarationTitle: row.declaration_title || 'Disaster Declaration',
       state: row.state || '',
@@ -678,6 +700,7 @@ export async function getFEMADisasters(req, res) {
       iaProgramDeclared: row.ia_program_declared === true || row.ia_program_declared === 'true',
       paProgramDeclared: row.pa_program_declared === true || row.pa_program_declared === 'true',
       hmProgramDeclared: row.hm_program_declared === true || row.hm_program_declared === 'true',
+      declarationDate: row.declaration_date || '',
       incidentBeginDate: row.incident_begin_date || '',
       incidentEndDate: row.incident_end_date || '',
       disasterCloseoutDate: null,

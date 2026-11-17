@@ -175,7 +175,7 @@ UCSD pier mounts are seeded from `data/hazard-webcam-seeds.json`. HPWREN mounts 
 
 UI: [`public/finance/disasters-webcams.html`](../public/finance/disasters-webcams.html) (legacy [`disasters-ca-cameras.html`](../public/finance/disasters-ca-cameras.html) redirects with `?state=CA&hazard=fire&source=alertcalifornia`).
 
-**Address search:** Google Places autocomplete on the catalog page centers the map, draws a radius circle, and loads nearest mounts via `GET /api/disasters/cameras?nearLat=&nearLng=&radiusMiles=`. Deep links: `?lat=&lng=&radius=&address=`; camera by slug: `disasters-webcams.html?camera=walton_lighthouse` (also `?q=lighthouse` for name search). Alaska volcano preset: `?state=AK&hazard=volcano`. If client Google geocode fails, search falls back to `GET /api/disasters/geocode-address?q=` (Mapbox/Nominatim via `geocodeAddressFree`; camera ingest geocode cache unchanged).
+**Address search:** Google Places autocomplete on the catalog page centers the map, draws a radius circle, and loads nearest mounts via `GET /api/disasters/cameras?nearLat=&nearLng=&radiusMiles=`. Deep links: `?lat=&lng=&radius=&address=`; camera by slug: `disasters-webcams.html?camera=walton_lighthouse` (also `?q=lighthouse` for name search). Alaska volcano cams remain on the national webcam catalog (`?state=AK&hazard=volcano`) but are outside the lending footprint used by Unified Disasters / loan proximity. If client Google geocode fails, search falls back to `GET /api/disasters/geocode-address?q=` (Mapbox/Nominatim via `geocodeAddressFree`; camera ingest geocode cache unchanged).
 
 ## Daily Refresh
 
@@ -220,7 +220,26 @@ Mute: music icon in the AI chat header, or `localStorage` key `dc_disaster_music
 | UI element | Meaning |
 |------------|---------|
 | **Major now** | Sticky source-bar filter: keep only **High** (intensity ≥ 6) and **Critical** (≥ 10) events from the last **2 or 3 days**. Applies to the grid, map pins, stats, and risk intel. Event intensity is a relative ranking — not loan ops triage and not a loss probability. Deep link: `?major=1` (3 days) or `?major=2` / `?major=3`. |
-| **Showcase demo** | `?showcase=1` (or `?showcase=demo`) auto-runs **Run Full Showcase Demo**: seeds reference hazards if the DB is empty, opens hotspots + spreadsheet, and analyzes the hashed 12-loan sample tape (`LN-HASH-*` / `Borrower-A`…`L`). |
+| **Three 0–15 scores (do not conflate)** | **Event intensity** (grid) = relative hazard ranking. **Loan ops triage** (loans panel / pipeline) = FEMA + flood zone table only. **Proximity composite** (spreadsheet tape) = multi-hazard proximity (FIRMS/NHC/USGS/NWS/FEMA in range). None is a loss probability. |
+| **Graph NEAR overlay** | Off by default on the hazard lens. Live `/near` is operational truth; graph `NEAR` is as-of `seeded_at` reseed. |
+| **Showcase demo** | `?showcase=1` (or `?showcase=demo`) auto-runs **Run Full Showcase Demo**: seeds reference hazards if the DB is empty, opens hotspots + spreadsheet, and analyzes the hashed 12-loan sample tape (`LN-HASH-*` / `Borrower-A`…`L`). Disclose synthetic seed if used with external audiences. |
+
+### Lending footprint
+
+Alaska (`AK` / FIPS `02`) is **outside the lending footprint** — no loans are originated there. Unified Disasters list/`/near`/stats and the hazard-lens state picker exclude AK; mock loan seeds omit Alaska cities (`lib/lender-footprint.js`).
+
+### Bank / EVP demo path (live DB)
+
+Safe framing: **situational awareness · ops triage · processor checklist prompts · multi-source proximity.** Never claim loss probability, GSE/FHA mandate, live NHC cone, or graph NEAR = live distance.
+
+1. Open `/finance/disasters-unified.html` — confirm · N DB on source chips; leave **Major now** off; Graph NEAR overlay stays off.
+2. Pick a rehearsed hot state/county (FEMA + FIRMS or NWS). FIRMS confidence stays **High** (Nominal+ only if High is empty).
+3. Select one strong event → live `/near` loans → “ops triage rank, not probability.”
+4. County hotspots → “example processor checks,” not Fannie/FHA mandate.
+5. **Analyze Sample Property Spreadsheet (12 Loans)** — say tape score is multi-hazard proximity composite; loan panel score is FEMA+flood only.
+6. Optional: webcams or `/finance/pipeline-risk-dashboard.html` (FEMA+flood Channel A).
+
+**Monday prep:** `npm run refresh-disasters` (or confirm scheduler); verify `GET /api/disasters/stats`; confirm FIRMS key; pre-pick county + event + `/near` loans; screenshot backup. Avoid mid-meeting Pull all sources, Impact Graph as live near, and undisclosed `?showcase=1`.
 | **Freshness dot (green)** | Source is enabled and returned rows in the current grid load |
 | **Freshness dot (amber)** | Source is enabled but returned zero rows (check filters or run **Refresh data**) |
 | **Freshness dot (gray)** | Source is disabled |

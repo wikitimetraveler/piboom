@@ -9,6 +9,7 @@ import {
   distanceTriageWeight,
   FLOOD_ZONE_TRIAGE_WEIGHTS,
 } from '../../services/disaster-risk.service.js';
+import { resolveFemaDeclarationFields } from '../../services/disasters.service.js';
 
 describe('floodZoneTriageWeight', () => {
   test('uses explicit zone table (not substring heuristics)', () => {
@@ -65,3 +66,41 @@ describe('calculateRiskScore (ops triage)', () => {
     expect(score).toBe(14);
   });
 });
+
+describe('resolveFemaDeclarationFields', () => {
+  test('uses deterministic source_id from disasterNumber + placeCode and newer declarationDate as start_time', () => {
+    const row1 = resolveFemaDeclarationFields({
+      id: 'ephemeral-uuid-1',
+      disasterNumber: 4955,
+      state: 'FL',
+      fipsStateCode: '12',
+      fipsCountyCode: '037',
+      placeCode: '99037',
+      designatedArea: 'Franklin (County)',
+      incidentType: 'Hurricane',
+      declarationTitle: 'HURRICANE ISAIAS',
+      declarationDate: '2026-10-27T00:00:00.000Z',
+      incidentBeginDate: '2026-10-06T00:00:00.000Z',
+    });
+    const row2 = resolveFemaDeclarationFields({
+      id: 'ephemeral-uuid-2',
+      disasterNumber: 4955,
+      state: 'FL',
+      fipsStateCode: '12',
+      fipsCountyCode: '037',
+      placeCode: '99037',
+      designatedArea: 'Franklin (County)',
+      incidentType: 'Hurricane',
+      declarationTitle: 'HURRICANE ISAIAS',
+      declarationDate: '2026-10-27T00:00:00.000Z',
+      incidentBeginDate: '2026-10-06T00:00:00.000Z',
+    });
+
+    expect(row1.source_id).toBe('fema-4955-99037');
+    expect(row2.source_id).toBe(row1.source_id);
+    expect(row1.start_time).toBe('2026-10-27T00:00:00.000Z');
+    expect(row1.county_fips).toBe('12037');
+    expect(row1.county_name).toBe('Franklin');
+  });
+});
+

@@ -694,8 +694,27 @@ export function resolveFemaDeclarationFields(item) {
     }
   }
 
-  const sourceId = String(item?.id || item?.disasterNumber || item?.declarationTitle || '').trim();
+  const disasterNum = item?.disasterNumber != null ? String(item.disasterNumber).trim() : '';
+  const areaSlug = String(
+    item?.placeCode || (fips && fips !== '00000' ? fips : '') || county || item?.designatedArea || ''
+  )
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+  const sourceId = disasterNum
+    ? (areaSlug ? `fema-${disasterNum}-${areaSlug}` : `fema-${disasterNum}`)
+    : String(item?.id || item?.declarationTitle || '').trim();
   if (!sourceId) return null;
+
+  const beginTime = item?.incidentBeginDate ? new Date(item.incidentBeginDate).getTime() : NaN;
+  const declTime = item?.declarationDate ? new Date(item.declarationDate).getTime() : NaN;
+  let startTime = new Date().toISOString();
+  if (Number.isFinite(beginTime) && Number.isFinite(declTime)) {
+    startTime = declTime >= beginTime ? item.declarationDate : item.incidentBeginDate;
+  } else if (item?.declarationDate || item?.incidentBeginDate) {
+    startTime = item.declarationDate || item.incidentBeginDate;
+  }
 
   return {
     source: 'fema',
@@ -703,7 +722,7 @@ export function resolveFemaDeclarationFields(item) {
     county_fips: fips || '00000',
     county_name: county,
     state_abbr: state,
-    start_time: item.incidentBeginDate || item.declarationDate || new Date().toISOString(),
+    start_time: startTime,
     end_time: item.incidentEndDate || null,
     severity: null,
     title: item.declarationTitle || item.title || 'FEMA Disaster',
@@ -1464,7 +1483,7 @@ export async function ingestNwsCap(options = {}) {
   return upsertDisasters(batch);
 }
 
-/** FEMA Disaster Declarations (last 90 days) **/
+/** FEMA Disaster Declarations (last 90 days by declarationDate or incidentBeginDate) **/
 export async function ingestFema() {
   const baseUrl = 'https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries';
 
@@ -1472,12 +1491,12 @@ export async function ingestFema() {
   ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - DISASTER_ROLLING_WINDOW_DAYS);
   const ninetyDaysAgoStr = ninetyDaysAgo.toISOString().split('T')[0];
 
-  const filter = `incidentBeginDate ge ${ninetyDaysAgoStr}`;
-  const url = `${baseUrl}?$filter=${encodeURIComponent(filter)}&$top=1000&$orderby=incidentBeginDate desc`;
+  const filter = `declarationDate ge ${ninetyDaysAgoStr} or incidentBeginDate ge ${ninetyDaysAgoStr}`;
+  const url = `${baseUrl}?$filter=${encodeURIComponent(filter)}&$top=1000&$orderby=${encodeURIComponent('declarationDate desc,incidentBeginDate desc')}`;
 
   let data;
   try {
-    console.log(`🏛️  FEMA: Querying disasters since ${ninetyDaysAgoStr}`);
+    console.log(`🏛️  FEMA: Querying disasters since ${ninetyDaysAgoStr} (declarationDate or incidentBeginDate)`);
     const resp = await fetch(url, {
       headers: {
         Accept: 'application/json',
@@ -1500,21 +1519,25 @@ export async function ingestFema() {
 
   const cutoffDate = new Date(ninetyDaysAgoStr);
   const recentDisasters = disasters.filter((disaster) => {
-    if (disaster.incidentBeginDate) {
-      return new Date(disaster.incidentBeginDate) >= cutoffDate;
-    }
-    return false;
+    const beginOk = disaster.incidentBeginDate && new Date(disaster.incidentBeginDate) >= cutoffDate;
+    const declOk = disaster.declarationDate && new Date(disaster.declarationDate) >= cutoffDate;
+    return Boolean(beginOk || declOk);
   });
 
   console.log(`🏛️  FEMA: ${recentDisasters.length} disasters within ${DISASTER_ROLLING_WINDOW_DAYS}-day window`);
 
   const batch = [];
+  const seenKeys = new Set();
   const coordCache = new Map();
   await loadFipsReference();
 
   for (const item of recentDisasters) {
     const rec = resolveFemaDeclarationFields(item);
     if (!rec || !(rec.county_fips !== '00000' || (rec.county_name && rec.state_abbr))) continue;
+
+    const dedupeKey = `${rec.county_fips}|${rec.source_id}|${rec.start_time}`;
+    if (seenKeys.has(dedupeKey)) continue;
+    seenKeys.add(dedupeKey);
 
     if (!hasFiniteCoords(rec.lat, rec.lng) && rec.county_name && rec.state_abbr) {
       const cacheKey = `${rec.county_name}|${rec.state_abbr}`;

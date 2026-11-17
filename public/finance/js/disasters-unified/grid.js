@@ -424,7 +424,7 @@ function initDisastersGrid() {
     {
       field: 'riskScore',
       headerName: 'Event intensity',
-      headerTooltip: 'Relative event intensity from loaded hazard data — not a loan ops triage score',
+      headerTooltip: 'Relative event ranking from loaded hazards (0–15) — not loan ops triage (FEMA+flood) and not a loss probability',
       width: 150,
       filter: 'agNumberColumnFilter',
       cellRenderer: (params) => htmlCellRenderer(getRiskBadge(params.value ?? 0))
@@ -1224,6 +1224,78 @@ function clearHotspotGridFilter() {
   }
   renderRiskIntelligencePanel(lastGridRows);
   setDashboardStatus('Location filter cleared.', 'info');
+}
+
+function clearDisastersGridFiltersAndData() {
+  activeHotspotKey = null;
+  activeHotspot = null;
+  updateHotspotFilterUi();
+
+  duHotspotCategoryFilter = 'all';
+  duHotspotSearchQuery = '';
+  const hsSearch = document.getElementById('duHotspotSearchInput');
+  if (hsSearch) hsSearch.value = '';
+  document.querySelectorAll('[data-du-hotspot-filter]').forEach((btn) => {
+    const on = (btn.getAttribute('data-du-hotspot-filter') || 'all') === 'all';
+    btn.classList.toggle('active', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+
+  nwsGridFilterActive = false;
+  nwsGridFilterContext = null;
+  updateNwsGridFilterUi();
+  const nwsToggle = document.getElementById('duShowNwsInGrid');
+  if (nwsToggle) nwsToggle.checked = false;
+
+  majorNowFilterActive = false;
+  majorNowFilterHours = 72;
+  const major3dRadio = document.getElementById('duMajorNow3d');
+  if (major3dRadio) major3dRadio.checked = true;
+  updateMajorNowFilterUi();
+
+  timeRangeFilterHours = null;
+  const timeAllRadio = document.getElementById('duTimeAll');
+  if (timeAllRadio) timeAllRadio.checked = true;
+
+  firmsConfidenceFilter = 'high';
+  const firmsHighRadio = document.getElementById('duFirmsConfHigh');
+  if (firmsHighRadio) firmsHighRadio.checked = true;
+
+  $('#disastersQuickFilter').val('');
+
+  if (disastersGridApi) {
+    if (typeof disastersGridApi.setFilterModel === 'function') {
+      disastersGridApi.setFilterModel(null);
+    } else if (typeof disastersGridApi.setGridOption === 'function') {
+      disastersGridApi.setGridOption('filterModel', null);
+    }
+    if (typeof disastersGridApi.setGridOption === 'function') {
+      disastersGridApi.setGridOption('quickFilterText', '');
+    } else if (typeof disastersGridApi.setQuickFilter === 'function') {
+      disastersGridApi.setQuickFilter('');
+    }
+    if (typeof disastersGridApi.deselectAll === 'function') {
+      disastersGridApi.deselectAll();
+    }
+  }
+
+  selectedDisaster = null;
+  selectedDisasterObj = null;
+  selectedDisasterRow = null;
+  lastGridSelectKey = '';
+  lastGridSelectAt = 0;
+  if (typeof updateSelectionContextStrip === 'function') {
+    updateSelectionContextStrip();
+  }
+
+  lastGridRows = [];
+  lastLoadedDisasterRows = [];
+  setDisastersGridRows([]);
+  refreshNwsGridExternalFilter();
+}
+
+if (typeof window !== 'undefined') {
+  window.clearDisastersGridFiltersAndData = clearDisastersGridFiltersAndData;
 }
 
 function applyHotspotSelection(hotspot) {

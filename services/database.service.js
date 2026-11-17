@@ -929,7 +929,7 @@ export async function createTables() {
         loan_amount DECIMAL(12, 2) NOT NULL,
         loan_type VARCHAR(50) DEFAULT 'Conventional',
         milestone VARCHAR(100) NOT NULL,
-        disaster_risk_score INTEGER DEFAULT 0,
+        disaster_risk_score DOUBLE PRECISION DEFAULT 0,
         disaster_declaration_count INTEGER DEFAULT 0,
         fema_data JSONB,
         last_risk_analysis TIMESTAMP,
@@ -987,6 +987,10 @@ export async function createTables() {
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
                        WHERE table_name='loans' AND column_name='last_flood_zone_check') THEN
           ALTER TABLE loans ADD COLUMN last_flood_zone_check TIMESTAMP;
+        END IF;
+        IF EXISTS (SELECT 1 FROM information_schema.columns 
+                   WHERE table_name='loans' AND column_name='disaster_risk_score' AND data_type='integer') THEN
+          ALTER TABLE loans ALTER COLUMN disaster_risk_score TYPE DOUBLE PRECISION USING disaster_risk_score::double precision;
         END IF;
       END $$;
     `);

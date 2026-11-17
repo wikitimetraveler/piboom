@@ -12,6 +12,8 @@ import buildRoutes from './routes/index.routes.js';
 import { initializeDatabase, createTables } from './services/database.service.js';
 import { refreshGenealogyCachesFromPostgres } from './services/genealogy.service.js';
 import { ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc, ingestFema, ingestCaFireCameras, pruneOldDisasters, initDisastersSchema, backfillDisasterGeocodes } from './services/disasters.service.js';
+import { getAllLoans } from './services/loan-pipeline.service.js';
+import { batchAnalyzeRisk } from './services/disaster-risk.service.js';
 import { ensureDisasterImpactGraphReady, refreshDisasterImpactGraphFromCurrentData } from './services/disaster-impact-graph.service.js';
 import { financePathNeedsSession, hasFinanceSession } from './lib/finance-session.js';
 import { scheduleDailyAt } from './lib/disaster-daily-scheduler.js';
@@ -227,6 +229,20 @@ async function runScheduledDisasterIngest(label = 'Disaster scheduler') {
     console.log(`✅ ${label} prune complete`);
   } catch (pruneErr) {
     console.warn(`⚠️ ${label} prune failed`, { error: pruneErr.message });
+  }
+
+  try {
+    const loans = await getAllLoans();
+    if (loans.length > 0) {
+      const loanResults = await batchAnalyzeRisk(loans);
+      const withDecls = loanResults.filter((r) => (r.disasterCount || 0) > 0).length;
+      console.log(`✅ ${label} loan FEMA risk refresh complete`, {
+        loansAnalyzed: loanResults.length,
+        loansWithFemaDeclarations: withDecls,
+      });
+    }
+  } catch (loanRiskErr) {
+    console.warn(`⚠️ ${label} loan FEMA risk refresh failed`, { error: loanRiskErr.message });
   }
 
   try {

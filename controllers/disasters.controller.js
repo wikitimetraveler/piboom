@@ -41,14 +41,18 @@ import {
   getRequestIp,
   setDisasterLiveCache,
 } from '../lib/disaster-live-endpoint-guard.js';
+import {
+  isExcludedLenderState,
+  sqlExcludeLenderStates,
+} from '../lib/lender-footprint.js';
 
 // Ensure schema on startup (best-effort)
 initDisastersSchema().catch(() => {});
 
-/** US state FIPS codes (first 2 digits of county_fips) */
-const US_STATE_FIPS = ['01','02','04','05','06','08','09','10','11','12','13','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','44','45','46','47','48','49','50','51','53','54','55','56','60','66','69','72','78'];
-/** US state abbreviations - for records with county_fips=00000 (FIPS lookup failed) */
-const US_STATE_ABBR = ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY','AS','GU','MP','PR','VI'];
+/** US state FIPS codes (first 2 digits of county_fips) — Alaska (02) omitted from mortgage footprint */
+const US_STATE_FIPS = ['01','04','05','06','08','09','10','11','12','13','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','44','45','46','47','48','49','50','51','53','54','55','56','60','66','69','72','78'];
+/** US state abbreviations - for records with county_fips=00000 (FIPS lookup failed). Alaska excluded (no loans). */
+const US_STATE_ABBR = ['AL','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY','AS','GU','MP','PR','VI'];
 
 export async function listDisasters(req, res) {
   try {
@@ -64,6 +68,18 @@ export async function listDisasters(req, res) {
       : DEFAULT_LIMIT;
     const offset = Number.isFinite(parsedOffset) && parsedOffset >= 0 ? parsedOffset : 0;
 
+    if (isExcludedLenderState(state)) {
+      return res.json({
+        success: true,
+        data: {
+          disasters: [],
+          pagination: { total: 0, limit, offset, hasMore: false },
+          excluded: true,
+          reason: 'State is outside the lending footprint (no loans originated there).',
+        },
+      });
+    }
+
     const clauses = [];
     const values = [];
     // Default: US-only (excludes international e.g. USGS Tibet earthquakes)
@@ -74,6 +90,8 @@ export async function listDisasters(req, res) {
       const abbrList = US_STATE_ABBR.map(a => `'${a}'`).join(',');
       clauses.push(`(LEFT(county_fips, 2) IN (${fipsList}) OR (UPPER(TRIM(COALESCE(state_abbr,''))) IN (${abbrList})))`);
     }
+    // Always hide out-of-footprint states (Alaska) even when usOnly=false or state omitted.
+    clauses.push(sqlExcludeLenderStates({ stateCol: 'state_abbr', fipsCol: 'county_fips' }));
     if (state) { values.push(state); clauses.push(`UPPER(TRIM(state_abbr)) = UPPER($${values.length})`); }
     if (county) { values.push(county); clauses.push(`county_name ILIKE $${values.length}`); values[values.length-1] = `%${county}%`; }
     if (source) { 
@@ -617,9 +635,16 @@ export async function statsDisasters(req, res) {
   try {
     const pool = getPool();
     if (!pool) throw new Error('Database not initialized');
-    const bySource = await pool.query(`SELECT source, COUNT(*) as count FROM disasters GROUP BY source ORDER BY count DESC`);
-    const byEvent = await pool.query(`SELECT event_type, COUNT(*) as count FROM disasters GROUP BY event_type ORDER BY count DESC`);
-    const byState = await pool.query(`SELECT state_abbr, COUNT(*) as count FROM disasters GROUP BY state_abbr ORDER BY count DESC`);
+    const footprintWhere = `WHERE ${sqlExcludeLenderStates({ stateCol: 'state_abbr', fipsCol: 'county_fips' })}`;
+    const bySource = await pool.query(
+      `SELECT source, COUNT(*) as count FROM disasters ${footprintWhere} GROUP BY source ORDER BY count DESC`
+    );
+    const byEvent = await pool.query(
+      `SELECT event_type, COUNT(*) as count FROM disasters ${footprintWhere} GROUP BY event_type ORDER BY count DESC`
+    );
+    const byState = await pool.query(
+      `SELECT state_abbr, COUNT(*) as count FROM disasters ${footprintWhere} GROUP BY state_abbr ORDER BY count DESC`
+    );
     res.json({ success: true, data: { bySource: bySource.rows, byEvent: byEvent.rows, byState: byState.rows } });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Failed to get stats', details: e.message });
@@ -632,6 +657,17 @@ export async function countySummaryByState(req, res) {
     const state = String(req.query.state || '').trim().toUpperCase();
     if (!state) {
       return res.status(400).json({ success: false, error: 'state query parameter is required' });
+    }
+    if (isExcludedLenderState(state)) {
+      return res.json({
+        success: true,
+        data: {
+          state,
+          counties: [],
+          excluded: true,
+          reason: 'State is outside the lending footprint (no loans originated there).',
+        },
+      });
     }
     const pool = getPool();
     if (!pool) throw new Error('Database not initialized');
@@ -661,6 +697,17 @@ export async function cameraCountySummaryByState(req, res) {
     if (!state) {
       return res.status(400).json({ success: false, error: 'state query parameter is required' });
     }
+    if (isExcludedLenderState(state)) {
+      return res.json({
+        success: true,
+        data: {
+          state,
+          counties: [],
+          excluded: true,
+          reason: 'State is outside the lending footprint (no loans originated there).',
+        },
+      });
+    }
     const pool = getPool();
     if (!pool) throw new Error('Database not initialized');
     const { rows } = await pool.query(
@@ -687,7 +734,12 @@ export async function exportCsv(req, res) {
   try {
     const pool = getPool();
     if (!pool) throw new Error('Database not initialized');
-    const { rows } = await pool.query(`SELECT source,event_type,county_name,state_abbr,start_time,end_time,title,lat,lng FROM disasters ORDER BY start_time DESC LIMIT 5000`);
+    const { rows } = await pool.query(
+      `SELECT source,event_type,county_name,state_abbr,start_time,end_time,title,lat,lng
+       FROM disasters
+       WHERE ${sqlExcludeLenderStates({ stateCol: 'state_abbr', fipsCol: 'county_fips' })}
+       ORDER BY start_time DESC LIMIT 5000`
+    );
     const header = 'source,event_type,county_name,state_abbr,start_time,end_time,title,lat,lng\n';
     const csv = rows.map(r => [
       r.source,

@@ -154,8 +154,16 @@
   }
 
   function styleStateLayer(feature) {
-    const fill = feature?.properties?.fill || '#cbd5e1';
     const abbr = feature?.properties?.state_abbr;
+    if (typeof duGeoData.isExcludedLenderState === 'function' && duGeoData.isExcludedLenderState(abbr)) {
+      return {
+        color: '#94a3b8',
+        weight: 0.75,
+        fillColor: '#e2e8f0',
+        fillOpacity: 0.25,
+      };
+    }
+    const fill = feature?.properties?.fill || '#cbd5e1';
     const selected = abbr && abbr === selectedState;
     return {
       color: selected ? '#1d4ed8' : '#64748b',
@@ -255,6 +263,13 @@
   async function selectState(stateAbbr, opts = {}) {
     const st = String(stateAbbr || '').toUpperCase();
     if (!st || !duGeoData.ST_TO_FIPS[st]) return;
+    if (typeof duGeoData.isExcludedLenderState === 'function' && duGeoData.isExcludedLenderState(st)) {
+      setPickerStatus(
+        `${duGeoData.stateName(st)} is outside the lending footprint — no loans originated there.`,
+        'warning'
+      );
+      return;
+    }
 
     selectedState = st;
     selectedCounty = null;
@@ -364,6 +379,16 @@
       onEachFeature: (feature, layer) => {
         const abbr = feature.properties?.state_abbr;
         const name = feature.properties?.state_name || abbr;
+        const excluded = typeof duGeoData.isExcludedLenderState === 'function'
+          && duGeoData.isExcludedLenderState(abbr);
+        if (excluded) {
+          bindFeatureTooltip(layer, {
+            name: `${name || abbr} — outside lending footprint`,
+            count: 0,
+            preferPermanent: false,
+          });
+          return;
+        }
         const count = Number(feature.properties?.event_count) || 0;
         // US zoom: sticky hover labels only — permanent tooltips on all states fight the main thread.
         bindFeatureTooltip(layer, { name: name || abbr || '', count, preferPermanent: false });
@@ -388,7 +413,10 @@
   function populateStateSelect() {
     const sel = $('#duGeoStateSelect');
     if (!sel) return;
-    const options = Object.keys(duGeoData.STATE_NAMES)
+    const abbrs = typeof duGeoData.selectableStateAbbrs === 'function'
+      ? duGeoData.selectableStateAbbrs()
+      : Object.keys(duGeoData.STATE_NAMES);
+    const options = abbrs
       .sort((a, b) => duGeoData.stateName(a).localeCompare(duGeoData.stateName(b)))
       .map((abbr) => `<option value="${abbr}">${duGeoData.stateName(abbr)} (${abbr})</option>`)
       .join('');

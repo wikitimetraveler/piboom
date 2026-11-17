@@ -437,7 +437,7 @@ export async function generateTestLoans(count = 100) {
         { name: 'Surprise', county: 'Maricopa', zip: '85374', address: '16000 N Civic Center Plaza' }
       ]},
       
-      // Additional states - All 50 US States
+      // Additional states (Alaska omitted — outside lending footprint)
       { state: 'AL', cities: [
         { name: 'Birmingham', county: 'Jefferson', zip: '35203', address: '710 N 20th St' },
         { name: 'Montgomery', county: 'Montgomery', zip: '36104', address: '103 N Perry St' },
@@ -450,18 +450,7 @@ export async function generateTestLoans(count = 100) {
         { name: 'Decatur', county: 'Morgan', zip: '35601', address: '402 Lee St NE' },
         { name: 'Madison', county: 'Madison', zip: '35758', address: '100 Hughes Rd' }
       ]},
-      { state: 'AK', cities: [
-        { name: 'Anchorage', county: 'Anchorage', zip: '99501', address: '632 W 6th Ave' },
-        { name: 'Fairbanks', county: 'Fairbanks North Star', zip: '99701', address: '800 Cushman St' },
-        { name: 'Juneau', county: 'Juneau', zip: '99801', address: '155 S Seward St' },
-        { name: 'Wasilla', county: 'Matanuska-Susitna', zip: '99654', address: '290 E Herning Ave' },
-        { name: 'Sitka', county: 'Sitka', zip: '99835', address: '100 Lincoln St' },
-        { name: 'Ketchikan', county: 'Ketchikan Gateway', zip: '99901', address: '334 Front St' },
-        { name: 'Kenai', county: 'Kenai Peninsula', zip: '99611', address: '210 Fidalgo Ave' },
-        { name: 'Kodiak', county: 'Kodiak Island', zip: '99615', address: '710 Mill Bay Rd' },
-        { name: 'Bethel', county: 'Bethel', zip: '99559', address: '675 3rd Ave' },
-        { name: 'Palmer', county: 'Matanuska-Susitna', zip: '99645', address: '231 W Evergreen Ave' }
-      ]},
+      // Alaska omitted — outside lending footprint (no loans originated there).
       { state: 'AR', cities: [
         { name: 'Little Rock', county: 'Pulaski', zip: '72201', address: '500 W Markham St' },
         { name: 'Fort Smith', county: 'Sebastian', zip: '72901', address: '623 Garrison Ave' },
@@ -1451,8 +1440,8 @@ export async function getPipelineStats() {
     const riskResult = await pool.query(`
       SELECT 
         CASE 
-          WHEN disaster_risk_score BETWEEN 0 AND 2 THEN 'Low Risk'
-          WHEN disaster_risk_score BETWEEN 3 AND 5 THEN 'Medium Risk'
+          WHEN disaster_risk_score >= 0 AND disaster_risk_score < 3 THEN 'Low Risk'
+          WHEN disaster_risk_score >= 3 AND disaster_risk_score < 6 THEN 'Medium Risk'
           WHEN disaster_risk_score >= 6 THEN 'High Risk'
           ELSE 'Not Analyzed'
         END as risk_level,
@@ -1460,8 +1449,8 @@ export async function getPipelineStats() {
       FROM loans 
       GROUP BY 
         CASE 
-          WHEN disaster_risk_score BETWEEN 0 AND 2 THEN 'Low Risk'
-          WHEN disaster_risk_score BETWEEN 3 AND 5 THEN 'Medium Risk'
+          WHEN disaster_risk_score >= 0 AND disaster_risk_score < 3 THEN 'Low Risk'
+          WHEN disaster_risk_score >= 3 AND disaster_risk_score < 6 THEN 'Medium Risk'
           WHEN disaster_risk_score >= 6 THEN 'High Risk'
           ELSE 'Not Analyzed'
         END

@@ -9,7 +9,8 @@ const bar = readFileSync(join(process.cwd(), 'public/shared/js/open-suite-bar.js
 
 describe('open suite', () => {
   test('LinkedIn page links the Open Lender Suite apps', () => {
-    expect(html).toContain('href="/finance/disasters-unified.html?showcase=1"');
+    expect(html).toContain('href="/finance/disasters-unified.html"');
+    expect(html).not.toContain('showcase=1');
     expect(html).toContain('href="/finance/encompass-assistant.html"');
     expect(html).toContain('href="/gse-analyzer.html"');
     expect(html).toContain('href="/finance/calc-engine-webgpu.html"');
@@ -27,11 +28,14 @@ describe('open suite', () => {
     expect(html).toContain('Outfit');
   });
 
-  test('Open Lender Suite mounts the WebGPU worldwide hazard globe', () => {
+  test('Open Lender Suite mounts a full-bleed WebGPU worldwide hazard globe hero', () => {
     expect(html).toContain('id="openSuiteGlobe"');
+    expect(html).toContain('id="openSuiteGlobeStage"');
     expect(html).toContain('/shared/js/webgpu-globe.js');
     expect(html).toContain('/open/open-suite-globe.js');
-    expect(html).toContain('Worldwide hazard pulse');
+    expect(html).toMatch(/open-suite__brand[^>]*>\s*Open Lender Suite/);
+    expect(html).toContain('open-suite__hero');
+    expect(html).toContain('id="openSuiteTools"');
   });
 
   test('suite bar switches among the public apps', () => {

@@ -25,6 +25,8 @@ import {
   pruneOldDisasters,
   backfillDisasterGeocodes,
 } from '../services/disasters.service.js';
+import { getAllLoans } from '../services/loan-pipeline.service.js';
+import { batchAnalyzeRisk } from '../services/disaster-risk.service.js';
 import { refreshDisasterImpactGraphFromCurrentData } from '../services/disaster-impact-graph.service.js';
 
 async function main() {
@@ -75,11 +77,24 @@ async function main() {
     await pruneOldDisasters();
     console.log('   Prune complete');
 
+    if (!skipFema) {
+      console.log('🏠 Refreshing loan pipeline FEMA risk scores...');
+      const loans = await getAllLoans();
+      if (loans.length > 0) {
+        const loanResults = await batchAnalyzeRisk(loans);
+        const withDecls = loanResults.filter((r) => (r.disasterCount || 0) > 0).length;
+        console.log(`   Loan FEMA risk refresh complete: ${loanResults.length} loans (${withDecls} with active 90d declarations)`);
+      } else {
+        console.log('   No loans in pipeline to analyze');
+      }
+    }
+
     console.log('🕸️ Refreshing disaster impact graph...');
     const graphRes = await refreshDisasterImpactGraphFromCurrentData();
     console.log('   Graph refresh complete', graphRes?.seeded || {});
 
     console.log('✅ Disaster refresh complete');
+    await pool.end().catch(() => {});
   } catch (error) {
     console.error('❌ Error:', error.message);
     process.exit(1);

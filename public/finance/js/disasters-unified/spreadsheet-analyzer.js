@@ -758,7 +758,7 @@
               <button type="button" class="btn btn-outline-primary du-sp-focus-btn" data-sp-idx="${idx}" title="Locate property on map and inspect county">
                 <i class="bi bi-geo-alt"></i>
               </button>
-              <button type="button" class="btn btn-outline-dark du-sp-checklist-btn" data-sp-idx="${idx}" title="View full lender underwriting &amp; closing checklist">
+              <button type="button" class="btn btn-outline-dark du-sp-checklist-btn" data-sp-idx="${idx}" title="View example processor checklist (illustrative, not policy)">
                 <i class="bi bi-card-checklist"></i> Checklist
               </button>
             </div>
@@ -987,7 +987,7 @@
       'Loan Type',
       'Flood Zone',
       'Risk Tier',
-      'Ops Triage Score',
+      'Proximity Composite Score',
       'FEMA Declared',
       'Matched Hazards Count',
       'Closest Hazard',

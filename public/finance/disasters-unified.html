@@ -214,7 +214,7 @@
             <div>
               <span class="badge text-bg-primary me-2"><i class="bi bi-stars me-1"></i>Hazard desk</span>
               <strong class="du-showcase-title">Hazards on one map</strong>
-              <span class="text-muted small ms-1">— From national hazard monitoring to property-level underwriting conditions in seconds.</span>
+              <span class="text-muted small ms-1">— From national hazard monitoring to property-level ops checklist prompts in seconds.</span>
             </div>
             <div class="d-flex flex-wrap gap-2">
               <button type="button" class="btn btn-sm btn-primary" id="duShowcaseSampleTapeBtn">
@@ -244,7 +244,7 @@
                   <span class="du-showcase-step-num">2</span>
                   <strong>County hotspots</strong>
                 </div>
-                <p class="small text-muted mb-0">Complete county-by-county hotspot ranking with exact <strong>GSE/FHA requirements</strong>: Form 1004D re-inspections, HOI binding moratoriums, and closing holds.</p>
+                <p class="small text-muted mb-0">Complete county-by-county hotspot ranking with <strong>example processor checks</strong> (illustrative, not policy): Form 1004D-style re-inspections, HOI binding checks, and closing holds.</p>
               </div>
             </div>
             <div class="col-xl-3 col-md-6">
@@ -253,7 +253,7 @@
                   <span class="du-showcase-step-num">3</span>
                   <strong>Spreadsheet Risk Analyzer</strong>
                 </div>
-                <p class="small text-muted mb-0">Upload an <code>.xlsx</code> or <code>.csv</code> property tape (or paste from Excel) to score every property against active disasters and export an underwriting checklist.</p>
+                <p class="small text-muted mb-0">Upload an <code>.xlsx</code> or <code>.csv</code> property tape (or paste from Excel) for a <strong>multi-hazard proximity composite</strong> score and an example processor checklist — not the loan FEMA+flood ops triage score.</p>
               </div>
             </div>
             <div class="col-xl-3 col-md-6">
@@ -298,7 +298,7 @@
             <button type="button" class="du-overlay-chip du-overlay-chip--active" data-du-overlay="live" aria-pressed="true" title="Live events inside the selected radius">
               <span class="du-overlay-swatch du-overlay-swatch--live"></span> Live /near ring
             </button>
-            <button type="button" class="du-overlay-chip du-overlay-chip--active" data-du-overlay="graphNear" aria-pressed="true" title="Persisted graph NEAR edges — as-of last reseed (seeded_at)">
+            <button type="button" class="du-overlay-chip" data-du-overlay="graphNear" aria-pressed="false" title="Persisted graph NEAR edges — as-of last reseed (seeded_at), not live /near">
               <span class="du-overlay-swatch du-overlay-swatch--near"></span> Graph NEAR
             </button>
             <button type="button" class="du-overlay-chip" data-du-overlay="firmsHeat" aria-pressed="false" title="FIRMS intensity weighted by FRP / brightness">
@@ -528,7 +528,7 @@
             <button type="button" class="btn btn-outline-warning btn-sm" id="duExportCinematicKmlToolbarBtn" onclick="exportCinematicDisasterKml()" disabled title="Select a disaster in the grid first">
               <i class="bi bi-globe-americas"></i> Google Earth KML
             </button>
-            <button type="button" class="btn btn-outline-primary btn-sm" id="applyBtn" title="Reload grid immediately (sources also auto-apply)"><i class="bi-arrow-repeat"></i> Reload grid</button>
+            <button type="button" class="btn btn-outline-primary btn-sm" id="applyBtn" title="Clear all filters, wipe grid filters, and reload grid fresh"><i class="bi-arrow-repeat"></i> Reload grid</button>
             <a class="btn btn-outline-secondary btn-sm" href="#refreshBtnHero" id="duJumpToPullLink" title="Jump to primary Pull control in the hero">
               <i class="bi bi-cloud-download"></i> Pull (hero)
             </a>
@@ -553,33 +553,33 @@
         </div>
         <div id="collapseRiskIntel" class="collapse show du-section-card-body" aria-labelledby="headingRiskIntel">
           <p class="small text-muted mb-3">
-            Complete list of active disaster hotspots ranked by severity, paired with concrete <strong>mortgage lender underwriting, inspection, insurance, and closing requirements</strong>. Click any hotspot to filter the events table and load affected county loans.
+            Active disaster hotspots ranked by severity, paired with <strong>example processor checks</strong> for inspection, insurance, and closing gates (illustrative prompts — not GSE/FHA mandates). Click any hotspot to filter the events table and load affected county loans.
           </p>
 
-          <!-- What a Lender Needs — 4 Pillar Policy Reference -->
-          <div class="row g-2 mb-3" aria-label="What a lender needs by hazard tier">
+          <!-- Example processor checks by hazard tier (illustrative — not policy) -->
+          <div class="row g-2 mb-3" aria-label="Example processor checks by hazard tier">
             <div class="col-xl-3 col-md-6">
               <div class="p-2 rounded border bg-danger-subtle border-danger-subtle h-100 small">
                 <div class="fw-bold text-danger-emphasis mb-1"><i class="bi bi-house-exclamation me-1"></i>1. FEMA Declared Counties (DR#)</div>
-                <div class="text-body-secondary">Require <strong>Post-Disaster Inspection (Form 1004D / exterior + interior photos)</strong>, borrower no-damage attestation, and active HOI verification before closing or funding.</div>
+                <div class="text-body-secondary">Example: consider <strong>post-disaster inspection (Form 1004D-style / exterior + interior photos)</strong>, borrower no-damage attestation, and active HOI verification before closing or funding.</div>
               </div>
             </div>
             <div class="col-xl-3 col-md-6">
               <div class="p-2 rounded border bg-warning-subtle border-warning-subtle h-100 small">
                 <div class="fw-bold text-warning-emphasis mb-1"><i class="bi bi-fire me-1"></i>2. Active Wildfire &amp; Hurricane (&lt;25 mi)</div>
-                <div class="text-body-secondary">Check <strong>insurance carrier ZIP binding moratoriums</strong>; require exterior photo certification confirming the subject property is outside active fire/surge perimeters.</div>
+                <div class="text-body-secondary">Example: check <strong>insurance carrier ZIP binding status</strong>; consider exterior photo certification that the subject is outside active fire/surge perimeters.</div>
               </div>
             </div>
             <div class="col-xl-3 col-md-6">
               <div class="p-2 rounded border bg-info-subtle border-info-subtle h-100 small">
                 <div class="fw-bold text-info-emphasis mb-1"><i class="bi bi-droplet-half me-1"></i>3. SFHA Flood Zones (A / AE / V / VE)</div>
-                <div class="text-body-secondary">Verify <strong>Life-of-Loan Flood Determination</strong>, mandatory NFIP or qualifying private flood insurance binder, and escrow setup per GSE/FHA coverage minimums.</div>
+                <div class="text-body-secondary">Example: verify <strong>Life-of-Loan Flood Determination</strong>, NFIP or qualifying private flood insurance binder, and escrow setup per your investor guidelines.</div>
               </div>
             </div>
             <div class="col-xl-3 col-md-6">
               <div class="p-2 rounded border bg-secondary-subtle border-secondary-subtle h-100 small">
                 <div class="fw-bold text-secondary-emphasis mb-1"><i class="bi bi-bank me-1"></i>4. Closing Gate &amp; Servicing Triage</div>
-                <div class="text-body-secondary">Place <strong>Clear-to-Close / Funding Hold</strong> on unverified loans in impact zones; flag closed/serviced loans in FEMA Individual Assistance (IA) counties for forbearance outreach.</div>
+                <div class="text-body-secondary">Example: consider a <strong>Clear-to-Close / Funding Hold</strong> on unverified loans in impact zones; flag closed/serviced loans in FEMA Individual Assistance (IA) counties for outreach.</div>
               </div>
             </div>
           </div>
@@ -610,7 +610,7 @@
                     <tr>
                       <th>Rank &amp; Location</th>
                       <th class="text-end">Events</th>
-                      <th class="text-end" title="Peak event intensity in this area">Peak Intensity</th>
+                      <th class="text-end" title="Peak event intensity in this area (relative ranking — not loan ops triage)">Peak Intensity</th>
                       <th>Dominant Hazard</th>
                       <th>FEMA Status</th>
                       <th>Inspection, insurance, and gate</th>
@@ -654,6 +654,7 @@
         <div id="collapseSpreadsheet" class="collapse show du-section-card-body" aria-labelledby="headingSpreadsheet">
           <p class="small text-muted mb-3">
             Upload a spreadsheet of properties (<code>.xlsx</code>, <code>.xls</code>, or <code>.csv</code>), paste rows from a sheet, or click <strong>Load sample properties</strong> to run a multi-hazard check with inspection, insurance, and closing-hold notes.
+            Tape scores are a <strong>multi-hazard proximity composite</strong> (FIRMS / NHC / USGS / NWS / FEMA in range) — <strong>not</strong> the loan panel’s FEMA+flood ops triage score (0–15), and <strong>not</strong> a loss probability.
             <strong>Do not upload real borrower names or loan numbers</strong> — use hashed or tokenized IDs and synthetic labels only (a de-identified property table is enough).
           </p>
 
@@ -786,10 +787,10 @@
                     <th>Property Address</th>
                     <th class="text-end">Amount &amp; Stage</th>
                     <th class="text-center">Flood Zone</th>
-                    <th>Risk Score</th>
+                    <th title="Multi-hazard proximity composite (0–15) — not loan FEMA+flood ops triage, not a loss probability">Proximity composite</th>
                     <th>Matched Hazards &amp; Closest</th>
                     <th>Status</th>
-                    <th>Inspection, insurance, and gate</th>
+                    <th>Example checks</th>
                     <th class="text-end">Actions</th>
                   </tr>
                 </thead>
@@ -889,7 +890,7 @@
                     <label class="form-check-label small" for="skipFemaCheck">Skip FEMA on refresh</label>
                   </div>
                   <a class="btn btn-outline-secondary btn-sm" href="/api/disasters/export.csv"><i class="bi-download"></i> Export CSV</a>
-                  <button type="button" class="btn btn-outline-primary btn-sm du-apply-filters-btn" title="Reload grid immediately"><i class="bi-arrow-repeat"></i> Reload grid</button>
+                  <button type="button" class="btn btn-outline-primary btn-sm du-apply-filters-btn" title="Clear all filters, wipe grid filters, and reload grid fresh"><i class="bi-arrow-repeat"></i> Reload grid</button>
                 </div>
               </div>
             </div>
@@ -922,7 +923,10 @@
                         <label class="form-check-label small" for="duShowNwsInGrid">Narrow grid on row selection (NWS-only for alerts; all sources in area for FEMA/other)</label>
                       </div>
                     </div>
-                    <input type="text" id="disastersQuickFilter" class="form-control form-control-sm" style="max-width: 280px;" placeholder="Quick filter (e.g. CA, wildfire, USGS)…" aria-label="Quick filter disasters grid">
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                      <input type="text" id="disastersQuickFilter" class="form-control form-control-sm" style="max-width: 280px;" placeholder="Quick filter (e.g. CA, wildfire, USGS)…" aria-label="Quick filter disasters grid">
+                      <button type="button" class="btn btn-outline-primary btn-sm du-apply-filters-btn" id="duReloadGridToolbarBtn" title="Clear all filters, wipe grid filters, and reload grid fresh"><i class="bi-arrow-repeat"></i> Reload grid</button>
+                    </div>
                   </div>
                   <div class="du-grid-shell position-relative">
                     <div id="disastersGrid" class="ag-theme-alpine"></div>

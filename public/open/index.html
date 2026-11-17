@@ -30,83 +30,74 @@
 <body class="open-suite-page dark-mode">
   <modern-navbar></modern-navbar>
   <main class="open-suite">
-    <header class="open-suite__hero">
-      <div class="open-suite__hero-layout">
-        <div class="open-suite__hero-copy">
-          <div class="open-suite__hero-top">
-            <p class="open-suite__kicker">Lane AI Labs · Open Lender Suite</p>
-            <span class="open-suite__badge"><i class="bi bi-unlock" aria-hidden="true"></i> No login</span>
-          </div>
-          <h1>Open Lender Suite</h1>
-          <p class="open-suite__lead">
-            Five public mortgage tools you can open from a LinkedIn link. Hazard intelligence,
-            agency scenario compare, integer-cent calc comparison, a synthetic loan training sim,
-            and an Encompass Developer AI Expert — research and training prototypes and proof of concepts.
-          </p>
-          <ul class="open-suite__meta" aria-label="Suite details">
-            <li><i class="bi bi-grid-3x3-gap" aria-hidden="true"></i> 5 tools</li>
-            <li><i class="bi bi-shield-check" aria-hidden="true"></i> Public · no borrower data</li>
-            <li><i class="bi bi-journal-text" aria-hidden="true"></i> Decision support only</li>
-          </ul>
-          <p class="open-suite__url">https://devconnectlabs.com/open/</p>
+    <header class="open-suite__hero" aria-label="Open Lender Suite">
+      <div class="open-suite-globe-stage fun-hero" id="openSuiteGlobeStage" aria-hidden="true">
+        <div class="open-suite-globe-aura" aria-hidden="true"></div>
+        <canvas id="openSuiteGlobe" class="open-suite-globe-canvas" role="img" aria-label="Spinning WebGPU Earth with worldwide disaster pulses"></canvas>
+        <div class="open-suite__hero-veil" aria-hidden="true"></div>
+      </div>
+      <div class="open-suite__hero-content">
+        <p class="open-suite__brand">Open Lender Suite</p>
+        <p class="open-suite__kicker">Lane AI Labs · No login</p>
+        <h1>Mortgage tools you can open from a link</h1>
+        <p class="open-suite__lead">
+          Hazard intelligence, agency scenario compare, integer-cent calc comparison,
+          a synthetic loan training sim, and an Encompass Developer AI Expert.
+        </p>
+        <div class="open-suite__cta-row">
+          <a class="btn open-suite__cta open-suite__cta--primary" href="/finance/disasters-unified.html">
+            Open Disasters <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          </a>
+          <a class="btn open-suite__cta open-suite__cta--ghost" href="#openSuiteTools">
+            Browse the suite
+          </a>
         </div>
-        <aside class="open-suite-globe-gate" aria-label="Worldwide hazard globe">
-          <div class="open-suite-globe-stage fun-hero" id="openSuiteGlobeStage">
-            <div class="open-suite-globe-aura" aria-hidden="true"></div>
-            <canvas id="openSuiteGlobe" class="open-suite-globe-canvas" role="img" aria-label="Spinning WebGPU Earth with worldwide disaster pulses"></canvas>
-            <div class="open-suite-globe-caption">
-              <span class="open-suite-globe-eyebrow">WebGPU · Blue Marble</span>
-              <strong>Worldwide hazard pulse</strong>
-              <span class="open-suite-globe-status" id="openSuiteGlobeStatus">Igniting globe…</span>
-            </div>
-            <ul class="open-suite-globe-legend" aria-label="Hazard pulse sources">
-              <li><span class="swatch swatch-firms"></span>FIRMS</li>
-              <li><span class="swatch swatch-usgs"></span>USGS</li>
-              <li><span class="swatch swatch-nws"></span>NWS</li>
-              <li><span class="swatch swatch-nhc"></span>NHC</li>
-              <li><span class="swatch swatch-fema"></span>FEMA</li>
-            </ul>
-          </div>
-        </aside>
+        <p class="open-suite-globe-status" id="openSuiteGlobeStatus">Igniting globe…</p>
       </div>
     </header>
 
-    <section class="open-suite__grid" aria-label="Open Lender Suite apps">
-      <article class="open-card open-card--disasters">
-        <div class="open-card__mark" aria-hidden="true"><i class="bi bi-shield-exclamation"></i></div>
-        <p class="open-card__kicker">01 · Hazard desk</p>
-        <h2>Unified Disasters</h2>
-        <p>Pick a county and review FEMA, NASA FIRMS, USGS, and NWS events on one map. Nearby context is ops triage, not a loss probability.</p>
-        <a class="btn btn-light open-card__cta" href="/finance/disasters-unified.html?showcase=1">Open Disasters <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
-      </article>
-      <article class="open-card open-card--gse">
-        <div class="open-card__mark" aria-hidden="true"><i class="bi bi-diagram-3"></i></div>
-        <p class="open-card__kicker">02 · Agency admin</p>
-        <h2>GSE analyzer</h2>
-        <p>Compare Fannie, Freddie, FHA, VA, and USDA on a clean scenario. AMI, LTV, and loan limits update as you type. Not DU, LPA, or a credit decision.</p>
-        <a class="btn btn-light open-card__cta" href="/gse-analyzer.html">Open the analyzer <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
-      </article>
-      <article class="open-card open-card--graph">
-        <div class="open-card__mark" aria-hidden="true"><i class="bi bi-gpu-card"></i></div>
-        <p class="open-card__kicker">03 · Calc comparison</p>
-        <h2>Graph calculation</h2>
-        <p>Watch a loan-amount cascade paint on a WebGPU graph. Integer-cent results sit beside the same math in GPU floats so the cent drift is visible.</p>
-        <a class="btn btn-light open-card__cta" href="/finance/calc-engine-webgpu.html">Open the graph <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
-      </article>
-      <article class="open-card open-card--flight">
-        <div class="open-card__mark" aria-hidden="true"><i class="bi bi-airplane"></i></div>
-        <p class="open-card__kicker">04 · Training sim</p>
-        <h2>Loan flight simulator</h2>
-        <p>Fly one synthetic loan from application to funding. TRID timing, LTV, and DTI instruments run on the shared calculation engine — no real borrower data.</p>
-        <a class="btn btn-light open-card__cta" href="/finance/loan-flight-sim.html">Open the sim <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
-      </article>
-      <article class="open-card open-card--expert">
-        <div class="open-card__mark" aria-hidden="true"><i class="bi bi-robot"></i></div>
-        <p class="open-card__kicker">05 · AI expert</p>
-        <h2>Encompass Expert</h2>
-        <p>Ask mortgage integration questions grounded in indexed docs and sample code. Hybrid search surfaces the slips; answers stay retrieval-only — live Hub calls stay on the Hub.</p>
-        <a class="btn btn-light open-card__cta" href="/finance/encompass-assistant.html">Open the expert <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
-      </article>
+    <section class="open-suite__tools" id="openSuiteTools" aria-label="Open Lender Suite apps">
+      <div class="open-suite__tools-head">
+        <h2>Five public tools</h2>
+        <p>Research and training prototypes — decision support only, no borrower data.</p>
+      </div>
+      <div class="open-suite__grid">
+        <article class="open-card open-card--disasters">
+          <div class="open-card__mark" aria-hidden="true"><i class="bi bi-shield-exclamation"></i></div>
+          <p class="open-card__kicker">01 · Hazard desk</p>
+          <h3>Unified Disasters</h3>
+          <p>Pick a county and review FEMA, NASA FIRMS, USGS, and NWS events on one map. Nearby context is ops triage, not a loss probability.</p>
+          <a class="btn btn-light open-card__cta" href="/finance/disasters-unified.html">Open Disasters <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+        </article>
+        <article class="open-card open-card--gse">
+          <div class="open-card__mark" aria-hidden="true"><i class="bi bi-diagram-3"></i></div>
+          <p class="open-card__kicker">02 · Agency admin</p>
+          <h3>GSE analyzer</h3>
+          <p>Compare Fannie, Freddie, FHA, VA, and USDA on a clean scenario. AMI, LTV, and loan limits update as you type. Not DU, LPA, or a credit decision.</p>
+          <a class="btn btn-light open-card__cta" href="/gse-analyzer.html">Open the analyzer <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+        </article>
+        <article class="open-card open-card--graph">
+          <div class="open-card__mark" aria-hidden="true"><i class="bi bi-gpu-card"></i></div>
+          <p class="open-card__kicker">03 · Calc comparison</p>
+          <h3>Graph calculation</h3>
+          <p>Watch a loan-amount cascade paint on a WebGPU graph. Integer-cent results sit beside the same math in GPU floats so the cent drift is visible.</p>
+          <a class="btn btn-light open-card__cta" href="/finance/calc-engine-webgpu.html">Open the graph <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+        </article>
+        <article class="open-card open-card--flight">
+          <div class="open-card__mark" aria-hidden="true"><i class="bi bi-airplane"></i></div>
+          <p class="open-card__kicker">04 · Training sim</p>
+          <h3>Loan flight simulator</h3>
+          <p>Fly one synthetic loan from application to funding. TRID timing, LTV, and DTI instruments run on the shared calculation engine — no real borrower data.</p>
+          <a class="btn btn-light open-card__cta" href="/finance/loan-flight-sim.html">Open the sim <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+        </article>
+        <article class="open-card open-card--expert">
+          <div class="open-card__mark" aria-hidden="true"><i class="bi bi-robot"></i></div>
+          <p class="open-card__kicker">05 · AI expert</p>
+          <h3>Encompass Expert</h3>
+          <p>Ask mortgage integration questions grounded in indexed docs and sample code. Hybrid search surfaces the slips; answers stay retrieval-only — live Hub calls stay on the Hub.</p>
+          <a class="btn btn-light open-card__cta" href="/finance/encompass-assistant.html">Open the expert <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+        </article>
+      </div>
     </section>
 
     <footer class="open-suite__foot">
@@ -116,9 +107,11 @@
         <span>Open Lender Suite</span>
         <span class="open-suite__credit-sep" aria-hidden="true">·</span>
         <a href="/stack.html">Tech stack</a>
+        <span class="open-suite__credit-sep" aria-hidden="true">·</span>
+        <span class="open-suite__url">https://devconnectlabs.com/open/</span>
       </p>
       <p class="open-suite__disclaimer">
-        Research and training prototypes and proof of concepts.
+        Research and training prototypes and proof of concepts. Decision support only — not a loss probability, credit decision, or investor mandate.
       </p>
     </footer>
   </main>

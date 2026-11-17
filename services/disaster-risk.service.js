@@ -378,7 +378,7 @@ export async function analyzeLoanRisk(loan) {
     
     // Get flood zone data if not already loaded - query and store it
     let floodZoneData = null;
-    if (!loan.flood_zone && loan.latitude && loan.longitude) {
+    if (!loan.flood_zone && !loan.last_flood_zone_check && loan.latitude && loan.longitude) {
       try {
         // Query flood zone data
         floodZoneData = await queryFloodZoneForPoint(
@@ -440,6 +440,132 @@ export async function analyzeLoanRisk(loan) {
   }
 }
 
+const femaCountyQueryCache = new Map();
+const FEMA_COUNTY_CACHE_TTL_MS = 5 * 60 * 1000;
+
+/**
+ * Pre-populate femaCountyQueryCache from a single national 90-day FEMA query
+ * so batchAnalyzeRisk does not make hundreds of per-county HTTP requests.
+ */
+async function primeFemaCountyCacheForBatch(loans) {
+  try {
+    const baseUrl = 'https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries';
+    const ninetyDaysAgo = new Date();
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+    const ninetyDaysAgoStr = ninetyDaysAgo.toISOString().split('T')[0];
+    const lastNinetyDaysDate = new Date(ninetyDaysAgoStr);
+
+    const filter = `declarationDate ge ${ninetyDaysAgoStr} or incidentBeginDate ge ${ninetyDaysAgoStr}`;
+    const url = `${baseUrl}?$filter=${encodeURIComponent(filter)}&$top=1000&$orderby=${encodeURIComponent('declarationDate desc,incidentBeginDate desc')}`;
+
+    const resp = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'DevConnectLabs-LoanPipeline/1.0'
+      }
+    });
+    if (!resp.ok) return false;
+
+    const data = await resp.json();
+    const rawList = data.DisasterDeclarationsSummaries || [];
+
+    const byCountyKey = new Map();
+    for (const item of rawList) {
+      const beginOk = item.incidentBeginDate && new Date(item.incidentBeginDate) >= lastNinetyDaysDate;
+      const declOk = item.declarationDate && new Date(item.declarationDate) >= lastNinetyDaysDate;
+      if (!beginOk && !declOk) continue;
+
+      const st = String(item.state || '').trim().toUpperCase();
+      const cnty = normalizeCountyName(
+        item.designatedArea || item.county || parseCountyFromTitle(item.declarationTitle || item.title) || ''
+      );
+      if (!st || !cnty) continue;
+
+      const key = `${st}|${cnty.toLowerCase()}`;
+      if (!byCountyKey.has(key)) {
+        byCountyKey.set(key, { state: st, county: cnty, seenNums: new Set(), items: [] });
+      }
+      const bucket = byCountyKey.get(key);
+      const dedupeId = String(item.disasterNumber || item.declarationTitle || item.id || '');
+      if (dedupeId && bucket.seenNums.has(dedupeId)) continue;
+      if (dedupeId) bucket.seenNums.add(dedupeId);
+      bucket.items.push(item);
+    }
+
+    const nowIso = new Date().toISOString();
+    const loanCountyKeys = new Map();
+    for (const loan of loans) {
+      const st = String(loan.state || '').trim().toUpperCase();
+      const cnty = normalizeCountyName(loan.county || '');
+      if (st && cnty) {
+        loanCountyKeys.set(`${st}|${cnty.toLowerCase()}`, { state: st, county: cnty });
+      }
+    }
+
+    for (const [key, { state: st, county: cnty }] of loanCountyKeys.entries()) {
+      const bucket = byCountyKey.get(key);
+      if (!bucket || bucket.items.length === 0) {
+        femaCountyQueryCache.set(key, {
+          timestamp: Date.now(),
+          data: {
+            disasterCount: 0,
+            disasters: [],
+            queryInfo: {
+              state: st,
+              county: cnty,
+              queriedAt: nowIso,
+              totalRecords: 0,
+              filterSince: ninetyDaysAgoStr
+            }
+          }
+        });
+        continue;
+      }
+
+      const coords = await geocodeCountyState(cnty, st);
+      const geocodedDisasters = bucket.items.map((disaster) => ({
+        disasterNumber: disaster.disasterNumber,
+        declarationType: disaster.declarationType || 'DR',
+        state: st,
+        county: cnty,
+        declarationDate: disaster.declarationDate,
+        incidentType: disaster.incidentType,
+        title: disaster.declarationTitle || disaster.title,
+        incidentBeginDate: disaster.incidentBeginDate,
+        incidentEndDate: disaster.incidentEndDate,
+        ihProgramDeclared: disaster.ihProgramDeclared,
+        iaProgramDeclared: disaster.iaProgramDeclared,
+        paProgramDeclared: disaster.paProgramDeclared,
+        hmProgramDeclared: disaster.hmProgramDeclared,
+        latitude: coords?.latitude ?? null,
+        longitude: coords?.longitude ?? null
+      }));
+
+      femaCountyQueryCache.set(key, {
+        timestamp: Date.now(),
+        data: {
+          disasterCount: geocodedDisasters.length,
+          disasters: geocodedDisasters,
+          queryInfo: {
+            state: st,
+            county: cnty,
+            queriedAt: nowIso,
+            totalRecords: geocodedDisasters.length,
+            filterSince: ninetyDaysAgoStr
+          }
+        }
+      });
+    }
+
+    console.log(`🏛️  Primed FEMA 90-day cache for ${loanCountyKeys.size} loan counties (${byCountyKey.size} active FEMA counties nationwide)`);
+    return true;
+  } catch (err) {
+    console.warn(`⚠️  Could not pre-warm FEMA county cache, falling back to per-county queries: ${err.message}`);
+    return false;
+  }
+}
+
 /**
  * Batch analyze risk for multiple loans
  * @param {Array} loans - Array of loan objects
@@ -448,8 +574,9 @@ export async function analyzeLoanRisk(loan) {
 export async function batchAnalyzeRisk(loans) {
   console.log(`🔄 Starting batch risk analysis for ${loans.length} loans...`);
   
+  const cachePrimed = await primeFemaCountyCacheForBatch(loans);
   const results = [];
-  const batchSize = 10; // Process in batches to avoid overwhelming FEMA API
+  const batchSize = cachePrimed ? 50 : 10; // Larger batches when FEMA cache is pre-warmed
   
   for (let i = 0; i < loans.length; i += batchSize) {
     const batch = loans.slice(i, i + batchSize);
@@ -474,8 +601,8 @@ export async function batchAnalyzeRisk(loans) {
     
     console.log(`🔄 Processed ${Math.min(i + batchSize, loans.length)}/${loans.length} loans...`);
     
-    // Add delay between batches to be respectful to FEMA API
-    if (i + batchSize < loans.length) {
+    // Add delay between batches when hitting FEMA API directly
+    if (!cachePrimed && i + batchSize < loans.length) {
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }
@@ -491,18 +618,36 @@ export async function batchAnalyzeRisk(loans) {
  * @returns {Promise<Object>} FEMA data with disaster count
  */
 async function queryFEMAApi(state, county) {
+  const cleanState = String(state || '').trim().toUpperCase();
+  const cleanCounty = normalizeCountyName(county);
+  const cacheKey = `${cleanState}|${cleanCounty.toLowerCase()}`;
+  const cached = femaCountyQueryCache.get(cacheKey);
+  if (cached && (Date.now() - cached.timestamp) < FEMA_COUNTY_CACHE_TTL_MS) {
+    return {
+      ...cached.data,
+      queryInfo: {
+        ...cached.data.queryInfo,
+        queriedAt: new Date().toISOString(),
+        cached: true
+      }
+    };
+  }
+
   try {
     // FEMA API v2 endpoint for disaster declarations (matches mashup logic)
     const baseUrl = 'https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries';
 
-    // Calculate date 90 days ago (only show disasters from last 90 days)
+    // Calculate date 90 days ago (include declarations declared OR started in last 90 days)
     const ninetyDaysAgo = new Date();
     ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
     const ninetyDaysAgoStr = ninetyDaysAgo.toISOString().split('T')[0]; // YYYY-MM-DD
 
+    // Escape OData single quotes in county names (e.g. "St. Mary's" -> "St. Mary''s")
+    const odataState = cleanState.replace(/'/g, "''");
+    const odataCounty = cleanCounty.replace(/'/g, "''");
+
     // designatedArea format example: "Harris (County)"; filter by designatedArea and state
-    // Note: FEMA API v2 uses designatedArea instead of county
-    const filter = `state eq '${state}' and designatedArea eq '${county} (County)' and incidentBeginDate ge ${ninetyDaysAgoStr}`;
+    const filter = `state eq '${odataState}' and designatedArea eq '${odataCounty} (County)' and (declarationDate ge ${ninetyDaysAgoStr} or incidentBeginDate ge ${ninetyDaysAgoStr})`;
     const url = `${baseUrl}?$filter=${encodeURIComponent(filter)}&$count=true`;
 
     console.log(`🌐 Querying FEMA API v2 (last 90 days): ${url}`);
@@ -524,14 +669,17 @@ async function queryFEMAApi(state, county) {
     // Extract disaster information
     let disasters = data.DisasterDeclarationsSummaries || [];
 
-    // Extra guard: ensure only last 90 days
+    // Extra guard: ensure only last 90 days (by declarationDate or incidentBeginDate) and deduplicate by disasterNumber
     const lastNinetyDaysDate = new Date(ninetyDaysAgoStr);
+    const seenDisasterNums = new Set();
     disasters = disasters.filter(disaster => {
-      if (disaster.incidentBeginDate) {
-        const disasterDate = new Date(disaster.incidentBeginDate);
-        return disasterDate >= lastNinetyDaysDate;
-      }
-      return false;
+      const beginOk = disaster.incidentBeginDate && new Date(disaster.incidentBeginDate) >= lastNinetyDaysDate;
+      const declOk = disaster.declarationDate && new Date(disaster.declarationDate) >= lastNinetyDaysDate;
+      if (!beginOk && !declOk) return false;
+      const key = String(disaster.disasterNumber || disaster.declarationTitle || disaster.id || '');
+      if (key && seenDisasterNums.has(key)) return false;
+      if (key) seenDisasterNums.add(key);
+      return true;
     });
     
     // Using FREE geocoding - OpenStreetMap Nominatim (no charges!)
@@ -541,9 +689,9 @@ async function queryFEMAApi(state, county) {
 
       // Prefer county from designatedArea, fallback to county field, then parse from title
       let countyFromApi = normalizeCountyName(
-        disaster.designatedArea || disaster.county || parseCountyFromTitle(disaster.declarationTitle || disaster.title) || county || ''
+        disaster.designatedArea || disaster.county || parseCountyFromTitle(disaster.declarationTitle || disaster.title) || cleanCounty || ''
       );
-      let stateFromApi = disaster.state || state || '';
+      let stateFromApi = disaster.state || cleanState || '';
 
       // Geocode using FREE service (respects 1 req/sec limit)
       if (stateFromApi && countyFromApi) {
@@ -555,6 +703,7 @@ async function queryFEMAApi(state, county) {
 
       return {
         disasterNumber: disaster.disasterNumber,
+        declarationType: disaster.declarationType || 'DR',
         state: stateFromApi,
         county: countyFromApi,
         declarationDate: disaster.declarationDate,
@@ -590,17 +739,19 @@ async function queryFEMAApi(state, county) {
       }
     }
     
-    return {
+    const payload = {
       disasterCount: geocodedDisasters.length,
       disasters: geocodedDisasters,
       queryInfo: {
-        state,
-        county,
+        state: cleanState,
+        county: cleanCounty,
         queriedAt: new Date().toISOString(),
         totalRecords: geocodedDisasters.length,
         filterSince: ninetyDaysAgoStr
       }
     };
+    femaCountyQueryCache.set(cacheKey, { timestamp: Date.now(), data: payload });
+    return payload;
   } catch (error) {
     console.error(`❌ FEMA API query error for ${state}, ${county}:`, error.message);
     

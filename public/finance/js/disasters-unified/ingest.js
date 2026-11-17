@@ -132,11 +132,42 @@ function scheduleFilterApply() {
 function applyFiltersNow() {
   clearTimeout(duFilterApplyTimer);
   duFilterApplyTimer = null;
-  if (!duCountyIntelLoaded) {
-    setDashboardStatus('Select a state or county on the hazard lens map first.', 'warning');
-    return;
-  }
+
+  $('#stateInput').val('');
+  $('#countyInput').val('');
+  $('#sourceInput option').prop('selected', true);
+  $('#eventInput option').prop('selected', false);
+  $('#eventInput').val([]);
   syncSourceChipsFromSelect();
+
+  if (typeof clearDisastersGridFiltersAndData === 'function') {
+    clearDisastersGridFiltersAndData();
+  }
+
+  if (typeof window.duGeoPickerReset === 'function') {
+    window.duGeoPickerReset();
+  }
+  duStateDisasterRows = [];
+  duSelectedGeoState = null;
+  duSelectedGeoCounty = null;
+  duGeoLoadScope = 'usa';
+  duCountyIntelLoaded = true;
+  duMultiPanelMode = true;
+
+  const crumb = document.getElementById('duGeoActiveCrumb');
+  if (crumb) {
+    crumb.textContent = 'United States';
+    crumb.hidden = false;
+  }
+  try {
+    const url = new URL(window.location.href);
+    url.searchParams.delete('state');
+    url.searchParams.delete('county');
+    url.searchParams.set('scope', 'usa');
+    url.searchParams.set('load', '1');
+    window.history.replaceState({}, '', url);
+  } catch (_) {}
+
   loadDisasters();
 }
 
@@ -284,9 +315,18 @@ async function loadDisasters() {
   ++duMapRenderGeneration;
   setDuInlineLoading(true);
   setDashboardStatus('');
-  activeHotspotKey = null;
-  activeHotspot = null;
-  updateHotspotFilterUi();
+  if (activeHotspotKey || activeHotspot) {
+    activeHotspotKey = null;
+    activeHotspot = null;
+    updateHotspotFilterUi();
+    if (disastersGridApi?.setFilterModel) {
+      disastersGridApi.setFilterModel(null);
+    } else if (disastersGridApi?.setGridOption) {
+      disastersGridApi.setGridOption('filterModel', null);
+    }
+  } else {
+    updateHotspotFilterUi();
+  }
 
   const { state, county, sources, events } = readDisasterFilterInputs();
   const scope = duGeoLoadScope || (county ? 'county' : (state ? 'state' : null));

@@ -9,6 +9,7 @@ import {
   sortCamerasByDistance,
   DISASTER_ROLLING_WINDOW_DAYS
 } from './disasters.service.js';
+import { sqlExcludeLenderStates } from '../lib/lender-footprint.js';
 
 export const METERS_PER_MILE = 1609.34;
 const MI_PER_KM = 0.621371;
@@ -69,6 +70,9 @@ function buildLoanFilterClauses(filters = {}, startIdx = 4) {
   const clauses = [];
   const values = [];
   let idx = startIdx;
+
+  // Outside lending footprint (e.g. Alaska) — no loans originated there.
+  clauses.push(sqlExcludeLenderStates({ stateCol: 'state', fipsCol: null }));
 
   if (filters.milestone) {
     values.push(filters.milestone);
@@ -217,7 +221,8 @@ export async function findDisastersNearPoint({
     'geom IS NOT NULL',
     `ST_DWithin(geom, ${pointSql}, $3)`,
     `start_time >= NOW() - INTERVAL '${Number(rollingDays)} days'`,
-    `event_type <> 'camera'`
+    `event_type <> 'camera'`,
+    sqlExcludeLenderStates({ stateCol: 'state_abbr', fipsCol: 'county_fips' }),
   ];
   const values = [lng, lat, meters];
 
@@ -260,6 +265,7 @@ async function findDisastersNearPointFallback({ lat, lng, radiusMiles, limit = 1
     WHERE lat IS NOT NULL AND lng IS NOT NULL
       AND start_time >= NOW() - INTERVAL '${DISASTER_ROLLING_WINDOW_DAYS} days'
       AND event_type <> 'camera'
+      AND ${sqlExcludeLenderStates({ stateCol: 'state_abbr', fipsCol: 'county_fips' })}
     ORDER BY start_time DESC
     LIMIT 5000`
   );

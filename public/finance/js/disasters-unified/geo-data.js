@@ -8,6 +8,9 @@
   const COUNTIES_BASE = `${GEO_BASE}/counties`;
 
   /** Postal abbreviation → Census state FIPS */
+  /** Outside mortgage lending footprint — hidden from hazard lens / loans. */
+  const EXCLUDED_LENDER_STATES = Object.freeze(['AK']);
+
   const ST_TO_FIPS = {
     AL: '01', AK: '02', AZ: '04', AR: '05', CA: '06', CO: '08', CT: '09', DE: '10', DC: '11',
     FL: '12', GA: '13', HI: '15', ID: '16', IL: '17', IN: '18', IA: '19', KS: '20', KY: '21',
@@ -238,6 +241,13 @@
     ST_TO_FIPS,
     FIPS_TO_ST,
     STATE_NAMES,
+    EXCLUDED_LENDER_STATES,
+    isExcludedLenderState(abbr) {
+      return EXCLUDED_LENDER_STATES.includes(String(abbr || '').trim().toUpperCase());
+    },
+    selectableStateAbbrs() {
+      return Object.keys(STATE_NAMES).filter((abbr) => !EXCLUDED_LENDER_STATES.includes(abbr));
+    },
     stateName,
     normalizeCountyName,
     loadStatesTopo,

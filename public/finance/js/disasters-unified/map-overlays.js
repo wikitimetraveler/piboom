@@ -47,7 +47,8 @@
   let overlayControl = null;
 
   let liveRingVisible = true;
-  let graphNearVisible = true;
+  // Off by default for EVP / live demos — live /near is operational truth; graph NEAR needs seeded_at.
+  let graphNearVisible = false;
   let firmsHeatVisible = false;
   let floodHaloVisible = true;
   const sourceVisible = {
