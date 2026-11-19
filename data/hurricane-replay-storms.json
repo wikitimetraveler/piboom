@@ -1,0 +1,629 @@
+{
+  "disclaimer": "Replay storms are for ops planning demos. Predicted EM/DR announcement windows are planning estimates calibrated to historical OpenFEMA hurricane lags — not official FEMA commitments.",
+  "storms": [
+    {
+      "id": "milton-2024",
+      "name": "Hurricane Milton",
+      "basin": "AL",
+      "year": 2024,
+      "category": 3,
+      "maxWindKt": 100,
+      "status": "Hurricane",
+      "landfall": {
+        "name": "Siesta Key, FL",
+        "lat": 27.267,
+        "lng": -82.553,
+        "at": "2024-10-09T20:30:00.000Z"
+      },
+      "advisories": [
+        {
+          "index": 0,
+          "label": "T-72h",
+          "issuedAt": "2024-10-06T18:00:00.000Z",
+          "center": { "lat": 22.1, "lng": -87.4 },
+          "track": [
+            { "tauH": 0, "lat": 22.1, "lng": -87.4, "windKt": 95, "category": 2 },
+            { "tauH": 12, "lat": 23.0, "lng": -86.2, "windKt": 105, "category": 3 },
+            { "tauH": 24, "lat": 24.2, "lng": -85.0, "windKt": 120, "category": 3 },
+            { "tauH": 36, "lat": 25.4, "lng": -83.8, "windKt": 125, "category": 4 },
+            { "tauH": 48, "lat": 26.5, "lng": -82.9, "windKt": 110, "category": 3 },
+            { "tauH": 72, "lat": 28.2, "lng": -81.6, "windKt": 75, "category": 1 },
+            { "tauH": 96, "lat": 30.1, "lng": -80.2, "windKt": 50, "category": 0 },
+            { "tauH": 120, "lat": 32.0, "lng": -78.5, "windKt": 35, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 160, "kt50": 90, "kt64": 45 },
+          "conePolygon": [
+            [-88.2, 21.2], [-86.5, 20.5], [-84.0, 21.8], [-82.0, 23.5], [-80.5, 26.0],
+            [-79.8, 28.5], [-80.5, 31.0], [-82.0, 32.5], [-84.5, 32.0], [-86.5, 30.0],
+            [-88.0, 27.0], [-89.0, 24.0], [-88.2, 21.2]
+          ]
+        },
+        {
+          "index": 1,
+          "label": "T-48h",
+          "issuedAt": "2024-10-07T18:00:00.000Z",
+          "center": { "lat": 23.8, "lng": -85.5 },
+          "track": [
+            { "tauH": 0, "lat": 23.8, "lng": -85.5, "windKt": 110, "category": 3 },
+            { "tauH": 12, "lat": 24.8, "lng": -84.4, "windKt": 125, "category": 4 },
+            { "tauH": 24, "lat": 25.9, "lng": -83.3, "windKt": 130, "category": 4 },
+            { "tauH": 36, "lat": 27.0, "lng": -82.5, "windKt": 105, "category": 3 },
+            { "tauH": 48, "lat": 28.4, "lng": -81.4, "windKt": 70, "category": 1 },
+            { "tauH": 72, "lat": 30.2, "lng": -80.0, "windKt": 45, "category": 0 },
+            { "tauH": 96, "lat": 32.0, "lng": -78.0, "windKt": 35, "category": 0 },
+            { "tauH": 120, "lat": 33.5, "lng": -75.5, "windKt": 30, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 170, "kt50": 95, "kt64": 50 },
+          "conePolygon": [
+            [-87.0, 22.5], [-85.0, 22.0], [-82.5, 23.5], [-81.0, 25.5], [-80.0, 28.0],
+            [-79.5, 30.5], [-81.0, 32.5], [-83.5, 32.0], [-85.5, 29.5], [-87.0, 26.5],
+            [-87.5, 24.0], [-87.0, 22.5]
+          ]
+        },
+        {
+          "index": 2,
+          "label": "T-24h",
+          "issuedAt": "2024-10-08T18:00:00.000Z",
+          "center": { "lat": 25.6, "lng": -83.6 },
+          "track": [
+            { "tauH": 0, "lat": 25.6, "lng": -83.6, "windKt": 125, "category": 4 },
+            { "tauH": 12, "lat": 26.6, "lng": -82.8, "windKt": 110, "category": 3 },
+            { "tauH": 24, "lat": 27.5, "lng": -82.2, "windKt": 95, "category": 2 },
+            { "tauH": 36, "lat": 28.8, "lng": -81.2, "windKt": 65, "category": 1 },
+            { "tauH": 48, "lat": 30.0, "lng": -80.0, "windKt": 45, "category": 0 },
+            { "tauH": 72, "lat": 32.0, "lng": -78.0, "windKt": 35, "category": 0 },
+            { "tauH": 96, "lat": 33.5, "lng": -75.5, "windKt": 30, "category": 0 },
+            { "tauH": 120, "lat": 34.5, "lng": -73.0, "windKt": 25, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 150, "kt50": 85, "kt64": 40 },
+          "conePolygon": [
+            [-85.5, 24.5], [-83.5, 24.0], [-81.5, 25.5], [-80.5, 27.5], [-80.0, 29.5],
+            [-80.5, 31.5], [-82.5, 32.0], [-84.5, 30.5], [-85.5, 28.0], [-85.8, 26.0],
+            [-85.5, 24.5]
+          ]
+        },
+        {
+          "index": 3,
+          "label": "Landfall",
+          "issuedAt": "2024-10-09T18:00:00.000Z",
+          "center": { "lat": 27.1, "lng": -82.6 },
+          "track": [
+            { "tauH": 0, "lat": 27.1, "lng": -82.6, "windKt": 100, "category": 3 },
+            { "tauH": 12, "lat": 28.2, "lng": -81.5, "windKt": 70, "category": 1 },
+            { "tauH": 24, "lat": 29.5, "lng": -80.2, "windKt": 50, "category": 0 },
+            { "tauH": 36, "lat": 31.0, "lng": -78.5, "windKt": 40, "category": 0 },
+            { "tauH": 48, "lat": 32.5, "lng": -76.5, "windKt": 35, "category": 0 },
+            { "tauH": 72, "lat": 34.0, "lng": -73.5, "windKt": 30, "category": 0 },
+            { "tauH": 96, "lat": 35.0, "lng": -70.5, "windKt": 25, "category": 0 },
+            { "tauH": 120, "lat": 35.5, "lng": -67.0, "windKt": 20, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 140, "kt50": 75, "kt64": 35 },
+          "conePolygon": [
+            [-84.5, 25.5], [-82.5, 25.0], [-80.5, 26.5], [-79.5, 28.5], [-79.0, 30.5],
+            [-80.0, 32.0], [-82.0, 32.5], [-84.0, 31.0], [-85.0, 28.5], [-84.5, 25.5]
+          ]
+        },
+        {
+          "index": 4,
+          "label": "Post-Landfall",
+          "issuedAt": "2024-10-10T18:00:00.000Z",
+          "center": { "lat": 29.0, "lng": -80.8 },
+          "track": [
+            { "tauH": 0, "lat": 29.0, "lng": -80.8, "windKt": 55, "category": 0 },
+            { "tauH": 12, "lat": 30.5, "lng": -79.0, "windKt": 45, "category": 0 },
+            { "tauH": 24, "lat": 32.0, "lng": -77.0, "windKt": 40, "category": 0 },
+            { "tauH": 36, "lat": 33.5, "lng": -74.5, "windKt": 35, "category": 0 },
+            { "tauH": 48, "lat": 34.5, "lng": -71.5, "windKt": 30, "category": 0 },
+            { "tauH": 72, "lat": 35.5, "lng": -67.5, "windKt": 25, "category": 0 },
+            { "tauH": 96, "lat": 36.0, "lng": -63.5, "windKt": 20, "category": 0 },
+            { "tauH": 120, "lat": 36.0, "lng": -59.0, "windKt": 20, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 120, "kt50": 50, "kt64": 0 },
+          "conePolygon": [
+            [-83.0, 27.0], [-81.0, 26.5], [-78.5, 28.0], [-76.5, 30.5], [-75.5, 33.0],
+            [-77.0, 35.0], [-80.0, 35.0], [-82.5, 33.0], [-83.5, 30.0], [-83.0, 27.0]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "helene-2024",
+      "name": "Hurricane Helene",
+      "basin": "AL",
+      "year": 2024,
+      "category": 4,
+      "maxWindKt": 140,
+      "status": "Hurricane",
+      "landfall": {
+        "name": "Perry, FL (Big Bend)",
+        "lat": 29.9,
+        "lng": -83.7,
+        "at": "2024-09-27T03:10:00.000Z"
+      },
+      "advisories": [
+        {
+          "index": 0,
+          "label": "T-72h",
+          "issuedAt": "2024-09-24T00:00:00.000Z",
+          "center": { "lat": 19.5, "lng": -84.0 },
+          "track": [
+            { "tauH": 0, "lat": 19.5, "lng": -84.0, "windKt": 70, "category": 1 },
+            { "tauH": 12, "lat": 21.0, "lng": -84.5, "windKt": 90, "category": 2 },
+            { "tauH": 24, "lat": 23.0, "lng": -84.8, "windKt": 110, "category": 3 },
+            { "tauH": 36, "lat": 25.5, "lng": -84.5, "windKt": 125, "category": 4 },
+            { "tauH": 48, "lat": 28.0, "lng": -84.0, "windKt": 140, "category": 4 },
+            { "tauH": 72, "lat": 32.5, "lng": -83.5, "windKt": 70, "category": 1 },
+            { "tauH": 96, "lat": 36.0, "lng": -82.5, "windKt": 40, "category": 0 },
+            { "tauH": 120, "lat": 39.0, "lng": -80.5, "windKt": 30, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 180, "kt50": 100, "kt64": 55 },
+          "conePolygon": [
+            [-87.5, 18.0], [-84.5, 17.5], [-81.5, 20.0], [-80.5, 24.0], [-80.0, 28.0],
+            [-80.5, 33.0], [-82.0, 38.0], [-85.0, 39.0], [-88.0, 35.0], [-89.0, 28.0],
+            [-88.5, 22.0], [-87.5, 18.0]
+          ]
+        },
+        {
+          "index": 1,
+          "label": "T-48h",
+          "issuedAt": "2024-09-25T00:00:00.000Z",
+          "center": { "lat": 22.5, "lng": -84.6 },
+          "track": [
+            { "tauH": 0, "lat": 22.5, "lng": -84.6, "windKt": 100, "category": 3 },
+            { "tauH": 12, "lat": 24.5, "lng": -84.7, "windKt": 120, "category": 3 },
+            { "tauH": 24, "lat": 26.8, "lng": -84.3, "windKt": 135, "category": 4 },
+            { "tauH": 36, "lat": 29.2, "lng": -83.8, "windKt": 140, "category": 4 },
+            { "tauH": 48, "lat": 32.0, "lng": -83.2, "windKt": 75, "category": 1 },
+            { "tauH": 72, "lat": 35.5, "lng": -82.0, "windKt": 40, "category": 0 },
+            { "tauH": 96, "lat": 38.5, "lng": -80.0, "windKt": 30, "category": 0 },
+            { "tauH": 120, "lat": 40.5, "lng": -77.5, "windKt": 25, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 190, "kt50": 110, "kt64": 60 },
+          "conePolygon": [
+            [-87.0, 21.0], [-84.0, 20.5], [-81.0, 23.0], [-80.0, 27.0], [-80.0, 32.0],
+            [-81.5, 37.0], [-84.5, 39.0], [-87.5, 36.0], [-88.5, 30.0], [-88.0, 24.0],
+            [-87.0, 21.0]
+          ]
+        },
+        {
+          "index": 2,
+          "label": "T-24h",
+          "issuedAt": "2024-09-26T00:00:00.000Z",
+          "center": { "lat": 26.0, "lng": -84.4 },
+          "track": [
+            { "tauH": 0, "lat": 26.0, "lng": -84.4, "windKt": 130, "category": 4 },
+            { "tauH": 12, "lat": 28.0, "lng": -84.0, "windKt": 140, "category": 4 },
+            { "tauH": 24, "lat": 30.5, "lng": -83.5, "windKt": 100, "category": 3 },
+            { "tauH": 36, "lat": 33.0, "lng": -82.8, "windKt": 60, "category": 0 },
+            { "tauH": 48, "lat": 35.5, "lng": -81.8, "windKt": 40, "category": 0 },
+            { "tauH": 72, "lat": 38.0, "lng": -79.5, "windKt": 30, "category": 0 },
+            { "tauH": 96, "lat": 40.0, "lng": -76.5, "windKt": 25, "category": 0 },
+            { "tauH": 120, "lat": 41.0, "lng": -73.0, "windKt": 20, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 175, "kt50": 100, "kt64": 55 },
+          "conePolygon": [
+            [-86.5, 24.5], [-84.0, 24.0], [-81.5, 26.0], [-80.5, 29.0], [-80.5, 33.0],
+            [-82.0, 37.0], [-85.0, 38.0], [-87.5, 35.0], [-88.0, 30.0], [-87.0, 26.0],
+            [-86.5, 24.5]
+          ]
+        },
+        {
+          "index": 3,
+          "label": "Landfall",
+          "issuedAt": "2024-09-27T00:00:00.000Z",
+          "center": { "lat": 29.6, "lng": -83.8 },
+          "track": [
+            { "tauH": 0, "lat": 29.6, "lng": -83.8, "windKt": 140, "category": 4 },
+            { "tauH": 12, "lat": 32.0, "lng": -83.2, "windKt": 80, "category": 1 },
+            { "tauH": 24, "lat": 34.5, "lng": -82.2, "windKt": 50, "category": 0 },
+            { "tauH": 36, "lat": 36.5, "lng": -80.8, "windKt": 40, "category": 0 },
+            { "tauH": 48, "lat": 38.5, "lng": -78.5, "windKt": 30, "category": 0 },
+            { "tauH": 72, "lat": 40.0, "lng": -75.0, "windKt": 25, "category": 0 },
+            { "tauH": 96, "lat": 40.5, "lng": -71.0, "windKt": 20, "category": 0 },
+            { "tauH": 120, "lat": 40.5, "lng": -67.0, "windKt": 20, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 160, "kt50": 90, "kt64": 45 },
+          "conePolygon": [
+            [-86.0, 27.5], [-83.5, 27.0], [-81.0, 29.0], [-80.0, 32.0], [-80.5, 36.0],
+            [-82.5, 39.0], [-85.5, 39.0], [-87.5, 36.0], [-88.0, 32.0], [-87.0, 28.5],
+            [-86.0, 27.5]
+          ]
+        },
+        {
+          "index": 4,
+          "label": "Post-Landfall",
+          "issuedAt": "2024-09-28T00:00:00.000Z",
+          "center": { "lat": 33.5, "lng": -82.5 },
+          "track": [
+            { "tauH": 0, "lat": 33.5, "lng": -82.5, "windKt": 55, "category": 0 },
+            { "tauH": 12, "lat": 35.5, "lng": -81.0, "windKt": 45, "category": 0 },
+            { "tauH": 24, "lat": 37.5, "lng": -78.5, "windKt": 35, "category": 0 },
+            { "tauH": 36, "lat": 39.0, "lng": -75.5, "windKt": 30, "category": 0 },
+            { "tauH": 48, "lat": 40.0, "lng": -72.0, "windKt": 25, "category": 0 },
+            { "tauH": 72, "lat": 40.5, "lng": -67.5, "windKt": 20, "category": 0 },
+            { "tauH": 96, "lat": 40.5, "lng": -63.0, "windKt": 20, "category": 0 },
+            { "tauH": 120, "lat": 40.0, "lng": -58.5, "windKt": 20, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 130, "kt50": 40, "kt64": 0 },
+          "conePolygon": [
+            [-85.0, 31.0], [-82.0, 30.5], [-79.0, 33.0], [-77.0, 36.5], [-76.5, 39.5],
+            [-79.0, 41.0], [-83.0, 40.5], [-85.5, 37.0], [-86.0, 33.5], [-85.0, 31.0]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ian-2022",
+      "name": "Hurricane Ian",
+      "basin": "AL",
+      "year": 2022,
+      "category": 4,
+      "maxWindKt": 150,
+      "status": "Hurricane",
+      "landfall": {
+        "name": "Cayo Costa, FL",
+        "lat": 26.65,
+        "lng": -82.22,
+        "at": "2022-09-28T19:05:00.000Z"
+      },
+      "advisories": [
+        {
+          "index": 0,
+          "label": "T-72h",
+          "issuedAt": "2022-09-25T18:00:00.000Z",
+          "center": { "lat": 18.5, "lng": -80.0 },
+          "track": [
+            { "tauH": 0, "lat": 18.5, "lng": -80.0, "windKt": 70, "category": 1 },
+            { "tauH": 12, "lat": 20.0, "lng": -81.0, "windKt": 90, "category": 2 },
+            { "tauH": 24, "lat": 21.5, "lng": -82.0, "windKt": 110, "category": 3 },
+            { "tauH": 36, "lat": 23.5, "lng": -82.5, "windKt": 130, "category": 4 },
+            { "tauH": 48, "lat": 25.5, "lng": -82.3, "windKt": 145, "category": 4 },
+            { "tauH": 72, "lat": 28.0, "lng": -81.5, "windKt": 80, "category": 1 },
+            { "tauH": 96, "lat": 30.5, "lng": -80.0, "windKt": 50, "category": 0 },
+            { "tauH": 120, "lat": 33.0, "lng": -78.0, "windKt": 35, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 170, "kt50": 95, "kt64": 50 },
+          "conePolygon": [
+            [-83.5, 17.0], [-80.5, 16.5], [-78.0, 19.0], [-77.0, 23.0], [-77.5, 27.0],
+            [-79.0, 31.0], [-82.0, 33.0], [-85.0, 31.0], [-86.0, 26.0], [-85.0, 20.0],
+            [-83.5, 17.0]
+          ]
+        },
+        {
+          "index": 1,
+          "label": "T-48h",
+          "issuedAt": "2022-09-26T18:00:00.000Z",
+          "center": { "lat": 21.0, "lng": -81.5 },
+          "track": [
+            { "tauH": 0, "lat": 21.0, "lng": -81.5, "windKt": 100, "category": 3 },
+            { "tauH": 12, "lat": 22.8, "lng": -82.2, "windKt": 120, "category": 3 },
+            { "tauH": 24, "lat": 24.8, "lng": -82.5, "windKt": 140, "category": 4 },
+            { "tauH": 36, "lat": 26.5, "lng": -82.2, "windKt": 150, "category": 4 },
+            { "tauH": 48, "lat": 28.2, "lng": -81.5, "windKt": 90, "category": 2 },
+            { "tauH": 72, "lat": 30.5, "lng": -80.0, "windKt": 50, "category": 0 },
+            { "tauH": 96, "lat": 33.0, "lng": -78.0, "windKt": 40, "category": 0 },
+            { "tauH": 120, "lat": 35.0, "lng": -75.5, "windKt": 30, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 180, "kt50": 105, "kt64": 55 },
+          "conePolygon": [
+            [-84.5, 19.5], [-81.5, 19.0], [-78.5, 21.5], [-77.5, 25.5], [-78.0, 29.5],
+            [-80.0, 33.0], [-83.0, 34.0], [-85.5, 31.0], [-86.0, 26.0], [-85.0, 21.5],
+            [-84.5, 19.5]
+          ]
+        },
+        {
+          "index": 2,
+          "label": "T-24h",
+          "issuedAt": "2022-09-27T18:00:00.000Z",
+          "center": { "lat": 24.5, "lng": -82.4 },
+          "track": [
+            { "tauH": 0, "lat": 24.5, "lng": -82.4, "windKt": 135, "category": 4 },
+            { "tauH": 12, "lat": 25.8, "lng": -82.3, "windKt": 145, "category": 4 },
+            { "tauH": 24, "lat": 27.2, "lng": -81.9, "windKt": 120, "category": 3 },
+            { "tauH": 36, "lat": 28.8, "lng": -81.2, "windKt": 70, "category": 1 },
+            { "tauH": 48, "lat": 30.5, "lng": -80.0, "windKt": 50, "category": 0 },
+            { "tauH": 72, "lat": 33.0, "lng": -78.0, "windKt": 40, "category": 0 },
+            { "tauH": 96, "lat": 35.0, "lng": -75.0, "windKt": 30, "category": 0 },
+            { "tauH": 120, "lat": 36.5, "lng": -72.0, "windKt": 25, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 160, "kt50": 90, "kt64": 50 },
+          "conePolygon": [
+            [-84.5, 23.0], [-82.0, 22.5], [-79.5, 24.5], [-78.5, 27.5], [-79.0, 31.0],
+            [-81.0, 33.5], [-83.5, 33.5], [-85.5, 30.5], [-85.5, 26.5], [-84.5, 23.0]
+          ]
+        },
+        {
+          "index": 3,
+          "label": "Landfall",
+          "issuedAt": "2022-09-28T18:00:00.000Z",
+          "center": { "lat": 26.5, "lng": -82.3 },
+          "track": [
+            { "tauH": 0, "lat": 26.5, "lng": -82.3, "windKt": 150, "category": 4 },
+            { "tauH": 12, "lat": 27.8, "lng": -81.6, "windKt": 90, "category": 2 },
+            { "tauH": 24, "lat": 29.2, "lng": -80.8, "windKt": 60, "category": 0 },
+            { "tauH": 36, "lat": 30.8, "lng": -79.5, "windKt": 45, "category": 0 },
+            { "tauH": 48, "lat": 32.5, "lng": -77.5, "windKt": 40, "category": 0 },
+            { "tauH": 72, "lat": 34.5, "lng": -74.5, "windKt": 30, "category": 0 },
+            { "tauH": 96, "lat": 35.5, "lng": -71.0, "windKt": 25, "category": 0 },
+            { "tauH": 120, "lat": 36.0, "lng": -67.0, "windKt": 20, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 150, "kt50": 85, "kt64": 45 },
+          "conePolygon": [
+            [-84.5, 25.0], [-82.0, 24.5], [-79.5, 26.5], [-78.5, 29.5], [-79.0, 32.5],
+            [-81.0, 34.0], [-83.5, 33.5], [-85.0, 30.5], [-85.0, 27.0], [-84.5, 25.0]
+          ]
+        },
+        {
+          "index": 4,
+          "label": "Post-Landfall",
+          "issuedAt": "2022-09-29T18:00:00.000Z",
+          "center": { "lat": 28.5, "lng": -81.0 },
+          "track": [
+            { "tauH": 0, "lat": 28.5, "lng": -81.0, "windKt": 60, "category": 0 },
+            { "tauH": 12, "lat": 30.0, "lng": -79.5, "windKt": 50, "category": 0 },
+            { "tauH": 24, "lat": 31.8, "lng": -77.5, "windKt": 45, "category": 0 },
+            { "tauH": 36, "lat": 33.5, "lng": -75.0, "windKt": 40, "category": 0 },
+            { "tauH": 48, "lat": 34.5, "lng": -72.0, "windKt": 35, "category": 0 },
+            { "tauH": 72, "lat": 35.5, "lng": -67.5, "windKt": 30, "category": 0 },
+            { "tauH": 96, "lat": 36.0, "lng": -63.0, "windKt": 25, "category": 0 },
+            { "tauH": 120, "lat": 36.0, "lng": -58.5, "windKt": 20, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 120, "kt50": 45, "kt64": 0 },
+          "conePolygon": [
+            [-83.0, 27.0], [-80.5, 26.5], [-77.5, 28.5], [-75.5, 31.5], [-75.0, 34.5],
+            [-77.5, 36.0], [-81.0, 35.5], [-83.5, 32.5], [-84.0, 29.0], [-83.0, 27.0]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "beryl-2024",
+      "name": "Hurricane Beryl",
+      "basin": "AL",
+      "year": 2024,
+      "category": 1,
+      "maxWindKt": 80,
+      "status": "Hurricane",
+      "landfall": {
+        "name": "Matagorda, TX",
+        "lat": 28.69,
+        "lng": -95.97,
+        "at": "2024-07-08T09:00:00.000Z"
+      },
+      "advisories": [
+        {
+          "index": 0,
+          "label": "T-72h",
+          "issuedAt": "2024-07-05T06:00:00.000Z",
+          "center": { "lat": 20.5, "lng": -88.0 },
+          "track": [
+            { "tauH": 0, "lat": 20.5, "lng": -88.0, "windKt": 55, "category": 0 },
+            { "tauH": 12, "lat": 22.0, "lng": -90.0, "windKt": 65, "category": 1 },
+            { "tauH": 24, "lat": 23.5, "lng": -92.0, "windKt": 75, "category": 1 },
+            { "tauH": 36, "lat": 25.5, "lng": -93.5, "windKt": 80, "category": 1 },
+            { "tauH": 48, "lat": 27.5, "lng": -95.0, "windKt": 80, "category": 1 },
+            { "tauH": 72, "lat": 30.5, "lng": -96.5, "windKt": 45, "category": 0 },
+            { "tauH": 96, "lat": 33.0, "lng": -97.0, "windKt": 30, "category": 0 },
+            { "tauH": 120, "lat": 35.0, "lng": -96.0, "windKt": 25, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 140, "kt50": 70, "kt64": 30 },
+          "conePolygon": [
+            [-91.0, 19.0], [-88.0, 18.5], [-85.5, 21.0], [-86.0, 25.0], [-88.5, 29.0],
+            [-92.0, 33.0], [-97.0, 34.5], [-100.0, 31.0], [-99.0, 26.0], [-95.0, 21.0],
+            [-91.0, 19.0]
+          ]
+        },
+        {
+          "index": 1,
+          "label": "T-48h",
+          "issuedAt": "2024-07-06T06:00:00.000Z",
+          "center": { "lat": 23.0, "lng": -91.0 },
+          "track": [
+            { "tauH": 0, "lat": 23.0, "lng": -91.0, "windKt": 70, "category": 1 },
+            { "tauH": 12, "lat": 24.5, "lng": -92.5, "windKt": 75, "category": 1 },
+            { "tauH": 24, "lat": 26.2, "lng": -94.0, "windKt": 80, "category": 1 },
+            { "tauH": 36, "lat": 28.0, "lng": -95.5, "windKt": 80, "category": 1 },
+            { "tauH": 48, "lat": 30.0, "lng": -96.5, "windKt": 50, "category": 0 },
+            { "tauH": 72, "lat": 32.5, "lng": -97.0, "windKt": 30, "category": 0 },
+            { "tauH": 96, "lat": 34.5, "lng": -96.0, "windKt": 25, "category": 0 },
+            { "tauH": 120, "lat": 36.0, "lng": -94.5, "windKt": 20, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 145, "kt50": 75, "kt64": 32 },
+          "conePolygon": [
+            [-94.0, 21.5], [-91.0, 21.0], [-88.5, 23.5], [-89.0, 27.0], [-91.5, 30.5],
+            [-95.0, 33.5], [-99.0, 33.5], [-100.5, 30.0], [-99.0, 25.5], [-96.0, 22.5],
+            [-94.0, 21.5]
+          ]
+        },
+        {
+          "index": 2,
+          "label": "T-24h",
+          "issuedAt": "2024-07-07T06:00:00.000Z",
+          "center": { "lat": 25.8, "lng": -93.8 },
+          "track": [
+            { "tauH": 0, "lat": 25.8, "lng": -93.8, "windKt": 75, "category": 1 },
+            { "tauH": 12, "lat": 27.2, "lng": -95.0, "windKt": 80, "category": 1 },
+            { "tauH": 24, "lat": 28.8, "lng": -96.0, "windKt": 70, "category": 1 },
+            { "tauH": 36, "lat": 30.5, "lng": -96.8, "windKt": 45, "category": 0 },
+            { "tauH": 48, "lat": 32.5, "lng": -97.0, "windKt": 30, "category": 0 },
+            { "tauH": 72, "lat": 34.5, "lng": -96.0, "windKt": 25, "category": 0 },
+            { "tauH": 96, "lat": 36.0, "lng": -94.0, "windKt": 20, "category": 0 },
+            { "tauH": 120, "lat": 37.0, "lng": -91.5, "windKt": 20, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 130, "kt50": 65, "kt64": 28 },
+          "conePolygon": [
+            [-96.0, 24.5], [-93.5, 24.0], [-91.0, 26.0], [-91.5, 29.0], [-93.5, 31.5],
+            [-96.5, 33.5], [-99.5, 32.5], [-100.0, 29.0], [-98.5, 26.0], [-96.0, 24.5]
+          ]
+        },
+        {
+          "index": 3,
+          "label": "Landfall",
+          "issuedAt": "2024-07-08T06:00:00.000Z",
+          "center": { "lat": 28.5, "lng": -95.8 },
+          "track": [
+            { "tauH": 0, "lat": 28.5, "lng": -95.8, "windKt": 80, "category": 1 },
+            { "tauH": 12, "lat": 30.0, "lng": -96.5, "windKt": 50, "category": 0 },
+            { "tauH": 24, "lat": 31.8, "lng": -97.0, "windKt": 35, "category": 0 },
+            { "tauH": 36, "lat": 33.5, "lng": -96.5, "windKt": 30, "category": 0 },
+            { "tauH": 48, "lat": 35.0, "lng": -95.0, "windKt": 25, "category": 0 },
+            { "tauH": 72, "lat": 36.5, "lng": -92.5, "windKt": 20, "category": 0 },
+            { "tauH": 96, "lat": 37.5, "lng": -89.5, "windKt": 20, "category": 0 },
+            { "tauH": 120, "lat": 38.0, "lng": -86.0, "windKt": 20, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 120, "kt50": 55, "kt64": 25 },
+          "conePolygon": [
+            [-98.0, 27.0], [-95.5, 26.5], [-93.0, 28.0], [-93.0, 31.0], [-95.0, 33.5],
+            [-98.0, 34.0], [-100.0, 32.0], [-100.0, 29.0], [-98.0, 27.0]
+          ]
+        },
+        {
+          "index": 4,
+          "label": "Post-Landfall",
+          "issuedAt": "2024-07-09T06:00:00.000Z",
+          "center": { "lat": 31.0, "lng": -96.8 },
+          "track": [
+            { "tauH": 0, "lat": 31.0, "lng": -96.8, "windKt": 40, "category": 0 },
+            { "tauH": 12, "lat": 32.8, "lng": -96.5, "windKt": 30, "category": 0 },
+            { "tauH": 24, "lat": 34.5, "lng": -95.0, "windKt": 25, "category": 0 },
+            { "tauH": 36, "lat": 36.0, "lng": -92.5, "windKt": 20, "category": 0 },
+            { "tauH": 48, "lat": 37.0, "lng": -89.5, "windKt": 20, "category": 0 },
+            { "tauH": 72, "lat": 38.0, "lng": -85.5, "windKt": 20, "category": 0 },
+            { "tauH": 96, "lat": 38.5, "lng": -81.5, "windKt": 20, "category": 0 },
+            { "tauH": 120, "lat": 38.5, "lng": -77.5, "windKt": 20, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 90, "kt50": 0, "kt64": 0 },
+          "conePolygon": [
+            [-99.0, 29.5], [-96.0, 29.0], [-93.0, 31.0], [-92.0, 34.0], [-94.0, 36.5],
+            [-97.5, 37.0], [-100.0, 34.5], [-100.5, 31.5], [-99.0, 29.5]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "synthetic-gulf-cat4",
+      "name": "Synthetic Gulf Cat 4 (Demo)",
+      "basin": "AL",
+      "year": 2026,
+      "category": 4,
+      "maxWindKt": 130,
+      "status": "Hurricane",
+      "synthetic": true,
+      "landfall": {
+        "name": "New Orleans / SE LA",
+        "lat": 29.4,
+        "lng": -89.9,
+        "at": "2026-09-15T18:00:00.000Z"
+      },
+      "advisories": [
+        {
+          "index": 0,
+          "label": "T-72h",
+          "issuedAt": "2026-09-12T18:00:00.000Z",
+          "center": { "lat": 22.0, "lng": -86.0 },
+          "track": [
+            { "tauH": 0, "lat": 22.0, "lng": -86.0, "windKt": 90, "category": 2 },
+            { "tauH": 12, "lat": 23.5, "lng": -87.0, "windKt": 105, "category": 3 },
+            { "tauH": 24, "lat": 25.0, "lng": -88.0, "windKt": 120, "category": 3 },
+            { "tauH": 36, "lat": 26.8, "lng": -88.8, "windKt": 130, "category": 4 },
+            { "tauH": 48, "lat": 28.5, "lng": -89.5, "windKt": 125, "category": 4 },
+            { "tauH": 72, "lat": 31.5, "lng": -90.5, "windKt": 70, "category": 1 },
+            { "tauH": 96, "lat": 34.0, "lng": -90.0, "windKt": 40, "category": 0 },
+            { "tauH": 120, "lat": 36.5, "lng": -88.5, "windKt": 30, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 175, "kt50": 100, "kt64": 55 },
+          "conePolygon": [
+            [-89.5, 20.5], [-86.0, 20.0], [-83.5, 22.5], [-84.0, 26.5], [-86.0, 30.5],
+            [-89.0, 34.5], [-93.0, 35.0], [-95.0, 31.0], [-94.0, 26.0], [-91.5, 22.0],
+            [-89.5, 20.5]
+          ]
+        },
+        {
+          "index": 1,
+          "label": "T-48h",
+          "issuedAt": "2026-09-13T18:00:00.000Z",
+          "center": { "lat": 24.5, "lng": -87.5 },
+          "track": [
+            { "tauH": 0, "lat": 24.5, "lng": -87.5, "windKt": 110, "category": 3 },
+            { "tauH": 12, "lat": 26.0, "lng": -88.3, "windKt": 125, "category": 4 },
+            { "tauH": 24, "lat": 27.5, "lng": -89.0, "windKt": 130, "category": 4 },
+            { "tauH": 36, "lat": 29.2, "lng": -89.7, "windKt": 120, "category": 3 },
+            { "tauH": 48, "lat": 31.2, "lng": -90.3, "windKt": 70, "category": 1 },
+            { "tauH": 72, "lat": 33.5, "lng": -90.0, "windKt": 40, "category": 0 },
+            { "tauH": 96, "lat": 36.0, "lng": -88.5, "windKt": 30, "category": 0 },
+            { "tauH": 120, "lat": 38.0, "lng": -86.0, "windKt": 25, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 180, "kt50": 105, "kt64": 60 },
+          "conePolygon": [
+            [-90.5, 23.0], [-87.0, 22.5], [-84.5, 25.0], [-85.0, 29.0], [-87.0, 32.5],
+            [-90.0, 35.5], [-94.0, 35.0], [-95.5, 31.0], [-94.0, 26.5], [-91.5, 23.5],
+            [-90.5, 23.0]
+          ]
+        },
+        {
+          "index": 2,
+          "label": "T-24h",
+          "issuedAt": "2026-09-14T18:00:00.000Z",
+          "center": { "lat": 27.0, "lng": -88.8 },
+          "track": [
+            { "tauH": 0, "lat": 27.0, "lng": -88.8, "windKt": 125, "category": 4 },
+            { "tauH": 12, "lat": 28.3, "lng": -89.4, "windKt": 130, "category": 4 },
+            { "tauH": 24, "lat": 29.8, "lng": -90.0, "windKt": 100, "category": 3 },
+            { "tauH": 36, "lat": 31.5, "lng": -90.5, "windKt": 60, "category": 0 },
+            { "tauH": 48, "lat": 33.5, "lng": -90.0, "windKt": 40, "category": 0 },
+            { "tauH": 72, "lat": 36.0, "lng": -88.0, "windKt": 30, "category": 0 },
+            { "tauH": 96, "lat": 38.0, "lng": -85.5, "windKt": 25, "category": 0 },
+            { "tauH": 120, "lat": 39.0, "lng": -82.5, "windKt": 20, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 165, "kt50": 95, "kt64": 50 },
+          "conePolygon": [
+            [-91.5, 25.5], [-88.5, 25.0], [-86.0, 27.0], [-86.5, 30.5], [-88.5, 33.5],
+            [-91.5, 35.0], [-94.5, 33.5], [-95.0, 29.5], [-93.5, 26.5], [-91.5, 25.5]
+          ]
+        },
+        {
+          "index": 3,
+          "label": "Landfall",
+          "issuedAt": "2026-09-15T18:00:00.000Z",
+          "center": { "lat": 29.3, "lng": -89.9 },
+          "track": [
+            { "tauH": 0, "lat": 29.3, "lng": -89.9, "windKt": 125, "category": 4 },
+            { "tauH": 12, "lat": 30.8, "lng": -90.4, "windKt": 80, "category": 1 },
+            { "tauH": 24, "lat": 32.5, "lng": -90.5, "windKt": 50, "category": 0 },
+            { "tauH": 36, "lat": 34.5, "lng": -89.5, "windKt": 40, "category": 0 },
+            { "tauH": 48, "lat": 36.5, "lng": -87.5, "windKt": 30, "category": 0 },
+            { "tauH": 72, "lat": 38.0, "lng": -84.5, "windKt": 25, "category": 0 },
+            { "tauH": 96, "lat": 38.5, "lng": -81.0, "windKt": 20, "category": 0 },
+            { "tauH": 120, "lat": 38.5, "lng": -77.0, "windKt": 20, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 155, "kt50": 85, "kt64": 45 },
+          "conePolygon": [
+            [-92.5, 27.5], [-89.5, 27.0], [-87.0, 29.0], [-87.5, 32.0], [-89.5, 35.0],
+            [-92.5, 35.5], [-95.0, 33.0], [-95.0, 29.5], [-93.5, 27.5], [-92.5, 27.5]
+          ]
+        },
+        {
+          "index": 4,
+          "label": "Post-Landfall",
+          "issuedAt": "2026-09-16T18:00:00.000Z",
+          "center": { "lat": 32.0, "lng": -90.5 },
+          "track": [
+            { "tauH": 0, "lat": 32.0, "lng": -90.5, "windKt": 55, "category": 0 },
+            { "tauH": 12, "lat": 33.8, "lng": -89.8, "windKt": 40, "category": 0 },
+            { "tauH": 24, "lat": 35.5, "lng": -88.0, "windKt": 35, "category": 0 },
+            { "tauH": 36, "lat": 37.0, "lng": -85.5, "windKt": 30, "category": 0 },
+            { "tauH": 48, "lat": 38.0, "lng": -82.5, "windKt": 25, "category": 0 },
+            { "tauH": 72, "lat": 38.5, "lng": -78.5, "windKt": 20, "category": 0 },
+            { "tauH": 96, "lat": 38.5, "lng": -74.5, "windKt": 20, "category": 0 },
+            { "tauH": 120, "lat": 38.0, "lng": -70.5, "windKt": 20, "category": 0 }
+          ],
+          "windRadiiNm": { "kt34": 110, "kt50": 35, "kt64": 0 },
+          "conePolygon": [
+            [-93.0, 30.5], [-90.0, 30.0], [-87.0, 32.0], [-86.0, 35.0], [-88.0, 37.5],
+            [-91.5, 38.0], [-94.5, 35.5], [-94.5, 32.0], [-93.0, 30.5]
+          ]
+        }
+      ]
+    }
+  ]
+}

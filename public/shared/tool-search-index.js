@@ -12,6 +12,7 @@
   const FINANCE_PUBLIC_PATHS = {
     '/finance/disasters-unified.html': true,
     '/finance/disasters-webcams.html': true,
+    '/finance/disasters-hurricanes.html': true,
     '/finance/disasters-encompass-map.html': true,
     '/finance/calc-engine-webgpu.html': true,
     '/finance/loan-flight-sim.html': true,
@@ -61,6 +62,7 @@
     { name: 'LTV Calculator', url: '/finance/ltv-calculator.html', category: 'Worksheets', keywords: 'loan to value', requiresAuth: true },
     { name: 'VA IRRRL', url: '/finance/va-irrrl-calculator.html', category: 'Worksheets', keywords: 'VA refinance', requiresAuth: true },
     { name: 'Disasters Unified', url: '/finance/disasters-unified.html', category: 'Worksheets', keywords: 'FEMA disaster', requiresAuth: false },
+    { name: 'Hurricane Tracker', url: '/finance/disasters-hurricanes.html', category: 'Worksheets', keywords: 'hurricane NHC cone governor state of emergency FEMA EM DR county prediction', requiresAuth: false },
     { name: 'Encompass map', url: '/finance/disasters-encompass-map.html', category: 'Worksheets', keywords: 'disaster encompass map loans proximity', requiresAuth: false },
     { name: 'The Parser', url: '/finance/tool2.html', category: 'Encompass', keywords: 'JSON parser', requiresAuth: true },
     { name: 'The Mashup', url: '/finance/tool3.html', category: 'Encompass', keywords: 'FEMA disaster data', requiresAuth: true },

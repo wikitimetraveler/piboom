@@ -22,6 +22,7 @@
     { href: '/finance/index.html', icon: 'bi-calculator', label: 'Worksheets Hub' },
     { href: '/finance/encompass-hub.html', icon: 'bi-columns-gap', label: 'Encompass Hub' },
     { href: '/finance/disasters-unified.html', icon: 'bi-globe', label: 'Unified Disasters' },
+    { href: '/finance/disasters-hurricanes.html', icon: 'bi-hurricane', label: 'Hurricane Tracker' },
     { href: '/finance/disasters-encompass-map.html', icon: 'bi-geo-alt', label: 'Encompass map' },
     { href: '/finance/loan-batch-update.html', icon: 'bi-layers-half', label: 'Loan batch update' },
     { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant' },
@@ -62,6 +63,7 @@
     { href: '/finance/tool6.html', icon: 'bi-arrow-repeat', label: 'Transformer' },
     { href: '/finance/tool8.html', icon: 'bi-magic', label: 'Alchemist' },
     { href: '/finance/disasters-unified.html', icon: 'bi-globe2', label: 'Unified Disasters' },
+    { href: '/finance/disasters-hurricanes.html', icon: 'bi-hurricane', label: 'Hurricane Tracker' },
     { href: '/gse-analyzer.html', icon: 'bi-graph-up-arrow', label: 'GSE scenario analyzer' },
     { divider: true },
     { href: '/finance/index.html', icon: 'bi-calculator', label: 'Worksheets Hub' },
@@ -177,6 +179,7 @@
     { href: '/finance/va-irrrl-calculator.html', icon: 'bi-calculator', label: 'VA IRRRL', title: 'VA IRRRL Calculator', since: '2025-11-02', category: 'calculators' },
     { href: '/open/', icon: 'bi-collection', label: 'Open Lender Suite', title: 'Public showcase — Disasters, GSE analyzer, graph calc, flight sim, Encompass Expert', since: '2026-10-31', category: 'risk' },
     { href: '/finance/disasters-unified.html', icon: 'bi-globe', label: 'Unified Disasters', title: 'Unified Disasters (90-day)', since: '2025-10-30', category: 'risk' },
+    { href: '/finance/disasters-hurricanes.html', icon: 'bi-hurricane', label: 'Hurricane Tracker', title: 'Hurricane track, county impact, Governor SoE (state-by-state) & FEMA EM/DR windows', since: '2026-11-18', category: 'risk' },
     { href: '/finance/disasters-encompass-map.html', icon: 'bi-geo-alt', label: 'Encompass map', title: 'Encompass map — live proximity loan pins', since: '2026-08-12', category: 'risk' },
   ];
 
@@ -188,6 +191,7 @@
     { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant', title: 'Encompass AI Assistant', since: '2025-10-24', category: 'ai' },
     { href: '/finance/encompass-analytics.html', icon: 'bi-bar-chart-line', label: 'Analytics', title: 'Encompass Analytics', since: '2025-12-07', category: 'encompass' },
     { href: '/finance/disasters-unified.html', icon: 'bi-globe', label: 'Unified Disasters', title: 'Unified Disasters (90-day)', since: '2025-10-30', category: 'risk' },
+    { href: '/finance/disasters-hurricanes.html', icon: 'bi-hurricane', label: 'Hurricane Tracker', title: 'Hurricane track, county impact, Governor SoE (state-by-state) & FEMA EM/DR windows', since: '2026-11-18', category: 'risk' },
     { href: '/finance/disasters-encompass-map.html', icon: 'bi-geo-alt', label: 'Encompass map', title: 'Encompass map — live proximity loan pins', since: '2026-08-12', category: 'risk' },
     { href: '/finance/loan-batch-update.html', icon: 'bi-layers-half', label: 'Loan batch update', title: 'Encompass loanBatch/updateRequests', since: '2026-03-25', category: 'encompass' },
     { href: '/finance/processor-assignment.html', icon: 'bi-people-fill', label: 'Processor assignment', title: 'Live processor assignment against Encompass pipeline', since: '2026-04-03', category: 'encompass' },
@@ -325,6 +329,7 @@
   const FINANCE_PUBLIC_PATHS = [
     '/finance/disasters-unified.html',
     '/finance/disasters-webcams.html',
+    '/finance/disasters-hurricanes.html',
     '/finance/disasters-encompass-map.html',
     '/finance/calc-engine-webgpu.html',
     '/finance/loan-flight-sim.html',

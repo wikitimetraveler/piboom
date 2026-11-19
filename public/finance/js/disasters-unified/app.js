@@ -1197,6 +1197,7 @@ function updateSelectionContextStrip() {
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
     <li><button type="button" class="dropdown-item" id="duStripFullscreenMapBtn"><i class="bi bi-fullscreen me-1"></i>Open fullscreen map</button></li>
+    <li><a class="dropdown-item" href="disasters-hurricanes.html"><i class="bi bi-hurricane me-1"></i>Hurricane Tracker</a></li>
     <li><a class="dropdown-item" href="disasters-webcams.html"><i class="bi bi-camera-video me-1"></i>Hazard webcams</a></li>
     <li><a class="dropdown-item" href="pipeline-risk-dashboard.html"><i class="bi bi-graph-up me-1"></i>FEMA pipeline ops triage</a></li>
     <li><a class="dropdown-item" href="/disaster-impact-graph.html" title="Persisted graph NEAR — as-of reseed (seeded_at), not live distance"><i class="bi bi-diagram-3 me-1"></i>Impact Graph <span class="text-muted small">(as-of reseed)</span></a></li>

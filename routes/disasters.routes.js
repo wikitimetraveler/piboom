@@ -44,6 +44,11 @@ router.get('/export.csv', disastersController.exportCsv);
 // Spreadsheet property portfolio risk analysis
 router.post('/analyze-spreadsheet', disastersController.analyzeSpreadsheet);
 
+// Hurricane Tracker — live/replay storms, county impact, Governor SoE (state-specific) + FEMA EM/DR
+router.get('/hurricanes/active', disastersController.listHurricanesActive);
+router.get('/hurricanes/predict', disastersController.predictHurricanes);
+router.post('/hurricanes/analyze-spreadsheet', disastersController.analyzeHurricaneSpreadsheetHandler);
+
 export default router;
 
 

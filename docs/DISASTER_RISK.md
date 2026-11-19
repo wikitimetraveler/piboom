@@ -12,6 +12,7 @@ Disaster data feeds, loan pipeline risk analysis, and the Disaster Risk AI assis
 | **Disaster Risk AI** | AI assistant for disaster impact on real estate |
 | **Pipeline Risk Dashboard** | `public/finance/pipeline-risk-dashboard.html` – map, tables, AI widgets |
 | **Unified Disasters** | `public/finance/disasters-unified.html` – multi-source disasters AG Grid, voice commands, disaster **processor** expert AI (`sessionId: unified-disaster-processor`) |
+| **Hurricane Tracker** | `public/finance/disasters-hurricanes.html` – NHC track/cone + replay storms; **county impact predictor**; **Governor State of Emergency windows that vary by state**; FEMA EM/DR announcement estimates; loans in path; coastal webcams; spreadsheet cone analyzer |
 
 ### Service Architecture
 
@@ -95,6 +96,9 @@ FIRMS NRT detections are clustered with **union-find single-linkage** (`clusterF
 | GET | `/stats` | Stats |
 | GET | `/export.csv` | CSV export |
 | POST | `/analyze-spreadsheet` | Analyze a spreadsheet/tape of properties (`properties[]`, `radiusMiles`, optional `disasters[]`) and return per-property risk triage, matched hazards, lender underwriting/closing checklists, and portfolio rollups (`services/disaster-spreadsheet.service.js`) |
+| GET | `/hurricanes/active` | Hurricane Tracker catalog — live NHC cyclones (when available) + replay storms (`?mode=auto\|live\|replay`). Service: `services/hurricane-tracker.service.js`, replay data: `data/hurricane-replay-storms.json` |
+| GET | `/hurricanes/predict` | County impact prediction for a storm/advisory (`stormId`, `advisoryIndex`, `mode`) — CPA, 34/50/64kt swath tiers, **Governor SoE windows (state-specific lags)**, FEMA EM/DR windows, pipeline loans in path, coastal webcams. Planning estimates only — not official announcements |
+| POST | `/hurricanes/analyze-spreadsheet` | Property tape vs hurricane cone (`properties[]` or `useSample: true`) with per-row Governor SoE / declaration timeline and lender checklist |
 | GET | `/geocode-address` | Forward geocode for webcam address search (`q` query param) |
 | GET | `/near` | Nearby disasters, webcams, and loans — query: `lat`, `lng`, `radiusMiles` (1–500, default 50), `types` (comma: `disasters`, `cameras`, `loans`; default all), `limit` (max 500). PostGIS when available; Haversine fallback otherwise. Each row includes `distance_miles` when applicable. |
 | GET | `/cameras` | Hazard webcams (national catalog) — query: `state`, `county` (ILIKE), `source`, `hazard` (JSONB tag), `mediaType`, `limit`, `offset`; geo: `nearLat`, `nearLng`, `radiusMiles` (1–500, default 50 when geo set) — PostGIS `ST_DWithin`/KNN when available, else Haversine; nearest-first, each row includes `distance_miles` when geo is used |
@@ -176,6 +180,19 @@ UCSD pier mounts are seeded from `data/hazard-webcam-seeds.json`. HPWREN mounts 
 UI: [`public/finance/disasters-webcams.html`](../public/finance/disasters-webcams.html) (legacy [`disasters-ca-cameras.html`](../public/finance/disasters-ca-cameras.html) redirects with `?state=CA&hazard=fire&source=alertcalifornia`).
 
 **Address search:** Google Places autocomplete on the catalog page centers the map, draws a radius circle, and loads nearest mounts via `GET /api/disasters/cameras?nearLat=&nearLng=&radiusMiles=`. Deep links: `?lat=&lng=&radius=&address=`; camera by slug: `disasters-webcams.html?camera=walton_lighthouse` (also `?q=lighthouse` for name search). Alaska volcano cams remain on the national webcam catalog (`?state=AK&hazard=volcano`) but are outside the lending footprint used by Unified Disasters / loan proximity. If client Google geocode fails, search falls back to `GET /api/disasters/geocode-address?q=` (Mapbox/Nominatim via `geocodeAddressFree`; camera ingest geocode cache unchanged).
+
+## Hurricane Tracker (Governor SoE varies by state)
+
+Page: [`public/finance/disasters-hurricanes.html`](../public/finance/disasters-hurricanes.html).
+
+Public announcement sequence modeled for ops planning (not official):
+
+1. **NWS Watch / Warning** advisories
+2. **Governor State of Emergency** — **timing differs by state** (`GOVERNOR_SOE_LAG_HOURS` / inland cascade table in `services/hurricane-tracker.service.js`). Coastal FL/LA often 24–72h pre-landfall; inland TN/KY/WV often after landfall as flooding cascades.
+3. **FEMA Emergency Declaration (EM)** — typically near landfall for Category B protective measures
+4. **Joint PDA** then **FEMA Major Disaster (DR)** public announcement — core Cat 3–5 counties often faster; secondary counties often via amendments
+
+Off-season / quiet basin demos use replay storms (Milton, Helene, Ian, Beryl, synthetic Gulf Cat 4) with an advisory scrubber.
 
 ## Daily Refresh
 

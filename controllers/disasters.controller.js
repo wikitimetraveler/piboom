@@ -35,6 +35,13 @@ import { buildDailyBriefing } from '../services/disaster-daily-briefing.service.
 import { crawlDisasterWeb } from '../services/disaster-web-crawler.service.js';
 import { analyzePropertySpreadsheet } from '../services/disaster-spreadsheet.service.js';
 import {
+  listActiveHurricanes,
+  predictHurricaneImpact,
+  analyzeHurricaneSpreadsheet,
+  getSampleHurricaneTape,
+  DECLARATION_DISCLAIMER,
+} from '../services/hurricane-tracker.service.js';
+import {
   buildDisasterLiveCacheKey,
   checkDisasterLiveRateLimit,
   getDisasterLiveCache,
@@ -808,6 +815,92 @@ export async function analyzeSpreadsheet(req, res) {
   }
 }
 
+/**
+ * GET /api/disasters/hurricanes/active
+ * Live NHC cyclones + replay catalog. Governor SoE timing is state-specific.
+ */
+export async function listHurricanesActive(req, res) {
+  try {
+    const mode = String(req.query.mode || 'auto').toLowerCase();
+    const data = await listActiveHurricanes({ mode });
+    res.json({ success: true, data });
+  } catch (e) {
+    console.error('❌ Hurricane active list error:', e);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to list active hurricanes',
+      details: e.message,
+      disclaimer: DECLARATION_DISCLAIMER,
+    });
+  }
+}
+
+/**
+ * GET /api/disasters/hurricanes/predict
+ * County impact + Governor SoE (varies by state) + FEMA EM/DR windows.
+ */
+export async function predictHurricanes(req, res) {
+  try {
+    const stormId = req.query.stormId || req.query.id || null;
+    const mode = String(req.query.mode || 'auto').toLowerCase();
+    const advisoryIndex = parseInt(req.query.advisoryIndex ?? req.query.advisory ?? '0', 10);
+    const data = await predictHurricaneImpact({
+      stormId,
+      mode,
+      advisoryIndex: Number.isFinite(advisoryIndex) ? advisoryIndex : 0,
+    });
+    if (!data.success) {
+      return res.status(404).json(data);
+    }
+    res.json({ success: true, data });
+  } catch (e) {
+    console.error('❌ Hurricane predict error:', e);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to predict hurricane county impacts',
+      details: e.message,
+      disclaimer: DECLARATION_DISCLAIMER,
+    });
+  }
+}
+
+/**
+ * POST /api/disasters/hurricanes/analyze-spreadsheet
+ * Body: { properties[], stormId?, mode?, advisoryIndex?, useSample? }
+ */
+export async function analyzeHurricaneSpreadsheetHandler(req, res) {
+  try {
+    let properties = req.body?.properties || req.body?.rows;
+    if (req.body?.useSample === true || req.query?.sample === '1') {
+      properties = getSampleHurricaneTape();
+    }
+    if (!Array.isArray(properties) || properties.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'Request body must include a non-empty properties array (or useSample: true)',
+      });
+    }
+    const data = await analyzeHurricaneSpreadsheet({
+      properties,
+      stormId: req.body?.stormId || req.query?.stormId,
+      mode: req.body?.mode || req.query?.mode || 'auto',
+      advisoryIndex: req.body?.advisoryIndex ?? req.query?.advisoryIndex ?? 0,
+    });
+    if (!data.success) {
+      return res.status(404).json(data);
+    }
+    res.json({ success: true, data });
+  } catch (e) {
+    console.error('❌ Hurricane spreadsheet analysis error:', e);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to analyze hurricane spreadsheet',
+      details: e.message,
+      disclaimer: DECLARATION_DISCLAIMER,
+    });
+  }
+}
+
 export default {
   listDisasters,
   refreshDisasters,
@@ -824,6 +917,9 @@ export default {
   exportCsv,
   geocodeAddress,
   analyzeSpreadsheet,
+  listHurricanesActive,
+  predictHurricanes,
+  analyzeHurricaneSpreadsheetHandler,
 };
 
 
