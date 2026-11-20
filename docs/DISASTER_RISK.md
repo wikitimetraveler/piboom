@@ -44,6 +44,8 @@ Both services share the same PostgreSQL database with PostGIS extension.
 
 Schema: `disasters` table (county_fips, source, event_type, start_time, lat, lng, etc.). Full table reference (including `fire_cameras`, `loans`, impact graph, and PostGIS): **`docs/UNIFIED_DISASTERS_DB_SCHEMA.md`**.
 
+**Upsert:** `upsertDisasters` uses `ON CONFLICT … DO UPDATE` for mutable fields (title, severity, end_time, raw, county_name; lat/lng prefer existing curated coords). Duplicate keys refresh in place so Policy Desk multi-county FEMA declare stays current.
+
 ### PostGIS spatial graph (Render Postgres)
 
 When `CREATE EXTENSION postgis` succeeds at startup, the app adds generated `geom geography(Point,4326)` columns (from existing lat/lng) on **`disasters`**, **`fire_cameras`**, and **`loans`**, with GiST indexes. Proximity uses `ST_DWithin` and KNN (`geom <-> point`) via `services/disaster-spatial.service.js`. If PostGIS is unavailable, behavior falls back to in-app Haversine (unchanged API shapes).

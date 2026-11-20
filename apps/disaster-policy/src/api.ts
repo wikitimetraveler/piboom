@@ -42,9 +42,20 @@ export async function setStatus(id: string, status: PolicyStatus) {
 }
 
 export async function fetchImpactedLoans(id: string) {
-  const data = await json<{ loans: ImpactedLoan[]; count: number }>(
-    await fetch(`${API}/events/${encodeURIComponent(id)}/impacted-loans`)
-  );
+  const data = await json<{
+    loans: ImpactedLoan[];
+    count: number;
+    matchCounts?: { byFips: number; byName: number };
+  }>(await fetch(`${API}/events/${encodeURIComponent(id)}/impacted-loans`));
+  return data;
+}
+
+export async function fetchFemaCounties(disasterNumber: string) {
+  const data = await json<{
+    disasterNumber: string;
+    counties: Array<{ countyFips: string; countyName: string; state: string }>;
+    count: number;
+  }>(await fetch(`${API}/fema/${encodeURIComponent(disasterNumber)}/counties`));
   return data;
 }
 

@@ -205,7 +205,7 @@ function renderMap(rows) {
         map,
         title: isCameraMarker
           ? (r.title || 'Camera')
-          : `${r.title || r.event_type} (risk ${riskScore.toFixed(1)})`,
+          : `${r.title || r.event_type} (intensity ${riskScore.toFixed(1)})`,
         icon: disasterIcon,
         zIndex: isCameraMarker ? 50 : Math.round(100 + riskScore * 10),
       });
@@ -213,7 +213,7 @@ function renderMap(rows) {
         cameraDataKey = `camera_${cameraIndex++}`;
         window.cameraDataStore[cameraDataKey] = r;
       }
-      let infoContent = `<div><strong>${r.title || r.event_type}</strong><br>${r.county_name || ''}, ${r.state_abbr || ''}<br>${r.start_time ? new Date(r.start_time).toLocaleString() : ''}<br><span class="text-muted small">Risk: ${riskScore.toFixed(1)}</span>`;
+      let infoContent = `<div><strong>${r.title || r.event_type}</strong><br>${r.county_name || ''}, ${r.state_abbr || ''}<br>${r.start_time ? new Date(r.start_time).toLocaleString() : ''}<br><span class="text-muted small" title="Relative event ranking — not loan ops triage and not a loss probability">Event intensity: ${riskScore.toFixed(1)}</span>`;
       if (isCameraMarker && cameraDataKey) {
         infoContent += `<br><br><button class="btn btn-sm btn-warning" onclick="window.openCameraViewerFromMarker('${cameraDataKey}')" style="margin-top: 8px;">
           <i class="bi-camera-video"></i> View Camera Feed

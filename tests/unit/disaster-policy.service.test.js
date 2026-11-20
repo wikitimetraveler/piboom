@@ -6,6 +6,7 @@ import {
   listPolicyEvents,
   setPolicyStatus,
   resetDisasterPolicyMemoryForTests,
+  classifyLoanAreaMatch,
 } from '../../services/disaster-policy.service.js';
 
 describe('disaster-policy.service', () => {
@@ -46,7 +47,23 @@ describe('disaster-policy.service', () => {
 
     const active = await setPolicyStatus(draft.id, 'active');
     expect(active.status).toBe('active');
-    expect(active.amerihomeTreasuryHold).toBe(true);
+    expect(active.acmeTreasuryHold).toBe(true);
+  });
+
+  test('classifyLoanAreaMatch prefers FIPS over mismatched county name', () => {
+    const areas = [{ state: 'FL', countyCode: '12086', countyName: 'Miami-Dade' }];
+    expect(
+      classifyLoanAreaMatch(
+        { state: 'FL', county: 'Saint Lucie', county_fips: '12086' },
+        areas
+      )
+    ).toBe('fips');
+    expect(
+      classifyLoanAreaMatch({ state: 'FL', county: 'Miami-Dade', county_fips: null }, areas)
+    ).toBe('name');
+    expect(
+      classifyLoanAreaMatch({ state: 'FL', county: 'Orange', county_fips: '12095' }, areas)
+    ).toBeNull();
   });
 
   test('rejects missing areas and bad kind', async () => {

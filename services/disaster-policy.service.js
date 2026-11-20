@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Disaster Policy Desk — Declared / Pending enforcement records (BRD field set).
  * Complements Unified Disasters hazard feeds; does not replace them.
  * Development work by David Lane
@@ -23,10 +23,10 @@ CREATE TABLE IF NOT EXISTS disaster_policy_events (
   fema_major_disaster_declaration_date DATE,
   presidential_declaration_date DATE,
   governor_declaration_date DATE,
-  amerihome_emergency_declaration_date DATE,
-  amerihome_disaster_announcement TEXT,
-  amerihome_treasury_hold BOOLEAN NOT NULL DEFAULT FALSE,
-  amerihome_funding_suspension BOOLEAN NOT NULL DEFAULT FALSE,
+  acme_emergency_declaration_date DATE,
+  acme_disaster_announcement TEXT,
+  acme_treasury_hold BOOLEAN NOT NULL DEFAULT FALSE,
+  acme_funding_suspension BOOLEAN NOT NULL DEFAULT FALSE,
   incident_begin_date DATE,
   created_by TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -57,6 +57,33 @@ export async function initDisasterPolicySchema() {
     return { mode: 'memory' };
   }
   await pool.query(CREATE_SQL);
+  // Rename legacy brand columns → ACME (never emit old lender names in product API)
+  await pool.query(`
+    DO $$ BEGIN
+      IF EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'disaster_policy_events' AND column_name = 'amerihome_treasury_hold'
+      ) AND NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'disaster_policy_events' AND column_name = 'acme_treasury_hold'
+      ) THEN
+        ALTER TABLE disaster_policy_events RENAME COLUMN amerihome_emergency_declaration_date TO acme_emergency_declaration_date;
+        ALTER TABLE disaster_policy_events RENAME COLUMN amerihome_disaster_announcement TO acme_disaster_announcement;
+        ALTER TABLE disaster_policy_events RENAME COLUMN amerihome_treasury_hold TO acme_treasury_hold;
+        ALTER TABLE disaster_policy_events RENAME COLUMN amerihome_funding_suspension TO acme_funding_suspension;
+      END IF;
+    END $$;
+  `);
+  await pool.query(`
+    DO $$ BEGIN
+      IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'loans' AND column_name = 'county_fips'
+      ) THEN
+        ALTER TABLE loans ADD COLUMN county_fips CHAR(5);
+      END IF;
+    END $$;
+  `);
   console.log('✅ Disaster policy schema ensured');
   return { mode: 'postgres' };
 }
@@ -127,7 +154,13 @@ function normalizeEventInput(body = {}) {
   const treasuryHold =
     kind === 'pending' && status === 'active'
       ? true
-      : asBool(body.amerihomeTreasuryHold ?? body.amerihome_treasury_hold, false);
+      : asBool(
+          body.acmeTreasuryHold ??
+            body.acme_treasury_hold ??
+            body.amerihomeTreasuryHold ??
+            body.amerihome_treasury_hold,
+          false
+        );
 
   return {
     kind,
@@ -147,14 +180,24 @@ function normalizeEventInput(body = {}) {
     governorDeclarationDate: asDate(
       body.governorDeclarationDate || body.governor_declaration_date
     ),
-    amerihomeEmergencyDeclarationDate: asDate(
-      body.amerihomeEmergencyDeclarationDate || body.amerihome_emergency_declaration_date
+    acmeEmergencyDeclarationDate: asDate(
+      body.acmeEmergencyDeclarationDate ||
+        body.acme_emergency_declaration_date ||
+        body.amerihomeEmergencyDeclarationDate ||
+        body.amerihome_emergency_declaration_date
     ),
-    amerihomeDisasterAnnouncement:
-      body.amerihomeDisasterAnnouncement || body.amerihome_disaster_announcement || null,
-    amerihomeTreasuryHold: treasuryHold,
-    amerihomeFundingSuspension: asBool(
-      body.amerihomeFundingSuspension ?? body.amerihome_funding_suspension,
+    acmeDisasterAnnouncement:
+      body.acmeDisasterAnnouncement ||
+      body.acme_disaster_announcement ||
+      body.amerihomeDisasterAnnouncement ||
+      body.amerihome_disaster_announcement ||
+      null,
+    acmeTreasuryHold: treasuryHold,
+    acmeFundingSuspension: asBool(
+      body.acmeFundingSuspension ??
+        body.acme_funding_suspension ??
+        body.amerihomeFundingSuspension ??
+        body.amerihome_funding_suspension,
       false
     ),
     incidentBeginDate: asDate(body.incidentBeginDate || body.incident_begin_date),
@@ -178,15 +221,15 @@ function publicEvent(row, areas = []) {
     presidentialDeclarationDate:
       row.presidential_declaration_date ?? row.presidentialDeclarationDate,
     governorDeclarationDate: row.governor_declaration_date ?? row.governorDeclarationDate,
-    amerihomeEmergencyDeclarationDate:
-      row.amerihome_emergency_declaration_date ?? row.amerihomeEmergencyDeclarationDate,
-    amerihomeDisasterAnnouncement:
-      row.amerihome_disaster_announcement ?? row.amerihomeDisasterAnnouncement,
-    amerihomeTreasuryHold: Boolean(
-      row.amerihome_treasury_hold ?? row.amerihomeTreasuryHold
+    acmeEmergencyDeclarationDate:
+      row.acme_emergency_declaration_date ?? row.acmeEmergencyDeclarationDate,
+    acmeDisasterAnnouncement:
+      row.acme_disaster_announcement ?? row.acmeDisasterAnnouncement,
+    acmeTreasuryHold: Boolean(
+      row.acme_treasury_hold ?? row.acmeTreasuryHold
     ),
-    amerihomeFundingSuspension: Boolean(
-      row.amerihome_funding_suspension ?? row.amerihomeFundingSuspension
+    acmeFundingSuspension: Boolean(
+      row.acme_funding_suspension ?? row.acmeFundingSuspension
     ),
     incidentBeginDate: row.incident_begin_date ?? row.incidentBeginDate,
     createdBy: row.created_by ?? row.createdBy,
@@ -221,10 +264,10 @@ function saveMemory(normalized) {
     femaMajorDisasterDeclarationDate: normalized.femaMajorDisasterDeclarationDate,
     presidentialDeclarationDate: normalized.presidentialDeclarationDate,
     governorDeclarationDate: normalized.governorDeclarationDate,
-    amerihomeEmergencyDeclarationDate: normalized.amerihomeEmergencyDeclarationDate,
-    amerihomeDisasterAnnouncement: normalized.amerihomeDisasterAnnouncement,
-    amerihomeTreasuryHold: normalized.amerihomeTreasuryHold,
-    amerihomeFundingSuspension: normalized.amerihomeFundingSuspension,
+    acmeEmergencyDeclarationDate: normalized.acmeEmergencyDeclarationDate,
+    acmeDisasterAnnouncement: normalized.acmeDisasterAnnouncement,
+    acmeTreasuryHold: normalized.acmeTreasuryHold,
+    acmeFundingSuspension: normalized.acmeFundingSuspension,
     incidentBeginDate: normalized.incidentBeginDate,
     createdBy: normalized.createdBy,
     createdAt: now,
@@ -249,8 +292,8 @@ export async function createPolicyEvent(body) {
         id, kind, status, event_name, disaster_type, fema_declaration_number,
         fema_emergency_declaration_date, fema_major_disaster_declaration_date,
         presidential_declaration_date, governor_declaration_date,
-        amerihome_emergency_declaration_date, amerihome_disaster_announcement,
-        amerihome_treasury_hold, amerihome_funding_suspension, incident_begin_date, created_by
+        acme_emergency_declaration_date, acme_disaster_announcement,
+        acme_treasury_hold, acme_funding_suspension, incident_begin_date, created_by
       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,
       [
         id,
@@ -263,10 +306,10 @@ export async function createPolicyEvent(body) {
         normalized.femaMajorDisasterDeclarationDate,
         normalized.presidentialDeclarationDate,
         normalized.governorDeclarationDate,
-        normalized.amerihomeEmergencyDeclarationDate,
-        normalized.amerihomeDisasterAnnouncement,
-        normalized.amerihomeTreasuryHold,
-        normalized.amerihomeFundingSuspension,
+        normalized.acmeEmergencyDeclarationDate,
+        normalized.acmeDisasterAnnouncement,
+        normalized.acmeTreasuryHold,
+        normalized.acmeFundingSuspension,
         normalized.incidentBeginDate,
         normalized.createdBy,
       ]
@@ -411,17 +454,17 @@ export async function setPolicyStatus(id, status) {
   if (!pool) {
     const mem = memoryEvents.get(event.id);
     mem.status = next;
-    if (mem.kind === 'pending' && next === 'active') mem.amerihomeTreasuryHold = true;
+    if (mem.kind === 'pending' && next === 'active') mem.acmeTreasuryHold = true;
     mem.updatedAt = new Date().toISOString();
     memoryEvents.set(event.id, mem);
     return publicEvent(mem, mem.areas);
   }
 
   const treasury =
-    event.kind === 'pending' && next === 'active' ? true : event.amerihomeTreasuryHold;
+    event.kind === 'pending' && next === 'active' ? true : event.acmeTreasuryHold;
   await pool.query(
     `UPDATE disaster_policy_events
-     SET status = $2, amerihome_treasury_hold = $3, updated_at = NOW()
+     SET status = $2, acme_treasury_hold = $3, updated_at = NOW()
      WHERE id = $1`,
     [event.id, next, treasury]
   );
@@ -429,38 +472,84 @@ export async function setPolicyStatus(id, status) {
 }
 
 /**
- * Match mock pipeline loans by state + county name for impact preview.
+ * Prefer FIPS match (county_code ↔ loans.county_fips); fall back to normalized county name.
+ */
+export function classifyLoanAreaMatch(loan, areas) {
+  const loanFips = String(loan?.countyFips || loan?.county_fips || '')
+    .padStart(5, '0')
+    .slice(0, 5);
+  const loanState = String(loan?.state || '').toUpperCase();
+  const loanCounty = String(loan?.county || '')
+    .toLowerCase()
+    .replace(/\s+county$/i, '')
+    .trim();
+  for (const a of areas || []) {
+    const areaState = String(a.state || '').toUpperCase();
+    if (areaState !== loanState) continue;
+    const areaFips = String(a.countyCode || a.county_code || '').padStart(5, '0').slice(0, 5);
+    if (/^\d{5}$/.test(loanFips) && loanFips !== '00000' && loanFips === areaFips) {
+      return 'fips';
+    }
+  }
+  for (const a of areas || []) {
+    const areaState = String(a.state || '').toUpperCase();
+    if (areaState !== loanState) continue;
+    const areaCounty = String(a.countyName || a.county_name || '')
+      .toLowerCase()
+      .replace(/\s+county$/i, '')
+      .trim();
+    if (areaCounty && loanCounty && areaCounty === loanCounty) return 'name';
+  }
+  return null;
+}
+
+/**
+ * Match mock pipeline loans by FIPS first, then state + county name.
  */
 export async function findImpactedLoans(eventId) {
   const event = await getPolicyEvent(eventId);
-  if (!event) return { event: null, loans: [], count: 0 };
+  if (!event) return { event: null, loans: [], count: 0, matchCounts: { byFips: 0, byName: 0 } };
 
   const pool = getPool();
   if (!pool) {
-    return { event, loans: [], count: 0, mode: 'memory' };
+    return { event, loans: [], count: 0, mode: 'memory', matchCounts: { byFips: 0, byName: 0 } };
   }
 
-  const pairs = event.areas.map((a) => [a.state, a.countyName.toLowerCase()]);
-  if (!pairs.length) return { event, loans: [], count: 0 };
+  if (!event.areas.length) {
+    return { event, loans: [], count: 0, matchCounts: { byFips: 0, byName: 0 } };
+  }
 
   const { rows } = await pool.query(
     `SELECT id, loan_number, borrower_name, property_address, city, state, county, zip_code,
-            milestone, loan_amount, disaster_risk_score
+            milestone, loan_amount, disaster_risk_score, county_fips
      FROM loans
      WHERE EXISTS (
        SELECT 1 FROM disaster_policy_areas a
        WHERE a.event_id = $1
          AND a.state = loans.state
-         AND LOWER(REPLACE(a.county_name, ' County', '')) = LOWER(REPLACE(loans.county, ' County', ''))
+         AND (
+           (
+             NULLIF(TRIM(COALESCE(loans.county_fips, '')), '') IS NOT NULL
+             AND LPAD(TRIM(loans.county_fips), 5, '0') = a.county_code
+           )
+           OR LOWER(REPLACE(a.county_name, ' County', '')) = LOWER(REPLACE(loans.county, ' County', ''))
+         )
      )
      ORDER BY state, county, loan_number
      LIMIT 500`,
     [event.id]
   );
 
-  return {
-    event,
-    loans: rows.map((r) => ({
+  let byFips = 0;
+  let byName = 0;
+  const loans = rows.map((r) => {
+    const matchMethod = classifyLoanAreaMatch(
+      { state: r.state, county: r.county, county_fips: r.county_fips },
+      event.areas
+    );
+    if (matchMethod === 'fips') byFips += 1;
+    else if (matchMethod === 'name') byName += 1;
+    return {
       id: r.id,
       loanNumber: r.loan_number,
       borrowerName: r.borrower_name,
@@ -468,15 +557,70 @@ export async function findImpactedLoans(eventId) {
       city: r.city,
       state: r.state,
       county: r.county,
+      countyFips: r.county_fips || null,
       zipCode: r.zip_code,
       milestone: r.milestone,
       loanAmount: r.loan_amount,
       disasterRiskScore: r.disaster_risk_score,
-      treasuryHold: Boolean(event.amerihomeTreasuryHold && event.status === 'active'),
-      fundingSuspension: Boolean(event.amerihomeFundingSuspension && event.status === 'active'),
-    })),
-    count: rows.length,
+      matchMethod: matchMethod || 'name',
+      treasuryHold: Boolean(event.acmeTreasuryHold && event.status === 'active'),
+      fundingSuspension: Boolean(event.acmeFundingSuspension && event.status === 'active'),
+    };
+  });
+
+  return {
+    event,
+    loans,
+    count: loans.length,
+    matchCounts: { byFips, byName },
   };
+}
+
+/**
+ * Distinct counties for a FEMA DR/EM number from unified disasters rows.
+ */
+export async function listFemaCountiesByDisasterNumber(disasterNumber) {
+  const raw = String(disasterNumber || '').trim();
+  if (!raw) return { disasterNumber: '', counties: [], count: 0 };
+
+  const normalized = raw.replace(/\s+/g, '');
+  const digits = normalized.replace(/^(DR|EM|FM)-?/i, '');
+  const pool = getPool();
+  if (!pool) {
+    return { disasterNumber: normalized, counties: [], count: 0, mode: 'memory' };
+  }
+
+  const { rows } = await pool.query(
+    `SELECT DISTINCT county_fips, county_name, state_abbr
+     FROM disasters
+     WHERE LOWER(source) = 'fema'
+       AND (
+         source_id = $1
+         OR source_id = $2
+         OR source_id ILIKE $3
+         OR source_id ILIKE $4
+         OR COALESCE(raw->>'disasterNumber','') = $2
+         OR COALESCE(raw->>'disasterNumber','') = $1
+       )
+       AND county_fips IS NOT NULL
+       AND county_fips <> '00000'
+     ORDER BY state_abbr, county_name
+     LIMIT 500`,
+    [
+      normalized,
+      digits,
+      `${normalized}%`,
+      `%${digits}%`,
+    ]
+  );
+
+  const counties = rows.map((r) => ({
+    countyFips: String(r.county_fips).padStart(5, '0'),
+    countyName: String(r.county_name || '').replace(/\s+County$/i, ''),
+    state: String(r.state_abbr || '').toUpperCase(),
+  }));
+
+  return { disasterNumber: normalized, counties, count: counties.length };
 }
 
 /** Test helper */

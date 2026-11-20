@@ -861,10 +861,10 @@ function selectDisaster(disasterData, disasterObj) {
   const riskScore = disasterObj?.risk_score || 0;
   const eventType = disasterObj?.event_type || row?.[1] || '';
 
-  console.log('Selecting disaster:', title, state, county, 'Risk:', riskScore);
+  console.log('Selecting disaster:', title, state, county, 'Event intensity:', riskScore);
 
   if (riskScore > 0) {
-    console.log(`⚠️  Risk Score: ${riskScore.toFixed(1)}`);
+    console.log(`⚠️  Event intensity: ${riskScore.toFixed(1)}`);
   }
 
   if (state) $('#stateInput').val(state);
@@ -1131,6 +1131,80 @@ function bindEncompassMapCtaLinks() {
   });
 }
 
+function mapPolicyDisasterTypeFromUnified(eventType, source) {
+  const t = String(eventType || '').toLowerCase();
+  const src = String(source || '').toLowerCase();
+  if (/hurricane|tropical|typhoon|cyclone/.test(t)) return 'Hurricane';
+  if (/flood|flash flood|coastal flood/.test(t)) return 'Flood';
+  if (/fire|wildfire/.test(t) || src === 'firms') return 'Wildfire';
+  if (/earthquake|quake/.test(t) || src === 'usgs') return 'Earthquake';
+  if (/tornado/.test(t)) return 'Tornado';
+  if (/freeze|winter|ice|snow|blizzard/.test(t)) return 'Winter Storm';
+  if (/wind|high wind/.test(t)) return 'High Wind';
+  if (t) return t.replace(/\b\w/g, (c) => c.toUpperCase());
+  return 'Natural Disaster';
+}
+
+function extractFemaNumberFromDisaster(d) {
+  if (!d) return '';
+  const raw = d.raw && typeof d.raw === 'object' ? d.raw : {};
+  const candidates = [
+    raw.disasterNumber,
+    raw.femaDeclarationNumber,
+    d.disasterNumber,
+    d.source_id,
+    d.sourceId,
+  ];
+  for (const c of candidates) {
+    const s = String(c || '').trim();
+    if (/^(DR|EM|FM)-\d+/i.test(s) || /^\d{3,5}$/.test(s)) return s;
+  }
+  return '';
+}
+
+/** Lightweight handoff: selected grid row → Policy Desk form query params. */
+function buildPolicyDeskUrlFromDisaster(disasterObj) {
+  const d = disasterObj || selectedDisasterObj;
+  if (!d) return '/finance/disaster-policy/';
+  const source = String(d.source || '').toLowerCase();
+  const title = d.title || d.declarationTitle || 'Selected disaster';
+  const params = new URLSearchParams({
+    from: 'unified',
+    kind: source === 'fema' ? 'declared' : 'pending',
+    eventName: title,
+    disasterType: mapPolicyDisasterTypeFromUnified(d.event_type || d.eventType, source),
+    autoAddCounty: '1',
+  });
+  const state = String(d.state_abbr || d.state || '').toUpperCase();
+  const county = String(d.county_name || d.county || '').trim();
+  const fips = String(d.county_fips || d.countyFips || '').trim();
+  if (state) params.set('state', state);
+  if (county) params.set('county', county.replace(/\s+County$/i, ''));
+  if (fips) params.set('countyFips', fips.padStart(5, '0'));
+  const begin = d.start_time || d.incidentBeginDate || d.declarationDate || d.startedAt;
+  if (begin) {
+    const iso = new Date(begin);
+    if (!Number.isNaN(iso.getTime())) params.set('incidentBegin', iso.toISOString().slice(0, 10));
+  }
+  const femaNumber = extractFemaNumberFromDisaster(d);
+  if (femaNumber) {
+    params.set('femaNumber', femaNumber);
+    const beginIso = params.get('incidentBegin') || '';
+    if (/^EM/i.test(femaNumber) && beginIso) params.set('femaEmDate', beginIso);
+    if (/^DR/i.test(femaNumber) && beginIso) params.set('femaDrDate', beginIso);
+    if (source === 'fema') params.set('autoAddAllCounties', '1');
+  }
+  return `/finance/disaster-policy/?${params.toString()}`;
+}
+
+function openPolicyDeskFromSelection() {
+  if (!selectedDisasterObj) {
+    console.warn('Select a disaster in the grid first');
+    return;
+  }
+  window.open(buildPolicyDeskUrlFromDisaster(selectedDisasterObj), '_blank', 'noopener');
+}
+
 function updateSelectionContextStrip() {
   const el = document.getElementById('selectionContextStrip');
   if (!el || !selectedDisasterObj) {
@@ -1168,42 +1242,74 @@ function updateSelectionContextStrip() {
   actions.setAttribute('role', 'group');
   actions.setAttribute('aria-label', 'Selection actions');
 
+  // Credit Admin primary + map stay visible; AI / KML / processor live in More to reduce crowding.
   const primaryActions = [
-    { label: 'Show proximity map', icon: 'bi-geo-alt', className: 'btn-outline-primary', onclick: 'openDuEncompassLoansMapSection()' },
-    { label: 'AI video briefing', icon: 'bi-camera-reels', className: 'btn-info text-white', onclick: 'openDisasterHeygenBriefing()' },
-    { label: 'Google Earth KML', icon: 'bi-globe-americas', className: 'btn-warning', onclick: 'exportCinematicDisasterKml()' },
-    { label: 'Processor expert', icon: 'bi-robot', className: 'btn-light', onclick: 'openProcessorExpert()' },
+    {
+      label: 'Policy Desk',
+      shortLabel: 'Policy Desk',
+      icon: 'bi-clipboard2-check',
+      className: 'btn-success du-selection-strip-btn-policy',
+      keepLabel: true,
+      onclick: 'openPolicyDeskFromSelection()',
+      title: 'Open Policy Desk with this disaster prefilled',
+    },
+    {
+      label: 'Proximity map',
+      shortLabel: 'Map',
+      icon: 'bi-geo-alt',
+      className: 'btn-outline-primary',
+      onclick: 'openDuEncompassLoansMapSection()',
+      title: 'Show proximity map',
+    },
   ];
   primaryActions.forEach((act) => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = `btn btn-sm ${act.className} du-selection-strip-btn`;
-    btn.title = act.label;
-    btn.setAttribute('aria-label', act.label);
-    btn.innerHTML = `<i class="bi ${act.icon}" aria-hidden="true"></i><span class="du-selection-strip-btn-label">${act.label}</span>`;
+    btn.title = act.title || act.label;
+    btn.setAttribute('aria-label', act.title || act.label);
+    const labelClass = act.keepLabel
+      ? 'du-selection-strip-btn-label du-selection-strip-btn-label-keep'
+      : 'du-selection-strip-btn-label';
+    const mobileLabel = act.shortLabel && act.shortLabel !== act.label
+      ? `<span class="du-selection-strip-btn-label-sm">${act.shortLabel}</span>`
+      : '';
+    btn.innerHTML = `<i class="bi ${act.icon}" aria-hidden="true"></i><span class="${labelClass}">${act.label}</span>${mobileLabel}`;
     btn.addEventListener('click', () => {
-      if (act.onclick === 'openDuEncompassLoansMapSection()') openDuEncompassLoansMapSection(3);
-      else if (act.onclick === 'openDisasterHeygenBriefing()') openDisasterHeygenBriefing();
-      else if (act.onclick === 'exportCinematicDisasterKml()') exportCinematicDisasterKml();
-      else openProcessorExpert();
+      if (act.onclick === 'openPolicyDeskFromSelection()') openPolicyDeskFromSelection();
+      else openDuEncompassLoansMapSection(3);
     });
     actions.appendChild(btn);
   });
 
   const overflow = document.createElement('div');
   overflow.className = 'dropdown du-selection-strip-overflow';
-  overflow.innerHTML = `<button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-label="More actions">
+  overflow.innerHTML = `<button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-label="More selection actions">
     <i class="bi bi-three-dots" aria-hidden="true"></i><span class="du-selection-strip-btn-label">More</span>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item" id="duStripHeygenBtn"><i class="bi bi-camera-reels me-1"></i>AI video briefing</button></li>
+    <li><button type="button" class="dropdown-item" id="duStripKmlBtn"><i class="bi bi-globe-americas me-1"></i>Google Earth KML</button></li>
+    <li><button type="button" class="dropdown-item" id="duStripProcessorBtn"><i class="bi bi-robot me-1"></i>Processor expert</button></li>
+    <li><hr class="dropdown-divider"></li>
     <li><button type="button" class="dropdown-item" id="duStripFullscreenMapBtn"><i class="bi bi-fullscreen me-1"></i>Open fullscreen map</button></li>
+    <li><a class="dropdown-item" id="duStripPolicyDeskLink" href="/finance/disaster-policy/"><i class="bi bi-clipboard2-check me-1"></i>Policy Desk (prefill link)</a></li>
     <li><a class="dropdown-item" href="disasters-hurricanes.html"><i class="bi bi-hurricane me-1"></i>Hurricane Tracker</a></li>
     <li><a class="dropdown-item" href="disasters-webcams.html"><i class="bi bi-camera-video me-1"></i>Hazard webcams</a></li>
     <li><a class="dropdown-item" href="pipeline-risk-dashboard.html"><i class="bi bi-graph-up me-1"></i>FEMA pipeline ops triage</a></li>
     <li><a class="dropdown-item" href="/disaster-impact-graph.html" title="Persisted graph NEAR — as-of reseed (seeded_at), not live distance"><i class="bi bi-diagram-3 me-1"></i>Impact Graph <span class="text-muted small">(as-of reseed)</span></a></li>
   </ul>`;
   actions.appendChild(overflow);
+  overflow.querySelector('#duStripHeygenBtn')?.addEventListener('click', () => openDisasterHeygenBriefing());
+  overflow.querySelector('#duStripKmlBtn')?.addEventListener('click', () => exportCinematicDisasterKml());
+  overflow.querySelector('#duStripProcessorBtn')?.addEventListener('click', () => openProcessorExpert());
   overflow.querySelector('#duStripFullscreenMapBtn')?.addEventListener('click', () => openEncompassMapFromUnified());
+  const policyLink = overflow.querySelector('#duStripPolicyDeskLink');
+  if (policyLink) {
+    policyLink.setAttribute('href', buildPolicyDeskUrlFromDisaster(selectedDisasterObj));
+    policyLink.setAttribute('target', '_blank');
+    policyLink.setAttribute('rel', 'noopener');
+  }
 
   el.appendChild(summary);
   el.appendChild(actions);
@@ -1456,6 +1562,8 @@ window.selectNearbyWeatherAlert = function selectNearbyWeatherAlert(index) {
 
 window.exportCinematicDisasterKml = exportCinematicDisasterKml;
 window.openDisasterHeygenBriefing = openDisasterHeygenBriefing;
+window.openPolicyDeskFromSelection = openPolicyDeskFromSelection;
+window.buildPolicyDeskUrlFromDisaster = buildPolicyDeskUrlFromDisaster;
 
 
 $(function init() {

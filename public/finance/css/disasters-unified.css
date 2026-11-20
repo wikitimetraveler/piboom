@@ -905,8 +905,18 @@ body.du-page {
   margin-left: 0.25rem;
 }
 
+.du-selection-strip-btn-label-sm {
+  display: none;
+  margin-left: 0.25rem;
+}
+
+.du-selection-strip-btn-policy {
+  font-weight: 650;
+  box-shadow: 0 1px 0 rgba(15, 118, 110, 0.15);
+}
+
 @media (max-width: 768px) {
-  .du-selection-strip-btn .du-selection-strip-btn-label {
+  .du-selection-strip-btn .du-selection-strip-btn-label:not(.du-selection-strip-btn-label-keep) {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -916,6 +926,14 @@ body.du-page {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+  }
+
+  .du-selection-strip-btn .du-selection-strip-btn-label-sm {
+    display: inline;
+  }
+
+  .du-selection-strip-btn-policy .du-selection-strip-btn-label-keep {
+    display: inline;
   }
 }
 

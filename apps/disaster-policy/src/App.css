@@ -19,8 +19,10 @@
   font-size: 0.9rem;
 }
 
-.dp-back:hover {
+.dp-back:hover,
+.dp-back:focus-visible {
   text-decoration: underline;
+  outline: none;
 }
 
 .dp-hero {
@@ -47,7 +49,7 @@
 }
 
 .dp-panel {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.96);
   border: 1px solid rgba(15, 118, 110, 0.12);
   border-radius: 14px;
   padding: 1.15rem 1.2rem;
@@ -59,6 +61,24 @@
   font-size: 1.05rem;
   font-weight: 650;
   margin: 0 0 0.85rem;
+  color: #0f172a;
+}
+
+.dp-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.dp-section-lede {
+  margin-top: 0.25rem;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  color: #475569;
+  max-width: 40rem;
 }
 
 .dp-status {
@@ -70,34 +90,239 @@
 
 .dp-status.ok {
   color: #0f766e;
+  font-weight: 600;
 }
 
 .dp-status.err {
   color: #b91c1c;
+  font-weight: 600;
+}
+
+/* Light, readable controls on white panels — even when site dark-mode is on */
+.dp-panel .form-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 0.2rem;
+}
+
+.dp-panel .form-control,
+.dp-panel .form-select,
+.dp-shell .form-control,
+.dp-shell .form-select {
+  background-color: #fff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+  color-scheme: light;
+}
+
+.dp-panel .form-control::placeholder,
+.dp-shell .form-control::placeholder {
+  color: #64748b !important;
+  opacity: 1;
+}
+
+.dp-panel .form-control:focus,
+.dp-panel .form-select:focus,
+.dp-shell .form-control:focus,
+.dp-shell .form-select:focus {
+  border-color: #0f766e !important;
+  box-shadow: 0 0 0 0.2rem rgba(15, 118, 110, 0.22) !important;
+  outline: none;
+}
+
+.dp-panel .form-check-input {
+  border-color: #64748b;
+  background-color: #fff;
+}
+
+.dp-panel .form-check-input:checked {
+  background-color: #0f766e;
+  border-color: #0f766e;
+}
+
+.dp-panel .form-check-input:focus {
+  box-shadow: 0 0 0 0.2rem rgba(15, 118, 110, 0.22);
+}
+
+.dp-panel .form-check-label {
+  color: #0f172a;
+  font-size: 0.875rem;
+}
+
+.dp-fieldset {
+  border: 0;
+  margin: 0 0 1rem;
+  padding: 0;
+  min-inline-size: 0;
+}
+
+.dp-legend {
+  float: none;
+  width: 100%;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #0f766e;
+  margin-bottom: 0.55rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid rgba(15, 118, 110, 0.16);
+}
+
+.dp-details {
+  border: 1px solid rgba(15, 118, 110, 0.14);
+  border-radius: 10px;
+  padding: 0.55rem 0.75rem;
+  margin-bottom: 1rem;
+  background: #f8fafc;
+}
+
+.dp-details > summary {
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 650;
+  color: #0f172a;
+  list-style: none;
+}
+
+.dp-details > summary::-webkit-details-marker {
+  display: none;
+}
+
+.dp-details > summary::before {
+  content: '▸';
+  display: inline-block;
+  margin-right: 0.4rem;
+  color: #0f766e;
+  transition: transform 0.15s ease;
+}
+
+.dp-details[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.dp-details > summary:focus-visible {
+  outline: 2px solid #0f766e;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.dp-advanced {
+  margin-top: 0.25rem;
+}
+
+.dp-hold-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+}
+
+.dp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-top: 0.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.dp-prefill-banner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 118, 110, 0.35);
+  background: linear-gradient(135deg, rgba(236, 253, 245, 0.95), rgba(240, 249, 255, 0.95));
+}
+
+.dp-prefill-banner-main {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.dp-prefill-banner-main strong {
+  display: block;
+  color: #0f766e;
+  margin-bottom: 0.2rem;
+}
+
+.dp-prefill-banner-main p {
+  font-size: 0.86rem;
+  color: #334155;
+  line-height: 1.4;
+}
+
+.dp-review-list {
+  list-style: none;
+  margin: 0.55rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.25rem;
+}
+
+.dp-review-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: #475569;
+}
+
+.dp-review-list li.is-ok {
+  color: #0f766e;
+}
+
+.dp-review-list li.is-miss {
+  color: #b45309;
+  font-weight: 600;
 }
 
 .dp-county-list {
   max-height: 220px;
   overflow: auto;
-  border: 1px solid rgba(15, 23, 42, 0.1);
+  border: 1px solid rgba(15, 23, 42, 0.12);
   border-radius: 8px;
   padding: 0.35rem 0.5rem;
-  background: #f8fafc;
+  background: #fff;
 }
 
-.dp-county-list label {
+.dp-county-row {
   display: flex;
   gap: 0.45rem;
   align-items: center;
   font-size: 0.875rem;
-  padding: 0.15rem 0;
+  color: #0f172a;
+  padding: 0.2rem 0.15rem;
+  margin: 0;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.dp-county-row:hover {
+  background: #f1f5f9;
+}
+
+.dp-county-row:focus-within {
+  outline: 2px solid #0f766e;
+  outline-offset: 1px;
+}
+
+.dp-fips {
+  color: #64748b;
+  font-size: 0.8rem;
 }
 
 .dp-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
-  margin-top: 0.5rem;
+  margin-top: 0.55rem;
 }
 
 .dp-chip {
@@ -119,6 +344,12 @@
   padding: 0;
   line-height: 1;
   cursor: pointer;
+  border-radius: 2px;
+}
+
+.dp-chip button:focus-visible {
+  outline: 2px solid #0f766e;
+  outline-offset: 2px;
 }
 
 .dp-table {
@@ -157,4 +388,156 @@
 .dp-muted {
   color: #64748b;
   font-size: 0.85rem;
+}
+
+.dp-briefing-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.55rem;
+  margin-bottom: 0.65rem;
+  font-size: 0.84rem;
+  color: #334155;
+}
+
+.dp-stat-chip {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #0f766e;
+  background: rgba(15, 118, 110, 0.1);
+  border-radius: 6px;
+  padding: 0.12rem 0.4rem;
+}
+
+.dp-state {
+  font-size: 0.88rem;
+  color: #475569;
+  padding: 0.65rem 0.15rem;
+}
+
+.dp-state-err {
+  color: #b91c1c;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.dp-state-loading {
+  color: #0f766e;
+  font-weight: 600;
+}
+
+.dp-briefing-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 260px;
+  overflow: auto;
+  padding-right: 0.15rem;
+}
+
+.dp-briefing-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.65rem;
+  align-items: center;
+  text-align: left;
+  width: 100%;
+  border: 1px solid rgba(15, 118, 110, 0.16);
+  background: #fff;
+  border-radius: 10px;
+  padding: 0.5rem 0.65rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dp-briefing-item:hover {
+  border-color: rgba(15, 118, 110, 0.5);
+  background: #ecfdf5;
+}
+
+.dp-briefing-item:focus-visible {
+  outline: 2px solid #0f766e;
+  outline-offset: 2px;
+  border-color: #0f766e;
+}
+
+.dp-briefing-source {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #0f766e;
+  background: rgba(15, 118, 110, 0.12);
+  border-radius: 6px;
+  padding: 0.2rem 0.4rem;
+  white-space: nowrap;
+}
+
+.dp-briefing-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.dp-briefing-body strong {
+  font-size: 0.88rem;
+  line-height: 1.3;
+  color: #0f172a;
+}
+
+.dp-briefing-cta {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0f766e;
+  white-space: nowrap;
+  padding: 0.25rem 0.45rem;
+  border-radius: 6px;
+  background: rgba(15, 118, 110, 0.1);
+}
+
+.dp-briefing-item:hover .dp-briefing-cta {
+  background: #0f766e;
+  color: #fff;
+}
+
+.dp-panel .btn-primary {
+  background-color: #0f766e;
+  border-color: #0f766e;
+}
+
+.dp-panel .btn-primary:hover,
+.dp-panel .btn-primary:focus-visible {
+  background-color: #0d9488;
+  border-color: #0d9488;
+}
+
+.dp-panel .btn-primary:disabled {
+  opacity: 0.55;
+}
+
+@media (max-width: 576px) {
+  .dp-shell {
+    padding: 0.85rem 0.75rem 2.5rem;
+  }
+
+  .dp-hero {
+    padding: 1.15rem 1rem;
+    border-radius: 14px;
+  }
+
+  .dp-panel {
+    padding: 0.95rem 0.85rem;
+  }
+
+  .dp-briefing-item {
+    grid-template-columns: auto 1fr;
+  }
+
+  .dp-briefing-cta {
+    grid-column: 2;
+    justify-self: start;
+  }
 }

@@ -506,13 +506,26 @@ export async function upsertDisasters(batch) {
           source, event_type, county_fips, county_name, state_abbr,
           start_time, end_time, severity, title, lat, lng, source_id, raw
         ) VALUES ${tuples.join(',')}
-        ON CONFLICT (county_fips, source, source_id, start_time) DO NOTHING
-        RETURNING id
+        ON CONFLICT (county_fips, source, source_id, start_time) DO UPDATE SET
+          county_name = COALESCE(EXCLUDED.county_name, disasters.county_name),
+          end_time = COALESCE(EXCLUDED.end_time, disasters.end_time),
+          severity = COALESCE(EXCLUDED.severity, disasters.severity),
+          title = COALESCE(EXCLUDED.title, disasters.title),
+          lat = COALESCE(disasters.lat, EXCLUDED.lat),
+          lng = COALESCE(disasters.lng, EXCLUDED.lng),
+          raw = COALESCE(EXCLUDED.raw, disasters.raw)
+        RETURNING id, (xmax = 0) AS was_inserted
       `;
       const res = await pool.query(text, values);
-      const chunkInserted = res.rowCount || 0;
+      const chunkInserted = (res.rows || []).filter((r) => r.was_inserted).length;
+      const chunkUpdated = (res.rowCount || 0) - chunkInserted;
       inserted += chunkInserted;
-      skipped += chunk.length - chunkInserted;
+      // Treat updates as non-skips so refresh UIs show progress; keep skipped for true misses
+      skipped += Math.max(0, chunk.length - (res.rowCount || 0));
+      if (chunkUpdated > 0) {
+        // count updates toward inserted for legacy callers that only read `inserted`
+        inserted += chunkUpdated;
+      }
     } catch (e) {
       console.warn('⚠️  Upsert disaster chunk failed, marking as skipped:', e.message);
       skipped += chunk.length;

@@ -9,6 +9,7 @@ const router = Router();
 
 router.get('/events', ctrl.listEvents);
 router.post('/events', ctrl.createEvent);
+router.get('/fema/:disasterNumber/counties', ctrl.femaCounties);
 router.get('/events/:id', ctrl.getEvent);
 router.post('/events/:id/areas', ctrl.appendAreas);
 router.patch('/events/:id/status', ctrl.patchStatus);

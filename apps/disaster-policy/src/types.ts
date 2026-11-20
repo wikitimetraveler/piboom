@@ -23,10 +23,10 @@ export interface PolicyEvent {
   femaMajorDisasterDeclarationDate?: string | null;
   presidentialDeclarationDate?: string | null;
   governorDeclarationDate?: string | null;
-  amerihomeEmergencyDeclarationDate?: string | null;
-  amerihomeDisasterAnnouncement?: string | null;
-  amerihomeTreasuryHold: boolean;
-  amerihomeFundingSuspension: boolean;
+  acmeEmergencyDeclarationDate?: string | null;
+  acmeDisasterAnnouncement?: string | null;
+  acmeTreasuryHold: boolean;
+  acmeFundingSuspension: boolean;
   incidentBeginDate?: string | null;
   createdBy?: string | null;
   createdAt?: string;
@@ -48,10 +48,12 @@ export interface ImpactedLoan {
   city: string;
   state: string;
   county: string;
+  countyFips?: string | null;
   zipCode: string;
   milestone: string;
   loanAmount: number;
   disasterRiskScore: number;
+  matchMethod?: 'fips' | 'name' | string;
   treasuryHold: boolean;
   fundingSuspension: boolean;
 }

@@ -9,6 +9,7 @@ import {
   appendPolicyAreas,
   setPolicyStatus,
   findImpactedLoans,
+  listFemaCountiesByDisasterNumber,
 } from '../services/disaster-policy.service.js';
 
 function statusFor(code) {
@@ -114,5 +115,14 @@ export async function impactedLoans(req, res) {
     return res.json({ success: true, ...result });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message || 'Impact query failed' });
+  }
+}
+
+export async function femaCounties(req, res) {
+  try {
+    const result = await listFemaCountiesByDisasterNumber(req.params.disasterNumber);
+    return res.json({ success: true, ...result });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message || 'FEMA counties query failed' });
   }
 }
