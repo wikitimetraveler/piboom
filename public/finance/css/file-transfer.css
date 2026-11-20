@@ -4,7 +4,7 @@
  */
 .ft-page {
   min-height: 100vh;
-  font-family: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   background:
     radial-gradient(ellipse 80% 50% at 10% -10%, rgba(14, 116, 144, 0.14), transparent 55%),
     radial-gradient(ellipse 60% 40% at 90% 0%, rgba(15, 118, 110, 0.12), transparent 50%),
@@ -59,7 +59,7 @@
 }
 
 .ft-hero h1 {
-  font-family: Fraunces, Georgia, serif;
+  font-family: Georgia, 'Times New Roman', serif;
   font-size: clamp(1.6rem, 3.5vw, 2.1rem);
   font-weight: 700;
   margin-bottom: 0.4rem;

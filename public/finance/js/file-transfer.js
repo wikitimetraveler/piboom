@@ -141,7 +141,12 @@
         const res = await fetch(`${API}/files`, { method: 'POST', body: form });
         const data = await res.json().catch(() => ({}));
         if (!res.ok || !data.success) {
-          throw new Error(data.error || `Upload failed for ${file.name}`);
+          const detail =
+            data.error ||
+            (res.status === 413
+              ? 'File too large for the server/proxy (413).'
+              : `Upload failed for ${file.name} (HTTP ${res.status})`);
+          throw new Error(detail);
         }
         ok += 1;
       } catch (err) {
