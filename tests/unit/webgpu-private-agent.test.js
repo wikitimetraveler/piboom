@@ -259,4 +259,73 @@ describe('WebGpuPrivateAgent', () => {
     expect(busyFlags).toContain(true);
     expect(busyFlags[busyFlags.length - 1]).toBe(false);
   });
+
+  test('chat answers immediately via on-device kernel tools when WebLLM is not loaded', async () => {
+    const controller = WebGpuPrivateAgent.createChatController({
+      gpu: {},
+      toolBus: WebGpuPrivateAgent.createToolBus({
+        calcMath,
+        getLiveInputs: () => ({
+          g7: 400000,
+          g8: 360000,
+          g9: 222000,
+          g12: 180000,
+          g13: 40000,
+          g14: 24000,
+          d29: 1.75,
+        }),
+        preferCpu: true,
+      }),
+    });
+
+    const driftRes = await controller.chat('Why can f32 miss a cent on the fee?');
+    expect(driftRes.toolTrace).toHaveLength(1);
+    expect(driftRes.toolTrace[0].call.tool).toBe('explain_f32_drift');
+    expect(driftRes.reply).toMatch(/525000 ¢/);
+
+    const scenRes = await controller.chat('What if current balance g9 is 200000? Use run_scenario.');
+    expect(scenRes.toolTrace).toHaveLength(1);
+    expect(scenRes.toolTrace[0].call).toEqual({
+      tool: 'run_scenario',
+      overlay: { g9: 200000 },
+    });
+    expect(scenRes.reply).toMatch(/g30=/);
+
+    const batchRes = await controller.chat(
+      'Batch fee percent d29 over 1.5, 1.75, 2.0 and compare g30 cents.'
+    );
+    expect(batchRes.toolTrace).toHaveLength(1);
+    expect(batchRes.toolTrace[0].call).toEqual({
+      tool: 'run_batch',
+      vary: 'd29',
+      values: [1.5, 1.75, 2.0],
+    });
+    expect(batchRes.toolTrace[0].result.rows).toHaveLength(3);
+  });
+
+  test('ensureEngine stall watchdog aborts hung "Start to fetch params" load and clears busy', async () => {
+    const busyFlags = [];
+    const importWebLlm = jest.fn(async () => ({
+      CreateMLCEngine: jest.fn(
+        (_modelId, opts) =>
+          new Promise(() => {
+            if (opts && typeof opts.initProgressCallback === 'function') {
+              opts.initProgressCallback({ text: 'Start to fetch params' });
+            }
+          })
+      ),
+    }));
+
+    const controller = WebGpuPrivateAgent.createChatController({
+      gpu: {},
+      importWebLlm,
+      stallTimeoutMs: 40,
+      onGpuBusy: (f) => busyFlags.push(f),
+      toolBus: WebGpuPrivateAgent.createToolBus({ calcMath, preferCpu: true }),
+    });
+
+    await expect(controller.ensureEngine()).rejects.toThrow(/Start to fetch params/i);
+    expect(controller.isBusy()).toBe(false);
+    expect(busyFlags[busyFlags.length - 1]).toBe(false);
+  });
 });

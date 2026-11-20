@@ -36,6 +36,12 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | * | `/api/encompass/*` and `/api/encompass-assistant/*` | Encompass Developer AI Expert (search, chat, summary, health, graph, history) |
 | POST | `/api/webhooks/encompass` | Encompass webhook receiver |
 | POST | `/api/reviewer/ai/chat` | The Screen Test AI |
+| GET | `/api/disaster-policy/events` | List Declared/Pending policy events (query: kind, status) |
+| POST | `/api/disaster-policy/events` | Create policy event + county areas (BRD field set) |
+| GET | `/api/disaster-policy/events/:id` | Get one policy event |
+| POST | `/api/disaster-policy/events/:id/areas` | Append counties/ZIPs |
+| PATCH | `/api/disaster-policy/events/:id/status` | draft → active → ended (Pending activate sets Treasury Hold) |
+| GET | `/api/disaster-policy/events/:id/impacted-loans` | Pipeline loans matching event counties |
 | GET | `/api/file-transfer/meta` | Allowed extensions + max size for general file transfer |
 | GET | `/api/file-transfer/files` | List uploaded docs/spreadsheets |
 | POST | `/api/file-transfer/files` | Upload a file (multipart `file`, optional `note`) |

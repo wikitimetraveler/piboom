@@ -569,7 +569,9 @@ fn main() {
     raf = requestAnimationFrame(frame);
     window.addEventListener('resize', resize);
 
-    async function runIntegerKernel(input) {
+    let kernelChain = Promise.resolve();
+
+    function runIntegerKernelOnce(input) {
       const math = root.calcMath;
       device.queue.writeBuffer(intInBuf, 0, packInputs(input, math));
       const bg = device.createBindGroup({
@@ -587,10 +589,20 @@ fn main() {
       cpass.end();
       encoder.copyBufferToBuffer(intOutBuf, 0, intReadBuf, 0, 48);
       device.queue.submit([encoder.finish()]);
-      await intReadBuf.mapAsync(GPUMapMode.READ);
-      const copy = Int32Array.from(new Int32Array(intReadBuf.getMappedRange()));
-      intReadBuf.unmap();
-      return centsOutFromArray(copy);
+      return intReadBuf.mapAsync(GPUMapMode.READ).then(() => {
+        const copy = Int32Array.from(new Int32Array(intReadBuf.getMappedRange()));
+        intReadBuf.unmap();
+        return centsOutFromArray(copy);
+      });
+    }
+
+    function runIntegerKernel(input) {
+      const next = kernelChain.then(
+        () => runIntegerKernelOnce(input),
+        () => runIntegerKernelOnce(input)
+      );
+      kernelChain = next.catch(() => {});
+      return next;
     }
 
     return {

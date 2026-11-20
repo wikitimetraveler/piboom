@@ -12,6 +12,7 @@ import buildRoutes from './routes/index.routes.js';
 import { initializeDatabase, createTables } from './services/database.service.js';
 import { refreshGenealogyCachesFromPostgres } from './services/genealogy.service.js';
 import { ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc, ingestFema, ingestCaFireCameras, pruneOldDisasters, initDisastersSchema, backfillDisasterGeocodes } from './services/disasters.service.js';
+import { initDisasterPolicySchema } from './services/disaster-policy.service.js';
 import { getAllLoans } from './services/loan-pipeline.service.js';
 import { batchAnalyzeRisk } from './services/disaster-risk.service.js';
 import { ensureDisasterImpactGraphReady, refreshDisasterImpactGraphFromCurrentData } from './services/disaster-impact-graph.service.js';
@@ -72,6 +73,13 @@ try {
   console.error('❌ Failed to initialize disasters schema:', err.message);
   console.error('   Application cannot start without database');
   process.exit(1);
+}
+
+try {
+  await initDisasterPolicySchema();
+  console.log('✅ Disaster policy schema ready');
+} catch (err) {
+  console.warn(`⚠️ Disaster policy schema initialization skipped: ${err.message}`);
 }
 
 try {

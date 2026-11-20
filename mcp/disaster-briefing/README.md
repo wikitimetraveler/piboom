@@ -39,22 +39,40 @@ npm run mcp:disaster-briefing
 
 ## Cursor MCP config
 
-Add to **Cursor Settings → MCP** (or `.cursor/mcp.json`):
+This repo ships a workspace MCP config at [`.cursor/mcp.json`](../../.cursor/mcp.json) that registers both:
+
+| Server | Script | Needs `npm run dev`? |
+|--------|--------|----------------------|
+| `disaster-briefing` | `mcp/disaster-briefing/server.mjs` | No (live feeds in-process). Set `MCP_HUB_BASE_URL` only for `us_disaster_refresh_and_brief`. |
+| `devconnect-encompass` | `mcp/devconnect-encompass/server.mjs` | Yes — proxies to `http://localhost:3000` |
+
+After opening the project, check **Cursor Settings → Tools & MCP** for green status (refresh if needed). Then ask the agent in natural language, for example:
+
+- “Run the US disaster daily briefing for the last 7 days”
+- “Check Encompass Hub status and list the first 10 loans in the pipeline”
+
+Committed config (no secrets; optional FIRMS key can be added under `env` if you have one):
 
 ```json
 {
   "mcpServers": {
     "disaster-briefing": {
       "command": "node",
-      "args": ["mcp/disaster-briefing/server.mjs"],
-      "cwd": "C:/projects/piBoom",
+      "args": ["mcp/disaster-briefing/server.mjs"]
+    },
+    "devconnect-encompass": {
+      "command": "node",
+      "args": ["mcp/devconnect-encompass/server.mjs"],
       "env": {
-        "MAP_KEY": "your-nasa-firms-key-optional"
+        "MCP_HUB_BASE_URL": "http://localhost:3000",
+        "MCP_ENCOMPASS_ENV": "correspondent"
       }
     }
   }
 }
 ```
+
+Optional — add `"MAP_KEY": "your-nasa-firms-key"` under `disaster-briefing.env` for authenticated FIRMS. These MCP processes run locally via Cursor stdio only; they do not add Render cost.
 
 ## HTTP API (same briefing)
 

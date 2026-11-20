@@ -64,6 +64,7 @@
     { name: 'VA IRRRL', url: '/finance/va-irrrl-calculator.html', category: 'Worksheets', keywords: 'VA refinance', requiresAuth: true },
     { name: 'Disasters Unified', url: '/finance/disasters-unified.html', category: 'Worksheets', keywords: 'FEMA disaster', requiresAuth: false },
     { name: 'Hurricane Tracker', url: '/finance/disasters-hurricanes.html', category: 'Worksheets', keywords: 'hurricane NHC cone governor state of emergency FEMA EM DR county prediction', requiresAuth: false },
+    { name: 'Disaster Policy Desk', url: '/finance/disaster-policy/', category: 'Worksheets', keywords: 'declared pending treasury hold funding suspension county FIPS Credit Administration BRD policy', requiresAuth: true },
     { name: 'Encompass map', url: '/finance/disasters-encompass-map.html', category: 'Worksheets', keywords: 'disaster encompass map loans proximity', requiresAuth: false },
     { name: 'The Parser', url: '/finance/tool2.html', category: 'Encompass', keywords: 'JSON parser', requiresAuth: true },
     { name: 'The Mashup', url: '/finance/tool3.html', category: 'Encompass', keywords: 'FEMA disaster data', requiresAuth: true },

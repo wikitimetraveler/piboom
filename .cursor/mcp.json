@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "disaster-briefing": {
+      "command": "node",
+      "args": ["mcp/disaster-briefing/server.mjs"]
+    },
+    "devconnect-encompass": {
+      "command": "node",
+      "args": ["mcp/devconnect-encompass/server.mjs"],
+      "env": {
+        "MCP_HUB_BASE_URL": "http://localhost:3000",
+        "MCP_ENCOMPASS_ENV": "correspondent"
+      }
+    }
+  }
+}

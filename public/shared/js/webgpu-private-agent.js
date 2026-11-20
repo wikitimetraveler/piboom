@@ -8,8 +8,9 @@
 
   const MAX_BATCH = 64;
   const MAX_TOOL_ROUNDS = 4;
+  const DEFAULT_STALL_TIMEOUT_MS = 12000;
   const INPUT_KEYS = ['g7', 'g8', 'g9', 'g12', 'g13', 'g14', 'd29'];
-  const DEFAULT_MODEL_ID = 'Llama-3.2-1B-Instruct-q4f16_1-MLC';
+  const DEFAULT_MODEL_ID = 'SmolLM2-360M-Instruct-q4f32_1-MLC';
   const WEBLLM_CDN = 'https://esm.run/@mlc-ai/web-llm';
 
   const SYSTEM_PROMPT = [
@@ -261,6 +262,277 @@
     };
   }
 
+  function formatCentsAsDollars(cents) {
+    const n = Number(cents);
+    if (!Number.isFinite(n)) return '—';
+    return (
+      '$' +
+      (n / 100).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })
+    );
+  }
+
+  function parseNumericToken(raw) {
+    if (raw === undefined || raw === null) return null;
+    const cleaned = String(raw).trim().replace(/[$,%\s]/g, '');
+    const m = cleaned.match(/^(-?\d+(?:\.\d+)?)(k)?$/i);
+    if (!m) return null;
+    const val = Number(m[1]) * (m[2] ? 1000 : 1);
+    return Number.isFinite(val) ? val : null;
+  }
+
+  function inferLocalToolCall(userText) {
+    const text = String(userText || '').trim();
+    if (!text) return { tool: 'get_compare_snapshot' };
+
+    const explicit = parseToolCall(text);
+    if (explicit) return explicit;
+
+    if (/f32|float|drift|miss\s+a\s+cent|missed\s+a\s+cent|ufmip|300000\.27|precision/i.test(text)) {
+      return { tool: 'explain_f32_drift' };
+    }
+
+    if (/\bbatch\b|\bsweep\b|run_batch/i.test(text)) {
+      let vary = 'd29';
+      for (let i = 0; i < INPUT_KEYS.length; i++) {
+        const k = INPUT_KEYS[i];
+        if (new RegExp('\\b(?:fs_)?' + k + '\\b', 'i').test(text)) {
+          vary = k;
+          break;
+        }
+      }
+      const stripped = text.replace(
+        /\b(?:fs_)?(?:g7|g8|g9|g12|g13|g14|g15|g18|g19|g20|g22|g24|g28|d29|e29|g29|g30|g33|f32|i32|u32|binary64)\b/gi,
+        ' '
+      );
+      const matches = stripped.match(/-?\d+(?:\.\d+)?k?/gi) || [];
+      const values = matches
+        .map((tok) => parseNumericToken(tok))
+        .filter((v) => v !== null);
+      return {
+        tool: 'run_batch',
+        vary,
+        values: values.length ? values : [1.5, 1.75, 2.0],
+      };
+    }
+
+    if (
+      /what\s+if|scenario|run_scenario|\b(?:g7|g8|g9|g12|g13|g14|d29)\b\s*(?:=|:|is|to|at)\b|\b(?:balance|base\s+amount|max\s+loan|add-?on|fee)\b.*?\d/i.test(
+        text
+      )
+    ) {
+      const overlay = {};
+      INPUT_KEYS.forEach((k) => {
+        const re = new RegExp(
+          '\\b(?:fs_)?' + k + '\\b(?:\\s*(?:=|:|is|to|at))?\\s*\\$?(-?[\\d,]+(?:\\.\\d+)?k?)',
+          'i'
+        );
+        const m = text.match(re);
+        if (m && m[1]) {
+          const v = parseNumericToken(m[1]);
+          if (v !== null) overlay[k] = v;
+        }
+      });
+
+      if (!Object.keys(overlay).length) {
+        const stripped = text.replace(
+          /\b(?:fs_)?(?:g7|g8|g9|g12|g13|g14|g15|g18|g19|g20|g22|g24|g28|d29|e29|g29|g30|g33|f32|i32|u32)\b/gi,
+          ' '
+        );
+        const numMatch = stripped.match(/\$?(-?[\d,]+(?:\.\d+)?k?)/i);
+        const numVal = numMatch ? parseNumericToken(numMatch[1]) : null;
+        if (numVal !== null) {
+          if (/balance/i.test(text)) overlay.g9 = numVal;
+          else if (/max\s+loan|\bcap\b/i.test(text)) overlay.g8 = numVal;
+          else if (/base/i.test(text)) overlay.g7 = numVal;
+          else if (/add-?on\s*b/i.test(text)) overlay.g13 = numVal;
+          else if (/add-?on\s*c/i.test(text)) overlay.g14 = numVal;
+          else if (/add-?on/i.test(text)) overlay.g12 = numVal;
+          else if (/fee/i.test(text)) overlay.d29 = numVal;
+          else overlay.g9 = numVal;
+        }
+      }
+      return { tool: 'run_scenario', overlay };
+    }
+
+    if (/\bdag\b|\bgraph\b|\bnodes?\b|\bedges?\b|\bcascade\b|\btopology\b|explain_dag/i.test(text)) {
+      return { tool: 'explain_dag' };
+    }
+
+    if (/\blive\s+inputs?\b|get_live_inputs/i.test(text)) {
+      return { tool: 'get_live_inputs' };
+    }
+
+    return { tool: 'get_compare_snapshot' };
+  }
+
+  function formatLocalToolReply(call, result) {
+    if (!result || result.error) {
+      return 'Tool error: ' + (result && result.error ? result.error : 'unknown error');
+    }
+    const tool = call && call.tool;
+
+    if (tool === 'explain_f32_drift') {
+      const sign = result.deltaCents > 0 ? '+' : '';
+      return (
+        'On a $' +
+        Number(result.baseDollars).toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }) +
+        ' base at ' +
+        result.feePercent +
+        '% fee, exact integer cents give ' +
+        result.integerCents +
+        ' ¢ (' +
+        formatCentsAsDollars(result.integerCents) +
+        '), while 32-bit float (f32) rounds to ' +
+        result.f32RoundedCents +
+        ' ¢ (' +
+        formatCentsAsDollars(result.f32RoundedCents) +
+        ', delta ' +
+        sign +
+        result.deltaCents +
+        ' ¢). IEEE-754 f32 only has 24 mantissa bits (~7 decimal digits), so loan-sized dollar amounts lose sub-cent precision before rounding. Keep money in integer cents (i32) on GPU and binary64 calcMath on CPU.'
+      );
+    }
+
+    if (tool === 'run_scenario') {
+      const c = result.cents || {};
+      const ovKeys = Object.keys((call && call.overlay) || {});
+      const ovDesc = ovKeys.length
+        ? ovKeys.map((k) => k + '=' + call.overlay[k]).join(', ')
+        : 'live inputs';
+      return (
+        'What-if (' +
+        ovDesc +
+        ', form unchanged, ' +
+        (result.source || 'cpu') +
+        ' integer-cent kernel): add-ons g15=' +
+        c.g15 +
+        ' ¢ (' +
+        formatCentsAsDollars(c.g15) +
+        '), gap g20=' +
+        c.g20 +
+        ' ¢ (' +
+        formatCentsAsDollars(c.g20) +
+        '), base loan g24=' +
+        c.g24 +
+        ' ¢ (' +
+        formatCentsAsDollars(c.g24) +
+        '), exact fee e29=' +
+        c.e29 +
+        ' ¢, rounded fee g29=' +
+        c.g29 +
+        ' ¢ (' +
+        formatCentsAsDollars(c.g29) +
+        '), total loan g30=' +
+        c.g30 +
+        ' ¢ (' +
+        formatCentsAsDollars(c.g30) +
+        '), ratio g33=' +
+        (Number(c.g33Hundredths || 0) / 100).toFixed(2) +
+        '×.'
+      );
+    }
+
+    if (tool === 'run_batch') {
+      const rows = result.rows || [];
+      const vary = result.vary || 'd29';
+      const src = rows[0] && rows[0].source ? rows[0].source : 'cpu';
+      const summary = rows
+        .map(
+          (r) =>
+            vary +
+            '=' +
+            r[vary] +
+            ' → g24=' +
+            r.g24 +
+            ' ¢, e29=' +
+            r.e29 +
+            ' ¢, g29=' +
+            r.g29 +
+            ' ¢, g30=' +
+            r.g30 +
+            ' ¢ (' +
+            formatCentsAsDollars(r.g30) +
+            ')'
+        )
+        .join(' | ');
+      return 'Batch sweep (' + rows.length + ' runs via ' + src + ' integer-cent kernel): ' + summary + '.';
+    }
+
+    if (tool === 'explain_dag') {
+      return (
+        'FHA loan-amount DAG has ' +
+        result.nodeCount +
+        ' nodes and ' +
+        result.edgeCount +
+        ' edges across cascade depth ' +
+        result.maxDepth +
+        '. ' +
+        (result.thesis || '')
+      );
+    }
+
+    if (tool === 'get_live_inputs') {
+      const inp = result.inputs || {};
+      const pairs = INPUT_KEYS.filter((k) => inp[k] !== undefined).map((k) => k + '=' + inp[k]);
+      return 'Live worksheet inputs (on-device): ' + pairs.join(', ') + '.';
+    }
+
+    const cpu = result.cpuIntegerCents || {};
+    const ker = (result.kernel && result.kernel.cents) || cpu;
+    const src = (result.kernel && result.kernel.source) || 'cpu';
+    const match =
+      cpu.g15 === ker.g15 &&
+      cpu.g20 === ker.g20 &&
+      cpu.g24 === ker.g24 &&
+      cpu.e29 === ker.e29 &&
+      cpu.g29 === ker.g29 &&
+      cpu.g30 === ker.g30;
+    return (
+      'Live snapshot (' +
+      src +
+      ' kernel ' +
+      (match ? 'matches' : 'differs from') +
+      ' CPU integer cents): add-ons g15=' +
+      ker.g15 +
+      ' ¢ (' +
+      formatCentsAsDollars(ker.g15) +
+      '), gap g20=' +
+      ker.g20 +
+      ' ¢, base loan g24=' +
+      ker.g24 +
+      ' ¢ (' +
+      formatCentsAsDollars(ker.g24) +
+      '), fee e29=' +
+      ker.e29 +
+      ' ¢ → g29=' +
+      ker.g29 +
+      ' ¢, total g30=' +
+      ker.g30 +
+      ' ¢ (' +
+      formatCentsAsDollars(ker.g30) +
+      '), ratio g33=' +
+      (Number(ker.g33Hundredths || 0) / 100).toFixed(2) +
+      '×.'
+    );
+  }
+
+  async function runLocalToolTurn(userText, bus) {
+    const call = inferLocalToolCall(userText);
+    const result = await bus.invoke(call);
+    const reply = formatLocalToolReply(call, result);
+    return {
+      reply,
+      toolTrace: [{ call, result }],
+      mode: 'local-kernel',
+    };
+  }
+
   async function loadWebLlm(importFn) {
     const importer =
       typeof importFn === 'function'
@@ -274,13 +546,60 @@
     return mod;
   }
 
+  function createWebLlmWorker() {
+    if (
+      typeof Worker !== 'function' ||
+      typeof Blob !== 'function' ||
+      typeof URL === 'undefined' ||
+      typeof URL.createObjectURL !== 'function'
+    ) {
+      return null;
+    }
+    try {
+      const code = [
+        'import * as webllm from ' + JSON.stringify(WEBLLM_CDN) + ';',
+        'const handler = new webllm.WebWorkerMLCEngineHandler();',
+        'self.onmessage = (msg) => handler.onmessage(msg);',
+      ].join('\n');
+      const blob = new Blob([code], { type: 'text/javascript' });
+      const blobUrl = URL.createObjectURL(blob);
+      const worker = new Worker(blobUrl, { type: 'module' });
+      return {
+        worker,
+        terminate() {
+          try {
+            worker.terminate();
+          } catch (_) {
+            /* ignore */
+          }
+          try {
+            if (typeof URL.revokeObjectURL === 'function') URL.revokeObjectURL(blobUrl);
+          } catch (_) {
+            /* ignore */
+          }
+        },
+      };
+    } catch (_) {
+      return null;
+    }
+  }
+
   function createChatController(opts) {
     const o = opts || {};
     const bus = o.toolBus || createToolBus(o);
     const onProgress = typeof o.onProgress === 'function' ? o.onProgress : () => {};
     const onGpuBusy = typeof o.onGpuBusy === 'function' ? o.onGpuBusy : () => {};
     const modelId = o.modelId || DEFAULT_MODEL_ID;
+    const hasCustomImporter = typeof o.importWebLlm === 'function';
+    const stallTimeoutMs =
+      typeof o.stallTimeoutMs === 'number'
+        ? o.stallTimeoutMs
+        : hasCustomImporter
+          ? 0
+          : DEFAULT_STALL_TIMEOUT_MS;
     let engine = null;
+    let activeWorker = null;
+    let cancelPendingLoad = null;
     let loading = false;
     let busy = false;
     const messages = [{ role: 'system', content: buildSystemPrompt(o.systemExtra) }];
@@ -292,6 +611,19 @@
       });
     }
 
+    function cleanupWorker() {
+      if (activeWorker) {
+        activeWorker.terminate();
+        activeWorker = null;
+      }
+    }
+
+    function cancelLoad() {
+      if (typeof cancelPendingLoad === 'function') {
+        cancelPendingLoad(new Error('Model load canceled — using instant on-device GPU kernel mode'));
+      }
+    }
+
     async function ensureEngine() {
       if (engine) return engine;
       if (loading) throw new Error('Model already loading');
@@ -300,15 +632,70 @@
       }
       loading = true;
       notifyGpuBusy();
+      let stallTimer = null;
       try {
         const webllm = await loadWebLlm(o.importWebLlm);
-        engine = await webllm.CreateMLCEngine(modelId, {
-          initProgressCallback: (report) => {
-            onProgress(report && report.text ? report.text : String(report || ''));
-          },
+        let lastStepText = 'initializing';
+
+        const createPromise = (async () => {
+          const progressCb = (report) => {
+            const text = report && report.text ? report.text : String(report || '');
+            lastStepText = text || lastStepText;
+            if (stallTimer && stallTimeoutMs > 0) {
+              clearTimeout(stallTimer);
+              stallTimer = setTimeout(() => {
+                if (typeof cancelPendingLoad === 'function') {
+                  cancelPendingLoad(
+                    new Error(
+                      'WebLLM stalled at "' +
+                        lastStepText +
+                        '" — using instant on-device GPU kernel mode'
+                    )
+                  );
+                }
+              }, stallTimeoutMs);
+            }
+            onProgress(text);
+          };
+
+          if (!hasCustomImporter && typeof webllm.CreateWebWorkerMLCEngine === 'function') {
+            const w = createWebLlmWorker();
+            if (w) {
+              activeWorker = w;
+              return webllm.CreateWebWorkerMLCEngine(w.worker, modelId, {
+                initProgressCallback: progressCb,
+              });
+            }
+          }
+
+          return webllm.CreateMLCEngine(modelId, {
+            initProgressCallback: progressCb,
+          });
+        })();
+
+        const abortPromise = new Promise((_, reject) => {
+          cancelPendingLoad = reject;
+          if (stallTimeoutMs > 0) {
+            stallTimer = setTimeout(() => {
+              reject(
+                new Error(
+                  'WebLLM stalled at "' +
+                    lastStepText +
+                    '" — using instant on-device GPU kernel mode'
+                )
+              );
+            }, stallTimeoutMs);
+          }
         });
+
+        engine = await Promise.race([createPromise, abortPromise]);
         return engine;
+      } catch (err) {
+        cleanupWorker();
+        throw err;
       } finally {
+        if (stallTimer) clearTimeout(stallTimer);
+        cancelPendingLoad = null;
         loading = false;
         // Clear GPU-busy when load was standalone (Load button). If chat
         // already set busy, completeOnce owns the clear after inference.
@@ -344,6 +731,15 @@
     async function chat(userText) {
       const text = String(userText || '').trim();
       if (!text) return { reply: '', toolTrace: [] };
+
+      const useLlm = Boolean(engine || hasCustomImporter || o.autoLoadModel);
+      if (!useLlm) {
+        messages.push({ role: 'user', content: text });
+        const localOut = await runLocalToolTurn(text, bus);
+        messages.push({ role: 'assistant', content: localOut.reply });
+        return localOut;
+      }
+
       messages.push({ role: 'user', content: text });
       const toolTrace = [];
       let reply = '';
@@ -378,10 +774,19 @@
       messages,
       chat,
       ensureEngine,
+      cancelLoad,
+      isModelLoaded() {
+        return Boolean(engine);
+      },
+      isLoading() {
+        return Boolean(loading);
+      },
       isBusy() {
         return busy || loading;
       },
       dispose() {
+        cancelLoad();
+        cleanupWorker();
         engine = null;
         busy = false;
         loading = false;
@@ -408,17 +813,21 @@
       '<div class="ce-private-agent">',
       '  <div class="ce-private-agent__head">',
       '    <h2 class="h5 mb-1">Private GPU agent</h2>',
-      '    <p class="small text-muted mb-2">On-device WebLLM via WebGPU. Loan inputs and chat stay in this browser — not our server assistants.</p>',
+      '    <p class="small text-muted mb-2">On-device WebGPU integer-cent tool agent + optional WebLLM. Loan inputs and chat stay in this browser — not our server assistants.</p>',
       '    <span class="badge text-bg-success border" id="cePrivacyBadge">Privacy: local only</span>',
       '    <span class="badge text-bg-light border ms-1" id="ceAgentStatus">' +
-        (hasGpu ? 'WebGPU detected' : 'WebGPU required') +
+        (hasGpu ? 'WebGPU ready (on-device kernel)' : 'CPU fallback ready') +
         '</span>',
       '  </div>',
       '  <div class="ce-private-agent__controls my-2 d-flex flex-wrap gap-2 align-items-center">',
-      '    <button type="button" class="btn btn-sm btn-primary" id="ceAgentLoad"' +
+      '    <button type="button" class="btn btn-sm btn-outline-primary" id="ceAgentLoad"' +
         (hasGpu ? '' : ' disabled') +
-        '>Load on-device model</button>',
-      '    <span class="small text-muted" id="ceAgentProgress"></span>',
+        '>Load optional WebLLM</button>',
+      '    <span class="small text-muted" id="ceAgentProgress">' +
+        (hasGpu
+          ? 'Instant on-device GPU kernel ready — click a prompt or ask below.'
+          : 'WebGPU unavailable for WebLLM; instant local CPU integer-cent tools ready.') +
+        '</span>',
       '  </div>',
       '  <div class="ce-private-agent__suggest d-flex flex-wrap gap-2 mb-2" id="ceAgentSuggest">',
       '    <button type="button" class="btn btn-sm btn-outline-secondary" data-prompt="Why can f32 miss a cent on the fee?">Why did fee miss a cent?</button>',
@@ -428,12 +837,8 @@
       '  <div class="ce-private-agent__log border rounded p-2 mb-2" id="ceAgentLog" aria-live="polite"></div>',
       '  <form class="ce-private-agent__form d-flex gap-2" id="ceAgentForm">',
       '    <label class="visually-hidden" for="ceAgentInput">Message</label>',
-      '    <input type="text" class="form-control form-control-sm" id="ceAgentInput" placeholder="Ask about the DAG, drift, or a what-if…" ' +
-        (hasGpu ? '' : 'disabled ') +
-        'autocomplete="off">',
-      '    <button type="submit" class="btn btn-sm btn-dark" id="ceAgentSend"' +
-        (hasGpu ? '' : ' disabled') +
-        '>Send</button>',
+      '    <input type="text" class="form-control form-control-sm" id="ceAgentInput" placeholder="Ask about the DAG, drift, or a what-if…" autocomplete="off">',
+      '    <button type="submit" class="btn btn-sm btn-dark" id="ceAgentSend">Send</button>',
       '  </form>',
       '</div>',
     ].join('\n');
@@ -467,7 +872,7 @@
       runIntegerKernel: o.runIntegerKernel,
       preferCpu: () => {
         if (typeof o.preferCpu === 'function') return o.preferCpu();
-        return Boolean(o._gpuBusy);
+        return Boolean(o._gpuInferencing);
       },
     });
 
@@ -476,26 +881,34 @@
       modelId: o.modelId || DEFAULT_MODEL_ID,
       importWebLlm: o.importWebLlm,
       gpu: o.gpu,
+      stallTimeoutMs: o.stallTimeoutMs,
       systemExtra: o.systemExtra,
       onProgress(text) {
         if (progressEl) progressEl.textContent = text || '';
       },
       onGpuBusy(flag, meta) {
+        const isInf = Boolean(flag && meta && meta.inferencing);
         o._gpuBusy = Boolean(flag);
+        o._gpuInferencing = isInf;
         if (typeof o.onGpuBusy === 'function') o.onGpuBusy(Boolean(flag), meta);
         if (statusEl && hasGpu) {
           if (!flag) {
-            statusEl.textContent = 'WebGPU ready';
+            statusEl.textContent = controller.isModelLoaded()
+              ? 'WebLLM loaded (on-device)'
+              : 'WebGPU ready (on-device kernel)';
           } else if (meta && meta.loading) {
-            statusEl.textContent = 'GPU: loading model (DAG paused)';
+            statusEl.textContent = 'Loading WebLLM in background…';
           } else {
-            statusEl.textContent = 'GPU: model busy (DAG paused)';
+            statusEl.textContent = 'GPU: model inferencing';
           }
         }
       },
     });
 
+    let sending = false;
     async function send(text) {
+      if (sending) return;
+      sending = true;
       appendBubble('user', text);
       if (input) input.value = '';
       try {
@@ -505,27 +918,42 @@
         });
         appendBubble('assistant', reply || '(empty reply)');
         if (statusEl && hasGpu && !controller.isBusy()) {
-          statusEl.textContent = 'WebGPU ready';
+          statusEl.textContent = controller.isModelLoaded()
+            ? 'WebLLM loaded (on-device)'
+            : 'WebGPU ready (on-device kernel)';
         }
       } catch (err) {
         appendBubble('assistant', 'Error: ' + (err && err.message ? err.message : String(err)));
-        if (statusEl) statusEl.textContent = hasGpu ? 'Error' : 'WebGPU required';
+        if (statusEl) {
+          statusEl.textContent = hasGpu ? 'WebGPU ready (on-device kernel)' : 'CPU fallback ready';
+        }
+      } finally {
+        sending = false;
       }
     }
 
     if (loadBtn) {
       loadBtn.addEventListener('click', async () => {
-        loadBtn.disabled = true;
+        if (controller.isLoading()) {
+          controller.cancelLoad();
+          return;
+        }
+        loadBtn.textContent = 'Cancel load';
         try {
           await controller.ensureEngine();
-          if (statusEl) statusEl.textContent = 'Model loaded (on-device)';
+          loadBtn.textContent = 'WebLLM loaded';
+          loadBtn.disabled = true;
+          if (statusEl) statusEl.textContent = 'WebLLM loaded (on-device)';
           if (progressEl) progressEl.textContent = 'Ready';
         } catch (err) {
+          loadBtn.textContent = 'Load optional WebLLM';
+          loadBtn.disabled = false;
           if (progressEl) {
             progressEl.textContent = err && err.message ? err.message : String(err);
           }
-          if (statusEl && hasGpu) statusEl.textContent = 'Error';
-          loadBtn.disabled = false;
+          if (statusEl && hasGpu) {
+            statusEl.textContent = 'WebGPU ready (on-device kernel)';
+          }
         }
       });
     }
@@ -534,7 +962,7 @@
       form.addEventListener('submit', (ev) => {
         ev.preventDefault();
         const text = input ? input.value.trim() : '';
-        if (!text || controller.isBusy()) return;
+        if (!text || sending) return;
         send(text);
       });
     }
@@ -542,15 +970,10 @@
     rootEl.querySelectorAll('#ceAgentSuggest [data-prompt]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const p = btn.getAttribute('data-prompt');
-        if (!p || controller.isBusy()) return;
+        if (!p || sending) return;
         send(p);
       });
     });
-
-    if (!hasGpu && progressEl) {
-      progressEl.textContent =
-        'WebGPU required for private on-device agent. Calc graph still works with CPU fallback.';
-    }
 
     return {
       controller,
@@ -565,6 +988,7 @@
   root.WebGpuPrivateAgent = {
     MAX_BATCH,
     MAX_TOOL_ROUNDS,
+    DEFAULT_STALL_TIMEOUT_MS,
     INPUT_KEYS: INPUT_KEYS.slice(),
     DEFAULT_MODEL_ID,
     WEBLLM_CDN,
@@ -573,6 +997,9 @@
     detectWebGpuAvailable,
     mergeInputs,
     parseToolCall,
+    inferLocalToolCall,
+    formatLocalToolReply,
+    runLocalToolTurn,
     buildSystemPrompt,
     createToolBus,
     createChatController,

@@ -490,9 +490,9 @@
               }
               return viz.runIntegerKernel(input);
             },
-            onGpuBusy: function (busy) {
+            onGpuBusy: function (busy, meta) {
               if (viz && typeof viz.setPaused === 'function') {
-                viz.setPaused(busy);
+                viz.setPaused(Boolean(busy && (!meta || !meta.loading)));
               }
             }
           });
