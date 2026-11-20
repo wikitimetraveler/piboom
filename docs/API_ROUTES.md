@@ -36,6 +36,11 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | * | `/api/encompass/*` and `/api/encompass-assistant/*` | Encompass Developer AI Expert (search, chat, summary, health, graph, history) |
 | POST | `/api/webhooks/encompass` | Encompass webhook receiver |
 | POST | `/api/reviewer/ai/chat` | The Screen Test AI |
+| GET | `/api/file-transfer/meta` | Allowed extensions + max size for general file transfer |
+| GET | `/api/file-transfer/files` | List uploaded docs/spreadsheets |
+| POST | `/api/file-transfer/files` | Upload a file (multipart `file`, optional `note`) |
+| GET | `/api/file-transfer/files/:id` | Download a transferred file |
+| DELETE | `/api/file-transfer/files/:id` | Delete a transferred file |
 | POST | `/api/unit-tests/files` | Upload unit test Excel to library |
 | GET | `/api/unit-tests/files` | List stored unit test files |
 | GET | `/api/unit-tests/files/:id` | Download unit test file |

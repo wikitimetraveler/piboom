@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>File Transfer · Docs &amp; Spreadsheets</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Fraunces:opsz,wght@9..144,600;9..144,700&amp;display=swap" />
+    <link rel="stylesheet" href="/shared/design-tokens.css" />
+    <link rel="stylesheet" href="/shared/styles.css" />
+    <link rel="stylesheet" href="/shared/encompass-dark-mode.css" />
+    <link rel="stylesheet" href="/finance/css/file-transfer.css" />
+    <script src="/shared/menu-config.js"></script>
+    <script src="/shared/modern-navbar.js" defer></script>
+  </head>
+  <body class="ft-page">
+    <modern-navbar></modern-navbar>
+
+    <main class="container py-4 ft-shell">
+      <p class="mb-3">
+        <a href="index.html" class="ft-back"><i class="bi-arrow-left"></i> Worksheets Hub</a>
+      </p>
+
+      <header class="ft-hero">
+        <p class="ft-hero-kicker">Anytime drop zone</p>
+        <h1>File Transfer</h1>
+        <p class="ft-hero-lead">
+          Upload docs and spreadsheets when you need to move them between machines — PDF, Word, Excel, CSV, and zip. Files stay on this server until you delete them.
+        </p>
+      </header>
+
+      <div id="ftStatus" class="ft-status" role="status" aria-live="polite"></div>
+
+      <section class="ft-panel" aria-labelledby="ftUploadHeading">
+        <div class="ft-panel-head">
+          <h2 id="ftUploadHeading"><i class="bi-cloud-upload me-2"></i>Upload</h2>
+          <span class="ft-panel-meta" id="ftLimitsMeta">Docs · spreadsheets · zip · up to 25 MB</span>
+        </div>
+
+        <div
+          id="ftDropZone"
+          class="ft-drop"
+          tabindex="0"
+          role="button"
+          aria-label="Drop files here or click to browse"
+        >
+          <i class="bi-file-earmark-arrow-up ft-drop-icon" aria-hidden="true"></i>
+          <p class="ft-drop-title">Drop files here</p>
+          <p class="ft-drop-hint">or click to browse — multiple files OK</p>
+          <input
+            type="file"
+            id="ftFileInput"
+            class="d-none"
+            multiple
+            accept=".pdf,.doc,.docx,.txt,.rtf,.odt,.xlsx,.xls,.csv,.ods,.pptx,.ppt,.zip"
+          />
+        </div>
+
+        <div class="row g-2 align-items-end mt-3">
+          <div class="col-md-8">
+            <label for="ftNote" class="form-label small text-muted mb-1">Optional note (applied to this batch)</label>
+            <input type="text" id="ftNote" class="form-control" maxlength="240" placeholder="e.g. Q4 pipeline export for David" />
+          </div>
+          <div class="col-md-4 d-grid">
+            <button type="button" class="btn btn-primary" id="ftUploadBtn" disabled>
+              <i class="bi-upload me-1"></i>Upload selected
+            </button>
+          </div>
+        </div>
+
+        <ul id="ftPendingList" class="ft-pending list-unstyled mt-3 mb-0" hidden></ul>
+      </section>
+
+      <section class="ft-panel mt-4" aria-labelledby="ftLibraryHeading">
+        <div class="ft-panel-head">
+          <h2 id="ftLibraryHeading"><i class="bi-folder2-open me-2"></i>On this server</h2>
+          <button type="button" class="btn btn-sm btn-outline-secondary" id="ftRefreshBtn" title="Refresh list">
+            <i class="bi-arrow-clockwise"></i> Refresh
+          </button>
+        </div>
+        <div class="table-responsive">
+          <table class="table ft-table align-middle mb-0">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Kind</th>
+                <th scope="col">Size</th>
+                <th scope="col">Uploaded</th>
+                <th scope="col">Note</th>
+                <th scope="col" class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ftFileTableBody">
+              <tr>
+                <td colspan="6" class="text-muted text-center py-4">Loading…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="/shared/finance-auth-guard.js"></script>
+    <script src="/shared/dark-mode.js"></script>
+    <script src="/finance/js/file-transfer.js"></script>
+  </body>
+</html>

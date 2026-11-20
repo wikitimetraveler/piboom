@@ -25,6 +25,7 @@
     { href: '/finance/disasters-hurricanes.html', icon: 'bi-hurricane', label: 'Hurricane Tracker' },
     { href: '/finance/disasters-encompass-map.html', icon: 'bi-geo-alt', label: 'Encompass map' },
     { href: '/finance/loan-batch-update.html', icon: 'bi-layers-half', label: 'Loan batch update' },
+    { href: '/finance/file-transfer.html', icon: 'bi-cloud-arrow-up', label: 'File Transfer' },
     { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant' },
     { href: '/finance/unit-tests.html', icon: 'bi-check2-circle', label: 'Unit Tests' },
     { href: '/finance/tool9.html', icon: 'bi-camera-reels', label: 'Screen Test' },
@@ -42,6 +43,7 @@
     { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant' },
     { href: '/finance/encompass-analytics.html', icon: 'bi-bar-chart-line', label: 'Analytics' },
     { href: '/finance/loan-batch-update.html', icon: 'bi-layers-half', label: 'Loan batch update' },
+    { href: '/finance/file-transfer.html', icon: 'bi-cloud-arrow-up', label: 'File Transfer' },
     { href: '/finance/processor-assignment.html', icon: 'bi-people-fill', label: 'Processor assignment' },
     { href: '/finance/processor-assignment-mock.html', icon: 'bi-people', label: 'Processor assignment (demo)' },
     { href: '/finance/pipeline-risk-dashboard.html', icon: 'bi-shield-check', label: 'Pipeline Risk' },
@@ -181,6 +183,7 @@
     { href: '/finance/disasters-unified.html', icon: 'bi-globe', label: 'Unified Disasters', title: 'Unified Disasters (90-day)', since: '2025-10-30', category: 'risk' },
     { href: '/finance/disasters-hurricanes.html', icon: 'bi-hurricane', label: 'Hurricane Tracker', title: 'Hurricane track, county impact, Governor SoE (state-by-state) & FEMA EM/DR windows', since: '2026-11-18', category: 'risk' },
     { href: '/finance/disasters-encompass-map.html', icon: 'bi-geo-alt', label: 'Encompass map', title: 'Encompass map — live proximity loan pins', since: '2026-08-12', category: 'risk' },
+    { href: '/finance/file-transfer.html', icon: 'bi-cloud-arrow-up', label: 'File Transfer', title: 'Upload docs and spreadsheets anytime — download or delete from this server', since: '2026-11-19', category: 'devtools' },
   ];
 
   /** Encompass hub / AI Assistant tool grid — full catalog when logged in. `since` is the page's first commit. */
@@ -194,6 +197,7 @@
     { href: '/finance/disasters-hurricanes.html', icon: 'bi-hurricane', label: 'Hurricane Tracker', title: 'Hurricane track, county impact, Governor SoE (state-by-state) & FEMA EM/DR windows', since: '2026-11-18', category: 'risk' },
     { href: '/finance/disasters-encompass-map.html', icon: 'bi-geo-alt', label: 'Encompass map', title: 'Encompass map — live proximity loan pins', since: '2026-08-12', category: 'risk' },
     { href: '/finance/loan-batch-update.html', icon: 'bi-layers-half', label: 'Loan batch update', title: 'Encompass loanBatch/updateRequests', since: '2026-03-25', category: 'encompass' },
+    { href: '/finance/file-transfer.html', icon: 'bi-cloud-arrow-up', label: 'File Transfer', title: 'Upload docs and spreadsheets anytime — download or delete from this server', since: '2026-11-19', category: 'devtools' },
     { href: '/finance/processor-assignment.html', icon: 'bi-people-fill', label: 'Processor assignment', title: 'Live processor assignment against Encompass pipeline', since: '2026-04-03', category: 'encompass' },
     { href: '/finance/processor-assignment-mock.html', icon: 'bi-people', label: 'Processor assignment (demo)', title: 'Processor assignment demo with synthetic loans', since: '2026-06-26', category: 'encompass' },
     { href: '/finance/loan-flight-sim.html', icon: 'bi-airplane', label: 'Loan flight simulator', title: 'Fly a synthetic loan file from application to funding — TRID timing, LTV, DTI fixes', since: '2026-10-04', category: 'encompass' },

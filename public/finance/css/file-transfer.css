@@ -1,0 +1,249 @@
+/**
+ * File Transfer page
+ * Development work by David Lane
+ */
+.ft-page {
+  min-height: 100vh;
+  font-family: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+  background:
+    radial-gradient(ellipse 80% 50% at 10% -10%, rgba(14, 116, 144, 0.14), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 90% 0%, rgba(15, 118, 110, 0.12), transparent 50%),
+    linear-gradient(165deg, #f0f9ff 0%, #ecfdf5 45%, #f8fafc 100%);
+  color: #0f172a;
+}
+
+.ft-shell {
+  max-width: 960px;
+}
+
+.ft-back {
+  color: #0f766e;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.ft-back:hover {
+  color: #115e59;
+  text-decoration: underline;
+}
+
+.ft-hero {
+  background: linear-gradient(135deg, #0f3d4c 0%, #0f766e 55%, #134e4a 100%);
+  color: #fff;
+  border-radius: 20px;
+  padding: 1.75rem 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 18px 40px rgba(15, 118, 110, 0.28);
+  position: relative;
+  overflow: hidden;
+}
+
+.ft-hero::after {
+  content: '';
+  position: absolute;
+  right: -36px;
+  top: -36px;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ft-hero-kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+  opacity: 0.8;
+  margin-bottom: 0.35rem;
+}
+
+.ft-hero h1 {
+  font-family: Fraunces, Georgia, serif;
+  font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.ft-hero-lead {
+  margin: 0;
+  max-width: 40rem;
+  opacity: 0.92;
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.ft-status {
+  min-height: 1.4rem;
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+  color: #475569;
+}
+
+.ft-status.is-ok {
+  color: #0f766e;
+}
+
+.ft-status.is-err {
+  color: #b91c1c;
+}
+
+.ft-panel {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(15, 118, 110, 0.12);
+  border-radius: 16px;
+  padding: 1.25rem 1.35rem;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+}
+
+.ft-panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.ft-panel-head h2 {
+  font-size: 1.05rem;
+  font-weight: 650;
+  margin: 0;
+}
+
+.ft-panel-meta {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.ft-drop {
+  border: 2px dashed rgba(15, 118, 110, 0.35);
+  border-radius: 14px;
+  background: rgba(15, 118, 110, 0.04);
+  padding: 2rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.ft-drop:hover,
+.ft-drop:focus-visible {
+  border-color: #0f766e;
+  background: rgba(15, 118, 110, 0.08);
+  outline: none;
+}
+
+.ft-drop.is-dragover {
+  border-color: #0d9488;
+  background: rgba(13, 148, 136, 0.14);
+  transform: scale(1.01);
+}
+
+.ft-drop-icon {
+  font-size: 2.4rem;
+  color: #0f766e;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.ft-drop-title {
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+}
+
+.ft-drop-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.ft-pending li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.03);
+  font-size: 0.875rem;
+  margin-bottom: 0.35rem;
+}
+
+.ft-pending .ft-pending-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ft-table {
+  font-size: 0.9rem;
+}
+
+.ft-table thead th {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  border-bottom-width: 1px;
+  white-space: nowrap;
+}
+
+.ft-kind {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  background: rgba(15, 118, 110, 0.1);
+  color: #0f766e;
+}
+
+.ft-kind--spreadsheet {
+  background: rgba(37, 99, 235, 0.1);
+  color: #1d4ed8;
+}
+
+.ft-kind--archive {
+  background: rgba(124, 58, 237, 0.1);
+  color: #6d28d9;
+}
+
+.ft-empty {
+  color: #64748b;
+  text-align: center;
+  padding: 2rem 1rem !important;
+}
+
+body.dark-mode .ft-page,
+html.dark-mode .ft-page {
+  background:
+    radial-gradient(ellipse 80% 50% at 10% -10%, rgba(45, 212, 191, 0.08), transparent 55%),
+    linear-gradient(165deg, #0b1220 0%, #0f172a 55%, #111827 100%);
+  color: #e2e8f0;
+}
+
+body.dark-mode .ft-panel,
+html.dark-mode .ft-panel {
+  background: rgba(30, 41, 59, 0.92);
+  border-color: rgba(148, 163, 184, 0.18);
+}
+
+body.dark-mode .ft-drop,
+html.dark-mode .ft-drop {
+  background: rgba(15, 118, 110, 0.12);
+  border-color: rgba(45, 212, 191, 0.35);
+}
+
+body.dark-mode .ft-table,
+html.dark-mode .ft-table {
+  --bs-table-bg: transparent;
+  --bs-table-color: #e2e8f0;
+  --bs-table-border-color: rgba(148, 163, 184, 0.2);
+}
+
+body.dark-mode .ft-status,
+html.dark-mode .ft-status {
+  color: #94a3b8;
+}

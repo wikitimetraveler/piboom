@@ -106,6 +106,10 @@ public/shared/audio/spirit-in-the-sky.mp3
 data/studio-releases/*
 !data/studio-releases/.gitkeep
 
+# General file transfer uploads (docs / spreadsheets; keep directory)
+data/file-transfers/*
+!data/file-transfers/.gitkeep
+
 # Nested LiveKit agent clone (local env/secrets; not this app)
 StarBand/
 

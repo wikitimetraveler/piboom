@@ -35,6 +35,7 @@
     { name: 'GSE scenario analyzer', url: '/gse-analyzer.html', category: 'Worksheets', keywords: 'GSE Fannie Freddie FHA VA USDA analyzer admin', requiresAuth: false },
     { name: 'Encompass Hub', url: '/finance/encompass-hub.html', category: 'Encompass', keywords: 'pipeline loans API', requiresAuth: true },
     { name: 'Loan batch update', url: '/finance/loan-batch-update.html', category: 'Encompass', keywords: 'batch update loanBatch custom fields filter', requiresAuth: true },
+    { name: 'File Transfer', url: '/finance/file-transfer.html', category: 'Worksheets', keywords: 'upload download docs spreadsheet excel csv pdf zip transfer dropzone', requiresAuth: true },
     { name: 'Processor assignment', url: '/finance/processor-assignment-mock.html', category: 'Encompass', keywords: 'processor assign complexity capacity associates mock demo synthetic offline', requiresAuth: true },
     { name: 'Processor assignment (live Encompass)', url: '/finance/processor-assignment.html', category: 'Encompass', keywords: 'processor assign live encompass pipeline associates PUT', requiresAuth: true },
     { name: 'Encompass Analytics', url: '/finance/encompass-analytics.html', category: 'Encompass', keywords: 'analytics charts pipeline metrics', requiresAuth: true },

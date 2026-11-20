@@ -49,6 +49,7 @@ import gseRoutes from './gse.routes.js';
 import loanFlightRoutes from './loan-flight.routes.js';
 import gseAssistantRoutes from './gse-assistant.routes.js';
 import financeRoutes from './finance.routes.js';
+import fileTransferRoutes from './file-transfer.routes.js';
 import disasterImpactGraphRoutes from './disaster-impact-graph.routes.js';
 import musicGraphRoutes from './music-graph.routes.js';
 import heygenRoutes from './heygen.routes.js';
@@ -122,6 +123,7 @@ export default function buildRoutes(io) {
   api.use('/loan-flight', loanFlightRoutes);
   api.use('/gse-assistant', gseAssistantRoutes);
   api.use('/finance', financeRoutes);
+  api.use('/file-transfer', fileTransferRoutes);
   api.use('/disaster-impact-graph', disasterImpactGraphRoutes);
   api.use('/music-graph', musicGraphRoutes);
   api.use('/heygen', heygenRoutes);

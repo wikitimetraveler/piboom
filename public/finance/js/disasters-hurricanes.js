@@ -56,9 +56,10 @@
   function initMap() {
     if (state.map) return;
     state.map = L.map('htMap', { scrollWheelZoom: true }).setView([27.5, -85], 5);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap &copy; CARTO',
-      maxZoom: 18,
+    // Free OSM tiles — no Carto/Mapbox key or paid basemap quota
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
     }).addTo(state.map);
     state.layers.counties = L.layerGroup().addTo(state.map);
     state.layers.loans = L.layerGroup().addTo(state.map);
