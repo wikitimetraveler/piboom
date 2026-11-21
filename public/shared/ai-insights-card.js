@@ -15,6 +15,7 @@ class AIInsightsCard {
         this.userId = config.userId || 'anonymous';
         this.containerId = config.containerId || 'aiInsightsContainer';
         this.onInsightsGenerated = config.onInsightsGenerated || null;
+        this.onOpenPortfolioAnalyst = config.onOpenPortfolioAnalyst || null;
         this.autoGenerate = config.autoGenerate !== false; // Default true
         
         this.insights = null;
@@ -100,15 +101,20 @@ class AIInsightsCard {
         }
     }
 
-    async generateInsights(filters = {}, trigger = 'load', selectedDisaster = null) {
+    async generateInsights(filters = {}, trigger = 'load', selectedDisaster = null, extra = {}) {
         const container = document.getElementById(this.containerId);
         if (!container) return;
+
+        this._lastFilters = filters;
+        this._lastTrigger = trigger;
+        this._lastDisaster = selectedDisaster;
+        this._lastExtra = extra || {};
 
         // Show loading state
         container.innerHTML = `
             <div class="ai-insights-card">
                 <div class="ai-insights-loading">
-                    <i class="bi bi-hourglass-split"></i> Generating insights...
+                    <i class="bi bi-hourglass-split"></i> Checking the portfolio…
                 </div>
             </div>
         `;
@@ -121,7 +127,10 @@ class AIInsightsCard {
                     filters,
                     trigger,
                     selectedDisaster,
-                    userId: this.userId
+                    userId: this.userId,
+                    expertProfile: extra.expertProfile || (trigger === 'disaster' ? 'portfolio' : undefined),
+                    nearbyLoans: extra.nearbyLoans || undefined,
+                    loanFilterMeta: extra.loanFilterMeta || undefined,
                 })
             });
 
@@ -135,11 +144,11 @@ class AIInsightsCard {
                     this.onInsightsGenerated(data.insights, data);
                 }
             } else {
-                this.displayError('Failed to generate insights');
+                this.displayError('Couldn’t load insights — try again.');
             }
         } catch (error) {
             console.error('Insights generation error:', error);
-            this.displayError('Error generating insights. Please try again.');
+            this.displayError('Couldn’t load insights — try again.');
         }
     }
 
@@ -149,20 +158,42 @@ class AIInsightsCard {
 
         // Parse insights (could be markdown or plain text)
         const formattedInsights = this.formatInsights(insights);
+        const showPortfolioCta = trigger === 'disaster' || trigger === 'manual';
 
         container.innerHTML = `
             <div class="ai-insights-card">
                 <div class="ai-insights-header">
-                    <h5><i class="bi bi-lightbulb"></i> AI Insights</h5>
-                    <button class="ai-insights-refresh-btn" onclick="window.aiInsightsCard?.generateInsights(window.currentFilters || {}, 'manual')" title="Refresh Insights">
+                    <h5><i class="bi bi-pie-chart"></i> Portfolio read</h5>
+                    <button type="button" class="ai-insights-refresh-btn" data-ai-insights-refresh title="Refresh">
                         <i class="bi bi-arrow-clockwise"></i>
                     </button>
                 </div>
                 <div class="ai-insights-content">
                     ${formattedInsights}
                 </div>
+                ${showPortfolioCta ? `<div class="ai-insights-actions mt-2">
+                  <button type="button" class="btn btn-sm btn-primary" data-open-portfolio-analyst>
+                    <i class="bi bi-chat-dots"></i> Ask portfolio analyst
+                  </button>
+                </div>` : ''}
             </div>
         `;
+
+        container.querySelector('[data-ai-insights-refresh]')?.addEventListener('click', () => {
+            this.generateInsights(
+                this._lastFilters || {},
+                this._lastTrigger || 'disaster',
+                this._lastDisaster,
+                this._lastExtra || {}
+            );
+        });
+        container.querySelector('[data-open-portfolio-analyst]')?.addEventListener('click', () => {
+            if (typeof this.onOpenPortfolioAnalyst === 'function') {
+                this.onOpenPortfolioAnalyst();
+            } else if (typeof window.openPortfolioAnalyst === 'function') {
+                window.openPortfolioAnalyst();
+            }
+        });
     }
 
     formatInsights(insights) {

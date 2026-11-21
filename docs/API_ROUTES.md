@@ -40,7 +40,10 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | POST | `/api/disaster-policy/events` | Create policy event + county areas (BRD field set; ACME hold flags) |
 | GET | `/api/disaster-policy/fema/:disasterNumber/counties` | Distinct FEMA counties from `disasters` for a DR/EM number |
 | GET | `/api/disaster-policy/events/:id` | Get one policy event |
+| PATCH | `/api/disaster-policy/events/:id` | Update BRD fields (name, dates, ACME holds) |
+| DELETE | `/api/disaster-policy/events/:id` | Delete policy event (+ areas) |
 | POST | `/api/disaster-policy/events/:id/areas` | Append counties/ZIPs |
+| DELETE | `/api/disaster-policy/events/:id/areas/:areaId` | Remove one county (refuses last area) |
 | PATCH | `/api/disaster-policy/events/:id/status` | draft → active → ended (Pending activate sets ACME Treasury Hold) |
 | GET | `/api/disaster-policy/events/:id/impacted-loans` | Pipeline loans matching event counties (FIPS first, name fallback) |
 | GET | `/api/file-transfer/meta` | Allowed extensions + max size for general file transfer |

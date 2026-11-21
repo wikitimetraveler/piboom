@@ -472,6 +472,213 @@ export async function setPolicyStatus(id, status) {
 }
 
 /**
+ * Update BRD fields on an existing event (areas stay append/remove via dedicated endpoints).
+ */
+export async function updatePolicyEvent(id, body = {}) {
+  const event = await getPolicyEvent(id);
+  if (!event) return null;
+
+  const eventName = String(body.eventName ?? body.event_name ?? event.eventName).trim();
+  if (!eventName) {
+    const err = new Error('EVENT_NAME_REQUIRED');
+    err.code = 'EVENT_NAME_REQUIRED';
+    throw err;
+  }
+
+  let kind = event.kind;
+  if (body.kind != null && String(body.kind).trim() !== '') {
+    const nextKind = String(body.kind || '').toLowerCase();
+    if (!POLICY_KINDS.includes(nextKind)) {
+      const err = new Error('KIND_INVALID');
+      err.code = 'KIND_INVALID';
+      throw err;
+    }
+    kind = nextKind;
+  }
+
+  const patch = {
+    kind,
+    eventName,
+    disasterType:
+      body.disasterType !== undefined || body.disaster_type !== undefined
+        ? body.disasterType || body.disaster_type || null
+        : event.disasterType,
+    femaDeclarationNumber:
+      body.femaDeclarationNumber !== undefined || body.fema_declaration_number !== undefined
+        ? body.femaDeclarationNumber || body.fema_declaration_number || null
+        : event.femaDeclarationNumber,
+    femaEmergencyDeclarationDate:
+      body.femaEmergencyDeclarationDate !== undefined ||
+      body.fema_emergency_declaration_date !== undefined
+        ? asDate(body.femaEmergencyDeclarationDate || body.fema_emergency_declaration_date)
+        : event.femaEmergencyDeclarationDate,
+    femaMajorDisasterDeclarationDate:
+      body.femaMajorDisasterDeclarationDate !== undefined ||
+      body.fema_major_disaster_declaration_date !== undefined
+        ? asDate(
+            body.femaMajorDisasterDeclarationDate || body.fema_major_disaster_declaration_date
+          )
+        : event.femaMajorDisasterDeclarationDate,
+    presidentialDeclarationDate:
+      body.presidentialDeclarationDate !== undefined ||
+      body.presidential_declaration_date !== undefined
+        ? asDate(body.presidentialDeclarationDate || body.presidential_declaration_date)
+        : event.presidentialDeclarationDate,
+    governorDeclarationDate:
+      body.governorDeclarationDate !== undefined || body.governor_declaration_date !== undefined
+        ? asDate(body.governorDeclarationDate || body.governor_declaration_date)
+        : event.governorDeclarationDate,
+    acmeEmergencyDeclarationDate:
+      body.acmeEmergencyDeclarationDate !== undefined ||
+      body.acme_emergency_declaration_date !== undefined ||
+      body.amerihomeEmergencyDeclarationDate !== undefined
+        ? asDate(
+            body.acmeEmergencyDeclarationDate ||
+              body.acme_emergency_declaration_date ||
+              body.amerihomeEmergencyDeclarationDate ||
+              body.amerihome_emergency_declaration_date
+          )
+        : event.acmeEmergencyDeclarationDate,
+    acmeDisasterAnnouncement:
+      body.acmeDisasterAnnouncement !== undefined ||
+      body.acme_disaster_announcement !== undefined ||
+      body.amerihomeDisasterAnnouncement !== undefined
+        ? body.acmeDisasterAnnouncement ||
+          body.acme_disaster_announcement ||
+          body.amerihomeDisasterAnnouncement ||
+          body.amerihome_disaster_announcement ||
+          null
+        : event.acmeDisasterAnnouncement,
+    acmeTreasuryHold:
+      body.acmeTreasuryHold !== undefined ||
+      body.acme_treasury_hold !== undefined ||
+      body.amerihomeTreasuryHold !== undefined
+        ? asBool(
+            body.acmeTreasuryHold ??
+              body.acme_treasury_hold ??
+              body.amerihomeTreasuryHold ??
+              body.amerihome_treasury_hold,
+            event.acmeTreasuryHold
+          )
+        : event.acmeTreasuryHold,
+    acmeFundingSuspension:
+      body.acmeFundingSuspension !== undefined ||
+      body.acme_funding_suspension !== undefined ||
+      body.amerihomeFundingSuspension !== undefined
+        ? asBool(
+            body.acmeFundingSuspension ??
+              body.acme_funding_suspension ??
+              body.amerihomeFundingSuspension ??
+              body.amerihome_funding_suspension,
+            event.acmeFundingSuspension
+          )
+        : event.acmeFundingSuspension,
+    incidentBeginDate:
+      body.incidentBeginDate !== undefined || body.incident_begin_date !== undefined
+        ? asDate(body.incidentBeginDate || body.incident_begin_date)
+        : event.incidentBeginDate,
+  };
+
+  const pool = getPool();
+  if (!pool) {
+    const mem = memoryEvents.get(event.id);
+    Object.assign(mem, patch, { updatedAt: new Date().toISOString() });
+    memoryEvents.set(event.id, mem);
+    return publicEvent(mem, mem.areas);
+  }
+
+  await pool.query(
+    `UPDATE disaster_policy_events SET
+      kind = $2,
+      event_name = $3,
+      disaster_type = $4,
+      fema_declaration_number = $5,
+      fema_emergency_declaration_date = $6,
+      fema_major_disaster_declaration_date = $7,
+      presidential_declaration_date = $8,
+      governor_declaration_date = $9,
+      acme_emergency_declaration_date = $10,
+      acme_disaster_announcement = $11,
+      acme_treasury_hold = $12,
+      acme_funding_suspension = $13,
+      incident_begin_date = $14,
+      updated_at = NOW()
+     WHERE id = $1`,
+    [
+      event.id,
+      patch.kind,
+      patch.eventName,
+      patch.disasterType,
+      patch.femaDeclarationNumber,
+      patch.femaEmergencyDeclarationDate,
+      patch.femaMajorDisasterDeclarationDate,
+      patch.presidentialDeclarationDate,
+      patch.governorDeclarationDate,
+      patch.acmeEmergencyDeclarationDate,
+      patch.acmeDisasterAnnouncement,
+      patch.acmeTreasuryHold,
+      patch.acmeFundingSuspension,
+      patch.incidentBeginDate,
+    ]
+  );
+  return getPolicyEvent(event.id);
+}
+
+export async function deletePolicyEvent(id) {
+  const event = await getPolicyEvent(id);
+  if (!event) return null;
+
+  const pool = getPool();
+  if (!pool) {
+    memoryEvents.delete(event.id);
+    return { id: event.id, deleted: true };
+  }
+  await pool.query(`DELETE FROM disaster_policy_events WHERE id = $1`, [event.id]);
+  return { id: event.id, deleted: true };
+}
+
+export async function removePolicyArea(eventId, areaId) {
+  const event = await getPolicyEvent(eventId);
+  if (!event) return null;
+  const areaKey = String(areaId || '').trim();
+  if (!areaKey) {
+    const err = new Error('AREA_INVALID');
+    err.code = 'AREA_INVALID';
+    throw err;
+  }
+
+  const target = event.areas.find((a) => a.id === areaKey);
+  if (!target) {
+    const err = new Error('AREA_NOT_FOUND');
+    err.code = 'AREA_NOT_FOUND';
+    throw err;
+  }
+  if (event.areas.length <= 1) {
+    const err = new Error('AREAS_REQUIRED');
+    err.code = 'AREAS_REQUIRED';
+    throw err;
+  }
+
+  const pool = getPool();
+  if (!pool) {
+    const mem = memoryEvents.get(event.id);
+    mem.areas = mem.areas.filter((a) => a.id !== areaKey);
+    mem.updatedAt = new Date().toISOString();
+    memoryEvents.set(event.id, mem);
+    return publicEvent(mem, mem.areas);
+  }
+
+  await pool.query(`DELETE FROM disaster_policy_areas WHERE id = $1 AND event_id = $2`, [
+    areaKey,
+    event.id,
+  ]);
+  await pool.query(`UPDATE disaster_policy_events SET updated_at = NOW() WHERE id = $1`, [
+    event.id,
+  ]);
+  return getPolicyEvent(event.id);
+}
+
+/**
  * Prefer FIPS match (county_code ↔ loans.county_fips); fall back to normalized county name.
  */
 export function classifyLoanAreaMatch(loan, areas) {

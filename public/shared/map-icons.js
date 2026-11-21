@@ -141,6 +141,9 @@
     const src = (source || '').toLowerCase();
     if (et === 'camera' || src === 'alertcalifornia') return disaster.camera;
     if (src === 'faa_weathercam') return disaster.storm;
+    if (src === 'ndbc_buoycam' || src === 'ioos_coastal' || src === 'nps_webcams' || src === 'dot_coastal' || src === 'webcoos' || src === 'ucsd_pier') {
+      return disaster.flood;
+    }
     if (src === 'usgs_volcano') return disaster.fire;
     if (et.includes('fire') || et.includes('wildfire') || src === 'firms') return disaster.fire;
     if (et.includes('earthquake') || et.includes('quake') || src === 'usgs') return disaster.earthquake;

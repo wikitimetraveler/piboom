@@ -15,6 +15,7 @@ import { resolveOpenAiAgentModel } from '../services/openai-agent-model.js';
 import { getAllLoans, getPipelineStats } from '../services/loan-pipeline.service.js';
 import { getPool } from '../services/database.service.js';
 import { findSimilarNodes } from '../services/disaster-impact-graph.service.js';
+import { appendStaffordKnowledgeToPrompt } from '../services/disaster-stafford-knowledge.service.js';
 
 // System prompt for loan pipeline AI assistant - Mortgage Operations Expert
 const LOAN_PIPELINE_SYSTEM_PROMPT = `You are an expert AI assistant specializing in mortgage operations and efficiency, with deep expertise in CORRESPONDENT and RETAIL lending channels. You help users optimize their loan pipeline operations, improve efficiency, manage disaster risk, and make data-driven decisions.
@@ -157,6 +158,18 @@ When users ask questions, consider:
 
 Always provide context-aware responses that help users understand how disasters affect real estate values and mortgage portfolios. Focus on actionable insights for property value protection and mortgage risk management.`;
 
+const DISASTER_PORTFOLIO_ANALYST_PROMPT = `You are ACME's disaster portfolio analyst. Help the team see how a hazard sits against the loan book — concentration, nearby loans, and practical next steps.
+
+Keep it conversational and useful. Stick to the context you're given (selected disaster, nearby loans, filters). Loan disaster_risk_score is an ops triage ranking for workflow priority, not a chance-of-loss number. Live weather/fire/quake feeds are situational awareness, separate from that score.
+
+Talk about:
+- Where loans cluster near the event (county, radius, milestones)
+- What looks hot in the triage scores and why that matters for review
+- Insurance / flood-cert questions worth asking
+- Sensible next moves (widen the map radius, open Policy Desk, ping a processor)
+
+Keep answers short: a quick summary, a few bullets, then 2–3 next steps. If data is thin, say so plainly. Don't invent loan numbers or FEMA IDs. Brand is ACME only.`;
+
 const DISASTER_PROCESSOR_EXPERT_PROMPT = `You are an expert AI assistant for MORTGAGE PROCESSORS and pipeline operations during natural disasters. You help users triage loans, understand FEMA declarations, and take appropriate processing actions—not legal advice; use only data provided in context.
 
 ## PROCESSOR OPERATIONS EXPERTISE
@@ -188,12 +201,51 @@ const DISASTER_PROCESSOR_EXPERT_PROMPT = `You are an expert AI assistant for MOR
 4. Do not invent loan numbers or declaration IDs not in context`;
 
 function resolveDisasterExpertPrompt(context = {}, sessionId = '') {
-    const profile = context.expertProfile || '';
+    const profile = String(context.expertProfile || '').toLowerCase();
     const sid = String(sessionId || '');
-    if (profile === 'processor' || sid === 'unified-disaster-processor' || sid.startsWith('disasters-unified')) {
-        return DISASTER_PROCESSOR_EXPERT_PROMPT;
+    let base;
+    if (
+        profile === 'portfolio' ||
+        sid === 'unified-disaster-portfolio' ||
+        sid.includes('disaster-portfolio')
+    ) {
+        base = DISASTER_PORTFOLIO_ANALYST_PROMPT;
+    } else if (
+        profile === 'processor' ||
+        sid === 'unified-disaster-processor' ||
+        sid.startsWith('disasters-unified')
+    ) {
+        base = DISASTER_PROCESSOR_EXPERT_PROMPT;
+    } else {
+        base = DISASTER_REAL_ESTATE_EXPERT_PROMPT;
     }
-    return DISASTER_REAL_ESTATE_EXPERT_PROMPT;
+    // All disaster experts consume 44 CFR § 206.48 (Governor → major disaster factors).
+    return appendStaffordKnowledgeToPrompt(base);
+}
+
+function disasterExpertTypeLabel(context = {}, sessionId = '') {
+    const profile = String(context.expertProfile || '').toLowerCase();
+    const sid = String(sessionId || '');
+    if (
+        profile === 'portfolio' ||
+        sid === 'unified-disaster-portfolio' ||
+        sid.includes('disaster-portfolio')
+    ) {
+        return 'disaster-portfolio-analyst';
+    }
+    if (
+        profile === 'processor' ||
+        sid === 'unified-disaster-processor' ||
+        sid.startsWith('disasters-unified')
+    ) {
+        return 'disaster-processor-expert';
+    }
+    return 'disaster-real-estate-expert';
+}
+
+/** Exported for unit tests */
+export function __testResolveDisasterExpertType(context, sessionId) {
+    return disasterExpertTypeLabel(context, sessionId);
 }
 
 function appendDisasterExpertContext(enhancedPrompt, context = {}) {
@@ -369,9 +421,7 @@ export async function chatWithDisasterExpert(req, res) {
             context: {
                 filters: context.filters || null,
                 selectedDisaster: context.selectedDisaster || null,
-                expertType: resolveDisasterExpertPrompt(context, sessionId) === DISASTER_PROCESSOR_EXPERT_PROMPT
-                    ? "disaster-processor-expert"
-                    : "disaster-real-estate-expert"
+                expertType: disasterExpertTypeLabel(context, sessionId),
             }
         });
 
@@ -391,7 +441,14 @@ export async function chatWithDisasterExpert(req, res) {
  */
 export async function generateInsights(req, res) {
     try {
-        const { filters = {}, trigger = 'load', selectedDisaster = null } = req.body;
+        const {
+            filters = {},
+            trigger = 'load',
+            selectedDisaster = null,
+            nearbyLoans = null,
+            loanFilterMeta = null,
+            expertProfile = null,
+        } = req.body;
         const userId = req.body.userId || 'system';
 
         // Get current loan data based on filters
@@ -410,11 +467,17 @@ export async function generateInsights(req, res) {
             loanCount: loans.length,
             filters: filters,
             selectedDisaster: selectedDisaster,
-            trigger: trigger
+            nearbyLoans: nearbyLoans || null,
+            loanFilterMeta: loanFilterMeta || null,
+            trigger: trigger,
+            note: 'disaster_risk_score = ops triage for workflow priority, not loss odds.',
         };
 
         // Build insight prompt based on trigger
         let insightPrompt = '';
+        const usePortfolio =
+            trigger === 'disaster' ||
+            String(expertProfile || '').toLowerCase() === 'portfolio';
         
         switch (trigger) {
             case 'load':
@@ -434,11 +497,12 @@ export async function generateInsights(req, res) {
                 break;
                 
             case 'disaster':
-                insightPrompt = `Analyze the selected disaster and its impact on the loan portfolio. Focus on:
-- Risk assessment for affected loans
-- Geographic proximity analysis
-- Potential impact severity
-- Recommended actions`;
+                insightPrompt = `Give a quick portfolio read on this disaster for ACME. 3–5 short bullets covering:
+- How many loans look nearby / where they cluster
+- Anything notable in ops triage scores (workflow priority, not loss odds)
+- Insurance or verification angles worth a look
+- 1–2 practical next steps (map, Policy Desk, processor)
+Keep the tone light and clear.`;
                 break;
                 
             case 'analysis':
@@ -453,8 +517,13 @@ export async function generateInsights(req, res) {
                 insightPrompt = `Provide key insights about the current loan pipeline state.`;
         }
 
+        const systemPrompt = usePortfolio
+            ? appendStaffordKnowledgeToPrompt(DISASTER_PORTFOLIO_ANALYST_PROMPT)
+            : LOAN_PIPELINE_SYSTEM_PROMPT;
+        const sessionKey = usePortfolio ? 'insights-disaster-portfolio' : 'insights';
+
         // Get conversation chain for insights (separate session)
-        const { chain } = await getConversationChain(userId, LOAN_PIPELINE_SYSTEM_PROMPT, 'insights');
+        const { chain } = await getConversationChain(userId, systemPrompt, sessionKey);
 
         // Generate insights
         const prompt = `${insightPrompt}\n\nCurrent Context:\n${JSON.stringify(context, null, 2)}\n\nProvide concise, actionable insights (3-5 bullet points).`;
@@ -469,6 +538,7 @@ export async function generateInsights(req, res) {
             success: true,
             insights,
             context,
+            expertType: usePortfolio ? 'disaster-portfolio-analyst' : 'loan-pipeline',
             timestamp: new Date().toISOString(),
             trigger
         });

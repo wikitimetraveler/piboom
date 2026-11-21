@@ -244,29 +244,64 @@
       : '—';
   }
 
+  function policyDeskUrlForGovernor(g, prediction) {
+    const storm = prediction?.storm || {};
+    const name = storm.name || prediction?.advisory?.label || 'Hurricane event';
+    const params = new URLSearchParams({
+      from: 'hurricane-tracker',
+      kind: 'pending',
+      eventName: `${name} — ${g.state_abbr} governor SoE`,
+      disasterType: 'Hurricane',
+      state: g.state_abbr || '',
+      autoAddCounty: '1',
+    });
+    const typical = g.typicalSoe || g.earliestSoeStart;
+    if (typical) {
+      const d = new Date(typical);
+      if (!Number.isNaN(d.getTime())) {
+        const iso = d.toISOString().slice(0, 10);
+        params.set('governorDate', iso);
+        params.set('incidentBegin', iso);
+      }
+    }
+    return `/finance/disaster-policy/?${params.toString()}`;
+  }
+
   function renderGovernorPanel(prediction) {
     const panel = $('htGovernorPanel');
     const rows = prediction.governorAnnouncementsByState || [];
     if (!rows.length) {
-      panel.innerHTML = '<p class="text-muted small mb-0">No governor SoE windows for this advisory.</p>';
+      panel.innerHTML =
+        '<p class="text-muted small mb-0">No governor SoE windows for this advisory.</p>' +
+        '<p class="small mt-2 mb-0"><a href="/finance/disaster-policy/">Record a governor declaration</a> on Policy Desk for any hazard (not only hurricanes).</p>';
       return;
     }
-    panel.innerHTML = rows
-      .map(
-        (g) => `
+    const sorted = [...rows].sort((a, b) =>
+      String(b.typicalSoe || b.earliestSoeStart || '').localeCompare(
+        String(a.typicalSoe || a.earliestSoeStart || '')
+      )
+    );
+    panel.innerHTML =
+      sorted
+        .map(
+          (g) => `
       <div class="ht-gov-card mb-2">
         <div class="d-flex justify-content-between align-items-start">
           <div class="ht-state">${g.state_abbr}</div>
           <span class="badge ${g.coastalPrimary ? 'bg-info' : 'bg-secondary'}">${g.coastalPrimary ? 'Coastal' : 'Inland / cascade'}</span>
         </div>
-        <div class="small mt-1"><strong>Governor SoE window</strong></div>
+        <div class="small mt-1"><strong>Governor SoE window</strong> <span class="text-muted">(estimate)</span></div>
         <div class="small">${fmtWindow(g.earliestSoeStart, g.latestSoeEnd)}</div>
         <div class="small text-muted">Typical: ${fmtDate(g.typicalSoe)}</div>
         <div class="ht-soe-note mt-1">${g.note || 'SoE timing varies by state.'}</div>
         <div class="small mt-1 text-muted">${g.counties.length} counties in path</div>
+        <a class="btn btn-sm btn-outline-primary mt-2" href="${policyDeskUrlForGovernor(g, prediction)}">
+          <i class="bi-clipboard2-check"></i> Record governor decl.
+        </a>
       </div>`
-      )
-      .join('');
+        )
+        .join('') +
+      '<p class="small text-muted mt-2 mb-0">Estimates only. Floods, wildfire, winter storms, and other hazards also get governor SoE — capture those on Policy Desk too.</p>';
   }
 
   function renderCountyTable(prediction) {
@@ -356,7 +391,13 @@
       `/api/disasters/hurricanes/predict?stormId=${encodeURIComponent(stormId)}&advisoryIndex=${advisoryIndex}&mode=auto`
     );
     state.prediction = res.data;
-    if (res.data.disclaimer) $('htDisclaimer').textContent = res.data.disclaimer;
+    if (res.data.disclaimer) {
+      const deskLink =
+        ' When a governor actually declares (any hazard), capture it on'
+        + ' <a href="/finance/disaster-policy/" class="alert-link">Policy Desk</a>'
+        + ' — that is step 1 of ACME declarations.';
+      $('htDisclaimer').innerHTML = `${res.data.disclaimer}${deskLink}`;
+    }
     updateModeBadge(res.data.mode);
     updateAdvisoryLabel(res.data);
     renderKpis(res.data);
@@ -419,7 +460,7 @@
     $('htSheetResult').innerHTML = `
       <div class="mb-2">In path: <strong>${d.rollup?.inPath ?? 0}</strong> / ${d.rollup?.total ?? 0}
         · Hold/inspect: <strong>${d.rollup?.holdClosing ?? 0}</strong></div>
-      <div class="table-responsive"><table class="table table-sm"><thead><tr><th>Loan</th><th>Loc</th><th>Tier</th><th>Gov SoE</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+      <div class="table-responsive"><table class="table table-sm"><thead><tr><th>Loan</th><th>Loc</th><th>Tier</th><th>Governor SoE (estimate)</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
 
   function exportKml() {

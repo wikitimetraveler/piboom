@@ -48,8 +48,9 @@
 
 .ht-gov-card {
   border-radius: 10px;
-  border: 1px solid rgba(148, 163, 184, 0.25);
-  background: rgba(15, 23, 42, 0.35);
+  border: 1px solid var(--border-light, #e5e7eb);
+  background: var(--zen-surface, #fff);
+  color: #0f172a;
   padding: 0.75rem 1rem;
 }
 
@@ -57,11 +58,12 @@
   font-size: 1.1rem;
   font-weight: 700;
   letter-spacing: 0.04em;
+  color: #0f172a;
 }
 
 .ht-gov-card .ht-soe-note {
   font-size: 0.75rem;
-  opacity: 0.85;
+  color: #475569;
 }
 
 .ht-scrubber label {
@@ -99,6 +101,18 @@
 body.dark-mode .ht-gov-card,
 html.dark .ht-gov-card {
   background: rgba(2, 6, 23, 0.55);
+  border-color: rgba(148, 163, 184, 0.25);
+  color: #e2e8f0;
+}
+
+body.dark-mode .ht-gov-card .ht-state,
+html.dark .ht-gov-card .ht-state {
+  color: #f8fafc;
+}
+
+body.dark-mode .ht-gov-card .ht-soe-note,
+html.dark .ht-gov-card .ht-soe-note {
+  color: #94a3b8;
 }
 
 @media (max-width: 768px) {

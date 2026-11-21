@@ -30,14 +30,18 @@
             <p class="du-hero-lead small text-white-50 mb-2">
               Predict which counties will be impacted, when winds arrive, and when each state&apos;s
               <strong>governor may announce a State of Emergency</strong> — timing varies by state —
-              then FEMA EM / DR public announcement windows for mortgage ops.
+              then FEMA EM / DR public announcement windows for mortgage ops. SoE is not hurricane-only:
+              record the actual governor date on Policy Desk (floods, wildfire, winter, etc.).
             </p>
             <span id="htModeBadge" class="ht-badge-replay" role="status">Replay Simulation Mode</span>
           </div>
-          <div class="du-hero-actions d-flex flex-wrap gap-2 align-items-center">
-            <a class="btn btn-light btn-sm" href="disasters-unified.html"><i class="bi-arrow-left"></i> Unified Disasters</a>
+          <div class="du-hero-actions d-flex flex-wrap gap-2 align-items-center" aria-label="Disaster desk pages">
+            <a class="btn btn-outline-light btn-sm" href="disasters-unified.html"><i class="bi-arrow-left"></i> Unified Disasters</a>
+            <a class="btn btn-outline-light btn-sm" href="/finance/disaster-policy/" title="Capture governor declaration date (step 1 for any hazard)"><i class="bi-clipboard2-check"></i> Policy Desk</a>
             <a class="btn btn-outline-light btn-sm" href="disasters-webcams.html"><i class="bi-camera-video"></i> Webcams</a>
-            <a class="btn btn-outline-light btn-sm" href="/disaster-impact-graph.html"><i class="bi-diagram-3"></i> Impact Graph</a>
+            <a class="btn btn-outline-light btn-sm" href="disasters-encompass-map.html"><i class="bi-geo-alt"></i> Proximity map</a>
+            <a class="btn btn-outline-light btn-sm" href="/disaster-impact-graph.html" title="Persisted graph — as-of reseed, not live /near"><i class="bi-diagram-3"></i> Impact Graph</a>
+            <a class="btn btn-outline-light btn-sm" href="pipeline-risk-dashboard.html"><i class="bi-bar-chart"></i> Pipeline</a>
           </div>
         </div>
 
@@ -74,7 +78,7 @@
               <div class="du-stat-icon"><i class="bi-megaphone"></i></div>
               <div>
                 <div class="stat-number" id="htKpiNext" style="font-size:0.95rem">—</div>
-                <div class="stat-label">Next public announcement</div>
+                <div class="stat-label">Next planning window</div>
               </div>
             </div>
           </div>
@@ -87,6 +91,8 @@
         Planning estimates only. Governor State of Emergency timing <strong>varies by state</strong>
         (coastal states often 24–72h pre-landfall; inland states often after cascading impacts).
         FEMA EM/DR windows are not official commitments.
+        When a governor actually declares (any hazard), capture it on
+        <a href="/finance/disaster-policy/" class="alert-link">Policy Desk</a> — that is step 1 of ACME declarations.
       </div>
 
       <div class="card shadow-sm mb-3">
@@ -138,7 +144,7 @@
           <div class="card shadow-sm h-100">
             <div class="card-header">
               <i class="bi-building me-1"></i> Governor SoE by state
-              <span class="small text-muted d-block">Announcement timing differs state-to-state</span>
+              <span class="small text-muted d-block">Estimated windows for this storm · record the real date on Policy Desk</span>
             </div>
             <div class="card-body" id="htGovernorPanel" style="max-height:560px;overflow:auto">
               <p class="text-muted small mb-0">Select a storm to load governor announcement windows.</p>
@@ -160,7 +166,7 @@
                 <th>Tier</th>
                 <th>CPA mi</th>
                 <th>Wind arrival</th>
-                <th>Governor SoE</th>
+                <th>Governor SoE (estimate)</th>
                 <th>FEMA EM</th>
                 <th>FEMA DR</th>
                 <th>Programs</th>
@@ -193,7 +199,7 @@
           </div>
           <div class="table-responsive" style="max-height:320px;overflow:auto">
             <table class="table table-sm mb-0">
-              <thead><tr><th>Loan</th><th>Location</th><th>Milestone</th><th>Flood</th><th>Tier</th><th>UPB</th><th>Gov SoE</th></tr></thead>
+              <thead><tr><th>Loan</th><th>Location</th><th>Milestone</th><th>Flood</th><th>Tier</th><th>UPB</th><th>Governor SoE (estimate)</th></tr></thead>
               <tbody id="htLoanBody"></tbody>
             </table>
           </div>

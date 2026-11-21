@@ -2048,6 +2048,11 @@ body.du-pull-sheet-open .du-bottom-dock {
   .du-workflow-strip {
     display: flex;
   }
+
+  /* Desktop strip replaces mobile hero pills */
+  #workflowHint.du-workflow-pills {
+    display: none;
+  }
 }
 
 /* Inline loading (filter reload — no full-screen overlay).

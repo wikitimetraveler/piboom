@@ -1970,7 +1970,11 @@ export async function ingestCaFireCameras() {
         network_url: camera.network_url || null,
         image_url: camera.image_url || null,
         status: camera.status || 'active',
-        hazard_types: ['fire'],
+        hazard_types: /\b(pier|wharf|inlet|beach|lighthouse|harbor|harbour|ocean|seashore|coast|coastal|gulf|bay|cape|surf)\b/i.test(
+          `${camera.name || ''} ${camera.site_name || ''}`
+        )
+          ? ['fire', 'coastal']
+          : ['fire'],
         media_type: 'live_stream',
         refresh_minutes: 5,
         geocoded_at: geocodedAt,

@@ -26,7 +26,8 @@ await jest.unstable_mockModule('../../services/disaster-impact-graph.service.js'
 
 const {
   chatWithAI,
-  chatWithDisasterExpert
+  chatWithDisasterExpert,
+  __testResolveDisasterExpertType,
 } = await import('../../controllers/loan-pipeline-ai.controller.js');
 
 const createRes = () => {
@@ -76,6 +77,37 @@ describe('loan-pipeline-ai.controller', () => {
       expect.objectContaining({
         success: true,
         response: 'pipeline-response'
+      })
+    );
+  });
+
+  test('resolves portfolio analyst profile and session', () => {
+    expect(__testResolveDisasterExpertType({ expertProfile: 'portfolio' }, 'x')).toBe(
+      'disaster-portfolio-analyst'
+    );
+    expect(__testResolveDisasterExpertType({}, 'unified-disaster-portfolio')).toBe(
+      'disaster-portfolio-analyst'
+    );
+    expect(__testResolveDisasterExpertType({ expertProfile: 'processor' }, 'x')).toBe(
+      'disaster-processor-expert'
+    );
+  });
+
+  test('chatWithDisasterExpert tags portfolio expertType', async () => {
+    const req = {
+      body: {
+        message: 'Where are we concentrated?',
+        userId: 'user-1',
+        sessionId: 'unified-disaster-portfolio',
+        context: { expertProfile: 'portfolio' },
+      },
+    };
+    const res = createRes();
+    await chatWithDisasterExpert(req, res);
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        success: true,
+        context: expect.objectContaining({ expertType: 'disaster-portfolio-analyst' }),
       })
     );
   });

@@ -8,6 +8,9 @@ import {
   getPolicyEvent,
   appendPolicyAreas,
   setPolicyStatus,
+  updatePolicyEvent,
+  deletePolicyEvent,
+  removePolicyArea,
   findImpactedLoans,
   listFemaCountiesByDisasterNumber,
 } from '../services/disaster-policy.service.js';
@@ -18,7 +21,8 @@ function statusFor(code) {
     code === 'STATUS_INVALID' ||
     code === 'EVENT_NAME_REQUIRED' ||
     code === 'AREAS_REQUIRED' ||
-    code === 'AREA_INVALID'
+    code === 'AREA_INVALID' ||
+    code === 'AREA_NOT_FOUND'
   ) {
     return 400;
   }
@@ -37,6 +41,8 @@ function messageFor(code) {
       return 'Select at least one county (or ZIP) area';
     case 'AREA_INVALID':
       return 'Each area needs state, countyCode (FIPS), and countyName';
+    case 'AREA_NOT_FOUND':
+      return 'County area not found on this event';
     default:
       return 'Disaster policy request failed';
   }
@@ -78,6 +84,31 @@ export async function getEvent(req, res) {
   }
 }
 
+export async function updateEvent(req, res) {
+  try {
+    const event = await updatePolicyEvent(req.params.id, req.body || {});
+    if (!event) return res.status(404).json({ success: false, error: 'Not found' });
+    return res.json({ success: true, event });
+  } catch (err) {
+    const code = err?.code || 'UPDATE_FAILED';
+    return res.status(statusFor(code)).json({
+      success: false,
+      error: messageFor(code),
+      code,
+    });
+  }
+}
+
+export async function deleteEvent(req, res) {
+  try {
+    const result = await deletePolicyEvent(req.params.id);
+    if (!result) return res.status(404).json({ success: false, error: 'Not found' });
+    return res.json({ success: true, ...result });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.message || 'Delete failed' });
+  }
+}
+
 export async function appendAreas(req, res) {
   try {
     const event = await appendPolicyAreas(req.params.id, req.body?.areas || []);
@@ -85,6 +116,21 @@ export async function appendAreas(req, res) {
     return res.json({ success: true, event });
   } catch (err) {
     const code = err?.code || 'APPEND_FAILED';
+    return res.status(statusFor(code)).json({
+      success: false,
+      error: messageFor(code),
+      code,
+    });
+  }
+}
+
+export async function deleteArea(req, res) {
+  try {
+    const event = await removePolicyArea(req.params.id, req.params.areaId);
+    if (!event) return res.status(404).json({ success: false, error: 'Not found' });
+    return res.json({ success: true, event });
+  } catch (err) {
+    const code = err?.code || 'AREA_DELETE_FAILED';
     return res.status(statusFor(code)).json({
       success: false,
       error: messageFor(code),

@@ -24,6 +24,13 @@ export const ALERTWEST_CAMERAS_URL = 'https://alertwest.live/api/firecams/v0/cam
 export const HPWREN_SITES_URL = 'https://www.hpwren.ucsd.edu/cameras/sites.js';
 export const CALTRANS_CWWP2_DISTRICTS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 const NY511_CAMERAS_URL = 'https://511ny.org/api/v2/get/cameras';
+export const NDBC_BUOYCAMS_URL = 'https://www.ndbc.noaa.gov/buoycams.php';
+export const NDBC_BUOYCAM_IMAGE = 'https://www.ndbc.noaa.gov/buoycam.php';
+export const DRIVENC_CAMERAS_URL = 'https://www.drivenc.gov/List/GetData/Cameras';
+export const FL511_CAMERAS_URL = 'https://fl511.com/List/GetData/Cameras';
+export const MD_CHART_CAMERAS_URL =
+  'https://chartexp1.sha.maryland.gov/CHARTExportClientService/getCameraMapDataJSON.do';
+export const NPS_WEBCAMS_URL = 'https://developer.nps.gov/api/v1/webcams';
 
 export const HAZARD_WEBCAM_SOURCES = [
   'alertcalifornia',
@@ -36,7 +43,89 @@ export const HAZARD_WEBCAM_SOURCES = [
   'ucsd_pier',
   'caltrans_cwwp2',
   'dot_511ny',
+  'ndbc_buoycam',
+  'ioos_coastal',
+  'nps_webcams',
+  'dot_coastal',
 ];
+
+export function normalizeCountyKey(county) {
+  return String(county || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\./g, '')
+    .replace(/-/g, ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/^saint\b/, 'st');
+}
+
+/** DriveNC counties on the Atlantic coastal plain and Outer Banks. */
+export const NC_COASTAL_COUNTIES = new Set([
+  'beaufort',
+  'bertie',
+  'brunswick',
+  'camden',
+  'carteret',
+  'chowan',
+  'craven',
+  'currituck',
+  'dare',
+  'hyde',
+  'new hanover',
+  'onslow',
+  'pamlico',
+  'pasquotank',
+  'pender',
+  'perquimans',
+  'tyrrell',
+  'washington',
+]);
+
+/** FL511 counties on the Atlantic or Gulf shore. */
+export const FL_COASTAL_COUNTIES = new Set([
+  'bay', 'brevard', 'broward', 'charlotte', 'citrus', 'collier', 'dixie', 'duval',
+  'escambia', 'flagler', 'franklin', 'gulf', 'hernando', 'hillsborough',
+  'indian river', 'jefferson', 'lee', 'levy', 'manatee', 'martin', 'miami dade',
+  'monroe', 'nassau', 'okaloosa', 'palm beach', 'pasco', 'pinellas', 'santa rosa',
+  'sarasota', 'st johns', 'st lucie', 'taylor', 'volusia', 'wakulla', 'walton',
+]);
+
+/** MD CHART groups that sit on the Chesapeake or Atlantic shore. */
+export const MD_COASTAL_CATEGORIES = new Set([
+  'eastern shore',
+  'annapolis',
+  'southern md',
+]);
+
+export const NPS_COASTAL_PARK_CODES = new Set([
+  'acad', 'asis', 'bisc', 'caco', 'caha', 'calo', 'chis', 'cuis', 'drto',
+  'ever', 'fiis', 'gate', 'goga', 'guis', 'havo', 'hale', 'kefj', 'olym',
+  'pais', 'pore', 'viis',
+]);
+
+const STATE_NAME_TO_ABBR = {
+  alabama: 'AL', alaska: 'AK', arizona: 'AZ', arkansas: 'AR', california: 'CA',
+  colorado: 'CO', connecticut: 'CT', delaware: 'DE', florida: 'FL', georgia: 'GA',
+  hawaii: 'HI', idaho: 'ID', illinois: 'IL', indiana: 'IN', iowa: 'IA',
+  kansas: 'KS', kentucky: 'KY', louisiana: 'LA', maine: 'ME', maryland: 'MD',
+  massachusetts: 'MA', michigan: 'MI', minnesota: 'MN', mississippi: 'MS',
+  missouri: 'MO', montana: 'MT', nebraska: 'NE', nevada: 'NV', 'new hampshire': 'NH',
+  'new jersey': 'NJ', 'new mexico': 'NM', 'new york': 'NY', 'north carolina': 'NC',
+  'north dakota': 'ND', ohio: 'OH', oklahoma: 'OK', oregon: 'OR', pennsylvania: 'PA',
+  'rhode island': 'RI', 'south carolina': 'SC', 'south dakota': 'SD', tennessee: 'TN',
+  texas: 'TX', utah: 'UT', vermont: 'VT', virginia: 'VA', washington: 'WA',
+  'west virginia': 'WV', wisconsin: 'WI', wyoming: 'WY',
+};
+
+const STATE_ABBRS = new Set(Object.values(STATE_NAME_TO_ABBR));
+
+/** JS word-boundary test. PostgreSQL retag uses COASTAL_NAME_SQL. */
+export const COASTAL_NAME_PATTERN =
+  /\b(pier|wharf|inlet|seawall|sea wall|surf|estuary|lagoon|beach|lighthouse|harbor|harbour|ocean|seashore|coast|coastal|gulf|bay|cape|outer banks|galveston|chesapeake|waikiki|boardwalk|jetty|marina|tidal|tide|causeway|pch|hwy\s*1|highway\s*1|sr-?1)\b/i;
+
+/** POSIX pattern for fire_cameras.name (~*). */
+export const COASTAL_NAME_SQL =
+  '\\y(pier|wharf|inlet|seawall|surf|estuary|lagoon|beach|lighthouse|harbor|harbour|ocean|seashore|coast|coastal|gulf|bay|cape|outer banks|galveston|chesapeake|waikiki|boardwalk|jetty|marina|tidal|tide|causeway|pch)\\y|sea[[:space:]]+wall|highway[[:space:]]*1|hwy[[:space:]]*1|sr-?1';
 
 const FETCH_HEADERS = {
   Accept: 'application/json',
@@ -106,6 +195,54 @@ function volcanoAshcamImageApiBase(feed) {
     : 'https://volcview.wr.usgs.gov/ashcam-api/imageApi';
 }
 
+export function textLooksCoastal(text) {
+  return COASTAL_NAME_PATTERN.test(String(text || ''));
+}
+
+export function withCoastalHazard(types, text) {
+  const tags = new Set(Array.isArray(types) ? types : []);
+  if (textLooksCoastal(text)) tags.add('coastal');
+  if (!tags.size) tags.add('hazard');
+  return Array.from(tags);
+}
+
+export function inferStateFromLabel(text) {
+  const raw = String(text || '');
+  const tail = raw.match(/,\s*([A-Z]{2})\b/);
+  if (tail && STATE_ABBRS.has(tail[1])) return tail[1];
+  const lower = raw.toLowerCase();
+  const names = Object.keys(STATE_NAME_TO_ABBR).sort((a, b) => b.length - a.length);
+  for (const name of names) {
+    if (lower.includes(name)) return STATE_NAME_TO_ABBR[name];
+  }
+  return null;
+}
+
+export function isNcCoastalCounty(county) {
+  return NC_COASTAL_COUNTIES.has(normalizeCountyKey(county));
+}
+
+export function isFlCoastalCounty(county) {
+  return FL_COASTAL_COUNTIES.has(normalizeCountyKey(county));
+}
+
+export function isMdCoastalChartCamera(cam) {
+  const cats = Array.isArray(cam?.cameraCategories) ? cam.cameraCategories : [];
+  if (cats.some((c) => MD_COASTAL_CATEGORIES.has(String(c || '').trim().toLowerCase()))) {
+    return true;
+  }
+  return textLooksCoastal(`${cam?.name || ''} ${cam?.description || ''}`);
+}
+
+function parsePointWkt(wkt) {
+  const match = /POINT\s*\(\s*([+-]?\d+(?:\.\d+)?)\s+([+-]?\d+(?:\.\d+)?)\s*\)/i.exec(String(wkt || ''));
+  if (!match) return null;
+  const lng = toNum(match[1]);
+  const lat = toNum(match[2]);
+  if (lat == null || lng == null) return null;
+  return { lat, lng };
+}
+
 function inferHazardTypesFromText(text) {
   const t = String(text || '').toLowerCase();
   const tags = new Set(['hazard']);
@@ -113,7 +250,7 @@ function inferHazardTypesFromText(text) {
   if (/flood|inund|dam|reservoir/.test(t)) tags.add('flood');
   if (/snow|ice|winter/.test(t)) tags.add('snow');
   if (/landslide|debris|mudflow/.test(t)) tags.add('landslide');
-  if (/coast|beach|tide|ocean|harbor|bay/.test(t)) tags.add('coastal');
+  if (textLooksCoastal(t)) tags.add('coastal');
   if (/volcano|ash|lava/.test(t)) tags.add('volcano');
   if (/fire|wildfire|burn/.test(t)) tags.add('fire');
   if (/storm|severe|wind|blizzard|winter|fog|visibility|weather/.test(t)) tags.add('storm');
@@ -163,7 +300,7 @@ export function normalizeAlertWestCamera(cam) {
     network_url: 'https://alertwest.live/',
     image_url: imageUrl,
     status: 'active',
-    hazard_types: ['fire', 'hazard'],
+    hazard_types: withCoastalHazard(['fire', 'hazard'], `${label} ${county || ''}`),
     media_type: imageUrl ? 'still_image' : 'live_stream',
     refresh_minutes: 2,
     raw: {
@@ -234,7 +371,7 @@ export function normalizeHpwrenCamera(siteKey, site, camId, cam) {
     network_url: 'https://www.hpwren.ucsd.edu/cameras/',
     image_url: `https://www.hpwren.ucsd.edu/cameras/LTA/${encodeURIComponent(camId)}/large/latest.jpg`,
     status: 'active',
-    hazard_types: ['fire', 'hazard', 'storm'],
+    hazard_types: withCoastalHazard(['fire', 'hazard', 'storm'], `${siteName} ${camName}`),
     media_type: 'still_image',
     refresh_minutes: 1,
     raw: {
@@ -352,6 +489,214 @@ export function normalize511NyCamera(cam) {
       attribution: '511NY / NYSDOT',
     },
   };
+}
+
+/** @param {object} station NDBC buoycams.php record */
+export function normalizeNdbcBuoyCam(station) {
+  if (!station) return null;
+  const id = station.id ?? station.stationId ?? station.station;
+  const lat = toNum(station.lat ?? station.latitude);
+  const lng = toNum(station.lng ?? station.lon ?? station.longitude);
+  if (id == null || lat == null || lng == null) return null;
+
+  const name = String(station.name || `NDBC ${id}`).trim();
+  const still = station.img
+    ? `https://www.ndbc.noaa.gov/images/buoycam/${station.img}`
+    : null;
+
+  return {
+    source: 'ndbc_buoycam',
+    source_id: String(id),
+    name: `NDBC ${id} — ${name}`,
+    lat,
+    lng,
+    state_abbr: inferStateFromLabel(name),
+    county_name: null,
+    camera_url: `https://www.ndbc.noaa.gov/station_page.php?station=${encodeURIComponent(id)}`,
+    network_url: 'https://www.ndbc.noaa.gov/',
+    image_url: `${NDBC_BUOYCAM_IMAGE}?station=${encodeURIComponent(id)}`,
+    status: 'active',
+    hazard_types: ['coastal', 'storm', 'hazard'],
+    media_type: 'still_image',
+    refresh_minutes: 10,
+    raw: {
+      ndbc_id: String(id),
+      latest_still: still,
+      attribution: 'NOAA National Data Buoy Center',
+    },
+  };
+}
+
+/**
+ * Shared 511 list row (DriveNC, FL511). Coordinates come from the feed.
+ * @param {object} cam
+ * @param {{ idPrefix: string, state: string, origin: string, network: string, counties: Set<string>, provider: string, attribution: string }} opts
+ */
+export function normalize511CoastalCamera(cam, opts) {
+  if (!cam || cam.visible === false || !opts?.counties) return null;
+  const id = cam.id ?? cam.DT_RowId;
+  const point = parsePointWkt(cam.latLng?.geography?.wellKnownText || cam.latLng?.wellKnownText);
+  const lat = point?.lat ?? toNum(cam.latitude ?? cam.lat);
+  const lng = point?.lng ?? toNum(cam.longitude ?? cam.lng ?? cam.lon);
+  if (id == null || lat == null || lng == null) return null;
+  if (!opts.counties.has(normalizeCountyKey(cam.county))) return null;
+
+  const images = Array.isArray(cam.images) ? cam.images : [];
+  const image = images.find((img) => img && !img.disabled && !img.blocked) || null;
+  let image_url = image?.imageUrl || null;
+  if (image_url && image_url.startsWith('/')) {
+    image_url = `${opts.origin.replace(/\/$/, '')}${image_url}`;
+  }
+  const video_url = image?.videoUrl || null;
+  const location = cam.location || cam.roadway || `${opts.state} camera ${id}`;
+  const name = [cam.roadway, location].filter(Boolean).join(' — ');
+
+  return {
+    source: 'dot_coastal',
+    source_id: `${opts.idPrefix}:${id}`,
+    name,
+    lat,
+    lng,
+    state_abbr: opts.state,
+    county_name: cam.county || null,
+    camera_url: video_url || image_url || opts.network,
+    network_url: opts.network,
+    image_url,
+    status: 'active',
+    hazard_types: withCoastalHazard(
+      ['coastal', ...inferDotHazardTypes(`${name} ${cam.county || ''} ${cam.direction || ''}`)],
+      `${name} ${cam.county || ''}`
+    ),
+    media_type: image_url ? 'still_image' : 'live_stream',
+    refresh_minutes: 2,
+    raw: {
+      provider: opts.provider,
+      roadway: cam.roadway || null,
+      direction: cam.direction || null,
+      video_url,
+      attribution: opts.attribution,
+    },
+  };
+}
+
+/** @param {object} cam DriveNC /List/GetData/Cameras row */
+export function normalizeDriveNcCamera(cam) {
+  return normalize511CoastalCamera(cam, {
+    idPrefix: 'nc',
+    state: 'NC',
+    origin: 'https://www.drivenc.gov',
+    network: 'https://www.drivenc.gov/cctv',
+    counties: NC_COASTAL_COUNTIES,
+    provider: 'ncdot',
+    attribution: 'DriveNC / NCDOT',
+  });
+}
+
+/** @param {object} cam FL511 /List/GetData/Cameras row */
+export function normalizeFl511Camera(cam) {
+  return normalize511CoastalCamera(cam, {
+    idPrefix: 'fl',
+    state: 'FL',
+    origin: 'https://fl511.com',
+    network: 'https://fl511.com/cctv',
+    counties: FL_COASTAL_COUNTIES,
+    provider: 'fl511',
+    attribution: 'FL511 / FDOT',
+  });
+}
+
+/** @param {object} cam MD CHART camera map record */
+export function normalizeMdChartCamera(cam) {
+  if (!cam || !isMdCoastalChartCamera(cam)) return null;
+  const id = cam.id;
+  const lat = toNum(cam.lat ?? cam.latitude);
+  const lng = toNum(cam.lon ?? cam.lng ?? cam.longitude);
+  if (id == null || lat == null || lng == null) return null;
+
+  const name = cam.description || cam.name || `MD CHART ${id}`;
+  const videoPage = cam.publicVideoURL || `https://chart.maryland.gov/Video/GetVideo/${id}`;
+  const online = String(cam.opStatus || '').toUpperCase() === 'OK'
+    || String(cam.commMode || '').toUpperCase() === 'ONLINE';
+
+  return {
+    source: 'dot_coastal',
+    source_id: `md:${id}`,
+    name: String(name),
+    lat,
+    lng,
+    state_abbr: 'MD',
+    county_name: null,
+    camera_url: videoPage,
+    network_url: 'https://chart.maryland.gov/',
+    image_url: null,
+    status: online ? 'active' : 'inactive',
+    hazard_types: withCoastalHazard(
+      ['coastal', ...inferDotHazardTypes(name)],
+      `${name} ${(cam.cameraCategories || []).join(' ')}`
+    ),
+    media_type: 'live_stream',
+    refresh_minutes: 1,
+    raw: {
+      provider: 'md_chart',
+      categories: cam.cameraCategories || [],
+      route: [cam.routePrefix, cam.routeNumber].filter(Boolean).join('-') || null,
+      attribution: 'MDOT SHA CHART',
+    },
+  };
+}
+
+/** @param {object} item NPS developer webcams API record */
+export function normalizeNpsWebcam(item) {
+  if (!item) return null;
+  const parks = Array.isArray(item.relatedParks) ? item.relatedParks : [];
+  const park = parks[0] || {};
+  const parkCode = String(park.parkCode || '').toLowerCase();
+  const title = item.title || item.name || park.fullName || '';
+  const text = `${title} ${item.description || ''} ${park.fullName || ''}`;
+  if (!NPS_COASTAL_PARK_CODES.has(parkCode) && !textLooksCoastal(text)) return null;
+
+  const lat = toNum(item.latitude ?? item.lat);
+  const lng = toNum(item.longitude ?? item.lng ?? item.lon);
+  const id = item.id || item.webcamId;
+  if (id == null || lat == null || lng == null) return null;
+
+  const images = Array.isArray(item.images) ? item.images : [];
+  const image_url = images[0]?.url || images[0]?.imageUrl || null;
+  const states = String(park.states || item.states || '');
+  const state_abbr = states.split(',')[0].trim().toUpperCase() || inferStateFromLabel(text);
+
+  return {
+    source: 'nps_webcams',
+    source_id: String(id),
+    name: title || `NPS webcam ${id}`,
+    lat,
+    lng,
+    state_abbr: state_abbr && state_abbr.length === 2 ? state_abbr : null,
+    county_name: null,
+    camera_url: item.url || (parkCode ? `https://www.nps.gov/${parkCode}/` : 'https://www.nps.gov/'),
+    network_url: 'https://www.nps.gov/',
+    image_url,
+    status: 'active',
+    hazard_types: ['coastal', 'hazard'],
+    media_type: image_url ? 'still_image' : 'live_stream',
+    refresh_minutes: 15,
+    raw: {
+      parkCode: parkCode || null,
+      parkName: park.fullName || null,
+      attribution: 'National Park Service',
+    },
+  };
+}
+
+function dedupeWebcamRows(rows) {
+  const byId = new Map();
+  for (const row of rows) {
+    if (!row?.source_id) continue;
+    const key = `${row.source}:${row.source_id}`;
+    const existing = byId.get(key);
+    if (!existing || (!existing.image_url && row.image_url)) byId.set(key, row);
+  }
+  return Array.from(byId.values());
 }
 
 /** @param {object} cam USGS NIMS camera record */
@@ -535,7 +880,7 @@ export function normalizeFaaWeatherCam(site, camera, image) {
     network_url: 'https://weathercams.faa.gov/',
     image_url: imageUri,
     status: 'active',
-    hazard_types: ['aviation', 'weather', 'hazard'],
+    hazard_types: withCoastalHazard(['aviation', 'weather', 'hazard'], siteName),
     media_type: 'still_image',
     refresh_minutes: 10,
     raw: {
@@ -876,6 +1221,205 @@ export async function ingestDot511NyWebcams() {
   };
 }
 
+export async function ingestNdbcBuoyCams() {
+  await initFireCamerasSchema();
+  const data = await fetchJson(NDBC_BUOYCAMS_URL);
+  const list = Array.isArray(data) ? data : (data.stations || data.buoys || []);
+  const batch = list.map(normalizeNdbcBuoyCam).filter(Boolean);
+  const result = await upsertHazardWebcams(batch);
+  return {
+    upserted: result.upserted || 0,
+    fetched: list.length,
+    normalized: batch.length,
+  };
+}
+
+async function fetch511CameraPages(url, referer) {
+  const pageSize = 250;
+  const cameras = [];
+  let start = 0;
+  let total = Infinity;
+
+  while (start < total && start < 8000) {
+    const body = new URLSearchParams({
+      draw: '1',
+      start: String(start),
+      length: String(pageSize),
+    });
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        ...FETCH_HEADERS,
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-Requested-With': 'XMLHttpRequest',
+        Referer: referer,
+      },
+      body: body.toString(),
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      throw new Error(`HTTP ${res.status} ${url}: ${text.slice(0, 200)}`);
+    }
+    const data = await res.json();
+    const page = Array.isArray(data?.data) ? data.data : [];
+    const reported = Number(data?.recordsTotal);
+    if (Number.isFinite(reported)) total = reported;
+    cameras.push(...page);
+    if (!page.length) break;
+    start += page.length;
+    if (page.length < pageSize) break;
+  }
+  return cameras;
+}
+
+export async function ingestDotCoastalWebcams() {
+  await initFireCamerasSchema();
+  const [ncResult, mdResult, flResult] = await Promise.allSettled([
+    fetch511CameraPages(DRIVENC_CAMERAS_URL, 'https://www.drivenc.gov/cctv'),
+    fetchJson(MD_CHART_CAMERAS_URL),
+    fetch511CameraPages(FL511_CAMERAS_URL, 'https://fl511.com/cctv'),
+  ]);
+
+  const batch = [];
+  let fetched = 0;
+  if (ncResult.status === 'fulfilled') {
+    fetched += ncResult.value.length;
+    for (const cam of ncResult.value) {
+      const row = normalizeDriveNcCamera(cam);
+      if (row) batch.push(row);
+    }
+  } else {
+    console.warn('⚠️  DriveNC cameras failed:', ncResult.reason?.message);
+  }
+
+  if (mdResult.status === 'fulfilled') {
+    const list = Array.isArray(mdResult.value?.data)
+      ? mdResult.value.data
+      : (Array.isArray(mdResult.value) ? mdResult.value : []);
+    fetched += list.length;
+    for (const cam of list) {
+      const row = normalizeMdChartCamera(cam);
+      if (row) batch.push(row);
+    }
+  } else {
+    console.warn('⚠️  MD CHART cameras failed:', mdResult.reason?.message);
+  }
+
+  if (flResult.status === 'fulfilled') {
+    fetched += flResult.value.length;
+    for (const cam of flResult.value) {
+      const row = normalizeFl511Camera(cam);
+      if (row) batch.push(row);
+    }
+  } else {
+    console.warn('⚠️  FL511 cameras failed:', flResult.reason?.message);
+  }
+
+  if (!batch.length
+    && ncResult.status === 'rejected'
+    && mdResult.status === 'rejected'
+    && flResult.status === 'rejected') {
+    throw new Error('No coastal DOT camera feeds available');
+  }
+
+  const result = await upsertHazardWebcams(batch);
+  return {
+    upserted: result.upserted || 0,
+    fetched,
+    normalized: batch.length,
+    nc: ncResult.status === 'fulfilled' ? ncResult.value.length : 0,
+    md: mdResult.status === 'fulfilled'
+      ? (Array.isArray(mdResult.value?.data) ? mdResult.value.data.length : 0)
+      : 0,
+    fl: flResult.status === 'fulfilled' ? flResult.value.length : 0,
+  };
+}
+
+function npsApiKey() {
+  return String(process.env.NPS_API_KEY || process.env.NPS_API_TOKEN || '').trim();
+}
+
+export async function ingestIoosCoastalWebcams() {
+  await initFireCamerasSchema();
+  const seeds = loadSeedFile();
+  const batch = [];
+  for (const row of seeds.ioos_coastal || []) {
+    const normalized = normalizeSeedMount(row, 'ioos_coastal');
+    if (normalized) {
+      normalized.hazard_types = withCoastalHazard(normalized.hazard_types, normalized.name);
+      batch.push(normalized);
+    }
+  }
+  const result = await upsertHazardWebcams(batch);
+  return { upserted: result.upserted || 0, fetched: batch.length, normalized: batch.length };
+}
+
+export async function ingestNpsWebcams() {
+  await initFireCamerasSchema();
+  const seeds = loadSeedFile();
+  const batch = [];
+  for (const row of seeds.nps_webcams || []) {
+    const normalized = normalizeSeedMount(row, 'nps_webcams');
+    if (normalized) {
+      normalized.hazard_types = withCoastalHazard(normalized.hazard_types, normalized.name);
+      batch.push(normalized);
+    }
+  }
+
+  const key = npsApiKey();
+  let apiFetched = 0;
+  if (key) {
+    try {
+      const url = `${NPS_WEBCAMS_URL}?limit=500&api_key=${encodeURIComponent(key)}`;
+      const data = await fetchJson(url);
+      const list = Array.isArray(data?.data) ? data.data : [];
+      apiFetched = list.length;
+      for (const item of list) {
+        const row = normalizeNpsWebcam(item);
+        if (row) batch.push(row);
+      }
+    } catch (e) {
+      console.warn('⚠️  NPS webcams API failed:', e.message);
+    }
+  } else {
+    console.warn('⚠️  NPS_API_KEY not set; using curated coastal park seeds');
+  }
+
+  const merged = dedupeWebcamRows(batch);
+  const result = await upsertHazardWebcams(merged);
+  return {
+    upserted: result.upserted || 0,
+    fetched: apiFetched || batch.length,
+    normalized: merged.length,
+    seeded: (seeds.nps_webcams || []).length,
+    api: Boolean(key),
+  };
+}
+
+export async function retagCoastalHazardTypes() {
+  const pool = getPool();
+  if (!pool) return { updated: 0, skipped: true, reason: 'database unavailable' };
+  const res = await pool.query(
+    `UPDATE fire_cameras
+     SET hazard_types = (
+       SELECT COALESCE(jsonb_agg(DISTINCT tag), '["coastal"]'::jsonb)
+       FROM (
+         SELECT jsonb_array_elements_text(COALESCE(hazard_types, '[]'::jsonb)) AS tag
+         UNION ALL
+         SELECT 'coastal'
+       ) tags
+     ),
+     updated_at = NOW()
+     WHERE NOT COALESCE(hazard_types, '[]'::jsonb) @> '["coastal"]'::jsonb
+       AND (
+         source IN ('webcoos','ucsd_pier','ndbc_buoycam','ioos_coastal','nps_webcams','dot_coastal')
+         OR COALESCE(name, '') ~* $1
+       )`,
+    [COASTAL_NAME_SQL]
+  );
+  return { updated: res.rowCount || 0 };
+}
+
 export async function ingestUcsdPierWebcams() {
   await initFireCamerasSchema();
   const seeds = loadSeedFile();
@@ -903,6 +1447,10 @@ const INGEST_HANDLERS = {
   ucsd_pier: ingestUcsdPierWebcams,
   caltrans_cwwp2: ingestCaltransCwwp2Webcams,
   dot_511ny: ingestDot511NyWebcams,
+  ndbc_buoycam: ingestNdbcBuoyCams,
+  ioos_coastal: ingestIoosCoastalWebcams,
+  nps_webcams: ingestNpsWebcams,
+  dot_coastal: ingestDotCoastalWebcams,
 };
 
 function parseSourcesArg(sources) {
@@ -936,6 +1484,13 @@ export async function ingestHazardWebcams(opts = {}) {
       console.warn(`⚠️  Ingest ${src} failed:`, e.message);
       results[src] = { error: e.message, upserted: 0 };
     }
+  }
+
+  try {
+    results.coastalRetag = await retagCoastalHazardTypes();
+  } catch (e) {
+    console.warn('⚠️  Coastal hazard retag failed:', e.message);
+    results.coastalRetag = { error: e.message, updated: 0 };
   }
 
   return results;
@@ -985,8 +1540,14 @@ export async function getHazardWebcamStats() {
     ORDER BY count DESC
   `);
   const total = await pool.query(`SELECT COUNT(*)::int AS total FROM fire_cameras`);
+  const coastal = await pool.query(
+    `SELECT COUNT(*)::int AS count
+     FROM fire_cameras
+     WHERE COALESCE(hazard_types, '[]'::jsonb) @> '["coastal"]'::jsonb`
+  );
   return {
     total: total.rows[0]?.total || 0,
+    coastal: coastal.rows[0]?.count || 0,
     bySource: bySource.rows,
   };
 }

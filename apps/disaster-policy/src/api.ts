@@ -30,6 +30,45 @@ export async function createEvent(body: Record<string, unknown>) {
   return data.event;
 }
 
+export async function updateEvent(id: string, body: Record<string, unknown>) {
+  const data = await json<{ event: PolicyEvent }>(
+    await fetch(`${API}/events/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+  );
+  return data.event;
+}
+
+export async function deleteEvent(id: string) {
+  const data = await json<{ id: string; deleted: boolean }>(
+    await fetch(`${API}/events/${encodeURIComponent(id)}`, { method: 'DELETE' })
+  );
+  return data;
+}
+
+export async function appendAreas(id: string, areas: unknown[]) {
+  const data = await json<{ event: PolicyEvent }>(
+    await fetch(`${API}/events/${encodeURIComponent(id)}/areas`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ areas }),
+    })
+  );
+  return data.event;
+}
+
+export async function deleteArea(eventId: string, areaId: string) {
+  const data = await json<{ event: PolicyEvent }>(
+    await fetch(
+      `${API}/events/${encodeURIComponent(eventId)}/areas/${encodeURIComponent(areaId)}`,
+      { method: 'DELETE' }
+    )
+  );
+  return data.event;
+}
+
 export async function setStatus(id: string, status: PolicyStatus) {
   const data = await json<{ event: PolicyEvent }>(
     await fetch(`${API}/events/${encodeURIComponent(id)}/status`, {

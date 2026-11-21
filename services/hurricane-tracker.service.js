@@ -867,7 +867,7 @@ async function matchCoastalCameras(counties, advisory) {
        WHERE UPPER(TRIM(COALESCE(state_abbr,''))) = ANY($1::text[])
          AND (
            hazard_types ?| ARRAY['coastal','storm','weather','flood']
-           OR source IN ('webcoos','ucsd_pier','faa_weathercam','dot_511ny','caltrans_cwwp2')
+           OR source IN ('webcoos','ucsd_pier','faa_weathercam','dot_511ny','caltrans_cwwp2','ndbc_buoycam','ioos_coastal','nps_webcams','dot_coastal')
          )
        ORDER BY updated_at DESC NULLS LAST
        LIMIT 200`,

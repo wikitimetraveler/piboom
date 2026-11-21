@@ -35,10 +35,13 @@
               <li><button type="button" class="du-workflow-pill-btn" data-hw-section="hwSectionCatalog"><span class="step-num">4</span> Catalog</button></li>
             </ul>
           </div>
-          <div class="du-hero-actions d-flex flex-wrap gap-2 align-items-center">
-            <a class="btn btn-light btn-sm" href="disasters-unified.html"><i class="bi-arrow-left"></i> Unified Disasters</a>
+          <div class="du-hero-actions d-flex flex-wrap gap-2 align-items-center" aria-label="Disaster desk pages">
+            <a class="btn btn-outline-light btn-sm" href="disasters-unified.html"><i class="bi-arrow-left"></i> Unified Disasters</a>
             <a class="btn btn-outline-light btn-sm" href="disasters-hurricanes.html"><i class="bi-hurricane"></i> Hurricanes</a>
+            <a class="btn btn-outline-light btn-sm" href="/finance/disaster-policy/"><i class="bi-clipboard2-check"></i> Policy Desk</a>
+            <a class="btn btn-outline-light btn-sm" href="disasters-encompass-map.html"><i class="bi-geo-alt"></i> Proximity map</a>
             <a class="btn btn-outline-light btn-sm" href="/disaster-impact-graph.html" title="Persisted graph — as-of reseed, not live /near"><i class="bi-diagram-3"></i> Impact Graph</a>
+            <a class="btn btn-outline-light btn-sm" href="pipeline-risk-dashboard.html"><i class="bi-bar-chart"></i> Pipeline</a>
             <button type="button" class="btn btn-warning btn-sm" id="refreshCamerasBtn" title="POST /api/disasters/refresh-cameras — ingest all hazard webcam sources into Postgres fire_cameras table">
               <i class="bi-database-down"></i> Pull webcams
             </button>
@@ -153,7 +156,7 @@
       <div id="hwSectionFilters" class="hw-filters-panel mb-3">
         <p class="small text-muted mb-3 mb-md-2">
           <i class="bi bi-info-circle me-1"></i>
-          USGS · NOAA WebCOOS · ALERTCalifornia · UCSD · Caltrans · 511NY — filter by source, state, county, or hazard type.
+          USGS · NOAA NDBC · WebCOOS · NPS · coastal DOT · ALERTCalifornia · UCSD · Caltrans · 511NY — filter by source, state, county, or hazard type.
         </p>
         <div id="sourceStatsRow" class="hw-source-stats mb-3"></div>
         <div class="row g-3 align-items-end">
@@ -169,6 +172,10 @@
             <option value="webcoos">NOAA WebCOOS (coastal)</option>
             <option value="caltrans_cwwp2">Caltrans CWWP2 (CA highways)</option>
             <option value="dot_511ny">511NY (NY highways)</option>
+            <option value="ndbc_buoycam">NOAA NDBC BuoyCams (coastal)</option>
+            <option value="ioos_coastal">IOOS / WebCOOS coastal catalog</option>
+            <option value="nps_webcams">NPS coastal parks</option>
+            <option value="dot_coastal">Coastal DOT (NC, FL, MD Chesapeake)</option>
             <option value="ucsd_pier">UCSD Scripps Pier</option>
             <option value="ucsd_hpwren">UCSD HPWREN</option>
           </select>
@@ -278,7 +285,7 @@
     <div class="modal fade" id="cameraViewerModal" tabindex="-1" aria-labelledby="cameraViewerModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
-          <div class="modal-header bg-warning text-dark">
+          <div class="modal-header">
             <h5 class="modal-title" id="cameraViewerModalLabel">
               <i class="bi-camera-video"></i> <span id="cameraViewerTitle">Webcam</span>
             </h5>
@@ -752,9 +759,12 @@
             const fireCount = bySource
               .filter((s) => fireSources.has(String(s.source || '').toLowerCase()))
               .reduce((sum, s) => sum + Number(s.count || 0), 0);
-            const coastalCount = bySource
-              .filter((s) => String(s.source || '').toLowerCase() === 'webcoos')
-              .reduce((sum, s) => sum + Number(s.count || 0), 0);
+            const coastalFromTags = Number(json.data.coastal);
+            const coastalCount = Number.isFinite(coastalFromTags)
+              ? coastalFromTags
+              : bySource
+                .filter((s) => String(s.source || '').toLowerCase() === 'webcoos')
+                .reduce((sum, s) => sum + Number(s.count || 0), 0);
             const activeSources = bySource.filter((s) => Number(s.count) > 0).length;
 
             const setStat = (id, value) => {

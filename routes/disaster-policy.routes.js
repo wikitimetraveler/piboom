@@ -11,7 +11,10 @@ router.get('/events', ctrl.listEvents);
 router.post('/events', ctrl.createEvent);
 router.get('/fema/:disasterNumber/counties', ctrl.femaCounties);
 router.get('/events/:id', ctrl.getEvent);
+router.patch('/events/:id', ctrl.updateEvent);
+router.delete('/events/:id', ctrl.deleteEvent);
 router.post('/events/:id/areas', ctrl.appendAreas);
+router.delete('/events/:id/areas/:areaId', ctrl.deleteArea);
 router.patch('/events/:id/status', ctrl.patchStatus);
 router.get('/events/:id/impacted-loans', ctrl.impactedLoans);
 

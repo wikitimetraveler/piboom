@@ -45,18 +45,18 @@ body.hw-page {
 }
 
 .hw-address-panel {
-  border: 1px solid var(--zen-border, rgba(74, 144, 164, 0.18));
+  border: 1px solid var(--border-light, var(--zen-border, rgba(74, 144, 164, 0.18)));
   border-radius: 12px;
-  background: linear-gradient(135deg, #fff 0%, var(--zen-surface, #f8fafc) 100%);
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  background: var(--zen-surface, #fff);
+  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
   padding: 1rem 1.15rem;
 }
 
 .hw-filters-panel {
-  border: 1px solid var(--zen-border, rgba(74, 144, 164, 0.18));
+  border: 1px solid var(--border-light, var(--zen-border, rgba(74, 144, 164, 0.18)));
   border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  background: var(--zen-surface, #fff);
+  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
   padding: 1rem 1.15rem;
 }
 
@@ -73,7 +73,7 @@ body.hw-page {
   font-weight: 600;
   padding: 0.35rem 0.8rem;
   border: 1px solid rgba(74, 144, 164, 0.22);
-  background: #fff;
+  background: var(--zen-surface, #fff);
   color: var(--text-muted, #6b7280);
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
@@ -91,10 +91,10 @@ body.hw-page {
 
 .hw-map-panel,
 .hw-nearest-panel {
-  border: 1px solid var(--zen-border, rgba(74, 144, 164, 0.18));
+  border: 1px solid var(--border-light, var(--zen-border, rgba(74, 144, 164, 0.18)));
   border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  background: var(--zen-surface, #fff);
+  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
   overflow: hidden;
 }
 

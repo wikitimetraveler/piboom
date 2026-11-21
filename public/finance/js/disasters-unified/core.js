@@ -33,6 +33,7 @@ var firmsConfidenceFilter = 'high';
 var majorNowFilterActive = false;
 var majorNowFilterHours = 72;
 var aiChatWidget = null;
+var portfolioAiChatWidget = null;
 var aiInsightsCard = null;
 var voiceRecognition = null;
 var isVoiceListening = false;

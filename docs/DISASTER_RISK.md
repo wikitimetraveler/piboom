@@ -133,7 +133,7 @@ FIRMS NRT detections are clustered with **union-find single-linkage** (`clusterF
 | Method | Path | Description |
 |--------|------|-------------|
 | POST | `/chat` | Chat with loan pipeline AI |
-| POST | `/chat-disaster-expert` | Disaster expert AI — `expertProfile: processor` + `sessionId: unified-disaster-processor` use processor-operations prompt; context may include `selectedDisaster`, `selectedLoan`, `nearbyLoans`, `nearbyCameras`, `loanFilterMeta`, `page: disasters-unified` |
+| POST | `/chat-disaster-expert` | Disaster expert AI — `expertProfile: processor` + `sessionId: unified-disaster-processor` for processor ops; `expertProfile: portfolio` + `sessionId: unified-disaster-portfolio` for portfolio exposure; context may include `selectedDisaster`, `nearbyLoans`, `loanFilterMeta`, `page: disasters-unified`. All profiles consume **44 CFR § 206.48** (Governor major-disaster request factors) via `services/disaster-stafford-knowledge.service.js` / `knowledge-sources/disaster/` — expert context only, not a live feed |
 | POST | `/insights` | Generate AI insights |
 | POST | `/analyze` | Analyze dashboard data |
 | GET | `/history` | Conversation history |

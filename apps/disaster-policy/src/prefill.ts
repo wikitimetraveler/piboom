@@ -8,6 +8,7 @@ export type PrefillPayload = {
   county?: string;
   countyFips?: string;
   incidentBegin?: string;
+  governorDate?: string;
   femaNumber?: string;
   femaEmDate?: string;
   femaDrDate?: string;
@@ -74,6 +75,7 @@ export function parsePrefillFromSearch(search: string): PrefillPayload | null {
     county: q.get('county') || undefined,
     countyFips: q.get('countyFips') || undefined,
     incidentBegin: toDateInput(q.get('incidentBegin')),
+    governorDate: toDateInput(q.get('governorDate') || q.get('governorDeclarationDate')),
     femaNumber: q.get('femaNumber') || undefined,
     femaEmDate: toDateInput(q.get('femaEmDate')),
     femaDrDate: toDateInput(q.get('femaDrDate')),

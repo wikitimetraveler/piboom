@@ -39,6 +39,10 @@
       ucsd_pier: 'Scripps COOL Lab',
       caltrans_cwwp2: 'Caltrans CWWP2',
       dot_511ny: '511NY / NYSDOT',
+      ndbc_buoycam: 'NOAA NDBC BuoyCam',
+      ioos_coastal: 'IOOS / WebCOOS coastal',
+      nps_webcams: 'National Park Service',
+      dot_coastal: 'Coastal DOT (NC / FL / MD)',
     };
     return map[source] || source || 'Webcam';
   }

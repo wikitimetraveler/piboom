@@ -5,6 +5,9 @@ import {
   createPolicyEvent,
   listPolicyEvents,
   setPolicyStatus,
+  updatePolicyEvent,
+  deletePolicyEvent,
+  removePolicyArea,
   resetDisasterPolicyMemoryForTests,
   classifyLoanAreaMatch,
 } from '../../services/disaster-policy.service.js';
@@ -64,6 +67,37 @@ describe('disaster-policy.service', () => {
     expect(
       classifyLoanAreaMatch({ state: 'FL', county: 'Orange', county_fips: '12095' }, areas)
     ).toBeNull();
+  });
+
+  test('update delete and area remove support full CRUD', async () => {
+    const created = await createPolicyEvent({
+      kind: 'declared',
+      status: 'active',
+      eventName: 'CRUD storm',
+      areas: [
+        { state: 'TX', countyCode: '48201', countyName: 'Harris' },
+        { state: 'TX', countyCode: '48167', countyName: 'Galveston' },
+      ],
+    });
+    const updated = await updatePolicyEvent(created.id, {
+      eventName: 'CRUD storm renamed',
+      acmeFundingSuspension: true,
+    });
+    expect(updated.eventName).toBe('CRUD storm renamed');
+    expect(updated.acmeFundingSuspension).toBe(true);
+    expect(updated.areas).toHaveLength(2);
+
+    const afterRemove = await removePolicyArea(created.id, created.areas[0].id);
+    expect(afterRemove.areas).toHaveLength(1);
+
+    await expect(removePolicyArea(created.id, afterRemove.areas[0].id)).rejects.toMatchObject({
+      code: 'AREAS_REQUIRED',
+    });
+
+    const del = await deletePolicyEvent(created.id);
+    expect(del.deleted).toBe(true);
+    const listed = await listPolicyEvents();
+    expect(listed.some((e) => e.id === created.id)).toBe(false);
   });
 
   test('rejects missing areas and bad kind', async () => {

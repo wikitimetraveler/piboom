@@ -1048,6 +1048,18 @@ function openProcessorExpert() {
   }
 }
 
+async function buildPortfolioAIContext() {
+  const base = await buildAIContext();
+  return { ...base, expertProfile: 'portfolio' };
+}
+
+function openPortfolioAnalyst() {
+  expandAiInsightsPanel();
+  if (window.portfolioAiChatWidget && typeof window.portfolioAiChatWidget.toggle === 'function') {
+    window.portfolioAiChatWidget.toggle();
+  }
+}
+
 function setAiInsightsPanelStatus(text) {
   const status = document.getElementById('duAiInsightsStatus');
   if (status) status.textContent = text || '';
@@ -1062,11 +1074,29 @@ function expandAiInsightsPanel() {
 function showInsightsIdlePlaceholder() {
   const container = document.getElementById('aiInsightsContainer');
   if (!container) return;
-  setAiInsightsPanelStatus('Select a disaster for tailored insights');
+  setAiInsightsPanelStatus('Pick a disaster for a quick portfolio read');
   container.innerHTML = `
     <div id="aiInsightsIdle" class="small text-muted mb-0">
-      <i class="bi bi-lightbulb" aria-hidden="true"></i> Select a disaster in the grid for tailored AI insights.
+      <i class="bi bi-pie-chart" aria-hidden="true"></i> Select a disaster in the grid — we’ll sketch portfolio exposure and next steps.
     </div>`;
+}
+
+function runPortfolioInsightsForSelection() {
+  if (!aiInsightsCard || !selectedDisasterObj) {
+    showInsightsIdlePlaceholder();
+    return;
+  }
+  const title = selectedDisasterObj.title || selectedDisasterObj.declarationTitle || 'Selected disaster';
+  setAiInsightsPanelStatus(title);
+  expandAiInsightsPanel();
+  aiInsightsCard.generateInsights(getCurrentFilters(), 'disaster', selectedDisasterObj, {
+    expertProfile: 'portfolio',
+    nearbyLoans: {
+      count: lastAffectedLoans.length,
+      sample: lastAffectedLoans.slice(0, 15),
+    },
+    loanFilterMeta: lastLoanFilterMeta,
+  });
 }
 
 function openEncompassMapFromUnified() {
@@ -1184,7 +1214,12 @@ function buildPolicyDeskUrlFromDisaster(disasterObj) {
   const begin = d.start_time || d.incidentBeginDate || d.declarationDate || d.startedAt;
   if (begin) {
     const iso = new Date(begin);
-    if (!Number.isNaN(iso.getTime())) params.set('incidentBegin', iso.toISOString().slice(0, 10));
+    if (!Number.isNaN(iso.getTime())) {
+      const day = iso.toISOString().slice(0, 10);
+      params.set('incidentBegin', day);
+      // Governor SoE is step 1 for any hazard — seed date from event start when known.
+      if (!params.get('governorDate')) params.set('governorDate', day);
+    }
   }
   const femaNumber = extractFemaNumberFromDisaster(d);
   if (femaNumber) {
@@ -1290,6 +1325,7 @@ function updateSelectionContextStrip() {
   <ul class="dropdown-menu dropdown-menu-end">
     <li><button type="button" class="dropdown-item" id="duStripHeygenBtn"><i class="bi bi-camera-reels me-1"></i>AI video briefing</button></li>
     <li><button type="button" class="dropdown-item" id="duStripKmlBtn"><i class="bi bi-globe-americas me-1"></i>Google Earth KML</button></li>
+    <li><button type="button" class="dropdown-item" id="duStripPortfolioBtn"><i class="bi bi-pie-chart me-1"></i>Portfolio analyst</button></li>
     <li><button type="button" class="dropdown-item" id="duStripProcessorBtn"><i class="bi bi-robot me-1"></i>Processor expert</button></li>
     <li><hr class="dropdown-divider"></li>
     <li><button type="button" class="dropdown-item" id="duStripFullscreenMapBtn"><i class="bi bi-fullscreen me-1"></i>Open fullscreen map</button></li>
@@ -1302,6 +1338,7 @@ function updateSelectionContextStrip() {
   actions.appendChild(overflow);
   overflow.querySelector('#duStripHeygenBtn')?.addEventListener('click', () => openDisasterHeygenBriefing());
   overflow.querySelector('#duStripKmlBtn')?.addEventListener('click', () => exportCinematicDisasterKml());
+  overflow.querySelector('#duStripPortfolioBtn')?.addEventListener('click', () => openPortfolioAnalyst());
   overflow.querySelector('#duStripProcessorBtn')?.addEventListener('click', () => openProcessorExpert());
   overflow.querySelector('#duStripFullscreenMapBtn')?.addEventListener('click', () => openEncompassMapFromUnified());
   const policyLink = overflow.querySelector('#duStripPolicyDeskLink');
@@ -1360,14 +1397,7 @@ function refreshAIOnSelection() {
   updateSelectionContextStrip();
   refreshAIContext();
   heygenStudio?.refreshScriptPreview?.();
-  if (aiInsightsCard && selectedDisasterObj) {
-    const title = selectedDisasterObj.title || selectedDisasterObj.declarationTitle || 'Selected disaster';
-    setAiInsightsPanelStatus(title);
-    expandAiInsightsPanel();
-    aiInsightsCard.generateInsights(getCurrentFilters(), 'disaster', selectedDisasterObj);
-  } else {
-    showInsightsIdlePlaceholder();
-  }
+  runPortfolioInsightsForSelection();
 }
 
 async function initializeAIComponents() {
@@ -1378,6 +1408,10 @@ async function initializeAIComponents() {
   const processorWelcome = `<i class="bi bi-robot"></i>
     <p><strong>Disaster processor expert</strong> — ask about verification, insurance, milestones, and triage for the selected event.</p>
     <small class="text-muted">Try: "What should I verify on loans within 25 miles?" · "Which milestones to hold until flood insurance is confirmed?" · "Summarize operational risk for this county."</small>`;
+
+  const portfolioWelcome = `<i class="bi bi-pie-chart"></i>
+    <p><strong>Portfolio analyst</strong> — how this disaster sits against the book: concentration, nearby loans, and what to do next.</p>
+    <small class="text-muted">Try: "Where are we concentrated?" · "What’s the ops triage look like nearby?" · "Should Credit Admin open a Pending hold?"</small>`;
 
   if (window.AIChatWidget) {
     aiChatWidget = new window.AIChatWidget({
@@ -1401,6 +1435,21 @@ async function initializeAIComponents() {
       onMessageReceived: (response) => console.log('Disaster expert response:', response)
     });
     window.aiChatWidget = aiChatWidget;
+
+    portfolioAiChatWidget = new window.AIChatWidget({
+      apiEndpoint: '/api/loan-pipeline/ai/chat-disaster-expert',
+      userId,
+      sessionId: 'unified-disaster-portfolio',
+      title: 'Portfolio Analyst',
+      buttonTitle: 'Disaster portfolio analyst',
+      welcomeHtml: portfolioWelcome,
+      inputPlaceholder: 'Ask about portfolio exposure for this disaster…',
+      getContext: buildPortfolioAIContext,
+      showMusicMute: false,
+      onMessageSent: (message) => console.log('Portfolio analyst message:', message),
+      onMessageReceived: (response) => console.log('Portfolio analyst response:', response),
+    });
+    window.portfolioAiChatWidget = portfolioAiChatWidget;
   }
 
   if (window.AIInsightsCard) {
@@ -1409,7 +1458,8 @@ async function initializeAIComponents() {
       userId,
       containerId: 'aiInsightsContainer',
       autoGenerate: false,
-      onInsightsGenerated: (insights) => console.log('AI Insights:', insights)
+      onInsightsGenerated: (insights) => console.log('Portfolio insights:', insights),
+      onOpenPortfolioAnalyst: openPortfolioAnalyst,
     });
     window.aiInsightsCard = aiInsightsCard;
   }
@@ -1479,9 +1529,15 @@ function initializeVoiceRecognition() {
     if (result.success) {
       setDashboardStatus(result.message || 'Done.', 'success');
       if (action.type === 'filter' && aiInsightsCard) {
-        setAiInsightsPanelStatus('Insights for current filters');
+        setAiInsightsPanelStatus('Filter view');
         expandAiInsightsPanel();
-        aiInsightsCard.generateInsights(getCurrentFilters(), 'filter', selectedDisasterObj);
+        aiInsightsCard.generateInsights(getCurrentFilters(), 'filter', selectedDisasterObj, {
+          nearbyLoans: {
+            count: lastAffectedLoans.length,
+            sample: lastAffectedLoans.slice(0, 15),
+          },
+          loanFilterMeta: lastLoanFilterMeta,
+        });
       }
     } else {
       setDashboardStatus(result.message || 'Command not recognized.', 'warning');
@@ -1563,6 +1619,8 @@ window.selectNearbyWeatherAlert = function selectNearbyWeatherAlert(index) {
 window.exportCinematicDisasterKml = exportCinematicDisasterKml;
 window.openDisasterHeygenBriefing = openDisasterHeygenBriefing;
 window.openPolicyDeskFromSelection = openPolicyDeskFromSelection;
+window.openPortfolioAnalyst = openPortfolioAnalyst;
+window.openProcessorExpert = openProcessorExpert;
 window.buildPolicyDeskUrlFromDisaster = buildPolicyDeskUrlFromDisaster;
 
 
