@@ -328,4 +328,73 @@ describe('WebGpuPrivateAgent', () => {
     expect(controller.isBusy()).toBe(false);
     expect(busyFlags[busyFlags.length - 1]).toBe(false);
   });
+
+  test('setLlmEnabled toggles between loaded WebLLM and instant local kernel without losing engine', async () => {
+    const create = jest.fn(async () => ({
+      choices: [{ message: { content: 'LLM answer: 525000 ¢' } }],
+    }));
+    const importWebLlm = jest.fn(async () => ({
+      CreateMLCEngine: jest.fn(async () => ({
+        chat: { completions: { create } },
+      })),
+    }));
+
+    const controller = WebGpuPrivateAgent.createChatController({
+      gpu: {},
+      importWebLlm,
+      toolBus: WebGpuPrivateAgent.createToolBus({ calcMath, preferCpu: true }),
+    });
+
+    await controller.ensureEngine();
+    expect(controller.isModelLoaded()).toBe(true);
+    expect(controller.isLlmEnabled()).toBe(true);
+
+    controller.setLlmEnabled(false);
+    expect(controller.isLlmEnabled()).toBe(false);
+    const kernelOut = await controller.chat('Why can f32 miss a cent on the fee?');
+    expect(kernelOut.mode).toBe('local-kernel');
+    expect(create).not.toHaveBeenCalled();
+
+    controller.setLlmEnabled(true);
+    expect(controller.isLlmEnabled()).toBe(true);
+    const llmOut = await controller.chat('Explain that');
+    expect(llmOut.reply).toMatch(/LLM answer/);
+    expect(create).toHaveBeenCalledTimes(1);
+  });
+
+  test('chat breaks out of duplicate tool calls from small models and falls back on inference timeout', async () => {
+    const repeatCreate = jest.fn(async () => ({
+      choices: [{ message: { content: '{"tool":"explain_f32_drift"}' } }],
+    }));
+    const repeatController = WebGpuPrivateAgent.createChatController({
+      gpu: {},
+      importWebLlm: async () => ({
+        CreateMLCEngine: async () => ({
+          chat: { completions: { create: repeatCreate } },
+        }),
+      }),
+      toolBus: WebGpuPrivateAgent.createToolBus({ calcMath, preferCpu: true }),
+    });
+
+    const repeatOut = await repeatController.chat('Why can f32 miss a cent on the fee?');
+    expect(repeatCreate).toHaveBeenCalledTimes(2);
+    expect(repeatOut.toolTrace).toHaveLength(1);
+    expect(repeatOut.reply).toMatch(/525000 ¢/);
+
+    const hungController = WebGpuPrivateAgent.createChatController({
+      gpu: {},
+      inferTimeoutMs: 30,
+      importWebLlm: async () => ({
+        CreateMLCEngine: async () => ({
+          chat: { completions: { create: () => new Promise(() => {}) } },
+        }),
+      }),
+      toolBus: WebGpuPrivateAgent.createToolBus({ calcMath, preferCpu: true }),
+    });
+
+    const fallbackOut = await hungController.chat('Why can f32 miss a cent on the fee?');
+    expect(hungController.isBusy()).toBe(false);
+    expect(fallbackOut.toolTrace).toHaveLength(1);
+    expect(fallbackOut.reply).toMatch(/525000 ¢/);
+  });
 });

@@ -9,6 +9,8 @@
   const MAX_BATCH = 64;
   const MAX_TOOL_ROUNDS = 4;
   const DEFAULT_STALL_TIMEOUT_MS = 12000;
+  const DEFAULT_INFER_TIMEOUT_MS = 8000;
+  const DEFAULT_MAX_TOKENS = 160;
   const INPUT_KEYS = ['g7', 'g8', 'g9', 'g12', 'g13', 'g14', 'd29'];
   const DEFAULT_MODEL_ID = 'SmolLM2-360M-Instruct-q4f32_1-MLC';
   const WEBLLM_CDN = 'https://esm.run/@mlc-ai/web-llm';
@@ -597,7 +599,14 @@
         : hasCustomImporter
           ? 0
           : DEFAULT_STALL_TIMEOUT_MS;
+    const inferTimeoutMs =
+      typeof o.inferTimeoutMs === 'number'
+        ? o.inferTimeoutMs
+        : hasCustomImporter
+          ? 0
+          : DEFAULT_INFER_TIMEOUT_MS;
     let engine = null;
+    let llmEnabled = true;
     let activeWorker = null;
     let cancelPendingLoad = null;
     let loading = false;
@@ -689,6 +698,7 @@
         });
 
         engine = await Promise.race([createPromise, abortPromise]);
+        llmEnabled = true;
         return engine;
       } catch (err) {
         cleanupWorker();
@@ -706,13 +716,30 @@
     async function completeOnce(history) {
       busy = true;
       notifyGpuBusy();
+      let inferTimer = null;
       try {
         const eng = await ensureEngine();
-        const reply = await eng.chat.completions.create({
+        const reqPromise = eng.chat.completions.create({
           messages: history,
           temperature: 0.2,
+          max_tokens: DEFAULT_MAX_TOKENS,
           stream: false,
         });
+        const reply =
+          inferTimeoutMs > 0
+            ? await Promise.race([
+                reqPromise,
+                new Promise((_, reject) => {
+                  inferTimer = setTimeout(() => {
+                    const err = new Error(
+                      'WebLLM inference timed out — using instant on-device kernel'
+                    );
+                    err.isInferenceTimeout = true;
+                    reject(err);
+                  }, inferTimeoutMs);
+                }),
+              ])
+            : await reqPromise;
         const content =
           reply &&
           reply.choices &&
@@ -723,6 +750,7 @@
             : '';
         return String(content || '');
       } finally {
+        if (inferTimer) clearTimeout(inferTimer);
         busy = false;
         notifyGpuBusy();
       }
@@ -732,7 +760,7 @@
       const text = String(userText || '').trim();
       if (!text) return { reply: '', toolTrace: [] };
 
-      const useLlm = Boolean(engine || hasCustomImporter || o.autoLoadModel);
+      const useLlm = Boolean(llmEnabled && (engine || hasCustomImporter || o.autoLoadModel));
       if (!useLlm) {
         messages.push({ role: 'user', content: text });
         const localOut = await runLocalToolTurn(text, bus);
@@ -742,31 +770,64 @@
 
       messages.push({ role: 'user', content: text });
       const toolTrace = [];
+      const seenCalls = new Set();
+      let lastCall = null;
+      let lastResult = null;
       let reply = '';
 
-      for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
-        reply = await completeOnce(messages);
-        const call = parseToolCall(reply);
-        if (!call) {
+      try {
+        for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+          reply = await completeOnce(messages);
+          const call = parseToolCall(reply);
+          if (!call) {
+            const finalReply =
+              reply.trim() ||
+              (lastCall && lastResult ? formatLocalToolReply(lastCall, lastResult) : '');
+            messages.push({ role: 'assistant', content: finalReply });
+            return { reply: finalReply, toolTrace };
+          }
+          const sig = JSON.stringify(call);
+          if (seenCalls.has(sig) && lastCall && lastResult) {
+            const formatted = formatLocalToolReply(lastCall, lastResult);
+            messages.push({ role: 'assistant', content: formatted });
+            return { reply: formatted, toolTrace };
+          }
+          seenCalls.add(sig);
           messages.push({ role: 'assistant', content: reply });
-          return { reply, toolTrace };
+          const result = await bus.invoke(call);
+          lastCall = call;
+          lastResult = result;
+          toolTrace.push({ call, result });
+          messages.push({
+            role: 'user',
+            content:
+              'Tool result for ' +
+              call.tool +
+              ' (explain in 1-2 short sentences using these exact numbers; do not output JSON):\n' +
+              JSON.stringify(result),
+          });
+        }
+
+        reply = await completeOnce(messages);
+        const postLoopCall = parseToolCall(reply);
+        if ((postLoopCall || !reply.trim()) && lastCall && lastResult) {
+          reply = formatLocalToolReply(lastCall, lastResult);
         }
         messages.push({ role: 'assistant', content: reply });
-        const result = await bus.invoke(call);
-        toolTrace.push({ call, result });
-        messages.push({
-          role: 'user',
-          content:
-            'Tool result for ' +
-            call.tool +
-            ' (use these exact numbers; do not invent money):\n' +
-            JSON.stringify(result),
-        });
+        return { reply, toolTrace };
+      } catch (err) {
+        if (err && err.isInferenceTimeout) {
+          if (lastCall && lastResult) {
+            const fallbackReply = formatLocalToolReply(lastCall, lastResult);
+            messages.push({ role: 'assistant', content: fallbackReply });
+            return { reply: fallbackReply, toolTrace, mode: 'local-kernel-fallback' };
+          }
+          const localOut = await runLocalToolTurn(text, bus);
+          messages.push({ role: 'assistant', content: localOut.reply });
+          return localOut;
+        }
+        throw err;
       }
-
-      reply = await completeOnce(messages);
-      messages.push({ role: 'assistant', content: reply });
-      return { reply, toolTrace };
     }
 
     return {
@@ -777,6 +838,13 @@
       cancelLoad,
       isModelLoaded() {
         return Boolean(engine);
+      },
+      isLlmEnabled() {
+        return Boolean(llmEnabled && engine);
+      },
+      setLlmEnabled(flag) {
+        llmEnabled = Boolean(flag);
+        return llmEnabled;
       },
       isLoading() {
         return Boolean(loading);
@@ -893,7 +961,7 @@
         if (typeof o.onGpuBusy === 'function') o.onGpuBusy(Boolean(flag), meta);
         if (statusEl && hasGpu) {
           if (!flag) {
-            statusEl.textContent = controller.isModelLoaded()
+            statusEl.textContent = controller.isLlmEnabled()
               ? 'WebLLM loaded (on-device)'
               : 'WebGPU ready (on-device kernel)';
           } else if (meta && meta.loading) {
@@ -904,6 +972,27 @@
         }
       },
     });
+
+    function syncLoadButtonUi() {
+      if (!loadBtn) return;
+      if (controller.isModelLoaded()) {
+        const active = controller.isLlmEnabled();
+        loadBtn.disabled = false;
+        loadBtn.textContent = active ? 'WebLLM: ON (toggle kernel)' : 'WebLLM: OFF (use WebLLM)';
+        loadBtn.classList.toggle('btn-primary', active);
+        loadBtn.classList.toggle('btn-outline-primary', !active);
+        if (statusEl && hasGpu && !controller.isBusy()) {
+          statusEl.textContent = active
+            ? 'WebLLM loaded (on-device)'
+            : 'WebGPU ready (on-device kernel)';
+        }
+        if (progressEl && !controller.isBusy()) {
+          progressEl.textContent = active
+            ? 'Ready (click button to switch to instant kernel)'
+            : 'Instant kernel active (WebLLM cached in VRAM — click to re-enable)';
+        }
+      }
+    }
 
     let sending = false;
     async function send(text) {
@@ -918,7 +1007,7 @@
         });
         appendBubble('assistant', reply || '(empty reply)');
         if (statusEl && hasGpu && !controller.isBusy()) {
-          statusEl.textContent = controller.isModelLoaded()
+          statusEl.textContent = controller.isLlmEnabled()
             ? 'WebLLM loaded (on-device)'
             : 'WebGPU ready (on-device kernel)';
         }
@@ -938,13 +1027,15 @@
           controller.cancelLoad();
           return;
         }
+        if (controller.isModelLoaded()) {
+          controller.setLlmEnabled(!controller.isLlmEnabled());
+          syncLoadButtonUi();
+          return;
+        }
         loadBtn.textContent = 'Cancel load';
         try {
           await controller.ensureEngine();
-          loadBtn.textContent = 'WebLLM loaded';
-          loadBtn.disabled = true;
-          if (statusEl) statusEl.textContent = 'WebLLM loaded (on-device)';
-          if (progressEl) progressEl.textContent = 'Ready';
+          syncLoadButtonUi();
         } catch (err) {
           loadBtn.textContent = 'Load optional WebLLM';
           loadBtn.disabled = false;
