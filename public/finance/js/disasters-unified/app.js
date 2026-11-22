@@ -1215,10 +1215,7 @@ function buildPolicyDeskUrlFromDisaster(disasterObj) {
   if (begin) {
     const iso = new Date(begin);
     if (!Number.isNaN(iso.getTime())) {
-      const day = iso.toISOString().slice(0, 10);
-      params.set('incidentBegin', day);
-      // Governor SoE is step 1 for any hazard — seed date from event start when known.
-      if (!params.get('governorDate')) params.set('governorDate', day);
+      params.set('incidentBegin', iso.toISOString().slice(0, 10));
     }
   }
   const femaNumber = extractFemaNumberFromDisaster(d);

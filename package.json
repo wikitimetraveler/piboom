@@ -78,6 +78,7 @@
     "harvest:lane-volumes-ia": "node scripts/harvest-lane-volumes-ia.mjs",
     "harvest:lane-volumes-ia:write": "node scripts/harvest-lane-volumes-ia.mjs --enrich --write",
     "build:us-geo": "node scripts/tools/build-us-geo-assets.mjs",
+    "build:us-zips": "node scripts/tools/build-us-zip-assets.mjs",
     "ingest:newport-pier": "node scripts/tools/ingest-newport-pier-video.mjs --input \"C:/Users/levij/Downloads/IMG_0847.MOV\"",
     "download:newport-pier-fish": "node scripts/tools/download-newport-pier-fish-images.mjs",
     "postprocess:heygen-pip": "node scripts/tools/postprocess-heygen-pip.mjs",

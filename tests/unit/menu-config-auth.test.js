@@ -81,7 +81,7 @@ describe('menu-config auth filtering', () => {
         '/finance/enhanced-conditions.html',
         '/finance/enhanced-conditions-expert.html',
         '/finance/tpo-connect.html',
-        '/finance/processor-assignment.html',
+        '/finance/processor-assignment-mock.html',
         '/finance/unit-tests.html',
         '/finance/fha-streamline-calculator.html',
         '/finance/disasters-unified.html',

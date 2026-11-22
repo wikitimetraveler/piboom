@@ -2,7 +2,8 @@
  * Development work by David Lane
  */
 /**
- * Processor assignment mock demo — synthetic loans/processors only; no Encompass pipeline or PUT.
+ * Processor assignment mock demo — synthetic loans/processors only.
+ * Scoring/routing runs entirely in-browser (processor-assignment-client-run.js); no Encompass APIs.
  */
 (function () {
   'use strict';
@@ -395,7 +396,7 @@
     return body;
   }
 
-  async function runAssignment() {
+  function runAssignment() {
     const statusEl = $('runStatus');
     statusEl.textContent = 'Running mock dry run…';
     saveStorage();
@@ -408,28 +409,20 @@
       return null;
     }
 
+    const clientRun = window.processorAssignmentClientRun;
+    if (!clientRun || typeof clientRun.run !== 'function') {
+      statusEl.textContent = 'Error: client-side assignment runner not loaded.';
+      return null;
+    }
+
     try {
-      const res = await fetch('/api/encompass-hub/processor-assignment/run', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      const text = await res.text();
-      let json;
-      try {
-        json = JSON.parse(text);
-      } catch {
-        throw new Error(text || res.statusText);
-      }
-      if (!res.ok) {
-        throw new Error(json.details || json.error || res.statusText);
-      }
+      const json = clientRun.run(body);
       lastRunPayload = { body, result: json };
       renderResults(json, false);
-      statusEl.textContent = 'Dry run complete (mock data only — no Encompass writes).';
+      statusEl.textContent = 'Dry run complete (mock data + client scoring — no API calls).';
       return json;
     } catch (e) {
-      statusEl.textContent = 'Error: ' + e.message;
+      statusEl.textContent = 'Error: ' + (e.message || e);
       return null;
     }
   }

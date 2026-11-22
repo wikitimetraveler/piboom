@@ -11,7 +11,9 @@ import {
   updatePolicyEvent,
   deletePolicyEvent,
   removePolicyArea,
+  updatePolicyAreas,
   findImpactedLoans,
+  previewImpactedLoans,
   listFemaCountiesByDisasterNumber,
 } from '../services/disaster-policy.service.js';
 
@@ -22,7 +24,11 @@ function statusFor(code) {
     code === 'EVENT_NAME_REQUIRED' ||
     code === 'AREAS_REQUIRED' ||
     code === 'AREA_INVALID' ||
-    code === 'AREA_NOT_FOUND'
+    code === 'AREA_NOT_FOUND' ||
+    code === 'ZIP_INVALID' ||
+    code === 'DATE_INVALID' ||
+    code === 'AREA_PATCH_EMPTY' ||
+    code === 'END_BEFORE_BEGIN'
   ) {
     return 400;
   }
@@ -42,7 +48,15 @@ function messageFor(code) {
     case 'AREA_INVALID':
       return 'Each area needs state, countyCode (FIPS), and countyName';
     case 'AREA_NOT_FOUND':
-      return 'County area not found on this event';
+      return 'Area not found on this event';
+    case 'ZIP_INVALID':
+      return 'zipCode must be a 5-digit ZIP Code';
+    case 'DATE_INVALID':
+      return 'Dates must be YYYY-MM-DD';
+    case 'AREA_PATCH_EMPTY':
+      return 'Send incidentEndDate and/or inspectionRequiredAppraisalsOnOrBefore';
+    case 'END_BEFORE_BEGIN':
+      return 'Incident Period End Date cannot be before the Incident Period Begin Date';
     default:
       return 'Disaster policy request failed';
   }
@@ -139,6 +153,21 @@ export async function deleteArea(req, res) {
   }
 }
 
+export async function patchAreas(req, res) {
+  try {
+    const event = await updatePolicyAreas(req.params.id, req.body || {});
+    if (!event) return res.status(404).json({ success: false, error: 'Not found' });
+    return res.json({ success: true, event });
+  } catch (err) {
+    const code = err?.code || 'AREA_UPDATE_FAILED';
+    return res.status(statusFor(code)).json({
+      success: false,
+      error: messageFor(code),
+      code,
+    });
+  }
+}
+
 export async function patchStatus(req, res) {
   try {
     const event = await setPolicyStatus(req.params.id, req.body?.status);
@@ -161,6 +190,20 @@ export async function impactedLoans(req, res) {
     return res.json({ success: true, ...result });
   } catch (err) {
     return res.status(500).json({ success: false, error: err.message || 'Impact query failed' });
+  }
+}
+
+export async function impactPreview(req, res) {
+  try {
+    const result = await previewImpactedLoans(req.body?.areas || []);
+    return res.json({ success: true, ...result });
+  } catch (err) {
+    const code = err?.code || 'PREVIEW_FAILED';
+    return res.status(statusFor(code)).json({
+      success: false,
+      error: messageFor(code),
+      code,
+    });
   }
 }
 

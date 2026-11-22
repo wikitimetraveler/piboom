@@ -390,6 +390,46 @@ body {
   color: var(--ski-ice);
 }
 
+.ski-bens {
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--ski-line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #0c151d;
+}
+
+.ski-bens__bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.75rem 1.25rem;
+  align-items: center;
+  padding: 0.85rem 1rem;
+}
+
+.ski-bens__bar h2 {
+  margin: 0 0 0.2rem;
+  font-size: 1.05rem;
+}
+
+.ski-bens__bar p {
+  margin: 0;
+  color: var(--ski-muted);
+  font-size: 0.84rem;
+}
+
+.ski-bens__bar a {
+  color: var(--ski-ice);
+}
+
+.ski-bens__frame {
+  display: block;
+  width: 100%;
+  height: 1100px;
+  border: 0;
+  background: #c4a574;
+}
+
 .ski-chips {
   display: flex;
   flex-wrap: wrap;

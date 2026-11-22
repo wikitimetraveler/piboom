@@ -37,15 +37,17 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | POST | `/api/webhooks/encompass` | Encompass webhook receiver |
 | POST | `/api/reviewer/ai/chat` | The Screen Test AI |
 | GET | `/api/disaster-policy/events` | List Declared/Pending policy events (query: kind, status) |
-| POST | `/api/disaster-policy/events` | Create policy event + county areas (BRD field set; ACME hold flags) |
+| POST | `/api/disaster-policy/events` | Create policy event + areas (BRD field set; ACME hold flags). An area is a whole county (`state`, `countyCode` FIPS, `countyName`) or one ZIP Code inside a county (add `zipCode`) |
+| POST | `/api/disaster-policy/impact-preview` | Impacted-loan report for a list of `areas` before an event is saved (review step; no holds applied) |
 | GET | `/api/disaster-policy/fema/:disasterNumber/counties` | Distinct FEMA counties from `disasters` for a DR/EM number |
 | GET | `/api/disaster-policy/events/:id` | Get one policy event |
 | PATCH | `/api/disaster-policy/events/:id` | Update BRD fields (name, dates, ACME holds) |
 | DELETE | `/api/disaster-policy/events/:id` | Delete policy event (+ areas) |
-| POST | `/api/disaster-policy/events/:id/areas` | Append counties/ZIPs |
-| DELETE | `/api/disaster-policy/events/:id/areas/:areaId` | Remove one county (refuses last area) |
+| POST | `/api/disaster-policy/events/:id/areas` | Append counties/ZIPs (areas already on the event are skipped) |
+| PATCH | `/api/disaster-policy/events/:id/areas` | Set or clear Incident Period End Date / inspection cutoff on `areaIds` |
+| DELETE | `/api/disaster-policy/events/:id/areas/:areaId` | Remove one area (refuses last area) |
 | PATCH | `/api/disaster-policy/events/:id/status` | draft → active → ended (Pending activate sets ACME Treasury Hold) |
-| GET | `/api/disaster-policy/events/:id/impacted-loans` | Pipeline loans matching event counties (FIPS first, name fallback) |
+| GET | `/api/disaster-policy/events/:id/impacted-loans` | Loans matching the event's areas (ZIP areas by property ZIP; county areas by FIPS, name fallback) plus `report`: Pipeline by channel × milestone, Inventory, Servicing, hold counts. Holds stop for an area once its Incident Period End Date is reached |
 | GET | `/api/file-transfer/meta` | Allowed extensions + max size for general file transfer |
 | GET | `/api/file-transfer/files` | List uploaded docs/spreadsheets |
 | POST | `/api/file-transfer/files` | Upload a file (multipart `file`, optional `note`) |

@@ -69,7 +69,7 @@ routes/encompass-*.routes.js
 | Area                     | Paths                                                                                                            |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------- |
 | Encompass Hub/API        | `services/encompass-hub.service.js`, `controllers/encompass-hub.controller.js`, `routes/encompass-hub.routes.js` |
-| Processor assignment     | `services/processor-assignment.service.js`, `services/processor-assignment-config.service.js`, `public/finance/processor-assignment.html`, `public/finance/js/processor-assignment.js` |
+| Processor assignment     | Mock UI: `public/finance/processor-assignment-mock.html` + `js/processor-assignment-mock.js` + `js/processor-assignment-client-run.js` (no hub APIs). Live archived: `processor-assignment-live.html`. Services: `services/processor-assignment.service.js`, `services/processor-assignment-config.service.js` |
 | Encompass Assistant (AI) | `controllers/encompass-assistant.controller.js`, `services/encompass-docs.service.js`                            |
 | ICE Knowledge            | `lib/knowledge/ice-knowledge.service.js`, `knowledge-sources/ice/`, `data/knowledge/ice-sources.json`            |
 | AI Chat / Memory         | `controllers/unit-tests-ai.controller.js`, `controllers/loan-pipeline-ai.controller.js`                          |

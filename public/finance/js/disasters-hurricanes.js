@@ -244,26 +244,17 @@
       : '—';
   }
 
-  function policyDeskUrlForGovernor(g, prediction) {
+  /** Start a Pending Natural Disaster on Policy Desk for one state in the path. Governor timing stays here (research). */
+  function policyDeskUrlForState(g, prediction) {
     const storm = prediction?.storm || {};
     const name = storm.name || prediction?.advisory?.label || 'Hurricane event';
     const params = new URLSearchParams({
       from: 'hurricane-tracker',
       kind: 'pending',
-      eventName: `${name} — ${g.state_abbr} governor SoE`,
+      eventName: `${name} — ${g.state_abbr}`,
       disasterType: 'Hurricane',
       state: g.state_abbr || '',
-      autoAddCounty: '1',
     });
-    const typical = g.typicalSoe || g.earliestSoeStart;
-    if (typical) {
-      const d = new Date(typical);
-      if (!Number.isNaN(d.getTime())) {
-        const iso = d.toISOString().slice(0, 10);
-        params.set('governorDate', iso);
-        params.set('incidentBegin', iso);
-      }
-    }
     return `/finance/disaster-policy/?${params.toString()}`;
   }
 
@@ -272,8 +263,7 @@
     const rows = prediction.governorAnnouncementsByState || [];
     if (!rows.length) {
       panel.innerHTML =
-        '<p class="text-muted small mb-0">No governor SoE windows for this advisory.</p>' +
-        '<p class="small mt-2 mb-0"><a href="/finance/disaster-policy/">Record a governor declaration</a> on Policy Desk for any hazard (not only hurricanes).</p>';
+        '<p class="text-muted small mb-0">No governor SoE windows for this advisory.</p>';
       return;
     }
     const sorted = [...rows].sort((a, b) =>
@@ -295,13 +285,13 @@
         <div class="small text-muted">Typical: ${fmtDate(g.typicalSoe)}</div>
         <div class="ht-soe-note mt-1">${g.note || 'SoE timing varies by state.'}</div>
         <div class="small mt-1 text-muted">${g.counties.length} counties in path</div>
-        <a class="btn btn-sm btn-outline-primary mt-2" href="${policyDeskUrlForGovernor(g, prediction)}">
-          <i class="bi-clipboard2-check"></i> Record governor decl.
+        <a class="btn btn-sm btn-outline-primary mt-2" href="${policyDeskUrlForState(g, prediction)}">
+          <i class="bi-clipboard2-check"></i> Start pending hold for ${g.state_abbr}
         </a>
       </div>`
         )
         .join('') +
-      '<p class="small text-muted mt-2 mb-0">Estimates only. Floods, wildfire, winter storms, and other hazards also get governor SoE — capture those on Policy Desk too.</p>';
+      '<p class="small text-muted mt-2 mb-0">Estimates only — early-warning research, not a record of what a governor has declared.</p>';
   }
 
   function renderCountyTable(prediction) {
@@ -393,9 +383,9 @@
     state.prediction = res.data;
     if (res.data.disclaimer) {
       const deskLink =
-        ' When a governor actually declares (any hazard), capture it on'
-        + ' <a href="/finance/disaster-policy/" class="alert-link">Policy Desk</a>'
-        + ' — that is step 1 of ACME declarations.';
+        ' Governor windows are early-warning research. To declare a disaster or place a'
+        + ' Pending Natural Disaster hold, use'
+        + ' <a href="/finance/disaster-policy/" class="alert-link">Policy Desk</a>.';
       $('htDisclaimer').innerHTML = `${res.data.disclaimer}${deskLink}`;
     }
     updateModeBadge(res.data.mode);

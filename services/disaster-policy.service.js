@@ -22,7 +22,6 @@ CREATE TABLE IF NOT EXISTS disaster_policy_events (
   fema_emergency_declaration_date DATE,
   fema_major_disaster_declaration_date DATE,
   presidential_declaration_date DATE,
-  governor_declaration_date DATE,
   acme_emergency_declaration_date DATE,
   acme_disaster_announcement TEXT,
   acme_treasury_hold BOOLEAN NOT NULL DEFAULT FALSE,
@@ -94,10 +93,45 @@ function asDate(v) {
   return /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : null;
 }
 
+/** Postgres DATE columns arrive as local-midnight Date objects; the API speaks YYYY-MM-DD. */
+function dateOnly(v) {
+  if (v instanceof Date) {
+    if (Number.isNaN(v.getTime())) return null;
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${v.getFullYear()}-${pad(v.getMonth() + 1)}-${pad(v.getDate())}`;
+  }
+  return asDate(v);
+}
+
+function todayIso() {
+  return dateOnly(new Date());
+}
+
 function asBool(v, fallback = false) {
   if (v === true || v === 'true' || v === 1 || v === '1') return true;
   if (v === false || v === 'false' || v === 0 || v === '0') return false;
   return fallback;
+}
+
+function policyError(code) {
+  const err = new Error(code);
+  err.code = code;
+  return err;
+}
+
+/** A county area has no ZIP; a ZIP area is one ZIP Code inside its county. */
+function areaKey(a) {
+  return `${a.state}:${a.countyCode}:${a.zipCode || ''}`;
+}
+
+function dedupeAreas(areas, taken = new Set()) {
+  const seen = new Set(taken);
+  return areas.filter((a) => {
+    const key = areaKey(a);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 function normalizeArea(raw) {
@@ -105,16 +139,18 @@ function normalizeArea(raw) {
   const state = String(raw?.state || '').toUpperCase().slice(0, 2);
   const countyName = String(raw?.countyName || raw?.county_name || '').trim();
   if (!/^\d{5}$/.test(countyCode) || !/^[A-Z]{2}$/.test(state) || !countyName) {
-    const err = new Error('AREA_INVALID');
-    err.code = 'AREA_INVALID';
-    throw err;
+    throw policyError('AREA_INVALID');
+  }
+  const zipRaw = String(raw?.zipCode ?? raw?.zip_code ?? '').trim();
+  if (zipRaw && !/^\d{5}$/.test(zipRaw)) {
+    throw policyError('ZIP_INVALID');
   }
   return {
     id: crypto.randomUUID(),
     countyCode,
     countyName,
     state,
-    zipCode: raw?.zipCode || raw?.zip_code || null,
+    zipCode: zipRaw || null,
     incidentBeginDate: asDate(raw?.incidentBeginDate || raw?.incident_begin_date),
     incidentEndDate: asDate(raw?.incidentEndDate || raw?.incident_end_date),
     inspectionRequiredAppraisalsOnOrBefore: asDate(
@@ -149,7 +185,12 @@ function normalizeEventInput(body = {}) {
     err.code = 'AREAS_REQUIRED';
     throw err;
   }
-  const areas = areasIn.map(normalizeArea);
+  const incidentBeginDate = asDate(body.incidentBeginDate || body.incident_begin_date);
+  // Areas inherit the event's begin date unless they carry their own.
+  const areas = dedupeAreas(areasIn.map(normalizeArea)).map((a) => ({
+    ...a,
+    incidentBeginDate: a.incidentBeginDate || incidentBeginDate,
+  }));
 
   const treasuryHold =
     kind === 'pending' && status === 'active'
@@ -177,9 +218,6 @@ function normalizeEventInput(body = {}) {
     presidentialDeclarationDate: asDate(
       body.presidentialDeclarationDate || body.presidential_declaration_date
     ),
-    governorDeclarationDate: asDate(
-      body.governorDeclarationDate || body.governor_declaration_date
-    ),
     acmeEmergencyDeclarationDate: asDate(
       body.acmeEmergencyDeclarationDate ||
         body.acme_emergency_declaration_date ||
@@ -200,7 +238,7 @@ function normalizeEventInput(body = {}) {
         body.amerihome_funding_suspension,
       false
     ),
-    incidentBeginDate: asDate(body.incidentBeginDate || body.incident_begin_date),
+    incidentBeginDate,
     createdBy: body.createdBy || body.created_by || null,
     areas,
   };
@@ -214,15 +252,18 @@ function publicEvent(row, areas = []) {
     eventName: row.event_name ?? row.eventName,
     disasterType: row.disaster_type ?? row.disasterType,
     femaDeclarationNumber: row.fema_declaration_number ?? row.femaDeclarationNumber,
-    femaEmergencyDeclarationDate:
-      row.fema_emergency_declaration_date ?? row.femaEmergencyDeclarationDate,
-    femaMajorDisasterDeclarationDate:
-      row.fema_major_disaster_declaration_date ?? row.femaMajorDisasterDeclarationDate,
-    presidentialDeclarationDate:
-      row.presidential_declaration_date ?? row.presidentialDeclarationDate,
-    governorDeclarationDate: row.governor_declaration_date ?? row.governorDeclarationDate,
-    acmeEmergencyDeclarationDate:
-      row.acme_emergency_declaration_date ?? row.acmeEmergencyDeclarationDate,
+    femaEmergencyDeclarationDate: dateOnly(
+      row.fema_emergency_declaration_date ?? row.femaEmergencyDeclarationDate
+    ),
+    femaMajorDisasterDeclarationDate: dateOnly(
+      row.fema_major_disaster_declaration_date ?? row.femaMajorDisasterDeclarationDate
+    ),
+    presidentialDeclarationDate: dateOnly(
+      row.presidential_declaration_date ?? row.presidentialDeclarationDate
+    ),
+    acmeEmergencyDeclarationDate: dateOnly(
+      row.acme_emergency_declaration_date ?? row.acmeEmergencyDeclarationDate
+    ),
     acmeDisasterAnnouncement:
       row.acme_disaster_announcement ?? row.acmeDisasterAnnouncement,
     acmeTreasuryHold: Boolean(
@@ -231,7 +272,7 @@ function publicEvent(row, areas = []) {
     acmeFundingSuspension: Boolean(
       row.acme_funding_suspension ?? row.acmeFundingSuspension
     ),
-    incidentBeginDate: row.incident_begin_date ?? row.incidentBeginDate,
+    incidentBeginDate: dateOnly(row.incident_begin_date ?? row.incidentBeginDate),
     createdBy: row.created_by ?? row.createdBy,
     createdAt: row.created_at ?? row.createdAt,
     updatedAt: row.updated_at ?? row.updatedAt,
@@ -240,12 +281,13 @@ function publicEvent(row, areas = []) {
       countyCode: a.county_code ?? a.countyCode,
       countyName: a.county_name ?? a.countyName,
       state: a.state,
-      zipCode: a.zip_code ?? a.zipCode,
-      incidentBeginDate: a.incident_begin_date ?? a.incidentBeginDate,
-      incidentEndDate: a.incident_end_date ?? a.incidentEndDate,
-      inspectionRequiredAppraisalsOnOrBefore:
+      zipCode: a.zip_code ?? a.zipCode ?? null,
+      incidentBeginDate: dateOnly(a.incident_begin_date ?? a.incidentBeginDate),
+      incidentEndDate: dateOnly(a.incident_end_date ?? a.incidentEndDate),
+      inspectionRequiredAppraisalsOnOrBefore: dateOnly(
         a.inspection_required_appraisals_on_or_before ??
-        a.inspectionRequiredAppraisalsOnOrBefore,
+          a.inspectionRequiredAppraisalsOnOrBefore
+      ),
     })),
   };
 }
@@ -263,7 +305,6 @@ function saveMemory(normalized) {
     femaEmergencyDeclarationDate: normalized.femaEmergencyDeclarationDate,
     femaMajorDisasterDeclarationDate: normalized.femaMajorDisasterDeclarationDate,
     presidentialDeclarationDate: normalized.presidentialDeclarationDate,
-    governorDeclarationDate: normalized.governorDeclarationDate,
     acmeEmergencyDeclarationDate: normalized.acmeEmergencyDeclarationDate,
     acmeDisasterAnnouncement: normalized.acmeDisasterAnnouncement,
     acmeTreasuryHold: normalized.acmeTreasuryHold,
@@ -291,10 +332,10 @@ export async function createPolicyEvent(body) {
       `INSERT INTO disaster_policy_events (
         id, kind, status, event_name, disaster_type, fema_declaration_number,
         fema_emergency_declaration_date, fema_major_disaster_declaration_date,
-        presidential_declaration_date, governor_declaration_date,
+        presidential_declaration_date,
         acme_emergency_declaration_date, acme_disaster_announcement,
         acme_treasury_hold, acme_funding_suspension, incident_begin_date, created_by
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`,
       [
         id,
         normalized.kind,
@@ -305,7 +346,6 @@ export async function createPolicyEvent(body) {
         normalized.femaEmergencyDeclarationDate,
         normalized.femaMajorDisasterDeclarationDate,
         normalized.presidentialDeclarationDate,
-        normalized.governorDeclarationDate,
         normalized.acmeEmergencyDeclarationDate,
         normalized.acmeDisasterAnnouncement,
         normalized.acmeTreasuryHold,
@@ -399,12 +439,16 @@ export async function getPolicyEvent(id) {
 export async function appendPolicyAreas(id, areasIn = []) {
   const event = await getPolicyEvent(id);
   if (!event) return null;
-  const areas = (Array.isArray(areasIn) ? areasIn : []).map(normalizeArea);
-  if (!areas.length) {
-    const err = new Error('AREAS_REQUIRED');
-    err.code = 'AREAS_REQUIRED';
-    throw err;
+  const requested = (Array.isArray(areasIn) ? areasIn : []).map(normalizeArea);
+  if (!requested.length) {
+    throw policyError('AREAS_REQUIRED');
   }
+  // Areas already on the event are skipped rather than stored twice.
+  const areas = dedupeAreas(requested, new Set(event.areas.map(areaKey))).map((a) => ({
+    ...a,
+    incidentBeginDate: a.incidentBeginDate || event.incidentBeginDate,
+  }));
+  if (!areas.length) return event;
 
   const pool = getPool();
   if (!pool) {
@@ -524,10 +568,6 @@ export async function updatePolicyEvent(id, body = {}) {
       body.presidential_declaration_date !== undefined
         ? asDate(body.presidentialDeclarationDate || body.presidential_declaration_date)
         : event.presidentialDeclarationDate,
-    governorDeclarationDate:
-      body.governorDeclarationDate !== undefined || body.governor_declaration_date !== undefined
-        ? asDate(body.governorDeclarationDate || body.governor_declaration_date)
-        : event.governorDeclarationDate,
     acmeEmergencyDeclarationDate:
       body.acmeEmergencyDeclarationDate !== undefined ||
       body.acme_emergency_declaration_date !== undefined ||
@@ -579,9 +619,19 @@ export async function updatePolicyEvent(id, body = {}) {
         : event.incidentBeginDate,
   };
 
+  // Areas that were following the event's begin date keep following it.
+  const beginChanged = patch.incidentBeginDate !== event.incidentBeginDate;
+
   const pool = getPool();
   if (!pool) {
     const mem = memoryEvents.get(event.id);
+    if (beginChanged) {
+      mem.areas = mem.areas.map((a) =>
+        !a.incidentBeginDate || a.incidentBeginDate === event.incidentBeginDate
+          ? { ...a, incidentBeginDate: patch.incidentBeginDate }
+          : a
+      );
+    }
     Object.assign(mem, patch, { updatedAt: new Date().toISOString() });
     memoryEvents.set(event.id, mem);
     return publicEvent(mem, mem.areas);
@@ -596,12 +646,11 @@ export async function updatePolicyEvent(id, body = {}) {
       fema_emergency_declaration_date = $6,
       fema_major_disaster_declaration_date = $7,
       presidential_declaration_date = $8,
-      governor_declaration_date = $9,
-      acme_emergency_declaration_date = $10,
-      acme_disaster_announcement = $11,
-      acme_treasury_hold = $12,
-      acme_funding_suspension = $13,
-      incident_begin_date = $14,
+      acme_emergency_declaration_date = $9,
+      acme_disaster_announcement = $10,
+      acme_treasury_hold = $11,
+      acme_funding_suspension = $12,
+      incident_begin_date = $13,
       updated_at = NOW()
      WHERE id = $1`,
     [
@@ -613,7 +662,6 @@ export async function updatePolicyEvent(id, body = {}) {
       patch.femaEmergencyDeclarationDate,
       patch.femaMajorDisasterDeclarationDate,
       patch.presidentialDeclarationDate,
-      patch.governorDeclarationDate,
       patch.acmeEmergencyDeclarationDate,
       patch.acmeDisasterAnnouncement,
       patch.acmeTreasuryHold,
@@ -621,6 +669,14 @@ export async function updatePolicyEvent(id, body = {}) {
       patch.incidentBeginDate,
     ]
   );
+  if (beginChanged) {
+    await pool.query(
+      `UPDATE disaster_policy_areas SET incident_begin_date = $2
+       WHERE event_id = $1
+         AND (incident_begin_date IS NULL OR incident_begin_date IS NOT DISTINCT FROM $3::date)`,
+      [event.id, patch.incidentBeginDate, event.incidentBeginDate]
+    );
+  }
   return getPolicyEvent(event.id);
 }
 
@@ -679,83 +735,273 @@ export async function removePolicyArea(eventId, areaId) {
 }
 
 /**
- * Prefer FIPS match (county_code ↔ loans.county_fips); fall back to normalized county name.
+ * Set the Incident Period End Date (and/or the appraisal inspection cutoff) on some of an
+ * event's areas. Only the keys present in the patch are written; null or '' clears a date.
  */
-export function classifyLoanAreaMatch(loan, areas) {
-  const loanFips = String(loan?.countyFips || loan?.county_fips || '')
-    .padStart(5, '0')
-    .slice(0, 5);
-  const loanState = String(loan?.state || '').toUpperCase();
-  const loanCounty = String(loan?.county || '')
-    .toLowerCase()
-    .replace(/\s+county$/i, '')
-    .trim();
-  for (const a of areas || []) {
-    const areaState = String(a.state || '').toUpperCase();
-    if (areaState !== loanState) continue;
-    const areaFips = String(a.countyCode || a.county_code || '').padStart(5, '0').slice(0, 5);
-    if (/^\d{5}$/.test(loanFips) && loanFips !== '00000' && loanFips === areaFips) {
-      return 'fips';
-    }
-  }
-  for (const a of areas || []) {
-    const areaState = String(a.state || '').toUpperCase();
-    if (areaState !== loanState) continue;
-    const areaCounty = String(a.countyName || a.county_name || '')
-      .toLowerCase()
-      .replace(/\s+county$/i, '')
-      .trim();
-    if (areaCounty && loanCounty && areaCounty === loanCounty) return 'name';
-  }
-  return null;
-}
-
-/**
- * Match mock pipeline loans by FIPS first, then state + county name.
- */
-export async function findImpactedLoans(eventId) {
+export async function updatePolicyAreas(eventId, body = {}) {
   const event = await getPolicyEvent(eventId);
-  if (!event) return { event: null, loans: [], count: 0, matchCounts: { byFips: 0, byName: 0 } };
+  if (!event) return null;
+
+  const areaIds = [...new Set((Array.isArray(body.areaIds) ? body.areaIds : []).map(String))];
+  if (!areaIds.length) throw policyError('AREAS_REQUIRED');
+  const known = new Set(event.areas.map((a) => a.id));
+  if (areaIds.some((id) => !known.has(id))) throw policyError('AREA_NOT_FOUND');
+
+  const patch = {};
+  for (const key of ['incidentEndDate', 'inspectionRequiredAppraisalsOnOrBefore']) {
+    if (body[key] === undefined) continue;
+    const cleared = body[key] === null || body[key] === '';
+    const value = cleared ? null : asDate(body[key]);
+    if (!cleared && !value) throw policyError('DATE_INVALID');
+    patch[key] = value;
+  }
+  if (!Object.keys(patch).length) throw policyError('AREA_PATCH_EMPTY');
+  if (patch.incidentEndDate && event.incidentBeginDate && patch.incidentEndDate < event.incidentBeginDate) {
+    throw policyError('END_BEFORE_BEGIN');
+  }
 
   const pool = getPool();
   if (!pool) {
-    return { event, loans: [], count: 0, mode: 'memory', matchCounts: { byFips: 0, byName: 0 } };
+    const mem = memoryEvents.get(event.id);
+    const ids = new Set(areaIds);
+    mem.areas = mem.areas.map((a) => (ids.has(a.id) ? { ...a, ...patch } : a));
+    mem.updatedAt = new Date().toISOString();
+    memoryEvents.set(event.id, mem);
+    return publicEvent(mem, mem.areas);
   }
 
-  if (!event.areas.length) {
-    return { event, loans: [], count: 0, matchCounts: { byFips: 0, byName: 0 } };
-  }
-
-  const { rows } = await pool.query(
-    `SELECT id, loan_number, borrower_name, property_address, city, state, county, zip_code,
-            milestone, loan_amount, disaster_risk_score, county_fips
-     FROM loans
-     WHERE EXISTS (
-       SELECT 1 FROM disaster_policy_areas a
-       WHERE a.event_id = $1
-         AND a.state = loans.state
-         AND (
-           (
-             NULLIF(TRIM(COALESCE(loans.county_fips, '')), '') IS NOT NULL
-             AND LPAD(TRIM(loans.county_fips), 5, '0') = a.county_code
-           )
-           OR LOWER(REPLACE(a.county_name, ' County', '')) = LOWER(REPLACE(loans.county, ' County', ''))
-         )
-     )
-     ORDER BY state, county, loan_number
-     LIMIT 500`,
-    [event.id]
+  const columns = {
+    incidentEndDate: 'incident_end_date',
+    inspectionRequiredAppraisalsOnOrBefore: 'inspection_required_appraisals_on_or_before',
+  };
+  const params = [event.id, areaIds];
+  const sets = Object.keys(patch).map((key) => {
+    params.push(patch[key]);
+    return `${columns[key]} = $${params.length}`;
+  });
+  await pool.query(
+    `UPDATE disaster_policy_areas SET ${sets.join(', ')}
+     WHERE event_id = $1 AND id = ANY($2::uuid[])`,
+    params
   );
+  await pool.query(`UPDATE disaster_policy_events SET updated_at = NOW() WHERE id = $1`, [
+    event.id,
+  ]);
+  return getPolicyEvent(event.id);
+}
 
-  let byFips = 0;
-  let byName = 0;
+function countyKey(name) {
+  return String(name || '')
+    .toLowerCase()
+    .replace(/\s+county$/i, '')
+    .trim();
+}
+
+/**
+ * Every area a loan falls in, with how it matched. A ZIP area matches on the property ZIP
+ * only; a county area matches on FIPS (county_code ↔ loans.county_fips) or, failing that,
+ * on the normalized county name.
+ */
+export function findLoanAreaMatches(loan, areas) {
+  const loanState = String(loan?.state || '').toUpperCase();
+  const loanFips = String(loan?.countyFips || loan?.county_fips || '').trim().padStart(5, '0').slice(0, 5);
+  const loanCounty = countyKey(loan?.county);
+  const loanZip = String(loan?.zipCode ?? loan?.zip_code ?? '').trim().slice(0, 5);
+
+  const matches = [];
+  for (const area of areas || []) {
+    if (String(area.state || '').toUpperCase() !== loanState) continue;
+    const areaZip = String(area.zipCode ?? area.zip_code ?? '').trim();
+    if (areaZip) {
+      if (loanZip && loanZip === areaZip) matches.push({ area, method: 'zip' });
+      continue;
+    }
+    const areaFips = String(area.countyCode || area.county_code || '').padStart(5, '0').slice(0, 5);
+    if (/^\d{5}$/.test(loanFips) && loanFips !== '00000' && loanFips === areaFips) {
+      matches.push({ area, method: 'fips' });
+      continue;
+    }
+    const areaCounty = countyKey(area.countyName || area.county_name);
+    if (areaCounty && loanCounty && areaCounty === loanCounty) matches.push({ area, method: 'name' });
+  }
+  return matches;
+}
+
+const MATCH_PRECEDENCE = ['zip', 'fips', 'name'];
+
+/** Most specific way a loan matched any area: zip, then fips, then name; null when it did not. */
+export function classifyLoanAreaMatch(loan, areas) {
+  const methods = new Set(findLoanAreaMatches(loan, areas).map((m) => m.method));
+  return MATCH_PRECEDENCE.find((m) => methods.has(m)) || null;
+}
+
+/** BRD reporting channels, in report order. Loans without one fall under `unassigned`. */
+export const POLICY_CHANNELS = Object.freeze([
+  Object.freeze({ id: 'delegated', label: 'Correspondent Delegated' }),
+  Object.freeze({ id: 'non_delegated', label: 'Correspondent Non-Delegated' }),
+  Object.freeze({ id: 'consumer', label: 'Consumer Direct' }),
+  Object.freeze({ id: 'unassigned', label: 'Channel not recorded' }),
+]);
+
+const MILESTONE_ORDER = ['Application', 'Processing', 'Underwriting', 'Closing', 'Funded'];
+
+function normalizeChannel(raw) {
+  const s = String(raw || '').toLowerCase().replace(/[^a-z]/g, '');
+  if (s.includes('nondelegated')) return 'non_delegated';
+  if (s.includes('delegated')) return 'delegated';
+  if (s.includes('consumer')) return 'consumer';
+  return 'unassigned';
+}
+
+function normalizeBook(raw) {
+  const s = String(raw || '').toLowerCase();
+  if (s.includes('inventory')) return 'inventory';
+  if (s.includes('servicing')) return 'servicing';
+  return 'pipeline';
+}
+
+function tally(bucket, loan) {
+  bucket.count += 1;
+  bucket.amount += Number(loan.loanAmount) || 0;
+}
+
+/**
+ * BRD impact report: Pipeline by Channel by Milestone, plus Inventory and Servicing Portfolio.
+ * Pure — takes the loan rows produced by the impact query.
+ */
+export function buildImpactReport(loans = []) {
+  const report = {
+    generatedAt: new Date().toISOString(),
+    totals: { count: 0, amount: 0, treasuryHold: 0, fundingSuspension: 0 },
+    pipeline: { count: 0, amount: 0, milestones: [], channels: [] },
+    inventory: { count: 0, amount: 0 },
+    servicing: { count: 0, amount: 0 },
+    channelNotRecorded: 0,
+  };
+  const channels = new Map(
+    POLICY_CHANNELS.map((c) => [c.id, { ...c, count: 0, amount: 0, byMilestone: {} }])
+  );
+  const milestones = new Set();
+
+  for (const loan of loans) {
+    tally(report.totals, loan);
+    if (loan.treasuryHold) report.totals.treasuryHold += 1;
+    if (loan.fundingSuspension) report.totals.fundingSuspension += 1;
+
+    if (loan.loanBook !== 'pipeline') {
+      tally(report[loan.loanBook], loan);
+      continue;
+    }
+    tally(report.pipeline, loan);
+    const channel = channels.get(loan.channel) || channels.get('unassigned');
+    if (channel.id === 'unassigned') report.channelNotRecorded += 1;
+    tally(channel, loan);
+    const milestone = loan.milestone || 'Not set';
+    milestones.add(milestone);
+    if (!channel.byMilestone[milestone]) channel.byMilestone[milestone] = { count: 0, amount: 0 };
+    tally(channel.byMilestone[milestone], loan);
+  }
+
+  const rank = (m) => {
+    const i = MILESTONE_ORDER.indexOf(m);
+    return i === -1 ? MILESTONE_ORDER.length : i;
+  };
+  report.pipeline.milestones = [...milestones].sort((a, b) => rank(a) - rank(b) || a.localeCompare(b));
+  // The three BRD channels always print; the catch-all row only when it has loans.
+  report.pipeline.channels = [...channels.values()].filter(
+    (c) => c.id !== 'unassigned' || c.count > 0
+  );
+  return report;
+}
+
+const LOAN_LIST_LIMIT = 5000;
+const EMPTY_MATCH_COUNTS = Object.freeze({ byZip: 0, byFips: 0, byName: 0 });
+
+function areaLabel(area) {
+  return area.zipCode ? `ZIP ${area.zipCode}` : `${area.countyName}, ${area.state}`;
+}
+
+/**
+ * Loans whose property falls in any of the areas. `channel` and `loan_book` are read when the
+ * loans table carries them (to_jsonb tolerates their absence).
+ */
+async function queryLoansForAreas(pool, areas) {
+  const { rows } = await pool.query(
+    `SELECT l.id, l.loan_number, l.borrower_name, l.property_address, l.city, l.state, l.county,
+            l.zip_code, l.milestone, l.loan_amount, l.disaster_risk_score, l.county_fips,
+            to_jsonb(l)->>'channel' AS channel,
+            to_jsonb(l)->>'loan_book' AS loan_book
+     FROM loans l
+     WHERE EXISTS (
+       SELECT 1
+       FROM unnest($1::text[], $2::text[], $3::text[], $4::text[])
+         AS a(state, county_code, county_name, zip_code)
+       WHERE a.state = l.state
+         AND CASE
+           WHEN a.zip_code IS NOT NULL THEN LEFT(TRIM(l.zip_code), 5) = a.zip_code
+           ELSE (
+             (
+               NULLIF(TRIM(COALESCE(l.county_fips, '')), '') IS NOT NULL
+               AND LPAD(TRIM(l.county_fips), 5, '0') = a.county_code
+             )
+             OR LOWER(REPLACE(a.county_name, ' County', '')) = LOWER(REPLACE(l.county, ' County', ''))
+           )
+         END
+     )
+     ORDER BY l.state, l.county, l.loan_number`,
+    [
+      areas.map((a) => a.state),
+      areas.map((a) => a.countyCode),
+      areas.map((a) => a.countyName),
+      areas.map((a) => a.zipCode || null),
+    ]
+  );
+  return rows;
+}
+
+/** Whether the loans table can tell the report a loan's channel and book at all. */
+async function loanReportColumns(pool) {
+  const { rows } = await pool.query(
+    `SELECT column_name FROM information_schema.columns
+     WHERE table_name = 'loans' AND column_name IN ('channel', 'loan_book')`
+  );
+  const names = new Set(rows.map((r) => r.column_name));
+  return { channel: names.has('channel'), loanBook: names.has('loan_book') };
+}
+
+async function impactForAreas(pool, areas, event) {
+  const [rows, loanColumns] = await Promise.all([
+    queryLoansForAreas(pool, areas),
+    loanReportColumns(pool),
+  ]);
+  return { ...describeImpactedLoans(rows, areas, event), loanColumns };
+}
+
+/**
+ * Shape loan rows for the desk. Holds apply only while the event is active and at least one of
+ * the loan's areas is still inside its incident period (no Incident Period End Date on or
+ * before today).
+ */
+export function describeImpactedLoans(rows, areas, { status, acmeTreasuryHold, acmeFundingSuspension } = {}) {
+  const today = todayIso();
+  const active = status === 'active';
+  const matchCounts = { ...EMPTY_MATCH_COUNTS };
+
   const loans = rows.map((r) => {
-    const matchMethod = classifyLoanAreaMatch(
-      { state: r.state, county: r.county, county_fips: r.county_fips },
-      event.areas
+    const matches = findLoanAreaMatches(
+      { state: r.state, county: r.county, county_fips: r.county_fips, zip_code: r.zip_code },
+      areas
     );
-    if (matchMethod === 'fips') byFips += 1;
-    else if (matchMethod === 'name') byName += 1;
+    const matchMethod = MATCH_PRECEDENCE.find((m) => matches.some((x) => x.method === m)) || 'name';
+    if (matchMethod === 'zip') matchCounts.byZip += 1;
+    else if (matchMethod === 'fips') matchCounts.byFips += 1;
+    else matchCounts.byName += 1;
+
+    const open = matches.filter((m) => !m.area.incidentEndDate || m.area.incidentEndDate > today);
+    const inIncidentPeriod = open.length > 0 || matches.length === 0;
+    const shown = (open[0] || matches[0])?.area;
+    const endDates = matches.map((m) => m.area.incidentEndDate).filter(Boolean).sort();
+
     return {
       id: r.id,
       loanNumber: r.loan_number,
@@ -767,20 +1013,57 @@ export async function findImpactedLoans(eventId) {
       countyFips: r.county_fips || null,
       zipCode: r.zip_code,
       milestone: r.milestone,
-      loanAmount: r.loan_amount,
+      loanAmount: Number(r.loan_amount) || 0,
       disasterRiskScore: r.disaster_risk_score,
-      matchMethod: matchMethod || 'name',
-      treasuryHold: Boolean(event.acmeTreasuryHold && event.status === 'active'),
-      fundingSuspension: Boolean(event.acmeFundingSuspension && event.status === 'active'),
+      channel: normalizeChannel(r.channel),
+      loanBook: normalizeBook(r.loan_book),
+      matchMethod,
+      matchedArea: shown ? areaLabel(shown) : null,
+      incidentEndDate: inIncidentPeriod ? null : endDates[endDates.length - 1] || null,
+      treasuryHold: Boolean(active && acmeTreasuryHold && inIncidentPeriod),
+      fundingSuspension: Boolean(active && acmeFundingSuspension && inIncidentPeriod),
     };
   });
 
   return {
-    event,
-    loans,
+    loans: loans.slice(0, LOAN_LIST_LIMIT),
     count: loans.length,
-    matchCounts: { byFips, byName },
+    truncated: loans.length > LOAN_LIST_LIMIT,
+    matchCounts,
+    report: buildImpactReport(loans),
   };
+}
+
+function emptyImpact() {
+  return describeImpactedLoans([], []);
+}
+
+/**
+ * Impacted loans + BRD report for a saved event.
+ */
+export async function findImpactedLoans(eventId) {
+  const event = await getPolicyEvent(eventId);
+  if (!event) return { event: null, ...emptyImpact() };
+
+  const pool = getPool();
+  if (!pool) return { event, mode: 'memory', ...emptyImpact() };
+  if (!event.areas.length) return { event, ...emptyImpact() };
+
+  return { event, ...(await impactForAreas(pool, event.areas, event)) };
+}
+
+/**
+ * Impacted loans + BRD report for an area list that has not been saved yet (review step).
+ * Nothing is on hold until the event is declared, so hold flags come back false.
+ */
+export async function previewImpactedLoans(areasIn = []) {
+  const areas = dedupeAreas((Array.isArray(areasIn) ? areasIn : []).map(normalizeArea));
+  if (!areas.length) throw policyError('AREAS_REQUIRED');
+
+  const pool = getPool();
+  if (!pool) return { mode: 'memory', ...emptyImpact() };
+
+  return impactForAreas(pool, areas);
 }
 
 /**

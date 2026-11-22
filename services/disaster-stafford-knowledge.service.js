@@ -41,9 +41,9 @@ Principal factors: (1) State fiscal capacity (TTR, GDP by State, local per capit
 Also: impacted population demographics (poverty, SSI/SNAP, unemployment, age, disability, LEP, Tribal); infrastructure outages >72h (life-saving, essential community, transport/utilities); casualties; disaster-related unemployment (self-employed / seasonal).
 
 ### ACME ops lens
-- Governor declaration date is Policy Desk step 1 (any hazard, not only hurricanes).
+- Governor declarations are early-warning research (Hurricane Tracker SoE windows); Policy Desk does not record them.
 - IA/IHP is more borrower-facing; PA is public infrastructure.
-- Distinguish planning estimates (e.g. Hurricane Tracker SoE windows) from actual captured governor / FEMA dates.
+- Distinguish planning estimates (e.g. Hurricane Tracker SoE windows) from actual FEMA dates and Policy Desk declarations.
 `.trim();
 
 let cachedFileBody = null;

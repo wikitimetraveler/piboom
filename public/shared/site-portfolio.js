@@ -286,7 +286,7 @@
           label: 'Processor assignment',
           detail: 'Rules + optional AI scoring, capacity-aware',
           icon: 'bi-people',
-          href: '/finance/processor-assignment.html',
+          href: '/finance/processor-assignment-mock.html',
         },
         {
           label: 'Unit Tests & Automator',
@@ -428,7 +428,7 @@
       id: 'processor-assignment',
       label: 'Processor Assignment',
       tagline: 'Rules engine, capacity, optional AI scoring',
-      path: '/finance/processor-assignment.html',
+      path: '/finance/processor-assignment-mock.html',
       icon: 'bi-people',
       category: 'encompass',
       featured: true,

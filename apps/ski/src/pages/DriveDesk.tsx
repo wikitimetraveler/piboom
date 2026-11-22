@@ -1,3 +1,4 @@
+import BensWeather from '../components/BensWeather';
 import DrivePanel from '../components/DrivePanel';
 import OnTheWay from '../components/OnTheWay';
 import WeatherBoard from '../components/WeatherBoard';
@@ -17,11 +18,13 @@ export default function DriveDesk({ brief, dest, selectedId, onSelect, stops }: 
       <header className="ski-hero">
         <h1>Ski Drive</h1>
         <p>
-          Weather desk for the Fountain Valley run to Mt. Baldy, Wrightwood, Big Bear, and Mammoth. Chains and
-          on-the-way stops live here. Mountain topography is on Ski Areas.
+          Weather desk for the Fountain Valley run to Mt. Baldy, Wrightwood, Big Bear, and Mammoth. Ben&apos;s
+          Weather is the local forecast for Bear Mountain, Snow Summit, and Snow Valley. Chains and on-the-way
+          stops live here. Mountain topography is on Ski Areas.
         </p>
         <p className="ski-disclaimer">{brief.disclaimer}</p>
       </header>
+      <BensWeather />
       <WeatherBoard destinations={brief.destinations} selectedId={selectedId} onSelect={onSelect} />
       {dest ? (
         <>
