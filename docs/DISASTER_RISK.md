@@ -13,6 +13,7 @@ Disaster data feeds, loan pipeline risk analysis, and the Disaster Risk AI assis
 | **Pipeline Risk Dashboard** | `public/finance/pipeline-risk-dashboard.html` – map, tables, AI widgets |
 | **Unified Disasters** | `public/finance/disasters-unified.html` – multi-source disasters AG Grid, voice commands, disaster **processor** expert AI (`sessionId: unified-disaster-processor`) |
 | **Hurricane Tracker** | `public/finance/disasters-hurricanes.html` – NHC track/cone + replay storms; **county impact predictor**; **Governor State of Emergency windows that vary by state**; FEMA EM/DR announcement estimates; loans in path; coastal webcams; spreadsheet cone analyzer. Governor windows are early-warning research only |
+| **Governor Declarations** | `public/finance/disasters-governor-declarations.html` – editable working list. Federal DR/EM/FM from **live OpenFEMA** (same cadence as disaster feed + `POST /api/governor-declarations/sync`). Governor orders are staff-entered real EOs. API `/api/governor-declarations`. Does not replace Policy Desk holds |
 | **Disaster Policy Desk** | `apps/disaster-policy/` (built to `public/finance/disaster-policy/`, `npm run build:disaster-policy`) – declare a **Declared Disaster** or a **Pending Natural Disaster** hold: pick counties and/or ZIP Codes, review the preliminary list, declare; then append areas, set Incident Period End Dates, and pull impacted-loan reports. Does not record governor declarations. ZIP pick lists: `public/finance/assets/geo/zips/` (`npm run build:us-zips` — Census 2020 ZCTA↔county + GeoNames postal names, CC BY 4.0) |
 
 ### Service Architecture
@@ -108,6 +109,19 @@ FIRMS NRT detections are clustered with **union-find single-linkage** (`clusterF
 | GET | `/cameras/stats` | Counts by source + last update time |
 | GET | `/cameras/:id/snapshot` | Latest still image URL (USGS NIMS resolves via listFiles on demand) |
 | POST | `/refresh-cameras` | Ingest hazard webcams — query/body `sources=all` or comma list (`alertcalifornia`, `alertwest`, `usgs_nims`, `usgs_volcano`, `faa_weathercam`, `webcoos`, `ucsd_hpwren`, `ucsd_pier`, `caltrans_cwwp2`, `dot_511ny`); requires disaster refresh access |
+
+### Governor Declarations (`/api/governor-declarations`)
+
+Editable working list (not Policy Desk holds). Service: `services/governor-declarations.service.js`. Federal rows sync from live OpenFEMA with the disaster feed (`runScheduledDisasterIngest`, `scripts/refresh-disasters.js`, `POST /api/disasters/refresh`) and on demand via `/sync`.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/` | List — query: `since` (YYYY-MM-DD; default three months ago), `state`, `kind` (`governor_order` \| `federal_dr` \| `federal_em` \| `federal_fm`) |
+| POST | `/` | Create declaration (staff governor orders / manual rows) |
+| POST | `/sync` | Pull live OpenFEMA DR/EM/FM for the last ~3 months and upsert |
+| GET | `/:id` | Get one |
+| PATCH | `/:id` | Update fields |
+| DELETE | `/:id` | Delete |
 
 ### Loan Pipeline (`/api/loan-pipeline`)
 

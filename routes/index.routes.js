@@ -51,6 +51,7 @@ import gseAssistantRoutes from './gse-assistant.routes.js';
 import financeRoutes from './finance.routes.js';
 import fileTransferRoutes from './file-transfer.routes.js';
 import disasterPolicyRoutes from './disaster-policy.routes.js';
+import governorDeclarationsRoutes from './governor-declarations.routes.js';
 import disasterImpactGraphRoutes from './disaster-impact-graph.routes.js';
 import musicGraphRoutes from './music-graph.routes.js';
 import heygenRoutes from './heygen.routes.js';
@@ -126,6 +127,7 @@ export default function buildRoutes(io) {
   api.use('/finance', financeRoutes);
   api.use('/file-transfer', fileTransferRoutes);
   api.use('/disaster-policy', disasterPolicyRoutes);
+  api.use('/governor-declarations', governorDeclarationsRoutes);
   api.use('/disaster-impact-graph', disasterImpactGraphRoutes);
   api.use('/music-graph', musicGraphRoutes);
   api.use('/heygen', heygenRoutes);

@@ -26,6 +26,7 @@ import {
 import { geocodeCountyStateWithCache } from '../services/geocoding-cache.service.js';
 import { geocodeAddressFree } from '../services/free-geocoding.service.js';
 import { refreshDisasterImpactGraphFromCurrentData } from '../services/disaster-impact-graph.service.js';
+import { syncGovernorDeclarationsFromOpenFema } from '../services/governor-declarations.service.js';
 import {
   resolveCamerasNearPoint,
   resolveDisastersNearPoint,
@@ -227,8 +228,10 @@ export async function refreshDisasters(req, res) {
 
     if (skipFema !== '1' && skipFema !== 'true') {
       results.fema = await ingestFema();
+      results.governorDeclarations = await syncGovernorDeclarationsFromOpenFema();
     } else {
       results.fema = { inserted: 0, skipped: 'skipped' };
+      results.governorDeclarations = { skipped: 'skipped with FEMA' };
     }
     results.firms = await ingestFirmsNrt();
     if (results.firms?.error) {

@@ -272,6 +272,7 @@
       '/finance/disasters-unified.html': true,
       '/finance/disasters-webcams.html': true,
       '/finance/disasters-hurricanes.html': true,
+      '/finance/disasters-governor-declarations.html': true,
       '/finance/disasters-encompass-map.html': true,
       '/finance/calc-engine-webgpu.html': true,
       '/finance/loan-flight-sim.html': true,

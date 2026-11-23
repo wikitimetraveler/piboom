@@ -10,6 +10,7 @@
     '/finance/disasters-unified.html',
     '/finance/disasters-webcams.html',
     '/finance/disasters-hurricanes.html',
+    '/finance/disasters-governor-declarations.html',
     '/finance/disasters-encompass-map.html',
     '/finance/calc-engine-webgpu.html',
     '/finance/loan-flight-sim.html',

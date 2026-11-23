@@ -1473,6 +1473,19 @@ async function initializeAIComponents() {
     });
   }
 
+  if (window.DisasterWebGpuAgent) {
+    window.disasterWebGpuAgent = window.DisasterWebGpuAgent.mount({
+      panelRoot: document.getElementById('disasterWebGpuAgentMount'),
+      userId,
+      getSelectedDisaster: () => selectedDisasterObj,
+      getFilters: () => getCurrentFilters(),
+      getNearbyLoans: () => lastAffectedLoans,
+      getNearbyCameras: () => lastNearbyCameras,
+      getProcessorContext: buildAIContext,
+      getPortfolioContext: buildPortfolioAIContext,
+    });
+  }
+
   if (new URLSearchParams(window.location.search).get('openAi') === '1') {
     openDuDashboardSection('collapseLoans', 3);
     setTimeout(() => openProcessorExpert(), 600);

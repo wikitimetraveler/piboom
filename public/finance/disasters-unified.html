@@ -92,6 +92,7 @@
           </div>
           <div class="du-hero-actions d-flex flex-wrap gap-2 align-items-center" aria-label="Disaster desk pages">
             <a class="btn btn-outline-light btn-sm" href="disasters-hurricanes.html"><i class="bi-hurricane"></i> Hurricanes</a>
+            <a class="btn btn-outline-light btn-sm" href="disasters-governor-declarations.html" title="Editable governor SoE and FEMA DR/EM/FM list"><i class="bi-megaphone"></i> Governor declarations</a>
             <a class="btn btn-outline-light btn-sm" href="/finance/disaster-policy/" title="Credit Admin Declared / Pending policy desk"><i class="bi-clipboard2-check"></i> Policy Desk</a>
             <a class="btn btn-outline-light btn-sm" href="disasters-webcams.html"><i class="bi-camera-video"></i> Webcams</a>
             <a class="btn btn-outline-light btn-sm" href="disasters-encompass-map.html" title="Optional fullscreen Google map · live proximity loan pins"><i class="bi-geo-alt"></i> Proximity map</a>
@@ -1048,6 +1049,7 @@
               </div>
               <div id="disasterAiScanCardMount" class="flex-shrink-0" aria-label="AI scan share card"></div>
             </div>
+            <div id="disasterWebGpuAgentMount" class="du-hazard-agent-mount mb-3" aria-label="Hazard on-device and OpenAI model panel"></div>
             <div class="du-loan-pills-menu mb-3">
               <ul class="nav nav-pills du-loan-panel-pills mb-2" id="duLoanPanelPills" role="tablist" aria-label="Mocked loan panels">
                 <li class="nav-item" role="presentation">
@@ -1536,6 +1538,8 @@
     <script src="https://d3js.org/d3.v7.min.js" crossorigin="anonymous"></script>
     <script src="/shared/vendor/topojson-client.min.js"></script>
     <script src="/shared/js/webgpu-runtime.js"></script>
+    <script src="/shared/js/webgpu-private-agent.js"></script>
+    <script src="/finance/js/disaster-webgpu-agent.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous"></script>
     <script src="/finance/js/disasters-unified/webgpu-heat-overlay.js"></script>
     <script src="/finance/js/disasters-unified/core.js"></script>

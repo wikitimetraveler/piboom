@@ -591,6 +591,16 @@
     const bus = o.toolBus || createToolBus(o);
     const onProgress = typeof o.onProgress === 'function' ? o.onProgress : () => {};
     const onGpuBusy = typeof o.onGpuBusy === 'function' ? o.onGpuBusy : () => {};
+    const parseTool =
+      typeof o.parseToolCall === 'function' ? o.parseToolCall : parseToolCall;
+    const formatReply =
+      typeof o.formatLocalToolReply === 'function'
+        ? o.formatLocalToolReply
+        : formatLocalToolReply;
+    const runLocal =
+      typeof o.runLocalToolTurn === 'function'
+        ? o.runLocalToolTurn
+        : runLocalToolTurn;
     const modelId = o.modelId || DEFAULT_MODEL_ID;
     const hasCustomImporter = typeof o.importWebLlm === 'function';
     const stallTimeoutMs =
@@ -611,7 +621,12 @@
     let cancelPendingLoad = null;
     let loading = false;
     let busy = false;
-    const messages = [{ role: 'system', content: buildSystemPrompt(o.systemExtra) }];
+    const systemContent = o.systemPrompt
+      ? o.systemExtra
+        ? String(o.systemPrompt) + ' ' + String(o.systemExtra)
+        : String(o.systemPrompt)
+      : buildSystemPrompt(o.systemExtra);
+    const messages = [{ role: 'system', content: systemContent }];
 
     function notifyGpuBusy() {
       onGpuBusy(Boolean(busy || loading), {
@@ -763,7 +778,7 @@
       const useLlm = Boolean(llmEnabled && (engine || hasCustomImporter || o.autoLoadModel));
       if (!useLlm) {
         messages.push({ role: 'user', content: text });
-        const localOut = await runLocalToolTurn(text, bus);
+        const localOut = await runLocal(text, bus);
         messages.push({ role: 'assistant', content: localOut.reply });
         return localOut;
       }
@@ -778,17 +793,17 @@
       try {
         for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
           reply = await completeOnce(messages);
-          const call = parseToolCall(reply);
+          const call = parseTool(reply);
           if (!call) {
             const finalReply =
               reply.trim() ||
-              (lastCall && lastResult ? formatLocalToolReply(lastCall, lastResult) : '');
+              (lastCall && lastResult ? formatReply(lastCall, lastResult) : '');
             messages.push({ role: 'assistant', content: finalReply });
             return { reply: finalReply, toolTrace };
           }
           const sig = JSON.stringify(call);
           if (seenCalls.has(sig) && lastCall && lastResult) {
-            const formatted = formatLocalToolReply(lastCall, lastResult);
+            const formatted = formatReply(lastCall, lastResult);
             messages.push({ role: 'assistant', content: formatted });
             return { reply: formatted, toolTrace };
           }
@@ -809,20 +824,20 @@
         }
 
         reply = await completeOnce(messages);
-        const postLoopCall = parseToolCall(reply);
+        const postLoopCall = parseTool(reply);
         if ((postLoopCall || !reply.trim()) && lastCall && lastResult) {
-          reply = formatLocalToolReply(lastCall, lastResult);
+          reply = formatReply(lastCall, lastResult);
         }
         messages.push({ role: 'assistant', content: reply });
         return { reply, toolTrace };
       } catch (err) {
         if (err && err.isInferenceTimeout) {
           if (lastCall && lastResult) {
-            const fallbackReply = formatLocalToolReply(lastCall, lastResult);
+            const fallbackReply = formatReply(lastCall, lastResult);
             messages.push({ role: 'assistant', content: fallbackReply });
             return { reply: fallbackReply, toolTrace, mode: 'local-kernel-fallback' };
           }
-          const localOut = await runLocalToolTurn(text, bus);
+          const localOut = await runLocal(text, bus);
           messages.push({ role: 'assistant', content: localOut.reply });
           return localOut;
         }

@@ -13,6 +13,10 @@ import { initializeDatabase, createTables } from './services/database.service.js
 import { refreshGenealogyCachesFromPostgres } from './services/genealogy.service.js';
 import { ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc, ingestFema, ingestCaFireCameras, pruneOldDisasters, initDisastersSchema, backfillDisasterGeocodes } from './services/disasters.service.js';
 import { initDisasterPolicySchema } from './services/disaster-policy.service.js';
+import {
+  initGovernorDeclarationsSchema,
+  syncGovernorDeclarationsFromOpenFema,
+} from './services/governor-declarations.service.js';
 import { getAllLoans } from './services/loan-pipeline.service.js';
 import { batchAnalyzeRisk } from './services/disaster-risk.service.js';
 import { ensureDisasterImpactGraphReady, refreshDisasterImpactGraphFromCurrentData } from './services/disaster-impact-graph.service.js';
@@ -80,6 +84,23 @@ try {
   console.log('✅ Disaster policy schema ready');
 } catch (err) {
   console.warn(`⚠️ Disaster policy schema initialization skipped: ${err.message}`);
+}
+
+try {
+  await initGovernorDeclarationsSchema();
+  console.log('✅ Governor declarations schema ready');
+  const govSync = await syncGovernorDeclarationsFromOpenFema();
+  if (govSync?.error) {
+    console.warn(`⚠️ Governor declarations OpenFEMA sync skipped: ${govSync.error}`);
+  } else {
+    console.log('✅ Governor declarations OpenFEMA sync ready', {
+      unique: govSync?.unique,
+      inserted: govSync?.inserted,
+      updated: govSync?.updated,
+    });
+  }
+} catch (err) {
+  console.warn(`⚠️ Governor declarations schema initialization skipped: ${err.message}`);
 }
 
 try {
@@ -224,6 +245,7 @@ async function runScheduledDisasterIngest(label = 'Disaster scheduler') {
   await runSource('nws', ingestNwsCap);
   await runSource('nhc', ingestNhc);
   await runSource('fema', ingestFema);
+  await runSource('governor-declarations-openfema', syncGovernorDeclarationsFromOpenFema);
 
   try {
     const geocodeBackfill = await backfillDisasterGeocodes();

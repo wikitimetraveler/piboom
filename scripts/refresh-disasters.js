@@ -28,6 +28,10 @@ import {
 import { getAllLoans } from '../services/loan-pipeline.service.js';
 import { batchAnalyzeRisk } from '../services/disaster-risk.service.js';
 import { refreshDisasterImpactGraphFromCurrentData } from '../services/disaster-impact-graph.service.js';
+import {
+  initGovernorDeclarationsSchema,
+  syncGovernorDeclarationsFromOpenFema,
+} from '../services/governor-declarations.service.js';
 
 async function main() {
   console.log('📊 Disaster Data Refresh');
@@ -42,6 +46,7 @@ async function main() {
     }
     await createTables();
     await initDisastersSchema();
+    await initGovernorDeclarationsSchema();
 
     const skipFema = process.env.SKIP_FEMA === '1' || process.env.SKIP_FEMA === 'true';
 
@@ -49,8 +54,15 @@ async function main() {
       console.log('📥 Ingesting FEMA...');
       const fema = await ingestFema();
       console.log(`   FEMA: ${fema?.inserted ?? 0} inserted`);
+
+      console.log('📥 Syncing governor declarations desk from live OpenFEMA...');
+      const gov = await syncGovernorDeclarationsFromOpenFema();
+      console.log(
+        `   Governor declarations: ${gov?.unique ?? 0} unique (inserted ${gov?.inserted ?? 0}, updated ${gov?.updated ?? 0})`
+      );
     } else {
       console.log('⏭️  Skipping FEMA (SKIP_FEMA=1)');
+      console.log('⏭️  Skipping governor declarations OpenFEMA sync (SKIP_FEMA=1)');
     }
 
     console.log('📥 Ingesting NASA FIRMS (fires)...');

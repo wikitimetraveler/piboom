@@ -2552,4 +2552,64 @@ body.du-pull-sheet-open .du-bottom-dock {
   background: rgba(219, 234, 254, 0.65);
 }
 
+/* Hazard on-device / OpenAI agent (Loans · ops triage) */
+.du-hazard-agent-mount {
+  width: 100%;
+}
+
+.du-hazard-agent {
+  border: 1px solid rgba(74, 144, 164, 0.28);
+  border-radius: 14px;
+  padding: 1rem 1.15rem;
+  background: linear-gradient(165deg, #f4faf8 0%, #eef5f8 55%, #f8fafb 100%);
+}
+
+.du-hazard-agent__mode {
+  min-width: 12rem;
+}
+
+.du-hazard-agent__explainer {
+  background: #fff;
+  color: #4a5a68;
+}
+
+.du-hazard-agent__log {
+  min-height: 120px;
+  max-height: 260px;
+  overflow: auto;
+  background: #fff;
+  font-size: 0.875rem;
+}
+
+.du-hazard-agent__msg {
+  margin-bottom: 0.5rem;
+}
+
+.du-hazard-agent__msg--user strong {
+  color: #2c3e50;
+}
+
+.du-hazard-agent__msg--assistant strong {
+  color: var(--zen-primary, #4a90a4);
+}
+
+.du-hazard-agent__msg--tool {
+  color: #5a6a78;
+  font-size: 0.8rem;
+}
+
+body.dark-mode .du-hazard-agent,
+html.dark-mode .du-hazard-agent {
+  background: linear-gradient(165deg, #1a2430 0%, #15202b 55%, #1c2633 100%);
+  border-color: rgba(74, 144, 164, 0.35);
+}
+
+body.dark-mode .du-hazard-agent__log,
+body.dark-mode .du-hazard-agent__explainer,
+html.dark-mode .du-hazard-agent__log,
+html.dark-mode .du-hazard-agent__explainer {
+  background: #121a22;
+  color: #c5d0da;
+}
+
 
