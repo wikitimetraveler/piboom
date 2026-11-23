@@ -19,7 +19,7 @@ devconnect-labs/
 │   │
 │   ├── finance/                # 🏦 Finance Domain
 │   │   ├── encompass-assistant.html
-│   │   ├── processor-assignment.html  # Processor capacity + complexity scoring
+│   │   ├── processor-assignment-mock.html  # Mock processors + loans only (no Encompass API)
 │   │   ├── tool9.html          # The Screen Test (manifest form code review)
 │   │   └── ...
 │   │

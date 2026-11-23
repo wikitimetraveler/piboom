@@ -65,7 +65,7 @@ In-browser binding to Encompass forms via Encompass Hub. The assistant knows bot
 - **Loan Pipeline** – Pipeline queries, filters
 - **Loans** – CRUD operations
 - **Loan Associates (v1)** – `GET/PUT/DELETE …/encompass/v1/loans/{id}/associates[/{logId}]` for milestone / milestone-free role slots (processor assignment tool proxies these under `/api/encompass-hub/loans/:loanGuid/associates`)
-- **Processor assignment** – UI at `public/finance/processor-assignment.html`: rule/AI complexity scoring, capacity-aware processor slots, dry run / apply via `POST /api/encompass-hub/processor-assignment/run`. Processors can be picked from company users (`GET /api/encompass-hub/users`); config persists in Postgres (`GET`/`PUT /api/encompass-hub/processor-assignment/config`, table `processor_assignment_tool_config`, one row per `X-Encompass-Env`). Services: `services/processor-assignment.service.js`, `services/processor-assignment-config.service.js`, `services/loan-complexity.service.js`, `services/loan-complexity-ai.service.js`.
+- **Processor assignment** – Worksheets UI is mock-data only at `public/finance/processor-assignment-mock.html` (synthetic processors and loans, client-side dry run / apply). It does not call Encompass users, pipeline, or `/api/encompass-hub/processor-assignment/*`. Those services remain for tests: `services/processor-assignment.service.js`, `services/processor-assignment-config.service.js`, `services/loan-complexity.service.js`, `services/loan-complexity-ai.service.js`.
 - **OAuth** – Token exchange
 - **Users/Organizations** – Via Settings API
 - **Enhanced Conditions** – Live CRUD UI at `/finance/enhanced-conditions.html` (`/api/encompass-conditions` catalog/invoke plus `/types`, `/templates`, `/loans/:loanId/conditions`). Condition Manager CDO conversion remains dry-run (`POST /convert`); apply after conversion via the CRUD page.
@@ -105,7 +105,7 @@ Encompass field browsers and unit-test grids use **AG Grid Community** (theme: a
 | `encompass-custom-fields.html` | Custom field browser |
 | `encompass-native-fields.html` | Native field browser |
 | `encompass-users.html` | User management |
-| `processor-assignment.html` | Complexity scoring + processor assignment (users picker, DB-backed config) |
+| `processor-assignment-mock.html` | Mock processors and loans only (no user login, no Encompass API) |
 | `encompass-analytics.html` | Analytics |
 | `pipeline-risk-dashboard.html` | Loan pipeline + risk |
 | `tool9.html` | **The Screen Test** — Manifest XML form code review, issue detection |

@@ -276,6 +276,9 @@
       '/finance/calc-engine-webgpu.html': true,
       '/finance/loan-flight-sim.html': true,
       '/finance/encompass-assistant.html': true,
+      '/finance/processor-assignment.html': true,
+      '/finance/processor-assignment-mock.html': true,
+      '/finance/processor-assignment-live.html': true,
     };
 
     const isPublicFinancePath = (pathOnly) => {

@@ -27,6 +27,7 @@ describe('menu-config auth filtering', () => {
     expect(MENU_CONFIG.pathRequiresAuth('/finance/disasters-encompass-map.html')).toBe(false);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/encompass-assistant.html')).toBe(false);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/loan-flight-sim.html')).toBe(false);
+    expect(MENU_CONFIG.pathRequiresAuth('/finance/processor-assignment-mock.html')).toBe(false);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/calc-engine-webgpu.html')).toBe(false);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/encompass-hub.html')).toBe(true);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/unit-tests.html')).toBe(true);
@@ -40,6 +41,7 @@ describe('menu-config auth filtering', () => {
     expect(hrefs).toContain('/finance/disasters-encompass-map.html');
     expect(hrefs).toContain('/finance/encompass-assistant.html');
     expect(hrefs).toContain('/finance/loan-flight-sim.html');
+    expect(hrefs).toContain('/finance/processor-assignment-mock.html');
     expect(hrefs).toContain('/gse-analyzer.html');
     expect(hrefs).not.toContain('/finance/index.html');
     expect(hrefs).not.toContain('/finance/unit-tests.html');
@@ -52,9 +54,10 @@ describe('menu-config auth filtering', () => {
     expect(visible.length).toBe(MENU_CONFIG.ENCOMPASS_TOOLS.length);
   });
 
-  test('pathRequiresAuth gates processor assignment tools', () => {
-    expect(MENU_CONFIG.pathRequiresAuth('/finance/processor-assignment.html')).toBe(true);
-    expect(MENU_CONFIG.pathRequiresAuth('/finance/processor-assignment-mock.html')).toBe(true);
+  test('pathRequiresAuth leaves processor assignment public (mock data, no Encompass API)', () => {
+    expect(MENU_CONFIG.pathRequiresAuth('/finance/processor-assignment.html')).toBe(false);
+    expect(MENU_CONFIG.pathRequiresAuth('/finance/processor-assignment-mock.html')).toBe(false);
+    expect(MENU_CONFIG.pathRequiresAuth('/finance/processor-assignment-live.html')).toBe(false);
   });
 
   test('getFinanceNavItems scrubs mortgage apps when logged out and expands when logged in', () => {
@@ -100,6 +103,7 @@ describe('menu-config auth filtering', () => {
     expect(outHrefs).toContain('/finance/disasters-unified.html');
     expect(outHrefs).toContain('/finance/encompass-assistant.html');
     expect(outHrefs).toContain('/finance/loan-flight-sim.html');
+    expect(outHrefs).toContain('/finance/processor-assignment-mock.html');
     expect(outHrefs).toContain('/gse-analyzer.html');
     expect(outHrefs).toContain('/finance/calc-engine-webgpu.html');
     expect(outHrefs).not.toContain('/finance/dti-calculator.html');

@@ -268,8 +268,8 @@
     },
     {
       "name": "Processor assignment",
-      "path": "/finance/processor-assignment.html",
-      "purpose": "Complexity scoring + associates assignment via Hub"
+      "path": "/finance/processor-assignment-mock.html",
+      "purpose": "Mock processors and loans only; client-side scoring. No Encompass users or hub APIs."
     },
     {
       "name": "Custom / Native Fields",

@@ -17,6 +17,9 @@
     '/finance/calc-engine-webgpu.html': true,
     '/finance/loan-flight-sim.html': true,
     '/finance/encompass-assistant.html': true,
+    '/finance/processor-assignment.html': true,
+    '/finance/processor-assignment-mock.html': true,
+    '/finance/processor-assignment-live.html': true,
   };
 
   function pathRequiresAuth(url) {
@@ -36,7 +39,7 @@
     { name: 'Encompass Hub', url: '/finance/encompass-hub.html', category: 'Encompass', keywords: 'pipeline loans API', requiresAuth: true },
     { name: 'Loan batch update', url: '/finance/loan-batch-update.html', category: 'Encompass', keywords: 'batch update loanBatch custom fields filter', requiresAuth: true },
     { name: 'File Transfer', url: '/finance/file-transfer.html', category: 'Worksheets', keywords: 'upload download docs spreadsheet excel csv pdf zip transfer dropzone', requiresAuth: true },
-    { name: 'Processor assignment', url: '/finance/processor-assignment-mock.html', category: 'Encompass', keywords: 'processor assign complexity capacity associates mock demo synthetic offline client', requiresAuth: true },
+    { name: 'Processor assignment', url: '/finance/processor-assignment-mock.html', category: 'Encompass', keywords: 'processor assign complexity capacity associates mock demo synthetic offline client', requiresAuth: false },
     { name: 'Encompass Analytics', url: '/finance/encompass-analytics.html', category: 'Encompass', keywords: 'analytics charts pipeline metrics', requiresAuth: true },
     { name: 'Test Endpoints', url: '/finance/encompass-hub-test.html', category: 'Encompass', keywords: 'API test', requiresAuth: true },
     { name: 'Pipeline Risk Dashboard', url: '/finance/pipeline-risk-dashboard.html', category: 'Encompass', keywords: 'disaster FEMA risk', requiresAuth: true },

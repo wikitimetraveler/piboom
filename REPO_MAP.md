@@ -41,7 +41,7 @@
 - Screen Test: `public/finance/tool9.html`, `controllers/reviewer-ai.controller.js`
 - Encompass field browsers: `encompass-custom-fields.html`, `encompass-native-fields.html`
 - Loan batch update: `public/finance/loan-batch-update.html` (AG Grid + env-scoped native/custom catalogs via hub APIs; SheetJS import; `loanFields` + `loanData.customFields`) → `POST /api/encompass-hub/loan-batch/update-requests` → Encompass `loanBatch/updateRequests`
-- Processor assignment: `public/finance/processor-assignment.html`, `services/processor-assignment.service.js`, `services/processor-assignment-config.service.js` → `GET`/`PUT /api/encompass-hub/processor-assignment/config` (Postgres), `POST /api/encompass-hub/processor-assignment/run`
+- Processor assignment UI: `public/finance/processor-assignment-mock.html` (synthetic data only; no user session and no hub calls). Test services: `services/processor-assignment.service.js`, `services/processor-assignment-config.service.js` (`GET`/`PUT /api/encompass-hub/processor-assignment/config`, `POST /api/encompass-hub/processor-assignment/run` — not used by the page)
 
 ### Nature
 - UI: `public/nature/` (nature-hub.html, tree-discovery.html, critter-discovery.html, fish-identification.html, rock-discovery.html, rock-collection.html, tree/critter/fish-collection.html, share-collection.html)

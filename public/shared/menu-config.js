@@ -340,6 +340,9 @@
     '/finance/calc-engine-webgpu.html',
     '/finance/loan-flight-sim.html',
     '/finance/encompass-assistant.html',
+    '/finance/processor-assignment.html',
+    '/finance/processor-assignment-mock.html',
+    '/finance/processor-assignment-live.html',
   ];
 
   /** Get home domain tiles, optionally filtered for demo mode + login */

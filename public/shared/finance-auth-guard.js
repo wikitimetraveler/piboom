@@ -14,6 +14,9 @@
     '/finance/calc-engine-webgpu.html',
     '/finance/loan-flight-sim.html',
     '/finance/encompass-assistant.html',
+    '/finance/processor-assignment.html',
+    '/finance/processor-assignment-mock.html',
+    '/finance/processor-assignment-live.html',
   ]);
 
   const financePath = window.location.pathname.toLowerCase();

@@ -45,6 +45,9 @@ describe('finance-session', () => {
     expect(financePathNeedsSession('/finance/disasters-encompass-map.html')).toBe(false);
     expect(financePathNeedsSession('/finance/encompass-assistant.html')).toBe(false);
     expect(financePathNeedsSession('/finance/loan-flight-sim.html')).toBe(false);
+    expect(financePathNeedsSession('/finance/processor-assignment.html')).toBe(false);
+    expect(financePathNeedsSession('/finance/processor-assignment-mock.html')).toBe(false);
+    expect(financePathNeedsSession('/finance/processor-assignment-live.html')).toBe(false);
     expect(financePathNeedsSession('/finance/calc-engine-webgpu.html')).toBe(false);
     expect(financePathNeedsSession('/gse-analyzer.html')).toBe(false);
     expect(financePathNeedsSession('/finance/assets/geo/us-states.geojson')).toBe(false);
