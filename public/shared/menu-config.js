@@ -283,7 +283,7 @@
     { href: '/ski/', icon: 'bi-signpost-2', label: 'Ski Drive', title: 'Fountain Valley drive desk — weather, chains, on-the-way stops. Ben’s Weather for Bear Mountain, Snow Summit, and Snow Valley' },
     { href: '/ski/areas', icon: 'bi-snow2', label: 'Ski Areas', title: 'Wrightwood and Big Bear ski-area topography — DEM, slope, aspect' },
     { href: '/mountain-high/', icon: 'bi-mountain', label: 'Mountain High', title: 'Mountain High Medicinals — 21+ type cards, Bud Master, embedded origins map' },
-    { href: '/nature/cannabis-origins.html', icon: 'bi-globe2', label: 'Cannabis Origins', title: 'Password-gated landrace map (standalone)' },
+    { href: '/nature/cannabis-origins.html', icon: 'bi-globe2', label: 'Cannabis Origins', title: 'Landrace origin map (standalone)' },
     { href: '/nature/tree-discovery.html', icon: 'bi-tree', label: 'Tree Discovery', title: 'Discover trees' },
     { href: '/nature/tree-collection.html', icon: 'bi-collection', label: 'Tree Collection', title: 'Your tree collection' },
     { href: '/nature/critter-discovery.html', icon: 'bi-bug', label: 'Critter Discovery', title: 'Discover critters' },
@@ -374,12 +374,9 @@
     }
   }
 
-  /** Mountain High Medicinals and the cannabis origins map. */
-  function isCannabisPath(href) {
-    const path = normalizeHrefPath(href);
-    if (!path) return false;
-    if (path === '/mountain-high' || path.startsWith('/mountain-high/')) return true;
-    return path === '/nature/cannabis-origins.html';
+  /** Neither cannabis page is login-gated. Mountain High keeps its own 21+ gate. */
+  function isCannabisPath() {
+    return false;
   }
 
   function visitorIsLoggedIn() {
@@ -391,7 +388,7 @@
     }
   }
 
-  /** Hide cannabis page links until the visitor is logged in. */
+  /** Cannabis links stay visible. Mountain High applies its 21+ gate on the page. */
   function syncCannabisLinks(root) {
     const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
     const show = visitorIsLoggedIn();
@@ -418,9 +415,8 @@
     });
   }
 
-  /** True for login-gated finance pages and every cannabis page. */
+  /** True for login-gated finance pages. */
   function pathRequiresAuth(href) {
-    if (isCannabisPath(href)) return true;
     const path = normalizeHrefPath(href);
     if (!path.startsWith('/finance/')) return false;
     return FINANCE_PUBLIC_PATHS.indexOf(path) === -1;

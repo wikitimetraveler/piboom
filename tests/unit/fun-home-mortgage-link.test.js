@@ -90,9 +90,10 @@ describe('fun-home public project cards', () => {
     expect(projectsSection[0]).not.toMatch(/href="\/open\/"/);
   });
 
-  test('Entertainment card More menu keeps Mountain High behind login', () => {
+  test('Entertainment card More menu shows Mountain High without a login gate', () => {
     const card = cardSlice('entertainment');
-    expect(card).toMatch(/href="\/mountain-high\/"[^>]*data-gated-featured[^>]*\bhidden\b/);
+    expect(card).toMatch(/href="\/mountain-high\/"/);
+    expect(card).not.toMatch(/href="\/mountain-high\/"[^>]*data-gated-featured/);
     expect(card).toMatch(/bi-mountain/);
     expect(card).toMatch(/Mountain High/);
   });

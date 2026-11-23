@@ -36,9 +36,7 @@
     if (window.MENU_CONFIG && typeof window.MENU_CONFIG.isCannabisPath === 'function') {
       return window.MENU_CONFIG.isCannabisPath(href);
     }
-    const path = String(href || '').split('?')[0].split('#')[0].toLowerCase();
-    return path === '/mountain-high' || path.indexOf('/mountain-high/') === 0
-      || path === '/nature/cannabis-origins.html';
+    return false;
   }
 
   function getNavItems() {

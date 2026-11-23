@@ -133,10 +133,12 @@ describe('menu-config auth filtering', () => {
     expect(moreHrefs).not.toContain('/ski/');
   });
 
-  test('cannabis pages require login and drop out of logged-out menus', () => {
-    expect(MENU_CONFIG.pathRequiresAuth('/mountain-high/')).toBe(true);
-    expect(MENU_CONFIG.pathRequiresAuth('/mountain-high')).toBe(true);
-    expect(MENU_CONFIG.pathRequiresAuth('/nature/cannabis-origins.html')).toBe(true);
+  test('cannabis pages are public; Mountain High keeps its 21+ gate', () => {
+    expect(MENU_CONFIG.pathRequiresAuth('/mountain-high/')).toBe(false);
+    expect(MENU_CONFIG.pathRequiresAuth('/mountain-high')).toBe(false);
+    expect(MENU_CONFIG.isCannabisPath('/mountain-high/')).toBe(false);
+    expect(MENU_CONFIG.pathRequiresAuth('/nature/cannabis-origins.html')).toBe(false);
+    expect(MENU_CONFIG.isCannabisPath('/nature/cannabis-origins.html')).toBe(false);
     expect(MENU_CONFIG.isCannabisPath('/ski/')).toBe(false);
     expect(MENU_CONFIG.pathRequiresAuth('/ski/')).toBe(false);
 
@@ -152,17 +154,24 @@ describe('menu-config auth filtering', () => {
       const visible = MENU_CONFIG.filterToolsByAuth(list, false)
         .filter((t) => t.href)
         .map((t) => t.href);
-      expect(visible).not.toContain('/mountain-high/');
-      expect(visible).not.toContain('/nature/cannabis-origins.html');
       const authed = MENU_CONFIG.filterToolsByAuth(list, true)
         .filter((t) => t.href)
         .map((t) => t.href);
       list.filter((t) => t.href === '/mountain-high/' || t.href === '/nature/cannabis-origins.html')
-        .forEach((t) => expect(authed).toContain(t.href));
+        .forEach((t) => {
+          expect(authed).toContain(t.href);
+          expect(visible).toContain(t.href);
+        });
     });
 
-    expect(readFileSync(join(process.cwd(), 'public/mountain-high/index.html'), 'utf8'))
-      .toContain('/shared/cannabis-page-guard.js');
+    const page = readFileSync(join(process.cwd(), 'public/mountain-high/index.html'), 'utf8');
+    expect(page).not.toContain('/shared/cannabis-page-guard.js');
+    expect(page).toContain('/mountain-high/js/mhm-age-gate.js');
+    expect(page).toContain('I am 21 or older');
+
+    const origins = readFileSync(join(process.cwd(), 'public/nature/cannabis-origins.html'), 'utf8');
+    expect(origins).not.toContain('/shared/cannabis-origins-guard.js');
+    expect(origins).not.toMatch(/id="cannabisOriginsContent"[^>]*\bhidden\b/);
   });
 
   test('mortgage tools carry a launch date and a hub category', () => {

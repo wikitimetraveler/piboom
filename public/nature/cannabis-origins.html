@@ -15,7 +15,6 @@
   <script src="/shared/user-login.js"></script>
   <script src="/shared/user-passwords.js"></script>
   <script src="/shared/modern-navbar.js"></script>
-  <script src="/shared/cannabis-origins-guard.js"></script>
   <style>
     :root {
       --co-forest: #1a2e1c;
@@ -214,7 +213,7 @@
 <body>
   <modern-navbar></modern-navbar>
 
-  <div id="cannabisOriginsContent" hidden aria-hidden="true">
+  <div id="cannabisOriginsContent">
     <header class="co-hero">
       <h1><i class="bi bi-globe2" aria-hidden="true"></i> Cannabis Origins</h1>
       <p>
@@ -250,19 +249,11 @@
         }
       }
 
-      function bootWhenReady() {
-        if (window.CannabisOriginsGuard?.readUnlock?.()) {
-          // Defer so the guard can unhide #cannabisOriginsContent first.
-          window.requestAnimationFrame(() => window.setTimeout(bootMap, 0));
-        }
-      }
-
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', bootWhenReady);
+        document.addEventListener('DOMContentLoaded', bootMap);
       } else {
-        bootWhenReady();
+        bootMap();
       }
-      window.addEventListener('cannabis-origins-unlocked', bootMap);
     })();
   </script>
 </body>
