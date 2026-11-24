@@ -13,7 +13,14 @@
   const DEFAULT_MAX_TOKENS = 160;
   const INPUT_KEYS = ['g7', 'g8', 'g9', 'g12', 'g13', 'g14', 'd29'];
   const DEFAULT_MODEL_ID = 'SmolLM2-360M-Instruct-q4f32_1-MLC';
-  const WEBLLM_CDN = 'https://esm.run/@mlc-ai/web-llm';
+  // Pinned ESM build. jsDelivr rewrites this file's built-in model URLs to
+  // protocol-relative `//host/...`. On an http page (or a blob worker) those
+  // become http:// and a work browser blocks them as mixed content.
+  const WEBLLM_CDN = 'https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.89/+esm';
+  const MODEL_WEIGHTS_URL =
+    'https://huggingface.co/mlc-ai/SmolLM2-360M-Instruct-q4f32_1-MLC';
+  const MODEL_WASM_URL =
+    'https://cdn.jsdelivr.net/gh/mlc-ai/binary-mlc-llm-libs@main/web-llm-models/v0_2_87/base/SmolLM2-360M-Instruct-q4f32_1_cs1k-webgpu.wasm';
 
   const SYSTEM_PROMPT = [
     'You are the Private GPU calc tutor on the WebGPU loan-amount research page.',
@@ -96,10 +103,72 @@
     return SYSTEM_PROMPT + ' ' + String(extra);
   }
 
+  function requireHttps(url) {
+    const s = String(url || '').trim();
+    if (!s) return s;
+    if (s.slice(0, 2) === '//') return 'https:' + s;
+    if (/^http:\/\//i.test(s)) return 'https://' + s.slice(7);
+    return s;
+  }
+
   function assertNoNetwork(url) {
-    const s = String(url || '');
+    const s = String(url || '').trim();
+    if (/^http:\/\//i.test(s) || s.slice(0, 2) === '//') {
+      throw new Error('Private agent must not request HTTP: ' + s);
+    }
     if (/\/api\/[^/]*assistant/i.test(s) || /assistant\/chat/i.test(s)) {
       throw new Error('Private agent tools must not call server assistant APIs');
+    }
+  }
+
+  function httpsAppConfig(modelId) {
+    if (modelId !== DEFAULT_MODEL_ID) return null;
+    return {
+      model_list: [
+        {
+          model: MODEL_WEIGHTS_URL,
+          model_id: DEFAULT_MODEL_ID,
+          model_lib: MODEL_WASM_URL,
+          vram_required_MB: 579.61,
+          low_resource_required: true,
+          overrides: { context_window_size: 4096 },
+        },
+      ],
+    };
+  }
+
+  function installHttpsOnlyFetch(scope) {
+    if (!scope || scope.__piBoomHttpsOnlyFetch) return;
+    const nativeFetch = scope.fetch;
+    if (typeof nativeFetch === 'function') {
+      scope.fetch = function (input, init) {
+        if (typeof input === 'string' || (typeof URL !== 'undefined' && input instanceof URL)) {
+          const raw = typeof input === 'string' ? input : input.href;
+          return nativeFetch.call(scope, requireHttps(raw), init);
+        }
+        if (input && typeof input.url === 'string') {
+          const next = requireHttps(input.url);
+          if (next !== input.url && typeof Request === 'function') {
+            return nativeFetch.call(scope, new Request(next, input), init);
+          }
+        }
+        return nativeFetch.call(scope, input, init);
+      };
+    }
+    const XHR = scope.XMLHttpRequest;
+    if (typeof XHR === 'function' && XHR.prototype && !XHR.prototype.__piBoomHttpsOpen) {
+      const origOpen = XHR.prototype.open;
+      XHR.prototype.open = function (method, url) {
+        const args = Array.prototype.slice.call(arguments);
+        if (typeof url === 'string') args[1] = requireHttps(url);
+        return origOpen.apply(this, args);
+      };
+      XHR.prototype.__piBoomHttpsOpen = true;
+    }
+    try {
+      Object.defineProperty(scope, '__piBoomHttpsOnlyFetch', { value: true });
+    } catch (_) {
+      scope.__piBoomHttpsOnlyFetch = true;
     }
   }
 
@@ -559,6 +628,9 @@
     }
     try {
       const code = [
+        requireHttps.toString(),
+        installHttpsOnlyFetch.toString(),
+        'installHttpsOnlyFetch(self);',
         'import * as webllm from ' + JSON.stringify(WEBLLM_CDN) + ';',
         'const handler = new webllm.WebWorkerMLCEngineHandler();',
         'self.onmessage = (msg) => handler.onmessage(msg);',
@@ -658,8 +730,10 @@
       notifyGpuBusy();
       let stallTimer = null;
       try {
+        if (!hasCustomImporter) installHttpsOnlyFetch(root);
         const webllm = await loadWebLlm(o.importWebLlm);
         let lastStepText = 'initializing';
+        const appConfig = httpsAppConfig(modelId);
 
         const createPromise = (async () => {
           const progressCb = (report) => {
@@ -688,12 +762,14 @@
               activeWorker = w;
               return webllm.CreateWebWorkerMLCEngine(w.worker, modelId, {
                 initProgressCallback: progressCb,
+                appConfig: appConfig || undefined,
               });
             }
           }
 
           return webllm.CreateMLCEngine(modelId, {
             initProgressCallback: progressCb,
+            appConfig: appConfig || undefined,
           });
         })();
 
@@ -1098,6 +1174,10 @@
     INPUT_KEYS: INPUT_KEYS.slice(),
     DEFAULT_MODEL_ID,
     WEBLLM_CDN,
+    MODEL_WEIGHTS_URL,
+    MODEL_WASM_URL,
+    requireHttps,
+    httpsAppConfig,
     SYSTEM_PROMPT,
     TOOL_NAMES: TOOL_NAMES.slice(),
     detectWebGpuAvailable,

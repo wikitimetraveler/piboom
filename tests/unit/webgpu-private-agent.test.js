@@ -141,6 +141,21 @@ describe('WebGpuPrivateAgent', () => {
     expect(() => bus.assertNoNetwork('/api/encompass-assistant/chat')).toThrow(/must not call/i);
     expect(() => bus.assertNoNetwork('/api/jordan/assistant/chat')).toThrow(/must not call/i);
     expect(() => bus.assertNoNetwork(WebGpuPrivateAgent.WEBLLM_CDN)).not.toThrow();
+    expect(() => bus.assertNoNetwork('http://huggingface.co/mlc-ai/model')).toThrow(/HTTP/i);
+    expect(() => bus.assertNoNetwork('//raw.githubusercontent.com/mlc-ai/libs')).toThrow(/HTTP/i);
+    expect(WebGpuPrivateAgent.requireHttps('http://huggingface.co/mlc-ai/model')).toBe(
+      'https://huggingface.co/mlc-ai/model'
+    );
+    expect(WebGpuPrivateAgent.requireHttps('//huggingface.co/mlc-ai/model')).toBe(
+      'https://huggingface.co/mlc-ai/model'
+    );
+    const record = WebGpuPrivateAgent.httpsAppConfig(WebGpuPrivateAgent.DEFAULT_MODEL_ID)
+      .model_list[0];
+    expect(record.model.startsWith('https://')).toBe(true);
+    expect(record.model_lib.startsWith('https://')).toBe(true);
+    expect(record.model.includes('http://')).toBe(false);
+    expect(record.model_lib.includes('http://')).toBe(false);
+    expect(WebGpuPrivateAgent.WEBLLM_CDN.startsWith('https://')).toBe(true);
   });
 
   test('preferCpu skips GPU kernel path', async () => {
