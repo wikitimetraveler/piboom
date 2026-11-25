@@ -13,9 +13,10 @@
   const DEFAULT_MAX_TOKENS = 160;
   const INPUT_KEYS = ['g7', 'g8', 'g9', 'g12', 'g13', 'g14', 'd29'];
   const DEFAULT_MODEL_ID = 'SmolLM2-360M-Instruct-q4f32_1-MLC';
-  // Pinned ESM build. jsDelivr rewrites this file's built-in model URLs to
-  // protocol-relative `//host/...`. On an http page (or a blob worker) those
-  // become http:// and a work browser blocks them as mixed content.
+  // Pinned ESM build. The loader runs in a blob worker whose origin is the
+  // page origin. On an http page, scheme-relative Hugging Face URLs therefore
+  // resolve to http:// and a work browser blocks them. installHttpsOnlyFetch
+  // upgrades URL, fetch, XHR, Request, and Cache before those weight requests.
   const WEBLLM_CDN = 'https://cdn.jsdelivr.net/npm/@mlc-ai/web-llm@0.2.89/+esm';
   const MODEL_WEIGHTS_URL =
     'https://huggingface.co/mlc-ai/SmolLM2-360M-Instruct-q4f32_1-MLC';
@@ -103,11 +104,40 @@
     return SYSTEM_PROMPT + ' ' + String(extra);
   }
 
+  function isLocalDevHost(hostname) {
+    return (
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname === '::1' ||
+      hostname === '[::1]'
+    );
+  }
+
+  function hostnameOf(url) {
+    const match = String(url || '').match(/^(?:https?:)?\/\/([^/?#]+)/i);
+    if (!match) return '';
+    let host = match[1];
+    if (host.charAt(0) === '[') {
+      const end = host.indexOf(']');
+      return end > 0 ? host.slice(1, end) : host;
+    }
+    const colon = host.indexOf(':');
+    return colon >= 0 ? host.slice(0, colon) : host;
+  }
+
   function requireHttps(url) {
     const s = String(url || '').trim();
     if (!s) return s;
-    if (s.slice(0, 2) === '//') return 'https:' + s;
-    if (/^http:\/\//i.test(s)) return 'https://' + s.slice(7);
+    // Do not use the URL constructor here. installHttpsOnlyFetch replaces it,
+    // and a constructor call from this function would recurse.
+    if (s.slice(0, 2) === '//') {
+      if (isLocalDevHost(hostnameOf(s))) return s;
+      return 'https:' + s;
+    }
+    if (/^http:\/\//i.test(s)) {
+      if (isLocalDevHost(hostnameOf(s))) return s;
+      return 'https://' + s.slice(7);
+    }
     return s;
   }
 
@@ -140,20 +170,59 @@
   function installHttpsOnlyFetch(scope) {
     if (!scope || scope.__piBoomHttpsOnlyFetch) return;
     const nativeFetch = scope.fetch;
-    if (typeof nativeFetch === 'function') {
-      scope.fetch = function (input, init) {
-        if (typeof input === 'string' || (typeof URL !== 'undefined' && input instanceof URL)) {
-          const raw = typeof input === 'string' ? input : input.href;
-          return nativeFetch.call(scope, requireHttps(raw), init);
-        }
-        if (input && typeof input.url === 'string') {
-          const next = requireHttps(input.url);
-          if (next !== input.url && typeof Request === 'function') {
-            return nativeFetch.call(scope, new Request(next, input), init);
+    const NativeRequest = scope.Request;
+    const NativeURL = scope.URL;
+
+    function requestInitFrom(input) {
+      const init = {};
+      if (input.method) init.method = input.method;
+      if (input.headers) init.headers = input.headers;
+      if (input.mode) init.mode = input.mode;
+      if (input.credentials) init.credentials = input.credentials;
+      if (input.cache) init.cache = input.cache;
+      if (input.redirect) init.redirect = input.redirect;
+      if (input.referrer) init.referrer = input.referrer;
+      if (input.integrity) init.integrity = input.integrity;
+      const method = String(input.method || 'GET').toUpperCase();
+      if (method !== 'GET' && method !== 'HEAD' && input.body != null) init.body = input.body;
+      return init;
+    }
+
+    function upgradeRequest(input) {
+      if (typeof input === 'string' || (NativeURL && input instanceof NativeURL)) {
+        const raw = typeof input === 'string' ? input : input.href;
+        return requireHttps(raw);
+      }
+      if (input && typeof input.url === 'string') {
+        const next = requireHttps(input.url);
+        if (next !== input.url && typeof NativeRequest === 'function') {
+          // Passing the old Request as init throws in the browser and used to
+          // keep the http:// Hugging Face URL.
+          try {
+            return new NativeRequest(next, requestInitFrom(input));
+          } catch (_) {
+            try {
+              return new NativeRequest(next);
+            } catch (_) {
+              return input;
+            }
           }
         }
-        return nativeFetch.call(scope, input, init);
+      }
+      return input;
+    }
+
+    if (typeof nativeFetch === 'function') {
+      scope.fetch = function (input, init) {
+        return nativeFetch.call(scope, upgradeRequest(input), init);
       };
+    }
+    if (typeof NativeRequest === 'function') {
+      const WrappedRequest = function (input, init) {
+        return new NativeRequest(upgradeRequest(input), init);
+      };
+      WrappedRequest.prototype = NativeRequest.prototype;
+      scope.Request = WrappedRequest;
     }
     const XHR = scope.XMLHttpRequest;
     if (typeof XHR === 'function' && XHR.prototype && !XHR.prototype.__piBoomHttpsOpen) {
@@ -165,11 +234,78 @@
       };
       XHR.prototype.__piBoomHttpsOpen = true;
     }
+    // WebLLM writes shards with cache.add(), which bypasses window.fetch.
+    const CacheProto = scope.Cache && scope.Cache.prototype;
+    if (CacheProto && !CacheProto.__piBoomHttpsAdd && typeof CacheProto.add === 'function') {
+      const origAdd = CacheProto.add;
+      CacheProto.add = function (request) {
+        return origAdd.call(this, upgradeRequest(request));
+      };
+      if (typeof CacheProto.addAll === 'function') {
+        const origAddAll = CacheProto.addAll;
+        CacheProto.addAll = function (requests) {
+          const list = Array.prototype.map.call(requests || [], function (req) {
+            return upgradeRequest(req);
+          });
+          return origAddAll.call(this, list);
+        };
+      }
+      if (typeof CacheProto.put === 'function') {
+        const origPut = CacheProto.put;
+        CacheProto.put = function (request, response) {
+          return origPut.call(this, upgradeRequest(request), response);
+        };
+      }
+      CacheProto.__piBoomHttpsAdd = true;
+    }
+    // Blob worker origin is the page origin. new URL('//huggingface.co/...',
+    // location.origin) therefore becomes http://huggingface.co on an http page.
+    if (typeof NativeURL === 'function') {
+      const WrappedURL = function (url, base) {
+        try {
+          const out = arguments.length < 2 ? new NativeURL(url) : new NativeURL(url, base);
+          const href = out && out.href;
+          const upgraded = requireHttps(href);
+          if (upgraded && upgraded !== href) return new NativeURL(upgraded);
+          return out;
+        } catch (err) {
+          if (typeof url === 'string') {
+            const upgraded = requireHttps(url.trim());
+            if (upgraded !== url.trim() && /^https?:\/\//i.test(upgraded)) {
+              return new NativeURL(upgraded);
+            }
+          }
+          throw err;
+        }
+      };
+      WrappedURL.prototype = NativeURL.prototype;
+      ['createObjectURL', 'revokeObjectURL', 'canParse', 'parse'].forEach(function (name) {
+        if (typeof NativeURL[name] === 'function') {
+          WrappedURL[name] = function () {
+            return NativeURL[name].apply(NativeURL, arguments);
+          };
+        }
+      });
+      scope.URL = WrappedURL;
+    }
     try {
       Object.defineProperty(scope, '__piBoomHttpsOnlyFetch', { value: true });
     } catch (_) {
       scope.__piBoomHttpsOnlyFetch = true;
     }
+  }
+
+  function webLlmWorkerBootstrap(cdnUrl) {
+    return [
+      isLocalDevHost.toString(),
+      hostnameOf.toString(),
+      requireHttps.toString(),
+      installHttpsOnlyFetch.toString(),
+      'installHttpsOnlyFetch(self);',
+      'import * as webllm from ' + JSON.stringify(cdnUrl) + ';',
+      'const handler = new webllm.WebWorkerMLCEngineHandler();',
+      'self.onmessage = (msg) => handler.onmessage(msg);',
+    ].join('\n');
   }
 
   function createToolBus(deps) {
@@ -627,14 +763,7 @@
       return null;
     }
     try {
-      const code = [
-        requireHttps.toString(),
-        installHttpsOnlyFetch.toString(),
-        'installHttpsOnlyFetch(self);',
-        'import * as webllm from ' + JSON.stringify(WEBLLM_CDN) + ';',
-        'const handler = new webllm.WebWorkerMLCEngineHandler();',
-        'self.onmessage = (msg) => handler.onmessage(msg);',
-      ].join('\n');
+      const code = webLlmWorkerBootstrap(WEBLLM_CDN);
       const blob = new Blob([code], { type: 'text/javascript' });
       const blobUrl = URL.createObjectURL(blob);
       const worker = new Worker(blobUrl, { type: 'module' });
@@ -1177,6 +1306,8 @@
     MODEL_WEIGHTS_URL,
     MODEL_WASM_URL,
     requireHttps,
+    installHttpsOnlyFetch,
+    webLlmWorkerBootstrap,
     httpsAppConfig,
     SYSTEM_PROMPT,
     TOOL_NAMES: TOOL_NAMES.slice(),

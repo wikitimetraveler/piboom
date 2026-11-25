@@ -75,6 +75,7 @@ import mountainHighRoutes from './mountain-high.routes.js';
 import skiRoutes from './ski.routes.js';
 import wolfmanLivekitRoutes from './wolfman-livekit.routes.js';
 import corgiRoutes from './corgi.routes.js';
+import eadRoutes from './ead.routes.js';
 
 export default function buildRoutes(io) {
   const api = Router();
@@ -151,6 +152,7 @@ export default function buildRoutes(io) {
   api.use('/ski', skiRoutes);
   api.use('/wolfman', wolfmanLivekitRoutes);
   api.use('/corgi', corgiRoutes);
+  api.use('/ead', eadRoutes);
   api.use('/', musicHistoryRoutes); // Music history and concert finder
   return api;
 }

@@ -26,6 +26,7 @@
   --open-tone-gse: #9a6a1a;
   --open-tone-graph: #2d6b7a;
   --open-tone-flight: #c45c20;
+  --open-tone-ead: #5b6b3a;
   --open-tone-expert: #1d7a8a;
 
   font-family: var(--open-font-body);
@@ -58,6 +59,7 @@
   --open-tone-gse: #e8c06a;
   --open-tone-graph: #7ec4d4;
   --open-tone-flight: #ffb074;
+  --open-tone-ead: #c5d48a;
   --open-tone-expert: #6ed4e4;
 
   background:
@@ -472,6 +474,13 @@
   background:
     radial-gradient(ellipse 80% 80% at 0% 0%, rgba(255, 255, 255, 0.16), transparent 52%),
     linear-gradient(155deg, #1e3a5f 0%, #0f3d5c 48%, #1d5a8a 100%);
+}
+
+.open-card--ead {
+  --open-card-tone: var(--open-tone-ead);
+  background:
+    radial-gradient(ellipse 80% 80% at 100% 0%, rgba(255, 255, 255, 0.15), transparent 52%),
+    linear-gradient(155deg, #2a3a28 0%, #1a2e32 48%, #4a5c32 100%);
 }
 
 .open-suite__foot {

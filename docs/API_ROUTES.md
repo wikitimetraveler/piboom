@@ -53,6 +53,11 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | POST | `/api/file-transfer/files` | Upload a file (multipart `file`, optional `note`) |
 | GET | `/api/file-transfer/files/:id` | Download a transferred file |
 | DELETE | `/api/file-transfer/files/:id` | Delete a transferred file |
+| GET | `/api/ead/meta` | EAD ZIP max size + accepted document types |
+| GET | `/api/ead/samples` | List local GSE Appendix D-1 scenario ZIPs under `fixtures/ead/appendix-d-1/` |
+| POST | `/api/ead/samples/:id/parse` | Parse a local sample by id (e.g. `sf5`, `condo1`) |
+| POST | `/api/ead/parse` | Parse a UAD 3.6 / FHA EAD appraisal ZIP (multipart `file`) → summary, images, PDF URL, SYS* findings |
+| GET | `/api/ead/assets/:sessionId/:name` | Short-lived PDF/image from the last parse session |
 | POST | `/api/unit-tests/files` | Upload unit test Excel to library |
 | GET | `/api/unit-tests/files` | List stored unit test files |
 | GET | `/api/unit-tests/files/:id` | Download unit test file |
@@ -249,5 +254,6 @@ Question bank: `data/loan-flight-question-bank.json`. Each of the eight stages h
 | `routes/disasters.routes.js` | `/api/disasters` |
 | `routes/finds.routes.js` | `/api/finds` |
 | `routes/gse.routes.js` | `/api/gse` |
+| `routes/ead.routes.js` | `/api/ead` |
 | `routes/chat.routes.js` | `/api/chat` |
 | (others) | See `routes/index.routes.js` |

@@ -1,0 +1,413 @@
+/* FHA EAD 3.6 appraisal viewer — Development work by David Lane */
+.ead-page {
+  background: var(--lf-bg, #f4f6f9);
+  min-height: 100vh;
+}
+
+.ead-shell {
+  max-width: 1100px;
+}
+
+.ead-back {
+  color: var(--zen-primary, #0d6efd);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.ead-back:hover {
+  text-decoration: underline;
+}
+
+.ead-hero {
+  margin-bottom: 1.5rem;
+}
+
+.ead-hero-kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.75rem;
+  color: var(--lf-muted, #6c757d);
+  margin-bottom: 0.35rem;
+}
+
+.ead-hero h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.ead-hero-lead {
+  color: var(--lf-muted, #5c6570);
+  max-width: 42rem;
+  margin-bottom: 0;
+}
+
+.ead-panel {
+  background: var(--lf-card, #fff);
+  border: 1px solid var(--lf-border, #dee2e6);
+  border-radius: 12px;
+  padding: 1.25rem 1.35rem;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+
+.ead-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.ead-panel-head h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.ead-panel-meta {
+  font-size: 0.8rem;
+  color: var(--lf-muted, #6c757d);
+}
+
+.ead-sample-select {
+  flex: 1 1 16rem;
+  min-width: 12rem;
+}
+
+.ead-sample-btn {
+  white-space: nowrap;
+}
+
+.ead-drop {
+  border: 2px dashed var(--lf-border, #adb5bd);
+  border-radius: 12px;
+  padding: 2rem 1.25rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  background: var(--lf-bg, #f8f9fa);
+}
+
+.ead-drop:hover,
+.ead-drop:focus,
+.ead-drop.is-dragover {
+  border-color: var(--zen-primary, #0d6efd);
+  background: rgba(13, 110, 253, 0.06);
+  outline: none;
+}
+
+.ead-drop-icon {
+  font-size: 2rem;
+  color: var(--zen-primary, #0d6efd);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.ead-drop-title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.ead-drop-hint {
+  font-size: 0.85rem;
+  color: var(--lf-muted, #6c757d);
+  margin-bottom: 0;
+}
+
+.ead-status {
+  min-height: 1.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.ead-status.is-error {
+  color: #b02a37;
+}
+
+.ead-status.is-ok {
+  color: #146c43;
+}
+
+.ead-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem 1rem;
+}
+
+.ead-field-label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--lf-muted, #6c757d);
+  margin-bottom: 0.15rem;
+}
+
+.ead-field-value {
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.ead-findings {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ead-findings li {
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.ead-findings li:last-child {
+  margin-bottom: 0;
+}
+
+.ead-findings .sev-Fatal {
+  background: #f8d7da;
+  color: #58151c;
+}
+
+.ead-findings .sev-Warning {
+  background: #fff3cd;
+  color: #664d03;
+}
+
+.ead-findings .code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-right: 0.4rem;
+}
+
+.ead-photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  perspective: 1200px;
+}
+
+.ead-flip {
+  height: 260px;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.ead-flip:focus-visible {
+  outline: 2px solid var(--zen-primary, #0d6efd);
+  outline-offset: 3px;
+  border-radius: 12px;
+}
+
+.ead-flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.ead-flip.is-flipped .ead-flip-inner {
+  transform: rotateY(180deg);
+}
+
+.ead-flip-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border: 1px solid var(--lf-border, #dee2e6);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
+}
+
+.ead-flip-front {
+  display: flex;
+  flex-direction: column;
+}
+
+.ead-flip-front img {
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  object-fit: cover;
+  display: block;
+  background: #e9ecef;
+}
+
+.ead-flip-front-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.78rem;
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1px solid var(--lf-border, #e9ecef);
+}
+
+.ead-flip-front-title {
+  font-weight: 600;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ead-flip-hint {
+  color: var(--lf-muted, #6c757d);
+  font-size: 0.68rem;
+  white-space: nowrap;
+}
+
+.ead-flip-back {
+  transform: rotateY(180deg);
+  padding: 0.75rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  background: linear-gradient(160deg, #f8fafc 0%, #eef2f7 100%);
+}
+
+.ead-flip-back h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.ead-flip-meta {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.78rem;
+  overflow: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.ead-flip-meta li {
+  display: grid;
+  grid-template-columns: 5.2rem 1fr;
+  gap: 0.35rem;
+  padding: 0.18rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.ead-flip-meta .k {
+  color: var(--lf-muted, #6c757d);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: 0.65rem;
+  padding-top: 0.15rem;
+}
+
+.ead-flip-meta .v {
+  word-break: break-word;
+  font-weight: 500;
+}
+
+.ead-flip-note-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--lf-muted, #6c757d);
+  margin: 0;
+}
+
+.ead-flip-note {
+  width: 100%;
+  min-height: 4.2rem;
+  resize: vertical;
+  border: 1px solid var(--lf-border, #ced4da);
+  border-radius: 8px;
+  padding: 0.45rem 0.55rem;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  background: #fff;
+}
+
+.ead-flip-note:focus {
+  outline: 2px solid rgba(13, 110, 253, 0.35);
+  border-color: var(--zen-primary, #0d6efd);
+}
+
+.ead-flip-note-status {
+  font-size: 0.68rem;
+  color: var(--lf-muted, #6c757d);
+  min-height: 1em;
+}
+
+body.dark-mode .ead-flip-face,
+html.dark-mode .ead-flip-face {
+  background: #1a1f27;
+  border-color: #2c3440;
+}
+
+body.dark-mode .ead-flip-back,
+html.dark-mode .ead-flip-back {
+  background: linear-gradient(160deg, #1a1f27 0%, #151a22 100%);
+}
+
+body.dark-mode .ead-flip-front-bar,
+html.dark-mode .ead-flip-front-bar {
+  background: rgba(26, 31, 39, 0.96);
+  border-top-color: #2c3440;
+}
+
+body.dark-mode .ead-flip-note,
+html.dark-mode .ead-flip-note {
+  background: #12151a;
+  border-color: #3a4554;
+  color: inherit;
+}
+
+.ead-pdf-frame {
+  width: 100%;
+  min-height: 480px;
+  border: 1px solid var(--lf-border, #dee2e6);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.ead-empty {
+  color: var(--lf-muted, #6c757d);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+body.dark-mode .ead-page,
+html.dark-mode .ead-page {
+  background: #12151a;
+}
+
+body.dark-mode .ead-panel,
+html.dark-mode .ead-panel {
+  background: #1a1f27;
+  border-color: #2c3440;
+}
+
+body.dark-mode .ead-drop,
+html.dark-mode .ead-drop {
+  background: #151a22;
+  border-color: #3a4554;
+}
+
+body.dark-mode .ead-findings .sev-Fatal,
+html.dark-mode .ead-findings .sev-Fatal {
+  background: #3d1519;
+  color: #f1aeb5;
+}
+
+body.dark-mode .ead-findings .sev-Warning,
+html.dark-mode .ead-findings .sev-Warning {
+  background: #3d3210;
+  color: #ffe69c;
+}

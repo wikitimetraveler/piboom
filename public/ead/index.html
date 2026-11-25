@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FHA EAD 3.6 Appraisal · Lane AI Labs</title>
+    <meta
+      name="description"
+      content="Ingest a UAD 3.6 / FHA EAD appraisal ZIP — MISMO XML, URAR PDF, and photos — and review parsed fields locally."
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="/shared/design-tokens.css" />
+    <link rel="stylesheet" href="/shared/styles.css" />
+    <link rel="stylesheet" href="/shared/encompass-dark-mode.css" />
+    <link rel="stylesheet" href="/ead/css/ead.css" />
+    <script src="/shared/menu-config.js"></script>
+    <script src="/shared/modern-navbar.js" defer></script>
+    <script src="/shared/js/open-suite-bar.js" defer></script>
+    <script src="/shared/dark-mode.js" defer></script>
+  </head>
+  <body class="ead-page">
+    <modern-navbar></modern-navbar>
+
+    <main class="container py-4 ead-shell">
+      <p class="mb-3">
+        <a href="/open/" class="ead-back"><i class="bi-arrow-left"></i> Open Lender Suite</a>
+      </p>
+
+      <header class="ead-hero">
+        <p class="ead-hero-kicker">FHA Electronic Appraisal Delivery</p>
+        <h1>UAD 3.6 appraisal package</h1>
+        <p class="ead-hero-lead">
+          Drop an EAD-shaped ZIP (one MISMO 3.6 XML, one URAR PDF, and an Images folder). We validate the package the
+          way the portal checks SYS findings and show the summary, photos, and PDF. Nothing is submitted to HUD.
+        </p>
+      </header>
+
+      <div id="eadStatus" class="ead-status" role="status" aria-live="polite"></div>
+
+      <section class="ead-panel" aria-labelledby="eadUploadHeading">
+        <div class="ead-panel-head">
+          <h2 id="eadUploadHeading"><i class="bi-file-earmark-zip me-2"></i>Upload package</h2>
+          <span class="ead-panel-meta" id="eadLimitsMeta">One .zip · up to 60 MB · XML + PDF + Images/</span>
+        </div>
+
+        <div class="ead-sample-row mb-3" id="eadSampleRow">
+          <label for="eadSampleSelect" class="form-label small text-muted mb-1">GSE Appendix D-1 scenario</label>
+          <div class="d-flex flex-wrap gap-2 align-items-stretch">
+            <select id="eadSampleSelect" class="form-select ead-sample-select" disabled>
+              <option value="">Loading samples…</option>
+            </select>
+            <button type="button" class="btn btn-primary ead-sample-btn" id="eadSampleLoadBtn" disabled>
+              <i class="bi-play-fill me-1"></i>Load scenario
+            </button>
+          </div>
+          <p class="small text-muted mt-2 mb-0" id="eadSampleHint">
+            Samples load from <code>fixtures/ead/appendix-d-1/</code>. Prefer SF5 for a typical single-family.
+          </p>
+        </div>
+
+        <div
+          id="eadDropZone"
+          class="ead-drop"
+          tabindex="0"
+          role="button"
+          aria-label="Drop appraisal ZIP here or click to browse"
+        >
+          <i class="bi-cloud-arrow-up ead-drop-icon" aria-hidden="true"></i>
+          <p class="ead-drop-title">Drop UAD 3.6 ZIP here</p>
+          <p class="ead-drop-hint">or click to browse — or pick a scenario above</p>
+          <input type="file" id="eadFileInput" class="d-none" accept=".zip,application/zip" />
+        </div>
+        <p class="small text-muted mt-3 mb-0">
+          Sample packages:
+          <a
+            href="https://sf.freddiemac.com/docs/zip/requirements/appendix-d-1-urar-sample-scenarios-and-xml-files.zip"
+            target="_blank"
+            rel="noopener"
+            >Appendix D-1</a
+          >
+          · schema
+          <a href="https://sf.freddiemac.com/docs/zip/uad-3.6-schema.zip" target="_blank" rel="noopener"
+            >GSE_UAD_3.6.0_V1.3</a
+          >
+          (see <code>docs/EAD.md</code> in the repo)
+        </p>
+      </section>
+
+      <div id="eadResults" hidden>
+        <section class="ead-panel mt-4" aria-labelledby="eadSummaryHeading">
+          <div class="ead-panel-head">
+            <h2 id="eadSummaryHeading"><i class="bi-card-checklist me-2"></i>Summary</h2>
+          </div>
+          <div id="eadSummary"></div>
+        </section>
+
+        <section class="ead-panel mt-4" aria-labelledby="eadFindingsHeading">
+          <div class="ead-panel-head">
+            <h2 id="eadFindingsHeading"><i class="bi-shield-exclamation me-2"></i>Validation</h2>
+          </div>
+          <p id="eadFindingsEmpty" class="ead-empty">No system findings.</p>
+          <ul id="eadFindings" class="ead-findings" hidden></ul>
+        </section>
+
+        <section class="ead-panel mt-4" aria-labelledby="eadPhotosHeading">
+          <div class="ead-panel-head">
+            <h2 id="eadPhotosHeading"><i class="bi-images me-2"></i>Photos</h2>
+            <span class="ead-panel-meta">Click a card to flip · notes save in this browser</span>
+          </div>
+          <p id="eadPhotosEmpty" class="ead-empty">No images extracted.</p>
+          <div id="eadPhotos" class="ead-photos" hidden></div>
+        </section>
+
+        <section class="ead-panel mt-4" aria-labelledby="eadPdfHeading">
+          <div class="ead-panel-head">
+            <h2 id="eadPdfHeading"><i class="bi-file-earmark-pdf me-2"></i>Appraisal PDF</h2>
+            <a id="eadPdfLink" class="btn btn-sm btn-outline-secondary" href="#" target="_blank" rel="noopener" hidden
+              >Open PDF</a
+            >
+          </div>
+          <p id="eadPdfEmpty" class="ead-empty">No PDF in this package.</p>
+          <iframe id="eadPdf" class="ead-pdf-frame" title="Appraisal PDF preview" hidden></iframe>
+        </section>
+      </div>
+    </main>
+
+    <script src="/ead/js/ead.js" defer></script>
+  </body>
+</html>

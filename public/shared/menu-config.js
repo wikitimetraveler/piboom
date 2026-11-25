@@ -18,7 +18,7 @@
 
   /** Navbar Worksheets dropdown items (URLs under /finance/) */
   const NAV_FINANCE = [
-    { href: '/open/', icon: 'bi-collection', label: 'Open Lender Suite', title: 'Public showcase — Disasters, GSE analyzer, graph calc, flight sim, Encompass Expert' },
+    { href: '/open/', icon: 'bi-collection', label: 'Open Lender Suite', title: 'Public showcase — Disasters, GSE analyzer, graph calc, flight sim, FHA EAD, Encompass Expert' },
     { href: '/finance/index.html', icon: 'bi-calculator', label: 'Worksheets Hub' },
     { href: '/finance/encompass-hub.html', icon: 'bi-columns-gap', label: 'Encompass Hub' },
     { href: '/finance/disasters-unified.html', icon: 'bi-globe', label: 'Unified Disasters' },
@@ -34,6 +34,7 @@
     { href: '/finance/pipeline-risk-dashboard.html', icon: 'bi-shield-check', label: 'Pipeline Risk' },
     { href: '/gse-analyzer.html', icon: 'bi-graph-up-arrow', label: 'GSE scenario analyzer' },
     { href: '/finance/loan-flight-sim.html', icon: 'bi-airplane', label: 'Loan flight simulator' },
+    { href: '/ead/', icon: 'bi-file-earmark-richtext', label: 'FHA EAD 3.6' },
     { href: '/finance/calc-engine-webgpu.html', icon: 'bi-diagram-3', label: 'Calc Engine WebGPU' },
     { divider: true },
     { href: '/finance/index.html', icon: 'bi-grid-3x3-gap', label: 'All Worksheets Tools' },
@@ -182,7 +183,7 @@
     { href: '/finance/closing-cost-calculator.html', icon: 'bi-receipt', label: 'Closing Cost', title: 'Closing Cost Calculator', since: '2025-10-30', category: 'calculators' },
     { href: '/finance/ltv-calculator.html', icon: 'bi-house-door', label: 'LTV', title: 'Loan-to-Value Calculator', since: '2025-10-30', category: 'calculators' },
     { href: '/finance/va-irrrl-calculator.html', icon: 'bi-calculator', label: 'VA IRRRL', title: 'VA IRRRL Calculator', since: '2025-11-02', category: 'calculators' },
-    { href: '/open/', icon: 'bi-collection', label: 'Open Lender Suite', title: 'Public showcase — Disasters, GSE analyzer, graph calc, flight sim, Encompass Expert', since: '2026-10-31', category: 'risk' },
+    { href: '/open/', icon: 'bi-collection', label: 'Open Lender Suite', title: 'Public showcase — Disasters, GSE analyzer, graph calc, flight sim, FHA EAD, Encompass Expert', since: '2026-10-31', category: 'risk' },
     { href: '/finance/disasters-unified.html', icon: 'bi-globe', label: 'Unified Disasters', title: 'Unified Disasters (90-day)', since: '2025-10-30', category: 'risk' },
     { href: '/finance/disasters-hurricanes.html', icon: 'bi-hurricane', label: 'Hurricane Tracker', title: 'Hurricane track, county impact, Governor SoE (state-by-state) & FEMA EM/DR windows', since: '2026-11-18', category: 'risk' },
     { href: '/finance/disasters-governor-declarations.html', icon: 'bi-megaphone', label: 'Governor declarations', title: 'Editable governor SoE and FEMA DR/EM/FM list (last 3 months)', since: '2026-11-22', category: 'risk' },
@@ -207,6 +208,7 @@
     { href: '/finance/file-transfer.html', icon: 'bi-cloud-arrow-up', label: 'File Transfer', title: 'Upload docs and spreadsheets anytime — download or delete from this server', since: '2026-11-19', category: 'devtools' },
     { href: '/finance/processor-assignment-mock.html', icon: 'bi-people-fill', label: 'Processor assignment', title: 'Mock processors and loans — client-side dry run / apply (no Encompass APIs)', since: '2026-04-03', category: 'encompass' },
     { href: '/finance/loan-flight-sim.html', icon: 'bi-airplane', label: 'Loan flight simulator', title: 'Fly a synthetic loan file from application to funding — TRID timing, LTV, DTI fixes', since: '2026-10-04', category: 'encompass' },
+    { href: '/ead/', icon: 'bi-file-earmark-richtext', label: 'FHA EAD 3.6', title: 'Parse UAD 3.6 appraisal ZIPs — XML, PDF, and photos (local validation)', since: '2026-11-24', category: 'encompass' },
     { href: '/finance/pipeline-risk-dashboard.html', icon: 'bi-shield-check', label: 'Pipeline Risk', title: 'Pipeline Risk Dashboard', since: '2025-10-29', category: 'risk' },
     { href: '/finance/risk-analysis-dashboard.html', icon: 'bi-graph-up', label: 'Risk Analysis', title: 'Risk Analysis Dashboard', since: '2025-11-14', category: 'risk' },
     { href: '/finance/unit-tests.html', icon: 'bi-check2-circle', label: 'Unit Tests', title: 'Unit Test Runner', since: '2026-02-04', category: 'devtools' },

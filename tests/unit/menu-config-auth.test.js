@@ -32,6 +32,7 @@ describe('menu-config auth filtering', () => {
     expect(MENU_CONFIG.pathRequiresAuth('/finance/encompass-hub.html')).toBe(true);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/unit-tests.html')).toBe(true);
     expect(MENU_CONFIG.pathRequiresAuth('/gse-analyzer.html')).toBe(false);
+    expect(MENU_CONFIG.pathRequiresAuth('/ead/')).toBe(false);
   });
 
   test('filterToolsByAuth logged-out visible set is the Open Lender Suite + GSE', () => {
@@ -43,6 +44,7 @@ describe('menu-config auth filtering', () => {
     expect(hrefs).toContain('/finance/loan-flight-sim.html');
     expect(hrefs).toContain('/finance/processor-assignment-mock.html');
     expect(hrefs).toContain('/gse-analyzer.html');
+    expect(hrefs).toContain('/ead/');
     expect(hrefs).not.toContain('/finance/index.html');
     expect(hrefs).not.toContain('/finance/unit-tests.html');
     expect(hrefs).not.toContain('/finance/loan-batch-update.html');
@@ -71,6 +73,7 @@ describe('menu-config auth filtering', () => {
     expect(outHrefs).toContain('/finance/loan-flight-sim.html');
     expect(outHrefs).toContain('/finance/calc-engine-webgpu.html');
     expect(outHrefs).toContain('/gse-analyzer.html');
+    expect(outHrefs).toContain('/ead/');
     expect(outHrefs).not.toContain('/finance/encompass-hub.html');
     expect(outHrefs).not.toContain('/finance/unit-tests.html');
     expect(outHrefs).not.toContain('/finance/index.html');
@@ -105,6 +108,7 @@ describe('menu-config auth filtering', () => {
     expect(outHrefs).toContain('/finance/loan-flight-sim.html');
     expect(outHrefs).toContain('/finance/processor-assignment-mock.html');
     expect(outHrefs).toContain('/gse-analyzer.html');
+    expect(outHrefs).toContain('/ead/');
     expect(outHrefs).toContain('/finance/calc-engine-webgpu.html');
     expect(outHrefs).not.toContain('/finance/dti-calculator.html');
     expect(loggedIn.map((t) => t.href)).toEqual(

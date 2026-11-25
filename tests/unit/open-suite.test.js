@@ -15,6 +15,9 @@ describe('open suite', () => {
     expect(html).toContain('href="/gse-analyzer.html"');
     expect(html).toContain('href="/finance/calc-engine-webgpu.html"');
     expect(html).toContain('href="/finance/loan-flight-sim.html"');
+    expect(html).toContain('href="/ead/"');
+    expect(html).toContain('FHA EAD 3.6');
+    expect(html).toContain('Six public tools');
     expect(html).toContain('https://devconnectlabs.com/open/');
     expect(html).toContain('David Lane');
     expect(html).toContain('href="/stack.html"');
@@ -44,6 +47,7 @@ describe('open suite', () => {
     expect(bar).toContain('/gse-analyzer.html');
     expect(bar).toContain('/finance/calc-engine-webgpu.html');
     expect(bar).toContain('/finance/loan-flight-sim.html');
+    expect(bar).toContain('/ead/');
     expect(bar).toContain('/open/');
   });
 
@@ -52,10 +56,13 @@ describe('open suite', () => {
     const disastersHtml = readFileSync(join(process.cwd(), 'public/finance/disasters-unified.html'), 'utf8');
     const calcHtml = readFileSync(join(process.cwd(), 'public/finance/calc-engine-webgpu.html'), 'utf8');
     const flightHtml = readFileSync(join(process.cwd(), 'public/finance/loan-flight-sim.html'), 'utf8');
+    const eadHtml = readFileSync(join(process.cwd(), 'public/ead/index.html'), 'utf8');
     expect(assistantHtml).not.toContain('encompassAppsSection');
     expect(assistantHtml).not.toContain('Every mortgage app in this session');
     expect(assistantHtml).toContain('open-suite-bar.js');
     expect(flightHtml).toContain('open-suite-bar.js');
+    expect(eadHtml).toContain('open-suite-bar.js');
+    expect(eadHtml).toContain('href="/open/"');
     expect(disastersHtml).not.toContain('href="/finance/index.html"');
     expect(calcHtml).not.toContain('href="/finance/index.html"');
   });

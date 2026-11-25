@@ -11,6 +11,7 @@
     { href: '/gse-analyzer.html', label: 'GSE analyzer', test: function (path) { return path === '/gse-analyzer.html'; } },
     { href: '/finance/calc-engine-webgpu.html', label: 'Graph calc', test: function (path) { return path === '/finance/calc-engine-webgpu.html'; } },
     { href: '/finance/loan-flight-sim.html', label: 'Flight sim', test: function (path) { return path === '/finance/loan-flight-sim.html'; } },
+    { href: '/ead/', label: 'FHA EAD', test: function (path) { return path === '/ead' || path === '/ead/' || path.indexOf('/ead/') === 0; } },
     { href: '/finance/encompass-assistant.html', label: 'Encompass Expert', test: function (path) { return path === '/finance/encompass-assistant.html'; } }
   ];
 

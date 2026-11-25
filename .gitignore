@@ -119,3 +119,8 @@ data/encompass-conditions/
 # Planetarium catalog build cache
 data/planetarium/.cache/
 
+# GSE Appendix D-1 appraisal sample ZIPs (copyrighted; fetch per docs/EAD.md)
+fixtures/ead/appendix-d-1/*
+!fixtures/ead/appendix-d-1/.gitkeep
+!fixtures/ead/README.md
+

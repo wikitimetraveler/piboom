@@ -136,7 +136,7 @@ describe('WebGpuPrivateAgent', () => {
     expect(config.groups.length).toBeGreaterThan(0);
   });
 
-  test('tool bus assertNoNetwork rejects assistant API URLs', () => {
+  test('tool bus assertNoNetwork rejects assistant API URLs', async () => {
     const bus = WebGpuPrivateAgent.createToolBus({ calcMath });
     expect(() => bus.assertNoNetwork('/api/encompass-assistant/chat')).toThrow(/must not call/i);
     expect(() => bus.assertNoNetwork('/api/jordan/assistant/chat')).toThrow(/must not call/i);
@@ -149,6 +149,80 @@ describe('WebGpuPrivateAgent', () => {
     expect(WebGpuPrivateAgent.requireHttps('//huggingface.co/mlc-ai/model')).toBe(
       'https://huggingface.co/mlc-ai/model'
     );
+    expect(WebGpuPrivateAgent.requireHttps('http://127.0.0.1:3000/api/health')).toBe(
+      'http://127.0.0.1:3000/api/health'
+    );
+
+    const seen = [];
+    const scope = {
+      fetch(input) {
+        seen.push('fetch ' + (input && input.url ? input.url : input));
+        return Promise.resolve({ ok: true });
+      },
+      Request: function Request(url, init) {
+        if (init && typeof init.url === 'string') {
+          throw new TypeError('RequestInit');
+        }
+        this.url = typeof url === 'string' ? url : url && url.url;
+        this.method = (init && init.method) || 'GET';
+      },
+      URL,
+      XMLHttpRequest: function XMLHttpRequest() {},
+      Cache: function Cache() {},
+    };
+    scope.XMLHttpRequest.prototype = { open() {} };
+    scope.Cache.prototype = {
+      add(req) {
+        seen.push('add ' + (req && req.url ? req.url : req));
+        return Promise.resolve();
+      },
+      addAll(reqs) {
+        seen.push('addAll ' + Array.prototype.map.call(reqs, (r) => (r && r.url) || r).join(','));
+        return Promise.resolve();
+      },
+    };
+    WebGpuPrivateAgent.installHttpsOnlyFetch(scope);
+    await scope.fetch('http://huggingface.co/mlc-ai/model');
+    await scope.fetch('//cdn.jsdelivr.net/gh/mlc-ai/model.wasm');
+    await scope.fetch('http://127.0.0.1:3000/api/health');
+    const cache = new scope.Cache();
+    await cache.add('http://huggingface.co/mlc-ai/SmolLM2/resolve/main/params_shard_0.bin');
+    await cache.add(new scope.Request('//huggingface.co/mlc-ai/SmolLM2/resolve/main/params_shard_1.bin'));
+    const alreadyHttp = new scope.Request('http://huggingface.co/mlc-ai/SmolLM2/resolve/main/params_shard_2.bin');
+    await cache.add(alreadyHttp);
+    expect(seen).toEqual([
+      'fetch https://huggingface.co/mlc-ai/model',
+      'fetch https://cdn.jsdelivr.net/gh/mlc-ai/model.wasm',
+      'fetch http://127.0.0.1:3000/api/health',
+      'add https://huggingface.co/mlc-ai/SmolLM2/resolve/main/params_shard_0.bin',
+      'add https://huggingface.co/mlc-ai/SmolLM2/resolve/main/params_shard_1.bin',
+      'add https://huggingface.co/mlc-ai/SmolLM2/resolve/main/params_shard_2.bin',
+    ]);
+    expect(
+      new scope.URL(
+        '//huggingface.co/mlc-ai/model',
+        'http://127.0.0.1:3000/finance/calc-engine-webgpu.html'
+      ).href
+    ).toBe('https://huggingface.co/mlc-ai/model');
+    expect(new scope.URL('http://huggingface.co/mlc-ai/model').href).toBe(
+      'https://huggingface.co/mlc-ai/model'
+    );
+    expect(new scope.URL('http://127.0.0.1:3000/api/health').href).toBe(
+      'http://127.0.0.1:3000/api/health'
+    );
+    expect(new scope.URL('params_shard_0.bin', 'https://huggingface.co/mlc-ai/model/resolve/main/').href).toBe(
+      'https://huggingface.co/mlc-ai/model/resolve/main/params_shard_0.bin'
+    );
+
+    const workerSource = WebGpuPrivateAgent.webLlmWorkerBootstrap(WebGpuPrivateAgent.WEBLLM_CDN);
+    expect(workerSource).toContain('installHttpsOnlyFetch(self);');
+    expect(workerSource).toContain(
+      'import * as webllm from ' + JSON.stringify(WebGpuPrivateAgent.WEBLLM_CDN)
+    );
+    expect(workerSource).toContain('scope.Cache.prototype');
+    expect(workerSource).toContain('scope.URL');
+    expect(workerSource).toContain('function hostnameOf');
+    expect(workerSource.includes('await import(')).toBe(false);
     const record = WebGpuPrivateAgent.httpsAppConfig(WebGpuPrivateAgent.DEFAULT_MODEL_ID)
       .model_list[0];
     expect(record.model.startsWith('https://')).toBe(true);

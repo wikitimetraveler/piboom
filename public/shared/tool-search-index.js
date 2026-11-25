@@ -33,9 +33,10 @@
   const TOOL_INDEX = [
     // Worksheets (calculators & disasters; paths remain /finance/)
     { name: 'Worksheets Hub', url: '/finance/index.html', category: 'Worksheets', keywords: 'calculator hub worksheets', requiresAuth: true },
-    { name: 'Open Lender Suite', url: '/open/', category: 'Worksheets', keywords: 'linkedin showcase disasters GSE analyzer graph calculation flight sim Encompass Expert public' },
+    { name: 'Open Lender Suite', url: '/open/', category: 'Worksheets', keywords: 'linkedin showcase disasters GSE analyzer graph calculation flight sim FHA EAD Encompass Expert public' },
     { name: 'Encompass Assistant', url: '/finance/encompass-assistant.html', category: 'Encompass', keywords: 'AI robot mortgage API expert open suite', requiresAuth: false },
     { name: 'Loan flight simulator', url: '/finance/loan-flight-sim.html', category: 'Encompass', keywords: 'training sim TRID LTV DTI synthetic loan open suite', requiresAuth: false },
+    { name: 'FHA EAD 3.6', url: '/ead/', category: 'Encompass', keywords: 'appraisal UAD MISMO EAD ZIP XML PDF photos URAR FHA open suite', requiresAuth: false },
     { name: 'GSE scenario analyzer', url: '/gse-analyzer.html', category: 'Worksheets', keywords: 'GSE Fannie Freddie FHA VA USDA analyzer admin', requiresAuth: false },
     { name: 'Encompass Hub', url: '/finance/encompass-hub.html', category: 'Encompass', keywords: 'pipeline loans API', requiresAuth: true },
     { name: 'Loan batch update', url: '/finance/loan-batch-update.html', category: 'Encompass', keywords: 'batch update loanBatch custom fields filter', requiresAuth: true },
