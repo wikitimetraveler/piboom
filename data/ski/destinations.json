@@ -126,6 +126,23 @@
       "highways": ["CA-91", "I-15", "US-395", "CA-158"],
       "chainHighways": ["US-395", "CA-158"],
       "mapsDest": "June Mountain Ski Area, June Lake, CA"
+    },
+    {
+      "id": "palisades",
+      "name": "Palisades Tahoe",
+      "area": "Lake Tahoe",
+      "route": "lake-tahoe",
+      "dem": "palisades",
+      "lat": 39.1969,
+      "lng": -120.2356,
+      "summitLat": 39.1983,
+      "summitLng": -120.2871,
+      "baseFt": 6200,
+      "summitFt": 9050,
+      "typicalDriveMin": 490,
+      "highways": ["I-5", "I-80", "CA-89"],
+      "chainHighways": ["I-5", "I-80", "CA-89"],
+      "mapsDest": "Palisades Tahoe, Olympic Valley, CA"
     }
   ]
 }

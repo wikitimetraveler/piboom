@@ -5,6 +5,7 @@ interface Face {
   avatarId?: string;
   voiceId?: string;
   greeting?: string;
+  clip?: string;
 }
 
 interface Session {
@@ -36,13 +37,17 @@ export default function ApexLive() {
   const sessionId = useRef('');
   const [status, setStatus] = useState('');
   const [live, setLive] = useState(false);
+  const [clip, setClip] = useState('');
 
   useEffect(() => {
     let on = true;
     fetch('/data/ski/apex-heygen-face.json')
       .then((res) => (res.ok ? res.json() : null))
       .then((data: Face | null) => {
-        if (on) face.current = data;
+        if (on) {
+          face.current = data;
+          setClip(data?.clip || '');
+        }
       })
       .catch(() => {
         if (on) face.current = null;
@@ -147,6 +152,9 @@ export default function ApexLive() {
           {live ? 'Hide Apex' : 'Live Apex'}
         </button>
       </div>
+      {clip ? (
+        <video className="ski-apex__video" src={clip} controls playsInline preload="metadata" />
+      ) : null}
       <div ref={host} className="ski-apex__media" hidden />
       {status ? <p className="ski-disclaimer">{status}</p> : null}
     </section>

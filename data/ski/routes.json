@@ -56,5 +56,24 @@
       { "id": "mammoth-lakes", "name": "Mammoth Lakes", "lat": 37.6485, "lng": -118.9721 },
       { "id": "june-lake", "name": "June Lake", "lat": 37.7799, "lng": -119.0743 }
     ]
+  },
+  "lake-tahoe": {
+    "id": "lake-tahoe",
+    "label": "Fountain Valley → Palisades Tahoe",
+    "highways": ["I-5", "I-80", "CA-89"],
+    "mapsDest": "Palisades Tahoe, Olympic Valley, CA",
+    "waypoints": [
+      { "id": "fountain-valley", "name": "Fountain Valley", "lat": 33.7095, "lng": -117.9537 },
+      { "id": "santa-clarita", "name": "Santa Clarita / I-5", "lat": 34.4100, "lng": -118.5600 },
+      { "id": "tejon-pass", "name": "Grapevine / Tejon Pass", "lat": 34.8028, "lng": -118.8768 },
+      { "id": "kettleman-city", "name": "Kettleman City", "lat": 36.0083, "lng": -120.0856 },
+      { "id": "santa-nella", "name": "Santa Nella", "lat": 37.1092, "lng": -121.0170 },
+      { "id": "sacramento", "name": "Sacramento", "lat": 38.5816, "lng": -121.4944 },
+      { "id": "auburn", "name": "Auburn / I-80", "lat": 38.8955, "lng": -121.0765 },
+      { "id": "emigrant-gap", "name": "Emigrant Gap", "lat": 39.3013, "lng": -120.6604 },
+      { "id": "donner-pass", "name": "Donner Pass", "lat": 39.3172, "lng": -120.3265 },
+      { "id": "truckee", "name": "Truckee", "lat": 39.3280, "lng": -120.1833 },
+      { "id": "olympic-valley", "name": "Olympic Valley", "lat": 39.1969, "lng": -120.2356 }
+    ]
   }
 }

@@ -28,6 +28,9 @@
     ],
     "june": [
       { "label": "June Mountain live cams", "url": "https://www.junemountain.com/mountain-information/live-cams" }
+    ],
+    "palisades": [
+      { "label": "Palisades Tahoe webcams", "url": "https://www.palisadestahoe.com/mountain-information/webcams" }
     ]
   }
 }

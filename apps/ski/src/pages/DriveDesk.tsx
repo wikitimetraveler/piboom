@@ -18,8 +18,9 @@ export default function DriveDesk({ brief, dest, selectedId, onSelect, stops }: 
       <header className="ski-hero">
         <h1>Ski Drive</h1>
         <p>
-          Weather desk for the Fountain Valley run to Mt. Baldy, Wrightwood, Big Bear, and Mammoth. Ben&apos;s
-          Weather is the local forecast for Bear Mountain, Snow Summit, and Snow Valley. Chains and on-the-way
+          Weather desk for the Fountain Valley run to Mt. Baldy, Wrightwood, Big Bear, Mammoth, and Palisades
+          Tahoe. Ben&apos;s Weather is the local forecast for Bear Mountain, Snow Summit, and Snow Valley. The
+          Tahoe drive is I-5 to I-80 over Donner Pass, then CA-89 into Olympic Valley. Chains and on-the-way
           stops live here. Mountain topography is on Ski Areas.
         </p>
         <p className="ski-disclaimer">{brief.disclaimer}</p>

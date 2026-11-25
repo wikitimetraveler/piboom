@@ -19,7 +19,7 @@ import {
 } from '../../services/ski-topo.service.js';
 
 describe('ski-topo.service', () => {
-  test('catalog has Fountain Valley home and seven resorts', async () => {
+  test('catalog has Fountain Valley home and eight resorts', async () => {
     const catalog = await loadDestinations();
     expect(catalog.home.name).toBe('Fountain Valley');
     expect(catalog.destinations.map((d) => d.id)).toEqual([
@@ -30,6 +30,7 @@ describe('ski-topo.service', () => {
       'bear-mountain',
       'mammoth',
       'june',
+      'palisades',
     ]);
     expect(catalog.destinations.every((d) => d.baseFt && d.summitFt)).toBe(true);
     expect(catalog.destinations.every((d) => Number.isFinite(d.summitLat) && Number.isFinite(d.summitLng))).toBe(true);
@@ -50,6 +51,10 @@ describe('ski-topo.service', () => {
     const sierra = routes['eastern-sierra'].waypoints.map((w) => w.id);
     expect(sierra[0]).toBe('fountain-valley');
     expect(sierra).toEqual(expect.arrayContaining(['bishop', 'mammoth-lakes', 'june-lake']));
+    const tahoe = routes['lake-tahoe'].waypoints.map((w) => w.id);
+    expect(tahoe[0]).toBe('fountain-valley');
+    expect(tahoe.at(-1)).toBe('olympic-valley');
+    expect(tahoe).toEqual(expect.arrayContaining(['tejon-pass', 'donner-pass', 'truckee']));
   });
 
   test('scoreGoNoGo: blizzard warning is no-go; missing weather is caution; clear is go', () => {
@@ -164,7 +169,7 @@ describe('ski-topo.service', () => {
     };
     const brief = await getBrief({ fetchFn });
     expect(brief.home.name).toBe('Fountain Valley');
-    expect(brief.destinations).toHaveLength(7);
+    expect(brief.destinations).toHaveLength(8);
     expect(brief.destinations[0].weather.tempF).toBe(28);
     expect(brief.destinations[0].score).toBe('go');
     expect(brief.disclaimer).toMatch(/not official/i);
@@ -304,17 +309,19 @@ describe('ski-topo.service', () => {
     expect(googleFirst.source).toBe('google');
   });
 
-  test('seed file exists and includes thrift, pizza, and A&W stops on every drive route', async () => {
+  test('seed file exists and includes thrift, pizza, A&W, and In-N-Out stops on every drive route', async () => {
     const raw = JSON.parse(await readFile(path.join(process.cwd(), 'data/ski/on-the-way.json'), 'utf8'));
     expect(raw.stops.length).toBeGreaterThanOrEqual(4);
     expect(raw.stops.every((s) => s.source === 'seed')).toBe(true);
-    for (const route of ['wrightwood', 'mt-baldy', 'big-bear', 'eastern-sierra']) {
+    for (const route of ['wrightwood', 'mt-baldy', 'big-bear', 'eastern-sierra', 'lake-tahoe']) {
       const routeThrifts = filterStops(raw.stops, { route, kind: 'thrift' });
       const routePizza = filterStops(raw.stops, { route, kind: 'pizza' });
       const routeAw = filterStops(raw.stops, { route, kind: 'aw' });
+      const routeIno = filterStops(raw.stops, { route, kind: 'in-n-out' });
       expect(routeThrifts.length).toBeGreaterThanOrEqual(2);
       expect(routePizza.length).toBeGreaterThanOrEqual(2);
       expect(routeAw.length).toBeGreaterThanOrEqual(2);
+      expect(routeIno.length).toBeGreaterThanOrEqual(2);
     }
   });
 });

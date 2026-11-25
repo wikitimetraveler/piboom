@@ -196,7 +196,13 @@ describe('ski-trails.service', () => {
         const named = enriched.runs.filter((r) => r.resort === resort.id && r.name);
         expect(named.length).toBeGreaterThan(10);
         // Baldy's Thunder Mountain runs fall off the west and northwest flanks.
-        const snowSide = spec.id === 'mt-baldy' ? ['N', 'NE', 'NW', 'W'] : ['N', 'NE', 'NW'];
+        // Olympic Valley opens east, so Palisades holds snow on the north and east walls.
+        const snowSide =
+          spec.id === 'mt-baldy'
+            ? ['N', 'NE', 'NW', 'W']
+            : spec.id === 'palisades'
+              ? ['N', 'NE', 'NW', 'E']
+              : ['N', 'NE', 'NW'];
         const northish = named.filter((r) => snowSide.includes(r.aspect)).length;
         expect(northish / named.length).toBeGreaterThan(0.6);
       }

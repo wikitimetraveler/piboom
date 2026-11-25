@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { SNOW } from '../lib/greeter';
 
 const FEMALE_VOICE = 'en-US-Neural2-F';
@@ -56,10 +56,24 @@ async function speakFemaleBrowser(text: string) {
 }
 
 export default function Greeter() {
+  const clip = useRef<HTMLVideoElement>(null);
   const [heard, setHeard] = useState(false);
+  const [showClip, setShowClip] = useState(false);
 
   async function sayHello() {
     window.ensureAudioUnlock?.();
+    const video = clip.current;
+    if (video) {
+      setShowClip(true);
+      try {
+        video.currentTime = 0;
+        await video.play();
+        setHeard(true);
+        return;
+      } catch {
+        setShowClip(false);
+      }
+    }
     const speak = window.speakWithGoogle;
     if (speak) {
       const ok = await speak(SNOW.line, FEMALE_VOICE, { preferFemale: true, gender: 'female', speakingRate: 1 });
@@ -88,6 +102,14 @@ export default function Greeter() {
           {heard ? 'Say it again' : 'Say hello'}
         </button>
       </div>
+      <video
+        ref={clip}
+        className="ski-greeter__clip"
+        src={SNOW.clip}
+        poster={SNOW.portrait}
+        playsInline
+        hidden={!showClip}
+      />
     </aside>
   );
 }

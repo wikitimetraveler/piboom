@@ -72,4 +72,12 @@ describe('ski-places.service', () => {
     expect(stops.some((s) => s.id === 'mormon-rocks')).toBe(true);
     expect(stops.some((s) => s.name === 'Live Thrift')).toBe(true);
   });
+
+  test('the same In-N-Out can sit on two drives without one copy erasing the other', async () => {
+    const fetchFn = jest.fn(async () => jsonResponse({ elements: [] }));
+    const sierra = await getStops({ route: 'eastern-sierra', kind: 'in-n-out', fetchFn });
+    expect(sierra.map((s) => s.id).sort()).toEqual(['ino-ontario-mills-sierra', 'ino-victorville-civic']);
+    const wright = await getStops({ route: 'wrightwood', kind: 'in-n-out', fetchFn });
+    expect(wright.map((s) => s.id).sort()).toEqual(['ino-ontario-mills-wrightwood', 'ino-rancho-foothill']);
+  });
 });

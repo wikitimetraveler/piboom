@@ -110,6 +110,23 @@ export const SKI_DEM_SPECS = [
       { lat: 37.756, lng: -119.072, elevFt: 9200, sigma: 0.008 },
     ],
   },
+  {
+    id: 'palisades',
+    name: 'Palisades Tahoe',
+    file: 'palisades-dem.json',
+    south: 39.17,
+    north: 39.218,
+    west: -120.305,
+    east: -120.198,
+    rows: 135,
+    cols: 232,
+    floorFt: 6200,
+    peaks: [
+      { lat: 39.1983, lng: -120.2871, elevFt: 9010, sigma: 0.012 },
+      { lat: 39.19, lng: -120.25, elevFt: 8200, sigma: 0.01 },
+      { lat: 39.204, lng: -120.255, elevFt: 8200, sigma: 0.008 },
+    ],
+  },
 ];
 
 export function pointInDemBounds(dem, lat, lng) {

@@ -125,7 +125,7 @@ export default function SkiAreas(props: Props) {
         <h1>Ski Areas</h1>
         <p>
           Start on the California table, then fly onto the mountain. Mt. Baldy, Mountain High, Snow Valley, Snow Summit, Bear
-          Mountain, Mammoth, and June carry real OpenStreetMap runs and lifts draped on a USGS 3DEP elevation model,
+          Mountain, Mammoth, June, and Palisades Tahoe carry real OpenStreetMap runs and lifts draped on a USGS 3DEP elevation model,
           with pitch and facing measured run by run. Lidar 3D adds the USGS point cloud — ground and trees from a
           snow-free flight, not the snowpack.
         </p>

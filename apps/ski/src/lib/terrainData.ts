@@ -7,6 +7,7 @@ const AREA_NAMES: Record<string, string> = {
   'snow-valley': 'Snow Valley',
   mammoth: 'Mammoth',
   june: 'June',
+  palisades: 'Palisades',
 };
 
 export function areaName(demId: string): string {

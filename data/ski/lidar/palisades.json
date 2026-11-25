@@ -1,0 +1,44 @@
+{
+  "id": "palisades",
+  "name": "Palisades Tahoe",
+  "south": 39.17,
+  "north": 39.218,
+  "west": -120.305,
+  "east": -120.198,
+  "zMinFt": 5800.032993999999,
+  "zMaxFt": 9246.555414,
+  "pointStride": 8,
+  "headerBytes": 40,
+  "lods": {
+    "0": {
+      "file": "palisades-lod0.bin",
+      "count": 200000,
+      "bytes": 1600040
+    },
+    "1": {
+      "file": "palisades-lod1.bin",
+      "count": 250000,
+      "bytes": 2000040
+    }
+  },
+  "sources": [
+    {
+      "name": "CA_PlacerCo_2012",
+      "year": 2012,
+      "url": "https://s3-us-west-2.amazonaws.com/usgs-lidar-public/CA_PlacerCo_2012/ept.json"
+    },
+    {
+      "name": "CA_SierraNevada_5_2022",
+      "year": 2022,
+      "url": "https://s3-us-west-2.amazonaws.com/usgs-lidar-public/CA_SierraNevada_5_2022/ept.json"
+    },
+    {
+      "name": "USGS_LPC_CA_NoCAL_Wildfires_B1_2018",
+      "year": 2018,
+      "url": "https://s3-us-west-2.amazonaws.com/usgs-lidar-public/USGS_LPC_CA_NoCAL_Wildfires_B1_2018/ept.json"
+    }
+  ],
+  "attribution": "USGS 3DEP lidar",
+  "snowFree": true,
+  "note": "3DEP lidar flights are mostly snow-free, so this cloud is the ground and trees, not the snowpack."
+}

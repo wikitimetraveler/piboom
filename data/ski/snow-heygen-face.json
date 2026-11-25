@@ -1,0 +1,12 @@
+{
+  "name": "Snow",
+  "avatarFile": "AVATAR-SNOW.md",
+  "avatarId": "ea054b4f27033a0a66c74a727ff2b506",
+  "groupId": "ea054b4f27033a0a66c74a727ff2b506",
+  "voiceId": "9cc364c4dadc444b87b4230e1923b151",
+  "voiceName": "Keeva - Bright & Sparky",
+  "greeting": "Hey, I'm Snow. Fountain Valley to first chair. Ask Ridge for the weather and the drive, and ask Apex which run fits your board.",
+  "status": "heygen-ready-with-video",
+  "clip": "/ski/snow-greeting.mp4",
+  "generatedAt": "2026-11-25T03:43:20.025Z"
+}

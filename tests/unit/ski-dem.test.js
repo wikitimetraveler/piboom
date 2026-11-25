@@ -21,6 +21,9 @@ const MAMMOTH_SUMMIT = { lat: 37.6308, lng: -119.0326 };
 const JUNE_LODGE = { lat: 37.7685, lng: -119.0905 };
 const BALDY_BASE = { lat: 34.2706, lng: -117.6215 };
 const BALDY_NOTCH = { lat: 34.2741, lng: -117.6104 };
+const PALISADES_BASE = { lat: 39.1969, lng: -120.2356 };
+const PALISADES_SUMMIT = { lat: 39.1983, lng: -120.2871 };
+const ALPINE_MEADOWS = { lat: 39.165, lng: -120.237 };
 
 describe('ski DEM', () => {
   test('Wrightwood DEM covers Mountain High only — not Fountain Valley', () => {
@@ -53,6 +56,14 @@ describe('ski DEM', () => {
     expect(pointInDemBounds(mammoth, JUNE_LODGE.lat, JUNE_LODGE.lng)).toBe(false);
     expect(pointInDemBounds(june, JUNE_LODGE.lat, JUNE_LODGE.lng)).toBe(true);
     expect(pointInDemBounds(june, MAMMOTH_LODGE.lat, MAMMOTH_LODGE.lng)).toBe(false);
+  });
+
+  test('Palisades DEM covers Olympic Valley and Granite Chief — not Alpine Meadows', () => {
+    const spec = SKI_DEM_SPECS.find((s) => s.id === 'palisades');
+    expect(pointInDemBounds(spec, PALISADES_BASE.lat, PALISADES_BASE.lng)).toBe(true);
+    expect(pointInDemBounds(spec, PALISADES_SUMMIT.lat, PALISADES_SUMMIT.lng)).toBe(true);
+    expect(pointInDemBounds(spec, ALPINE_MEADOWS.lat, ALPINE_MEADOWS.lng)).toBe(false);
+    expect(pointInDemBounds(spec, FOUNTAIN_VALLEY.lat, FOUNTAIN_VALLEY.lng)).toBe(false);
   });
 
   test('Mt. Baldy DEM covers the base and the Notch — not Mountain High or Fountain Valley', () => {
@@ -134,5 +145,8 @@ describe('ski DEM', () => {
     const mb = loadDem('mt-baldy');
     expect(interpolateDem(mb, BALDY_BASE.lat, BALDY_BASE.lng)).toBeGreaterThan(6000);
     expect(interpolateDem(mb, BALDY_NOTCH.lat, BALDY_NOTCH.lng)).toBeGreaterThan(7500);
+    const pal = loadDem('palisades');
+    expect(interpolateDem(pal, PALISADES_BASE.lat, PALISADES_BASE.lng)).toBeGreaterThan(6000);
+    expect(interpolateDem(pal, PALISADES_SUMMIT.lat, PALISADES_SUMMIT.lng)).toBeGreaterThan(8500);
   });
 });

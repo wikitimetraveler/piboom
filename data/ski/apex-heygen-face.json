@@ -6,5 +6,7 @@
   "voiceId": "96b762a3f37e44a78f3faf4d3490f96a",
   "voiceName": "Neville - Warm & Easygoing",
   "greeting": "Apex here. Point me at a run and I'll tell you if it's a cruiser or a race line.",
-  "status": "heygen-ready"
+  "status": "heygen-ready-with-video",
+  "clip": "/ski/apex-greeting.mp4",
+  "generatedAt": "2026-11-25T03:43:26.340Z"
 }

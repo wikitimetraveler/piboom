@@ -151,8 +151,10 @@ export async function fetchLiveStopsForRoute(routeId, fetchFn = fetch) {
 export async function getStops({ route, kind, fetchFn = fetch } = {}) {
   const seed = await loadOnTheWaySeed();
   const live = route ? await fetchLiveStopsForRoute(route, fetchFn) : [];
-  const merged = mergeStops(seed, live);
-  return filterStops(merged, { route, kind });
+  // The same restaurant can be seeded on two drives. Dedupe inside one route so the other drive's copy survives.
+  const scoped = route ? filterStops(seed, { route }) : seed;
+  const merged = mergeStops(scoped, live);
+  return filterStops(merged, { kind });
 }
 
 export default {

@@ -7,6 +7,7 @@ const CHIPS = [
   { id: 'thrift', label: 'Thrift' },
   { id: 'pizza', label: 'Pizza' },
   { id: 'aw', label: 'A&W' },
+  { id: 'in-n-out', label: 'In-N-Out' },
   { id: 'scenic', label: 'Scenic' },
 ];
 

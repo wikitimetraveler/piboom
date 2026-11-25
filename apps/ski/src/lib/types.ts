@@ -1,6 +1,6 @@
 export type GoScore = 'go' | 'caution' | 'no-go';
 
-export type StopKind = 'thrift' | 'pizza' | 'aw' | 'viewpoint' | 'town' | 'food' | 'lake' | 'hike' | 'history';
+export type StopKind = 'thrift' | 'pizza' | 'aw' | 'in-n-out' | 'viewpoint' | 'town' | 'food' | 'lake' | 'hike' | 'history';
 
 export interface WeatherSnap {
   tempF?: number | null;
@@ -40,8 +40,8 @@ export interface DestinationBrief {
   id: string;
   name: string;
   area: string;
-  route: 'mt-baldy' | 'wrightwood' | 'big-bear' | 'eastern-sierra';
-  dem: 'mt-baldy' | 'wrightwood' | 'big-bear' | 'snow-valley' | 'mammoth' | 'june';
+  route: 'mt-baldy' | 'wrightwood' | 'big-bear' | 'eastern-sierra' | 'lake-tahoe';
+  dem: 'mt-baldy' | 'wrightwood' | 'big-bear' | 'snow-valley' | 'mammoth' | 'june' | 'palisades';
   lat: number;
   lng: number;
   summitLat?: number;
