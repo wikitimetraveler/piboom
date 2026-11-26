@@ -309,6 +309,151 @@ function extractImagesFromXml(doc) {
   return images;
 }
 
+/** UAD 3.6 ImageCategoryType values used on the photo desk. */
+export const UAD_IMAGE_CATEGORIES = [
+  { id: 'PropertyPhoto', section: 'Subject' },
+  { id: 'DwellingFront', section: 'Subject' },
+  { id: 'PropertyAccess', section: 'Subject' },
+  { id: 'DwellingRear', section: 'Dwelling exterior' },
+  { id: 'DwellingExteriorExhibit', section: 'Dwelling exterior' },
+  { id: 'NoncontinuousArea', section: 'Dwelling exterior' },
+  { id: 'ManufacturedHomeExhibit', section: 'Dwelling exterior' },
+  { id: 'ManufacturedHomeHUDDataPlate', section: 'Dwelling exterior' },
+  { id: 'ManufacturedHomeHUDCertificationLabel', section: 'Dwelling exterior' },
+  { id: 'ManufacturedHomeFinancingProgramEligibilityCertification', section: 'Dwelling exterior' },
+  { id: 'UnitInteriorExhibit', section: 'Unit interior' },
+  { id: 'View', section: 'Site' },
+  { id: 'SiteExhibit', section: 'Site' },
+  { id: 'SiteInfluence', section: 'Site' },
+  { id: 'SiteCharacteristic', section: 'Site' },
+  { id: 'Encroachment', section: 'Site' },
+  { id: 'PropertyBoundaries', section: 'Site' },
+  { id: 'PermanentWaterfrontFeature', section: 'Site' },
+  { id: 'LegalDescription', section: 'Site' },
+  { id: 'VehicleStorageExhibit', section: 'Site' },
+  { id: 'OutbuildingExhibit', section: 'Site' },
+  { id: 'SubjectPropertyAmenitiesExhibit', section: 'Site' },
+  { id: 'SalesComparableMap', section: 'Maps and exhibits' },
+  { id: 'LandComparableMap', section: 'Maps and exhibits' },
+  { id: 'RentalComparableMap', section: 'Maps and exhibits' },
+  { id: 'PriceTrendGraph', section: 'Maps and exhibits' },
+  { id: 'AbsorptionRateGraph', section: 'Maps and exhibits' },
+  { id: 'MedianDaysOnMarketGraph', section: 'Maps and exhibits' },
+  { id: 'PercentOfDistressedSalesGraph', section: 'Maps and exhibits' },
+  { id: 'YearBuiltOfSalesGraph', section: 'Maps and exhibits' },
+  { id: 'SalesComparisonApproachExhibit', section: 'Maps and exhibits' },
+  { id: 'MarketAnalysisExhibit', section: 'Maps and exhibits' },
+  { id: 'SubjectPropertyExhibit', section: 'Maps and exhibits' },
+  { id: 'SupplementalExhibit', section: 'Maps and exhibits' },
+  { id: 'AssignmentExhibit', section: 'Maps and exhibits' },
+  { id: 'CostApproachExhibit', section: 'Maps and exhibits' },
+  { id: 'IncomeApproachExhibit', section: 'Maps and exhibits' },
+  { id: 'ReconciliationExhibit', section: 'Maps and exhibits' },
+  { id: 'RentalInformationExhibit', section: 'Maps and exhibits' },
+  { id: 'SalesContractExhibit', section: 'Maps and exhibits' },
+  { id: 'SubjectListingExhibit', section: 'Maps and exhibits' },
+  { id: 'PriorSaleAndTransferHistoryExhibit', section: 'Maps and exhibits' },
+  { id: 'DisasterMitigationExhibit', section: 'Maps and exhibits' },
+  { id: 'EnergyEfficientAndGreenFeaturesExhibit', section: 'Maps and exhibits' },
+  { id: 'FunctionalObsolescenceExhibit', section: 'Maps and exhibits' },
+  { id: 'HighestAndBestUseExhibit', section: 'Maps and exhibits' },
+  { id: 'ProjectAmenity', section: 'Maps and exhibits' },
+  { id: 'ProjectDeficiency', section: 'Maps and exhibits' },
+  { id: 'ProjectExhibit', section: 'Maps and exhibits' },
+  { id: 'ValuationCompletionExhibit', section: 'Maps and exhibits' },
+];
+
+const UAD_BY_KEY = new Map(
+  UAD_IMAGE_CATEGORIES.map((row) => [row.id.toLowerCase(), row.id])
+);
+
+const ROOM_TO_UAD = {
+  kitchen: 'UnitInteriorExhibit',
+  bathroom: 'UnitInteriorExhibit',
+  fullbathroom: 'UnitInteriorExhibit',
+  halfbathroom: 'UnitInteriorExhibit',
+  bedroom: 'UnitInteriorExhibit',
+  livingroom: 'UnitInteriorExhibit',
+  diningroom: 'UnitInteriorExhibit',
+  den: 'UnitInteriorExhibit',
+  laundryroom: 'UnitInteriorExhibit',
+};
+
+function alphaKey(value) {
+  return String(value || '').toLowerCase().replace(/[^a-z]/g, '');
+}
+
+/**
+ * Resolve a photo to a UAD 3.6 ImageCategoryType.
+ * Room photos often omit ImageCategoryType; the room container is the category.
+ */
+export function photoUadCategory(img) {
+  const catKey = alphaKey(img?.category);
+  if (UAD_BY_KEY.has(catKey)) return UAD_BY_KEY.get(catKey);
+  if (ROOM_TO_UAD[catKey]) return ROOM_TO_UAD[catKey];
+  const roomKey = alphaKey(img?.roomType);
+  if (ROOM_TO_UAD[roomKey]) return ROOM_TO_UAD[roomKey];
+  const name = String(img?.location || img?.zipPath || img?.name || '').toLowerCase();
+  const section = String(img?.section || '').toLowerCase();
+  if (section === 'car storage' || /vehiclestorage|garage/.test(name)) return 'VehicleStorageExhibit';
+  if (/deck|patio|porch/.test(name)) return 'SubjectPropertyAmenitiesExhibit';
+  if (/comparablemap|compmap|salesmap/.test(name)) return 'SalesComparableMap';
+  if (/pricetrend/.test(name)) return 'PriceTrendGraph';
+  if (/propertyaccess/.test(name)) return 'PropertyAccess';
+  if (/dwellingfront/.test(name)) return 'DwellingFront';
+  if (/comp\d/.test(name)) return 'PropertyPhoto';
+  return '';
+}
+
+export function photoDeskGroup(img) {
+  return photoUadCategory(img) || 'Uncategorized';
+}
+
+function attrValue(el, name) {
+  if (!el || typeof el.getAttribute !== 'function') return '';
+  return el.getAttribute(name) || '';
+}
+
+function numberOrNull(value) {
+  if (value == null || value === '') return null;
+  const n = Number(String(value).replace(/,/g, ''));
+  return Number.isFinite(n) ? n : null;
+}
+
+function extractSales(doc) {
+  const rows = [];
+  for (const prop of collectByLocalName(doc, 'PROPERTY')) {
+    const role = attrValue(prop, 'ValuationUseType');
+    if (role !== 'SubjectProperty' && role !== 'SalesComparable') continue;
+    const address = extractAddress(prop);
+    const ordinal = numberOrNull(firstTextByLocalName(prop, 'PropertyOrdinalNumber'));
+    const label =
+      role === 'SubjectProperty'
+        ? 'Subject'
+        : `Comp ${ordinal || rows.filter((r) => r.role === 'SalesComparable').length + 1}`;
+    rows.push({
+      role,
+      label,
+      ordinal,
+      address: address.formatted || '',
+      addressLine: address.addressLine || '',
+      city: address.city || '',
+      state: address.state || '',
+      postalCode: address.postalCode || '',
+      latitude: numberOrNull(firstTextByLocalName(prop, 'LatitudeIdentifier')),
+      longitude: numberOrNull(firstTextByLocalName(prop, 'LongitudeIdentifier')),
+      salePrice: numberOrNull(firstTextByLocalName(prop, 'OwnershipTransferTransactionAmount')),
+      adjustedPrice: numberOrNull(firstTextByLocalName(prop, 'AdjustedSalesPriceAmount')),
+      saleDate: firstTextByLocalName(prop, 'OwnershipTransferDate') || '',
+    });
+  }
+  rows.sort((a, b) => {
+    if (a.role !== b.role) return a.role === 'SubjectProperty' ? -1 : 1;
+    return (a.ordinal || 0) - (b.ordinal || 0);
+  });
+  return rows;
+}
+
 function extractSummaryFields(doc) {
   const documentType =
     firstTextByLocalName(doc, 'DocumentType')
@@ -348,6 +493,7 @@ function extractSummaryFields(doc) {
     appraiserName,
     pdfReference,
     xmlImages,
+    sales: extractSales(doc),
   };
 }
 
@@ -378,6 +524,8 @@ function matchImages(xmlImages, zipImages) {
       levelType: ref.levelType || '',
       section: ref.section || '',
       displayTitle: ref.displayTitle || ref.caption || ref.category || ref.base,
+      uadCategory: photoUadCategory(ref),
+      group: photoDeskGroup(ref),
       base: ref.base,
     };
     if (hit) {
@@ -450,6 +598,8 @@ async function writeSessionAssets({ pdf, images, matched }) {
       levelType: m.levelType || '',
       section: m.section || '',
       displayTitle: m.displayTitle || m.caption || m.category || safeName,
+      uadCategory: m.uadCategory || photoUadCategory(m),
+      group: m.group || photoDeskGroup(m),
       location: m.location,
       url: `/api/ead/assets/${sessionId}/${encodeURIComponent(safeName)}`,
       zipPath: zipImg.name,
@@ -512,6 +662,7 @@ export async function parseEadAppraisalZip(buffer, opts = {}) {
   }
 
   let summary = null;
+  let sales = [];
   let matchedImages = [];
   let xmlParseOk = false;
 
@@ -608,6 +759,7 @@ export async function parseEadAppraisalZip(buffer, opts = {}) {
         imageCount: images.length,
         referencedImageCount: fields.xmlImages.length,
       };
+      sales = fields.sales || [];
     }
   }
 
@@ -640,6 +792,7 @@ export async function parseEadAppraisalZip(buffer, opts = {}) {
     originalName: opts.originalName || null,
     findings,
     summary,
+    sales,
     sessionId,
     pdf: pdfAsset,
     images: imageAssets,
@@ -785,6 +938,47 @@ export function buildSyntheticEadZip({
       </DEALS>
     </DEAL_SET>
   </DEAL_SETS>
+  <PROPERTY ValuationUseType="SubjectProperty">
+    <ADDRESS>
+      <AddressLineText>12345 Holiday Hwy</AddressLineText>
+      <CityName>Surfside</CityName>
+      <StateCode>HI</StateCode>
+      <PostalCode>12345</PostalCode>
+    </ADDRESS>
+    <LOCATION_IDENTIFIER>
+      <GEOSPATIAL_INFORMATION>
+        <LatitudeIdentifier>21.2800</LatitudeIdentifier>
+        <LongitudeIdentifier>-157.8200</LongitudeIdentifier>
+      </GEOSPATIAL_INFORMATION>
+    </LOCATION_IDENTIFIER>
+  </PROPERTY>
+  <PROPERTY ValuationUseType="SalesComparable">
+    <ADDRESS>
+      <AddressLineText>10 Comp St</AddressLineText>
+      <CityName>Surfside</CityName>
+      <StateCode>HI</StateCode>
+      <PostalCode>12345</PostalCode>
+    </ADDRESS>
+    <LOCATION_IDENTIFIER>
+      <GEOSPATIAL_INFORMATION>
+        <LatitudeIdentifier>21.2810</LatitudeIdentifier>
+        <LongitudeIdentifier>-157.8210</LongitudeIdentifier>
+      </GEOSPATIAL_INFORMATION>
+    </LOCATION_IDENTIFIER>
+    <COMPARABLE>
+      <COMPARABLE_DETAIL>
+        <AdjustedSalesPriceAmount>200000</AdjustedSalesPriceAmount>
+        <PropertyOrdinalNumber>1</PropertyOrdinalNumber>
+      </COMPARABLE_DETAIL>
+    </COMPARABLE>
+    <SALES_HISTORIES>
+      <SALES_HISTORY>
+        <OwnershipTransferDate>2019-01-15</OwnershipTransferDate>
+        <OwnershipTransferTransactionAmount>190000</OwnershipTransferTransactionAmount>
+        <OwnershipTransferTransactionType>Sale</OwnershipTransferTransactionType>
+      </SALES_HISTORY>
+    </SALES_HISTORIES>
+  </PROPERTY>
 </MESSAGE>
 `;
 

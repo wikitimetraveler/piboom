@@ -10,6 +10,7 @@ import {
   eadMeta,
   listEadSamplesHandler,
   parseEadSampleHandler,
+  chatEadExpertHandler,
 } from '../controllers/ead.controller.js';
 import { MAX_ZIP_BYTES } from '../services/ead-appraisal.service.js';
 
@@ -30,6 +31,7 @@ const upload = multer({
 
 router.get('/meta', eadMeta);
 router.get('/samples', listEadSamplesHandler);
+router.post('/assistant/chat', chatEadExpertHandler);
 router.post('/samples/:id/parse', parseEadSampleHandler);
 router.get('/assets/:sessionId/:name', getEadAsset);
 router.post('/parse', (req, res, next) => {

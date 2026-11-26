@@ -8,7 +8,14 @@ import {
   listEadSamples,
   parseEadSample,
   MAX_ZIP_BYTES,
+  UAD_IMAGE_CATEGORIES,
 } from '../services/ead-appraisal.service.js';
+import {
+  chatEadExpert,
+  EXPERT_TITLE,
+  APPRAISAL_SKILLS,
+  UNDERWRITING_SKILLS,
+} from '../services/ead-assistant.service.js';
 
 export async function parseEadZip(req, res) {
   try {
@@ -64,6 +71,10 @@ export function eadMeta(_req, res) {
     maxMb: Math.round(MAX_ZIP_BYTES / (1024 * 1024)),
     accept: ['.zip'],
     documentTypes: ['AppraisalReport', 'ValuationUpdate', 'ValuationCompletion'],
+    imageCategories: UAD_IMAGE_CATEGORIES,
+    expertTitle: EXPERT_TITLE,
+    appraisalSkills: APPRAISAL_SKILLS,
+    underwritingSkills: UNDERWRITING_SKILLS,
   });
 }
 
@@ -81,6 +92,34 @@ export async function listEadSamplesHandler(_req, res) {
     return res.status(500).json({
       success: false,
       error: err.message || 'Failed to list samples',
+    });
+  }
+}
+
+export async function chatEadExpertHandler(req, res) {
+  try {
+    const message = req.body?.message;
+    if (!message || !String(message).trim()) {
+      return res.status(400).json({ success: false, error: 'Message is required' });
+    }
+    const result = await chatEadExpert({
+      message,
+      history: Array.isArray(req.body?.history) ? req.body.history : [],
+      package: req.body?.package || null,
+      userId: req.body?.userId || req.headers['x-user-id'] || 'ead-guest',
+      sessionId: req.body?.sessionId || 'ead-desk',
+    });
+    return res.json({
+      success: true,
+      reply: result.reply,
+      title: result.title || EXPERT_TITLE,
+    });
+  } catch (err) {
+    const status = err?.code === 'OPENAI_NOT_CONFIGURED' ? 503 : 500;
+    return res.status(status).json({
+      success: false,
+      error: err.message || 'Expert chat failed',
+      code: err.code || 'CHAT_FAILED',
     });
   }
 }

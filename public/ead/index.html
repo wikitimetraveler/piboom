@@ -24,8 +24,8 @@
     <modern-navbar></modern-navbar>
 
     <main class="container py-4 ead-shell">
-      <p class="mb-3">
-        <a href="/open/" class="ead-back"><i class="bi-arrow-left"></i> Open Lender Suite</a>
+      <p class="ead-back-row">
+        <a href="/open/" class="ead-back"><i class="bi-arrow-left" aria-hidden="true"></i> Open Lender Suite</a>
       </p>
 
       <header class="ead-hero">
@@ -39,14 +39,14 @@
 
       <div id="eadStatus" class="ead-status" role="status" aria-live="polite"></div>
 
-      <section class="ead-panel" aria-labelledby="eadUploadHeading">
+      <section class="ead-panel ead-panel-intake" aria-labelledby="eadUploadHeading">
         <div class="ead-panel-head">
-          <h2 id="eadUploadHeading"><i class="bi-file-earmark-zip me-2"></i>Upload package</h2>
+          <h2 id="eadUploadHeading"><i class="bi-file-earmark-zip" aria-hidden="true"></i>Upload package</h2>
           <span class="ead-panel-meta" id="eadLimitsMeta">One .zip · up to 60 MB · XML + PDF + Images/</span>
         </div>
 
-        <div class="ead-sample-row mb-3" id="eadSampleRow">
-          <label for="eadSampleSelect" class="form-label small text-muted mb-1">GSE Appendix D-1 scenario</label>
+        <div class="ead-sample-row" id="eadSampleRow">
+          <label for="eadSampleSelect" class="ead-field-label">GSE Appendix D-1 scenario</label>
           <div class="d-flex flex-wrap gap-2 align-items-stretch">
             <select id="eadSampleSelect" class="form-select ead-sample-select" disabled>
               <option value="">Loading samples…</option>
@@ -55,7 +55,7 @@
               <i class="bi-play-fill me-1"></i>Load scenario
             </button>
           </div>
-          <p class="small text-muted mt-2 mb-0" id="eadSampleHint">
+          <p class="ead-hint" id="eadSampleHint">
             Samples load from <code>fixtures/ead/appendix-d-1/</code>. Prefer SF5 for a typical single-family.
           </p>
         </div>
@@ -69,10 +69,11 @@
         >
           <i class="bi-cloud-arrow-up ead-drop-icon" aria-hidden="true"></i>
           <p class="ead-drop-title">Drop UAD 3.6 ZIP here</p>
-          <p class="ead-drop-hint">or click to browse — or pick a scenario above</p>
-          <input type="file" id="eadFileInput" class="d-none" accept=".zip,application/zip" />
+          <p class="ead-drop-hint">or use the button — the file picker opens from a click on this box too</p>
+          <button type="button" class="btn btn-outline-primary btn-sm mt-3" id="eadBrowseBtn">Browse ZIP</button>
         </div>
-        <p class="small text-muted mt-3 mb-0">
+        <input type="file" id="eadFileInput" class="ead-file-input" accept=".zip,application/zip" tabindex="-1" />
+        <p class="ead-hint ead-hint-links">
           Sample packages:
           <a
             href="https://sf.freddiemac.com/docs/zip/requirements/appendix-d-1-urar-sample-scenarios-and-xml-files.zip"
@@ -88,34 +89,82 @@
         </p>
       </section>
 
-      <div id="eadResults" hidden>
-        <section class="ead-panel mt-4" aria-labelledby="eadSummaryHeading">
+      <div id="eadResults" class="ead-results" hidden>
+        <section class="ead-panel ead-panel-ledger" aria-labelledby="eadSummaryHeading">
           <div class="ead-panel-head">
-            <h2 id="eadSummaryHeading"><i class="bi-card-checklist me-2"></i>Summary</h2>
+            <h2 id="eadSummaryHeading"><i class="bi-card-checklist" aria-hidden="true"></i>Summary</h2>
           </div>
           <div id="eadSummary"></div>
         </section>
 
-        <section class="ead-panel mt-4" aria-labelledby="eadFindingsHeading">
+        <section class="ead-panel ead-panel-findings" aria-labelledby="eadFindingsHeading">
           <div class="ead-panel-head">
-            <h2 id="eadFindingsHeading"><i class="bi-shield-exclamation me-2"></i>Validation</h2>
+            <h2 id="eadFindingsHeading"><i class="bi-shield-exclamation" aria-hidden="true"></i>Validation</h2>
           </div>
           <p id="eadFindingsEmpty" class="ead-empty">No system findings.</p>
           <ul id="eadFindings" class="ead-findings" hidden></ul>
         </section>
 
-        <section class="ead-panel mt-4" aria-labelledby="eadPhotosHeading">
+        <section class="ead-panel ead-panel-photos" aria-labelledby="eadPhotosHeading">
           <div class="ead-panel-head">
-            <h2 id="eadPhotosHeading"><i class="bi-images me-2"></i>Photos</h2>
-            <span class="ead-panel-meta">Click a card to flip · notes save in this browser</span>
+            <h2 id="eadPhotosHeading"><i class="bi-images" aria-hidden="true"></i>Photos</h2>
+            <span class="ead-panel-meta">Flip a card to set its UAD category or edit a note</span>
           </div>
+          <div id="eadPhotoFilters" class="ead-photo-filters" role="toolbar" aria-label="Filter photos by UAD category" hidden></div>
           <p id="eadPhotosEmpty" class="ead-empty">No images extracted.</p>
           <div id="eadPhotos" class="ead-photos" hidden></div>
         </section>
 
-        <section class="ead-panel mt-4" aria-labelledby="eadPdfHeading">
+        <section class="ead-panel mt-4" aria-labelledby="eadSalesHeading">
           <div class="ead-panel-head">
-            <h2 id="eadPdfHeading"><i class="bi-file-earmark-pdf me-2"></i>Appraisal PDF</h2>
+            <h2 id="eadSalesHeading"><i class="bi-map me-2"></i>Sales choropleth</h2>
+            <span class="ead-panel-meta">Subject and comps colored by sale price</span>
+          </div>
+          <div id="eadSalesLegend" class="ead-sales-legend" hidden></div>
+          <div class="ead-sales-layout">
+            <div id="eadSalesMap" class="ead-sales-map" role="region" aria-label="Comparable sales map"></div>
+            <ul id="eadSalesList" class="ead-sales-list"></ul>
+          </div>
+          <p id="eadSalesEmpty" class="ead-empty">No subject or comparable coordinates in this package.</p>
+        </section>
+
+        <section class="ead-panel mt-4" aria-labelledby="eadExpertHeading">
+          <div class="ead-panel-head">
+            <h2 id="eadExpertHeading">Dave</h2>
+            <span class="ead-panel-meta">Appraisal and underwriting reviewer</span>
+          </div>
+          <div class="ead-expert-layout">
+            <aside class="ead-levi" aria-label="Dave">
+              <div class="ead-levi-stage" id="eadLeviMedia">
+                <img src="/family/assets/DavidELane.png" alt="Dave" width="220" height="293" />
+              </div>
+              <p class="ead-levi-role">HeyGen · Dave</p>
+              <button type="button" class="btn btn-sm btn-outline-primary" id="eadLeviToggle">Bring Dave on</button>
+              <p id="eadLeviStatus" class="ead-levi-status"></p>
+            </aside>
+            <div class="ead-expert-main">
+          <p class="ead-expert-note">
+            One reviewer for the appraisal read and the underwriting read. Decision support only. Not a credit decision and not a new appraised value.
+          </p>
+          <div id="eadExpertSkills" class="ead-expert-skills"></div>
+          <div id="eadExpertPrompts" class="ead-photo-filters mb-2">
+            <button type="button" class="ead-photo-chip" data-expert-prompt="Which required UAD photos are still missing?">Photo coverage</button>
+            <button type="button" class="ead-photo-chip" data-expert-prompt="Do the comparable sales support the opinion of value?">Value support</button>
+            <button type="button" class="ead-photo-chip" data-expert-prompt="What underwriting conditions would you write for this package?">Conditions</button>
+          </div>
+          <div id="eadExpertLog" class="ead-expert-log" aria-live="polite"></div>
+          <form id="eadExpertForm" class="ead-expert-form">
+            <label class="visually-hidden" for="eadExpertInput">Ask the desk expert</label>
+            <textarea id="eadExpertInput" rows="2" placeholder="Ask about photo coverage, comps, or what underwriting still needs…"></textarea>
+            <button type="submit" class="btn btn-primary" id="eadExpertSend">Ask Dave</button>
+          </form>
+            </div>
+          </div>
+        </section>
+
+        <section class="ead-panel ead-panel-pdf" aria-labelledby="eadPdfHeading">
+          <div class="ead-panel-head">
+            <h2 id="eadPdfHeading"><i class="bi-file-earmark-pdf" aria-hidden="true"></i>Appraisal PDF</h2>
             <a id="eadPdfLink" class="btn btn-sm btn-outline-secondary" href="#" target="_blank" rel="noopener" hidden
               >Open PDF</a
             >
@@ -126,6 +175,9 @@
       </div>
     </main>
 
+    <script src="/shared/js/heygen-live-tile.js" defer></script>
+    <script src="/family/js/lane-family-google-maps.js" defer></script>
+    <script src="/shared/google-advanced-markers.js" defer></script>
     <script src="/ead/js/ead.js" defer></script>
   </body>
 </html>

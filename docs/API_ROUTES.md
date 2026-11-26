@@ -57,6 +57,7 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | GET | `/api/ead/samples` | List local GSE Appendix D-1 scenario ZIPs under `fixtures/ead/appendix-d-1/` |
 | POST | `/api/ead/samples/:id/parse` | Parse a local sample by id (e.g. `sf5`, `condo1`) |
 | POST | `/api/ead/parse` | Parse a UAD 3.6 / FHA EAD appraisal ZIP (multipart `file`) → summary, images, PDF URL, SYS* findings |
+| POST | `/api/ead/assistant/chat` | Appraisal and underwriting reviewer for the loaded package (decision support; no credit decision or new value) |
 | GET | `/api/ead/assets/:sessionId/:name` | Short-lived PDF/image from the last parse session |
 | POST | `/api/unit-tests/files` | Upload unit test Excel to library |
 | GET | `/api/unit-tests/files` | List stored unit test files |

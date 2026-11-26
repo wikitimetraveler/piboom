@@ -42,7 +42,15 @@ describe('ead-appraisal.service', () => {
     expect(result.images).toHaveLength(2);
     expect(result.images[0].caption).toMatch(/front/i);
     expect(result.images[0].category).toMatch(/DwellingFront/i);
+    expect(result.images[0].group).toBe('DwellingFront');
+    expect(result.images[0].uadCategory).toBe('DwellingFront');
+    expect(result.images[1].category).toMatch(/Kitchen/i);
+    expect(result.images[1].group).toBe('UnitInteriorExhibit');
     expect(result.images[0].displayTitle).toMatch(/front/i);
+    expect(result.sales.map((row) => row.role)).toEqual(['SubjectProperty', 'SalesComparable']);
+    expect(result.sales[1].salePrice).toBe(190000);
+    expect(result.sales[1].adjustedPrice).toBe(200000);
+    expect(result.sales[0].latitude).toBeCloseTo(21.28, 2);
     expect(result.pdf).toBeTruthy();
     expect(result.sessionId).toBeTruthy();
 
